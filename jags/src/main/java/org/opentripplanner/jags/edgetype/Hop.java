@@ -1,6 +1,7 @@
 package org.opentripplanner.jags.edgetype;
 
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
@@ -12,7 +13,7 @@ import org.opentripplanner.jags.gtfs.StopTime;
 import org.opentripplanner.jags.gtfs.exception.DateOutOfBoundsException;
 
 
-public class Hop extends AbstractPayload implements Comparable<Hop> {
+public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	
 	public static class HopArrivalTimeComparator implements Comparator<Hop> {
 
@@ -105,6 +106,19 @@ public class Hop extends AbstractPayload implements Comparable<Hop> {
 	
 	public String toString() {
 		return this.start + " " + this.end + " " + this.calendar;
+	}
+
+	public ArrayList<Point> getGeometry() {
+		ArrayList<Point> ret = new ArrayList<Point>();
+		
+		ret.add( new Point(this.start.getStop().stop_lon.floatValue(),
+				           this.start.getStop().stop_lat.floatValue(),
+				           this.start.departure_time.getSecondsSinceMidnight()) );
+		ret.add( new Point(this.end.getStop().stop_lon.floatValue(),
+				           this.end.getStop().stop_lat.floatValue(),
+				           this.end.arrival_time.getSecondsSinceMidnight()) );
+		
+		return ret;
 	}
 	
 }

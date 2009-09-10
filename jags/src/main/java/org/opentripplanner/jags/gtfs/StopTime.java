@@ -19,7 +19,8 @@ public class StopTime extends Record implements Comparable<StopTime> {
 	public Integer drop_off_type;
 	public Double shape_dist_traveled;
 	
-	Trip trip;
+	Trip trip=null;
+	Stop stop=null;
 	
 	StopTime(Table stops, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
@@ -29,7 +30,17 @@ public class StopTime extends Record implements Comparable<StopTime> {
 	}
 	
 	public Trip getTrip() {
-		return table.feed.trips.get( trip_id );
+		if(trip==null) {
+		    trip = table.feed.trips.get( trip_id );
+		}
+		return trip;
+	}
+	
+	public Stop getStop() {
+		if(stop==null) {
+			stop = table.feed.stops.get( stop_id );
+		}
+		return stop;
 	}
 
 	public String toString() {
