@@ -1,0 +1,12 @@
+--== OVERVIEW ==--
+
+OpenTripPlanner is an open source multi-modal trip planner. For more
+information, see the project website: http://opentripplanner.org
+
+--== FILES ==--
+
+The jags directory contains the routine engine for the OpenTripPlanner
+project.
+
+
+
