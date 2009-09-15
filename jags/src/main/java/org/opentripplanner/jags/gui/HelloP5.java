@@ -92,11 +92,13 @@ public class HelloP5 extends PApplet{
 		smooth();
 		background(255);
 		
-		try {
-			Feed feed = new Feed( "/home/brandon/workspace/jags/bart-archiver_20090826_0242.zip" );
+		try {			
+			Feed feed = new Feed( "../../bart-archiver_20090826_0242.zip" );
 			gg = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
-			hl.load(new LoadDrawHandler());
+			System.out.println( "Loading feed to graph" );
+			hl.load(new LoadDrawHandler(),true);
+			System.out.println( "Done" );
 			
 			//frame(left,start,right,end);
 			

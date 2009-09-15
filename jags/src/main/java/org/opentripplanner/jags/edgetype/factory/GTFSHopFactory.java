@@ -1,6 +1,7 @@
 package org.opentripplanner.jags.edgetype.factory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.gtfs.Feed;
@@ -14,15 +15,23 @@ public class GTFSHopFactory {
 	
 	public GTFSHopFactory(Feed feed) throws Exception {
 		this.feed = feed;
-		this.feed.loadStopTimes();
-		this.feed.loadCalendarDates();
 	}
 	
-	public ArrayList<Hop> run() throws Exception {
+	public ArrayList<Hop> run(boolean verbose) throws Exception {
+		if(verbose){System.out.println("\tLoading stoptimes");}
+		this.feed.loadStopTimes();
+		if(verbose){System.out.println("\tLoading calendar dates");}
+		this.feed.loadCalendarDates();
+		
 		ArrayList<Hop> ret = new ArrayList<Hop>();
 		
 		//Load hops
-		for(Trip trip : feed.getAllTrips() ) {
+		Collection<Trip> trips = feed.getAllTrips();
+		int j=0;
+		int n=trips.size();
+		for(Trip trip : trips ) {
+			j++;
+			if(verbose && j%(n/100)==0){ System.out.println( "Trip "+j+"/"+n ); }
 			ArrayList<StopTime> stoptimes = trip.getStopTimes();
 			for(int i=0; i<stoptimes.size()-1; i++) {
 				StopTime st0 = stoptimes.get(i);
@@ -33,5 +42,9 @@ public class GTFSHopFactory {
 		}
 		
 		return ret;
+	}
+	
+	public ArrayList<Hop> run() throws Exception {
+		return run(false);
 	}
 }
