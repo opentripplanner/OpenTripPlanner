@@ -32,6 +32,21 @@ public class ServiceCalendar extends Record{
 		this.serviceCalendarDates = new HashMap<GTFSDate,ServiceCalendarDate>();
 	}
 	
+	public ServiceCalendar(ServiceCalendarDate scd) {
+		super();
+		this.serviceCalendarDates = new HashMap<GTFSDate,ServiceCalendarDate>();
+		this.monday=new GTFSBoolean("0");
+		this.tuesday=new GTFSBoolean("0");
+		this.wednesday=new GTFSBoolean("0");
+		this.thursday=new GTFSBoolean("0");
+		this.friday=new GTFSBoolean("0");
+		this.saturday=new GTFSBoolean("0");
+		this.sunday=new GTFSBoolean("0");
+		this.start_date=new GTFSDate(1900,1,1);
+		this.end_date=new GTFSDate(2099,1,1);
+		this.addServiceCalendarDate(scd);
+	}
+	
 	public String toString() {
 		return service_id + " " + this.start_date + " " + this.end_date + " ["+this.monday+this.tuesday+this.wednesday+this.thursday+this.friday+this.saturday+this.sunday+"]";
 	}

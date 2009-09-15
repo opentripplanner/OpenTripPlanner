@@ -7,6 +7,9 @@ import java.lang.reflect.InvocationTargetException;
 public class Record {
 	Table table;
 	
+	Record() {
+	}
+	
 	Record(Table table, String[] record) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		this.table = table;
 		

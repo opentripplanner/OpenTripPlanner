@@ -39,8 +39,14 @@ public class Feed {
 		
 		Table table = this.getTable( "calendar_dates" );
 		while( table.hasMoreElements() ) {
-			ServiceCalendarDate cd = new ServiceCalendarDate( table, table.nextElement() );
-			getServiceCalendar( cd.service_id ).addServiceCalendarDate( cd );
+			ServiceCalendarDate scd = new ServiceCalendarDate( table, table.nextElement() );
+			ServiceCalendar sc = getServiceCalendar( scd.service_id );
+			// if a service calendar doesn't exist for this exception, create one
+			if(sc==null) {
+				sc = new ServiceCalendar(scd);
+				serviceCalendars.put(scd.service_id, sc);
+			}
+			sc.addServiceCalendarDate( scd );
 		}
 	}
 	
