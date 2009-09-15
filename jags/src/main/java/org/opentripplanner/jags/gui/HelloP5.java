@@ -59,13 +59,11 @@ public class HelloP5 extends PApplet{
 	float xtrans;
 	float ytrans;
 	
-	void frame(float left,float bottom,float right,float top) {
+	void setTransformation(float left,float bottom,float right,float top) {
 		  xscale = width/(right-left);
 		  yscale = height/(bottom-top);
 		  xtrans = -left;
 		  ytrans = -top;
-		  scale( xscale, yscale );
-		  translate( xtrans, ytrans );
 	}
 	
 	public void drawGeoms() {
@@ -76,9 +74,9 @@ public class HelloP5 extends PApplet{
 				Point p1 = geom.get(i);
 				Point p2 = geom.get(i+1);
 				if(timeMode) {
-				    line(p1.x, p1.z, p2.x, p2.z);
+				    line((p1.x+xtrans)*xscale, (p1.z+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.z+ytrans)*yscale);
 				} else {
-					line(p1.x, p1.y, p2.x, p2.y);
+					line((p1.x+xtrans)*xscale, (p1.y+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.y+ytrans)*yscale);
 				}
 			}
 		}
@@ -86,14 +84,14 @@ public class HelloP5 extends PApplet{
 	}
 
 	public void setup(){
-		size(700, 700);
+		size(700, 700, JAVA2D);
 		stroke(155,0,0);
 
 		smooth();
 		background(255);
 		
 		try {			
-			Feed feed = new Feed( "../../bart-archiver_20090826_0242.zip" );
+			Feed feed = new Feed( "../../caltrain_gtfs.zip" );
 			gg = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
 			System.out.println( "Loading feed to graph" );
@@ -115,27 +113,56 @@ public class HelloP5 extends PApplet{
 
 	public void draw(){
 		if(timeMode) {
-		    frame(left,start,right,end);
+		    setTransformation(left,start,right,end);
 		} else {
-			frame(left,bottom,right,top);
+			setTransformation(left,bottom,right,top);
 		}
 		background(255);
-		strokeWeight(0.001f);
+		strokeWeight(0.1f);
 		drawGeoms();
-		strokeWeight(1);
-		float x1 = 0*xscale+xtrans;
-		float y1 = ytrans-mouseY/yscale;
+		strokeWeight(0.1f);
 		
-		//System.out.println( x1 );
-		//System.out.println( y1 );
-		
-		line(x1,y1,width*xscale+xtrans,mouseY*yscale+ytrans);
+//		if(timeMode) {
+//			//draw a line that represents the time to select
+//			float x1 = -(xtrans-mouseX/xscale);
+//			float y1 = -(ytrans-mouseY/yscale);
+//			
+//			System.out.println( left );
+//			System.out.println( right );
+//			System.out.println( start );
+//			System.out.println( end );
+//			System.out.println( x1 );
+//			System.out.println( y1 );
+//			
+//			line(left,start,right,y1);
+//			
+//			line(left,y1,right,y1);
+//		} else {
+//			//draw a line that represents the time to select
+//			float x1 = -(xtrans-mouseX/xscale);
+//			float y1 = -(ytrans-mouseY/yscale);
+//			
+//			System.out.println( left );
+//			System.out.println( right );
+//			System.out.println( start );
+//			System.out.println( end );
+//			System.out.println( x1 );
+//			System.out.println( y1 );
+//			
+//			line(left,start,right,y1);
+//			
+//			line(left,y1,right,y1);
+//		}
 	}
 	
 	public void keyPressed() {
 		if(this.keyCode==84) {
 			this.timeMode = !this.timeMode;
 		}
+	}
+	
+	public void mousePressed() {
+		System.out.println( "("+mouseX+","+mouseY+")" );
 	}
 
 } 
