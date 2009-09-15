@@ -29,6 +29,8 @@ public class HelloP5 extends PApplet{
 	float right=Integer.MIN_VALUE;
 	float top=Integer.MIN_VALUE;
 	
+	boolean timeMode=true;
+	
 	ArrayList<ArrayList<Point>> geoms = new ArrayList<ArrayList<Point>>();
 	
 	public class LoadDrawHandler implements DrawHandler{
@@ -73,26 +75,30 @@ public class HelloP5 extends PApplet{
 			for(int i=0; i<geom.size()-1; i++) {
 				Point p1 = geom.get(i);
 				Point p2 = geom.get(i+1);
-				line(p1.x, p1.z, p2.x, p2.z);
+				if(timeMode) {
+				    line(p1.x, p1.z, p2.x, p2.z);
+				} else {
+					line(p1.x, p1.y, p2.x, p2.y);
+				}
 			}
 		}
 		//this.popMatrix();
 	}
 
 	public void setup(){
-		size(700, 700, JAVA2D);
+		size(700, 700);
 		stroke(155,0,0);
 
 		smooth();
 		background(255);
 		
 		try {
-			Feed feed = new Feed( "/Users/badhill/Code/graphserver/jags/caltrain_gtfs.zip" );
+			Feed feed = new Feed( "/home/brandon/workspace/jags/bart-archiver_20090826_0242.zip" );
 			gg = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
 			hl.load(new LoadDrawHandler());
 			
-			frame(left,start,right,end);
+			//frame(left,start,right,end);
 			
 			System.out.println( left );
 			System.out.println( start );
@@ -106,7 +112,11 @@ public class HelloP5 extends PApplet{
 	}
 
 	public void draw(){
-		frame(left,start,right,end);
+		if(timeMode) {
+		    frame(left,start,right,end);
+		} else {
+			frame(left,bottom,right,top);
+		}
 		background(255);
 		strokeWeight(0.001f);
 		drawGeoms();
@@ -118,6 +128,12 @@ public class HelloP5 extends PApplet{
 		//System.out.println( y1 );
 		
 		line(x1,y1,width*xscale+xtrans,mouseY*yscale+ytrans);
+	}
+	
+	public void keyPressed() {
+		if(this.keyCode==84) {
+			this.timeMode = !this.timeMode;
+		}
 	}
 
 } 
