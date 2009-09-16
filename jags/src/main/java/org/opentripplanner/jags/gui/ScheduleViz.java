@@ -22,7 +22,7 @@ import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import processing.core.*;
 
-public class HelloP5 extends PApplet{
+public class ScheduleViz extends PApplet{
 
 	private static final long serialVersionUID = -8450606812010850595L;
 	
