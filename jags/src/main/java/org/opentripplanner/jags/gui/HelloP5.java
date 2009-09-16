@@ -2,17 +2,23 @@ package org.opentripplanner.jags.gui;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
+import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Drawable;
 import org.opentripplanner.jags.edgetype.Point;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.gtfs.Feed;
+import org.opentripplanner.jags.spt.SPTEdge;
+import org.opentripplanner.jags.spt.SPTVertex;
+import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import processing.core.*;
 
@@ -21,6 +27,7 @@ public class HelloP5 extends PApplet{
 	private static final long serialVersionUID = -8450606812010850595L;
 	
 	Graph gg = null;
+	ShortestPathTree spt = null;
 	
 	float start=Integer.MAX_VALUE;
 	float end=Integer.MIN_VALUE;
@@ -29,9 +36,11 @@ public class HelloP5 extends PApplet{
 	float right=Integer.MIN_VALUE;
 	float top=Integer.MIN_VALUE;
 	
-	boolean timeMode=true;
+	boolean timeMode=false;
+	float time = 0;
+	Vertex startVertex = null;
 	
-	ArrayList<ArrayList<Point>> geoms = new ArrayList<ArrayList<Point>>();
+	//ArrayList<ArrayList<Point>> geoms = new ArrayList<ArrayList<Point>>();
 	
 	public class LoadDrawHandler implements DrawHandler{
 
@@ -48,9 +57,6 @@ public class HelloP5 extends PApplet{
 				start = min(pp.z,start);
 				end = max(pp.z,end);
 			}
-			
-			// add geom to list of geoms to be drawn
-			geoms.add(geom);
 		}
 	}
 	
@@ -66,21 +72,17 @@ public class HelloP5 extends PApplet{
 		  ytrans = -top;
 	}
 	
-	public void drawGeoms() {
-		//this.pushMatrix();
-		//frame(left,start,right,end);
-		for( ArrayList<Point> geom : geoms ) {
-			for(int i=0; i<geom.size()-1; i++) {
-				Point p1 = geom.get(i);
-				Point p2 = geom.get(i+1);
-				if(timeMode) {
-				    line((p1.x+xtrans)*xscale, (p1.z+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.z+ytrans)*yscale);
-				} else {
-					line((p1.x+xtrans)*xscale, (p1.y+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.y+ytrans)*yscale);
-				}
+	
+	public void drawGeom(ArrayList<Point> geom) {
+		for(int i=0; i<geom.size()-1; i++) {
+			Point p1 = geom.get(i);
+			Point p2 = geom.get(i+1);
+			if(timeMode) {
+			    line((p1.x+xtrans)*xscale, (p1.z+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.z+ytrans)*yscale);
+			} else {
+				line((p1.x+xtrans)*xscale, (p1.y+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.y+ytrans)*yscale);
 			}
 		}
-		//this.popMatrix();
 	}
 
 	public void setup(){
@@ -98,71 +100,86 @@ public class HelloP5 extends PApplet{
 			hl.load(new LoadDrawHandler(),true);
 			System.out.println( "Done" );
 			
-			//frame(left,start,right,end);
-			
-			System.out.println( left );
-			System.out.println( start );
-			System.out.println( right );
-			System.out.println( end );
+			setTransformation(left,bottom,right,top);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-
-	public void draw(){
-		if(timeMode) {
-		    setTransformation(left,start,right,end);
-		} else {
-			setTransformation(left,bottom,right,top);
+	
+	class Drawer implements DrawHandler {
+		public void handle(Drawable payload) {
+			ArrayList<Point> geom = payload.getGeometry();
+			drawGeom(geom);
 		}
+	}
+	
+	public void draw(){
+		//Set scaling factors dependant on the current mode
+
+		
+		stroke(155,0,0);
 		background(255);
 		strokeWeight(0.1f);
-		drawGeoms();
-		strokeWeight(0.1f);
+		try {
+			gg.draw(new Drawer());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		stroke(0,0,155);
+		strokeWeight(2);
 		
-//		if(timeMode) {
-//			//draw a line that represents the time to select
-//			float x1 = -(xtrans-mouseX/xscale);
-//			float y1 = -(ytrans-mouseY/yscale);
-//			
-//			System.out.println( left );
-//			System.out.println( right );
-//			System.out.println( start );
-//			System.out.println( end );
-//			System.out.println( x1 );
-//			System.out.println( y1 );
-//			
-//			line(left,start,right,y1);
-//			
-//			line(left,y1,right,y1);
-//		} else {
-//			//draw a line that represents the time to select
-//			float x1 = -(xtrans-mouseX/xscale);
-//			float y1 = -(ytrans-mouseY/yscale);
-//			
-//			System.out.println( left );
-//			System.out.println( right );
-//			System.out.println( start );
-//			System.out.println( end );
-//			System.out.println( x1 );
-//			System.out.println( y1 );
-//			
-//			line(left,start,right,y1);
-//			
-//			line(left,y1,right,y1);
-//		}
+		try {
+			if(spt!=null){ spt.draw(new Drawer()); }
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		stroke(155,155,155);
+		strokeWeight(1);
+		if(timeMode) {
+			//draw a line that represents the time to select
+			line(0,mouseY,width,mouseY);
+		} 
 	}
 	
 	public void keyPressed() {
 		if(this.keyCode==84) {
 			this.timeMode = !this.timeMode;
 		}
+		
+		if(timeMode) {
+		    setTransformation(left,start,right,end);
+		} else {
+			setTransformation(left,bottom,right,top);
+		}
 	}
 	
 	public void mousePressed() {
-		System.out.println( "("+mouseX+","+mouseY+")" );
+		if(timeMode) {
+			time=mouseY/yscale-ytrans;
+			System.out.println("time:"+time);
+		} else {
+			float lat = mouseY/yscale-ytrans;
+			float lon = mouseX/xscale-xtrans;
+			
+			startVertex = gg.nearestVertex(lat,lon);
+		}
+		
+		if(startVertex != null) {
+			System.out.println( "find SPT from "+startVertex+" at "+time);
+			GregorianCalendar now = new GregorianCalendar();
+			now.set(GregorianCalendar.HOUR_OF_DAY, 0);
+			now.set(GregorianCalendar.MINUTE, 0 );
+			now.set(GregorianCalendar.SECOND, 0 );
+			now.add(GregorianCalendar.SECOND, (int)time);
+			
+			State s0 = new State(now);
+			spt = Dijkstra.getShortestPathTree(gg, startVertex.label, null, s0, new WalkOptions());
+
+		}
+		
 	}
 
 } 
