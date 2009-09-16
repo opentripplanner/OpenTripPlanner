@@ -4,18 +4,21 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.opentripplanner.jags.core.AbstractVertex;
+import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
+import org.opentripplanner.jags.edgetype.DrawHandler;
+import org.opentripplanner.jags.edgetype.Drawable;
 
 
 
-public class ShortestPathTree extends Graph {
+public class ShortestPathTree {
 	private static final long serialVersionUID = -3899613853043676031L;
-	HashMap<Vertex,AbstractVertex> vertices;
+	HashMap<Vertex,SPTVertex> vertices;
     
     public ShortestPathTree() {
-        vertices = new HashMap<Vertex,AbstractVertex>();
+        vertices = new HashMap<Vertex,SPTVertex>();
     }
     
     public SPTVertex addVertex( Vertex vv, State ss, double weightSum ) {
@@ -24,7 +27,7 @@ public class ShortestPathTree extends Graph {
         return ret;
     }
     
-    public Collection<AbstractVertex> getVertices() {
+    public Collection<SPTVertex> getVertices() {
     	return this.vertices.values();
     }
     
@@ -48,5 +51,19 @@ public class ShortestPathTree extends Graph {
 	    }
 	    
 	    return ret;
+	}
+	
+	public String toString() {
+		return "SPT "+this.vertices.size();
+	}
+	
+	public void draw(DrawHandler drawer) throws Exception {
+		for(SPTVertex vv : this.getVertices() ) {
+			for(SPTEdge ee : vv.outgoing ) {
+				if(ee.payload instanceof Drawable) {
+					drawer.handle((Drawable)ee.payload);
+				}
+			}
+		}
 	}
 }
