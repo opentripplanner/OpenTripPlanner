@@ -76,7 +76,7 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
     	//The basic idea: find the amount of time from the hop arrival to state0.time. Weight is that wait+the transit time
 
     	GregorianCalendar serviceDay = (GregorianCalendar)state0.time.clone();
-    	int secondsSinceMidnight = state0.time.get(GregorianCalendar.HOUR)*SECS_IN_HOUR+
+    	int secondsSinceMidnight = state0.time.get(GregorianCalendar.HOUR_OF_DAY)*SECS_IN_HOUR+
     	                           state0.time.get(GregorianCalendar.MINUTE)*SECS_IN_MINUTE+
     	                           state0.time.get(GregorianCalendar.SECOND);
     	// if the Hop's arrival StopTime is more than 24 hours from midnight (say, yesterday) we don't need to check
@@ -108,7 +108,12 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 		return this.start + " " + this.end + " " + this.calendar;
 	}
 
+	ArrayList<Point> geometryCache = null;
 	public ArrayList<Point> getGeometry() {
+		if(geometryCache != null) {
+			return geometryCache;
+		}
+		
 		ArrayList<Point> ret = new ArrayList<Point>();
 		
 		ret.add( new Point(this.start.getStop().stop_lon.floatValue(),
@@ -118,6 +123,7 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 				           this.end.getStop().stop_lat.floatValue(),
 				           this.end.arrival_time.getSecondsSinceMidnight()) );
 		
+		geometryCache = ret;
 		return ret;
 	}
 	
