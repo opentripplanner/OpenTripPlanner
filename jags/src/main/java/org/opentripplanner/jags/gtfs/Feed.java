@@ -68,14 +68,21 @@ public class Feed {
 		}
 	}
 	
-	public void loadStopTimes() throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+	public void loadStopTimes(boolean verbose) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		loadTrips();
 		
 		Table stoptimes_table = this.getTable( "stop_times" );
+		int i=0;
 		while( stoptimes_table.hasMoreElements() ) {
+			i++;
+			if(verbose && i%1000==0){ System.out.println( "stoptime "+i ); }
 			StopTime stoptime = new StopTime( stoptimes_table, stoptimes_table.nextElement() );
 			trips.get(stoptime.trip_id).addStopTime( stoptime );
 		}
+	}
+	
+	public void loadStopTimes() throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+		loadStopTimes(false);
 	}
 	
 
