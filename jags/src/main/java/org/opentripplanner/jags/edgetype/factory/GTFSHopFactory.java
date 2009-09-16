@@ -19,7 +19,7 @@ public class GTFSHopFactory {
 	
 	public ArrayList<Hop> run(boolean verbose) throws Exception {
 		if(verbose){System.out.println("\tLoading stoptimes");}
-		this.feed.loadStopTimes();
+		this.feed.loadStopTimes(verbose);
 		if(verbose){System.out.println("\tLoading calendar dates");}
 		this.feed.loadCalendarDates();
 		
