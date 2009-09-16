@@ -3,6 +3,7 @@ package org.opentripplanner.jags.edgetype.loader;
 import java.util.ArrayList;
 
 import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
@@ -23,17 +24,14 @@ public class GTFSHopLoader {
 		if(verbose){ System.out.println( "Loading stops" ); }
 		feed.loadStops();
 		for( Stop stop : feed.getAllStops() ) {
-			graph.addVertex( stop.stop_id );
+			graph.addVertex( new SpatialVertex( stop.stop_id, stop.stop_lon, stop.stop_lat ) );
 		}
 		
 		//Load hops
 		if(verbose){ System.out.println( "Loading hops" ); }
 		GTFSHopFactory hf = new GTFSHopFactory(feed);
-		int i=0;
 		ArrayList<Hop> hops = hf.run(verbose);
 		for( Hop hop : hops ) {
-			i++;
-			if(verbose && i%1000==0) { System.out.println( String.valueOf(i) ); }
 			if(drawHandler != null){ drawHandler.handle(hop); }
 			graph.addEdge(hop.start.stop_id, hop.end.stop_id, hop);
 		}
