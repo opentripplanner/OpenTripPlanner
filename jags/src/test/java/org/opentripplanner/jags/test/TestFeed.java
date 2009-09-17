@@ -21,8 +21,8 @@ public class TestFeed extends TestCase {
 		
 		assertEquals( table.getHeader().index("trip_id"), 0 );
 		
-		while( table.hasMoreElements() ) {
-			String fromElement = table.nextElement()[0];
+		for(String[] record : table ) {
+			String fromElement = record[0];
 			assertEquals( fromElement, "10W1010" );
 			break;
 		}
