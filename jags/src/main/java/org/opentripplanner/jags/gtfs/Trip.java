@@ -17,7 +17,7 @@ public class Trip extends Record {
 	
 	ArrayList<StopTime> stoptimes;
 	
-	Trip(Feed feed, TableHeader header, String[] record) throws SecurityException,
+	Trip(PackagedFeed feed, TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		super(feed, header, record);

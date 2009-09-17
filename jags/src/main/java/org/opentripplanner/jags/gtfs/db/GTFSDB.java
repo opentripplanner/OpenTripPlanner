@@ -7,7 +7,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.opentripplanner.jags.gtfs.Feed;
+import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.Stop;
 
 public class GTFSDB {
@@ -17,7 +17,7 @@ public class GTFSDB {
 		sessionFactory = new Configuration().configure().buildSessionFactory();
 	}
 	
-	public void store(Feed feed) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+	public void store(PackagedFeed feed) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		feed.loadStops();
 		
 		Session session = sessionFactory.getCurrentSession();
@@ -32,7 +32,7 @@ public class GTFSDB {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Feed feed = new Feed( "caltrain_gtfs.zip" );
+		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
 		
 		GTFSDB gtfsdb = new GTFSDB();
 		gtfsdb.store(feed);

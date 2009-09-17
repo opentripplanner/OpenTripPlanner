@@ -22,7 +22,7 @@ public class StopTime extends Record implements Comparable<StopTime> {
 	Trip trip=null;
 	Stop stop=null;
 	
-	StopTime(Feed feed, TableHeader header, String[] record) throws SecurityException,
+	StopTime(PackagedFeed feed, TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException {

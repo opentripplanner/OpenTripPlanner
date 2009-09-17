@@ -15,7 +15,7 @@ import org.opentripplanner.jags.edgetype.Drawable;
 import org.opentripplanner.jags.edgetype.Point;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.Feed;
+import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.SPTVertex;
 import org.opentripplanner.jags.spt.ShortestPathTree;
@@ -93,7 +93,7 @@ public class ScheduleViz extends PApplet{
 		background(255);
 		
 		try {			
-			Feed feed = new Feed( "../../caltrain_gtfs.zip" );
+			PackagedFeed feed = new PackagedFeed( "../../caltrain_gtfs.zip" );
 			gg = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
 			System.out.println( "Loading feed to graph" );

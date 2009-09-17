@@ -7,14 +7,14 @@ import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
-import org.opentripplanner.jags.gtfs.Feed;
+import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.Stop;
 
 public class GTFSHopLoader {
 	Graph graph;
-	Feed feed;
+	PackagedFeed feed;
 	
-	public GTFSHopLoader( Graph graph, Feed feed ) {
+	public GTFSHopLoader( Graph graph, PackagedFeed feed ) {
 		this.graph = graph;
 		this.feed = feed;
 	}

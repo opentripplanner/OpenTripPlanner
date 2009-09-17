@@ -13,7 +13,7 @@ import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.Feed;
+import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 
@@ -21,7 +21,7 @@ import junit.framework.TestCase;
 
 public class TestKao extends TestCase {
 	public void testBasic() throws Exception {
-		Feed feed = new Feed( "caltrain_gtfs.zip" );
+		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
 		KaoGraph kg = new KaoGraph( );
 		GTFSHopLoader hl = new GTFSHopLoader(kg, feed);
 		hl.load();

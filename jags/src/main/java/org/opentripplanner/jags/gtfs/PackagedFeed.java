@@ -13,14 +13,14 @@ import java.util.zip.ZipFile;
 
 import org.opentripplanner.jags.gtfs.types.GTFSDate;
 
-public class Feed {
+public class PackagedFeed {
 	
 	private ZipFile zippedFeed;
 	public HashMap<String,Stop> stops;
 	public HashMap<String,Trip> trips;
 	public HashMap<String,ServiceCalendar> serviceCalendars;
 	
-	public Feed( String feed_name ) throws ZipException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+	public PackagedFeed( String feed_name ) throws ZipException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
     	File ff = new File( feed_name );
 		zippedFeed = new ZipFile(ff);
 	}

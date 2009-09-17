@@ -12,7 +12,7 @@ public class Table implements Enumeration<String[]>{
 	CSVReader reader;
 	String[] nextElement;
 	
-	Table( Feed feed, InputStream in ) throws IOException {
+	Table( PackagedFeed feed, InputStream in ) throws IOException {
 		reader = new CSVReader( new InputStreamReader( in ) );
 		String[] columns = reader.readNext();
 		header = new TableHeader(columns);
