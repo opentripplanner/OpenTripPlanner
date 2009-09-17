@@ -3,6 +3,7 @@ package org.opentripplanner.jags.gtfs.db;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,13 +19,12 @@ public class GTFSDB {
 		sessionFactory = new Configuration().configure().buildSessionFactory();
 	}
 	
-	public void store(Feed feed) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		feed.loadStops();
-		
+	public void store(PackagedFeed feed) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+
 		Session session = sessionFactory.getCurrentSession();
 		session.beginTransaction();
 		
-		for( Stop stop : feed.getAllStops()) {
+		for( Stop stop : feed.stopTable) {
 			System.out.println( stop );
 			session.save(stop);
 		}
@@ -32,11 +32,21 @@ public class GTFSDB {
 		session.getTransaction().commit();
 	}
 	
+	public List<Stop> get() {
+        Session session = sessionFactory.getCurrentSession();
+        session.beginTransaction();
+        List<Stop> result = session.createQuery("from Stop").list();
+        session.getTransaction().commit();
+        return result;
+	}
+	
 	public static void main(String[] args) throws Exception {
 		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
-		Feed feed = new Feed(pfeed);
 		
 		GTFSDB gtfsdb = new GTFSDB();
-		gtfsdb.store(feed);
+		gtfsdb.store(pfeed);
+		
+		List<Stop> stops = gtfsdb.get();
+		System.out.println( stops );
 	}
 }

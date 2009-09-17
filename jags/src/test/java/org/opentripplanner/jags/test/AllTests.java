@@ -14,6 +14,7 @@ public class AllTests {
 		suite.addTestSuite(TestHopFactory.class);
 		suite.addTestSuite(TestKaoGraph.class);
 		suite.addTestSuite(TestDijkstra.class);
+		suite.addTestSuite(TestPackagedFeed.class);
 		//$JUnit-END$
 		return suite;
 	}

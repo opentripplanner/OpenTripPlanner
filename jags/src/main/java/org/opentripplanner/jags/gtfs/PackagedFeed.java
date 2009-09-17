@@ -17,12 +17,14 @@ public class PackagedFeed {
 	
 	private ZipFile zippedFeed;	
 	public StopTable stopTable;
+	public StopTimeTable stopTimeTable;
 	
 	public PackagedFeed( String feed_name ) throws ZipException, IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
     	File ff = new File( feed_name );
 		zippedFeed = new ZipFile(ff);
 		
 		stopTable = new StopTable( zippedFeed.getInputStream( zippedFeed.getEntry( "stops.txt" ) ) );
+		stopTimeTable = new StopTimeTable( zippedFeed.getInputStream( zippedFeed.getEntry( "stop_times.txt" ) ) );
 	}
 
 	public Table getTable( String tableName ) throws IOException {

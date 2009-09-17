@@ -17,14 +17,6 @@ public class TestFeed extends TestCase {
 		assertEquals( feed.getZippedFeed().getName(), feed_name);
 	}
 	
-	public void testGetStopTable() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
-		
-		for(Stop stop : feed.stopTable) {
-			System.out.println( stop );
-		}
-	}
-	
 	public void testGetTable() throws Exception {
 		PackagedFeed feed = new PackagedFeed( "google_transit.zip" );
 		Table table = feed.getTable( "stop_times" );

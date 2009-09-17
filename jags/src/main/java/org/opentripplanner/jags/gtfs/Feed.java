@@ -48,9 +48,7 @@ public class Feed {
 	
 	public void loadStops() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		stops = new HashMap<String,Stop>();
-		Table table = packagedFeed.getTable( "stops" );
-		for( String[] record : table ) {
-			Stop stop = new Stop( this, table.getHeader(), record );
+		for( Stop stop : packagedFeed.stopTable ) {
 			stops.put( stop.stop_id, stop );
 		}
 	}
