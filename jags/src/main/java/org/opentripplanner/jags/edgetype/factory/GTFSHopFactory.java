@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.StopTime;
 import org.opentripplanner.jags.gtfs.Trip;
 
 
 
 public class GTFSHopFactory {
-	private PackagedFeed feed;
+	private Feed feed;
 	
-	public GTFSHopFactory(PackagedFeed feed) throws Exception {
+	public GTFSHopFactory(Feed feed) throws Exception {
 		this.feed = feed;
 	}
 	

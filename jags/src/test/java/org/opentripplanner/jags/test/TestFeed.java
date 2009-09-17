@@ -1,7 +1,9 @@
 package org.opentripplanner.jags.test;
 
+import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.ServiceCalendar;
+import org.opentripplanner.jags.gtfs.Stop;
 import org.opentripplanner.jags.gtfs.Table;
 import org.opentripplanner.jags.gtfs.Trip;
 import org.opentripplanner.jags.gtfs.types.GTFSDate;
@@ -13,6 +15,14 @@ public class TestFeed extends TestCase {
 		String feed_name = "google_transit.zip";
 		PackagedFeed feed = new PackagedFeed( feed_name );
 		assertEquals( feed.getZippedFeed().getName(), feed_name);
+	}
+	
+	public void testGetStopTable() throws Exception {
+		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		
+		for(Stop stop : feed.stopTable) {
+			System.out.println( stop );
+		}
 	}
 	
 	public void testGetTable() throws Exception {
@@ -29,13 +39,15 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetStop() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadStops();
 		assertEquals( feed.stops.get( "San Carlos Caltrain" ).stop_name, "San Carlos Caltrain" );
 	}
 	
 	public void testGetTrip() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadTrips();
 		
 		assertEquals( feed.trips.get("21520090831").trip_id, "21520090831" );
@@ -43,7 +55,8 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetStopTime() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadStopTimes();
 		
 		assertEquals( feed.trips.get("21520090831").getStopTimes().get(0).stop_sequence, new Integer(1) );
@@ -51,14 +64,16 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetCalendar() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadCalendar();
 		
 		assertEquals( feed.getAllServiceCalendars().get(0).service_id, "WD20090831" );
 	}
 	
 	public void testGetCalendarDate() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		
 		assertEquals( feed.getServiceCalendar("WD20090831").getServiceCalendarDates().get(0).service_id, "WD20090831" );
@@ -69,7 +84,8 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testCalendarDateRunsOn() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		
 		ServiceCalendar sc = feed.getServiceCalendar("WD20090831");
@@ -104,7 +120,8 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testTripServiceCalendar() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadTrips();
 		
 		Trip tr = feed.getTrip( "36520090302" );
@@ -121,7 +138,8 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetServiceCalendars() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		
 		assertTrue( feed.getServiceCalendars(new GTFSDate(2009,12,5)).size() == 2 );

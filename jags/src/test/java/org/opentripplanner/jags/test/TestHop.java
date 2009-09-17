@@ -10,13 +10,14 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
+import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
 
 
 public class TestHop extends TestCase {
 	
 	public void testHopAfterMidnight() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
 		GTFSHopFactory hf = new GTFSHopFactory( feed );
 		ArrayList<Hop> hops = hf.run();
 		

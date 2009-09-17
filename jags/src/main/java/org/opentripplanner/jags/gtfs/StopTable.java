@@ -7,25 +7,26 @@ import java.util.Iterator;
 
 import au.com.bytecode.opencsv.CSVReader;
 
-public class Table implements Iterable<String[]>{
+public class StopTable implements Iterable<Stop>{
 	TableHeader header;
 	CSVReader reader;
 	String[] nextElement;
 	
-	class TableIterator implements Iterator<String[]> {
+	class TableIterator implements Iterator<Stop> {
 		
-		String[] nextElement;
+		Stop nextElement;
 
 		public boolean hasNext() {
 			try {
-				nextElement = reader.readNext();
+				String[] record = reader.readNext();
+				nextElement = new Stop(null,header,record);
 				return nextElement != null;
-			} catch( IOException ex ) {
+			} catch( Exception ex ) {
 				return false;
 			}
 		}
 
-		public String[] next() {
+		public Stop next() {
 			return nextElement;
 		}
 
@@ -33,7 +34,7 @@ public class Table implements Iterable<String[]>{
 		
 	}
 	
-	Table( InputStream in ) throws IOException {
+	StopTable( InputStream in ) throws IOException {
 		reader = new CSVReader( new InputStreamReader( in ) );
 		String[] columns = reader.readNext();
 		header = new TableHeader(columns);
@@ -43,7 +44,7 @@ public class Table implements Iterable<String[]>{
 		return header;
 	}
 
-	public Iterator<String[]> iterator() {
+	public Iterator<Stop> iterator() {
 		return new TableIterator();
 	}
 }

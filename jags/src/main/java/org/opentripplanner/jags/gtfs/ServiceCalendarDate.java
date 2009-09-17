@@ -11,7 +11,7 @@ public class ServiceCalendarDate extends Record{
 	public GTFSDate date;
 	public Integer exception_type;
 
-	ServiceCalendarDate(PackagedFeed feed, TableHeader header, String[] record) throws SecurityException,
+	ServiceCalendarDate(Feed feed, TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException {
