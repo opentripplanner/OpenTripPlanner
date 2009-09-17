@@ -11,10 +11,8 @@ public class Table implements Enumeration<String[]>{
 	TableHeader header;
 	CSVReader reader;
 	String[] nextElement;
-	Feed feed;
 	
 	Table( Feed feed, InputStream in ) throws IOException {
-		this.feed = feed;
 		reader = new CSVReader( new InputStreamReader( in ) );
 		String[] columns = reader.readNext();
 		header = new TableHeader(columns);

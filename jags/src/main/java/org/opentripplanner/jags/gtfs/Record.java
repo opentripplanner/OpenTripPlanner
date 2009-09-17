@@ -5,18 +5,18 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class Record {
-	Table table;
+	Feed feed;
 	
 	Record() {
 	}
 	
-	Record(Table table, String[] record) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		this.table = table;
+	Record(Feed feed, TableHeader header, String[] record) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+		this.feed = feed;
 		
 		Field[] fields = this.getClass().getFields();
 		for(int i=0; i<fields.length; i++) {
 			Field field = fields[i];
-			int ix = table.getHeader().index( field.getName() );
+			int ix = header.index( field.getName() );
 			if( ix != -1 ) {
 				try {
 					Constructor<?> stringConstructor = field.getType().getConstructor(String.class);

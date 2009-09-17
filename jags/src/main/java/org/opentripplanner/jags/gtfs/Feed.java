@@ -29,7 +29,7 @@ public class Feed {
 		serviceCalendars = new HashMap<String,ServiceCalendar>();
 		Table table = this.getTable( "calendar" );
 		while( table.hasMoreElements() ) {
-			ServiceCalendar cal = new ServiceCalendar( table, table.nextElement() );
+			ServiceCalendar cal = new ServiceCalendar( this, table.getHeader(), table.nextElement() );
 			serviceCalendars.put( cal.service_id, cal );
 		}
 	}
@@ -39,7 +39,7 @@ public class Feed {
 		
 		Table table = this.getTable( "calendar_dates" );
 		while( table.hasMoreElements() ) {
-			ServiceCalendarDate scd = new ServiceCalendarDate( table, table.nextElement() );
+			ServiceCalendarDate scd = new ServiceCalendarDate( this, table.getHeader(), table.nextElement() );
 			ServiceCalendar sc = getServiceCalendar( scd.service_id );
 			// if a service calendar doesn't exist for this exception, create one
 			if(sc==null) {
@@ -54,7 +54,7 @@ public class Feed {
 		stops = new HashMap<String,Stop>();
 		Table stops_table = this.getTable( "stops" );
 		while( stops_table.hasMoreElements() ) {
-			Stop stop = new Stop( stops_table, stops_table.nextElement() );
+			Stop stop = new Stop( this, stops_table.getHeader(), stops_table.nextElement() );
 			stops.put( stop.stop_id, stop );
 		}
 	}
@@ -63,7 +63,7 @@ public class Feed {
 		trips = new HashMap<String,Trip>();
 		Table trips_table = this.getTable( "trips" );
 		while( trips_table.hasMoreElements() ) {
-			Trip trip = new Trip( trips_table, trips_table.nextElement() );
+			Trip trip = new Trip( this, trips_table.getHeader(), trips_table.nextElement() );
 			trips.put( trip.trip_id, trip);
 		}
 	}
@@ -76,7 +76,7 @@ public class Feed {
 		while( stoptimes_table.hasMoreElements() ) {
 			i++;
 			if(verbose && i%1000==0){ System.out.println( "stoptime "+i ); }
-			StopTime stoptime = new StopTime( stoptimes_table, stoptimes_table.nextElement() );
+			StopTime stoptime = new StopTime( this, stoptimes_table.getHeader(), stoptimes_table.nextElement() );
 			trips.get(stoptime.trip_id).addStopTime( stoptime );
 		}
 	}

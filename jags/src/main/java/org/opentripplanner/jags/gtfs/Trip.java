@@ -17,10 +17,10 @@ public class Trip extends Record {
 	
 	ArrayList<StopTime> stoptimes;
 	
-	Trip(Table stops, String[] record) throws SecurityException,
+	Trip(Feed feed, TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		super(stops, record);
+		super(feed, header, record);
 		stoptimes = new ArrayList<StopTime>();
 	}
 	
@@ -32,7 +32,7 @@ public class Trip extends Record {
 	}
 	
 	public ServiceCalendar getServiceCalendar() throws Exception {
-		return table.feed.getServiceCalendar( service_id );
+		return feed.getServiceCalendar( service_id );
 	}
 	
 	public void addStopTime( StopTime st ) {

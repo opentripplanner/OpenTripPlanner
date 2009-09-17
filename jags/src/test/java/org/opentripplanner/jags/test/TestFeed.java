@@ -19,7 +19,7 @@ public class TestFeed extends TestCase {
 		Feed feed = new Feed( "google_transit.zip" );
 		Table table = feed.getTable( "stop_times" );
 		
-		assertEquals( table.getHeader().get("trip_id").intValue(), 0 );
+		assertEquals( table.getHeader().index("trip_id"), 0 );
 		
 		while( table.hasMoreElements() ) {
 			String fromElement = table.nextElement()[0];
