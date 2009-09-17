@@ -16,7 +16,7 @@ public class Record {
 		Field[] fields = this.getClass().getFields();
 		for(int i=0; i<fields.length; i++) {
 			Field field = fields[i];
-			int ix = table.colIndex( field.getName() );
+			int ix = table.getHeader().index( field.getName() );
 			if( ix != -1 ) {
 				try {
 					Constructor<?> stringConstructor = field.getType().getConstructor(String.class);

@@ -4,12 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
-import java.util.HashMap;
 
 import au.com.bytecode.opencsv.CSVReader;
 
 public class Table implements Enumeration<String[]>{
-	HashMap<String, Integer> header;
+	TableHeader header;
 	CSVReader reader;
 	String[] nextElement;
 	Feed feed;
@@ -17,24 +16,12 @@ public class Table implements Enumeration<String[]>{
 	Table( Feed feed, InputStream in ) throws IOException {
 		this.feed = feed;
 		reader = new CSVReader( new InputStreamReader( in ) );
-		String[] rawheader = reader.readNext();
-		header = new HashMap<String, Integer>();
-		for(int i=0; i<rawheader.length; i++) {
-			header.put(rawheader[i], new Integer(i));
-		}
+		String[] columns = reader.readNext();
+		header = new TableHeader(columns);
 	}
 	
-	public HashMap<String, Integer> getHeader() {
+	public TableHeader getHeader() {
 		return header;
-	}
-	
-	public int colIndex( String colname ) {
-		Integer ix = header.get( colname );
-		if( ix == null ) {
-			return -1;
-		} else {
-			return ix.intValue();
-		}
 	}
 	
 	public boolean hasMoreElements() {
