@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.opentripplanner.jags.gtfs">
+
+    <class name="Stop" table="Stop">
+        <id name="stop_id" type="string" column="stop_id">
+            <generator class="assigned"/>
+        </id>
+        <property name="stop_code"/>
+        <property name="stop_name"/>
+        <property name="stop_desc"/>
+        <property name="stop_lat"/>
+        <property name="stop_lon"/>
+        <property name="zone_id"/>
+        <property name="stop_url"/>
+        <property name="location_type"/>
+        <property name="parent_station"/>
+    </class>
+
+</hibernate-mapping>
