@@ -6,6 +6,10 @@ public class GTFSTime {
 	int second;
 	int time;
 	
+	public GTFSTime() {
+		
+	}
+	
 	public GTFSTime(String in) {
 		String[] components = in.split(":");
 		hour = Integer.parseInt( components[0] );
@@ -20,5 +24,37 @@ public class GTFSTime {
 	
 	public String toString() {
 		return hour+":"+minute+":"+second;
+	}
+	
+	public int getHour() {
+		return hour;
+	}
+
+	public void setHour(int hour) {
+		this.hour = hour;
+	}
+
+	public int getMinute() {
+		return minute;
+	}
+
+	public void setMinute(int minute) {
+		this.minute = minute;
+	}
+
+	public int getSecond() {
+		return second;
+	}
+
+	public void setSecond(int second) {
+		this.second = second;
+	}
+	
+	public int getTime() {
+		return time;
+	}
+
+	public void setTime(int time) {
+		this.time = time;
 	}
 }

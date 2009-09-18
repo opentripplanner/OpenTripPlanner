@@ -18,7 +18,7 @@ public class StopTimeTable implements Iterable<StopTime>{
 		public boolean hasNext() {
 			try {
 				String[] record = reader.readNext();
-				nextElement = new StopTime(null,header,record);
+				nextElement = new StopTime(header,record);
 				return nextElement != null;
 			} catch( Exception ex ) {
 				return false;

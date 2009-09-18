@@ -18,7 +18,7 @@ public class StopTable implements Iterable<Stop>{
 		public boolean hasNext() {
 			try {
 				String[] record = reader.readNext();
-				nextElement = new Stop(null,header,record);
+				nextElement = new Stop(header,record);
 				return nextElement != null;
 			} catch( Exception ex ) {
 				return false;

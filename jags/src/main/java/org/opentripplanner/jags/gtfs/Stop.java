@@ -17,10 +17,10 @@ public class Stop extends Record{
 	// null constructor for Hibernate
 	public Stop() {}
 	
-	Stop(Feed feed, TableHeader header, String[] record) throws SecurityException,
+	Stop(TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		super(feed, header, record);
+		super(header, record);
 	}
 	
 	public String toString() {

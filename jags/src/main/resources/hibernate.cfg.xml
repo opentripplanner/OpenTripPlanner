@@ -25,6 +25,7 @@
 
         
         <mapping resource="org/opentripplanner/jags/gtfs/Stop.hbm.xml"/>
+        <mapping resource="org/opentripplanner/jags/gtfs/StopTime.hbm.xml"/>
 
     </session-factory>
 

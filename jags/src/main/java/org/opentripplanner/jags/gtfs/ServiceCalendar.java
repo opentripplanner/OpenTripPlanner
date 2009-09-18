@@ -24,11 +24,11 @@ public class ServiceCalendar extends Record{
 	public GTFSDate end_date;
 	public HashMap<GTFSDate,ServiceCalendarDate> serviceCalendarDates;
 
-	public ServiceCalendar(Feed feed, TableHeader header, String[] record) throws SecurityException,
+	public ServiceCalendar(TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException {
-		super(feed, header, record);
+		super(header, record);
 		this.serviceCalendarDates = new HashMap<GTFSDate,ServiceCalendarDate>();
 	}
 	

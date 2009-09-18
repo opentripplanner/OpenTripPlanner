@@ -11,6 +11,7 @@ import org.hibernate.cfg.Configuration;
 import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.Stop;
+import org.opentripplanner.jags.gtfs.StopTime;
 
 public class GTFSDB {
 	SessionFactory sessionFactory;
@@ -27,6 +28,11 @@ public class GTFSDB {
 		for( Stop stop : feed.stopTable) {
 			System.out.println( stop );
 			session.save(stop);
+		}
+		
+		for( StopTime stop_time : feed.stopTimeTable ) {
+			System.out.println( stop_time );
+			session.save(stop_time);
 		}
 		
 		session.getTransaction().commit();

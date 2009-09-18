@@ -117,16 +117,17 @@ public class TestFeed extends TestCase {
 		feed.loadTrips();
 		
 		Trip tr = feed.getTrip( "36520090302" );
+		assertNotNull(tr);
 		
 		try {
-			System.out.println( tr.getServiceCalendar() );
+			System.out.println( feed.getServiceCalendar(tr.service_id) );
 		} catch (Exception e) {
 			assertEquals( e.getMessage(), "ServiceCalendars have not been loaded" );
 		}
 		
 		feed.loadCalendarDates();
 		
-		assertEquals( tr.getServiceCalendar().service_id, "WD20090302" );
+		assertEquals( feed.getServiceCalendar(tr.service_id).service_id, "WD20090302" );
 	}
 	
 	public void testGetServiceCalendars() throws Exception {

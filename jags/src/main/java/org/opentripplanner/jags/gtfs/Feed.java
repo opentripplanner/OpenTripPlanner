@@ -25,7 +25,7 @@ public class Feed {
 		serviceCalendars = new HashMap<String,ServiceCalendar>();
 		Table table = packagedFeed.getTable( "calendar" );
 		for( String[] record : table ) {
-			ServiceCalendar cal = new ServiceCalendar( this, table.getHeader(), record );
+			ServiceCalendar cal = new ServiceCalendar( table.getHeader(), record );
 			serviceCalendars.put( cal.service_id, cal );
 		}
 	}
@@ -35,7 +35,7 @@ public class Feed {
 		
 		Table table = packagedFeed.getTable( "calendar_dates" );
 		for( String[] record : table ) {
-			ServiceCalendarDate scd = new ServiceCalendarDate( this, table.getHeader(), record );
+			ServiceCalendarDate scd = new ServiceCalendarDate( table.getHeader(), record );
 			ServiceCalendar sc = getServiceCalendar( scd.service_id );
 			// if a service calendar doesn't exist for this exception, create one
 			if(sc==null) {
@@ -54,6 +54,8 @@ public class Feed {
 	}
 	
 	public void loadTrips() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+		
+		
 		trips = new HashMap<String,Trip>();
 		Table table = packagedFeed.getTable( "trips" );
 		for( String[] record : table ) {
@@ -65,13 +67,10 @@ public class Feed {
 	public void loadStopTimes(boolean verbose) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		loadTrips();
 		
-		Table table = packagedFeed.getTable( "stop_times" );
-		int i=0;
-		for( String[] record : table ) {
-			i++;
-			if(verbose && i%1000==0){ System.out.println( "stoptime "+i ); }
-			StopTime stoptime = new StopTime( this, table.getHeader(), record );
-			trips.get(stoptime.trip_id).addStopTime( stoptime );
+		for( StopTime stoptime : packagedFeed.stopTimeTable ) {
+			Trip trip = trips.get(stoptime.trip_id);
+			stoptime.setTrip( trip );
+			trip.addStopTime( stoptime );
 		}
 	}
 	

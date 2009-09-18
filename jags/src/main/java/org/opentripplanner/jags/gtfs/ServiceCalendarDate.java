@@ -11,11 +11,11 @@ public class ServiceCalendarDate extends Record{
 	public GTFSDate date;
 	public Integer exception_type;
 
-	ServiceCalendarDate(Feed feed, TableHeader header, String[] record) throws SecurityException,
+	ServiceCalendarDate(TableHeader header, String[] record) throws SecurityException,
 			NoSuchFieldException, IllegalArgumentException,
 			IllegalAccessException, InstantiationException,
 			InvocationTargetException, NoSuchMethodException {
-		super(feed, header, record);
+		super(header, record);
 	}
 	
 	public String toString() {

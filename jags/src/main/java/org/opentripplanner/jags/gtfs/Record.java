@@ -5,14 +5,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 
 public class Record {
-	Feed feed;
-	
 	Record() {
 	}
 	
-	Record(Feed feed, TableHeader header, String[] record) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
-		this.feed = feed;
-		
+	Record(TableHeader header, String[] record) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {		
 		Field[] fields = this.getClass().getFields();
 		for(int i=0; i<fields.length; i++) {
 			Field field = fields[i];
