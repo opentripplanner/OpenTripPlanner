@@ -37,8 +37,9 @@ public class TestKao extends TestCase {
 		
 		assertTrue( ((Hop)path.get(path.size()-1).payload).end.arrival_time.getSecondsSinceMidnight()==48540 );
 		
+		Feed feed2 = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
 		Graph gg = new Graph();
-		GTFSHopLoader h2 = new GTFSHopLoader(gg,feed);
+		GTFSHopLoader h2 = new GTFSHopLoader(gg,feed2);
 		h2.load();
 		ShortestPathTree spt = org.opentripplanner.jags.algorithm.Dijkstra.getShortestPathTree(gg, 
 											   "Millbrae Caltrain", 
