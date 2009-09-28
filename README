@@ -3,6 +3,11 @@
 OpenTripPlanner is an open source multi-modal trip planner. For more
 information, see the project website: http://opentripplanner.org
 
+--== INSTALL ==--
+
+Installation instructions are available on the website:
+http://opentripplanner.org/wiki/Install
+
 --== FILES ==--
 
 The jags directory contains the routine engine for the OpenTripPlanner
