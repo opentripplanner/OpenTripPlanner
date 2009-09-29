@@ -15,11 +15,16 @@ public class Record {
 			int ix = header.index( field.getName() );
 			if( ix != -1 ) {
 				try {
-					Constructor<?> stringConstructor = field.getType().getConstructor(String.class);
 					if( record[ix].length()==0 ) {
 						field.set( this, null );
 					} else {
-						field.set( this, stringConstructor.newInstance(record[ix]) );
+              if (field.getType() == String.class) {
+                  String strValue = (String) record[ix];
+                  field.set(this, strValue.intern());
+              } else {
+                  Constructor<?> stringConstructor = field.getType().getConstructor(String.class);
+                  field.set( this, stringConstructor.newInstance(record[ix]));
+              }
 					}
 				} catch( NoSuchMethodException ex) {
 					throw new NoSuchMethodException( "Class: "+field.getType().getName()+" does not have constructor for ("+String.class+")" );
