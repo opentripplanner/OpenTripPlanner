@@ -32,7 +32,11 @@ public class Street extends AbstractPayload {
     }
     
     public String toString() {
-        return "Street("+this.length+")";
+        if (this.name != null) {
+            return "Street(" + this.name + ", " + this.length + ")";
+        } else {
+            return "Street(" + this.length + ")";
+        }
     }
     
 }
