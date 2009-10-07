@@ -1,6 +1,5 @@
 package org.opentripplanner.jags.gtfs.db;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -8,7 +7,6 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
-import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.Stop;
 import org.opentripplanner.jags.gtfs.StopTime;

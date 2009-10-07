@@ -3,7 +3,6 @@ package org.opentripplanner.jags.test;
 import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.gtfs.ServiceCalendar;
-import org.opentripplanner.jags.gtfs.Stop;
 import org.opentripplanner.jags.gtfs.Table;
 import org.opentripplanner.jags.gtfs.Trip;
 import org.opentripplanner.jags.gtfs.types.GTFSDate;

@@ -3,9 +3,6 @@ package org.opentripplanner.jags.spt;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.opentripplanner.jags.core.AbstractVertex;
-import org.opentripplanner.jags.core.Edge;
-import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.DrawHandler;

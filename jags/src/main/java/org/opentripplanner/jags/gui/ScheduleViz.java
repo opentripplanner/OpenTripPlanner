@@ -1,11 +1,9 @@
 package org.opentripplanner.jags.gui;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
@@ -13,12 +11,9 @@ import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Drawable;
 import org.opentripplanner.jags.edgetype.Point;
-import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
-import org.opentripplanner.jags.spt.SPTEdge;
-import org.opentripplanner.jags.spt.SPTVertex;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import processing.core.*;
