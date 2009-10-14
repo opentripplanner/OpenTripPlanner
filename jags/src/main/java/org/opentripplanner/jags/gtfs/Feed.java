@@ -50,6 +50,7 @@ public class Feed {
 			stops.put( stop.stop_id, stop );
 		}
 	}
+	
 	public void loadRoutes() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		routes = new HashMap<String,Route>();
 		for( Route route : packagedFeed.routeTable ) {
@@ -74,6 +75,7 @@ public class Feed {
 		for( StopTime stoptime : packagedFeed.stopTimeTable ) {
 			Trip trip = trips.get(stoptime.trip_id);
 			stoptime.setTrip( trip );
+			stoptime.setStop( stops.get(stoptime.stop_id) );
 			trip.addStopTime( stoptime );
 		}
 	}
@@ -86,6 +88,8 @@ public class Feed {
 	
 	public void load() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException{
 		loadStops();
+		
+		loadRoutes();
 		
 		loadTrips();
 		

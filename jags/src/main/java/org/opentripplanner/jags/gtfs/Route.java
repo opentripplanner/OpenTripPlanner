@@ -11,7 +11,7 @@ public class Route extends Record {
 	public String route_short_name;
 	public String route_long_name;
 	public String route_desc;
-	public TransportationMode route_type;
+	public String route_type;
 	public String route_url;
 	public String route_color;
 	public String route_text_color;
@@ -69,11 +69,11 @@ public class Route extends Record {
 		route_desc = routeDesc;
 	}
 
-	public TransportationMode getRoute_type() {
+	public String getRoute_type() {
 		return route_type;
 	}
 
-	public void setRoute_type(TransportationMode routeType) {
+	public void setRoute_type(String routeType) {
 		route_type = routeType;
 	}
 
@@ -101,5 +101,16 @@ public class Route extends Record {
 		route_text_color = routeTextColor;
 	}
 
+	public TransportationMode getTransportationMode() {
+		int i = Integer.parseInt(route_type);
+		return TransportationMode.values()[i];
+	}
+
+	public String getName() {
+		if (route_short_name != null && !route_short_name.equals(null)) {
+			return route_short_name;
+		}
+		return route_long_name;
+	}
 	
 }

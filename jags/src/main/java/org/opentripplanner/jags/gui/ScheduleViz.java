@@ -10,7 +10,7 @@ import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Drawable;
-import org.opentripplanner.jags.edgetype.Point;
+import org.opentripplanner.jags.edgetype.DrawablePoint;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.gtfs.Feed;
 import org.opentripplanner.jags.gtfs.PackagedFeed;
@@ -42,10 +42,10 @@ public class ScheduleViz extends PApplet{
 
 		public void handle(Drawable todraw) throws Exception {
 			// get geometry
-			ArrayList<Point> geom = todraw.getGeometry();
+			ArrayList<DrawablePoint> geom = todraw.getDrawableGeometry();
 			
 			// extend drawing window bounds if necessary
-			for( Point pp : geom ) {	
+			for( DrawablePoint pp : geom ) {	
 				left = min(pp.x,left);
 				bottom = min(pp.y,bottom);
 				right = max(pp.x,right);
@@ -69,10 +69,10 @@ public class ScheduleViz extends PApplet{
 	}
 	
 	
-	public void drawGeom(ArrayList<Point> geom) {
+	public void drawGeom(ArrayList<DrawablePoint> geom) {
 		for(int i=0; i<geom.size()-1; i++) {
-			Point p1 = geom.get(i);
-			Point p2 = geom.get(i+1);
+			DrawablePoint p1 = geom.get(i);
+			DrawablePoint p2 = geom.get(i+1);
 			if(timeMode) {
 			    line((p1.x+xtrans)*xscale, (p1.z+ytrans)*yscale, (p2.x+xtrans)*xscale, (p2.z+ytrans)*yscale);
 			} else {
@@ -106,7 +106,7 @@ public class ScheduleViz extends PApplet{
 	
 	class Drawer implements DrawHandler {
 		public void handle(Drawable payload) {
-			ArrayList<Point> geom = payload.getGeometry();
+			ArrayList<DrawablePoint> geom = payload.getDrawableGeometry();
 			drawGeom(geom);
 		}
 	}

@@ -2,6 +2,11 @@ package org.opentripplanner.jags.gtfs;
 
 import java.lang.reflect.InvocationTargetException;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 public class Stop extends Record{
 	public String stop_id;
 	public String stop_code;
@@ -106,4 +111,11 @@ public class Stop extends Record{
 	public void setParent_station(String parentStation) {
 		parent_station = parentStation;
 	}
+	
+	public Geometry getGeometry() {
+		//FIXME: do not recreate factory on every call
+		GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
+		return factory.createPoint(new Coordinate(stop_lat, stop_lon));
+	}
+
 }

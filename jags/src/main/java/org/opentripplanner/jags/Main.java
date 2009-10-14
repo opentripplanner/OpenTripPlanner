@@ -28,8 +28,8 @@ class Main {
                 double length = Double.parseDouble( splitline[3] );
                 gg.addVertex( fromv );
                 gg.addVertex( tov );
-                gg.addEdge( fromv, tov, new Street(name, length) );
-                gg.addEdge( tov, fromv, new Street(name, length) );
+                gg.addEdge( fromv, tov, new Street(name, name, length) );
+                gg.addEdge( tov, fromv, new Street(name, name, length) );
             }
         } catch( IOException x ) {
             

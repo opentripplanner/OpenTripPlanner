@@ -5,13 +5,24 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
 
+import org.geotools.geometry.jts.JTS;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.jags.core.State;
+import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.core.WalkResult;
 import org.opentripplanner.jags.gtfs.ServiceCalendar;
 import org.opentripplanner.jags.gtfs.StopTime;
 import org.opentripplanner.jags.gtfs.exception.DateOutOfBoundsException;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	
@@ -108,23 +119,59 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 		return this.start + " " + this.end + " " + this.calendar;
 	}
 
-	ArrayList<Point> geometryCache = null;
-	public ArrayList<Point> getGeometry() {
+	ArrayList<DrawablePoint> geometryCache = null;
+	public ArrayList<DrawablePoint> getDrawableGeometry() {
 		if(geometryCache != null) {
 			return geometryCache;
 		}
 		
-		ArrayList<Point> ret = new ArrayList<Point>();
+		ArrayList<DrawablePoint> ret = new ArrayList<DrawablePoint>();
 		
-		ret.add( new Point(this.start.getStop().stop_lon.floatValue(),
+		ret.add( new DrawablePoint(this.start.getStop().stop_lon.floatValue(),
 				           this.start.getStop().stop_lat.floatValue(),
 				           this.start.departure_time.getSecondsSinceMidnight()) );
-		ret.add( new Point(this.end.getStop().stop_lon.floatValue(),
+		ret.add( new DrawablePoint(this.end.getStop().stop_lon.floatValue(),
 				           this.end.getStop().stop_lat.floatValue(),
 				           this.end.arrival_time.getSecondsSinceMidnight()) );
 		
 		geometryCache = ret;
 		return ret;
+	}
+
+	public String getDirection() {
+		return start.getTrip().trip_headsign;
+	}
+
+	public double getDistanceKm() {
+		Point startGeom = (Point) start.getStop().getGeometry();
+		Point endGeom = (Point) end.getStop().getGeometry();
+		return startGeom.distance(endGeom); //FIXME: units are probably wrong
+	}
+
+	public String getEnd() {
+		return end.stop_headsign;
+	}
+
+	public TransportationMode getMode() {
+		return start.getTrip().getRoute().getTransportationMode();
+	}
+
+	public String getStart() {
+		return start.stop_headsign;
+	}
+
+	public String getName() {
+		return start.getTrip().getRoute().getName();
+	}
+
+	public Geometry getGeometry() {
+		//FIXME: use shape if available
+		GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
+		return factory.createLineString(new Coordinate[] {
+				start.getStop().getGeometry().getCoordinate(), 
+				end.getStop().getGeometry().getCoordinate()
+		}
+		);
 	}
 	
 }

@@ -27,6 +27,9 @@ public class GTFSHopLoader {
 			graph.addVertex( new SpatialVertex( stop.stop_id, stop.stop_lon, stop.stop_lat ) );
 		}
 		
+		//Load routes
+		feed.loadRoutes();
+		
 		//Load hops
 		if(verbose){ System.out.println( "Loading hops" ); }
 		GTFSHopFactory hf = new GTFSHopFactory(feed);

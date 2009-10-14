@@ -44,6 +44,7 @@ public class ShortestPathTree {
 	        if( end.incoming == null ) {
 	            break;
 	        }
+	        ret.edges.add(0, end.incoming);	        
 	        end = end.incoming.fromv;
 	    }
 	    
