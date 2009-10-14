@@ -8,6 +8,7 @@ import java.util.HashMap;
 import org.opentripplanner.jags.gtfs.types.GTFSDate;
 
 public class Feed {
+	public HashMap<String,Route> routes;
 	public HashMap<String,Stop> stops;
 	public HashMap<String,Trip> trips;
 	public HashMap<String,ServiceCalendar> serviceCalendars;
@@ -49,7 +50,13 @@ public class Feed {
 			stops.put( stop.stop_id, stop );
 		}
 	}
-	
+	public void loadRoutes() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
+		routes = new HashMap<String,Route>();
+		for( Route route : packagedFeed.routeTable ) {
+			routes.put( route.route_id, route );
+		}
+	}
+		
 	public void loadTrips() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		
 		
@@ -107,6 +114,10 @@ public class Feed {
 
 	public Trip getTrip(String tripId) {
 		return this.trips.get(tripId);
+	}
+	
+	public Route getRoute(String routeId) {
+		return this.routes.get(routeId);
 	}
 	
 	public ArrayList<ServiceCalendar> getServiceCalendars(GTFSDate date) {

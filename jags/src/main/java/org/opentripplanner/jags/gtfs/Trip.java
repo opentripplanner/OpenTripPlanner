@@ -50,6 +50,10 @@ public class Trip extends Record {
 		stoptimes.add( st );
 	}
 	
+	public Route getRoute() {
+		return feed.getRoute(route_id);
+	}
+	
 	public String toString() {
 		return "<Trip "+trip_id+">";
 	}
