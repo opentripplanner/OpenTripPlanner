@@ -90,7 +90,7 @@
          <artifactId>maven-surefire-plugin</artifactId>
          <version>2.2</version>
          <configuration>
-           <argLine>-Xmx3192m</argLine>
+           <argLine>-Xmx1500m</argLine>
            <disableXmlReport>true</disableXmlReport>
          </configuration>
        </plugin>
