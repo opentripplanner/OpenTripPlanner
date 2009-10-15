@@ -38,9 +38,9 @@ public class StopTime extends Record implements Comparable<StopTime> {
 		super(header, record);
 	}
 	
-	public void setStop(Stop stop) throws Exception {
+	public void setStop(Stop stop) {
 		if(stop==null) {
-			throw new Exception( "Stops not yet loaded" );
+			throw new RuntimeException( "Stops not yet loaded" );
 		}
 		this.stop = stop;
 	}
@@ -49,9 +49,9 @@ public class StopTime extends Record implements Comparable<StopTime> {
 		this.trip = trip;
 	}
 	
-	public Trip getTrip() throws Exception {
+	public Trip getTrip()  {
 		if(trip==null){
-			throw new Exception( "Trips not yet loaded" );
+			throw new RuntimeException( "Trips not yet loaded" );
 		}
 		return trip;
 	}
