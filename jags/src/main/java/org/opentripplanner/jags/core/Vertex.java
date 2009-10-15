@@ -9,6 +9,7 @@ public class Vertex extends AbstractVertex implements Serializable{
 	public Vector<Edge> outgoing;
     public Vector<Edge> incoming;
     public String label;
+    public boolean isTransitStop = false;
     
     Vertex( String label ) {
         this.label = label;

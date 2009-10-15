@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.SpatialVertex;
+import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
@@ -36,7 +37,11 @@ public class GTFSHopLoader {
 		ArrayList<Hop> hops = hf.run(verbose);
 		for( Hop hop : hops ) {
 			if(drawHandler != null){ drawHandler.handle(hop); }
-			graph.addEdge(hop.start.stop_id, hop.end.stop_id, hop);
+			Vertex start = graph.addVertex(hop.start.stop_id);
+			start.isTransitStop = true;
+			Vertex end = graph.addVertex(hop.end.stop_id);
+			end.isTransitStop = true;
+			graph.addEdge(start, end, hop);
 		}
 	}
 	

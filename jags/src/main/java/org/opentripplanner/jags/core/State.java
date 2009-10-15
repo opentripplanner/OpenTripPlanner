@@ -5,6 +5,7 @@ import java.util.TimeZone;
 public class State {
 	public GregorianCalendar time;
 	public TimeZone timezone;
+	public boolean justTransfered = false;
 	
 	public State() {
 		this.time = new GregorianCalendar();

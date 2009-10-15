@@ -144,6 +144,9 @@ class NarrativeSection {
 	}
 
 	public String asText() {
+		if (mode == TransportationMode.TRANSFER) {
+			return "transfer";
+		}
 		return direction + " on " + name + " via " + mode + "(" + items.size() + " items)";
 	}
 }
@@ -162,16 +165,14 @@ public class Narrative {
 		String lastName = path.edges.elementAt(0).payload.getName();
 		Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
 		for (SPTEdge edge : path.edges) {
-			if (edge.payload.getName() == lastName) { 
-				currentSection.add(edge);
-			} else {
+			if (!edge.payload.getName().equals(lastName)) { 
 				sections.add(new NarrativeSection(currentSection));
 				currentSection.clear();
+				lastName = edge.payload.getName();
 			}
+			currentSection.add(edge);
 		}
-		if (currentSection.size() > 0) {
-			sections.add(new NarrativeSection(currentSection));
-		}
+		sections.add(new NarrativeSection(currentSection));
 	}
 
 	public String asText() {
