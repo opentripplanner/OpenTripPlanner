@@ -47,8 +47,9 @@ public class TestNarrativeGenerator extends TestCase {
 				   airport.label, 
 				   new State(new GregorianCalendar(2009,10,15,12,36,0)), 
 				   new WalkOptions());
-
 		
+		GraphPath path = spt.getPath(airport);
+
 		Narrative narrative = new Narrative(path);
 		Vector<NarrativeSection> sections = narrative.getSections();
 		assertEquals (3, sections.size());
