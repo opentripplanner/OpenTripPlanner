@@ -12,5 +12,6 @@ public enum TransportationMode {
 	WALK,
 	BICYCLE, 
 	BOARDING,
-	ALIGHTING
+	ALIGHTING, 
+	TRANSFER
 }
