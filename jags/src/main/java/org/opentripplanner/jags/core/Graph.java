@@ -39,7 +39,7 @@ public class Graph implements Serializable{
     }
     
     public Vertex getVertex( String label ) {
-        return (Vertex)this.vertices.get( label );
+        return this.vertices.get( label );
     }
     
     public Collection<Vertex> getVertices() {
