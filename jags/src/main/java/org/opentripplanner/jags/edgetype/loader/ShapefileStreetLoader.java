@@ -45,12 +45,12 @@ public class ShapefileStreetLoader {
 						coordinates[0].toString(), 
 						coordinates[0].x, 
 						coordinates[0].y);
-				graph.addVertex(startCorner);
+				startCorner = graph.addVertex(startCorner);
 				Vertex endCorner = new SpatialVertex(
 						coordinates[coordinates.length - 1].toString(),
 						coordinates[coordinates.length - 1].x,
 						coordinates[coordinates.length - 1].y);
-				graph.addVertex(endCorner);
+				endCorner = graph.addVertex(endCorner);
 
 				if (trafDir.equals("W")) {
 					// traffic flows With geometry
