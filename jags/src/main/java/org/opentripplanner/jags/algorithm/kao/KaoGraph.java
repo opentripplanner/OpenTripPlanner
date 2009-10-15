@@ -7,6 +7,7 @@ import java.util.GregorianCalendar;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
+import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.core.WalkResult;
 import org.opentripplanner.jags.edgetype.Hop;
@@ -22,8 +23,8 @@ public class KaoGraph extends Graph {
 		allhops = new ArrayList<Edge>();
 	}
 	
-    public Edge addEdge( String from_label, String to_label, Walkable ep ) {
-    	Edge ret = super.addEdge(from_label, to_label, ep);
+	public Edge addEdge( Vertex a, Vertex b, Walkable ep ) {
+    	Edge ret = super.addEdge(a, b, ep);
     	allhops.add(ret);
     	return ret;
     }
