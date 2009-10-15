@@ -21,6 +21,9 @@ public class Feed {
 	
 	public void loadCalendar() throws IOException, SecurityException, IllegalArgumentException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		serviceCalendars = new HashMap<String,ServiceCalendar>();
+		if (!packagedFeed.hasTable( "calendar" )) {
+			return;
+		}
 		Table table = packagedFeed.getTable( "calendar" );
 		for( String[] record : table ) {
 			ServiceCalendar cal = new ServiceCalendar( table.getHeader(), record );

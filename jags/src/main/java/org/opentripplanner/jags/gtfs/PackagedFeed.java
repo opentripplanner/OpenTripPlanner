@@ -23,6 +23,10 @@ public class PackagedFeed {
 		stopTimeTable = new StopTimeTable( zippedFeed.getInputStream( zippedFeed.getEntry( "stop_times.txt" ) ) );
 		routeTable = new RouteTable( zippedFeed.getInputStream( zippedFeed.getEntry( "routes.txt" ) ) );
 	}
+	
+	public boolean hasTable ( String tableName ) throws IOException {
+		return zippedFeed.getEntry(tableName + ".txt") != null;		
+	}
 
 	public Table getTable( String tableName ) throws IOException {
 		InputStream table_stream = zippedFeed.getInputStream( zippedFeed.getEntry( tableName+".txt" ) );
