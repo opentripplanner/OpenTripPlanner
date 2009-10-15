@@ -71,7 +71,9 @@ public class Feed {
 	
 	public void loadStopTimes(boolean verbose) throws SecurityException, IllegalArgumentException, IOException, NoSuchFieldException, IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException {
 		loadTrips();
-		
+		if (stops == null) {
+			loadStops();
+		}
 		for( StopTime stoptime : packagedFeed.stopTimeTable ) {
 			Trip trip = trips.get(stoptime.trip_id);
 			stoptime.setTrip( trip );
