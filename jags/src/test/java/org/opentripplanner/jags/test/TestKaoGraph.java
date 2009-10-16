@@ -20,7 +20,7 @@ public class TestKaoGraph extends TestCase {
 	}
 	
 	public void testImport() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		KaoGraph kg = new KaoGraph();
 		GTFSHopLoader hl = new GTFSHopLoader(kg,feed);
 		hl.load();
@@ -34,7 +34,7 @@ public class TestKaoGraph extends TestCase {
 	}
 	
 	public void testF() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		KaoGraph kg = new KaoGraph();
 		GTFSHopLoader hl = new GTFSHopLoader(kg,feed);
 		hl.load();

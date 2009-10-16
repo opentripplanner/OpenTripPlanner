@@ -15,7 +15,7 @@ import junit.framework.TestCase;
 public class TestHopFactory extends TestCase {
 	
 	public void testBasic() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		GTFSHopFactory hf = new GTFSHopFactory( feed );
 		ArrayList<Hop> hops = hf.run();
 		

@@ -11,13 +11,13 @@ import junit.framework.TestCase;
 
 public class TestFeed extends TestCase {
 	public void testBasic() throws Exception {
-		String feed_name = "google_transit.zip";
+		String feed_name = TestConstants.DEFAULT_GTFS;
 		PackagedFeed feed = new PackagedFeed( feed_name );
 		assertEquals( feed.getZippedFeed().getName(), feed_name);
 	}
 	
 	public void testGetTable() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "google_transit.zip" );
+		PackagedFeed feed = new PackagedFeed( TestConstants.DEFAULT_GTFS );
 		Table table = feed.getTable( "stop_times" );
 		
 		assertEquals( table.getHeader().index("trip_id"), 0 );
@@ -30,14 +30,14 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetStop() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadStops();
 		assertEquals( feed.stops.get( "San Carlos Caltrain" ).stop_name, "San Carlos Caltrain" );
 	}
 	
 	public void testGetTrip() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadTrips();
 		
@@ -46,7 +46,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetStopTime() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadStopTimes();
 		
@@ -55,7 +55,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetCalendar() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadCalendar();
 		
@@ -63,7 +63,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetCalendarDate() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		
@@ -75,7 +75,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testCalendarDateRunsOn() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		
@@ -111,7 +111,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testTripServiceCalendar() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadTrips();
 		
@@ -130,7 +130,7 @@ public class TestFeed extends TestCase {
 	}
 	
 	public void testGetServiceCalendars() throws Exception {
-		PackagedFeed pfeed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed pfeed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		Feed feed = new Feed(pfeed);
 		feed.loadCalendarDates();
 		

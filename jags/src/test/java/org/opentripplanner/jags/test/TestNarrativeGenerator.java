@@ -1,7 +1,6 @@
 package org.opentripplanner.jags.test;
 
-import java.util.GregorianCalendar;
-import java.util.Vector;
+import junit.framework.TestCase;
 
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
@@ -9,7 +8,6 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.edgetype.loader.NetworkLinker;
 import org.opentripplanner.jags.gtfs.Feed;
@@ -17,10 +15,10 @@ import org.opentripplanner.jags.gtfs.PackagedFeed;
 import org.opentripplanner.jags.narrative.Narrative;
 import org.opentripplanner.jags.narrative.NarrativeSection;
 import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
-import junit.framework.TestCase;
+import java.util.GregorianCalendar;
+import java.util.Vector;
 
 public class TestNarrativeGenerator extends TestCase {
 
@@ -28,7 +26,7 @@ public class TestNarrativeGenerator extends TestCase {
 	
 	public void setUp() {
 		try {
-			Feed feed = new Feed(new PackagedFeed( "google_transit.zip" ));
+			Feed feed = new Feed(new PackagedFeed( TestConstants.DEFAULT_GTFS ));
 			graph = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(graph, feed);
 			hl.load();

@@ -17,7 +17,7 @@ import org.opentripplanner.jags.gtfs.PackagedFeed;
 public class TestHop extends TestCase {
 	
 	public void testHopAfterMidnight() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		GTFSHopFactory hf = new GTFSHopFactory( feed );
 		ArrayList<Hop> hops = hf.run();
 		

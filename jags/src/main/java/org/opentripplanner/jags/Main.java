@@ -97,7 +97,7 @@ class Main {
     
     @SuppressWarnings("unused")
 	private static void play_with_zipfile() {
-    	File ff = new File( "google_transit.zip" );
+    	File ff = new File( "src/test/resources/google_transit.zip" );
     	try{
     		ZipFile zf = new ZipFile(ff);
     		InputStream stops = zf.getInputStream( zf.getEntry( "stops.txt" ) );

@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 public class TestKao extends TestCase {
 	public void testBasic() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		KaoGraph kg = new KaoGraph( );
 		GTFSHopLoader hl = new GTFSHopLoader(kg, feed);
 		hl.load();
@@ -37,7 +37,7 @@ public class TestKao extends TestCase {
 		
 		assertTrue( ((Hop)path.get(path.size()-1).payload).end.arrival_time.getSecondsSinceMidnight()==48540 );
 		
-		Feed feed2 = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed2 = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		Graph gg = new Graph();
 		GTFSHopLoader h2 = new GTFSHopLoader(gg,feed2);
 		h2.load();

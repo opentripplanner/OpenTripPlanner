@@ -9,7 +9,7 @@ import org.opentripplanner.jags.gtfs.StopTime;
 
 public class TestPackagedFeed  extends TestCase {
 	public void testGetStopTable() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed feed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		
 		for(Stop stop : feed.stopTable) {
 			assertEquals( stop.stop_name, "San Francisco Caltrain" );
@@ -18,7 +18,7 @@ public class TestPackagedFeed  extends TestCase {
 	}
 	
 	public void testGetStopTimeTable() throws Exception {
-		PackagedFeed feed = new PackagedFeed( "caltrain_gtfs.zip" );
+		PackagedFeed feed = new PackagedFeed( TestConstants.CALTRAIN_GTFS );
 		
 		for(StopTime st : feed.stopTimeTable) {
 			assertEquals( st.stop_id, "22nd Street Caltrain" );

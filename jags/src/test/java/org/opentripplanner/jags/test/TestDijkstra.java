@@ -16,7 +16,7 @@ import junit.framework.TestCase;
 
 public class TestDijkstra extends TestCase {
 	public void testBasic() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( "caltrain_gtfs.zip" ));
+		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
 		Graph gg = new Graph();
 		GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
 		hl.load();
