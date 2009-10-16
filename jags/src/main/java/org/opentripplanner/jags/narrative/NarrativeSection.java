@@ -88,6 +88,8 @@ public class NarrativeSection {
 				item.setDirection(walkable.getDirection());
 				item.setGeometry(walkable.getGeometry());
 				item.setStart(walkable.getStart());
+				item.setEnd(walkable.getEnd());
+        items.add(item);
 			}
 		}
 	}
