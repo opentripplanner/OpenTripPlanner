@@ -11,6 +11,10 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 import java.util.Iterator;
 
@@ -22,7 +26,21 @@ public class ShapefileStreetLoader {
 	public ShapefileStreetLoader(Graph graph,
 			FeatureSource<SimpleFeatureType, SimpleFeature> featureSource) {
 		this.graph = graph;
-		this.featureSource = featureSource;
+		this.featureSource = featureSource;	
+		
+	}
+	
+	public static LineString toLineString(Geometry g) {
+		if (g instanceof LineString) {
+			return (LineString) g;
+		} else if (g instanceof MultiLineString) {
+			MultiLineString ml = (MultiLineString) g;
+			Coordinate[] coords = ml.getCoordinates();
+			GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
+			return factory.createLineString(coords);
+		} else {
+			throw new RuntimeException("found a geometry feature that's not a linestring: " + g);
+		}
 	}
 
 	public void load() throws Exception {
@@ -33,11 +51,9 @@ public class ShapefileStreetLoader {
 		try {
 			while (i.hasNext()) {
 				SimpleFeature feature = i.next();
-				Geometry geom = (Geometry) feature.getDefaultGeometry();
+				LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 				String id = "" + feature.getAttribute("StreetCode");
 				String name = "" + feature.getAttribute("Street");
-				Street street = new Street(id, name, geom.getLength());
-				street.setGeometry(geom);
 				Coordinate[] coordinates = geom.getCoordinates();
 
 				String trafDir = (String) feature.getAttribute("TrafDir");
@@ -54,14 +70,22 @@ public class ShapefileStreetLoader {
 
 				if (trafDir.equals("W")) {
 					// traffic flows With geometry
+					Street street = new Street(id, name, geom.getLength());
+					street.setGeometry(geom);
 					graph.addEdge(startCorner, endCorner, street);
 				} else if (trafDir.equals("A")) {
 					// traffic flows Against geometry
+					Street street = new Street(id, name, geom.getLength());
+					street.setGeometry(geom);
 					graph.addEdge(endCorner, startCorner, street);
 				} else if (trafDir.equals("T")) {
 					// traffic flows Two ways
+					Street street = new Street(id, name, geom.getLength());
+					street.setGeometry(geom);
 					graph.addEdge(startCorner, endCorner, street);
-					graph.addEdge(endCorner, startCorner, street);
+					Street backStreet = new Street(id, name, geom.getLength());
+					street.setGeometry(geom.reverse());
+					graph.addEdge(endCorner, startCorner, backStreet);
 				} else {
 					// pedestrian
 				}
