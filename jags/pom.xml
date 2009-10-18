@@ -52,8 +52,13 @@
       <artifactId>processing-core</artifactId>
       <version>1.0.7</version>
     </dependency>
-    
+    <dependency>
+      <groupId>org.onebusaway</groupId>
+      <artifactId>onebusaway-gtfs</artifactId>
+      <version>1.0.0</version>
+    </dependency>
   </dependencies>
+  
   <repositories>
     <repository>
       <id>maven2-repository.dev.java.net</id>
@@ -73,6 +78,16 @@
       </snapshots>
       <url>http://repo.osgeo.org/</url>
     </repository>
+	<repository>
+	   <id>releases.developer.onebusaway.org</id>
+	   <url>http://developer.onebusaway.org/maven/repository/</url>
+	   <releases>
+	       <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+    </repository>
   </repositories>
   <build>
     <plugins>
@@ -80,8 +95,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
        <plugin>

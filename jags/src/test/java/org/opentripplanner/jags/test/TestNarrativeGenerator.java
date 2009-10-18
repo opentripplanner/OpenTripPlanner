@@ -17,12 +17,11 @@ import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.edgetype.loader.NetworkLinker;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
-import org.opentripplanner.jags.gtfs.Feed;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.narrative.Narrative;
 import org.opentripplanner.jags.narrative.NarrativeSection;
 import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import java.io.File;
@@ -35,9 +34,9 @@ public class TestNarrativeGenerator extends TestCase {
 	
 	public void setUp() {
 		try {
-			Feed feed = new Feed(new PackagedFeed( TestConstants.DEFAULT_GTFS ));
+		  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
 			graph = new Graph();
-			GTFSHopLoader hl = new GTFSHopLoader(graph, feed);
+			GTFSHopLoader hl = new GTFSHopLoader(graph, context);
 			hl.load();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -48,9 +47,9 @@ public class TestNarrativeGenerator extends TestCase {
 	
 	public void testNarrativeGenerator() {
 
-		Vertex airport = graph.getVertex("10579");
+		Vertex airport = graph.getVertex("Caltrain_10579");
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, 
-				   "6876", 
+				   "Caltrain_6876", 
 				   airport.label, 
 				   new State(new GregorianCalendar(2009,10,15,12,36,0)), 
 				   new WalkOptions());
@@ -70,7 +69,7 @@ public class TestNarrativeGenerator extends TestCase {
 
 		Graph gg = new Graph();
 		try {
-			File file = new File("simple_streets.shp");
+			File file = new File("src/test/resources/simple_streets/simple_streets.shp");
 			DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
 			// we are now connected
 			String[] typeNames = dataStore.getTypeNames();

@@ -1,12 +1,11 @@
 package org.opentripplanner.jags.algorithm.kao;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.gtfs.types.GTFSTime;
+
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 
 public class Kao {
@@ -19,7 +18,7 @@ public class Kao {
 		for( EdgeOption eo: edgeoptions ) {
 			Edge segment = eo.edge;
 			
-			GTFSTime segmentStartTime = ((Hop)segment.payload).start.departure_time;
+			int segmentStartTime = ((Hop)segment.payload).getStartStopTime().getDepartureTime();
 			Vertex segmentOrig = segment.fromv;
 			Vertex segmentDest = segment.tov;
 			
@@ -31,9 +30,9 @@ public class Kao {
 					continue;
 				}
 				
-				GTFSTime parentSegmentEndTime = ((Hop)parentSegment.payload).end.arrival_time;
+				int parentSegmentEndTime = ((Hop)parentSegment.payload).getEndStopTime().getArrivalTime();
 				
-				if( segmentStartTime.getSecondsSinceMidnight() >= parentSegmentEndTime.getSecondsSinceMidnight() ) {
+				if( segmentStartTime >= parentSegmentEndTime ) {
 					tree.setParent(segmentDest, segment);
 				}
 			}

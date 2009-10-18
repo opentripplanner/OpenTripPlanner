@@ -1,8 +1,7 @@
 package org.opentripplanner.jags.edgetype;
 
-import java.util.GregorianCalendar;
-
 import com.vividsolutions.jts.geom.Geometry;
+
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.WalkOptions;

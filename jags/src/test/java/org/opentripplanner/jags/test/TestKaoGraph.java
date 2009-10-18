@@ -1,17 +1,18 @@
 package org.opentripplanner.jags.test;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
+import junit.framework.TestCase;
 
 import org.opentripplanner.jags.algorithm.kao.EdgeOption;
 import org.opentripplanner.jags.algorithm.kao.KaoGraph;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.Feed;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
-import junit.framework.TestCase;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 public class TestKaoGraph extends TestCase {
 	public void testBasic() throws Exception {
@@ -20,27 +21,33 @@ public class TestKaoGraph extends TestCase {
 	}
 	
 	public void testImport() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
+	  
+	  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+		
 		KaoGraph kg = new KaoGraph();
-		GTFSHopLoader hl = new GTFSHopLoader(kg,feed);
+		GTFSHopLoader hl = new GTFSHopLoader(kg,context);
 		hl.load();
 		
-		Vertex mlb = kg.getVertex( "Millbrae Caltrain" );
+		Vertex mlb = kg.getVertex( "Caltrain_Millbrae Caltrain" );
 		assertTrue( mlb.getDegreeOut() == 236 );
 		assertTrue( mlb.getDegreeIn() == 236 );
 		
-		Vertex gilroy = kg.getVertex( "Gilroy Caltrain" );
+		Vertex gilroy = kg.getVertex( "Caltrain_Gilroy Caltrain" );
 		assertNotNull( gilroy );
 	}
 	
 	public void testF() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
+	  
+	  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+		
 		KaoGraph kg = new KaoGraph();
-		GTFSHopLoader hl = new GTFSHopLoader(kg,feed);
+		kg.setGtfsContext(context);
+		
+		GTFSHopLoader hl = new GTFSHopLoader(kg,context);
 		hl.load();
 		
 		ArrayList<EdgeOption> hol = kg.sortedEdges(new GregorianCalendar(2009,8,7,12,0,0), 1000000000);
-		assertTrue( ((Hop)hol.get(0).edge.payload).start.departure_time.getSecondsSinceMidnight()==43200 );
-		assertTrue( ((Hop)hol.get(hol.size()-1).edge.payload).end.arrival_time.getSecondsSinceMidnight()==82260 );
+		assertEquals(43200,((Hop)hol.get(0).edge.payload).getStartStopTime().getArrivalTime());
+		assertEquals(82260, ((Hop)hol.get(hol.size()-1).edge.payload).getEndStopTime().getArrivalTime());
 	}
 }

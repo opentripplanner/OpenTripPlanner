@@ -1,26 +1,27 @@
 package org.opentripplanner.jags.test;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import junit.framework.TestCase;
 
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
-import org.opentripplanner.jags.gtfs.Feed;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
-import junit.framework.TestCase;
-
-
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class TestHopFactory extends TestCase {
-	
-	public void testBasic() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
-		GTFSHopFactory hf = new GTFSHopFactory( feed );
-		ArrayList<Hop> hops = hf.run();
-		
-		Collections.sort(hops, new Hop.HopArrivalTimeComparator());
-		Hop last = hops.get(hops.size()-1);
-		assertTrue(last.start.departure_time.getSecondsSinceMidnight()==91740);
-	}
+
+  public void testBasic() throws Exception {
+
+    GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+
+    GTFSHopFactory hf = new GTFSHopFactory(context);
+    ArrayList<Hop> hops = hf.run();
+
+    Collections.sort(hops, new Hop.HopArrivalTimeComparator());
+    Hop last = hops.get(hops.size() - 1);
+    assertEquals(91740, last.getStartStopTime().getDepartureTime());
+  }
 }

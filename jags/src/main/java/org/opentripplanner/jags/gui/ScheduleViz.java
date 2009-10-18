@@ -1,5 +1,6 @@
 package org.opentripplanner.jags.gui;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
@@ -12,8 +13,8 @@ import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Drawable;
 import org.opentripplanner.jags.edgetype.DrawablePoint;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.Feed;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import processing.core.*;
@@ -88,10 +89,10 @@ public class ScheduleViz extends PApplet{
 		smooth();
 		background(255);
 		
-		try {			
-			Feed feed = new Feed(new PackagedFeed( "../../caltrain_gtfs.zip" ));
+		try {
+		  GtfsContext context = GtfsLibrary.readGtfs(new File("../../caltrain_gtfs.zip"));
 			gg = new Graph();
-			GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
+			GTFSHopLoader hl = new GTFSHopLoader(gg,context);
 			System.out.println( "Loading feed to graph" );
 			hl.load(new LoadDrawHandler(),true);
 			System.out.println( "Done" );

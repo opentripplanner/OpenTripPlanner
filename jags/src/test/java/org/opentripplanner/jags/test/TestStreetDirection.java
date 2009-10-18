@@ -28,7 +28,7 @@ public class TestStreetDirection extends TestCase {
 
 		Graph gg = new Graph();
 		try {
-			File file = new File("simple_streets.shp");
+			File file = new File("src/test/resources/simple_streets/simple_streets.shp");
 			DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
 			// we are now connected
 			String[] typeNames = dataStore.getTypeNames();

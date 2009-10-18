@@ -1,6 +1,6 @@
 package org.opentripplanner.jags.test;
 
-import java.util.GregorianCalendar;
+import junit.framework.TestCase;
 
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
@@ -8,24 +8,31 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.Feed;
-import org.opentripplanner.jags.gtfs.PackagedFeed;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
-import junit.framework.TestCase;
+import java.io.File;
+import java.util.GregorianCalendar;
 
 public class TestDijkstra extends TestCase {
 	public void testBasic() throws Exception {
-		Feed feed = new Feed(new PackagedFeed( TestConstants.CALTRAIN_GTFS ));
+	  
+	  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+
+    WalkOptions options = new WalkOptions();
+    options.setGtfsContext(context);
+    
 		Graph gg = new Graph();
-		GTFSHopLoader hl = new GTFSHopLoader(gg,feed);
+		GTFSHopLoader hl = new GTFSHopLoader(gg,context);
 		hl.load();
 		
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, 
-				   "Millbrae Caltrain", 
-				   "Mountain View Caltrain", 
+				   "Caltrain_Millbrae Caltrain", 
+				   "Caltrain_Mountain View Caltrain", 
 				   new State(new GregorianCalendar(2009,8,7,12,0,0)), 
-				   new WalkOptions());
-		assertTrue( ((Hop)spt.getPath(gg.getVertex("Mountain View Caltrain")).vertices.lastElement().incoming.payload).end.arrival_time.getSecondsSinceMidnight()==48540 );
+				   options);
+		
+		assertTrue( ((Hop)spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain")).vertices.lastElement().incoming.payload).getEndStopTime().getArrivalTime()==48540 );
 	}
 }
