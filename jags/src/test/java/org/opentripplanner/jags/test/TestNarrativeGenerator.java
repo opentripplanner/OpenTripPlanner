@@ -34,18 +34,8 @@ public class TestNarrativeGenerator extends TestCase {
 	GtfsContext context;
 
 	public void setUp() {
-		try {
-			context = GtfsLibrary
-					.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
-			graph = new Graph();
-			GTFSHopLoader hl = new GTFSHopLoader(graph, context);
-			hl.load();
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-		NetworkLinker nl = new NetworkLinker(graph);
-		nl.createLinkage();
+		graph = ConstantsForTests.getInstance().getPortlandGraph();
+		context = ConstantsForTests.getInstance().getPortlandContext();
 	}
 
 	public void testNarrativeGenerator() {
