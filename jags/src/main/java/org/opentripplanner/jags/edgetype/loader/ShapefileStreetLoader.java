@@ -84,7 +84,7 @@ public class ShapefileStreetLoader {
 					street.setGeometry(geom);
 					graph.addEdge(startCorner, endCorner, street);
 					Street backStreet = new Street(id, name, geom.getLength());
-					street.setGeometry(geom.reverse());
+					backStreet.setGeometry(geom.reverse());
 					graph.addEdge(endCorner, startCorner, backStreet);
 				} else {
 					// pedestrian
