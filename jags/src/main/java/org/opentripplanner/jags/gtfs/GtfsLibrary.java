@@ -25,13 +25,22 @@ public class GtfsLibrary {
 
   private static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
 
+  
   public static GtfsContext readGtfs(File path) throws IOException {
+    return readGtfs(path,null);
+  }
+  
+  public static GtfsContext readGtfs(File path, String defaultAgencyId) throws IOException {
 
     GtfsRelationalDaoImpl dao = new GtfsRelationalDaoImpl();
 
-    GtfsReader reader = new GtfsReader();
+    GtfsReader reader = new GtfsReader();    
     reader.setInputLocation(path);
     reader.setEntityStore(dao);
+    
+    if( defaultAgencyId != null)
+      reader.setDefaultAgencyId(defaultAgencyId);
+    
     reader.run();
 
     CalendarService calendarService = createCalendarService(dao);
