@@ -44,7 +44,7 @@ public class NarrativeSection {
 
 	public NarrativeSection(Vector<SPTEdge> edges) {
 		items = new Vector<NarrativeItem>();
-		Walkable walkable = edges.elementAt(0).payload;
+		Walkable walkable = edges.firstElement().payload;
 		mode = walkable.getMode(); 
 		if (walkable instanceof Hop) {
 			name = walkable.getName();
@@ -69,7 +69,12 @@ public class NarrativeSection {
 			items.add(item);
 		} else if (walkable instanceof Street) {
 			name = "walk";
-			direction = "FIXME: compute from start/end geometry"; 
+			Street street1 = (Street) edges.firstElement().payload;
+			Street street2 = (Street) edges.lastElement().payload;
+			direction = Street.computeDirection(
+					street1.getGeometry().getStartPoint(),
+					street2.getGeometry().getEndPoint());
+			
 			double totalDistance = 0;
 			String lastStreet = null;
 			BasicNarrativeItem item = null;
@@ -89,7 +94,7 @@ public class NarrativeSection {
 				item.setGeometry(walkable.getGeometry());
 				item.setStart(walkable.getStart());
 				item.setEnd(walkable.getEnd());
-        items.add(item);
+				items.add(item);
 			}
 		}
 	}
