@@ -76,7 +76,7 @@ public class ShapefileStreetLoader {
 				} else if (trafDir.equals("A")) {
 					// traffic flows Against geometry
 					Street street = new Street(id, name, geom.getLength());
-					street.setGeometry(geom);
+					street.setGeometry(geom.reverse());
 					graph.addEdge(endCorner, startCorner, street);
 				} else if (trafDir.equals("T")) {
 					// traffic flows Two ways
