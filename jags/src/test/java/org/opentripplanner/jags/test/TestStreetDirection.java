@@ -16,6 +16,7 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
+import org.opentripplanner.jags.narrative.Narrative;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.ShortestPathTree;
@@ -80,6 +81,9 @@ public class TestStreetDirection extends TestCase {
 		assertEquals("south", seventhAve.payload.getDirection());
 		SPTEdge garfieldPl = edges.elementAt(1);
 		assertEquals("east", garfieldPl.payload.getDirection());
+		
+		Narrative narrative = new Narrative(path);
+		String direction = narrative.getSections().elementAt(0).getDirection();
+		assertEquals ("southeast", direction);
 	}
-
 }
