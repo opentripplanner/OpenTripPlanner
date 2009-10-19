@@ -36,7 +36,7 @@ public class TestNarrativeGenerator extends TestCase {
 	public void setUp() {
 		try {
 			context = GtfsLibrary
-					.readGtfs(new File(TestConstants.PORTLAND_GTFS));
+					.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
 			graph = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(graph, context);
 			hl.load();

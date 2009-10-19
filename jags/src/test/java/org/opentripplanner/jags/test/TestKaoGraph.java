@@ -22,7 +22,7 @@ public class TestKaoGraph extends TestCase {
 	
 	public void testImport() throws Exception {
 	  
-	  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+	  GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 		
 		KaoGraph kg = new KaoGraph();
 		GTFSHopLoader hl = new GTFSHopLoader(kg,context);
@@ -38,7 +38,7 @@ public class TestKaoGraph extends TestCase {
 	
 	public void testF() throws Exception {
 	  
-	  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+	  GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 		
 		KaoGraph kg = new KaoGraph();
 		kg.setGtfsContext(context);

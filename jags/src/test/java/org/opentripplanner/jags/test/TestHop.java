@@ -19,7 +19,7 @@ public class TestHop extends TestCase {
 
   public void testHopAfterMidnight() throws Exception {
 
-    GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+    GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 
     WalkOptions options = new WalkOptions();
     options.setGtfsContext(context);

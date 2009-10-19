@@ -25,7 +25,7 @@ public class TestKao extends TestCase {
 
   public void testBasic() throws Exception {
 
-    GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+    GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 
     GregorianCalendar t_0 = new GregorianCalendar(2009, 8, 7, 12, 0, 0);
 
