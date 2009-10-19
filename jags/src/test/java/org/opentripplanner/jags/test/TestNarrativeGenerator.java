@@ -31,15 +31,17 @@ import java.util.Vector;
 public class TestNarrativeGenerator extends TestCase {
 
 	Graph graph;
+	GtfsContext context;
 	
 	public void setUp() {
 		try {
-		  GtfsContext context = GtfsLibrary.readGtfs(new File(TestConstants.CALTRAIN_GTFS));
+		  context = GtfsLibrary.readGtfs(new File(TestConstants.PORTLAND_GTFS));
 			graph = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(graph, context);
 			hl.load();
 		} catch (Exception e) {
 			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 		NetworkLinker nl = new NetworkLinker(graph);
 		nl.createLinkage();
@@ -47,12 +49,14 @@ public class TestNarrativeGenerator extends TestCase {
 	
 	public void testNarrativeGenerator() {
 
-		Vertex airport = graph.getVertex("Caltrain_10579");
+		Vertex airport = graph.getVertex("TriMet_10579");
+		WalkOptions wo = new WalkOptions();
+		wo.setGtfsContext(context);
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, 
-				   "Caltrain_6876", 
+				   "TriMet_6876", 
 				   airport.label, 
 				   new State(new GregorianCalendar(2009,10,15,12,36,0)), 
-				   new WalkOptions());
+				   wo);
 		
 		GraphPath path = spt.getPath(airport);
 
@@ -62,8 +66,6 @@ public class TestNarrativeGenerator extends TestCase {
 		assertEquals (TransportationMode.BUS, sections.elementAt(0).getMode());
 		assertEquals (TransportationMode.TRAM, sections.elementAt(1).getMode());
 	}
-	
-
 	
 	public void testWalkNarrative() {
 
