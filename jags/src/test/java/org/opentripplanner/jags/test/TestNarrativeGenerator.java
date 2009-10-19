@@ -32,10 +32,11 @@ public class TestNarrativeGenerator extends TestCase {
 
 	Graph graph;
 	GtfsContext context;
-	
+
 	public void setUp() {
 		try {
-		  context = GtfsLibrary.readGtfs(new File(TestConstants.PORTLAND_GTFS));
+			context = GtfsLibrary
+					.readGtfs(new File(TestConstants.PORTLAND_GTFS));
 			graph = new Graph();
 			GTFSHopLoader hl = new GTFSHopLoader(graph, context);
 			hl.load();
@@ -46,32 +47,37 @@ public class TestNarrativeGenerator extends TestCase {
 		NetworkLinker nl = new NetworkLinker(graph);
 		nl.createLinkage();
 	}
-	
+
 	public void testNarrativeGenerator() {
 
 		Vertex airport = graph.getVertex("TriMet_10579");
 		WalkOptions wo = new WalkOptions();
 		wo.setGtfsContext(context);
-		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, 
-				   "TriMet_6876", 
-				   airport.label, 
-				   new State(new GregorianCalendar(2009,10,15,12,36,0)), 
-				   wo);
-		
+		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph,
+				"TriMet_6876", airport.label, new State(new GregorianCalendar(
+						2009, 10, 15, 12, 36, 0)), wo);
+
 		GraphPath path = spt.getPath(airport);
 
 		Narrative narrative = new Narrative(path);
 		Vector<NarrativeSection> sections = narrative.getSections();
-		assertEquals (3, sections.size());
-		assertEquals (TransportationMode.BUS, sections.elementAt(0).getMode());
-		assertEquals (TransportationMode.TRAM, sections.elementAt(1).getMode());
+		/*
+		 * This trip, from a bus stop near TriMet HQ to the Airport, should take
+		 * the #70 bus, then transfer, then take the MAX Red Line, thus three
+		 * sections. If the test fails, that's because a more complex (and
+		 * wrong) route is being chosen.
+		 */
+		assertEquals(3, sections.size());
+		assertEquals(TransportationMode.BUS, sections.elementAt(0).getMode());
+		assertEquals(TransportationMode.TRAM, sections.elementAt(1).getMode());
 	}
-	
+
 	public void testWalkNarrative() {
 
 		Graph gg = new Graph();
 		try {
-			File file = new File("src/test/resources/simple_streets/simple_streets.shp");
+			File file = new File(
+					"src/test/resources/simple_streets/simple_streets.shp");
 			DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
 			// we are now connected
 			String[] typeNames = dataStore.getTypeNames();
@@ -93,7 +99,8 @@ public class TestNarrativeGenerator extends TestCase {
 		for (Vertex v : gg.getVertices()) {
 			if (v instanceof SpatialVertex) {
 				SpatialVertex sv = (SpatialVertex) v;
-				if (northVertex == null || sv.getCoordinate().y > northVertex.getCoordinate().y) {
+				if (northVertex == null
+						|| sv.getCoordinate().y > northVertex.getCoordinate().y) {
 					northVertex = sv;
 				}
 			}
@@ -103,20 +110,22 @@ public class TestNarrativeGenerator extends TestCase {
 		for (Vertex v : gg.getVertices()) {
 			if (v instanceof SpatialVertex) {
 				SpatialVertex sv = (SpatialVertex) v;
-				if (eastVertex == null || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
+				if (eastVertex == null
+						|| sv.getCoordinate().x > eastVertex.getCoordinate().x) {
 					eastVertex = sv;
 				}
 			}
-		}		
-		
+		}
+
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
 				northVertex.label, eastVertex.label, new State(
 						new GregorianCalendar(2009, 8, 7, 12, 0, 0)),
 				new WalkOptions());
-		
+
 		GraphPath path = spt.getPath(eastVertex);
 		Narrative narrative = new Narrative(path);
 		assertEquals(1, narrative.getSections().size());
-		assertEquals(2, narrative.getSections().firstElement().getItems().size());
+		assertEquals(2, narrative.getSections().firstElement().getItems()
+				.size());
 	}
 }
