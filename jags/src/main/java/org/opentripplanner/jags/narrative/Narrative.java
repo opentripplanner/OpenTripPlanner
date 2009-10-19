@@ -1,5 +1,7 @@
 package org.opentripplanner.jags.narrative;
 
+import org.opentripplanner.jags.core.TransportationMode;
+import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.GraphPath;
 
@@ -90,14 +92,20 @@ public class Narrative {
 		this.sections = new Vector<NarrativeSection>();
 		
 		String lastName = path.edges.elementAt(0).payload.getName();
+		TransportationMode lastMode = null;
 		Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
 		for (SPTEdge edge : path.edges) {
-			String edgeName = edge.payload.getName();
-			if (!edgeName.equals(lastName)) { 
+			Walkable walkable = edge.payload;
+			String edgeName = walkable.getName();
+			if (!edgeName.equals(lastName) && 
+					!(walkable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
+				//a section ends the name of the payload changes except  
+				//when walking
 				sections.add(new NarrativeSection(currentSection));
 				currentSection.clear();
 				lastName = edgeName;
 			}
+			lastMode = walkable.getMode();
 			currentSection.add(edge);
 		}
 		sections.add(new NarrativeSection(currentSection));
