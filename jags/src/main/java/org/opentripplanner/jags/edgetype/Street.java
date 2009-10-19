@@ -6,7 +6,8 @@ import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.core.WalkResult;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class Street extends AbstractPayload {
 
@@ -15,7 +16,7 @@ public class Street extends AbstractPayload {
 			"southeast", "south", "southwest", "west", "northwest" };
 	String id;
 	String name;
-	Geometry geometry;
+	LineString geometry;
 	double length;
 
 	public Street(double length) {
@@ -28,7 +29,7 @@ public class Street extends AbstractPayload {
 		this.length = length;
 	}
 
-	public void setGeometry(Geometry g) {
+	public void setGeometry(LineString g) {
 		geometry = g;
 	}
 
@@ -55,14 +56,22 @@ public class Street extends AbstractPayload {
 
 	public String getDirection() {
 		Coordinate[] coordinates = geometry.getCoordinates();
-		double run = coordinates[1].x - coordinates[0].x;
-		double rise = coordinates[1].y - coordinates[0].y;
-		double direction = Math.atan2(run, -rise);
+		return getDirection(coordinates[0], coordinates[coordinates.length - 1]);
+	}
+
+	private static String getDirection(Coordinate a, Coordinate b) {
+		double run = b.x - a.x;
+		double rise = b.y - a.y;
+		double direction = Math.atan2(run, rise);
 		int octant = (int) (8 + Math.round(direction * 8 / (Math.PI * 2))) % 8;
 
 		return DIRECTIONS[octant];
 	}
 
+	public static String computeDirection(Point startPoint, Point endPoint) {
+		return getDirection(startPoint.getCoordinate(), endPoint.getCoordinate());
+	}
+	
 	public double getDistanceKm() {
 		return length;
 	}
@@ -72,7 +81,7 @@ public class Street extends AbstractPayload {
 		return null;
 	}
 
-	public Geometry getGeometry() {
+	public LineString getGeometry() {
 		return geometry;
 	}
 
