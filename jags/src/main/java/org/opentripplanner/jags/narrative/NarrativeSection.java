@@ -81,7 +81,6 @@ public class NarrativeSection {
 			direction = walkable.getDirection();
 			BasicNarrativeItem item = new BasicNarrativeItem();
 			item.setDirection(walkable.getDirection());
-			item.setDirection(walkable.getDirection());
 			item.setName(walkable.getName());
 			String end = walkable.getEnd();
 			Geometry geom = walkable.getGeometry();
