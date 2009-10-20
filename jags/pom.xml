@@ -76,7 +76,7 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-      <url>http://repo.osgeo.org/</url>
+      <url>http://download.osgeo.org/</url>
     </repository>
 	<repository>
 	   <id>releases.developer.onebusaway.org</id>
