@@ -1,5 +1,7 @@
 package org.opentripplanner.jags.narrative;
 
+import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Vector;
 
 import org.opentripplanner.jags.core.TransportationMode;
@@ -7,6 +9,7 @@ import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.Street;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.spt.SPTEdge;
+import org.opentripplanner.jags.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -24,7 +27,18 @@ public class NarrativeSection {
 	
 	TransportationMode mode;
 	String name;
-	String direction;	
+	String direction;
+
+	private GregorianCalendar startTime;	
+	private GregorianCalendar endTime;
+	
+	public GregorianCalendar getStartTime() {
+		return startTime;
+	}
+	
+	public GregorianCalendar getEndTime() {
+		return endTime;
+	}
 	
 	public Vector<NarrativeItem> getItems() {
 		return items;
@@ -42,7 +56,13 @@ public class NarrativeSection {
 		return direction;
 	}
 
-	public NarrativeSection(Vector<SPTEdge> edges) {
+	public NarrativeSection(List<SPTVertex> vertices, Vector<SPTEdge> edges) {
+		/* compute start and end times */
+		SPTVertex first = vertices.get(0);
+		startTime = first.state.time;
+		SPTVertex last = vertices.get(vertices.size() - 1);
+		endTime = last.state.time;
+		
 		items = new Vector<NarrativeItem>();
 		Walkable walkable = edges.firstElement().payload;
 		mode = walkable.getMode(); 

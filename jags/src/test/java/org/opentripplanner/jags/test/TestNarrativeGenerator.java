@@ -14,11 +14,8 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.edgetype.loader.NetworkLinker;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.narrative.Narrative;
 import org.opentripplanner.jags.narrative.NarrativeSection;
 import org.opentripplanner.jags.spt.GraphPath;
@@ -43,12 +40,15 @@ public class TestNarrativeGenerator extends TestCase {
 		Vertex airport = graph.getVertex("TriMet_10579");
 		WalkOptions wo = new WalkOptions();
 		wo.setGtfsContext(context);
+		GregorianCalendar startTime = new GregorianCalendar(
+				2009, 10, 15, 12, 36, 0);
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph,
-				"TriMet_6876", airport.label, new State(new GregorianCalendar(
-						2009, 10, 15, 12, 36, 0)), wo);
+				"TriMet_6876", airport.label, new State(startTime), wo);
 
 		GraphPath path = spt.getPath(airport);
 
+		assertNotNull(path);
+		
 		Narrative narrative = new Narrative(path);
 		Vector<NarrativeSection> sections = narrative.getSections();
 		/*
@@ -57,9 +57,17 @@ public class TestNarrativeGenerator extends TestCase {
 		 * sections. If the test fails, that's because a more complex (and
 		 * wrong) route is being chosen.
 		 */
+		
+		NarrativeSection busSection = sections.elementAt(0);
+		NarrativeSection redLineSection = sections.elementAt(2);
+		
+		assertTrue(busSection.getEndTime().before(redLineSection.getStartTime()));
+		assertEquals(startTime, busSection.getStartTime());
+		
+		assertEquals(TransportationMode.BUS, busSection.getMode());
+		assertEquals(TransportationMode.TRAM, redLineSection.getMode());
+		
 		assertEquals(3, sections.size());
-		assertEquals(TransportationMode.BUS, sections.elementAt(0).getMode());
-		assertEquals(TransportationMode.TRAM, sections.elementAt(1).getMode());
 	}
 
 	public void testWalkNarrative() {

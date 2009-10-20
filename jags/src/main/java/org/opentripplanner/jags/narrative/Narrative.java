@@ -4,9 +4,11 @@ import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.GraphPath;
+import org.opentripplanner.jags.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import java.util.List;
 import java.util.Vector;
 
 
@@ -94,6 +96,8 @@ public class Narrative {
 		String lastName = path.edges.elementAt(0).payload.getName();
 		TransportationMode lastMode = null;
 		Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
+		int startVertex = 0;
+		int i = 0;
 		for (SPTEdge edge : path.edges) {
 			Walkable walkable = edge.payload;
 			String edgeName = walkable.getName();
@@ -101,14 +105,17 @@ public class Narrative {
 					!(walkable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
 				//a section ends the name of the payload changes except  
 				//when walking
-				sections.add(new NarrativeSection(currentSection));
+				List<SPTVertex> currentVertices = path.vertices.subList(startVertex, i + 1);
+				sections.add(new NarrativeSection(currentVertices, currentSection));
 				currentSection.clear();
 				lastName = edgeName;
+				startVertex = i;
 			}
+			i += 1;
 			lastMode = walkable.getMode();
 			currentSection.add(edge);
 		}
-		sections.add(new NarrativeSection(currentSection));
+		sections.add(new NarrativeSection(path.vertices.subList(startVertex, i + 1), currentSection));
 	}
 
 	public String asText() {
