@@ -39,7 +39,7 @@ public class TestNarrativeGenerator extends TestCase {
 		context = ConstantsForTests.getInstance().getPortlandContext();
 	}
 
-	public void xtestNarrativeGenerator() {
+	public void testNarrativeGenerator() {
 
 		Vertex airport = graph.getVertex("TriMet_10579");
 		WalkOptions wo = new WalkOptions();
