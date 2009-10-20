@@ -28,9 +28,14 @@ public class NarrativeSection {
 	TransportationMode mode;
 	String name;
 	String direction;
-
+	Geometry geometry;
+	
 	private GregorianCalendar startTime;	
 	private GregorianCalendar endTime;
+	
+	public Geometry getGeometry() {
+		return geometry;
+	}
 	
 	public GregorianCalendar getStartTime() {
 		return startTime;
@@ -65,7 +70,12 @@ public class NarrativeSection {
 		
 		items = new Vector<NarrativeItem>();
 		Walkable walkable = edges.firstElement().payload;
-		mode = walkable.getMode(); 
+		mode = walkable.getMode();
+		geometry = walkable.getGeometry();
+		for (SPTEdge edge : edges.subList(1, edges.size())) {
+			geometry = geometry.union(edge.payload.getGeometry());
+		}
+		
 		if (walkable instanceof Hop) {
 			name = walkable.getName();
 			direction = walkable.getDirection();
