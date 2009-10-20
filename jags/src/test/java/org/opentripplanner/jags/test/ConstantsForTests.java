@@ -31,7 +31,9 @@ public class ConstantsForTests {
   }
   
   public GtfsContext getPortlandContext() {
-	  setupPortland();
+	  if (portlandGraph == null) {
+		  setupPortland();
+	  }
 	  return portlandContext;
   }
   
