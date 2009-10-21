@@ -14,7 +14,7 @@ public class AllTests {
 		suite.addTestSuite(TestHopFactory.class);
 		suite.addTestSuite(TestKaoGraph.class);
 		suite.addTestSuite(TestNarrativeGenerator.class);
-		suite.addTestSuite(TestStreetDirection.class);
+		suite.addTestSuite(TestStreet.class);
 		//$JUnit-END$
 		return suite;
 	}
