@@ -28,6 +28,40 @@ import junit.framework.TestCase;
 
 public class TestStreet extends TestCase {
     
+    public void testStreetWalk() {
+        Graph gg = new Graph();
+
+        Vertex start = gg.addVertex("start");
+        Vertex end = gg.addVertex("end");
+
+        WalkOptions wo = new WalkOptions();
+        wo.speed = 1.37; // meters/sec (http://en.wikipedia.org/wiki/Walking),
+                         // roughly 3mph
+        double streetLength = 100; // meters
+        Edge ee = gg.addEdge(start, end, new Street(streetLength));
+
+        // Start at October 19, 2009 at 1:00:00pm
+        GregorianCalendar startTime = new GregorianCalendar(2009, 9, 21, 13, 0, 0);
+        GregorianCalendar endTime = (GregorianCalendar) startTime.clone();
+        int expectedSecElapsed = (int) (streetLength / wo.speed);
+        endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
+        
+        State s0 = new State(startTime);
+        WalkResult wr = ee.walk(s0, wo);
+
+        assertNotNull(wr);
+        assertEquals(wr.weight, streetLength / wo.speed);
+        assertEquals(wr.state.time, endTime); // Has the time elapsed as expected?
+        
+        wr = null;
+        s0 = new State(endTime);
+        wr = ee.walkBack(s0, wo);
+        
+        assertNotNull(wr);
+        assertEquals(wr.weight, streetLength / wo.speed);
+        assertEquals(wr.state.time, startTime);
+    }
+    
     public void testStreetDirection() {
 
         Graph gg = new Graph();
