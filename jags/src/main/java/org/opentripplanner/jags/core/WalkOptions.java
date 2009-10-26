@@ -3,14 +3,15 @@ package org.opentripplanner.jags.core;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 
 public class WalkOptions {
-    public double speed; //fixme: figure out units
+    public double speed; // in meters/second
     public boolean bicycle;
 	public double transferPenalty = 120;
 	
 	private GtfsContext _context;
     
     public WalkOptions() {
-        this.speed = 0.85;
+        // http://en.wikipedia.org/wiki/Walking
+        this.speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         this.bicycle = false;
     }
     
