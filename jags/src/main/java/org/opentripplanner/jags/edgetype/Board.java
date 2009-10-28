@@ -25,7 +25,7 @@ public class Board extends AbstractPayload {
 		return null;
 	}
 
-	public double getDistanceKm() {
+	public double getDistance() {
 		return 0;
 	}
 

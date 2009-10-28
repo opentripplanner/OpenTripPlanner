@@ -20,7 +20,7 @@ public class Transfer implements Walkable {
 		return null;
 	}
 
-	public double getDistanceKm() {
+	public double getDistance() {
 		return distance;
 	}
 
