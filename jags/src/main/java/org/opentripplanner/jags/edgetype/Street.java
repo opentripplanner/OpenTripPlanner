@@ -78,7 +78,7 @@ public class Street extends AbstractPayload {
 		return getDirection(startPoint.getCoordinate(), endPoint.getCoordinate());
 	}
 	
-	public double getDistance() {
+	public double getDistanceKm() {
 		return length;
 	}
 

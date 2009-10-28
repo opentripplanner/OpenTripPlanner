@@ -22,7 +22,7 @@ public class Alight extends AbstractPayload {
 		return null;
 	}
 
-	public double getDistance() {
+	public double getDistanceKm() {
 		return 0;
 	}
 

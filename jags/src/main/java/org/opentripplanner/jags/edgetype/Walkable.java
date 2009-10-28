@@ -15,7 +15,7 @@ public interface Walkable {
 	public Geometry getGeometry();
 	public String getStart();
 	public String getEnd();
-	public double getDistance();
+	public double getDistanceKm();
 	
     WalkResult walk( State s0, WalkOptions wo );
     WalkResult walkBack( State s0, WalkOptions wo );    

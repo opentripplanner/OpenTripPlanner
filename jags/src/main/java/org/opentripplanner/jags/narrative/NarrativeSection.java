@@ -85,10 +85,10 @@ public class NarrativeSection {
 			String end = walkable.getEnd();
 			Geometry geom = walkable.getGeometry();
 			
-			double totalDistance = walkable.getDistance();
+			double totalDistance = walkable.getDistanceKm();
 			for (SPTEdge edge : edges.subList(1, edges.size())) {
 				walkable = edge.payload;
-				totalDistance += walkable.getDistance();
+				totalDistance += walkable.getDistanceKm();
 				geom = geom.union(walkable.getGeometry());			
 				end = walkable.getEnd();
 			}
@@ -111,7 +111,7 @@ public class NarrativeSection {
 				walkable = edge.payload;
 				String streetName = walkable.getName();
 				if (streetName == lastStreet) {
-					totalDistance += walkable.getDistance(); 
+					totalDistance += walkable.getDistanceKm(); 
 					item.setDistance(totalDistance);
 					item.setGeometry(item.getGeometry().union(walkable.getGeometry()));
 					item.setEnd(walkable.getStart());

@@ -135,7 +135,7 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 		return start.getTrip().getTripHeadsign();
 	}
 
-	public double getDistance() {
+	public double getDistanceKm() {
 	  Stop stop1 = start.getStop();
 	  Stop stop2 = start.getStop();
 	  return GtfsLibrary.distance(stop1.getLat(), stop1.getLon(), stop2.getLat(), stop2.getLon());
