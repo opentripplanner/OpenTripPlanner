@@ -1,28 +1,37 @@
 package org.opentripplanner.jags.core;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+import java.util.Date;
 
 public class State {
-	public GregorianCalendar time;
-	public TimeZone timezone;
+	
+  private long _time;
+
 	public boolean justTransfered = false;
 	
 	public State() {
-		this.time = new GregorianCalendar();
+		this(System.currentTimeMillis());
 	}
 	
-	public State(GregorianCalendar time) {
-		this.time = time;
+	public State(long time) {
+		_time = time;
 	}
+	
+	public long getTime() {
+	  return _time;
+	}
+
+  public void incrementTimeInSeconds(int numOfSeconds) {
+    _time += numOfSeconds * 1000;
+  }
 	
     public State clone() {
         State ret = new State();
-        ret.time = (GregorianCalendar)time.clone();
+        ret._time = _time;
         return ret;
     }
     
     public String toString() {
-    	return "<State "+time.getTime()+">";
+    	return "<State "+new Date(_time)+">";
     }
+
    
 }

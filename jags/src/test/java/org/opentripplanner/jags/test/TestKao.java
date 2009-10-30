@@ -38,7 +38,7 @@ public class TestKao extends TestCase {
     Vertex mlb = kg.getVertex("Caltrain_Millbrae Caltrain");
     Vertex mtv = kg.getVertex("Caltrain_Mountain View Caltrain");
 
-    Tree tree = Kao.find(kg, t_0, mlb, delta);
+    Tree tree = Kao.find(kg, t_0.getTime(), mlb, delta);
     ArrayList<Edge> path = tree.path(mtv);
 
     assertTrue(((Hop) path.get(path.size() - 1).payload).getEndStopTime().getArrivalTime() == 48540);
@@ -51,7 +51,7 @@ public class TestKao extends TestCase {
     h2.load();
     ShortestPathTree spt = org.opentripplanner.jags.algorithm.Dijkstra.getShortestPathTree(
         gg, "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain",
-        new State(t_0), options);
+        new State(t_0.getTimeInMillis()), options);
 
     Vertex vertex = gg.getVertex("Caltrain_Mountain View Caltrain");
     Hop hop = (Hop) spt.getPath(vertex).vertices.lastElement().incoming.payload;

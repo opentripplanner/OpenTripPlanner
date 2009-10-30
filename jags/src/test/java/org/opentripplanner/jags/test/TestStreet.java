@@ -46,20 +46,20 @@ public class TestStreet extends TestCase {
         int expectedSecElapsed = (int) (streetLength / wo.speed);
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
         
-        State s0 = new State(startTime);
+        State s0 = new State(startTime.getTimeInMillis());
         WalkResult wr = ee.walk(s0, wo);
 
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
-        assertEquals(wr.state.time, endTime); // Has the time elapsed as expected?
+        assertEquals(wr.state.getTime(), endTime.getTimeInMillis()); // Has the time elapsed as expected?
         
         wr = null;
-        s0 = new State(endTime);
+        s0 = new State(endTime.getTimeInMillis());
         wr = ee.walkBack(s0, wo);
         
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
-        assertEquals(wr.state.time, startTime);
+        assertEquals(wr.state.getTime(), startTime.getTimeInMillis());
     }
     
     public void testStreetDirection() {
@@ -109,7 +109,7 @@ public class TestStreet extends TestCase {
 
         ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
                 northVertex.label, eastVertex.label, new State(
-                        new GregorianCalendar(2009, 8, 7, 12, 0, 0)),
+                        new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis()),
                 new WalkOptions());
 
         GraphPath path = spt.getPath(eastVertex);

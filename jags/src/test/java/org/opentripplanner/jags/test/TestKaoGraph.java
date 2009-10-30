@@ -46,7 +46,7 @@ public class TestKaoGraph extends TestCase {
 		GTFSHopLoader hl = new GTFSHopLoader(kg,context);
 		hl.load();
 		
-		ArrayList<EdgeOption> hol = kg.sortedEdges(new GregorianCalendar(2009,8,7,12,0,0), 1000000000);
+		ArrayList<EdgeOption> hol = kg.sortedEdges(new GregorianCalendar(2009,8,7,12,0,0).getTime(), 1000000000);
 		assertEquals(43200,((Hop)hol.get(0).edge.payload).getStartStopTime().getArrivalTime());
 		assertEquals(82260, ((Hop)hol.get(hol.size()-1).edge.payload).getEndStopTime().getArrivalTime());
 	}

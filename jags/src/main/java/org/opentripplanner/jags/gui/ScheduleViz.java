@@ -172,7 +172,7 @@ public class ScheduleViz extends PApplet{
 			now.set(GregorianCalendar.SECOND, 0 );
 			now.add(GregorianCalendar.SECOND, (int)time);
 			
-			State s0 = new State(now);
+			State s0 = new State(now.getTimeInMillis());
 			spt = Dijkstra.getShortestPathTree(gg, startVertex.label, null, s0, new WalkOptions());
 
 		}

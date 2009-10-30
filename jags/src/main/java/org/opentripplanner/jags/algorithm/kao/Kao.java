@@ -1,15 +1,15 @@
 package org.opentripplanner.jags.algorithm.kao;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Hop;
 
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-
 
 public class Kao {
-	public static Tree find(KaoGraph graph, GregorianCalendar startTime, Vertex startVertex, long window) {
+	public static Tree find(KaoGraph graph, Date startTime, Vertex startVertex, long window) {
 		Tree tree = new Tree();
 		tree.setParent(startVertex,null);
 		

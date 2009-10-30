@@ -1,28 +1,26 @@
 package org.opentripplanner.jags.edgetype;
 
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Set;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
-
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.core.WalkResult;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Set;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	
@@ -64,9 +62,9 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	
     public WalkResult walk( State state0, WalkOptions wo ) {
       
-      Date currentTime = state0.time.getTime();
+      long currentTime = state0.getTime();
       Date serviceDate = getServiceDate(currentTime, false);
-      int secondsSinceMidnight = (int) ((currentTime.getTime()-serviceDate.getTime()) / 1000);
+      int secondsSinceMidnight = (int) ((currentTime-serviceDate.getTime()) / 1000);
       
     	CalendarService service = wo.getGtfsContext().getCalendarService();
     	Set<Date> serviceDates = service.getServiceDatesForServiceId(_serviceId);
@@ -79,15 +77,15 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
     	}
     	
     	State state1 = state0.clone();
-    	state1.time.add(GregorianCalendar.SECOND, wait+elapsed);
+    	state1.incrementTimeInSeconds(wait+elapsed);
     	return new WalkResult(wait+elapsed, state1);
     }
     
     public WalkResult walkBack( State state0, WalkOptions wo ) {
       
-      Date currentTime = state0.time.getTime();
+      long currentTime = state0.getTime();
       Date serviceDate = getServiceDate(currentTime, true);
-      int secondsSinceMidnight = (int) ((currentTime.getTime()-serviceDate.getTime()) / 1000);
+      int secondsSinceMidnight = (int) ((currentTime-serviceDate.getTime()) / 1000);
 
       CalendarService service = wo.getGtfsContext().getCalendarService(); 
       if( ! service.getServiceDatesForServiceId(_serviceId).contains(serviceDate) )
@@ -99,7 +97,7 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
     	}
     	
     	State state1 = state0.clone();
-    	state1.time.add(GregorianCalendar.SECOND, -(wait+elapsed));
+    	state1.incrementTimeInSeconds(-(wait+elapsed));
     	return new WalkResult(wait+elapsed, state1);
     	
     }
@@ -173,10 +171,10 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	 * Private Methods
 	 ****/
 	
-	private Date getServiceDate(Date currentTime, boolean useArrival) {
+	private Date getServiceDate(long currentTime, boolean useArrival) {
 	  int scheduleTime = useArrival ? end.getArrivalTime() : start.getDepartureTime();
 	  Calendar c = Calendar.getInstance();
-	  c.setTime(currentTime);
+	  c.setTimeInMillis(currentTime);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);

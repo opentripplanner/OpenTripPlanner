@@ -1,6 +1,5 @@
 package org.opentripplanner.jags.narrative;
 
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
 
@@ -30,18 +29,18 @@ public class NarrativeSection {
 	String direction;
 	Geometry geometry;
 	
-	private GregorianCalendar startTime;	
-	private GregorianCalendar endTime;
+	private long startTime;	
+	private long endTime;
 	
 	public Geometry getGeometry() {
 		return geometry;
 	}
 	
-	public GregorianCalendar getStartTime() {
+	public long getStartTime() {
 		return startTime;
 	}
 	
-	public GregorianCalendar getEndTime() {
+	public long getEndTime() {
 		return endTime;
 	}
 	
@@ -64,9 +63,9 @@ public class NarrativeSection {
 	public NarrativeSection(List<SPTVertex> vertices, Vector<SPTEdge> edges) {
 		/* compute start and end times */
 		SPTVertex first = vertices.get(0);
-		startTime = first.state.time;
+		startTime = first.state.getTime();
 		SPTVertex last = vertices.get(vertices.size() - 1);
-		endTime = last.state.time;
+		endTime = last.state.getTime();
 		
 		items = new Vector<NarrativeItem>();
 		Walkable walkable = edges.firstElement().payload;

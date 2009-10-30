@@ -1,5 +1,9 @@
 package org.opentripplanner.jags.test;
 
+import java.io.File;
+import java.util.GregorianCalendar;
+import java.util.Vector;
+
 import junit.framework.TestCase;
 
 import org.geotools.data.DataStore;
@@ -8,7 +12,6 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.core.State;
@@ -24,10 +27,6 @@ import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-
-import java.io.File;
-import java.util.GregorianCalendar;
-import java.util.Vector;
 
 public class TestNarrativeGenerator extends TestCase {
 
@@ -47,7 +46,7 @@ public class TestNarrativeGenerator extends TestCase {
 		GregorianCalendar startTime = new GregorianCalendar(2009, 10, 15, 12,
 				36, 0);
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph,
-				"TriMet_6876", airport.label, new State(startTime), wo);
+				"TriMet_6876", airport.label, new State(startTime.getTimeInMillis()), wo);
 
 		GraphPath path = spt.getPath(airport);
 
@@ -65,9 +64,8 @@ public class TestNarrativeGenerator extends TestCase {
 		NarrativeSection busSection = sections.elementAt(0);
 		NarrativeSection redLineSection = sections.elementAt(2);
 
-		assertTrue(busSection.getEndTime()
-				.before(redLineSection.getStartTime()));
-		assertEquals(startTime, busSection.getStartTime());
+		assertTrue(busSection.getEndTime() < redLineSection.getStartTime());
+		assertEquals(startTime.getTimeInMillis(), busSection.getStartTime());
 
 		assertEquals(TransportationMode.BUS, busSection.getMode());
 		assertEquals(TransportationMode.TRAM, redLineSection.getMode());
@@ -122,7 +120,7 @@ public class TestNarrativeGenerator extends TestCase {
 
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
 				northVertex.label, eastVertex.label, new State(
-						new GregorianCalendar(2009, 8, 7, 12, 0, 0)),
+						new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis()),
 				new WalkOptions());
 
 		GraphPath path = spt.getPath(eastVertex);

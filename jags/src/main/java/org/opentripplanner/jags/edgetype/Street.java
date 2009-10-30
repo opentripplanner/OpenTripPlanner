@@ -1,7 +1,5 @@
 package org.opentripplanner.jags.edgetype;
 
-import java.util.GregorianCalendar;
-
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.WalkOptions;
@@ -39,7 +37,7 @@ public class Street extends AbstractPayload {
 		State s1 = s0.clone();
 		double weight = this.length / wo.speed;
         // it takes time to walk/bike along a street, so update state accordingly
-        s1.time.add(GregorianCalendar.SECOND, (int)weight);
+        s1.incrementTimeInSeconds( (int)weight);
 		return new WalkResult(weight, s1);
 	}
 
@@ -47,7 +45,7 @@ public class Street extends AbstractPayload {
 		State s1 = s0.clone();
 		double weight = this.length / wo.speed;
         // time moves *backwards* when traversing an edge in the opposite direction
-        s1.time.add(GregorianCalendar.SECOND, -(int)weight);
+        s1.incrementTimeInSeconds(-(int)weight);
 		return new WalkResult(weight, s1);
 	}
 

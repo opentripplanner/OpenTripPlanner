@@ -30,7 +30,7 @@ public class TestDijkstra extends TestCase {
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, 
 				   "Caltrain_Millbrae Caltrain", 
 				   "Caltrain_Mountain View Caltrain", 
-				   new State(new GregorianCalendar(2009,8,7,12,0,0)), 
+				   new State(new GregorianCalendar(2009,8,7,12,0,0).getTimeInMillis()), 
 				   options);
 		
 		assertTrue( ((Hop)spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain")).vertices.lastElement().incoming.payload).getEndStopTime().getArrivalTime()==48540 );
