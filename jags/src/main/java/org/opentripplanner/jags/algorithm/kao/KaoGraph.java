@@ -10,6 +10,7 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
 import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.gtfs.GtfsContext;
@@ -39,20 +40,32 @@ public class KaoGraph extends Graph {
 	public ArrayList<EdgeOption> sortedEdges(Date time, long window) {
 		ArrayList<EdgeOption> ret = new ArrayList<EdgeOption>();
 		State state0 = new State(time.getTime());
-		
+
+        WalkOptions options = new WalkOptions();
+        options.setGtfsContext(_context);
+        
+
 		for(int i=0; i<allhops.size(); i++) {
-			Edge hopedge = allhops.get(i);
-			Hop hop = (Hop)hopedge.payload;
-			
-			WalkOptions options = new WalkOptions();
-			options.setGtfsContext(_context);
-			
-			WalkResult wr = hop.walk(state0, options);
+			Edge edge = allhops.get(i);
+			if (!(edge.payload instanceof Board)) continue;
+			Board board = (Board) edge.payload;
+
+			WalkResult wr = board.walk(state0, options);
 			
 			if( wr != null ) {
+			    for (Edge og : edge.tov.outgoing) {
+			        if (og.payload instanceof Hop) {
+			            edge = og;
+			            wr = edge.walk(wr.state, options);
+			            break;
+			        }
+			    }
+
 				long timeToArrival = wr.state.getTime() - time.getTime();
+
+
 				if( timeToArrival <= window ) {
-					ret.add( new EdgeOption(hopedge, timeToArrival) );
+					ret.add( new EdgeOption(edge, timeToArrival) );
 				}
 			}
 		}

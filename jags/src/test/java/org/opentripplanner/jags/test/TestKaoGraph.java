@@ -47,7 +47,15 @@ public class TestKaoGraph extends TestCase {
 		hl.load();
 		
 		ArrayList<EdgeOption> hol = kg.sortedEdges(new GregorianCalendar(2009,8,7,12,0,0).getTime(), 1000000000);
-		assertEquals(43200,((Hop)hol.get(0).edge.payload).getStartStopTime().getArrivalTime());
+		
+		Hop firstHop = null;
+		for (EdgeOption eo : hol) {
+		    if (eo.edge.payload instanceof Hop) {
+		        firstHop = (Hop) eo.edge.payload;
+		        break;
+		    }
+		}
+		assertEquals(43200, firstHop.getStartStopTime().getArrivalTime());
 		assertEquals(82260, ((Hop)hol.get(hol.size()-1).edge.payload).getEndStopTime().getArrivalTime());
 	}
 }

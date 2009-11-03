@@ -10,6 +10,7 @@ import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
+import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import java.io.File;
@@ -33,6 +34,8 @@ public class TestDijkstra extends TestCase {
 				   new State(new GregorianCalendar(2009,8,7,12,0,0).getTimeInMillis()), 
 				   options);
 		
-		assertTrue( ((Hop)spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain")).vertices.lastElement().incoming.payload).getEndStopTime().getArrivalTime()==48540 );
+		GraphPath path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
+		
+		assertTrue( ((Hop)path.vertices.elementAt(path.vertices.size()-2).incoming.payload).getEndStopTime().getArrivalTime()==48540 );
 	}
 }

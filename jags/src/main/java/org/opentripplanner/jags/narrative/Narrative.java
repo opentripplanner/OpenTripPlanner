@@ -93,20 +93,21 @@ public class Narrative {
 		}
 		this.sections = new Vector<NarrativeSection>();
 		
-		String lastName = path.edges.elementAt(0).payload.getName();
+		int i = 0;
+		String lastName = path.edges.elementAt(i).payload.getName();
 		TransportationMode lastMode = null;
 		Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
 		int startVertex = 0;
-		int i = 0;
 		for (SPTEdge edge : path.edges) {
 			Walkable walkable = edge.payload;
 			String edgeName = walkable.getName();
 			if (!edgeName.equals(lastName) && 
 					!(walkable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
-				//a section ends the name of the payload changes except  
-				//when walking
+				//A section ends when the name of the payload changes except when walking
 				List<SPTVertex> currentVertices = path.vertices.subList(startVertex, i + 1);
-				sections.add(new NarrativeSection(currentVertices, currentSection));
+				// Don't add boarding and alighting edges as separate sections in the narrative
+				if (lastMode != TransportationMode.ALIGHTING && lastMode != TransportationMode.BOARDING)
+				    sections.add(new NarrativeSection(currentVertices, currentSection));
 				currentSection.clear();
 				lastName = edgeName;
 				startVertex = i;
@@ -115,7 +116,10 @@ public class Narrative {
 			lastMode = walkable.getMode();
 			currentSection.add(edge);
 		}
-		sections.add(new NarrativeSection(path.vertices.subList(startVertex, i + 1), currentSection));
+		// Add the last section, unless it's an alight
+		if (lastMode != TransportationMode.ALIGHTING) {
+		    sections.add(new NarrativeSection(path.vertices.subList(startVertex, i + 1), currentSection));
+		}
 	}
 
 	public String asText() {

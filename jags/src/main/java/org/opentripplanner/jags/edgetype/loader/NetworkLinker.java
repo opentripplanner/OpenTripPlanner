@@ -2,15 +2,18 @@ package org.opentripplanner.jags.edgetype.loader;
 
 import java.util.List;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.edgetype.Alight;
-import org.opentripplanner.jags.edgetype.Board;
+import org.opentripplanner.jags.edgetype.StreetTransitLink;
 import org.opentripplanner.jags.edgetype.Transfer;
+import org.opentripplanner.jags.gtfs.GtfsLibrary;
+import org.opentripplanner.jags.vertextypes.Intersection;
+import org.opentripplanner.jags.vertextypes.TransitStop;
 
 
 public class NetworkLinker {
@@ -31,7 +34,7 @@ public class NetworkLinker {
 		}
 		
 		for(Vertex v : graph.getVertices()) { 
-			if (v.isTransitStop && v instanceof SpatialVertex) {
+			if (v.type == TransitStop.class && v instanceof SpatialVertex) {
 				//find nearby vertices
 				SpatialVertex sv = (SpatialVertex) v;
 
@@ -39,27 +42,34 @@ public class NetworkLinker {
 				env.expandBy(0.0018); //FIXME: meters?
 				List<SpatialVertex> nearby = (List<SpatialVertex>) index.query(env);
 				
-				SpatialVertex nearestNonTransitVertex = null;
-				double minDistance = 0;
+				SpatialVertex nearestIntersection = null;
+				double minDistance = 1000000000;
+				Coordinate coord = sv.getCoordinate();
+				double lat1 = coord.y;
+				double lon1 = coord.x;
 				for (SpatialVertex nv : nearby) {
 					if (nv == sv) {
 						continue;
 					}
-					double distance = nv.getCoordinate().distance(sv.getCoordinate());
-					if (nv.isTransitStop) {
+					coord = nv.getCoordinate();
+					double lat2 = coord.y;
+					double lon2 = coord.x;
+					double distance = GtfsLibrary.distance(lat1, lon1, lat2, lon2) * 2;
+					
+					if (nv.type == TransitStop.class) {
 						graph.addEdge(sv, nv, new Transfer(distance));
 						graph.addEdge(nv, sv, new Transfer(distance));
-					} else {
+					} else if (nv.type == Intersection.class) {
 						if (distance < minDistance) {
 							minDistance = distance;
-							nearestNonTransitVertex = nv;
+							nearestIntersection = nv;
 						}
 					}
 				}
 				
-				if (nearestNonTransitVertex != null) {
-					graph.addEdge(nearestNonTransitVertex, sv, new Board());
-					graph.addEdge(sv, nearestNonTransitVertex, new Alight());
+				if (nearestIntersection != null) {
+					graph.addEdge(nearestIntersection, sv, new StreetTransitLink());
+					graph.addEdge(sv, nearestIntersection, new StreetTransitLink());
 				}
 			}
 		}

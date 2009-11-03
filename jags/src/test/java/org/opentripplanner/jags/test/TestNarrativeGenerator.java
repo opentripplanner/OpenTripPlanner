@@ -43,8 +43,8 @@ public class TestNarrativeGenerator extends TestCase {
 		Vertex airport = graph.getVertex("TriMet_10579");
 		WalkOptions wo = new WalkOptions();
 		wo.setGtfsContext(context);
-		GregorianCalendar startTime = new GregorianCalendar(2009, 10, 15, 12,
-				36, 0);
+		GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12,
+				34, 25);
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph,
 				"TriMet_6876", airport.label, new State(startTime.getTimeInMillis()), wo);
 
@@ -60,7 +60,7 @@ public class TestNarrativeGenerator extends TestCase {
 		 * sections. If the test fails, that's because a more complex (and
 		 * wrong) route is being chosen.
 		 */
-
+		
 		NarrativeSection busSection = sections.elementAt(0);
 		NarrativeSection redLineSection = sections.elementAt(2);
 
@@ -107,6 +107,8 @@ public class TestNarrativeGenerator extends TestCase {
 			}
 		}
 
+		assertNotNull(northVertex);
+		
 		SpatialVertex eastVertex = null;
 		for (Vertex v : gg.getVertices()) {
 			if (v instanceof SpatialVertex) {
@@ -118,12 +120,15 @@ public class TestNarrativeGenerator extends TestCase {
 			}
 		}
 
+		assertNotNull(eastVertex);
+		
 		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
 				northVertex.label, eastVertex.label, new State(
 						new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis()),
 				new WalkOptions());
 
 		GraphPath path = spt.getPath(eastVertex);
+		assertNotNull(path);
 		Narrative narrative = new Narrative(path);
 
 		// there's only one narrative section (the walk), and it has two items
@@ -136,8 +141,9 @@ public class TestNarrativeGenerator extends TestCase {
 		Geometry g = walkSection.getGeometry();
 		Coordinate[] coords = g.getCoordinates();
 
-		assertEquals(coords[0], northVertex.getCoordinate());
-		assertEquals(coords[coords.length - 1], eastVertex.getCoordinate());
+		
+		assertTrue(coords[0].distance(northVertex.getCoordinate()) < 0.0000001);
+		assertTrue(coords[coords.length - 1].distance(eastVertex.getCoordinate()) < 0.0000001);
 
 	}
 }

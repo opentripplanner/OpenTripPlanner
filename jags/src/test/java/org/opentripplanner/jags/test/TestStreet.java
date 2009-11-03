@@ -35,12 +35,11 @@ public class TestStreet extends TestCase {
         Vertex end = gg.addVertex("end");
 
         WalkOptions wo = new WalkOptions();
-        wo.speed = 1.37; // meters/sec (http://en.wikipedia.org/wiki/Walking),
-                         // roughly 3mph
+        wo.speed = ConstantsForTests.WALKING_SPEED;
         double streetLength = 100; // meters
         Edge ee = gg.addEdge(start, end, new Street(streetLength));
 
-        // Start at October 19, 2009 at 1:00:00pm
+        // Start at October 21, 2009 at 1:00:00pm
         GregorianCalendar startTime = new GregorianCalendar(2009, 9, 21, 13, 0, 0);
         GregorianCalendar endTime = (GregorianCalendar) startTime.clone();
         int expectedSecElapsed = (int) (streetLength / wo.speed);

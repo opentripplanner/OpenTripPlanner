@@ -15,6 +15,11 @@ public class WalkOptions {
         this.bicycle = false;
     }
     
+    public WalkOptions(GtfsContext context) {
+    	this();
+    	this._context = context;
+    }
+    
     public GtfsContext getGtfsContext( ){
       return _context;
     }

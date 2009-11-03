@@ -33,6 +33,6 @@ public class TestHop extends TestCase {
     GregorianCalendar aSundayAtMidnight = new GregorianCalendar(2009, 7, 30, 0,
         0, 0);
     WalkResult walkResult = last.walk(new State(aSundayAtMidnight.getTimeInMillis()), options);
-    assertEquals(5820.0,walkResult.weight);
+    assertEquals(480.0,walkResult.weight);
   }
 }

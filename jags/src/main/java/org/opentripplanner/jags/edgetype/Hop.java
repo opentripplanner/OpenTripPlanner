@@ -10,7 +10,12 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
+
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.WalkOptions;
@@ -35,13 +40,16 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	}
 	
 	private static final long serialVersionUID = -7761092317912812048L;
-	
-	private static final int SECS_IN_DAY = 86400;
-	
+		
 	private StopTime start;
 	private StopTime end;
-	private AgencyAndId _serviceId;
-	private int elapsed;
+
+    private AgencyAndId _serviceId;
+    private int elapsed;
+	
+	public AgencyAndId getServiceId() {
+        return _serviceId;
+    }
 
 	public Hop( StopTime start, StopTime end ) throws Exception {
 		this.start = start;
@@ -61,45 +69,15 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	
 	
     public WalkResult walk( State state0, WalkOptions wo ) {
-      
-      long currentTime = state0.getTime();
-      Date serviceDate = getServiceDate(currentTime, false);
-      int secondsSinceMidnight = (int) ((currentTime-serviceDate.getTime()) / 1000);
-      
-    	CalendarService service = wo.getGtfsContext().getCalendarService();
-    	Set<Date> serviceDates = service.getServiceDatesForServiceId(_serviceId);
-      if( ! serviceDates.contains(serviceDate))
-    	  return null;
-    	
-    	int wait = start.getDepartureTime() - secondsSinceMidnight;
-    	if( wait < 0 ) {
-    		return null;
-    	}
-    	
-    	State state1 = state0.clone();
-    	state1.incrementTimeInSeconds(wait+elapsed);
-    	return new WalkResult(wait+elapsed, state1);
+          State state1 = state0.clone();
+          state1.incrementTimeInSeconds(elapsed);
+          return new WalkResult(elapsed, state1);
     }
     
     public WalkResult walkBack( State state0, WalkOptions wo ) {
-      
-      long currentTime = state0.getTime();
-      Date serviceDate = getServiceDate(currentTime, true);
-      int secondsSinceMidnight = (int) ((currentTime-serviceDate.getTime()) / 1000);
-
-      CalendarService service = wo.getGtfsContext().getCalendarService(); 
-      if( ! service.getServiceDatesForServiceId(_serviceId).contains(serviceDate) )
-        return null;
-    	
-    	int wait = secondsSinceMidnight - end.getArrivalTime();
-    	if( wait < 0 ) {
-    		return null;
-    	}
-    	
-    	State state1 = state0.clone();
-    	state1.incrementTimeInSeconds(-(wait+elapsed));
-    	return new WalkResult(wait+elapsed, state1);
-    	
+        	State state1 = state0.clone();
+         	state1.incrementTimeInSeconds(-elapsed);
+      	  return new WalkResult(elapsed, state1);
     }
 
 	public int compareTo(Hop arg0) {
@@ -133,9 +111,9 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 		return start.getTrip().getTripHeadsign();
 	}
 
-	public double getDistanceKm() {
+	public double getDistance() {
 	  Stop stop1 = start.getStop();
-	  Stop stop2 = start.getStop();
+	  Stop stop2 = end.getStop();
 	  return GtfsLibrary.distance(stop1.getLat(), stop1.getLon(), stop2.getLat(), stop2.getLon());
 	}
 
@@ -171,17 +149,4 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
 	 * Private Methods
 	 ****/
 	
-	private Date getServiceDate(long currentTime, boolean useArrival) {
-	  int scheduleTime = useArrival ? end.getArrivalTime() : start.getDepartureTime();
-	  Calendar c = Calendar.getInstance();
-	  c.setTimeInMillis(currentTime);
-    c.set(Calendar.HOUR_OF_DAY, 0);
-    c.set(Calendar.MINUTE, 0);
-    c.set(Calendar.SECOND, 0);
-    c.set(Calendar.MILLISECOND, 0);
-    
-    int dayOverflow = scheduleTime /SECS_IN_DAY;
-    c.add(Calendar.DAY_OF_YEAR,-dayOverflow);
-    return c.getTime();
-	}
 }

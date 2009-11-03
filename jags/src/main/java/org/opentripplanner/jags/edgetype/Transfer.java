@@ -20,7 +20,7 @@ public class Transfer implements Walkable {
 		return null;
 	}
 
-	public double getDistanceKm() {
+	public double getDistance() {
 		return distance;
 	}
 
@@ -35,7 +35,6 @@ public class Transfer implements Walkable {
 	}
 
 	public TransportationMode getMode() {
-		// TODO Auto-generated method stub
 		return TransportationMode.TRANSFER;
 	}
 
@@ -50,22 +49,12 @@ public class Transfer implements Walkable {
 	}
 
 	public WalkResult walk(State s0, WalkOptions wo) {
-		if (s0.justTransfered) {
-			// do not transfer twice in a row -- you might as well just make the
-			// correct transfer the first time.
-			return null;
-		}
 		State s1 = s0.clone();
-		s1.justTransfered = true;
 		return new WalkResult(distance / wo.speed + wo.transferPenalty, s1);
 	}
 
 	public WalkResult walkBack(State s0, WalkOptions wo) {
-		if (s0.justTransfered) {
-			return null;
-		}
 		State s1 = s0.clone();
-		s1.justTransfered = true;
 		return new WalkResult(distance / wo.speed + wo.transferPenalty, s1);
 	}
 

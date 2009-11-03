@@ -5,7 +5,6 @@ public class State {
 	
   private long _time;
 
-	public boolean justTransfered = false;
 	
 	public State() {
 		this(System.currentTimeMillis());
