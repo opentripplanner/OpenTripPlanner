@@ -127,7 +127,7 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
         GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING),
                 4326);
         Stop stop1 = start.getStop();
-        Stop stop2 = start.getStop();
+        Stop stop2 = end.getStop();
 
         Coordinate c1 = new Coordinate(stop1.getLon(), stop1.getLat());
         Coordinate c2 = new Coordinate(stop2.getLon(), stop2.getLat());
