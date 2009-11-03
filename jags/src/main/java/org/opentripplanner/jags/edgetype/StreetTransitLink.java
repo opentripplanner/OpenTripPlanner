@@ -45,7 +45,7 @@ public class StreetTransitLink extends AbstractPayload {
 
     public WalkResult walk(State s0, WalkOptions wo) {
         State s1 = s0.clone();
-        return  new WalkResult(0, s1);
+        return new WalkResult(0, s1);
     }
 
     public WalkResult walkBack(State s0, WalkOptions wo) {

@@ -24,8 +24,9 @@ import junit.framework.TestCase;
 public class TestHopLoader extends TestCase {
 
     private Graph graph;
+
     private GtfsContext context;
-    
+
     public void setUp() throws Exception {
 
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -33,9 +34,9 @@ public class TestHopLoader extends TestCase {
 
         GTFSHopLoader hl = new GTFSHopLoader(graph, context);
         hl.load();
-        
+
     }
-    
+
     public void testBoardAlight() throws Exception {
 
         Vertex stop_a = graph.getVertex("agency_A");
@@ -51,7 +52,7 @@ public class TestHopLoader extends TestCase {
         Vertex journey_a_1 = stop_a.outgoing.get(0).tov;
 
         assertEquals(1, journey_a_1.getDegreeIn());
-        
+
         for (Edge e : journey_a_1.outgoing) {
             if (e.tov.type == TransitStop.class) {
                 assertEquals(Alight.class, e.payload.getClass());
@@ -60,7 +61,7 @@ public class TestHopLoader extends TestCase {
             }
         }
     }
-    
+
     public void testRouting() throws Exception {
 
         Vertex stop_a = graph.getVertex("agency_A");
@@ -71,50 +72,38 @@ public class TestHopLoader extends TestCase {
 
         WalkOptions options = new WalkOptions();
         options.setGtfsContext(context);
-        
+
         ShortestPathTree spt;
         GraphPath path;
-        
-        //A to B
-        spt = Dijkstra.getShortestPathTree(graph, 
-                stop_a.label, 
-                stop_b.label, 
-                new State(new GregorianCalendar(2009,8,7,0,0,0).getTimeInMillis()), 
-                options);
+
+        // A to B
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_b.label, new State(
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_b);
         assertNotNull(path);
         assertEquals(4, path.vertices.size());
-        
-        //A to C
-        spt = Dijkstra.getShortestPathTree(graph, 
-                       stop_a.label, 
-                       stop_c.label, 
-                       new State(new GregorianCalendar(2009,8,7,0,0,0).getTimeInMillis()), 
-                       options);
-        
+
+        // A to C
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_c.label, new State(
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+
         path = spt.getPath(stop_c);
         assertNotNull(path);
         assertEquals(5, path.vertices.size());
-        
-        //A to D
-        spt = Dijkstra.getShortestPathTree(graph, 
-                stop_a.label, 
-                stop_d.label, 
-                new State(new GregorianCalendar(2009,8,7,0,0,0).getTimeInMillis()), 
-                options);
- 
+
+        // A to D
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_d.label, new State(
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+
         path = spt.getPath(stop_d);
         assertNotNull(path);
         assertEquals(8, path.vertices.size());
 
-        //A to E
-        spt = Dijkstra.getShortestPathTree(graph, 
-                       stop_a.label, 
-                       stop_e.label, 
-                       new State(new GregorianCalendar(2009,8,7,0,0,0).getTimeInMillis()), 
-                       options);
-        
+        // A to E
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_e.label, new State(
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+
         path = spt.getPath(stop_e);
         assertNotNull(path);
         assertEquals(9, path.vertices.size());

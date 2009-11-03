@@ -17,22 +17,21 @@ import java.util.GregorianCalendar;
 
 public class TestHop extends TestCase {
 
-  public void testHopAfterMidnight() throws Exception {
+    public void testHopAfterMidnight() throws Exception {
 
-    GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 
-    WalkOptions options = new WalkOptions();
-    options.setGtfsContext(context);
+        WalkOptions options = new WalkOptions();
+        options.setGtfsContext(context);
 
-    GTFSHopFactory hf = new GTFSHopFactory(context);
-    ArrayList<Hop> hops = hf.run();
+        GTFSHopFactory hf = new GTFSHopFactory(context);
+        ArrayList<Hop> hops = hf.run();
 
-    Collections.sort(hops, new Hop.HopArrivalTimeComparator());
-    Hop last = hops.get(hops.size() - 1);
+        Collections.sort(hops, new Hop.HopArrivalTimeComparator());
+        Hop last = hops.get(hops.size() - 1);
 
-    GregorianCalendar aSundayAtMidnight = new GregorianCalendar(2009, 7, 30, 0,
-        0, 0);
-    WalkResult walkResult = last.walk(new State(aSundayAtMidnight.getTimeInMillis()), options);
-    assertEquals(480.0,walkResult.weight);
-  }
+        GregorianCalendar aSundayAtMidnight = new GregorianCalendar(2009, 7, 30, 0, 0, 0);
+        WalkResult walkResult = last.walk(new State(aSundayAtMidnight.getTimeInMillis()), options);
+        assertEquals(480.0, walkResult.weight);
+    }
 }

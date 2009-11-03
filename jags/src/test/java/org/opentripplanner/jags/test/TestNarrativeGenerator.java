@@ -30,120 +30,113 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class TestNarrativeGenerator extends TestCase {
 
-	Graph graph;
-	GtfsContext context;
+    Graph graph;
 
-	public void setUp() {
-		graph = ConstantsForTests.getInstance().getPortlandGraph();
-		context = ConstantsForTests.getInstance().getPortlandContext();
-	}
+    GtfsContext context;
 
-	public void testNarrativeGenerator() {
+    public void setUp() {
+        graph = ConstantsForTests.getInstance().getPortlandGraph();
+        context = ConstantsForTests.getInstance().getPortlandContext();
+    }
 
-		Vertex airport = graph.getVertex("TriMet_10579");
-		WalkOptions wo = new WalkOptions();
-		wo.setGtfsContext(context);
-		GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12,
-				34, 25);
-		ShortestPathTree spt = Dijkstra.getShortestPathTree(graph,
-				"TriMet_6876", airport.label, new State(startTime.getTimeInMillis()), wo);
+    public void testNarrativeGenerator() {
 
-		GraphPath path = spt.getPath(airport);
+        Vertex airport = graph.getVertex("TriMet_10579");
+        WalkOptions wo = new WalkOptions();
+        wo.setGtfsContext(context);
+        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label,
+                new State(startTime.getTimeInMillis()), wo);
 
-		assertNotNull(path);
+        GraphPath path = spt.getPath(airport);
 
-		Narrative narrative = new Narrative(path);
-		Vector<NarrativeSection> sections = narrative.getSections();
-		/*
-		 * This trip, from a bus stop near TriMet HQ to the Airport, should take
-		 * the #70 bus, then transfer, then take the MAX Red Line, thus three
-		 * sections. If the test fails, that's because a more complex (and
-		 * wrong) route is being chosen.
-		 */
-		
-		NarrativeSection busSection = sections.elementAt(0);
-		NarrativeSection redLineSection = sections.elementAt(2);
+        assertNotNull(path);
 
-		assertTrue(busSection.getEndTime() < redLineSection.getStartTime());
-		assertEquals(startTime.getTimeInMillis(), busSection.getStartTime());
+        Narrative narrative = new Narrative(path);
+        Vector<NarrativeSection> sections = narrative.getSections();
+        /*
+         * This trip, from a bus stop near TriMet HQ to the Airport, should take the #70 bus, then
+         * transfer, then take the MAX Red Line, thus three sections. If the test fails, that's
+         * because a more complex (and wrong) route is being chosen.
+         */
 
-		assertEquals(TransportationMode.BUS, busSection.getMode());
-		assertEquals(TransportationMode.TRAM, redLineSection.getMode());
+        NarrativeSection busSection = sections.elementAt(0);
+        NarrativeSection redLineSection = sections.elementAt(2);
 
-		assertEquals(3, sections.size());
-	}
+        assertTrue(busSection.getEndTime() < redLineSection.getStartTime());
+        assertEquals(startTime.getTimeInMillis(), busSection.getStartTime());
 
-	public void testWalkNarrative() {
+        assertEquals(TransportationMode.BUS, busSection.getMode());
+        assertEquals(TransportationMode.TRAM, redLineSection.getMode());
 
-		Graph gg = new Graph();
-		try {
-			File file = new File(
-					"src/test/resources/simple_streets/simple_streets.shp");
-			DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
-			// we are now connected
-			String[] typeNames = dataStore.getTypeNames();
-			String typeName = typeNames[0];
+        assertEquals(3, sections.size());
+    }
 
-			FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+    public void testWalkNarrative() {
 
-			featureSource = dataStore.getFeatureSource(typeName);
+        Graph gg = new Graph();
+        try {
+            File file = new File("src/test/resources/simple_streets/simple_streets.shp");
+            DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
+            // we are now connected
+            String[] typeNames = dataStore.getTypeNames();
+            String typeName = typeNames[0];
 
-			ShapefileStreetLoader loader = new ShapefileStreetLoader(gg,
-					featureSource);
-			loader.load();
-		} catch (Exception e) {
-			e.printStackTrace();
-			assertNull("got an exception");
-		}
+            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
 
-		SpatialVertex northVertex = null;
-		for (Vertex v : gg.getVertices()) {
-			if (v instanceof SpatialVertex) {
-				SpatialVertex sv = (SpatialVertex) v;
-				if (northVertex == null
-						|| sv.getCoordinate().y > northVertex.getCoordinate().y) {
-					northVertex = sv;
-				}
-			}
-		}
+            featureSource = dataStore.getFeatureSource(typeName);
 
-		assertNotNull(northVertex);
-		
-		SpatialVertex eastVertex = null;
-		for (Vertex v : gg.getVertices()) {
-			if (v instanceof SpatialVertex) {
-				SpatialVertex sv = (SpatialVertex) v;
-				if (eastVertex == null
-						|| sv.getCoordinate().x > eastVertex.getCoordinate().x) {
-					eastVertex = sv;
-				}
-			}
-		}
+            ShapefileStreetLoader loader = new ShapefileStreetLoader(gg, featureSource);
+            loader.load();
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertNull("got an exception");
+        }
 
-		assertNotNull(eastVertex);
-		
-		ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
-				northVertex.label, eastVertex.label, new State(
-						new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis()),
-				new WalkOptions());
+        SpatialVertex northVertex = null;
+        for (Vertex v : gg.getVertices()) {
+            if (v instanceof SpatialVertex) {
+                SpatialVertex sv = (SpatialVertex) v;
+                if (northVertex == null || sv.getCoordinate().y > northVertex.getCoordinate().y) {
+                    northVertex = sv;
+                }
+            }
+        }
 
-		GraphPath path = spt.getPath(eastVertex);
-		assertNotNull(path);
-		Narrative narrative = new Narrative(path);
+        assertNotNull(northVertex);
 
-		// there's only one narrative section (the walk), and it has two items
-		// (the street segments)
-		assertEquals(1, narrative.getSections().size());
-		NarrativeSection walkSection = narrative.getSections().firstElement();
-		assertEquals(2, walkSection.getItems().size());
+        SpatialVertex eastVertex = null;
+        for (Vertex v : gg.getVertices()) {
+            if (v instanceof SpatialVertex) {
+                SpatialVertex sv = (SpatialVertex) v;
+                if (eastVertex == null || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
+                    eastVertex = sv;
+                }
+            }
+        }
 
-		// the geometry starts at the start point, and ends at the end point
-		Geometry g = walkSection.getGeometry();
-		Coordinate[] coords = g.getCoordinates();
+        assertNotNull(eastVertex);
 
-		
-		assertTrue(coords[0].distance(northVertex.getCoordinate()) < 0.0000001);
-		assertTrue(coords[coords.length - 1].distance(eastVertex.getCoordinate()) < 0.0000001);
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
+                eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
+                        .getTimeInMillis()), new WalkOptions());
 
-	}
+        GraphPath path = spt.getPath(eastVertex);
+        assertNotNull(path);
+        Narrative narrative = new Narrative(path);
+
+        // there's only one narrative section (the walk), and it has two items
+        // (the street segments)
+        assertEquals(1, narrative.getSections().size());
+        NarrativeSection walkSection = narrative.getSections().firstElement();
+        assertEquals(2, walkSection.getItems().size());
+
+        // the geometry starts at the start point, and ends at the end point
+        Geometry g = walkSection.getGeometry();
+        Coordinate[] coords = g.getCoordinates();
+
+        assertTrue(coords[0].distance(northVertex.getCoordinate()) < 0.0000001);
+        assertTrue(coords[coords.length - 1].distance(eastVertex.getCoordinate()) < 0.0000001);
+
+    }
 }

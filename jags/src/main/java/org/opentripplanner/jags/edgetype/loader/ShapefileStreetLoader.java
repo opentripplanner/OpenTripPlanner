@@ -31,44 +31,47 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 public class ShapefileStreetLoader {
-	/** Load a shape file of streets, possibly reprojecting it.  This is intended to
-	 * work with NYC's LION data.  
-	 */
+    /**
+     * Load a shape file of streets, possibly reprojecting it. This is intended to work with NYC's
+     * LION data.
+     */
     Graph graph;
 
     FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+
     CoordinateReferenceSystem sourceCRS = null;
-    
+
     static {
-    	System.setProperty("org.geotools.referencing.forceXY", "true");
+        System.setProperty("org.geotools.referencing.forceXY", "true");
     }
-    
+
     /**
      * 
-     * @param graph A Graph to load streets into
-     * @param featureSource A source for streets
-     * Attempts to get the CRS from the data.
+     * @param graph
+     *            A Graph to load streets into
+     * @param featureSource
+     *            A source for streets Attempts to get the CRS from the data.
      */
     public ShapefileStreetLoader(Graph graph,
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource) {
 
-    	this.graph = graph;
-    	this.featureSource = featureSource;
-    	sourceCRS = featureSource.getInfo().getCRS();
+        this.graph = graph;
+        this.featureSource = featureSource;
+        sourceCRS = featureSource.getInfo().getCRS();
     }
-    
+
     public ShapefileStreetLoader(Graph graph,
             FeatureSource<SimpleFeatureType, SimpleFeature> featureSource, int sourceSRID) {
-        	this.graph = graph;
-        	this.featureSource = featureSource;
-            	
-    	try {
-			sourceCRS = CRS.decode("EPSG:" + sourceSRID);
-		} catch (NoSuchAuthorityCodeException e) {
-			throw new RuntimeException(e);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
+        this.graph = graph;
+        this.featureSource = featureSource;
+
+        try {
+            sourceCRS = CRS.decode("EPSG:" + sourceSRID);
+        } catch (NoSuchAuthorityCodeException e) {
+            throw new RuntimeException(e);
+        } catch (FactoryException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static LineString toLineString(Geometry g) {
@@ -76,46 +79,47 @@ public class ShapefileStreetLoader {
             return (LineString) g;
         } else if (g instanceof MultiLineString) {
             MultiLineString ml = (MultiLineString) g;
-         
+
             Coordinate[] coords = ml.getCoordinates();
             GeometryFactory factory = new GeometryFactory(new PrecisionModel(
                     PrecisionModel.FLOATING), 4326);
             return factory.createLineString(coords);
         } else {
-            throw new RuntimeException(
-                    "found a geometry feature that's not a linestring: " + g);
+            throw new RuntimeException("found a geometry feature that's not a linestring: " + g);
         }
     }
 
     public void load() throws Exception {
         // fixme: what logger? Logger.log("loading shapes from " + shapefile);
-    
+
         Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-        CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+        CRSAuthorityFactory factory = ReferencingFactoryFinder
+                .getCRSAuthorityFactory("EPSG", hints);
         CoordinateReferenceSystem worldCRS = factory.createCoordinateReferenceSystem("EPSG:4326");
-        
+
         DefaultQuery query = new DefaultQuery();
         query.setCoordinateSystem(sourceCRS);
         query.setCoordinateSystemReproject(worldCRS);
-        
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource.getFeatures(query);
+
+        FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource
+                .getFeatures(query);
         Iterator<SimpleFeature> i = features.iterator();
-        
+
         try {
-            
+
             HashMap<Coordinate, TreeSet<String>> coordinateToStreets = new HashMap<Coordinate, TreeSet<String>>();
 
             while (i.hasNext()) {
-            	            	
+
                 SimpleFeature feature = i.next();
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
-                
+
                 for (Coordinate coord : geom.getCoordinates()) {
-                	//FIXME: this rounding is a total hack, to work around 
-                	//http://jira.codehaus.org/browse/GEOT-2811
-                	Coordinate rounded = new Coordinate(Math.round(coord.x * 1048576) / 1048576.0,
-                				Math.round(coord.y * 1048576) / 1048576.0);
-                	
+                    // FIXME: this rounding is a total hack, to work around
+                    // http://jira.codehaus.org/browse/GEOT-2811
+                    Coordinate rounded = new Coordinate(Math.round(coord.x * 1048576) / 1048576.0,
+                            Math.round(coord.y * 1048576) / 1048576.0);
+
                     TreeSet<String> streets = coordinateToStreets.get(rounded);
                     if (streets == null) {
                         streets = new TreeSet<String>();
@@ -124,7 +128,7 @@ public class ShapefileStreetLoader {
                     streets.add((String) feature.getAttribute("Street"));
                 }
             }
-            
+
             features.close(i);
             features = featureSource.getFeatures(query);
 
@@ -141,38 +145,39 @@ public class ShapefileStreetLoader {
                 Coordinate[] coordinates = geom.getCoordinates();
                 String trafDir = (String) feature.getAttribute("TrafDir");
 
-            	//FIXME: this rounding is a total hack, to work around 
-            	//http://jira.codehaus.org/browse/GEOT-2811
-                Coordinate startCoordinate = new Coordinate(Math.round(coordinates[0].x * 1048576) / 1048576.0,
-        				Math.round(coordinates[0].y * 1048576) / 1048576.0);
-                Coordinate endCoordinate = new Coordinate(Math.round(coordinates[coordinates.length - 1].x * 1048576) / 1048576.0,
-        				Math.round(coordinates[coordinates.length - 1].y * 1048576) / 1048576.0);
-                
+                // FIXME: this rounding is a total hack, to work around
+                // http://jira.codehaus.org/browse/GEOT-2811
+                Coordinate startCoordinate = new Coordinate(
+                        Math.round(coordinates[0].x * 1048576) / 1048576.0, Math
+                                .round(coordinates[0].y * 1048576) / 1048576.0);
+                Coordinate endCoordinate = new Coordinate(Math
+                        .round(coordinates[coordinates.length - 1].x * 1048576) / 1048576.0, Math
+                        .round(coordinates[coordinates.length - 1].y * 1048576) / 1048576.0);
+
                 String startIntersectionName = getIntersectionName(coordinateToStreets,
                         intersectionNameToId, startCoordinate);
-                
+
                 if (startIntersectionName == "null") {
-                  System.out.println(name);
+                    System.out.println(name);
                 }
                 String endIntersectionName = getIntersectionName(coordinateToStreets,
                         intersectionNameToId, endCoordinate);
-                Vertex startCorner = new SpatialVertex(startIntersectionName, 
-                		startCoordinate.x,
+                Vertex startCorner = new SpatialVertex(startIntersectionName, startCoordinate.x,
                         startCoordinate.y);
                 startCorner = graph.addVertex(startCorner);
                 startCorner.type = Intersection.class;
-                Vertex endCorner = new SpatialVertex(endIntersectionName,
-                        endCoordinate.x,
+                Vertex endCorner = new SpatialVertex(endIntersectionName, endCoordinate.x,
                         endCoordinate.y);
                 endCorner = graph.addVertex(endCorner);
                 endCorner.type = Intersection.class;
-                
-               double length = JTS.orthodromicDistance(coordinates[0], coordinates[coordinates.length - 1], worldCRS);
 
-               	// FIXME: we actually want all streets to go in both directions,
+                double length = JTS.orthodromicDistance(coordinates[0],
+                        coordinates[coordinates.length - 1], worldCRS);
+
+                // FIXME: we actually want all streets to go in both directions,
                 // and to check on traversal if we're on a bike/car and have
                 // to obey direction rules.
-               
+
                 // TODO: The following assumes the street direction convention
                 // used in NYC
                 // This code should either be moved or generalized (if

@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import junit.framework.TestCase;
+
 import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
@@ -24,10 +26,8 @@ import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
-import junit.framework.TestCase;
-
 public class TestStreet extends TestCase {
-    
+
     public void testStreetWalk() {
         Graph gg = new Graph();
 
@@ -44,29 +44,29 @@ public class TestStreet extends TestCase {
         GregorianCalendar endTime = (GregorianCalendar) startTime.clone();
         int expectedSecElapsed = (int) (streetLength / wo.speed);
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
-        
+
         State s0 = new State(startTime.getTimeInMillis());
         WalkResult wr = ee.walk(s0, wo);
 
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
-        assertEquals(wr.state.getTime(), endTime.getTimeInMillis()); // Has the time elapsed as expected?
-        
+        // Has the time elapsed as expected?
+        assertEquals(wr.state.getTime(), endTime.getTimeInMillis());
+
         wr = null;
         s0 = new State(endTime.getTimeInMillis());
         wr = ee.walkBack(s0, wo);
-        
+
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
         assertEquals(wr.state.getTime(), startTime.getTimeInMillis());
     }
-    
+
     public void testStreetDirection() {
 
         Graph gg = new Graph();
         try {
-            File file = new File(
-                    "src/test/resources/simple_streets/simple_streets.shp");
+            File file = new File("src/test/resources/simple_streets/simple_streets.shp");
             DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
             // we are now connected
             String[] typeNames = dataStore.getTypeNames();
@@ -76,8 +76,7 @@ public class TestStreet extends TestCase {
 
             featureSource = dataStore.getFeatureSource(typeName);
 
-            ShapefileStreetLoader loader = new ShapefileStreetLoader(gg,
-                    featureSource);
+            ShapefileStreetLoader loader = new ShapefileStreetLoader(gg, featureSource);
             loader.load();
         } catch (Exception e) {
             e.printStackTrace();
@@ -88,8 +87,7 @@ public class TestStreet extends TestCase {
         for (Vertex v : gg.getVertices()) {
             if (v instanceof SpatialVertex) {
                 SpatialVertex sv = (SpatialVertex) v;
-                if (northVertex == null
-                        || sv.getCoordinate().y > northVertex.getCoordinate().y) {
+                if (northVertex == null || sv.getCoordinate().y > northVertex.getCoordinate().y) {
                     northVertex = sv;
                 }
             }
@@ -99,17 +97,15 @@ public class TestStreet extends TestCase {
         for (Vertex v : gg.getVertices()) {
             if (v instanceof SpatialVertex) {
                 SpatialVertex sv = (SpatialVertex) v;
-                if (eastVertex == null
-                        || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
+                if (eastVertex == null || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
                     eastVertex = sv;
                 }
             }
         }
 
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg,
-                northVertex.label, eastVertex.label, new State(
-                        new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis()),
-                new WalkOptions());
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
+                eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
+                        .getTimeInMillis()), new WalkOptions());
 
         GraphPath path = spt.getPath(eastVertex);
         assertNotNull(path);

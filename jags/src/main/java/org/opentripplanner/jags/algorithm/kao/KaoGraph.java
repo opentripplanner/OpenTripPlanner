@@ -15,66 +15,62 @@ import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.Walkable;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 
-
 public class KaoGraph extends Graph {
-	private static final long serialVersionUID = 3667189924531545548L;
-	
-	ArrayList<Edge> allhops;
+    private static final long serialVersionUID = 3667189924531545548L;
 
-  private GtfsContext _context;
-	
-  public KaoGraph() {
-		allhops = new ArrayList<Edge>();
-	}
-	
-	public void setGtfsContext(GtfsContext context) {
-	  _context = context;
-  }
-	
-	public Edge addEdge( Vertex a, Vertex b, Walkable ep ) {
-    	Edge ret = super.addEdge(a, b, ep);
-    	allhops.add(ret);
-    	return ret;
+    ArrayList<Edge> allhops;
+
+    private GtfsContext _context;
+
+    public KaoGraph() {
+        allhops = new ArrayList<Edge>();
     }
-	
-	public ArrayList<EdgeOption> sortedEdges(Date time, long window) {
-		ArrayList<EdgeOption> ret = new ArrayList<EdgeOption>();
-		State state0 = new State(time.getTime());
+
+    public void setGtfsContext(GtfsContext context) {
+        _context = context;
+    }
+
+    public Edge addEdge(Vertex a, Vertex b, Walkable ep) {
+        Edge ret = super.addEdge(a, b, ep);
+        allhops.add(ret);
+        return ret;
+    }
+
+    public ArrayList<EdgeOption> sortedEdges(Date time, long window) {
+        ArrayList<EdgeOption> ret = new ArrayList<EdgeOption>();
+        State state0 = new State(time.getTime());
 
         WalkOptions options = new WalkOptions();
         options.setGtfsContext(_context);
-        
 
-		for(int i=0; i<allhops.size(); i++) {
-			Edge edge = allhops.get(i);
-			if (!(edge.payload instanceof Board)) continue;
-			Board board = (Board) edge.payload;
+        for (int i = 0; i < allhops.size(); i++) {
+            Edge edge = allhops.get(i);
+            if (!(edge.payload instanceof Board))
+                continue;
+            Board board = (Board) edge.payload;
 
-			WalkResult wr = board.walk(state0, options);
-			
-			if( wr != null ) {
-			    for (Edge og : edge.tov.outgoing) {
-			        if (og.payload instanceof Hop) {
-			            edge = og;
-			            wr = edge.walk(wr.state, options);
-			            break;
-			        }
-			    }
+            WalkResult wr = board.walk(state0, options);
 
-				long timeToArrival = wr.state.getTime() - time.getTime();
+            if (wr != null) {
+                for (Edge og : edge.tov.outgoing) {
+                    if (og.payload instanceof Hop) {
+                        edge = og;
+                        wr = edge.walk(wr.state, options);
+                        break;
+                    }
+                }
 
+                long timeToArrival = wr.state.getTime() - time.getTime();
 
-				if( timeToArrival <= window ) {
-					ret.add( new EdgeOption(edge, timeToArrival) );
-				}
-			}
-		}
-		
-		Collections.sort(ret);
-		
-		return ret;
-	}
+                if (timeToArrival <= window) {
+                    ret.add(new EdgeOption(edge, timeToArrival));
+                }
+            }
+        }
 
-  
+        Collections.sort(ret);
+
+        return ret;
+    }
+
 }
-

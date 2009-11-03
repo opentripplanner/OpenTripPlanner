@@ -16,50 +16,53 @@ import org.opentripplanner.jags.core.WalkResult;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Board extends AbstractPayload {
- 
-	String start_id; // a street vertex's id
-	String end_id; // a transit node's GTFS id
+
+    String start_id; // a street vertex's id
+
+    String end_id; // a transit node's GTFS id
+
     public Hop hop;
-    
+
     private static final int SECS_IN_DAY = 86400;
-	private static final long serialVersionUID = 2L;
 
-	public Board(Hop hop) {
-	    this.hop = hop;
-	}
-	
-	public String getDirection() {
-		return null;
-	}
+    private static final long serialVersionUID = 2L;
 
-	public double getDistance() {
-		return 0;
-	}
+    public Board(Hop hop) {
+        this.hop = hop;
+    }
 
-	public String getEnd() {
-		return null;
-	}
+    public String getDirection() {
+        return null;
+    }
 
-	public Geometry getGeometry() {
-		// TODO Auto-generated method stub -- need to provide link between
-		// location of street node and location of transit node.
-		return null;
-	}
+    public double getDistance() {
+        return 0;
+    }
 
-	public TransportationMode getMode() {
-		return TransportationMode.BOARDING;
-	}
+    public String getEnd() {
+        return null;
+    }
 
-	public String getName() {
-		// "Enter 7th Avenue Station"
-		return "leave street network for transit network";
-	}
+    public Geometry getGeometry() {
+        // TODO Auto-generated method stub -- need to provide link between
+        // location of street node and location of transit node.
+        return null;
+    }
 
-	public String getStart() {
-		return null;
-	}
+    public TransportationMode getMode() {
+        return TransportationMode.BOARDING;
+    }
 
-	public WalkResult walk(State state0, WalkOptions wo) {
+    public String getName() {
+        // "Enter 7th Avenue Station"
+        return "leave street network for transit network";
+    }
+
+    public String getStart() {
+        return null;
+    }
+
+    public WalkResult walk(State state0, WalkOptions wo) {
 
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, false);
@@ -100,8 +103,8 @@ public class Board extends AbstractPayload {
     }
 
     private Date getServiceDate(long currentTime, boolean useArrival) {
-        int scheduleTime = useArrival ? hop.getEndStopTime().getArrivalTime()
-                : hop.getStartStopTime().getDepartureTime();
+        int scheduleTime = useArrival ? hop.getEndStopTime().getArrivalTime() : hop
+                .getStartStopTime().getDepartureTime();
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(currentTime);
         c.set(Calendar.HOUR_OF_DAY, 0);

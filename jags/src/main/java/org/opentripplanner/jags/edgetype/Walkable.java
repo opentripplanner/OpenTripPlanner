@@ -9,15 +9,21 @@ import org.opentripplanner.jags.core.WalkResult;
 
 public interface Walkable {
 
-	public TransportationMode getMode();
-	public String getName();
-	public String getDirection();
-	public Geometry getGeometry();
-	public String getStart();
-	public String getEnd();
-	public double getDistance();
-	
-    WalkResult walk( State s0, WalkOptions wo );
-    WalkResult walkBack( State s0, WalkOptions wo );    
-}
+    public TransportationMode getMode();
 
+    public String getName();
+
+    public String getDirection();
+
+    public Geometry getGeometry();
+
+    public String getStart();
+
+    public String getEnd();
+
+    public double getDistance();
+
+    WalkResult walk(State s0, WalkOptions wo);
+
+    WalkResult walkBack(State s0, WalkOptions wo);
+}

@@ -9,51 +9,52 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class Alight extends AbstractPayload {
 
-	String start_id; // a street vertex's id
-	String end_id; // a transit node's GTFS id
+    String start_id; // a street vertex's id
 
-	private static final long serialVersionUID = 1L;
+    String end_id; // a transit node's GTFS id
 
-	public String getDirection() {
-		return null;
-	}
+    private static final long serialVersionUID = 1L;
 
-	public double getDistance() {
-		return 0;
-	}
+    public String getDirection() {
+        return null;
+    }
 
-	public String getEnd() {
-		return null;
-	}
+    public double getDistance() {
+        return 0;
+    }
 
-	public Geometry getGeometry() {
-		// TODO Auto-generated method stub -- need to provide link between
-		// location of street node and location of transit node.
-		return null;
-	}
+    public String getEnd() {
+        return null;
+    }
 
-	public TransportationMode getMode() {
-		return TransportationMode.ALIGHTING;
-	}
+    public Geometry getGeometry() {
+        // TODO Auto-generated method stub -- need to provide link between
+        // location of street node and location of transit node.
+        return null;
+    }
 
-	public String getName() {
-		// TODO Auto-generated method stub -- need to say something like,
-		// "Exit 7th Avenue Station"
-		return "leave transit network for street network";
-	}
+    public TransportationMode getMode() {
+        return TransportationMode.ALIGHTING;
+    }
 
-	public String getStart() {
-		return null;
-	}
+    public String getName() {
+        // TODO Auto-generated method stub -- need to say something like,
+        // "Exit 7th Avenue Station"
+        return "leave transit network for street network";
+    }
 
-	public WalkResult walk(State s0, WalkOptions wo) {
-		State s1 = s0.clone();
-		return new WalkResult(1, s1);
-	}
+    public String getStart() {
+        return null;
+    }
 
-	public WalkResult walkBack(State s0, WalkOptions wo) {
-		State s1 = s0.clone();
-		return new WalkResult(1, s1);
-	}
+    public WalkResult walk(State s0, WalkOptions wo) {
+        State s1 = s0.clone();
+        return new WalkResult(1, s1);
+    }
+
+    public WalkResult walkBack(State s0, WalkOptions wo) {
+        State s1 = s0.clone();
+        return new WalkResult(1, s1);
+    }
 
 }
