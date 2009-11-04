@@ -14,7 +14,6 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.WalkOptions;
@@ -31,8 +30,8 @@ public class TestStreet extends TestCase {
     public void testStreetWalk() {
         Graph gg = new Graph();
 
-        Vertex start = gg.addVertex("start");
-        Vertex end = gg.addVertex("end");
+        Vertex start = gg.addVertex("start", -74.002, 40.5);
+        Vertex end = gg.addVertex("end", -74.004, 40.5);
 
         WalkOptions wo = new WalkOptions();
         wo.speed = ConstantsForTests.WALKING_SPEED;
@@ -83,23 +82,17 @@ public class TestStreet extends TestCase {
             assertNull("got an exception");
         }
 
-        SpatialVertex northVertex = null;
+        Vertex northVertex = null;
         for (Vertex v : gg.getVertices()) {
-            if (v instanceof SpatialVertex) {
-                SpatialVertex sv = (SpatialVertex) v;
-                if (northVertex == null || sv.getCoordinate().y > northVertex.getCoordinate().y) {
-                    northVertex = sv;
-                }
+            if (northVertex == null || v.getCoordinate().y > northVertex.getCoordinate().y) {
+                northVertex = v;
             }
         }
 
-        SpatialVertex eastVertex = null;
+        Vertex eastVertex = null;
         for (Vertex v : gg.getVertices()) {
-            if (v instanceof SpatialVertex) {
-                SpatialVertex sv = (SpatialVertex) v;
-                if (eastVertex == null || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
-                    eastVertex = sv;
-                }
+            if (eastVertex == null || v.getCoordinate().x > eastVertex.getCoordinate().x) {
+                eastVertex = v;
             }
         }
 

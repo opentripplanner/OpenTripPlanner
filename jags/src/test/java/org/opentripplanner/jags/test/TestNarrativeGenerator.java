@@ -13,7 +13,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.Vertex;
@@ -93,26 +92,22 @@ public class TestNarrativeGenerator extends TestCase {
             assertNull("got an exception");
         }
 
-        SpatialVertex northVertex = null;
+        Vertex northVertex = null;
         for (Vertex v : gg.getVertices()) {
-            if (v instanceof SpatialVertex) {
-                SpatialVertex sv = (SpatialVertex) v;
-                if (northVertex == null || sv.getCoordinate().y > northVertex.getCoordinate().y) {
-                    northVertex = sv;
+            if (northVertex == null || v.getCoordinate().y > northVertex.getCoordinate().y) {
+                northVertex = v;
                 }
-            }
+
         }
 
         assertNotNull(northVertex);
 
-        SpatialVertex eastVertex = null;
+        Vertex eastVertex = null;
         for (Vertex v : gg.getVertices()) {
-            if (v instanceof SpatialVertex) {
-                SpatialVertex sv = (SpatialVertex) v;
-                if (eastVertex == null || sv.getCoordinate().x > eastVertex.getCoordinate().x) {
-                    eastVertex = sv;
+            if (eastVertex == null || v.getCoordinate().x > eastVertex.getCoordinate().x) {
+                eastVertex = v;
                 }
-            }
+
         }
 
         assertNotNull(eastVertex);

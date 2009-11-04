@@ -1,16 +1,25 @@
 package org.opentripplanner.jags;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.util.Vector;
+import java.util.zip.ZipFile;
 
+import org.opentripplanner.jags.algorithm.Dijkstra;
+import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.State;
+import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.edgetype.Street;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
-import org.opentripplanner.jags.core.*;
-import org.opentripplanner.jags.edgetype.*;
-import org.opentripplanner.jags.algorithm.Dijkstra;
-import au.com.bytecode.opencsv.*;
-import java.util.zip.*;
+import au.com.bytecode.opencsv.CSVReader;
 
 // a trivial change
 
@@ -27,8 +36,13 @@ class Main {
                 String tov = splitline[2];
                 String name = splitline[0];
                 double length = Double.parseDouble(splitline[3]);
-                gg.addVertex(fromv);
-                gg.addVertex(tov);
+
+                double fromx = Double.parseDouble(fromv.substring(0, 4));
+                double fromy = Double.parseDouble(fromv.substring(4));
+                double tox = Double.parseDouble(tov.substring(0, 4));
+                double toy = Double.parseDouble(tov.substring(4));
+                gg.addVertex(fromv, fromx, fromy);
+                gg.addVertex(tov, tox, toy);
                 gg.addEdge(fromv, tov, new Street(name, name, length));
                 gg.addEdge(tov, fromv, new Street(name, name, length));
             }

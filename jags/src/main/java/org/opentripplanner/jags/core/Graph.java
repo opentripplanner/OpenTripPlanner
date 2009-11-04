@@ -27,13 +27,14 @@ public class Graph implements Serializable {
         return vv;
     }
 
-    public Vertex addVertex(String label) {
+    public Vertex addVertex(String label, double x, double y) {
         Vertex exists = this.vertices.get(label);
         if (exists != null) {
+            assert exists.x == x && exists.y == y;
             return exists;
         }
 
-        Vertex ret = new Vertex(label);
+        Vertex ret = new Vertex(label, x, y);
         this.vertices.put(label, ret);
         return ret;
     }

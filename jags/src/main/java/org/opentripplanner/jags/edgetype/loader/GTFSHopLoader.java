@@ -1,12 +1,12 @@
 package org.opentripplanner.jags.edgetype.loader;
 
+import java.util.ArrayList;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
-
 import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.SpatialVertex;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Alight;
 import org.opentripplanner.jags.edgetype.Board;
@@ -15,8 +15,6 @@ import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.vertextypes.TransitStop;
-
-import java.util.ArrayList;
 
 public class GTFSHopLoader {
 
@@ -36,7 +34,7 @@ public class GTFSHopLoader {
 
         // Load stops
         for (Stop stop : _dao.getAllStops()) {
-            Vertex vertex = _graph.addVertex(new SpatialVertex(id(stop.getId()), stop.getLon(),
+            Vertex vertex = _graph.addVertex(new Vertex(id(stop.getId()), stop.getLon(),
                     stop.getLat()));
             vertex.type = TransitStop.class;
         }
@@ -53,16 +51,17 @@ public class GTFSHopLoader {
             }
             StopTime startStopTime = hop.getStartStopTime();
             StopTime endStopTime = hop.getEndStopTime();
-            Vertex startStation = _graph.getVertex(id(startStopTime.getStop().getId()));
-            Vertex endStation = _graph.getVertex(id(endStopTime.getStop().getId()));
+            Stop startStop = startStopTime.getStop();
+            Stop endStop = endStopTime.getStop();
+            Vertex startStation = _graph.getVertex(id(startStop.getId()));
+            Vertex endStation = _graph.getVertex(id(endStop.getId()));
 
             // create journey vertices
-            Vertex startJourney = _graph.addVertex(id(startStopTime.getStop().getId()) + "_"
-                    + id(startStopTime.getTrip().getId()));
-            Vertex endJourney = _graph.addVertex(id(endStopTime.getStop().getId()) + "_"
-                    + id(endStopTime.getTrip().getId()));
+            Vertex startJourney = _graph.addVertex(id(startStop.getId()) + "_"
+                    + id(startStopTime.getTrip().getId()), startStop.getLon(), startStop.getLat());
+            Vertex endJourney = _graph.addVertex(id(endStop.getId()) + "_"
+                    + id(endStopTime.getTrip().getId()), endStop.getLon(), endStop.getLat());
 
-            // FIXME: do not create board/alight edges for last/first stop
             Board boarding = new Board(hop);
             _graph.addEdge(startStation, startJourney, boarding);
             _graph.addEdge(endJourney, endStation, new Alight());

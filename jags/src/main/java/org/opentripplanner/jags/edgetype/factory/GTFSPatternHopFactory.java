@@ -115,8 +115,10 @@ public class GTFSPatternHopFactory {
                     Vertex endStation = graph.getVertex(id(s1.getId()));
 
                     // create journey vertices
-                    Vertex startJourney = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId()));
-                    Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()));
+                    Vertex startJourney = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId()),
+                            s0.getLon(), s0.getLat());
+                    Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()), s1
+                            .getLon(), s1.getLat());
 
                     PatternBoard boarding = new PatternBoard(tripPattern, s0);
                     graph.addEdge(startStation, startJourney, boarding);

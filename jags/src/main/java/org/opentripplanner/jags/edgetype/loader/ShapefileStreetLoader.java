@@ -1,23 +1,26 @@
 package org.opentripplanner.jags.edgetype.loader;
 
-import org.geotools.data.FeatureSource;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.TreeSet;
+
 import org.geotools.data.DefaultQuery;
+import org.geotools.data.FeatureSource;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.ReferencingFactoryFinder;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.SpatialVertex;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.edgetype.Street;
-import org.opentripplanner.jags.vertextypes.Intersection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.Vertex;
+import org.opentripplanner.jags.edgetype.Street;
+import org.opentripplanner.jags.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -25,10 +28,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TreeSet;
 
 public class ShapefileStreetLoader {
     /**
@@ -162,11 +161,11 @@ public class ShapefileStreetLoader {
                 }
                 String endIntersectionName = getIntersectionName(coordinateToStreets,
                         intersectionNameToId, endCoordinate);
-                Vertex startCorner = new SpatialVertex(startIntersectionName, startCoordinate.x,
+                Vertex startCorner = new Vertex(startIntersectionName, startCoordinate.x,
                         startCoordinate.y);
                 startCorner = graph.addVertex(startCorner);
                 startCorner.type = Intersection.class;
-                Vertex endCorner = new SpatialVertex(endIntersectionName, endCoordinate.x,
+                Vertex endCorner = new Vertex(endIntersectionName, endCoordinate.x,
                         endCoordinate.y);
                 endCorner = graph.addVertex(endCorner);
                 endCorner.type = Intersection.class;
