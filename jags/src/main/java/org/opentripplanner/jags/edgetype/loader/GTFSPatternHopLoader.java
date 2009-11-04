@@ -1,0 +1,52 @@
+package org.opentripplanner.jags.edgetype.loader;
+
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.SpatialVertex;
+import org.opentripplanner.jags.core.Vertex;
+import org.opentripplanner.jags.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.jags.vertextypes.TransitStop;
+
+public class GTFSPatternHopLoader {
+
+    private Graph _graph;
+
+    private GtfsRelationalDao _dao;
+
+    private GtfsContext _context;
+
+    public GTFSPatternHopLoader(Graph graph, GtfsContext context) {
+        _graph = graph;
+        _context = context;
+        _dao = context.getDao();
+    }
+
+    public void load(boolean verbose) throws Exception {
+
+        // Load stops
+        for (Stop stop : _dao.getAllStops()) {
+            Vertex vertex = _graph.addVertex(new SpatialVertex(id(stop.getId()), stop.getLon(),
+                    stop.getLat()));
+            vertex.type = TransitStop.class;
+        }
+
+        // Load hops
+        if (verbose) {
+            System.out.println("Loading hops");
+        }
+        GTFSPatternHopFactory hf = new GTFSPatternHopFactory(_context);
+        hf.run(_graph);
+    }
+
+    private String id(AgencyAndId id) {
+        return id.getAgencyId() + "_" + id.getId();
+    }
+
+    public void load() throws Exception {
+        load(false);
+    }
+
+}
