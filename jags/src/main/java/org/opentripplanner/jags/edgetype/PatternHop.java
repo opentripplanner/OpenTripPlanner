@@ -68,7 +68,6 @@ public class PatternHop extends AbstractPayload {
     }
 
     public WalkResult walk(State state0, WalkOptions wo) {
-        System.out.println("hopped from " + state0 + " for  " + runningTime + " to " + end);
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(runningTime);
         return new WalkResult(runningTime, state1);
