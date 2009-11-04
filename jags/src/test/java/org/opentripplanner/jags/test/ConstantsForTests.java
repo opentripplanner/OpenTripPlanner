@@ -3,7 +3,7 @@ package org.opentripplanner.jags.test;
 import java.io.File;
 
 import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.jags.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.jags.edgetype.loader.NetworkLinker;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
@@ -58,7 +58,7 @@ public class ConstantsForTests {
         try {
             portlandContext = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
             portlandGraph = new Graph();
-            GTFSHopLoader hl = new GTFSHopLoader(portlandGraph, portlandContext);
+            GTFSPatternHopLoader hl = new GTFSPatternHopLoader(portlandGraph, portlandContext);
             hl.load();
         } catch (Exception e) {
             e.printStackTrace();

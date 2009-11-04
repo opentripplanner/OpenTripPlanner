@@ -1,5 +1,10 @@
 package org.opentripplanner.jags.test;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+
 import junit.framework.TestCase;
 
 import org.opentripplanner.jags.core.State;
@@ -9,11 +14,6 @@ import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.GregorianCalendar;
 
 public class TestHop extends TestCase {
 
@@ -34,4 +34,5 @@ public class TestHop extends TestCase {
         WalkResult walkResult = last.walk(new State(aSundayAtMidnight.getTimeInMillis()), options);
         assertEquals(480.0, walkResult.weight);
     }
+
 }

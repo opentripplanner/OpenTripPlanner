@@ -3,6 +3,8 @@ package org.opentripplanner.jags.test;
 import java.io.File;
 import java.util.GregorianCalendar;
 
+import junit.framework.TestCase;
+
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
@@ -18,8 +20,6 @@ import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 import org.opentripplanner.jags.vertextypes.TransitStop;
-
-import junit.framework.TestCase;
 
 public class TestHopLoader extends TestCase {
 

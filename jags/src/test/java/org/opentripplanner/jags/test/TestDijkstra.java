@@ -9,8 +9,7 @@ import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.jags.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.GraphPath;
@@ -25,7 +24,7 @@ public class TestDijkstra extends TestCase {
         options.setGtfsContext(context);
 
         Graph gg = new Graph();
-        GTFSHopLoader hl = new GTFSHopLoader(gg, context);
+        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
         hl.load();
 
         long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
@@ -34,7 +33,8 @@ public class TestDijkstra extends TestCase {
 
         GraphPath path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
 
-        assertTrue(((Hop) path.vertices.elementAt(path.vertices.size() - 2).incoming.payload)
-                .getEndStopTime().getArrivalTime() == 48540);
+        GregorianCalendar endTime = new GregorianCalendar(2009, 8, 7, 13, 29);
+        
+        assertEquals(path.vertices.lastElement().state.getTime(), endTime.getTimeInMillis());
     }
 }

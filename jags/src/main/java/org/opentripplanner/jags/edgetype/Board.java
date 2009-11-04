@@ -41,8 +41,6 @@ public class Board extends AbstractPayload {
     }
 
     public Geometry getGeometry() {
-        // TODO Auto-generated method stub -- need to provide link between
-        // location of street node and location of transit node.
         return null;
     }
 
