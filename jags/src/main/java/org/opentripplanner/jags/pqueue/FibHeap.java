@@ -1,6 +1,9 @@
 package org.opentripplanner.jags.pqueue;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.ListIterator;
+import java.util.Random;
 
 interface AbstractDirectoryPriorityQueue {
     void insert(Object payload, double key);
@@ -44,6 +47,8 @@ class FibNode {
 }
 
 public class FibHeap implements AbstractDirectoryPriorityQueue {
+    private static final double LOG2 = Math.log(2);
+
     int n;
 
     public FibNode min;
@@ -89,11 +94,7 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
     void consolidate() {
         // System.out.println( "consolidating" );
 
-        FibNode[] rootnode_with_degree = new FibNode[this.n];
-
-        for (int i = 0; i < this.n; i++) {
-            rootnode_with_degree[i] = null;
-        }
+        FibNode[] rootnode_with_degree = new FibNode[(int) (Math.ceil(Math.log(this.n) / LOG2))];
 
         Object[] root_list_array = this.root_list.toArray();
         for (int i = 0; i < root_list_array.length; i++) {
