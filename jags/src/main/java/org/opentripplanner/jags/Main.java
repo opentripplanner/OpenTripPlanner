@@ -14,7 +14,7 @@ import java.util.zip.ZipFile;
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.Street;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.ShortestPathTree;
@@ -86,7 +86,7 @@ class Main {
 
             long t0 = System.currentTimeMillis();
             ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, pair[0], pair[1], new State(),
-                    new WalkOptions());
+                    new TraverseOptions());
             @SuppressWarnings("unused")
             GraphPath gp = spt.getPath(gg.getVertex(pair[1]));
             long t1 = System.currentTimeMillis();

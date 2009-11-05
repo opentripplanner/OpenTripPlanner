@@ -2,12 +2,12 @@ package org.opentripplanner.jags.edgetype;
 
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Transfer implements Walkable {
+public class Transfer implements Traversable {
 
     double distance = 0;
 
@@ -48,14 +48,14 @@ public class Transfer implements Walkable {
         return null;
     }
 
-    public WalkResult walk(State s0, WalkOptions wo) {
+    public TraverseResult traverse(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        return new WalkResult(distance / wo.speed + wo.transferPenalty, s1);
+        return new TraverseResult(distance / wo.speed + wo.transferPenalty, s1);
     }
 
-    public WalkResult walkBack(State s0, WalkOptions wo) {
+    public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        return new WalkResult(distance / wo.speed + wo.transferPenalty, s1);
+        return new TraverseResult(distance / wo.speed + wo.transferPenalty, s1);
     }
 
 }

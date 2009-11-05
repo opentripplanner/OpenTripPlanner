@@ -8,7 +8,7 @@ import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Drawable;
 import org.opentripplanner.jags.edgetype.DrawablePoint;
@@ -186,7 +186,7 @@ public class ScheduleViz extends PApplet {
             now.add(GregorianCalendar.SECOND, (int) time);
 
             State s0 = new State(now.getTimeInMillis());
-            spt = Dijkstra.getShortestPathTree(gg, startVertex.label, null, s0, new WalkOptions());
+            spt = Dijkstra.getShortestPathTree(gg, startVertex.label, null, s0, new TraverseOptions());
 
         }
 

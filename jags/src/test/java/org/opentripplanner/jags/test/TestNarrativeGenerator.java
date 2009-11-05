@@ -16,7 +16,7 @@ import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.narrative.Narrative;
@@ -41,7 +41,7 @@ public class TestNarrativeGenerator extends TestCase {
     public void testNarrativeGenerator() {
 
         Vertex airport = graph.getVertex("TriMet_10579");
-        WalkOptions wo = new WalkOptions();
+        TraverseOptions wo = new TraverseOptions();
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
         ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label,
@@ -114,7 +114,7 @@ public class TestNarrativeGenerator extends TestCase {
 
         ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
                 eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
-                        .getTimeInMillis()), new WalkOptions());
+                        .getTimeInMillis()), new TraverseOptions());
 
         GraphPath path = spt.getPath(eastVertex);
         assertNotNull(path);

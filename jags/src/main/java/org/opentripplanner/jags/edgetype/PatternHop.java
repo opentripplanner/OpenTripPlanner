@@ -3,8 +3,8 @@ package org.opentripplanner.jags.edgetype;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -67,16 +67,16 @@ public class PatternHop extends AbstractPayload {
         return factory.createLineString(new Coordinate[] { c1, c2 });
     }
 
-    public WalkResult walk(State state0, WalkOptions wo) {
+    public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(runningTime);
-        return new WalkResult(runningTime, state1);
+        return new TraverseResult(runningTime, state1);
     }
 
-    public WalkResult walkBack(State state0, WalkOptions wo) {
+    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-runningTime);
-        return new WalkResult(runningTime, state1);
+        return new TraverseResult(runningTime, state1);
     }
 
 }

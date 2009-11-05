@@ -8,7 +8,7 @@ import junit.framework.TestCase;
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
@@ -20,7 +20,7 @@ public class TestDijkstra extends TestCase {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 
-        WalkOptions options = new WalkOptions();
+        TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
 
         Graph gg = new Graph();

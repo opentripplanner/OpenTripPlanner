@@ -8,8 +8,8 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
 import org.opentripplanner.jags.gtfs.GtfsContext;
@@ -21,7 +21,7 @@ public class TestHop extends TestCase {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
 
-        WalkOptions options = new WalkOptions();
+        TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
 
         GTFSHopFactory hf = new GTFSHopFactory(context);
@@ -31,8 +31,8 @@ public class TestHop extends TestCase {
         Hop last = hops.get(hops.size() - 1);
 
         GregorianCalendar aSundayAtMidnight = new GregorianCalendar(2009, 7, 30, 0, 0, 0);
-        WalkResult walkResult = last.walk(new State(aSundayAtMidnight.getTimeInMillis()), options);
-        assertEquals(480.0, walkResult.weight);
+        TraverseResult traverseResult = last.traverse(new State(aSundayAtMidnight.getTimeInMillis()), options);
+        assertEquals(480.0, traverseResult.weight);
     }
 
 }

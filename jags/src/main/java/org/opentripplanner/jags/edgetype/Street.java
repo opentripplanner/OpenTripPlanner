@@ -2,8 +2,8 @@ package org.opentripplanner.jags.edgetype;
 
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -38,20 +38,20 @@ public class Street extends AbstractPayload {
         geometry = g;
     }
 
-    public WalkResult walk(State s0, WalkOptions wo) {
+    public TraverseResult traverse(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
         double weight = this.length / wo.speed;
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) weight);
-        return new WalkResult(weight, s1);
+        return new TraverseResult(weight, s1);
     }
 
-    public WalkResult walkBack(State s0, WalkOptions wo) {
+    public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
         double weight = this.length / wo.speed;
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) weight);
-        return new WalkResult(weight, s1);
+        return new TraverseResult(weight, s1);
     }
 
     public String toString() {
@@ -94,7 +94,7 @@ public class Street extends AbstractPayload {
     }
 
     public TransportationMode getMode() {
-        // this is actually WALK or BICYCLE depending on the walkoptions
+        // this is actually WALK or BICYCLE depending on the TraverseOptions
         return TransportationMode.WALK;
     }
 

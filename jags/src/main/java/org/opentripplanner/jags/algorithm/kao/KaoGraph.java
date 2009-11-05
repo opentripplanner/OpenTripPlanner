@@ -8,11 +8,11 @@ import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.Walkable;
+import org.opentripplanner.jags.edgetype.Traversable;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 
 public class KaoGraph extends Graph {
@@ -30,7 +30,7 @@ public class KaoGraph extends Graph {
         _context = context;
     }
 
-    public Edge addEdge(Vertex a, Vertex b, Walkable ep) {
+    public Edge addEdge(Vertex a, Vertex b, Traversable ep) {
         Edge ret = super.addEdge(a, b, ep);
         allhops.add(ret);
         return ret;
@@ -40,7 +40,7 @@ public class KaoGraph extends Graph {
         ArrayList<EdgeOption> ret = new ArrayList<EdgeOption>();
         State state0 = new State(time.getTime());
 
-        WalkOptions options = new WalkOptions();
+        TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(_context);
 
         for (int i = 0; i < allhops.size(); i++) {
@@ -49,13 +49,13 @@ public class KaoGraph extends Graph {
                 continue;
             Board board = (Board) edge.payload;
 
-            WalkResult wr = board.walk(state0, options);
+            TraverseResult wr = board.traverse(state0, options);
 
             if (wr != null) {
                 for (Edge og : edge.tov.outgoing) {
                     if (og.payload instanceof Hop) {
                         edge = og;
-                        wr = edge.walk(wr.state, options);
+                        wr = edge.traverse(wr.state, options);
                         break;
                     }
                 }

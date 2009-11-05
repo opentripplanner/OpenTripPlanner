@@ -4,8 +4,8 @@ import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.gtfs.exception.NegativeWeightException;
 import org.opentripplanner.jags.pqueue.FibHeap;
 import org.opentripplanner.jags.spt.SPTVertex;
@@ -14,7 +14,7 @@ import org.opentripplanner.jags.spt.ShortestPathTree;
 public class Dijkstra {
 
     public static ShortestPathTree getShortestPathTree(Graph gg, String from_label,
-            String to_label, State init, WalkOptions options) {
+            String to_label, State init, TraverseOptions options) {
         // Goal Variables
         String origin_label = from_label;
         String target_label = to_label;
@@ -44,7 +44,7 @@ public class Dijkstra {
 
             for (Edge edge : spt_u.mirror.outgoing) {
 
-                WalkResult wr = edge.walk(spt_u.state, options);
+                TraverseResult wr = edge.traverse(spt_u.state, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.

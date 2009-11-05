@@ -2,8 +2,8 @@ package org.opentripplanner.jags.edgetype;
 
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -43,14 +43,14 @@ public class StreetTransitLink extends AbstractPayload {
         return null;
     }
 
-    public WalkResult walk(State s0, WalkOptions wo) {
+    public TraverseResult traverse(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        return new WalkResult(0, s1);
+        return new TraverseResult(0, s1);
     }
 
-    public WalkResult walkBack(State s0, WalkOptions wo) {
+    public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        return new WalkResult(0, s1);
+        return new TraverseResult(0, s1);
     }
 
 }

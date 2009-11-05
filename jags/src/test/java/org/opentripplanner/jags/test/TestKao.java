@@ -9,7 +9,7 @@ import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.jags.gtfs.GtfsContext;
@@ -42,7 +42,7 @@ public class TestKao extends TestCase {
 
         assertTrue(((Hop) path.get(path.size() - 1).payload).getEndStopTime().getArrivalTime() == 48540);
 
-        WalkOptions options = new WalkOptions();
+        TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
 
         Graph gg = new Graph();

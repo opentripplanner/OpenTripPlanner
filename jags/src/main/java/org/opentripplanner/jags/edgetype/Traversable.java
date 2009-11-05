@@ -4,10 +4,10 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 
-public interface Walkable {
+public interface Traversable {
 
     public TransportationMode getMode();
 
@@ -23,7 +23,7 @@ public interface Walkable {
 
     public double getDistance();
 
-    WalkResult walk(State s0, WalkOptions wo);
+    TraverseResult traverse(State s0, TraverseOptions wo);
 
-    WalkResult walkBack(State s0, WalkOptions wo);
+    TraverseResult traverseBack(State s0, TraverseOptions wo);
 }

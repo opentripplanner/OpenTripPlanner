@@ -10,7 +10,7 @@ import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
+import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.Alight;
 import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.Hop;
@@ -70,7 +70,7 @@ public class TestHopLoader extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_e = graph.getVertex("agency_E");
 
-        WalkOptions options = new WalkOptions();
+        TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
 
         ShortestPathTree spt;

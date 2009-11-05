@@ -17,7 +17,7 @@ import org.opentripplanner.jags.edgetype.Alight;
 import org.opentripplanner.jags.edgetype.PatternBoard;
 import org.opentripplanner.jags.edgetype.PatternHop;
 import org.opentripplanner.jags.edgetype.TripPattern;
-import org.opentripplanner.jags.edgetype.Walkable;
+import org.opentripplanner.jags.edgetype.Traversable;
 import org.opentripplanner.jags.gtfs.GtfsContext;
 
 class StopPattern {
@@ -84,9 +84,9 @@ public class GTFSPatternHopFactory {
         return id.getAgencyId() + "_" + id.getId();
     }
 
-    public ArrayList<Walkable> run(Graph graph) throws Exception {
+    public ArrayList<Traversable> run(Graph graph) throws Exception {
 
-        ArrayList<Walkable> ret = new ArrayList<Walkable>();
+        ArrayList<Traversable> ret = new ArrayList<Traversable>();
 
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();

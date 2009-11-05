@@ -1,7 +1,7 @@
 package org.opentripplanner.jags.narrative;
 
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.edgetype.Walkable;
+import org.opentripplanner.jags.edgetype.Traversable;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.SPTVertex;
@@ -124,10 +124,10 @@ public class Narrative {
         Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
         int startVertex = 0;
         for (SPTEdge edge : path.edges) {
-            Walkable walkable = edge.payload;
-            String edgeName = walkable.getName();
+            Traversable traversable = edge.payload;
+            String edgeName = traversable.getName();
             if (!edgeName.equals(lastName)
-                    && !(walkable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
+                    && !(traversable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
                 // A section ends when the name of the payload changes except when walking
                 List<SPTVertex> currentVertices = path.vertices.subList(startVertex, i + 1);
                 // Don't add boarding and alighting edges as separate sections in the narrative
@@ -139,7 +139,7 @@ public class Narrative {
                 startVertex = i;
             }
             i += 1;
-            lastMode = walkable.getMode();
+            lastMode = traversable.getMode();
             currentSection.add(edge);
         }
         // Add the last section, unless it's an alight

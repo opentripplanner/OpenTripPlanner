@@ -5,7 +5,7 @@ import java.util.Vector;
 import org.opentripplanner.jags.core.AbstractVertex;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.edgetype.Walkable;
+import org.opentripplanner.jags.edgetype.Traversable;
 
 public class SPTVertex extends AbstractVertex {
     public SPTEdge incoming;
@@ -29,7 +29,7 @@ public class SPTVertex extends AbstractVertex {
         this.outgoing.add(ee);
     }
 
-    public void setParent(SPTVertex parent, Walkable ep) {
+    public void setParent(SPTVertex parent, Traversable ep) {
         // remove this edge from outgoing list of previous parent
         if (incoming != null) {
             incoming.fromv.outgoing.remove(incoming);

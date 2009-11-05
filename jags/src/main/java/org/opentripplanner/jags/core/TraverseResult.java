@@ -1,11 +1,11 @@
 package org.opentripplanner.jags.core;
 
-public class WalkResult {
+public class TraverseResult {
     public double weight;
 
     public State state;
 
-    public WalkResult(double weight, State sprime) {
+    public TraverseResult(double weight, State sprime) {
         this.weight = weight;
         this.state = sprime;
     }

@@ -2,7 +2,7 @@ package org.opentripplanner.jags.core;
 
 import java.io.Serializable;
 
-import org.opentripplanner.jags.edgetype.Walkable;
+import org.opentripplanner.jags.edgetype.Traversable;
 import org.opentripplanner.jags.gtfs.exception.NegativeWeightException;
 
 public class Edge extends AbstractEdge implements Serializable {
@@ -12,22 +12,22 @@ public class Edge extends AbstractEdge implements Serializable {
 
     public Vertex tov;
 
-    public Walkable payload;
+    public Traversable payload;
 
-    Edge(Vertex fromv, Vertex tov, Walkable payload) {
+    Edge(Vertex fromv, Vertex tov, Traversable payload) {
         this.fromv = fromv;
         this.tov = tov;
         this.payload = payload;
     }
 
-    public WalkResult walk(State s0, WalkOptions wo) throws NegativeWeightException {
-        WalkResult wr = this.payload.walk(s0, wo);
-        return wr;
+    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
+        TraverseResult tr = this.payload.traverse(s0, wo);
+        return tr;
     }
 
-    public WalkResult walkBack(State s0, WalkOptions wo) throws NegativeWeightException {
-        WalkResult wr = this.payload.walkBack(s0, wo);
-        return wr;
+    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
+        TraverseResult tr = this.payload.traverseBack(s0, wo);
+        return tr;
     }
 
     public String toString() {

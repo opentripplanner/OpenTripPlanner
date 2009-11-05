@@ -16,8 +16,8 @@ import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.edgetype.Street;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
 import org.opentripplanner.jags.narrative.Narrative;
@@ -33,7 +33,7 @@ public class TestStreet extends TestCase {
         Vertex start = gg.addVertex("start", -74.002, 40.5);
         Vertex end = gg.addVertex("end", -74.004, 40.5);
 
-        WalkOptions wo = new WalkOptions();
+        TraverseOptions wo = new TraverseOptions();
         wo.speed = ConstantsForTests.WALKING_SPEED;
         double streetLength = 100; // meters
         Edge ee = gg.addEdge(start, end, new Street(streetLength));
@@ -45,7 +45,7 @@ public class TestStreet extends TestCase {
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
         State s0 = new State(startTime.getTimeInMillis());
-        WalkResult wr = ee.walk(s0, wo);
+        TraverseResult wr = ee.traverse(s0, wo);
 
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
@@ -54,7 +54,7 @@ public class TestStreet extends TestCase {
 
         wr = null;
         s0 = new State(endTime.getTimeInMillis());
-        wr = ee.walkBack(s0, wo);
+        wr = ee.traverseBack(s0, wo);
 
         assertNotNull(wr);
         assertEquals(wr.weight, streetLength / wo.speed);
@@ -98,7 +98,7 @@ public class TestStreet extends TestCase {
 
         ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
                 eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
-                        .getTimeInMillis()), new WalkOptions());
+                        .getTimeInMillis()), new TraverseOptions());
 
         GraphPath path = spt.getPath(eastVertex);
         assertNotNull(path);

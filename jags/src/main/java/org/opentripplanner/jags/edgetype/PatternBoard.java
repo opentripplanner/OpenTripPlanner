@@ -8,8 +8,8 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -58,7 +58,7 @@ public class PatternBoard extends AbstractPayload {
         return null;
     }
 
-    private int computeWait(State state0, WalkOptions wo) {
+    private int computeWait(State state0, TraverseOptions wo) {
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime);
         Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY);
@@ -93,17 +93,17 @@ public class PatternBoard extends AbstractPayload {
         return wait;
     }
 
-    public WalkResult walk(State state0, WalkOptions wo) {
+    public TraverseResult traverse(State state0, TraverseOptions wo) {
         int wait = computeWait(state0, wo);
         if (wait < 0) {
             return null;
         }
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(wait);
-        return new WalkResult(wait, state1);
+        return new TraverseResult(wait, state1);
     }
 
-    public WalkResult walkBack(State state0, WalkOptions wo) {
+    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
 
         int wait = computeWait(state0, wo);
         if (wait < 0) {
@@ -111,7 +111,7 @@ public class PatternBoard extends AbstractPayload {
         }
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-wait);
-        return new WalkResult(wait, state1);
+        return new TraverseResult(wait, state1);
     }
 
     private Date getServiceDate(long currentTime) {

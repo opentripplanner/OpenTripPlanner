@@ -8,8 +8,8 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.core.WalkOptions;
-import org.opentripplanner.jags.core.WalkResult;
+import org.opentripplanner.jags.core.TraverseOptions;
+import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -58,16 +58,16 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
         return end;
     }
 
-    public WalkResult walk(State state0, WalkOptions wo) {
+    public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(elapsed);
-        return new WalkResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1);
     }
 
-    public WalkResult walkBack(State state0, WalkOptions wo) {
+    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-elapsed);
-        return new WalkResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1);
     }
 
     public int compareTo(Hop arg0) {
