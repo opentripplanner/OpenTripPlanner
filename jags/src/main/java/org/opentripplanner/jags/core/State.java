@@ -23,8 +23,7 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State();
-        ret._time = _time;
+        State ret = new State(_time);
         return ret;
     }
 
