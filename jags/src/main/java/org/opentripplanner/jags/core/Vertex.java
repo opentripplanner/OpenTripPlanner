@@ -5,7 +5,7 @@ import java.util.Vector;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class Vertex extends AbstractVertex implements Serializable {
+public class Vertex implements Serializable {
 
     private static final long serialVersionUID = 364261663335739528L;
 
@@ -19,6 +19,10 @@ public class Vertex extends AbstractVertex implements Serializable {
 
     double x, y;
 
+    static final double COS_MAX_LAT = Math.cos(46 * Math.PI / 180);
+
+    static final double METERS_PER_DEGREE_AT_EQUATOR = 111319.9;
+
     public Vertex(String label, double x, double y) {
         this.label = label;
         this.x = x;
@@ -27,8 +31,14 @@ public class Vertex extends AbstractVertex implements Serializable {
         this.incoming = new Vector<Edge>();
     }
 
-    public double distance(double x, double y) {
-        return Math.pow((Math.pow(this.x - x, 2) + Math.pow(this.y - y, 2)), 0.5);
+    public double distance(Vertex v) {
+
+        double xd = v.x - x;
+        double yd = v.y - y;
+        return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR * COS_MAX_LAT;
+
+        /* This is more accurate but slower */
+        // return GtfsLibrary.distance(y, x, v.y, v.x);
     }
 
     public Coordinate getCoordinate() {
