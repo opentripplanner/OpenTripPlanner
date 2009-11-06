@@ -15,7 +15,7 @@ public class TraverseOptions {
 
     public boolean bicycle;
 
-    public double transferPenalty = 120;
+    public double transferPenalty = 600;
 
     private GtfsContext _context;
 
