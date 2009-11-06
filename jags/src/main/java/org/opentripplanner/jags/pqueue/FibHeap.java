@@ -57,15 +57,26 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
 
     public HashMap<Object, FibNode> directory;
 
-    public FibHeap() {
+    private FibNode[] rootnode_with_degree;
+
+    int maxSize, maxRootNodes;
+
+    private int getMaxRootNodes(int maxSize) {
+        return (int) Math.ceil(Math.log(maxSize) / LOG2);
+    }
+
+    public FibHeap(int maxSize) {
         n = 0;
         min = null;
         root_list = new LinkedList<FibNode>();
         directory = new HashMap<Object, FibNode>();
+        this.maxSize = maxSize;
+        maxRootNodes = getMaxRootNodes(maxSize);
+        rootnode_with_degree = new FibNode[maxRootNodes];
     }
 
     static FibHeap union(FibHeap H1, FibHeap H2) {
-        FibHeap H = new FibHeap();
+        FibHeap H = new FibHeap(H1.maxSize + H2.maxSize);
         H.root_list.addAll(H1.root_list);
         H.root_list.addAll(H2.root_list);
         H.min = H1.min;
@@ -94,7 +105,9 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
     void consolidate() {
         // System.out.println( "consolidating" );
 
-        FibNode[] rootnode_with_degree = new FibNode[(int) (Math.ceil(Math.log(this.n) / LOG2))];
+        for (int i = 0; i < maxRootNodes; ++i) {
+            rootnode_with_degree[i] = null;
+        }
 
         Object[] root_list_array = this.root_list.toArray();
         for (int i = 0; i < root_list_array.length; i++) {
@@ -220,7 +233,7 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
     }
 
     public static void selfTest() {
-        FibHeap fh = new FibHeap();
+        FibHeap fh = new FibHeap(1000);
 
         Random rr = new Random();
         for (int i = 0; i < 1000; i++) {

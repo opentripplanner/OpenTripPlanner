@@ -3,9 +3,9 @@ package org.opentripplanner.jags.algorithm;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.core.TraverseResult;
+import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.gtfs.exception.NegativeWeightException;
 import org.opentripplanner.jags.pqueue.FibHeap;
 import org.opentripplanner.jags.spt.SPTVertex;
@@ -31,7 +31,7 @@ public class Dijkstra {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0);
 
         // Priority Queue
-        FibHeap pq = new FibHeap();
+        FibHeap pq = new FibHeap(gg.getVertices().size());
         pq.insert(spt_origin, spt_origin.weightSum);
 
         // Iteration Variables
