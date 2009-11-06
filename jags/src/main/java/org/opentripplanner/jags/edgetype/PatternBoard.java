@@ -2,10 +2,9 @@ package org.opentripplanner.jags.edgetype;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Set;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.TraverseOptions;
@@ -60,21 +59,18 @@ public class PatternBoard extends AbstractPayload {
 
     private int computeWait(State state0, TraverseOptions wo) {
         long currentTime = state0.getTime();
-        Date serviceDate = getServiceDate(currentTime);
-        Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY);
+        Date serviceDate = getServiceDate(currentTime, wo.calendar);
+        Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
-
-        CalendarService service = wo.getGtfsContext().getCalendarService();
-        Set<Date> serviceDates = service.getServiceDatesForServiceId(pattern.exemplar
-                .getServiceId());
 
         int wait = -1;
 
-        if (serviceDates.contains(serviceDate)) {
+        AgencyAndId service = pattern.exemplar.getServiceId();
+        if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
             wait = pattern.getNextDepartureTime(stop, secondsSinceMidnight) - secondsSinceMidnight;
         }
-        if (serviceDates.contains(serviceDateYesterday)) {
+        if (wo.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
@@ -114,8 +110,7 @@ public class PatternBoard extends AbstractPayload {
         return new TraverseResult(wait, state1);
     }
 
-    private Date getServiceDate(long currentTime) {
-        Calendar c = Calendar.getInstance();
+    private Date getServiceDate(long currentTime, Calendar c) {
         c.setTimeInMillis(currentTime);
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
