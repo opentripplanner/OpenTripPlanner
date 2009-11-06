@@ -1,32 +1,15 @@
 package org.opentripplanner.jags.narrative;
 
-import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.edgetype.Traversable;
-import org.opentripplanner.jags.spt.SPTEdge;
-import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.SPTVertex;
-
-import com.vividsolutions.jts.geom.Geometry;
-
 import java.util.List;
 import java.util.Vector;
 
-/* A NarrativeItem represents a particular line in turn-by-turn directions */
-interface NarrativeItem {
-    String getName(); // 2, Q, Red Line, R5, Rector St.
+import org.opentripplanner.jags.core.TransportationMode;
+import org.opentripplanner.jags.edgetype.Traversable;
+import org.opentripplanner.jags.spt.GraphPath;
+import org.opentripplanner.jags.spt.SPTEdge;
+import org.opentripplanner.jags.spt.SPTVertex;
 
-    String getDirection(); // 241 St-Wakefield Sta, Inbound, Northwest
-
-    String getTowards();
-
-    Geometry getGeometry();
-
-    String getStart();
-
-    String getEnd();
-
-    double getDistanceKm();
-}
+import com.vividsolutions.jts.geom.Geometry;
 
 class BasicNarrativeItem implements NarrativeItem {
     private String name;
