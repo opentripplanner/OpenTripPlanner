@@ -1,11 +1,9 @@
 package org.opentripplanner.jags.edgetype;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Vector;
 
-import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 
@@ -19,7 +17,7 @@ public class TripPattern {
 
     private Vector<Integer> startTimes;
 
-    private Map<Stop, PatternStop> stops;
+    private List<PatternStop> patternStops;
 
     class PatternStop {
         public int arrivalTimeOffset;
@@ -35,14 +33,14 @@ public class TripPattern {
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
         startTimes = new Vector<Integer>();
-        stops = new HashMap<Stop, PatternStop>();
+        patternStops = new ArrayList<PatternStop>();
+        
         int startTime = stopTimes.get(0).getDepartureTime();
         
         for (StopTime stopTime : stopTimes) {
             PatternStop patternStop = new PatternStop(stopTime.getDepartureTime() - startTime,
                     stopTime.getArrivalTime() - startTime);
-            stops.put(stopTime.getStop(), patternStop);
-            
+            patternStops.add(patternStop);
         }
     }
 
@@ -56,9 +54,10 @@ public class TripPattern {
         startTimes.insertElementAt(time, i);
     }
 
-    public int getNextDepartureTime(Stop stop, int afterTime) {
+    public int getNextDepartureTime(int stopIndex, int afterTime) {
 
-        int departureTimeOffset = stops.get(stop).departureTimeOffset;
+        PatternStop patternStop = patternStops.get(stopIndex);
+        int departureTimeOffset = patternStop.departureTimeOffset;
 
         for (int i = 0; i < startTimes.size(); ++i) {
             int startTime = startTimes.get(i);

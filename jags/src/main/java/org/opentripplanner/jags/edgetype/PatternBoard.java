@@ -4,7 +4,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.TraverseOptions;
@@ -22,11 +21,11 @@ public class PatternBoard extends AbstractPayload {
 
     private TripPattern pattern;
 
-    private Stop stop;
+    private int stopIndex;
 
-    public PatternBoard(TripPattern pattern, Stop stop) {
+    public PatternBoard(TripPattern pattern, int stopIndex) {
         this.pattern = pattern;
-        this.stop = stop;
+        this.stopIndex = stopIndex;
     }
 
     public String getDirection() {
@@ -68,14 +67,14 @@ public class PatternBoard extends AbstractPayload {
         AgencyAndId service = pattern.exemplar.getServiceId();
         if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            wait = pattern.getNextDepartureTime(stop, secondsSinceMidnight) - secondsSinceMidnight;
+            wait = pattern.getNextDepartureTime(stopIndex,secondsSinceMidnight) - secondsSinceMidnight;
         }
         if (wo.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int waitYesterday = pattern
-                    .getNextDepartureTime(stop, secondsSinceMidnight - SEC_IN_DAY)
+                    .getNextDepartureTime(stopIndex,secondsSinceMidnight - SEC_IN_DAY)
                     - (secondsSinceMidnight - SEC_IN_DAY);
             if (waitYesterday != -1 && (wait < 0 || waitYesterday < wait)) {
                 // choose the better time

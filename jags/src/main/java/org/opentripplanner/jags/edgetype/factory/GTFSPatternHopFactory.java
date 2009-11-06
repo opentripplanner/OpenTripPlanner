@@ -120,7 +120,7 @@ public class GTFSPatternHopFactory {
                     Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()), s1
                             .getLon(), s1.getLat());
 
-                    PatternBoard boarding = new PatternBoard(tripPattern, s0);
+                    PatternBoard boarding = new PatternBoard(tripPattern, i);
                     graph.addEdge(startStation, startJourney, boarding);
                     graph.addEdge(endJourney, endStation, new Alight());
                     graph.addEdge(startJourney, endJourney, hop);
