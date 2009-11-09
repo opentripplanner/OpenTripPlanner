@@ -15,7 +15,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
 
-import org.opentripplanner.jags.core.TransportationMode;
+import org.opentripplanner.routing.core.TransportationMode;
 
 import java.io.File;
 import java.io.IOException;

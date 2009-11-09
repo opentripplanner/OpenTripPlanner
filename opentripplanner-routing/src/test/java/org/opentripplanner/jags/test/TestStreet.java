@@ -11,19 +11,19 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Edge;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.core.TraverseResult;
-import org.opentripplanner.jags.edgetype.Street;
-import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
-import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.SPTEdge;
-import org.opentripplanner.jags.spt.ShortestPathTree;
 import org.opentripplanner.narrative.Narrative;
+import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.loader.ShapefileStreetLoader;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TestStreet extends TestCase {
 

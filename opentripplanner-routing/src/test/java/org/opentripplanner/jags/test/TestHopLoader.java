@@ -7,19 +7,19 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Edge;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.edgetype.Alight;
-import org.opentripplanner.jags.edgetype.Board;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.ShortestPathTree;
-import org.opentripplanner.jags.vertextypes.TransitStop;
+import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.Board;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextypes.TransitStop;
 
 public class TestHopLoader extends TestCase {
 

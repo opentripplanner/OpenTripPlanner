@@ -9,11 +9,11 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.core.TraverseResult;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.factory.GTFSHopFactory;
 
 public class TestHop extends TestCase {
 

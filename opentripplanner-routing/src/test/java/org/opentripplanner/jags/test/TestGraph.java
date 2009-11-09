@@ -2,10 +2,10 @@ package org.opentripplanner.jags.test;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.jags.core.Edge;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.edgetype.Street;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
 
 public class TestGraph extends TestCase {
     public void testBasic() throws Exception {

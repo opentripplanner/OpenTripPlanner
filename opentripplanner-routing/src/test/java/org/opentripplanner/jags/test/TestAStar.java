@@ -7,15 +7,15 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.algorithm.AStar;
-import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.edgetype.loader.GTFSPatternHopLoader;
-import org.opentripplanner.jags.spt.GraphPath;
-import org.opentripplanner.jags.spt.ShortestPathTree;
+import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TestAStar extends TestCase {
     public void testBasic() throws Exception {

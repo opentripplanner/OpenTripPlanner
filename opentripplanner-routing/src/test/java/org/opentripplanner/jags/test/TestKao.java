@@ -4,17 +4,17 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.algorithm.kao.Kao;
-import org.opentripplanner.jags.algorithm.kao.KaoGraph;
-import org.opentripplanner.jags.algorithm.kao.Tree;
-import org.opentripplanner.jags.core.Edge;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.spt.ShortestPathTree;
+import org.opentripplanner.routing.algorithm.kao.Kao;
+import org.opentripplanner.routing.algorithm.kao.KaoGraph;
+import org.opentripplanner.routing.algorithm.kao.Tree;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class TestKao extends TestCase {
         Graph gg = new Graph();
         GTFSHopLoader h2 = new GTFSHopLoader(gg, context);
         h2.load();
-        ShortestPathTree spt = org.opentripplanner.jags.algorithm.Dijkstra.getShortestPathTree(gg,
+        ShortestPathTree spt = org.opentripplanner.routing.algorithm.Dijkstra.getShortestPathTree(gg,
                 "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain", new State(t_0
                         .getTimeInMillis()), options);
 

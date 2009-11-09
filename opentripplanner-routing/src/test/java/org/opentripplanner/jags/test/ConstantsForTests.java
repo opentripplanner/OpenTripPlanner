@@ -4,9 +4,9 @@ import java.io.File;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.edgetype.loader.GTFSPatternHopLoader;
-import org.opentripplanner.jags.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 
 public class ConstantsForTests {
 

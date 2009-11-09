@@ -3,12 +3,12 @@ package org.opentripplanner.narrative;
 import java.util.List;
 import java.util.Vector;
 
-import org.opentripplanner.jags.core.TransportationMode;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.Street;
-import org.opentripplanner.jags.edgetype.Traversable;
-import org.opentripplanner.jags.spt.SPTEdge;
-import org.opentripplanner.jags.spt.SPTVertex;
+import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.Traversable;
+import org.opentripplanner.routing.spt.SPTEdge;
+import org.opentripplanner.routing.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 

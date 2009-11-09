@@ -6,16 +6,16 @@ import java.util.GregorianCalendar;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.algorithm.Dijkstra;
-import org.opentripplanner.jags.core.Graph;
-import org.opentripplanner.jags.core.State;
-import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.core.TraverseOptions;
-import org.opentripplanner.jags.edgetype.DrawHandler;
-import org.opentripplanner.jags.edgetype.Drawable;
-import org.opentripplanner.jags.edgetype.DrawablePoint;
-import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.spt.ShortestPathTree;
+import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.DrawHandler;
+import org.opentripplanner.routing.edgetype.Drawable;
+import org.opentripplanner.routing.edgetype.DrawablePoint;
+import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import processing.core.*;
 

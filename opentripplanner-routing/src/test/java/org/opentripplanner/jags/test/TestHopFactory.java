@@ -4,8 +4,8 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.factory.GTFSHopFactory;
 
 import java.io.File;
 import java.util.ArrayList;
