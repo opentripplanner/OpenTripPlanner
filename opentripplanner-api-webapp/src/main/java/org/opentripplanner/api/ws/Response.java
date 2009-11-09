@@ -1,13 +1,9 @@
 package org.opentripplanner.api.ws;
 
-import java.util.List;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
-import javax.ws.rs.Path;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.TripPlan;
 
 /**

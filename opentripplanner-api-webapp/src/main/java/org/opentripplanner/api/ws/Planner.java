@@ -1,32 +1,17 @@
 package org.opentripplanner.api.ws;
 
-import org.opentripplanner.api.model.Itinerary;
-
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Date;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
-import com.sun.jersey.api.NotFoundException;
-import com.sun.jersey.api.view.ImplicitProduces;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.util.DateUtils;
-
-import org.opentripplanner.api.ws.Response;
-import org.opentripplanner.api.ws.Request;
-import org.opentripplanner.api.ws.RequestInf;
+import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.ws.RequestInf.ModeType;
 import org.opentripplanner.api.ws.RequestInf.OptimizeType;
 

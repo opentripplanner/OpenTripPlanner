@@ -1,11 +1,7 @@
 package org.opentripplanner.api.model;
 
-import java.util.Date;
-import java.util.List;
 import java.util.ArrayList;
-
-import javax.ws.rs.Path;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.List;
 
 /**
  *

@@ -1,13 +1,12 @@
 package org.opentripplanner.api.ws;
 
-import javax.ws.rs.core.MediaType;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Date;
+
+import javax.ws.rs.core.MediaType;
 
 import org.opentripplanner.util.DateUtils;
 

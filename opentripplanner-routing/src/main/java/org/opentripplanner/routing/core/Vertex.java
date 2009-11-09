@@ -15,7 +15,7 @@ public class Vertex implements Serializable {
 
     public String label;
 
-    public Class type;
+    public Class<?> type;
 
     double x, y;
 
