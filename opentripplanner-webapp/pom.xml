@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.opentripplanner</groupId>
+    <artifactId>opentripplanner-webapp</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>    
+    <name>opentripplanner-webapp</name>
+
+    <parent>
+        <artifactId>opentripplanner</artifactId>
+        <groupId>org.opentripplanner</groupId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+
+    </dependencies>
+</project>
