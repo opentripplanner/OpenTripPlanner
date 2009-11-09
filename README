@@ -10,8 +10,8 @@ http://opentripplanner.org/wiki/Install
 
 --== FILES ==--
 
-The jags directory contains the routine engine for the OpenTripPlanner
-project.
-
+opentripplanner-routing    - Core routing algorithms, data-structures, and libraries
+opentripplanner-api-webapp - Webapp providing a REST web api to the trip planning engine
+opentripplanner-webapp     - Webapp providing web-based user interface to trip planning engine
 
 
