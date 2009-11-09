@@ -1,0 +1,87 @@
+<html debug="true">
+<head>
+    <title>POI test</title>
+
+    <script type="text/javascript" src="Control.js"></script>
+    <script type="text/javascript" src="Popup.js"></script>
+    <script type="text/javascript" src="Style.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="logo" id="logo"> 
+    <a href="http://trimet.org" title="Back to TriMet Home"><img src="/images/ui/buttons/logoSmall.gif" alt="Back to TriMet Home"/></a>
+</div> 
+<script type="text/javascript">
+var page_start = Number(new Date());
+Ext.onReady(function()
+{
+    OpenLayers.ImgPath = "/images/map/controls/gray/";
+
+    var pro  = new trimet.locale.profile.Barrier();
+    var map  = new trimet.map.SimpleMap({tileURLs:trimet.utils.Constants.tileTestServers, attribution:trimet.utils.ExtUtils.MAP_ATTRIBUTION});
+    var ui   = new trimet.widget.ui.UI({map:map});
+    var tbar = new trimet.widget.ui.Buttons({ui:ui,profile:pro});
+
+    // wfs, search & planner mock TEST data (set if to false to use
+    var vurl, surl, gxconfig;
+    if(true)
+    {
+        surl = '/js/trimet/widget/search/test.json';
+        vurl = '/js/trimet/widget/vehicles/test/vehicles.json';
+        trimet.utils.URL.plannerGEO = "/js/trimet/widget/planner/test/test.json";
+        trimet.utils.URL.planner    = "/js/trimet/widget/planner/test/test.xml";
+        //trimet.utils.URL.planner    = "/js/trimet/widget/planner/test/fromTo.xml";
+
+        // overlay
+        trimet.utils.URL.cachedWMS = trimet.utils.URL.wmsCacheTest;
+        trimet.utils.URL.wfs = '/js/trimet/widget/overlay/test/wfs-portland.json';
+        
+        // wfs mock stop data
+        trimet.map.wfs.MapDecorator.url = "/js/trimet/map/wfs/test/test.xml";
+        gxconfig = {landmarkURL:"/js/trimet/map/wfs/test/testStop.json", mapPanel:ui.center}
+    }
+
+    ////////// search  ///////////
+    var poi     = new trimet.map.poi.Control({map:map.getMap()});
+
+/**/
+    var vecs = [
+        new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(7616400, 607000), null, trimet.map.poi.Style.fromTrip),
+        new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(7616500, 607000), null, trimet.map.poi.Style.toTrip),
+        new OpenLayers.Feature.Vector(new OpenLayers.Geometry.Point(7616600, 607000), null, trimet.map.poi.Style.green),
+    ]
+    poi.layer.addFeatures(vecs);
+/**/
+    poi.makeFeature(7616400, 607500, null, trimet.map.poi.Style.startTrip);
+    poi.makeFeature(7616500, 607500, null, trimet.map.poi.Style.endTrip);
+    poi.makeFeature(7616600, 607500);
+/**/
+    var search  = new trimet.widget.search.Search({profile:pro, url:surl, poi:poi});
+    var sp      = search.getPanel();
+    ui.accordion.add(sp);
+
+    // wfs decorator to add stops popups to the map -- note, this is done last, so the feature layer appears ontop
+    if(Ext.isIE)  // on IE, don't show stops until 6th zoom level
+        trimet.map.wfs.MapDecorator.stopZoomResolution = 4;
+    trimet.map.wfs.MapDecorator.decorate(map, trimet.map.wfs.GxControl, gxconfig);
+    map.getMap().setCenter(new OpenLayers.LonLat(7616862, 607850), 6);
+
+    ////////// clear ///////////
+    clear = function() 
+    {
+        poi.clear();
+
+        var fs = tbar.getFullScreen();
+        fs.toggle(false);
+        ui.fullScreen(false);
+    }
+    var cb = tbar.getClear();
+    cb.on("click", clear, this);
+
+    ui.accordion.doLayout();
+});
+</script> 
+</body>
+</html>

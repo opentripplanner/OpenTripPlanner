@@ -1,0 +1,17 @@
+<projectDescription>
+  <name>jags</name>
+  <comment/>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+    <buildCommand>
+      <name>org.maven.ide.eclipse.maven2Builder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
+  </natures>
+</projectDescription>

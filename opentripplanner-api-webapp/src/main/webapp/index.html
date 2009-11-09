@@ -1,0 +1,74 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html debug="true">
+<head>
+    <title>OpenTripPlanner Map</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta name="description" content="multi modal trip planner tripplanner bike tranist map"/>
+    <meta name="keywords"    content="multi modal trip planner tripplanner bike tranist map" />
+    <meta content="tripplanner v0.1 - November 2009"/>
+
+    <!--
+    * Browser Support (as of Nov 2007):
+    *   Internet Explorer 6+
+    *   FireFox 1.5+ (PC, Mac)
+    *   Safari 2+
+    *   Opera 9+ (PC, Mac)
+    -->    
+    <link rel="stylesheet" type="text/css" href="/js/lib/ext/resources/css/ext-all-notheme.css" />
+    <link rel="stylesheet" type="text/css" href="/js/lib/ext/resources/css/xtheme-gray-extend.css" />
+    <link rel="stylesheet" type="text/css" href="/js/lib/openlayers/theme/default/style.css" />
+    <!--[if lte IE 6]> <link rel=ÓstylesheetÓ href=Ó/js/openlayers/theme/default/ie6-style.cssÓ type=Ótext/cssÓ /> <![endif]-->
+    <link rel="stylesheet" type="text/css" href="planner.css" />
+
+    <script src="/js/lib/openlayers/OpenLayers.js"></script>
+    <script src="/js/lib/ext/adapter/ext/ext-base.js"></script>
+    <script src="/js/lib/ext/ext-custom-min.js"></script>
+    <script src="/js/lib/geoext/GeoExt.js"></script>
+
+    <script src="/js/otp/otp.js"></script>
+    <script src="/js/otp/util/OpenLayersUtils.js"></script>
+    <script src="/js/otp/util/ExtUtils.js"></script>
+    <script src="/js/otp/locale/English.js"></script>
+    <script src="/js/otp/planner/Utils.js"></script>
+    <script src="/js/otp/planner/ContextMenu.js"></script>
+    <script src="/js/otp/core/ComboBox.js"></script>
+    <script src="/js/otp/core/Map.js"></script>
+    <script src="/js/otp/core/Measure.js"></script>
+    <script src="/js/otp/core/UI.js"></script>
+    <script src="/js/otp/planner/Forms.js"></script>
+    <script src="/js/otp/planner/Itinerary.js"></script>
+    <script src="/js/otp/planner/Planner.js"></script>
+    <script src="/js/otp/planner/Renderer.js"></script>
+    <script src="/js/otp/planner/Templates.js"></script>
+    <script src="/js/otp/planner/TripTab.js"></script>
+    <script src="/js/otp/util/AnalyticsUtils.js"></script>
+    <script src="/js/otp/util/DateUtils.js"></script>
+    <script src="/js/otp/util/ObjUtils.js"></script>
+    <script src="/js/otp/util/StringFormattingUtils.js"></script>
+    <script src="/js/otp/planner/poi/Control.js"></script>
+    <script src="/js/otp/planner/poi/Popup.js"></script>
+    <script src="/js/otp/planner/poi/Style.js"></script>
+</head>
+<style>
+</style>
+<body>
+    <div class="logo" id="logo"> 
+        <a href="http://opentripplanner.org" title="OpenTripPlanner Home"><img src="/images/ui/logoSmall.png" alt="OpenTripPlanner home"/></a>
+    </div> 
+    <script type="text/javascript">
+    Ext.onReady(function()
+    {
+        var map  = new otp.core.Map({attribution:otp.util.ExtUtils.MAP_ATTRIBUTION}); 
+        var ui   = new otp.core.UI({map:map});
+        
+
+        ////////// trip planner ///////////
+        var poi  = new otp.planner.poi.Control({map:map.getMap()});
+        var plan = new otp.planner.Planner({map:this.map, poi:poi});
+        var cm   = new otp.planner.ContextMenu({map:map, forms:plan.getForms()});
+        ui.accordion.add(plan.getPanel());
+    });
+    </script>
+</body>
+</html>
