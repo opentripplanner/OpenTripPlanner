@@ -4,8 +4,8 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.jags.edgetype.Hop;
-import org.opentripplanner.jags.gtfs.GtfsContext;
 
 import java.util.ArrayList;
 import java.util.Collection;

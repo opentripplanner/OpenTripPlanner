@@ -11,6 +11,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Alight;
@@ -18,7 +19,6 @@ import org.opentripplanner.jags.edgetype.PatternBoard;
 import org.opentripplanner.jags.edgetype.PatternHop;
 import org.opentripplanner.jags.edgetype.TripPattern;
 import org.opentripplanner.jags.edgetype.Traversable;
-import org.opentripplanner.jags.gtfs.GtfsContext;
 
 class StopPattern {
     Vector<Stop> stops;

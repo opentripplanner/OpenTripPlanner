@@ -20,10 +20,10 @@ import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.edgetype.Street;
 import org.opentripplanner.jags.edgetype.loader.ShapefileStreetLoader;
-import org.opentripplanner.jags.narrative.Narrative;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.SPTEdge;
 import org.opentripplanner.jags.spt.ShortestPathTree;
+import org.opentripplanner.narrative.Narrative;
 
 public class TestStreet extends TestCase {
 

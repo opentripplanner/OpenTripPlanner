@@ -2,11 +2,11 @@ package org.opentripplanner.jags.edgetype.loader;
 
 import java.util.List;
 
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.StreetTransitLink;
 import org.opentripplanner.jags.edgetype.Transfer;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.vertextypes.Intersection;
 import org.opentripplanner.jags.vertextypes.TransitStop;
 

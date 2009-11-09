@@ -2,6 +2,8 @@ package org.opentripplanner.jags.test;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.algorithm.kao.Kao;
 import org.opentripplanner.jags.algorithm.kao.KaoGraph;
 import org.opentripplanner.jags.algorithm.kao.Tree;
@@ -12,8 +14,6 @@ import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.GtfsContext;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 
 import java.io.File;

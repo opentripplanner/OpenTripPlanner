@@ -2,8 +2,8 @@ package org.opentripplanner.jags.core;
 
 import java.io.Serializable;
 
+import org.opentripplanner.jags.algorithm.NegativeWeightException;
 import org.opentripplanner.jags.edgetype.Traversable;
-import org.opentripplanner.jags.gtfs.exception.NegativeWeightException;
 
 public class Edge extends AbstractEdge implements Serializable {
     private static final long serialVersionUID = 2847531383395983317L;

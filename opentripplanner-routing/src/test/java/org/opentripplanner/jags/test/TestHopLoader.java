@@ -5,6 +5,8 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.algorithm.Dijkstra;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
@@ -15,8 +17,6 @@ import org.opentripplanner.jags.edgetype.Alight;
 import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.loader.GTFSHopLoader;
-import org.opentripplanner.jags.gtfs.GtfsContext;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.spt.GraphPath;
 import org.opentripplanner.jags.spt.ShortestPathTree;
 import org.opentripplanner.jags.vertextypes.TransitStop;

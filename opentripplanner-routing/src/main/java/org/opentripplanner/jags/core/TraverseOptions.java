@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.jags.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsContext;
 
 public class TraverseOptions {
     public double speed; // in meters/second

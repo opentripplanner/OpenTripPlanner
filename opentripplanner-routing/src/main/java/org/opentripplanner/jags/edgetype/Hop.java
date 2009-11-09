@@ -6,11 +6,11 @@ import java.util.Comparator;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TransportationMode;
 import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.core.TraverseResult;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;

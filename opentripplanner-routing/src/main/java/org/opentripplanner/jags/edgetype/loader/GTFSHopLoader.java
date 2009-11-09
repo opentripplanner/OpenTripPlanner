@@ -6,6 +6,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.Alight;
@@ -13,7 +14,6 @@ import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.DrawHandler;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
-import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.vertextypes.TransitStop;
 
 public class GTFSHopLoader {

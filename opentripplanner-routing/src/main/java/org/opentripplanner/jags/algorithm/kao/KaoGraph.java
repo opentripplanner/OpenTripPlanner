@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.jags.core.Edge;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.State;
@@ -13,7 +14,6 @@ import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.edgetype.Board;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.Traversable;
-import org.opentripplanner.jags.gtfs.GtfsContext;
 
 public class KaoGraph extends Graph {
     private static final long serialVersionUID = 3667189924531545548L;

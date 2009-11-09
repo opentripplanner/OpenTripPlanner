@@ -6,7 +6,6 @@ import org.opentripplanner.jags.core.State;
 import org.opentripplanner.jags.core.TraverseOptions;
 import org.opentripplanner.jags.core.TraverseResult;
 import org.opentripplanner.jags.core.Vertex;
-import org.opentripplanner.jags.gtfs.exception.NegativeWeightException;
 import org.opentripplanner.jags.pqueue.FibHeap;
 import org.opentripplanner.jags.spt.SPTVertex;
 import org.opentripplanner.jags.spt.ShortestPathTree;

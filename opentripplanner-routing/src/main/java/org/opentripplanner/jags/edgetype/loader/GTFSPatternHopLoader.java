@@ -3,10 +3,10 @@ package org.opentripplanner.jags.edgetype.loader;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.jags.core.Graph;
 import org.opentripplanner.jags.core.Vertex;
 import org.opentripplanner.jags.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.jags.gtfs.GtfsContext;
 import org.opentripplanner.jags.vertextypes.TransitStop;
 
 public class GTFSPatternHopLoader {

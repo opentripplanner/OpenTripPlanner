@@ -2,10 +2,10 @@ package org.opentripplanner.jags.test;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.jags.edgetype.Hop;
 import org.opentripplanner.jags.edgetype.factory.GTFSHopFactory;
-import org.opentripplanner.jags.gtfs.GtfsContext;
-import org.opentripplanner.jags.gtfs.GtfsLibrary;
 
 import java.io.File;
 import java.util.ArrayList;
