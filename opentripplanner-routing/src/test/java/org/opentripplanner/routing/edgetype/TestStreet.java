@@ -1,4 +1,4 @@
-package org.opentripplanner.jags.test;
+package org.opentripplanner.routing.edgetype;
 
 import java.io.File;
 import java.util.GregorianCalendar;
@@ -11,6 +11,7 @@ import org.geotools.data.FeatureSource;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.narrative.Narrative;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;

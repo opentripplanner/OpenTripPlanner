@@ -1,10 +1,11 @@
-package org.opentripplanner.jags.test;
+package org.opentripplanner.routing.edgetype.loader;
 
 import java.io.File;
 import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.Dijkstra;

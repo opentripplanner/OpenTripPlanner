@@ -1,4 +1,4 @@
-package org.opentripplanner.jags.test;
+package org.opentripplanner;
 
 import java.io.File;
 

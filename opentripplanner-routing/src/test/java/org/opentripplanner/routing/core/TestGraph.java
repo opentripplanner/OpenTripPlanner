@@ -1,4 +1,4 @@
-package org.opentripplanner.jags.test;
+package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
