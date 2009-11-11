@@ -39,7 +39,6 @@ public class AStar {
 
         // Iteration Variables
         SPTVertex spt_u, spt_v;
-        int i = 0;
         while (!pq.empty()) { // Until the priority queue is empty:
             spt_u = (SPTVertex) pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
@@ -47,7 +46,6 @@ public class AStar {
                 break;
 
             for (Edge edge : spt_u.mirror.outgoing) {
-                i++;
 
                 TraverseResult wr = edge.payload.traverse(spt_u.state, options);
 
@@ -89,7 +87,6 @@ public class AStar {
                 }
             }
         }
-        System.out.println("examined: " + i);
         return spt;
     }
 
