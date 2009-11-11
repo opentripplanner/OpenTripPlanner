@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.test;
+package org.opentripplanner.routing;
 
 import java.util.GregorianCalendar;
 
