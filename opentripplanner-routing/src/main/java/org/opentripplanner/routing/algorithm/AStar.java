@@ -1,14 +1,83 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+class NullExtraEdges implements Map<Vertex, Edge> {
+
+    @Override
+    public void clear() {
+    }
+
+    @Override
+    public boolean containsKey(Object arg0) {
+        return false;
+    }
+
+    @Override
+    public boolean containsValue(Object arg0) {
+        return false;
+    }
+
+    @Override
+    public Set<java.util.Map.Entry<Vertex, Edge>> entrySet() {
+        return null;
+    }
+
+    @Override
+    public Edge get(Object arg0) {
+        return null;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+    @Override
+    public Set<Vertex> keySet() {
+        return null;
+    }
+
+    @Override
+    public Edge put(Vertex arg0, Edge arg1) {
+        return null;
+    }
+
+    @Override
+    public void putAll(Map<? extends Vertex, ? extends Edge> arg0) {      
+    }
+
+    @Override
+    public Edge remove(Object arg0) {
+        return null;
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public Collection<Edge> values() {
+        return null;
+    }
+}
+
 
 public class AStar {
     
@@ -23,6 +92,28 @@ public class AStar {
         // Get origin vertex to make sure it exists
         Vertex origin = gg.getVertex(origin_label);
         Vertex target = gg.getVertex(target_label);
+
+        Map<Vertex, Edge> extraEdges = new NullExtraEdges();
+        return getShortestPathTree(gg, origin, target, init, options, extraEdges);
+    }
+
+    public static ShortestPathTree getShortestPathTree(Graph gg, StreetLocation origin, StreetLocation target,
+            State init, TraverseOptions options) {
+        
+        Map<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
+
+        Edge toEdge = target.getToEdge();
+        extraEdges.put(target.street.tov, toEdge);
+        Edge fromEdge = target.getFromEdge();
+        extraEdges.put(target.street.fromv, fromEdge);
+        
+        return getShortestPathTree(gg, origin.vertex, target.vertex, init, options, extraEdges);
+    }
+    
+    private static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
+            State init, TraverseOptions options, Map<Vertex, Edge> extraEdges) {
+
+
         if (origin == null) {
             return null;
         }
@@ -34,7 +125,7 @@ public class AStar {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0);
 
         // Priority Queue
-        FibHeap pq = new FibHeap(gg.getVertices().size());
+        FibHeap pq = new FibHeap(gg.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         // Iteration Variables
@@ -45,7 +136,13 @@ public class AStar {
             if (spt_u.mirror == target)
                 break;
 
-            for (Edge edge : spt_u.mirror.outgoing) {
+            Collection<Edge> outgoing = spt_u.mirror.outgoing;
+            if (extraEdges.containsKey(spt_u.mirror)) {
+                outgoing = new Vector<Edge>(outgoing);
+                outgoing.add(extraEdges.get(spt_u.mirror));
+            }
+            
+            for (Edge edge : outgoing) {
 
                 TraverseResult wr = edge.payload.traverse(spt_u.state, options);
 

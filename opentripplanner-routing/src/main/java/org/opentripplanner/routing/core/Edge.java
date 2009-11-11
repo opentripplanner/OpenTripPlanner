@@ -14,7 +14,7 @@ public class Edge extends AbstractEdge implements Serializable {
 
     public Traversable payload;
 
-    Edge(Vertex fromv, Vertex tov, Traversable payload) {
+    public Edge(Vertex fromv, Vertex tov, Traversable payload) {
         this.fromv = fromv;
         this.tov = tov;
         this.payload = payload;
