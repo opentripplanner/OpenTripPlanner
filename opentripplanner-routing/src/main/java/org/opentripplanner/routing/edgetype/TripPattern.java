@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
 public class TripPattern {
     /*
@@ -44,18 +45,30 @@ public class TripPattern {
         }
     }
 
-    public void addHop(int stopindex, int departureTime, int runningTime) {
-        Vector<Integer> stopRunningTimes = runningTimes[stopindex];
-        Vector<Integer> stopDepartureTimes = departureTimes[stopindex];
+    public void removeHop(int stopindex, int hop) {
         
-        int i;
-        for (i = 0; i < stopDepartureTimes.size(); ++i) {
-            if (stopDepartureTimes.elementAt(i) > departureTime) {
-                break;
+        
+    }
+    
+    public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime) {
+        Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
+        Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
+        
+        //throw an exception when this departure time is not between the departure times it 
+        //should be between, indicating a trip that overtakes another.
+
+        if (insertionPoint > 0) {
+            if (stopDepartureTimes.elementAt(insertionPoint - 1) > departureTime) {
+                throw new TripOvertakingException();
             }
         }
-        stopDepartureTimes.insertElementAt(departureTime, i);
-        stopRunningTimes.insertElementAt(runningTime, i);
+        if (insertionPoint < stopDepartureTimes.size()) {
+            if (stopDepartureTimes.elementAt(insertionPoint) < departureTime) {
+                throw new TripOvertakingException();
+            }
+        }
+        stopDepartureTimes.insertElementAt(departureTime, insertionPoint);
+        stopRunningTimes.insertElementAt(runningTime, insertionPoint);
     }
 
     public int getNextPattern(int stopIndex, int afterTime) {
@@ -79,5 +92,11 @@ public class TripPattern {
     public int getDepartureTime(int stopIndex, int pattern) {
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
         return stopDepartureTimes.get(pattern);
+    }
+
+    public int getInsertionPoint(int departureTime) {
+        Vector<Integer> stopDepartureTimes = departureTimes[0];
+        int index = Collections.binarySearch(stopDepartureTimes, departureTime); 
+        return -index - 1;  
     }
 }
