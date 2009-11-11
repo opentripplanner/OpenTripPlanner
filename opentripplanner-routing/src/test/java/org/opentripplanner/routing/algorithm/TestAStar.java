@@ -56,33 +56,36 @@ public class TestAStar extends TestCase {
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         long startClock, endClock;
-        ShortestPathTree spt;
+        ShortestPathTree spt = null;
 
         /* time Dijkstra */
-         startClock = System.nanoTime();
-         
-         spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label, new
-         State(startTime.getTimeInMillis()), wo);
-         
+        startClock = System.nanoTime();
+        for (int i = 0; i < 20; ++i) {
+            spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label, new State(
+                    startTime.getTimeInMillis()), wo);
+        }
         endClock = System.nanoTime();
-        long aStarSpeed = endClock - startClock;
+        long dijkstraTime = endClock - startClock;
 
         GraphPath path = spt.getPath(airport);
         assertNotNull(path);
-         
+
         /* time A* */
         startClock = System.nanoTime();
-
-        spt = AStar.getShortestPathTree(graph, "TriMet_6876", airport.label, new State(startTime
-                .getTimeInMillis()), wo);
+        for (int i = 0; i < 20; ++i) {
+            spt = AStar.getShortestPathTree(graph, "TriMet_6876", airport.label, new State(
+                    startTime.getTimeInMillis()), wo);
+        }
 
         endClock = System.nanoTime();
-        long dijkstraSpeed = endClock - startClock;
-
-        assertTrue(aStarSpeed >= dijkstraSpeed);
+        long aStarTime = endClock - startClock;
 
         path = spt.getPath(airport);
+        assertNotNull(path);
 
+        System.out.println("A* took" + aStarTime / 1000000000.0);
+
+        assertTrue(dijkstraTime >= aStarTime);
 
     }
 }
