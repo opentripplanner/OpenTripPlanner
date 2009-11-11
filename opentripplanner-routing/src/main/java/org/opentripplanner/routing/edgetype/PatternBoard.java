@@ -68,7 +68,7 @@ public class PatternBoard extends AbstractPayload {
         if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
             patternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight);
-            if (patternIndex > 0) {
+            if (patternIndex >= 0) {
                 wait = pattern.getDepartureTime(stopIndex,patternIndex) - secondsSinceMidnight;
             }
         }
@@ -77,7 +77,7 @@ public class PatternBoard extends AbstractPayload {
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight - SEC_IN_DAY);
-            if (yesterdayPatternIndex > 0) {
+            if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getDepartureTime(stopIndex,yesterdayPatternIndex) - (secondsSinceMidnight - SEC_IN_DAY);
                 if (wait < 0 || waitYesterday < wait) {
                     // choose the better time
