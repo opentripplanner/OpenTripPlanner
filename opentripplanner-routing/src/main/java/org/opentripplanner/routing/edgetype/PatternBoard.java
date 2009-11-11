@@ -56,57 +56,52 @@ public class PatternBoard extends AbstractPayload {
         return null;
     }
 
-    private int computeWait(State state0, TraverseOptions wo) {
+    private TraverseResult computeWait(State state0, TraverseOptions wo, boolean back) {
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, wo.calendar);
         Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
 
         int wait = -1;
-
+        int patternIndex = -1;
         AgencyAndId service = pattern.exemplar.getServiceId();
         if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            wait = pattern.getNextDepartureTime(stopIndex,secondsSinceMidnight) - secondsSinceMidnight;
+            patternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight);
+            if (patternIndex > 0) {
+                wait = pattern.getDepartureTime(stopIndex,patternIndex) - secondsSinceMidnight;
+            }
         }
         if (wo.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
-            int waitYesterday = pattern
-                    .getNextDepartureTime(stopIndex,secondsSinceMidnight - SEC_IN_DAY)
-                    - (secondsSinceMidnight - SEC_IN_DAY);
-            if (waitYesterday != -1 && (wait < 0 || waitYesterday < wait)) {
-                // choose the better time
-                wait = waitYesterday;
+            int yesterdayPatternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight - SEC_IN_DAY);
+            if (yesterdayPatternIndex > 0) {
+                int waitYesterday = pattern.getDepartureTime(stopIndex,yesterdayPatternIndex) - (secondsSinceMidnight - SEC_IN_DAY);
+                if (wait < 0 || waitYesterday < wait) {
+                    // choose the better time
+                    wait = waitYesterday;
+                    patternIndex = yesterdayPatternIndex;
+                }
             }
         }
 
         if (wait < 0) {
-            return -1;
+            return null;
         }
-        return wait;
+        State state1 = state0.clone();
+        state1.setPattern(patternIndex);
+        state1.incrementTimeInSeconds(back ? -wait : wait);
+        return new TraverseResult(wait, state1);
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        int wait = computeWait(state0, wo);
-        if (wait < 0) {
-            return null;
-        }
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(wait);
-        return new TraverseResult(wait, state1);
+        return computeWait(state0, wo, false);        
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-
-        int wait = computeWait(state0, wo);
-        if (wait < 0) {
-            return null;
-        }
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait, state1);
+        return computeWait(state0, wo, true);
     }
 
     private Date getServiceDate(long currentTime, Calendar c) {

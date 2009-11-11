@@ -5,15 +5,22 @@ import java.util.Date;
 public class State {
 
     private long _time;
-
+    private int curPattern = -1;
+    
     public State() {
         this(System.currentTimeMillis());
     }
 
     public State(long time) {
         _time = time;
+    }    
+
+    public State(long time, int pattern) {
+        _time = time;
+        curPattern = pattern;
     }
 
+    
     public long getTime() {
         return _time;
     }
@@ -23,12 +30,20 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time);
+        State ret = new State(_time, curPattern);
         return ret;
     }
 
     public String toString() {
-        return "<State " + new Date(_time) + ">";
+        return "<State " + new Date(_time) + "," + curPattern + ">";
+    }
+
+    public void setPattern(int curPattern) {
+        this.curPattern = curPattern;
+    }
+
+    public int getPattern() {
+        return curPattern;
     }
 
 }

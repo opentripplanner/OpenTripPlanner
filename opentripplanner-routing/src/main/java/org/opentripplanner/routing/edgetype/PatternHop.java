@@ -23,13 +23,13 @@ public class PatternHop extends AbstractPayload {
 
     private Stop start, end;
 
-    private int runningTime;
+    private int stopIndex;
 
-    public PatternHop(Stop start, Stop end, int runningTime, TripPattern pattern) {
+    public PatternHop(Stop start, Stop end, int stopIndex, TripPattern tripPattern) {
         this.start = start;
         this.end = end;
-        this.runningTime = runningTime;
-        this.pattern = pattern;
+        this.stopIndex = stopIndex;
+        this.pattern = tripPattern;
     }
 
     public String getDirection() {
@@ -69,12 +69,14 @@ public class PatternHop extends AbstractPayload {
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
+        int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(runningTime);
         return new TraverseResult(runningTime, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
+        int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(-runningTime);
         return new TraverseResult(runningTime, state1);
     }

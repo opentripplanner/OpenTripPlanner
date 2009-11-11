@@ -11,47 +11,42 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.Traversable;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.jags.core.Graph;
+import org.opentripplanner.jags.core.Vertex;
+import org.opentripplanner.jags.edgetype.Alight;
+import org.opentripplanner.jags.edgetype.PatternBoard;
+import org.opentripplanner.jags.edgetype.PatternHop;
+import org.opentripplanner.jags.edgetype.Traversable;
+import org.opentripplanner.jags.edgetype.TripPattern;
+import org.opentripplanner.jags.gtfs.GtfsContext;
 
-class StopPattern {
+class StopPattern2 {
     Vector<Stop> stops;
-
-    Vector<Long> times;
 
     AgencyAndId calendarId;
 
-    public StopPattern(Vector<Stop> stops, Vector<Long> times, AgencyAndId calendarId) {
+    public StopPattern2(Vector<Stop> stops, AgencyAndId calendarId) {
         this.stops = stops;
-        this.times = times;
         this.calendarId = calendarId;
     }
 
     public boolean equals(Object other) {
-        if (other instanceof StopPattern) {
-            StopPattern pattern = (StopPattern) other;
-            return pattern.stops.equals(stops) && pattern.times.equals(times)
-                    && pattern.calendarId.equals(calendarId);
+        if (other instanceof StopPattern2) {
+            StopPattern2 pattern = (StopPattern2) other;
+            return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId);
         } else {
             return false;
         }
     }
 
     public int hashCode() {
-        return this.stops.hashCode() ^ this.times.hashCode() ^ this.calendarId.hashCode();
+        return this.stops.hashCode() ^ this.calendarId.hashCode();
     }
 
     public String toString() {
-        return "StopPattern(" + stops + ", " + times + ", " + calendarId + ")";
+        return "StopPattern(" + stops + ", " + calendarId + ")";
     }
 }
-
 
 public class GTFSPatternHopFactory {
 
@@ -61,22 +56,13 @@ public class GTFSPatternHopFactory {
         _dao = context.getDao();
     }
 
-    public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
+    public static StopPattern2 stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
         Vector<Stop> stops = new Vector<Stop>();
-        Vector<Long> times = new Vector<Long>();
-        int start = -1;
 
         for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
             stops.add(stoptime.getStop());
-            if (start == -1) {
-                start = stoptime.getArrivalTime();
-            }
-            long crossingTime = stoptime.getArrivalTime() - start;
-            times.add(crossingTime);
-            long dwellTime = stoptime.getDepartureTime() - stoptime.getArrivalTime();
-            times.add(dwellTime);
         }
-        StopPattern pattern = new StopPattern(stops, times, trip.getServiceId());
+        StopPattern2 pattern = new StopPattern2(stops, trip.getServiceId());
         return pattern;
     }
 
@@ -91,15 +77,15 @@ public class GTFSPatternHopFactory {
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
 
-        HashMap<StopPattern, TripPattern> patterns = new HashMap<StopPattern, TripPattern>();
+        HashMap<StopPattern2, TripPattern> patterns = new HashMap<StopPattern2, TripPattern>();
 
         for (Trip trip : trips) {
             List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
-            StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
+            StopPattern2 stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
+            int lastStop = stopTimes.size() - 1;
             if (tripPattern == null) {
                 tripPattern = new TripPattern(trip, stopTimes);
-                int lastStop = stopTimes.size() - 1;
                 for (int i = 0; i < lastStop; i++) {
                     StopTime st0 = stopTimes.get(i);
                     Stop s0 = st0.getStop();
@@ -107,8 +93,9 @@ public class GTFSPatternHopFactory {
                     Stop s1 = st1.getStop();
                     int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
-                    PatternHop hop = new PatternHop(s0, s1, runningTime,
-                            tripPattern);
+                    PatternHop hop = new PatternHop(s0, s1, i, tripPattern);
+                    tripPattern.addHop(i, st0.getDepartureTime(), runningTime);
+                    
                     ret.add(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));
@@ -126,9 +113,14 @@ public class GTFSPatternHopFactory {
                     graph.addEdge(startJourney, endJourney, hop);
                 }
                 patterns.put(stopPattern, tripPattern);
+            } else {
+                for (int i = 0; i < lastStop; i++) {
+                    StopTime st0 = stopTimes.get(i);
+                    StopTime st1 = stopTimes.get(i + 1);
+                    int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+                    tripPattern.addHop(i, st0.getDepartureTime(), runningTime);
+                }
             }
-            int firstDepartureTime = stopTimes.get(0).getDepartureTime();
-            tripPattern.addStartTime(firstDepartureTime);
         }
 
         return ret;

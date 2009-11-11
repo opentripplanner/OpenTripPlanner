@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.ArrayList;
+import java.lang.reflect.Array;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,9 +16,9 @@ public class TripPattern {
 
     public Trip exemplar;
 
-    private Vector<Integer> startTimes;
+    private Vector<Integer> [] departureTimes;
+    private Vector<Integer> [] runningTimes;
 
-    private List<PatternStop> patternStops;
 
     class PatternStop {
         public int arrivalTimeOffset;
@@ -30,43 +31,53 @@ public class TripPattern {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
-        startTimes = new Vector<Integer>();
-        patternStops = new ArrayList<PatternStop>();
+        departureTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
+        runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
         
-        int startTime = stopTimes.get(0).getDepartureTime();
-        
-        for (StopTime stopTime : stopTimes) {
-            PatternStop patternStop = new PatternStop(stopTime.getDepartureTime() - startTime,
-                    stopTime.getArrivalTime() - startTime);
-            patternStops.add(patternStop);
+        for (int i = 0; i < stopTimes.size(); ++i) {
+            departureTimes[i] = new Vector<Integer>();
+            runningTimes[i] = new Vector<Integer>();
+            
         }
     }
 
-    public void addStartTime(int time) {
+    public void addHop(int stopindex, int departureTime, int runningTime) {
+        Vector<Integer> stopRunningTimes = runningTimes[stopindex];
+        Vector<Integer> stopDepartureTimes = departureTimes[stopindex];
+        
         int i;
-        for (i = 0; i < startTimes.size(); ++i) {
-            if (startTimes.elementAt(i) > time) {
+        for (i = 0; i < stopDepartureTimes.size(); ++i) {
+            if (stopDepartureTimes.elementAt(i) > departureTime) {
                 break;
             }
         }
-        startTimes.insertElementAt(time, i);
+        stopDepartureTimes.insertElementAt(departureTime, i);
+        stopRunningTimes.insertElementAt(runningTime, i);
     }
 
-    public int getNextDepartureTime(int stopIndex, int afterTime) {
+    public int getNextPattern(int stopIndex, int afterTime) {
+        Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
+        int index = Collections.binarySearch(stopDepartureTimes, afterTime);
+        if (index == - stopDepartureTimes.size() - 1) 
+            return -1;
 
-        PatternStop patternStop = patternStops.get(stopIndex);
-        int departureTimeOffset = patternStop.departureTimeOffset;
-
-        for (int i = 0; i < startTimes.size(); ++i) {
-            int startTime = startTimes.get(i);
-            int departureTime = startTime + departureTimeOffset;
-            if (departureTime >= afterTime) {
-                return departureTime;
-            }
+        if (index >= 0) {
+            return index;
+        } else {
+            return -index - 1;
         }
-        return -1;
     }
 
+    public int getRunningTime(int stopIndex, int pattern) {
+        Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
+        return stopRunningTimes.get(pattern);
+    }
+
+    public int getDepartureTime(int stopIndex, int pattern) {
+        Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
+        return stopDepartureTimes.get(pattern);
+    }
 }
