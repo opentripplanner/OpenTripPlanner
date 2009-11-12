@@ -39,8 +39,8 @@ public class TestHalfEdges extends TestCase {
         graph.addEdge(tr, br, new Street(d));
         Edge endEdge = graph.addEdge(br, tr, new Street(d));
         
-        StreetLocation start = new StreetLocation("start", startEdge, 0.6, false);
-        StreetLocation end = new StreetLocation("end", endEdge, 0.8, true);
+        StreetLocation start = new StreetLocation(startEdge, 0.6, false);
+        StreetLocation end = new StreetLocation(endEdge, 0.8, true);
         
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 

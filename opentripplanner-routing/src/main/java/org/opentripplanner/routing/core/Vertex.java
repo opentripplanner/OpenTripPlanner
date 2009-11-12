@@ -3,6 +3,8 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Vector;
 
+import org.opentripplanner.gtfs.GtfsLibrary;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class Vertex implements Serializable {
@@ -40,6 +42,11 @@ public class Vertex implements Serializable {
         /* This is more accurate but slower */
         // return GtfsLibrary.distance(y, x, v.y, v.x);
     }
+    
+
+    public double distance(Coordinate c) {
+        return GtfsLibrary.distance(y, x, c.y, c.x);
+    }
 
     public Coordinate getCoordinate() {
         return new Coordinate(x, y);
@@ -64,4 +71,5 @@ public class Vertex implements Serializable {
     public String toString() {
         return "<" + this.label + " " + this.outgoing.size() + " " + this.incoming.size() + ">";
     }
+
 }
