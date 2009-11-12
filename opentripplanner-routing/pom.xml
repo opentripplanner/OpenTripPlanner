@@ -58,16 +58,10 @@
             <version>3.6.16</version>
         </dependency>
         <dependency>
-            <groupId>org.processing</groupId>
-            <artifactId>processing-core</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-        <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
             <version>1.0.1</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
