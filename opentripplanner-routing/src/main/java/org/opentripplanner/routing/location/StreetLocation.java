@@ -19,7 +19,8 @@ public class StreetLocation {
 
     public Vertex vertex;
     Edge[] halfEdges;
-    public StreetLocation(String name, Edge street, double location, boolean incoming) {
+
+    public StreetLocation(Edge street, double location, boolean incoming) {
         assert 0 <= location;
         assert location <= 1;
         this.street = street;
@@ -30,25 +31,29 @@ public class StreetLocation {
         double x = startCoord.x * (1 - location) + endCoord.x * location;
         double y = startCoord.y * (1 - location) + endCoord.y * location;
         
-        vertex = new Vertex(name, x, y);
+        String streetName = street.payload.getName();
+        
+        vertex = new Vertex(streetName, x, y);
         double weight1 = GtfsLibrary.distance(y, x, startCoord.y, startCoord.x);
         double weight2 = GtfsLibrary.distance(y, x, endCoord.y, endCoord.x);
-        String streetName = street.payload.getName();
         
         if (incoming) {
             halfEdges = new Edge[] { 
                     new Edge(street.fromv, vertex, new Street(streetName, streetName, weight1)),
                     new Edge(street.tov, vertex, new Street(streetName, streetName, weight2)) 
                     };
+            for (Edge e: halfEdges) {
+                vertex.addIncoming(e);
+            }   
         } else {
             halfEdges = new Edge[] { 
                     new Edge(vertex, street.fromv, new Street(streetName, streetName, weight1)),
                     new Edge(vertex, street.tov, new Street(streetName, streetName, weight2)) 
                     };
-        }
-        for (Edge e: halfEdges) {
-            vertex.addOutgoing(e);
-        }
+            for (Edge e: halfEdges) {
+                vertex.addOutgoing(e);
+            }
+        }                
     }
     
     public Edge getFromEdge() {
