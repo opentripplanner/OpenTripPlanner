@@ -1,4 +1,5 @@
 otp.namespace("otp.core");
+
 /** singleton / static reference to our 'Map' */
 otp.core.MapSingleton = null;
 
