@@ -56,7 +56,7 @@ public class StreetLocationFinder {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
-            
+
             nearby = intersections.query(envelope);
 
             Collections.sort(nearby, new Comparator<Vertex>() {
@@ -66,14 +66,14 @@ public class StreetLocationFinder {
                 }
 
             });
-            System.out.println("nearby: " + nearby);
+
             for (Vertex a : nearby) {
                 for (Vertex b : nearby) {
                     if (a == b) {
                         continue;
                     }
-                    //search the edges for one where a connects to b
-                    Edge street = null;                    
+                    // search the edges for one where a connects to b
+                    Edge street = null;
                     for (int j = 0; j < a.outgoing.size(); ++j) {
                         street = a.outgoing.get(j);
                         if (street.tov == b) {
@@ -101,6 +101,7 @@ public class StreetLocationFinder {
                 }
             }
         }
-        throw new IntersectionNotFoundException("No intersection found near " + c + " within envelope " + envelope);
+        throw new IntersectionNotFoundException("No intersection found near " + c
+                + " within envelope " + envelope);
     }
 }
