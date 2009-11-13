@@ -19,7 +19,6 @@ import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TripHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.slf4j.Logger;
