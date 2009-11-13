@@ -34,7 +34,7 @@ public class NetworkLinker {
                 // find nearby vertices
 
                 Envelope env = new Envelope(v.getCoordinate());
-                env.expandBy(0.0018); // FIXME: meters?
+                env.expandBy(0.0018); 
                 List<Vertex> nearby = (List<Vertex>) index.query(env);
 
                 Vertex nearestIntersection = null;
@@ -44,6 +44,10 @@ public class NetworkLinker {
                 double lon1 = coord.x;
                 for (Vertex nv : nearby) {
                     if (nv == v) {
+                        continue;
+                    }
+                    if (nv.distance(v) > 200) {
+                        //STRtree.query does not guarantee that all found points will actually be within the envelope
                         continue;
                     }
                     coord = nv.getCoordinate();
