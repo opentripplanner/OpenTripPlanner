@@ -1,4 +1,4 @@
-package org.opentripplanner.routing;
+package org.opentripplanner.routing.edgetype.loader;
 
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -17,11 +17,9 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.FeatureSource;
-import org.geotools.referencing.CRS;
 
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.File;
 import java.util.GregorianCalendar;

@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.edgetype.factory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
@@ -17,10 +19,19 @@ import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.TripHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 class StopPattern2 {
     Vector<Stop> stops;
@@ -92,6 +103,13 @@ public class GTFSPatternHopFactory {
             int lastStop = stopTimes.size() - 1;
             if (tripPattern == null) {
                 tripPattern = new TripPattern(trip, stopTimes);
+                Geometry g = getTripGeometry(trip);
+                LengthIndexedLine lil = null;
+                LocationIndexedLine lol = null;
+                if (g != null) {
+                    lil = new LengthIndexedLine(g);
+                    lol = new LocationIndexedLine(g);
+                }
                 for (int i = 0; i < lastStop; i++) {
                     StopTime st0 = stopTimes.get(i);
                     Stop s0 = st0.getStop();
@@ -104,21 +122,23 @@ public class GTFSPatternHopFactory {
                             s0.getLon(), s0.getLat());
                     Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()), s1
                             .getLon(), s1.getLat());
-                    
-                    PatternHop hop = new PatternHop(startJourney, endJourney, s0, s1, i, tripPattern);
-                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
 
+                    PatternHop hop = new PatternHop(startJourney, endJourney, s0, s1, i,
+                            tripPattern);
+                    if (g != null) {
+                        hop.setGeometry(getHopGeometry(lil, lol, st0, st1, startJourney, endJourney));
+                    }
+                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
                     graph.addEdge(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));
                     Vertex endStation = graph.getVertex(id(s1.getId()));
 
-
                     PatternBoard boarding = new PatternBoard(startStation, startJourney,
                             tripPattern, i);
                     graph.addEdge(boarding);
                     graph.addEdge(new Alight(endJourney, endStation));
-                    
+
                 }
                 patterns.put(stopPattern, tripPattern);
             } else {
@@ -135,6 +155,7 @@ public class GTFSPatternHopFactory {
                     createSimpleHops(graph, trip, stopTimes);
 
                 } else {
+
                     // try to insert this trip at this location
                     for (int i = 0; i < lastStop; i++) {
                         StopTime st0 = stopTimes.get(i);
@@ -161,9 +182,38 @@ public class GTFSPatternHopFactory {
         }
     }
 
+    private LineString getTripGeometry(Trip trip) {
+        AgencyAndId shapeId = trip.getShapeId();
+        if (shapeId == null || shapeId.getId() == null) {
+            return null;
+        }
+        List<ShapePoint> points = _dao.getShapePointsForShapeId(shapeId);
+        if (points.size() == 0) {
+            return null;
+        }
+        GeometryFactory factory = new GeometryFactory();
+        Coordinate[] coordinates = new Coordinate[points.size()];
+        int i = 0;
+        for (ShapePoint point : points) {
+            coordinates[i++] = new Coordinate(point.getLon(), point.getLat());
+        }
+        LineString hopString = (LineString) factory.createLineString(coordinates);
+
+        return hopString;
+    }
+
     private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes)
             throws Exception {
         String tripId = id(trip.getId());
+        ArrayList<Hop> hops = new ArrayList<Hop>();
+
+        Geometry g = getTripGeometry(trip);
+        LengthIndexedLine lil = null;
+        LocationIndexedLine lol = null;
+        if (g != null) {
+            lil = new LengthIndexedLine(g);
+            lol = new LocationIndexedLine(g);
+        }
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
@@ -179,11 +229,30 @@ public class GTFSPatternHopFactory {
                     .getLat());
 
             Hop hop = new Hop(startJourney, endJourney, st0, st1);
-            graph.addEdge(hop);
+            if (g != null) {
+                hop.setGeometry(getHopGeometry(lil, lol, st0, st1, startJourney, endJourney));
+            }
+            hops.add(hop);
             Board boarding = new Board(startStation, startJourney, hop);
             graph.addEdge(boarding);
             graph.addEdge(new Alight(endJourney, endStation));
 
+        }
+    }
+
+    private Geometry getHopGeometry(LengthIndexedLine lil, LocationIndexedLine lol, StopTime st0,
+            StopTime st1, Vertex startJourney, Vertex endJourney) {
+        if (lil == null) {
+            return null;
+        }
+        double startDt = st0.getShapeDistTraveled();
+        if (startDt == -1) {
+            LinearLocation startCoord = lol.indexOf(startJourney.getCoordinate());
+            LinearLocation endCoord = lol.indexOf(endJourney.getCoordinate());
+            return lol.extractLine(startCoord, endCoord);
+        } else {
+            double endDt = st1.getShapeDistTraveled();
+            return lil.extractLine(startDt, endDt);
         }
     }
 }

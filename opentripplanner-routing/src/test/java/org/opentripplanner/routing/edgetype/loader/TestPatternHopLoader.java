@@ -22,6 +22,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextypes.TransitStop;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public class TestPatternHopLoader extends TestCase {
 
     private Graph graph;
@@ -135,6 +137,28 @@ public class TestPatternHopLoader extends TestCase {
         path = spt.getPath(stop_h);
         assertNotNull(path);
         assertEquals(4, path.vertices.size());
+
+    }
+
+    public void testShape() throws Exception {
+        Vertex stop_g = graph.getVertex("agency_G");
+        Vertex stop_h = graph.getVertex("agency_H");
+
+        Edge hop = null;
+        for (Edge e : stop_g.getOutgoing()) {
+            if (e instanceof PatternBoard) {
+                for (Edge f : e.getToVertex().getOutgoing()) {
+                    if (f instanceof PatternHop) {
+                        hop = f;
+                        break;
+                    }
+                }
+                if (hop != null) break;
+            }
+        }
+        
+        Geometry geometry = hop.getGeometry();
+        assertTrue(geometry.getLength() > 1.0);
 
     }
 }

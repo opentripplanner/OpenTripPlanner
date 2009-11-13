@@ -27,7 +27,10 @@ public class PatternHop extends AbstractEdge {
 
     private int stopIndex;
 
-    public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex, TripPattern tripPattern) {
+    private Geometry geometry = null;
+
+    public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
+            TripPattern tripPattern) {
         super(startJourney, endJourney);
         this.start = start;
         this.end = end;
@@ -59,17 +62,6 @@ public class PatternHop extends AbstractEdge {
         return GtfsLibrary.getRouteName(pattern.exemplar.getRoute());
     }
 
-    public Geometry getGeometry() {
-        // FIXME: use shape if available
-        GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING),
-                4326);
-
-        Coordinate c1 = new Coordinate(start.getLon(), start.getLat());
-        Coordinate c2 = new Coordinate(end.getLon(), end.getLat());
-
-        return factory.createLineString(new Coordinate[] { c1, c2 });
-    }
-
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
@@ -82,6 +74,23 @@ public class PatternHop extends AbstractEdge {
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(-runningTime);
         return new TraverseResult(runningTime, state1);
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
+
+    public Geometry getGeometry() {
+        if (geometry == null) {
+            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
+                    PrecisionModel.FLOATING), 4326);
+
+            Coordinate c1 = new Coordinate(start.getLon(), start.getLat());
+            Coordinate c2 = new Coordinate(end.getLon(), end.getLat());
+
+            return factory.createLineString(new Coordinate[] { c1, c2 });
+        }
+        return geometry;
     }
 
 }

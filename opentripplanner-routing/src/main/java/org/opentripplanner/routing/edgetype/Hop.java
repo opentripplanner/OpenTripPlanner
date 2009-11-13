@@ -6,6 +6,7 @@ import java.util.Comparator;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -45,7 +46,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
         return _serviceId;
     }
 
-    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end) throws Exception {
+    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end)
+            throws Exception {
         super(startJourney, endJourney);
         this.start = start;
         this.end = end;
@@ -82,6 +84,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
     }
 
     ArrayList<DrawablePoint> geometryCache = null;
+
+    private Geometry geometry = null;
 
     public ArrayList<DrawablePoint> getDrawableGeometry() {
         if (geometryCache != null) {
@@ -126,16 +130,23 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
     }
 
     public Geometry getGeometry() {
-        // FIXME: use shape if available
-        GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING),
-                4326);
-        Stop stop1 = start.getStop();
-        Stop stop2 = end.getStop();
+        if (geometry == null) {
 
-        Coordinate c1 = new Coordinate(stop1.getLon(), stop1.getLat());
-        Coordinate c2 = new Coordinate(stop2.getLon(), stop2.getLat());
+            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
+                    PrecisionModel.FLOATING), 4326);
+            Stop stop1 = start.getStop();
+            Stop stop2 = end.getStop();
 
-        return factory.createLineString(new Coordinate[] { c1, c2 });
+            Coordinate c1 = new Coordinate(stop1.getLon(), stop1.getLat());
+            Coordinate c2 = new Coordinate(stop2.getLon(), stop2.getLat());
+
+            geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+        }
+        return geometry;
+    }
+
+    public void setGeometry(Geometry line) {
+        geometry = line;
     }
 
     /****
