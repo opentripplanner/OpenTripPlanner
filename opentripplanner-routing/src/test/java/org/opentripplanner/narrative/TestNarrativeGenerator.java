@@ -45,7 +45,7 @@ public class TestNarrativeGenerator extends TestCase {
         TraverseOptions wo = new TraverseOptions();
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label,
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.getLabel(),
                 new State(startTime.getTimeInMillis()), wo);
 
         GraphPath path = spt.getPath(airport);
@@ -113,8 +113,8 @@ public class TestNarrativeGenerator extends TestCase {
 
         assertNotNull(eastVertex);
 
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
-                eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.getLabel(),
+                eastVertex.getLabel(), new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
                         .getTimeInMillis()), new TraverseOptions());
 
         GraphPath path = spt.getPath(eastVertex);

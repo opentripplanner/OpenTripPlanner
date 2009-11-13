@@ -17,12 +17,12 @@ public class Graph implements Serializable {
     }
 
     public Vertex addVertex(Vertex vv) {
-        Vertex exists = this.vertices.get(vv.label);
+        Vertex exists = this.vertices.get(vv.getLabel());
         if (exists != null) {
             return exists;
         }
 
-        this.vertices.put(vv.label, vv);
+        this.vertices.put(vv.getLabel(), vv);
         return vv;
     }
 
@@ -33,7 +33,7 @@ public class Graph implements Serializable {
             return exists;
         }
 
-        Vertex ret = new Vertex(label, x, y);
+        Vertex ret = new GenericVertex(label, x, y);
         this.vertices.put(label, ret);
         return ret;
     }
@@ -82,7 +82,7 @@ public class Graph implements Serializable {
 
     public void draw(DrawHandler drawer) throws Exception {
         for (Vertex vv : this.getVertices()) {
-            for (Edge ee : vv.outgoing) {
+            for (Edge ee : vv.getOutgoing()) {
                 if (ee instanceof Drawable) {
                     drawer.handle((Drawable) ee);
                 }

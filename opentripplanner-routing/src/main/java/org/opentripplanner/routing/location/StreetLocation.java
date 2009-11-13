@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.location;
 
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -35,7 +36,7 @@ public class StreetLocation {
         
         String streetName = street.getName();
         
-        vertex = new Vertex(streetName, x, y);
+        vertex = new GenericVertex(streetName, x, y);
         double weight1 = GtfsLibrary.distance(y, x, startCoord.y, startCoord.x);
         double weight2 = GtfsLibrary.distance(y, x, endCoord.y, endCoord.x);
         

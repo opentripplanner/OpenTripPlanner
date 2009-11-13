@@ -30,7 +30,7 @@ public class NetworkLinker {
         }
 
         for (Vertex v : graph.getVertices()) {
-            if (v.type == TransitStop.class) {
+            if (v.getType() == TransitStop.class) {
                 // find nearby vertices
 
                 Envelope env = new Envelope(v.getCoordinate());
@@ -51,10 +51,10 @@ public class NetworkLinker {
                     double lon2 = coord.x;
                     double distance = GtfsLibrary.distance(lat1, lon1, lat2, lon2) * 2;
 
-                    if (nv.type == TransitStop.class) {
+                    if (nv.getType() == TransitStop.class) {
                         graph.addEdge(new Transfer(v, nv, distance));
                         graph.addEdge(new Transfer(nv, v, distance));
-                    } else if (nv.type == Intersection.class) {
+                    } else if (nv.getType() == Intersection.class) {
                         if (distance < minDistance) {
                             minDistance = distance;
                             nearestIntersection = nv;

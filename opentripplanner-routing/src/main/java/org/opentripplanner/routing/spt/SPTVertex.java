@@ -2,11 +2,12 @@ package org.opentripplanner.routing.spt;
 
 import java.util.Vector;
 
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 
-public class SPTVertex extends Vertex {
+public class SPTVertex extends GenericVertex {
     
     private static final long serialVersionUID = -4422788581123655293L;
 
@@ -21,7 +22,7 @@ public class SPTVertex extends Vertex {
     public double weightSum;
 
     SPTVertex(Vertex mirror, State state, double weightSum) {
-        super(mirror.label, mirror.getX(), mirror.getY());
+        super(mirror.getLabel(), mirror.getX(), mirror.getY());
         this.mirror = mirror;
         this.state = state;
         this.weightSum = weightSum;
@@ -42,7 +43,7 @@ public class SPTVertex extends Vertex {
     }
 
     public String toString() {
-        return this.mirror.label + " (" + this.weightSum + ")";
+        return this.mirror.getLabel() + " (" + this.weightSum + ")";
     }
 
 }

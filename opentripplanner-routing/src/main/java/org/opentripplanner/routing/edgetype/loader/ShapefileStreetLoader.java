@@ -17,6 +17,7 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
@@ -162,14 +163,14 @@ public class ShapefileStreetLoader {
                 }
                 String endIntersectionName = getIntersectionName(coordinateToStreets,
                         intersectionNameToId, endCoordinate);
-                Vertex startCorner = new Vertex(startIntersectionName, startCoordinate.x,
+                Vertex startCorner = new GenericVertex(startIntersectionName, startCoordinate.x,
                         startCoordinate.y);
                 startCorner = graph.addVertex(startCorner);
-                startCorner.type = Intersection.class;
-                Vertex endCorner = new Vertex(endIntersectionName, endCoordinate.x,
+                startCorner.setType(Intersection.class);
+                Vertex endCorner = new GenericVertex(endIntersectionName, endCoordinate.x,
                         endCoordinate.y);
                 endCorner = graph.addVertex(endCorner);
-                endCorner.type = Intersection.class;
+                endCorner.setType(Intersection.class);
 
                 double length = JTS.orthodromicDistance(coordinates[0],
                         coordinates[coordinates.length - 1], worldCRS);

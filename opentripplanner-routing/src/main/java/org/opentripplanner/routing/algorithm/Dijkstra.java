@@ -41,7 +41,7 @@ public class Dijkstra {
             if (spt_u.mirror == target)
                 break;
 
-            for (Edge edge : spt_u.mirror.outgoing) {
+            for (Edge edge : spt_u.mirror.getOutgoing()) {
 
                 TraverseResult wr = edge.traverse(spt_u.state, options);
 

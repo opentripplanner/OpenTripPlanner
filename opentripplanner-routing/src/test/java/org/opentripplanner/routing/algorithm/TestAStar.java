@@ -61,7 +61,7 @@ public class TestAStar extends TestCase {
         /* time Dijkstra */
         startClock = System.nanoTime();
         for (int i = 0; i < 20; ++i) {
-            spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.label, new State(
+            spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.getLabel(), new State(
                     startTime.getTimeInMillis()), wo);
         }
         endClock = System.nanoTime();
@@ -73,7 +73,7 @@ public class TestAStar extends TestCase {
         /* time A* */
         startClock = System.nanoTime();
         for (int i = 0; i < 20; ++i) {
-            spt = AStar.getShortestPathTree(graph, "TriMet_6876", airport.label, new State(
+            spt = AStar.getShortestPathTree(graph, "TriMet_6876", airport.getLabel(), new State(
                     startTime.getTimeInMillis()), wo);
         }
 

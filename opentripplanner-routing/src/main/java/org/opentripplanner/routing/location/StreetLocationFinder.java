@@ -74,15 +74,15 @@ public class StreetLocationFinder {
                     }
                     // search the edges for one where a connects to b
                     Edge street = null;
-                    for (int j = 0; j < a.outgoing.size(); ++j) {
-                        street = a.outgoing.get(j);
+                    for (int j = 0; j < a.getOutgoing().size(); ++j) {
+                        street = a.getOutgoing().get(j);
                         if (street.getToVertex() == b) {
                             break;
                         }
                     }
                     if (street == null) {
-                        for (int j = 0; j < a.incoming.size(); ++j) {
-                            street = a.incoming.get(j);
+                        for (int j = 0; j < a.getIncoming().size(); ++j) {
+                            street = a.getIncoming().get(j);
                             if (street.getToVertex() == b) {
                                 break;
                             }

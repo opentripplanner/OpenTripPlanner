@@ -16,7 +16,7 @@ public class TestGraph extends TestCase {
     public void testAddVertex() throws Exception {
         Graph gg = new Graph();
         Vertex a = gg.addVertex("A", 5, 5);
-        assertEquals(a.label, "A");
+        assertEquals(a.getLabel(), "A");
     }
 
     public void testGetVertex() throws Exception {

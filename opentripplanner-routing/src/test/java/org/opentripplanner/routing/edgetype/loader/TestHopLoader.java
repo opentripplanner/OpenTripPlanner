@@ -46,16 +46,16 @@ public class TestHopLoader extends TestCase {
         assertEquals(2, stop_a.getDegreeOut());
         assertEquals(6, stop_b.getDegreeOut());
 
-        for (Edge e : stop_a.outgoing) {
+        for (Edge e : stop_a.getOutgoing()) {
             assertEquals(Board.class, e.getClass());
         }
 
-        Vertex journey_a_1 = stop_a.outgoing.get(0).getToVertex();
+        Vertex journey_a_1 = stop_a.getOutgoing().get(0).getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (Edge e : journey_a_1.outgoing) {
-            if (e.getToVertex().type == TransitStop.class) {
+        for (Edge e : journey_a_1.getOutgoing()) {
+            if (e.getToVertex().getType() == TransitStop.class) {
                 assertEquals(Alight.class, e.getClass());
             } else {
                 assertEquals(Hop.class, e.getClass());
@@ -78,7 +78,7 @@ public class TestHopLoader extends TestCase {
         GraphPath path;
 
         // A to B
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_b.label, new State(
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_b);
@@ -86,7 +86,7 @@ public class TestHopLoader extends TestCase {
         assertEquals(4, path.vertices.size());
 
         // A to C
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_c.label, new State(
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_c);
@@ -94,7 +94,7 @@ public class TestHopLoader extends TestCase {
         assertEquals(5, path.vertices.size());
 
         // A to D
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_d.label, new State(
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_d);
@@ -102,7 +102,7 @@ public class TestHopLoader extends TestCase {
         assertEquals(8, path.vertices.size());
 
         // A to E
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.label, stop_e.label, new State(
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_e);

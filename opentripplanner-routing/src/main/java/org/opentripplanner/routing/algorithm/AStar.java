@@ -136,7 +136,7 @@ public class AStar {
             if (spt_u.mirror == target)
                 break;
 
-            Collection<Edge> outgoing = spt_u.mirror.outgoing;
+            Collection<Edge> outgoing = spt_u.mirror.getOutgoing();
             if (extraEdges.containsKey(spt_u.mirror)) {
                 outgoing = new Vector<Edge>(outgoing);
                 outgoing.add(extraEdges.get(spt_u.mirror));

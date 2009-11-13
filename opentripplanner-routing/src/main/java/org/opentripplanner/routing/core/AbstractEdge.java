@@ -5,7 +5,7 @@ public abstract class AbstractEdge implements Edge {
     private Vertex fromv, tov;
 
     public String toString() {
-        return fromv.label + "-> " + tov.label;
+        return fromv.getLabel() + "-> " + tov.getLabel();
     }
 
     public AbstractEdge(Vertex fromv, Vertex tov) {

@@ -4,6 +4,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -27,9 +28,9 @@ public class GTFSPatternHopLoader {
 
         // Load stops
         for (Stop stop : _dao.getAllStops()) {
-            Vertex vertex = _graph.addVertex(new Vertex(id(stop.getId()), stop.getLon(),
+            Vertex vertex = _graph.addVertex(new GenericVertex(id(stop.getId()), stop.getLon(),
                     stop.getLat()));
-            vertex.type = TransitStop.class;
+            vertex.setType(TransitStop.class);
         }
 
         // Load hops

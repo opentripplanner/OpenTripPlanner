@@ -99,19 +99,19 @@ public class TestStreet extends TestCase {
             }
         }
 
-        Edge garfieldPlBack = eastVertex.outgoing.get(0);
+        Edge garfieldPlBack = eastVertex.getOutgoing().get(0);
         TraverseOptions toWalk = new TraverseOptions(TraverseMode.WALK);
         assertNotNull(garfieldPlBack.traverse(new State(), toWalk));
         
         TraverseOptions toCar = new TraverseOptions(TraverseMode.CAR);
         assertNull(garfieldPlBack.traverse(new State(), toCar));
         
-        Edge garfieldPl = eastVertex.incoming.get(0);
+        Edge garfieldPl = eastVertex.getIncoming().get(0);
         assertNotNull(garfieldPl.traverse(new State(), toCar));
         
         
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
-                eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.getLabel(),
+                eastVertex.getLabel(), new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
                         .getTimeInMillis()), new TraverseOptions());
 
         GraphPath path = spt.getPath(eastVertex);

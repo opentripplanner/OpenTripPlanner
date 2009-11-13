@@ -27,14 +27,14 @@ public class TestHopFactory extends TestCase {
         loader.load(null);
         Set<Hop> hopSet = new HashSet<Hop>();
         for (Vertex v : graph.getVertices()) {
-            for (Edge e : v.outgoing) {
+            for (Edge e : v.getOutgoing()) {
                 if (e instanceof Hop) {
                     hopSet.add((Hop) e);
                 }
             }
         }
 
-        ArrayList<Hop> hops = new ArrayList(hopSet);
+        ArrayList<Hop> hops = new ArrayList<Hop>(hopSet);
 
         Collections.sort(hops, new Hop.HopArrivalTimeComparator());
         Hop last = hops.get(hops.size() - 1);
