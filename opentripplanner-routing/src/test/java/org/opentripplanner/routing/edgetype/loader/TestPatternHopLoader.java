@@ -140,25 +140,40 @@ public class TestPatternHopLoader extends TestCase {
 
     }
 
-    public void testShape() throws Exception {
-        Vertex stop_g = graph.getVertex("agency_G");
-        Vertex stop_h = graph.getVertex("agency_H");
+    public Edge getHopOut(Vertex v) {
 
         Edge hop = null;
-        for (Edge e : stop_g.getOutgoing()) {
+        for (Edge e : v.getOutgoing()) {
             if (e instanceof PatternBoard) {
                 for (Edge f : e.getToVertex().getOutgoing()) {
                     if (f instanceof PatternHop) {
-                        hop = f;
-                        break;
+                        return f;
                     }
                 }
-                if (hop != null) break;
             }
         }
-        
+        return null;
+    }
+    
+    public void testShapeByLocation() throws Exception {
+        Vertex stop_g = graph.getVertex("agency_G");
+        Edge hop = getHopOut(stop_g);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
+        
+        Vertex stop_a = graph.getVertex("agency_A");
+        hop = getHopOut(stop_a);
+        geometry = hop.getGeometry();
+        assertTrue(geometry.getLength() > 0.999);
+        assertTrue(geometry.getLength() < 1.001);
 
     }
+    public void testShapeBydistance() throws Exception {
+        Vertex stop_i = graph.getVertex("agency_I");
+        Edge hop = getHopOut(stop_i);
+        Geometry geometry = hop.getGeometry();
+        assertTrue(geometry.getLength() > 1.0);
+        assertTrue(geometry.getLength() < 2.0);
+    }
+
 }

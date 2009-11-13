@@ -2,7 +2,9 @@ package org.opentripplanner.routing.edgetype.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -102,12 +104,12 @@ public class GTFSPatternHopFactory {
             int lastStop = stopTimes.size() - 1;
             if (tripPattern == null) {
                 tripPattern = new TripPattern(trip, stopTimes);
-                Geometry g = getTripGeometry(trip);
-                LengthIndexedLine lil = null;
+                Geometry geometry = getTripGeometry(trip);
                 LocationIndexedLine lol = null;
-                if (g != null) {
-                    lil = new LengthIndexedLine(g);
-                    lol = new LocationIndexedLine(g);
+                List<ShapePoint> shapePoints = null;
+                if (geometry != null) {
+                    shapePoints = _dao.getShapePointsForShapeId(trip.getShapeId());
+                    lol = new LocationIndexedLine(geometry);
                 }
                 for (int i = 0; i < lastStop; i++) {
                     StopTime st0 = stopTimes.get(i);
@@ -124,8 +126,8 @@ public class GTFSPatternHopFactory {
 
                     PatternHop hop = new PatternHop(startJourney, endJourney, s0, s1, i,
                             tripPattern);
-                    if (g != null) {
-                        hop.setGeometry(getHopGeometry(lil, lol, st0, st1, startJourney, endJourney));
+                    if (geometry != null) {
+                        hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1, startJourney, endJourney));
                     }
                     tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
                     graph.addEdge(hop);
@@ -206,12 +208,12 @@ public class GTFSPatternHopFactory {
         String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();
 
-        Geometry g = getTripGeometry(trip);
-        LengthIndexedLine lil = null;
+        LineString geometry = getTripGeometry(trip);
         LocationIndexedLine lol = null;
-        if (g != null) {
-            lil = new LengthIndexedLine(g);
-            lol = new LocationIndexedLine(g);
+        List<ShapePoint> shapePoints = null;
+        if (geometry != null) {
+            shapePoints  = _dao.getShapePointsForShapeId(trip.getShapeId());
+            lol = new LocationIndexedLine(geometry);
         }
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
@@ -228,8 +230,8 @@ public class GTFSPatternHopFactory {
                     .getLat());
 
             Hop hop = new Hop(startJourney, endJourney, st0, st1);
-            if (g != null) {
-                hop.setGeometry(getHopGeometry(lil, lol, st0, st1, startJourney, endJourney));
+            if (geometry != null) {
+                hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1, startJourney, endJourney));
             }
             hops.add(hop);
             Board boarding = new Board(startStation, startJourney, hop);
@@ -239,9 +241,9 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private Geometry getHopGeometry(LengthIndexedLine lil, LocationIndexedLine lol, StopTime st0,
+    private Geometry getHopGeometry(List<ShapePoint> points, LocationIndexedLine lol, StopTime st0,
             StopTime st1, Vertex startJourney, Vertex endJourney) {
-        if (lil == null) {
+        if (lol == null) {
             return null;
         }
         double startDt = st0.getShapeDistTraveled();
@@ -250,9 +252,50 @@ public class GTFSPatternHopFactory {
             LinearLocation endCoord = lol.indexOf(endJourney.getCoordinate());
             return lol.extractLine(startCoord, endCoord);
         } else {
-            //fixme: I don't think this actually works correctly, because getShapeDistTraveled returns a value between m and n, not 0 and 1
             double endDt = st1.getShapeDistTraveled();
-            return lil.extractLine(startDt, endDt);
+
+            //find the line segment that startDt is in
+            ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
+            ShapePoint prev = null;;
+            Iterator<ShapePoint> it = points.iterator();
+            while (it.hasNext()) {
+                ShapePoint point = it.next();
+                if (point.getDistTraveled() >= startDt) {
+                    Coordinate c = interpolatePoint(startDt, prev, point);
+                    coords.add(c);
+                    //now, find end
+                    do {
+                        if (point.getDistTraveled() < endDt) {
+                            coords.add(new Coordinate(point.getLon(), point.getLat()));
+                        } else {
+                            c = interpolatePoint(endDt, prev, point);
+                            coords.add(c);
+                        }
+                        prev = point;
+                        point = it.next();
+                    } while (it.hasNext());
+                    break;
+                }
+                prev = point;
+            }
+            GeometryFactory factory = new GeometryFactory();
+            if (coords.size() < 2) {
+                throw new RuntimeException("Not enough points when interpolating geometry by shape_dist_traveled");
+            }
+            return factory.createLineString(coords.toArray(new Coordinate[0]));
         }
+    }
+
+    private Coordinate interpolatePoint(double startDt, ShapePoint before, ShapePoint point) {
+        if (before == null) {
+            return new Coordinate(point.getLon(), point.getLat());
+        }
+        double segmentLength = point.getDistTraveled() - before.getDistTraveled();
+        double startLocation = startDt - before.getDistTraveled();
+        double interpolation = startLocation / segmentLength;
+        double x = before.getLon() * interpolation + point.getLon() * (1 - interpolation);
+        double y = before.getLat() * interpolation + point.getLat() * (1 - interpolation);
+        Coordinate c = new Coordinate(x, y);
+        return c;
     }
 }
