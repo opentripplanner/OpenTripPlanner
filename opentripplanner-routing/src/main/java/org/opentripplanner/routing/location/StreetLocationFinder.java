@@ -8,6 +8,7 @@ import java.util.List;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -26,8 +27,10 @@ public class StreetLocationFinder {
         this.graph = graph;
         intersections = new STRtree();
         for (Vertex v : graph.getVertices()) {
-            Envelope env = new Envelope(v.getCoordinate());
-            intersections.insert(env, v);
+            if (v.getType() == Intersection.class) {
+                Envelope env = new Envelope(v.getCoordinate());
+                intersections.insert(env, v);
+            }
         }
         intersections.build();
     }

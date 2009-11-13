@@ -16,6 +16,7 @@ import org.opentripplanner.routing.location.StreetLocationFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -50,9 +51,13 @@ public class TestHalfEdges extends TestCase {
         graph = new Graph();
         // a 1 degree x 1 degree square
         Vertex tl = graph.addVertex("tl", -74, 41);
+        tl.setType(Intersection.class);
         Vertex tr = graph.addVertex("tr", -73, 41);
+        tr.setType(Intersection.class);
         Vertex bl = graph.addVertex("bl", -74, 40);
+        bl.setType(Intersection.class);
         Vertex br = graph.addVertex("br", -73, 40);
+        br.setType(Intersection.class);
 
         double td = GtfsLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
