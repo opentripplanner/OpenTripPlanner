@@ -3,10 +3,10 @@ package org.opentripplanner.narrative;
 import java.util.List;
 import java.util.Vector;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.routing.edgetype.Traversable;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 
@@ -70,34 +70,34 @@ public class NarrativeSection {
         endTime = last.state.getTime();
 
         items = new Vector<NarrativeItem>();
-        Traversable traversable = edges.firstElement().payload;
-        mode = traversable.getMode();
-        geometry = traversable.getGeometry();
+        Edge graphEdge = edges.firstElement().payload;
+        mode = graphEdge.getMode();
+        geometry = graphEdge.getGeometry();
         for (SPTEdge edge : edges.subList(1, edges.size())) {
             geometry = geometry.union(edge.payload.getGeometry());
         }
 
-        if (traversable instanceof Hop) {
-            name = traversable.getName();
-            direction = traversable.getDirection();
+        if (graphEdge instanceof Hop) {
+            name = graphEdge.getName();
+            direction = graphEdge.getDirection();
             BasicNarrativeItem item = new BasicNarrativeItem();
-            item.setDirection(traversable.getDirection());
-            item.setName(traversable.getName());
-            String end = traversable.getEnd();
-            Geometry geom = traversable.getGeometry();
+            item.setDirection(graphEdge.getDirection());
+            item.setName(graphEdge.getName());
+            String end = graphEdge.getEnd();
+            Geometry geom = graphEdge.getGeometry();
 
-            double totalDistance = traversable.getDistance();
+            double totalDistance = graphEdge.getDistance();
             for (SPTEdge edge : edges.subList(1, edges.size())) {
-                traversable = edge.payload;
-                totalDistance += traversable.getDistance();
-                geom = geom.union(traversable.getGeometry());
-                end = traversable.getEnd();
+                graphEdge = edge.payload;
+                totalDistance += graphEdge.getDistance();
+                geom = geom.union(graphEdge.getGeometry());
+                end = graphEdge.getEnd();
             }
             item.setGeometry(geom);
             item.setDistance(totalDistance);
             item.setEnd(end);
             items.add(item);
-        } else if (traversable instanceof Street) {
+        } else if (graphEdge instanceof Street) {
             name = "walk";
             Street street1 = (Street) edges.firstElement().payload;
             Street street2 = (Street) edges.lastElement().payload;
@@ -108,21 +108,21 @@ public class NarrativeSection {
             String lastStreet = null;
             BasicNarrativeItem item = null;
             for (SPTEdge edge : edges) {
-                traversable = edge.payload;
-                String streetName = traversable.getName();
+                graphEdge = edge.payload;
+                String streetName = graphEdge.getName();
                 if (streetName == lastStreet) {
-                    totalDistance += traversable.getDistance();
+                    totalDistance += graphEdge.getDistance();
                     item.setDistance(totalDistance);
-                    item.setGeometry(item.getGeometry().union(traversable.getGeometry()));
-                    item.setEnd(traversable.getStart());
+                    item.setGeometry(item.getGeometry().union(graphEdge.getGeometry()));
+                    item.setEnd(graphEdge.getStart());
                     continue;
                 }
                 item = new BasicNarrativeItem();
                 item.setName(streetName);
-                item.setDirection(traversable.getDirection());
-                item.setGeometry(traversable.getGeometry());
-                item.setStart(traversable.getStart());
-                item.setEnd(traversable.getEnd());
+                item.setDirection(graphEdge.getDirection());
+                item.setGeometry(graphEdge.getGeometry());
+                item.setStart(graphEdge.getStart());
+                item.setEnd(graphEdge.getEnd());
                 items.add(item);
             }
         }

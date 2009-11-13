@@ -2,12 +2,14 @@ package org.opentripplanner.routing.spt;
 
 import java.util.Vector;
 
-import org.opentripplanner.routing.core.AbstractVertex;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Traversable;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.State;
 
-public class SPTVertex extends AbstractVertex {
+public class SPTVertex extends Vertex {
+    
+    private static final long serialVersionUID = -4422788581123655293L;
+
     public SPTEdge incoming;
 
     public Vector<SPTEdge> outgoing;
@@ -19,6 +21,7 @@ public class SPTVertex extends AbstractVertex {
     public double weightSum;
 
     SPTVertex(Vertex mirror, State state, double weightSum) {
+        super(mirror.label, mirror.getX(), mirror.getY());
         this.mirror = mirror;
         this.state = state;
         this.weightSum = weightSum;
@@ -29,7 +32,7 @@ public class SPTVertex extends AbstractVertex {
         this.outgoing.add(ee);
     }
 
-    public void setParent(SPTVertex parent, Traversable ep) {
+    public void setParent(SPTVertex parent, Edge ep) {
         // remove this edge from outgoing list of previous parent
         if (incoming != null) {
             incoming.fromv.outgoing.remove(incoming);

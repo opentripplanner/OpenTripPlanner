@@ -103,9 +103,9 @@ public class AStar {
         Map<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
 
         Edge toEdge = target.getToEdge();
-        extraEdges.put(target.street.tov, toEdge);
+        extraEdges.put(target.street.getToVertex(), toEdge);
         Edge fromEdge = target.getFromEdge();
-        extraEdges.put(target.street.fromv, fromEdge);
+        extraEdges.put(target.street.getFromVertex(), fromEdge);
         
         return getShortestPathTree(gg, origin.vertex, target.vertex, init, options, extraEdges);
     }
@@ -144,7 +144,7 @@ public class AStar {
             
             for (Edge edge : outgoing) {
 
-                TraverseResult wr = edge.payload.traverse(spt_u.state, options);
+                TraverseResult wr = edge.traverse(spt_u.state, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
@@ -156,15 +156,16 @@ public class AStar {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
 
-                distance = edge.tov.distance(target) / MAX_SPEED;
+                Vertex tov = edge.getToVertex();
+                distance = tov.distance(target) / MAX_SPEED;
                 double new_w = spt_u.weightSum + wr.weight;
                 double old_w;
 
-                spt_v = spt.getVertex(edge.tov);
+                spt_v = spt.getVertex(tov);
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
                     old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(edge.tov, wr.state, new_w);
+                    spt_v = spt.addVertex(tov, wr.state, new_w);
                 } else {
                     old_w = spt_v.weightSum + distance;
                 }
@@ -180,7 +181,7 @@ public class AStar {
                         pq.insert_or_dec_key(spt_v, new_w + distance);
                     }
 
-                    spt_v.setParent(spt_u, edge.payload);
+                    spt_v.setParent(spt_u, edge);
                 }
             }
         }

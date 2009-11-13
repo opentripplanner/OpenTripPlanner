@@ -1,16 +1,17 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public class Street extends AbstractPayload {
+public class Street extends AbstractEdge {
 
     private static final long serialVersionUID = -3215764532108343102L;
 
@@ -25,11 +26,13 @@ public class Street extends AbstractPayload {
 
     double length;
 
-    public Street(double length) {
+    public Street(Vertex start, Vertex end, double length) {
+        super(start, end);
         this.length = length;
     }
 
-    public Street(String id, String name, double length) {
+    public Street(Vertex start, Vertex end, String id, String name, double length) {
+        super(start, end);
         this.id = id;
         this.name = name;
         this.length = length;

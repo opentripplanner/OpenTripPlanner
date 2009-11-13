@@ -1,17 +1,20 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Transfer implements Traversable {
+public class Transfer extends AbstractEdge {
 
     double distance = 0;
 
-    public Transfer(double distance) {
+    public Transfer(Vertex fromv, Vertex tov, double distance) {
+        super(fromv, tov);
         this.distance = distance;
     }
 

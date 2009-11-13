@@ -2,17 +2,19 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class PatternHop extends AbstractPayload {
+public class PatternHop extends AbstractEdge {
 
     /**
      * 
@@ -25,7 +27,8 @@ public class PatternHop extends AbstractPayload {
 
     private int stopIndex;
 
-    public PatternHop(Stop start, Stop end, int stopIndex, TripPattern tripPattern) {
+    public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex, TripPattern tripPattern) {
+        super(startJourney, endJourney);
         this.start = start;
         this.end = end;
         this.stopIndex = stopIndex;

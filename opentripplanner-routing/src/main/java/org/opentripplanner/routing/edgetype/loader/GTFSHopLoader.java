@@ -62,11 +62,14 @@ public class GTFSHopLoader {
             Vertex endJourney = _graph.addVertex(id(endStop.getId()) + "_"
                     + id(endStopTime.getTrip().getId()), endStop.getLon(), endStop.getLat());
 
-            Board boarding = new Board(hop);
-            _graph.addEdge(startStation, startJourney, boarding);
-            _graph.addEdge(endJourney, endStation, new Alight());
+            //recreate hop with correct vertices
+            hop = new Hop(startJourney, endJourney, startStopTime, endStopTime); 
+            
+            Board boarding = new Board(startStation, startJourney, hop);
+            _graph.addEdge(boarding);
+            _graph.addEdge(new Alight(endJourney, endStation));
 
-            _graph.addEdge(startJourney, endJourney, hop);
+            _graph.addEdge(hop);
 
         }
     }

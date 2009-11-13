@@ -1,13 +1,19 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Alight extends AbstractPayload {
+public class Alight extends AbstractEdge {
+
+    public Alight(Vertex fromv, Vertex tov) {
+        super(fromv, tov);
+    }
 
     String start_id; // a street vertex's id
 

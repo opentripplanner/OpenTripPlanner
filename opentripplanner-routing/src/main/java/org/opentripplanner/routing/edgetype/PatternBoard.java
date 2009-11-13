@@ -4,14 +4,16 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternBoard extends AbstractPayload {
+public class PatternBoard extends AbstractEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
@@ -23,7 +25,8 @@ public class PatternBoard extends AbstractPayload {
 
     private int stopIndex;
 
-    public PatternBoard(TripPattern pattern, int stopIndex) {
+    public PatternBoard(Vertex startStation, Vertex startJourney, TripPattern pattern, int stopIndex) {
+        super(startStation, startJourney);
         this.pattern = pattern;
         this.stopIndex = stopIndex;
     }

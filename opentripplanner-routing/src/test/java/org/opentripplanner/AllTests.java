@@ -4,7 +4,6 @@ import org.opentripplanner.narrative.TestNarrativeGenerator;
 import org.opentripplanner.routing.TestHalfEdges;
 import org.opentripplanner.routing.algorithm.TestDijkstra;
 import org.opentripplanner.routing.core.TestGraph;
-import org.opentripplanner.routing.edgetype.TestHop;
 import org.opentripplanner.routing.edgetype.TestStreet;
 import org.opentripplanner.routing.edgetype.factory.TestHopFactory;
 
@@ -18,7 +17,6 @@ public class AllTests {
         // $JUnit-BEGIN$
         suite.addTestSuite(TestDijkstra.class);
         suite.addTestSuite(TestGraph.class);
-        suite.addTestSuite(TestHop.class);
         suite.addTestSuite(TestHopFactory.class);
         suite.addTestSuite(TestHalfEdges.class);
         suite.addTestSuite(TestNarrativeGenerator.class);

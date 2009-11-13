@@ -6,7 +6,6 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -26,17 +25,17 @@ public class TestHalfEdges extends TestCase {
 
     Graph graph;
 
-    private Edge leftUp;
+    private Street leftUp;
 
-    private Edge rightUp;
+    private Street rightUp;
 
-    private Edge top;
+    private Street top;
 
-    private Edge bottom;
+    private Street bottom;
 
-    private Edge leftDown;
+    private Street leftDown;
 
-    private Edge rightDown;
+    private Street rightDown;
 
     public LineString createGeometry(Vertex a, Vertex b) {
 
@@ -57,34 +56,34 @@ public class TestHalfEdges extends TestCase {
 
         double td = GtfsLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
-        Street topStreet = new Street(td);
-        topStreet.setGeometry(createGeometry(tl, tr));
-        top = graph.addEdge(tl, tr, topStreet);
+        top = new Street(tl, tr, td);
+        top.setGeometry(createGeometry(tl, tr));
+        graph.addEdge(top);
 
         double bd = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, br
                 .getCoordinate().y, br.getCoordinate().x);
-        Street bottomStreet = new Street(bd);
-        topStreet.setGeometry(createGeometry(bl, br));
-        bottom = graph.addEdge(bl, br, bottomStreet);
+        bottom = new Street(bl, br, bd);
+        bottom.setGeometry(createGeometry(bl, br));
+        graph.addEdge(bottom);
 
         double d = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, tl
                 .getCoordinate().y, tl.getCoordinate().x);
 
-        Street leftDownStreet = new Street(d);
-        leftDownStreet.setGeometry(createGeometry(tl, bl));
-        leftDown = graph.addEdge(tl, bl, leftDownStreet);
+        leftDown = new Street(tl, bl, d);
+        leftDown.setGeometry(createGeometry(tl, bl));
+        graph.addEdge(leftDown);
 
-        Street leftUpStreet = new Street(d);
-        leftUpStreet.setGeometry(createGeometry(bl, tl));
-        leftUp = graph.addEdge(bl, tl, leftUpStreet);
+        leftUp = new Street(bl, tl, d);
+        leftUp.setGeometry(createGeometry(bl, tl));
+        graph.addEdge(leftUp);
 
-        Street rightDownStreet = new Street(d);
-        rightDownStreet.setGeometry(createGeometry(tr, br));
-        rightDown = graph.addEdge(tr, br, rightDownStreet);
+        rightDown = new Street(tr, br, d);
+        rightDown.setGeometry(createGeometry(tr, br));
+        graph.addEdge(rightDown);
 
-        Street rightUpStreet = new Street(d);
-        rightUpStreet.setGeometry(createGeometry(tr, br));
-        rightUp = graph.addEdge(br, tr, rightUpStreet);
+        rightUp = new Street(br, tr, d);
+        rightUp.setGeometry(createGeometry(tr, br));
+        graph.addEdge(rightUp);
     }
 
     public void testHalfEdges() {
@@ -101,8 +100,6 @@ public class TestHalfEdges extends TestCase {
 
         GraphPath path = spt.getPath(end.vertex);
         assertNotNull(path);
-
-        System.out.println("path: " + path.vertices);
 
         // the bottom-left point is not part of the shortest path
         for (SPTVertex v : path.vertices) {

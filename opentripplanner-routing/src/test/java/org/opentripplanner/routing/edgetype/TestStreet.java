@@ -37,7 +37,8 @@ public class TestStreet extends TestCase {
         TraverseOptions wo = new TraverseOptions();
         wo.speed = ConstantsForTests.WALKING_SPEED;
         double streetLength = 100; // meters
-        Edge ee = gg.addEdge(start, end, new Street(streetLength));
+        Edge ee = new Street(start, end, streetLength);
+        gg.addEdge(ee);
 
         // Start at October 21, 2009 at 1:00:00pm
         GregorianCalendar startTime = new GregorianCalendar(2009, 9, 21, 13, 0, 0);

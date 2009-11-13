@@ -52,8 +52,8 @@ public class NetworkLinker {
                     double distance = GtfsLibrary.distance(lat1, lon1, lat2, lon2) * 2;
 
                     if (nv.type == TransitStop.class) {
-                        graph.addEdge(v, nv, new Transfer(distance));
-                        graph.addEdge(nv, v, new Transfer(distance));
+                        graph.addEdge(new Transfer(v, nv, distance));
+                        graph.addEdge(new Transfer(nv, v, distance));
                     } else if (nv.type == Intersection.class) {
                         if (distance < minDistance) {
                             minDistance = distance;
@@ -63,8 +63,8 @@ public class NetworkLinker {
                 }
 
                 if (nearestIntersection != null) {
-                    graph.addEdge(nearestIntersection, v, new StreetTransitLink());
-                    graph.addEdge(v, nearestIntersection, new StreetTransitLink());
+                    graph.addEdge(new StreetTransitLink(nearestIntersection, v));
+                    graph.addEdge(new StreetTransitLink(v, nearestIntersection));
                 }
             }
         }

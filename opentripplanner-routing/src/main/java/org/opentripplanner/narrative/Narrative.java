@@ -3,8 +3,8 @@ package org.opentripplanner.narrative;
 import java.util.List;
 import java.util.Vector;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TransportationMode;
-import org.opentripplanner.routing.edgetype.Traversable;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
@@ -106,11 +106,11 @@ public class Narrative {
         TransportationMode lastMode = null;
         Vector<SPTEdge> currentSection = new Vector<SPTEdge>();
         int startVertex = 0;
-        for (SPTEdge edge : path.edges) {
-            Traversable traversable = edge.payload;
-            String edgeName = traversable.getName();
+        for (SPTEdge sptEdge : path.edges) {
+            Edge edge = sptEdge.payload;
+            String edgeName = edge.getName();
             if (!edgeName.equals(lastName)
-                    && !(traversable.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
+                    && !(edge.getMode() == TransportationMode.WALK && lastMode == TransportationMode.WALK)) {
                 // A section ends when the name of the payload changes except when walking
                 List<SPTVertex> currentVertices = path.vertices.subList(startVertex, i + 1);
                 // Don't add boarding and alighting edges as separate sections in the narrative
@@ -122,8 +122,8 @@ public class Narrative {
                 startVertex = i;
             }
             i += 1;
-            lastMode = traversable.getMode();
-            currentSection.add(edge);
+            lastMode = edge.getMode();
+            currentSection.add(sptEdge);
         }
         // Add the last section, unless it's an alight
         if (lastMode != TransportationMode.ALIGHTING) {

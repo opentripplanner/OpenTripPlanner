@@ -18,7 +18,6 @@ import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.Traversable;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.slf4j.Logger;
@@ -76,12 +75,11 @@ public class GTFSPatternHopFactory {
         return id.getAgencyId() + "_" + id.getId();
     }
 
-    public ArrayList<Traversable> run(Graph graph) throws Exception {
+    public void run(Graph graph) throws Exception {
         /*
          * For each trip, create either pattern edges, the entries in a trip pattern's list of
          * departures, or simple hops
          */
-        ArrayList<Traversable> ret = new ArrayList<Traversable>();
 
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
@@ -102,24 +100,26 @@ public class GTFSPatternHopFactory {
                     Stop s1 = st1.getStop();
                     int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
-                    PatternHop hop = new PatternHop(s0, s1, i, tripPattern);
-                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
-
-                    ret.add(hop);
-
-                    Vertex startStation = graph.getVertex(id(s0.getId()));
-                    Vertex endStation = graph.getVertex(id(s1.getId()));
-
                     // create journey vertices
                     Vertex startJourney = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId()),
                             s0.getLon(), s0.getLat());
                     Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()), s1
                             .getLon(), s1.getLat());
+                    
+                    PatternHop hop = new PatternHop(startJourney, endJourney, s0, s1, i, tripPattern);
+                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
 
-                    PatternBoard boarding = new PatternBoard(tripPattern, i);
-                    graph.addEdge(startStation, startJourney, boarding);
-                    graph.addEdge(endJourney, endStation, new Alight());
-                    graph.addEdge(startJourney, endJourney, hop);
+                    graph.addEdge(hop);
+
+                    Vertex startStation = graph.getVertex(id(s0.getId()));
+                    Vertex endStation = graph.getVertex(id(s1.getId()));
+
+
+                    PatternBoard boarding = new PatternBoard(startStation, startJourney,
+                            tripPattern, i);
+                    graph.addEdge(boarding);
+                    graph.addEdge(new Alight(endJourney, endStation));
+                    
                 }
                 patterns.put(stopPattern, tripPattern);
             } else {
@@ -141,12 +141,14 @@ public class GTFSPatternHopFactory {
                         StopTime st0 = stopTimes.get(i);
                         StopTime st1 = stopTimes.get(i + 1);
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-                        try { 
+                        try {
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
                                     runningTime);
                         } catch (TripOvertakingException e) {
-                            _log.warn("trip " + trip.getId()
-                                    + "overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
+                            _log
+                                    .warn("trip "
+                                            + trip.getId()
+                                            + "overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
                             // back out trips and revert to the simple method
                             for (; i >= 0; --i) {
                                 tripPattern.removeHop(i, insertionPoint);
@@ -158,8 +160,6 @@ public class GTFSPatternHopFactory {
                 }
             }
         }
-
-        return ret;
     }
 
     private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes)
@@ -179,13 +179,12 @@ public class GTFSPatternHopFactory {
             Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + tripId, s1.getLon(), s1
                     .getLat());
 
-            Hop hop = new Hop(st0, st1);
+            Hop hop = new Hop(startJourney, endJourney, st0, st1);
+            graph.addEdge(hop);
+            Board boarding = new Board(startStation, startJourney, hop);
+            graph.addEdge(boarding);
+            graph.addEdge(new Alight(endJourney, endStation));
 
-            Board boarding = new Board(hop);
-            graph.addEdge(startStation, startJourney, boarding);
-            graph.addEdge(endJourney, endStation, new Alight());
-
-            graph.addEdge(startJourney, endJourney, hop);
         }
     }
 }

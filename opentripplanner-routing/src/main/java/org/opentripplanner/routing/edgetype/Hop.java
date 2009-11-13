@@ -7,17 +7,19 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
+public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
 
     public static class HopArrivalTimeComparator implements Comparator<Hop> {
 
@@ -43,7 +45,8 @@ public class Hop extends AbstractPayload implements Comparable<Hop>, Drawable {
         return _serviceId;
     }
 
-    public Hop(StopTime start, StopTime end) throws Exception {
+    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end) throws Exception {
+        super(startJourney, endJourney);
         this.start = start;
         this.end = end;
         this._serviceId = start.getTrip().getServiceId();

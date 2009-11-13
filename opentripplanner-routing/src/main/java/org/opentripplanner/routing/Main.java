@@ -15,6 +15,7 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -32,19 +33,19 @@ class Main {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] splitline = line.split(",");
-                String fromv = splitline[1];
-                String tov = splitline[2];
+                String fromvName = splitline[1];
+                String tovName = splitline[2];
                 String name = splitline[0];
                 double length = Double.parseDouble(splitline[3]);
 
-                double fromx = Double.parseDouble(fromv.substring(0, 4));
-                double fromy = Double.parseDouble(fromv.substring(4));
-                double tox = Double.parseDouble(tov.substring(0, 4));
-                double toy = Double.parseDouble(tov.substring(4));
-                gg.addVertex(fromv, fromx, fromy);
-                gg.addVertex(tov, tox, toy);
-                gg.addEdge(fromv, tov, new Street(name, name, length));
-                gg.addEdge(tov, fromv, new Street(name, name, length));
+                double fromx = Double.parseDouble(fromvName.substring(0, 4));
+                double fromy = Double.parseDouble(fromvName.substring(4));
+                double tox = Double.parseDouble(tovName.substring(0, 4));
+                double toy = Double.parseDouble(tovName.substring(4));
+                Vertex fromv = gg.addVertex(fromvName, fromx, fromy);
+                Vertex tov = gg.addVertex(tovName, tox, toy);
+                gg.addEdge(new Street(fromv, tov, name, name, length));
+                gg.addEdge(new Street(tov, fromv, name, name, length));
             }
         } catch (IOException x) {
 

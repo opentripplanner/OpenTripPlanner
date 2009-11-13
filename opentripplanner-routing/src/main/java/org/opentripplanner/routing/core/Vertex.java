@@ -19,7 +19,9 @@ public class Vertex implements Serializable {
 
     public Class<?> type;
 
-    double x, y;
+    private double y;
+
+    private double x;
 
     static final double COS_MAX_LAT = Math.cos(46 * Math.PI / 180);
 
@@ -27,16 +29,16 @@ public class Vertex implements Serializable {
 
     public Vertex(String label, double x, double y) {
         this.label = label;
-        this.x = x;
-        this.y = y;
+        this.setX(x);
+        this.setY(y);
         this.outgoing = new Vector<Edge>();
         this.incoming = new Vector<Edge>();
     }
 
     public double distance(Vertex v) {
 
-        double xd = v.x - x;
-        double yd = v.y - y;
+        double xd = v.getX() - getX();
+        double yd = v.getY() - getY();
         return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR * COS_MAX_LAT;
 
         /* This is more accurate but slower */
@@ -45,11 +47,11 @@ public class Vertex implements Serializable {
     
 
     public double distance(Coordinate c) {
-        return GtfsLibrary.distance(y, x, c.y, c.x);
+        return GtfsLibrary.distance(getY(), getX(), c.y, c.x);
     }
 
     public Coordinate getCoordinate() {
-        return new Coordinate(x, y);
+        return new Coordinate(getX(), getY());
     }
 
     public int getDegreeOut() {
@@ -70,6 +72,22 @@ public class Vertex implements Serializable {
 
     public String toString() {
         return "<" + this.label + " " + this.outgoing.size() + " " + this.incoming.size() + ">";
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getY() {
+        return y;
     }
 
 }

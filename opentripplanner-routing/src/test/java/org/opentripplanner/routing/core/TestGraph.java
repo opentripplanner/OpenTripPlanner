@@ -28,9 +28,10 @@ public class TestGraph extends TestCase {
 
     public void testAddEdge() throws Exception {
         Graph gg = new Graph();
-        gg.addVertex("A", 5, 5);
-        gg.addVertex("B", 6, 6);
-        Edge ee = gg.addEdge("A", "B", new Street(1));
+        Vertex a = gg.addVertex("A", 5, 5);
+        Vertex b = gg.addVertex("B", 6, 6);
+        Edge ee = new Street(a,b, 1);
+        gg.addEdge(ee);
         assertNotNull(ee);
     }
 }

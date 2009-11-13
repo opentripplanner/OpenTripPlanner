@@ -1,10 +1,13 @@
 package org.opentripplanner.routing.edgetype.factory;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Hop;
 
 import java.util.ArrayList;
@@ -37,7 +40,7 @@ public class GTFSHopFactory {
             for (int i = 0; i < stopTimes.size() - 1; i++) {
                 StopTime st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
-                Hop hop = new Hop(st0, st1);
+                Hop hop = new Hop(null, null, st0, st1);
                 ret.add(hop);
             }
         }

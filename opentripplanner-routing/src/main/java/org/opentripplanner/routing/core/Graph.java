@@ -6,7 +6,6 @@ import java.util.HashMap;
 
 import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
-import org.opentripplanner.routing.edgetype.Traversable;
 
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
@@ -30,7 +29,7 @@ public class Graph implements Serializable {
     public Vertex addVertex(String label, double x, double y) {
         Vertex exists = this.vertices.get(label);
         if (exists != null) {
-            assert exists.x == x && exists.y == y;
+            assert exists.getX() == x && exists.getY() == y;
             return exists;
         }
 
@@ -47,18 +46,23 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
-    public Edge addEdge(Vertex a, Vertex b, Traversable ep) {
-        Edge ee = new Edge(a, b, ep);
+    public void addEdge(Vertex a, Vertex b, Edge ee) {
         a.addOutgoing(ee);
         b.addIncoming(ee);
-        return ee;
     }
 
-    public Edge addEdge(String from_label, String to_label, Traversable ep) {
+    public void addEdge(Edge ee) {
+        Vertex fromv = ee.getFromVertex();
+        Vertex tov = ee.getToVertex();
+        fromv.addOutgoing(ee);
+        tov.addIncoming(ee);
+    }
+    
+    public void addEdge(String from_label, String to_label, Edge ee) {
         Vertex v1 = this.getVertex(from_label);
         Vertex v2 = this.getVertex(to_label);
-
-        return addEdge(v1, v2, ep);
+        
+        addEdge(v1, v2, ee);
     }
 
     public Vertex nearestVertex(float lat, float lon) {
@@ -79,8 +83,8 @@ public class Graph implements Serializable {
     public void draw(DrawHandler drawer) throws Exception {
         for (Vertex vv : this.getVertices()) {
             for (Edge ee : vv.outgoing) {
-                if (ee.payload instanceof Drawable) {
-                    drawer.handle((Drawable) ee.payload);
+                if (ee instanceof Drawable) {
+                    drawer.handle((Drawable) ee);
                 }
             }
         }

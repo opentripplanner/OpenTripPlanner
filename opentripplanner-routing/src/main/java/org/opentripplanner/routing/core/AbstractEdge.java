@@ -1,7 +1,25 @@
 package org.opentripplanner.routing.core;
 
-public abstract class AbstractEdge {
-    public AbstractVertex fromv;
+public abstract class AbstractEdge implements Edge {
 
-    public AbstractVertex tov;
+    private Vertex fromv, tov;
+
+    public String toString() {
+        return fromv.label + "-> " + tov.label;
+    }
+
+    public AbstractEdge(Vertex fromv, Vertex tov) {
+        this.fromv = fromv;
+        this.tov = tov;
+    }
+
+    @Override
+    public Vertex getFromVertex() {
+        return fromv;
+    }
+
+    @Override
+    public Vertex getToVertex() {
+        return tov;
+    }
 }

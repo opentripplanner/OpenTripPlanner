@@ -183,22 +183,22 @@ public class ShapefileStreetLoader {
                 // possible).
                 if (trafDir.equals("W")) {
                     // traffic flows With geometry
-                    Street street = new Street(id, name, length);
+                    Street street = new Street(startCorner, endCorner, id, name, length);
                     street.setGeometry(geom);
-                    graph.addEdge(startCorner, endCorner, street);
+                    graph.addEdge(street);
                 } else if (trafDir.equals("A")) {
                     // traffic flows Against geometry
-                    Street street = new Street(id, name, length);
+                    Street street = new Street(endCorner, startCorner, id, name, length);
                     street.setGeometry(geom.reverse());
-                    graph.addEdge(endCorner, startCorner, street);
+                    graph.addEdge(street);
                 } else if (trafDir.equals("T")) {
                     // traffic flows Two ways
-                    Street street = new Street(id, name, length);
+                    Street street = new Street(startCorner, endCorner, id, name, length);
                     street.setGeometry(geom);
-                    graph.addEdge(startCorner, endCorner, street);
-                    Street backStreet = new Street(id, name, length);
+                    graph.addEdge(street);
+                    Street backStreet = new Street(endCorner, startCorner, id, name, length);
                     backStreet.setGeometry(geom.reverse());
-                    graph.addEdge(endCorner, startCorner, backStreet);
+                    graph.addEdge(backStreet);
                 } else {
                     // pedestrian
                 }

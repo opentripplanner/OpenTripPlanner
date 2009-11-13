@@ -1,13 +1,19 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class StreetTransitLink extends AbstractPayload {
+public class StreetTransitLink extends AbstractEdge {
+
+    public StreetTransitLink(Vertex fromv, Vertex tov) {
+        super(fromv, tov);
+    }
 
     private static final long serialVersionUID = -3311099256178798981L;
 

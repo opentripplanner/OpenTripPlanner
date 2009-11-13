@@ -76,21 +76,21 @@ public class StreetLocationFinder {
                     Edge street = null;
                     for (int j = 0; j < a.outgoing.size(); ++j) {
                         street = a.outgoing.get(j);
-                        if (street.tov == b) {
+                        if (street.getToVertex() == b) {
                             break;
                         }
                     }
                     if (street == null) {
                         for (int j = 0; j < a.incoming.size(); ++j) {
                             street = a.incoming.get(j);
-                            if (street.tov == b) {
+                            if (street.getToVertex() == b) {
                                 break;
                             }
                         }
                     }
 
                     if (street != null) {
-                        LineString g = (LineString) street.payload.getGeometry();
+                        LineString g = (LineString) street.getGeometry();
                         GeometryFactory factory = new GeometryFactory();
                         if (g.distance(factory.createPoint(c)) < 0.00000001) {
                             LengthIndexedLine l = new LengthIndexedLine(g);

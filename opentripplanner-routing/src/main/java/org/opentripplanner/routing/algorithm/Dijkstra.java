@@ -58,11 +58,12 @@ public class Dijkstra {
                 double new_w = spt_u.weightSum + wr.weight;
                 double old_w;
 
-                spt_v = spt.getVertex(edge.tov);
+                Vertex tov = edge.getToVertex();
+                spt_v = spt.getVertex(tov);
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
                     old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(edge.tov, wr.state, new_w);
+                    spt_v = spt.addVertex(tov, wr.state, new_w);
                 } else {
                     old_w = spt_v.weightSum;
                 }
@@ -74,7 +75,7 @@ public class Dijkstra {
                     spt_v.weightSum = new_w;
                     pq.insert_or_dec_key(spt_v, new_w);
 
-                    spt_v.setParent(spt_u, edge.payload);
+                    spt_v.setParent(spt_u, edge);
                 }
             }
         }

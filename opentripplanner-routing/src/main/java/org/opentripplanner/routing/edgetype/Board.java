@@ -5,14 +5,16 @@ import java.util.Date;
 import java.util.Set;
 
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Board extends AbstractPayload {
+public class Board extends AbstractEdge {
 
     String start_id; // a street vertex's id
 
@@ -24,7 +26,8 @@ public class Board extends AbstractPayload {
 
     private static final long serialVersionUID = 2L;
 
-    public Board(Hop hop) {
+    public Board(Vertex startStation, Vertex startJourney, Hop hop) {
+        super(startStation, startJourney);
         this.hop = hop;
     }
 

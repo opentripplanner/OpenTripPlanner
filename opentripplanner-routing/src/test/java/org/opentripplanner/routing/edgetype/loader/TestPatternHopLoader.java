@@ -47,18 +47,18 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(3, stop_b.getDegreeOut());
 
         for (Edge e : stop_a.outgoing) {
-            assertEquals(PatternBoard.class, e.payload.getClass());
+            assertEquals(PatternBoard.class, e.getClass());
         }
 
-        Vertex journey_a_1 = stop_a.outgoing.get(0).tov;
+        Vertex journey_a_1 = stop_a.outgoing.get(0).getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
         for (Edge e : journey_a_1.outgoing) {
-            if (e.tov.type == TransitStop.class) {
-                assertEquals(Alight.class, e.payload.getClass());
+            if (e.getToVertex().type == TransitStop.class) {
+                assertEquals(Alight.class, e.getClass());
             } else {
-                assertEquals(PatternHop.class, e.payload.getClass());
+                assertEquals(PatternHop.class, e.getClass());
             }
         }
     }
