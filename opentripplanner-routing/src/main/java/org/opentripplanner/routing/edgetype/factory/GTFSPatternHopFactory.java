@@ -251,6 +251,7 @@ public class GTFSPatternHopFactory {
             LinearLocation endCoord = lol.indexOf(endJourney.getCoordinate());
             return lol.extractLine(startCoord, endCoord);
         } else {
+            //fixme: I don't think this actually works correctly, because getShapeDistTraveled returns a value between m and n, not 0 and 1
             double endDt = st1.getShapeDistTraveled();
             return lil.extractLine(startDt, endDt);
         }
