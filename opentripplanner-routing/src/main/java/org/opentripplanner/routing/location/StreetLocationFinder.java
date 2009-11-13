@@ -17,6 +17,11 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
+/**
+ * This creates a StreetLocation representing a location on a street that's not at an intersection,
+ * based on input latitude and longitude. Instantiating this class is expensive, because it creates
+ * a spatial index of all of the intersections in the graph.
+ */
 public class StreetLocationFinder {
 
     Graph graph;
