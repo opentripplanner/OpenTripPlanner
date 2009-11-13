@@ -1,13 +1,10 @@
 package org.opentripplanner.routing.edgetype.factory;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Hop;
 
 import java.util.ArrayList;

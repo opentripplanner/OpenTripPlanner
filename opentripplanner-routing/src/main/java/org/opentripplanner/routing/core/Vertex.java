@@ -3,15 +3,12 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.vertextypes.TransitStop;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface Vertex extends Serializable {
 
     public String getLabel();
-    
+
     public double distance(Vertex v);
 
     public double distance(Coordinate c);
@@ -24,7 +21,7 @@ public interface Vertex extends Serializable {
 
     public void addIncoming(Edge ee);
 
-    public void addOutgoing(Edge ee) ;
+    public void addOutgoing(Edge ee);
 
     public String toString();
 
@@ -45,7 +42,7 @@ public interface Vertex extends Serializable {
     public Vector<Edge> getIncoming();
 
     public Class getType();
-    
+
     public void setType(Class type);
 
 }
