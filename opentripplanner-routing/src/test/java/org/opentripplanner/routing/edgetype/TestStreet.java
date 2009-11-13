@@ -17,6 +17,7 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -98,6 +99,17 @@ public class TestStreet extends TestCase {
             }
         }
 
+        Edge garfieldPlBack = eastVertex.outgoing.get(0);
+        TraverseOptions toWalk = new TraverseOptions(TraverseMode.WALK);
+        assertNotNull(garfieldPlBack.traverse(new State(), toWalk));
+        
+        TraverseOptions toCar = new TraverseOptions(TraverseMode.CAR);
+        assertNull(garfieldPlBack.traverse(new State(), toCar));
+        
+        Edge garfieldPl = eastVertex.incoming.get(0);
+        assertNotNull(garfieldPl.traverse(new State(), toCar));
+        
+        
         ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.label,
                 eastVertex.label, new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
                         .getTimeInMillis()), new TraverseOptions());
@@ -108,8 +120,8 @@ public class TestStreet extends TestCase {
         Vector<SPTEdge> edges = path.edges;
         SPTEdge seventhAve = edges.elementAt(0);
         assertEquals("south", seventhAve.payload.getDirection());
-        SPTEdge garfieldPl = edges.elementAt(1);
-        assertEquals("east", garfieldPl.payload.getDirection());
+        SPTEdge sptGarfieldPl = edges.elementAt(1);
+        assertEquals("east", sptGarfieldPl.payload.getDirection());
 
         Narrative narrative = new Narrative(path);
         String direction = narrative.getSections().elementAt(0).getDirection();

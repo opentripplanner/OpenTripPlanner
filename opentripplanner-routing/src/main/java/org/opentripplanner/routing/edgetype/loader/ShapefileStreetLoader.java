@@ -20,6 +20,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -173,34 +174,32 @@ public class ShapefileStreetLoader {
                 double length = JTS.orthodromicDistance(coordinates[0],
                         coordinates[coordinates.length - 1], worldCRS);
 
-                // FIXME: we actually want all streets to go in both directions,
-                // and to check on traversal if we're on a bike/car and have
-                // to obey direction rules.
-
                 // TODO: The following assumes the street direction convention
                 // used in NYC
                 // This code should either be moved or generalized (if
                 // possible).
+
+                Street street = new Street(startCorner, endCorner, id, name, length);
+                street.setGeometry(geom);
+                graph.addEdge(street);
+                Street backStreet = new Street(endCorner, startCorner, id, name, length);
+                backStreet.setGeometry(geom.reverse());
+                graph.addEdge(backStreet);
+                
                 if (trafDir.equals("W")) {
                     // traffic flows With geometry
-                    Street street = new Street(startCorner, endCorner, id, name, length);
-                    street.setGeometry(geom);
-                    graph.addEdge(street);
+                    street.setTraversalPermission(StreetTraversalPermission.ALL);
+                    backStreet.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN_ONLY);
                 } else if (trafDir.equals("A")) {
-                    // traffic flows Against geometry
-                    Street street = new Street(endCorner, startCorner, id, name, length);
-                    street.setGeometry(geom.reverse());
-                    graph.addEdge(street);
+                    backStreet.setTraversalPermission(StreetTraversalPermission.ALL);
+                    street.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN_ONLY);
                 } else if (trafDir.equals("T")) {
-                    // traffic flows Two ways
-                    Street street = new Street(startCorner, endCorner, id, name, length);
-                    street.setGeometry(geom);
-                    graph.addEdge(street);
-                    Street backStreet = new Street(endCorner, startCorner, id, name, length);
-                    backStreet.setGeometry(geom.reverse());
-                    graph.addEdge(backStreet);
+                    backStreet.setTraversalPermission(StreetTraversalPermission.ALL);
+                    street.setTraversalPermission(StreetTraversalPermission.ALL);
                 } else {
-                    // pedestrian
+                    // no cars allowed
+                    backStreet.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
+                    street.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
                 }
 
             }

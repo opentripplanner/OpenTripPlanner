@@ -26,9 +26,12 @@ public class Street extends AbstractEdge {
 
     double length;
 
+    StreetTraversalPermission permission;
+
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
         this.length = length;
+        this.permission = StreetTraversalPermission.ALL;
     }
 
     public Street(Vertex start, Vertex end, String id, String name, double length) {
@@ -36,6 +39,7 @@ public class Street extends AbstractEdge {
         this.id = id;
         this.name = name;
         this.length = length;
+        this.permission = StreetTraversalPermission.ALL;
     }
 
     public void setGeometry(LineString g) {
@@ -43,6 +47,9 @@ public class Street extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
+        if (!canTraverse(wo)) {
+            return null;
+        }
         State s1 = s0.clone();
         double weight = this.length / wo.speed;
         // it takes time to walk/bike along a street, so update state accordingly
@@ -51,11 +58,49 @@ public class Street extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+        if (!canTraverse(wo)) {
+            return null;
+        }
         State s1 = s0.clone();
         double weight = this.length / wo.speed;
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) weight);
         return new TraverseResult(weight, s1);
+    }
+
+    private boolean canTraverse(TraverseOptions wo) {
+        switch (permission) {
+        case BICYCLE_ONLY:
+            switch (wo.mode) {
+            case CAR:
+            case CAR_AND_TRANSIT:
+            case WALK:
+            case WALK_AND_TRANSIT:
+                return false;
+            }
+            break;
+        case PEDESTRIAN_AND_BICYCLE_ONLY:
+            switch (wo.mode) {
+            case CAR:
+            case CAR_AND_TRANSIT:
+                return false;
+            }
+            break;
+        case PEDESTRIAN_ONLY:
+            switch (wo.mode) {
+            case CAR:
+            case CAR_AND_TRANSIT:
+            case BICYCLE:
+            case BICYCLE_AND_TRANSIT:
+                return false;
+            }
+            break;
+        case ALL:
+        case CROSSHATCHED:
+            /* everything is allowed */
+            break;
+        }
+        return true;
     }
 
     public String toString() {
@@ -109,6 +154,10 @@ public class Street extends AbstractEdge {
     public String getStart() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void setTraversalPermission(StreetTraversalPermission permission) {
+        this.permission = permission;
     }
 
 }

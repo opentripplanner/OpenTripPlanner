@@ -68,4 +68,12 @@ public class SPTEdge extends AbstractEdge {
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
         return payload.traverseBack(s0, wo);
     }
+
+    public SPTVertex getToSPTVertex() {
+        return tov;
+    }
+
+    public SPTVertex getFromSPTVertex() {
+        return fromv;
+    }
 }
