@@ -14,6 +14,10 @@ public class StreetTransitLink extends AbstractEdge {
     public StreetTransitLink(Vertex fromv, Vertex tov) {
         super(fromv, tov);
     }
+    
+    /*
+     * Models traveling between a station adjacent to the street and the street itself. Returns a clone of the state unaltered.
+     */
 
     private static final long serialVersionUID = -3311099256178798981L;
 

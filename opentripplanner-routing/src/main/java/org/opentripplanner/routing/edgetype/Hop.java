@@ -21,6 +21,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
+    
+    /*
+     * Models traveling from one point to another in a fixed amount of time. This may be useful for its simplicity, but has been
+     * largely replaced by PatternHop
+     */
 
     public static class HopArrivalTimeComparator implements Comparator<Hop> {
 

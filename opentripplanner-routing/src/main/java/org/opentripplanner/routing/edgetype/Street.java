@@ -12,6 +12,11 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class Street extends AbstractEdge {
+    
+    /*
+     * Models traveling between two points on a street. Increments the travel state by a time determined from the street length and
+     * the traverse options speed.
+     */
 
     private static final long serialVersionUID = -3215764532108343102L;
 

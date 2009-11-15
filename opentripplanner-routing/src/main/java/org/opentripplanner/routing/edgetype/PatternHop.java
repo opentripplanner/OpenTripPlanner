@@ -17,8 +17,10 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 public class PatternHop extends AbstractEdge {
 
     /**
-     * 
+     *  Models traveling from one station on vehicle to another station on vehicle by incrementing the State.time by an amount contingent
+     *  upon the State.pattern
      */
+    
     private static final long serialVersionUID = 1L;
 
     private TripPattern pattern;
