@@ -9,10 +9,17 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/* This represents the connection between a street vertex and a transit vertex
+ * where going from the street to the vehicle is immediate -- such as at a 
+ * curbside bus stop.
+ */
 public class StreetTransitLink extends AbstractEdge {
 
-    public StreetTransitLink(Vertex fromv, Vertex tov) {
+    boolean isBoarding;
+    
+    public StreetTransitLink(Vertex fromv, Vertex tov, boolean isBoarding) {
         super(fromv, tov);
+        this.isBoarding = true;
     }
     
     /*
@@ -55,11 +62,25 @@ public class StreetTransitLink extends AbstractEdge {
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
+        if (isBoarding) {
+            s1.setJustBoarded(true);
+        } else {
+            if (s0.getJustBoarded()) { 
+                return null;
+            }
+        }
         return new TraverseResult(0, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
+        if (isBoarding) {
+            s1.setJustBoarded(true);
+        } else {
+            if (s0.getJustBoarded()) { 
+                return null;
+            }
+        }
         return new TraverseResult(0, s1);
     }
 

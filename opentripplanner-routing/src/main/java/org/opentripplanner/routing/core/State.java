@@ -6,7 +6,16 @@ public class State {
 
     private long _time;
     private int curPattern = -1;
+    private boolean justBoarded = false;
     
+    public boolean getJustBoarded() {
+        return justBoarded;
+    }
+
+    public void setJustBoarded(boolean justBoarded) {
+        this.justBoarded = justBoarded;
+    }
+
     public State() {
         this(System.currentTimeMillis());
     }
