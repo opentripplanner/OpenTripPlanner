@@ -179,7 +179,8 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         this.consolidate();
 
         this.n = this.n - 1;
-
+        this.directory.remove(z.payload);
+        
         return z.payload;
     }
 
