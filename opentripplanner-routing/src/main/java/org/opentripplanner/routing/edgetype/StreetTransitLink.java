@@ -19,7 +19,7 @@ public class StreetTransitLink extends AbstractEdge {
     
     public StreetTransitLink(Vertex fromv, Vertex tov, boolean isBoarding) {
         super(fromv, tov);
-        this.isBoarding = true;
+        this.isBoarding = isBoarding;
     }
     
     /*
