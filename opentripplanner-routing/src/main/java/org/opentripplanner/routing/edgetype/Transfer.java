@@ -71,5 +71,16 @@ public class Transfer extends AbstractEdge {
         s1.incrementTimeInSeconds(-(int)(distance / wo.speed));
         return new TraverseResult(distance / wo.speed, s1);
     }
-
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof Transfer)) {
+            return false;
+        }
+        Transfer t = (Transfer) o;
+        return t.getToVertex().equals(getToVertex()) && t.getFromVertex().equals(getFromVertex());
+    }
+    
+    public int hashCode() {
+        return getToVertex().hashCode() ^ getFromVertex().hashCode();
+    }
 }
