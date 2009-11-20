@@ -27,6 +27,8 @@ public class PatternBoard extends AbstractEdge {
 
     private static final int SEC_IN_DAY = 24 * 60 * 60;
 
+    private static final int BOARD_COST = 120;
+
     private TripPattern pattern;
 
     private int stopIndex;
@@ -102,7 +104,7 @@ public class PatternBoard extends AbstractEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(back ? -wait : wait);
-        return new TraverseResult(wait, state1);
+        return new TraverseResult(wait + BOARD_COST, state1);
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
