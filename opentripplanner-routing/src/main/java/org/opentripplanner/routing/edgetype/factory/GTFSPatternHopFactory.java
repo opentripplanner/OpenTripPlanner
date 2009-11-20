@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -186,7 +188,8 @@ public class GTFSPatternHopFactory {
     }
     
     private void loadTransfers(Graph graph) {
-        Collection<Transfer> transfers = _dao.getAllTransfers();        
+        Collection<Transfer> transfers = _dao.getAllTransfers();
+        Set<org.opentripplanner.routing.edgetype.Transfer> createdTransfers = new HashSet<org.opentripplanner.routing.edgetype.Transfer>();  
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
@@ -198,6 +201,10 @@ public class GTFSPatternHopFactory {
                     transferTime = t.getMinTransferTime();
                 }
                 org.opentripplanner.routing.edgetype.Transfer edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation, toStation, transferTime);
+                if (createdTransfers.contains(edge)) {
+                    continue;
+                }
+                createdTransfers.add(edge);
                 graph.addEdge(edge);
             }
         }
