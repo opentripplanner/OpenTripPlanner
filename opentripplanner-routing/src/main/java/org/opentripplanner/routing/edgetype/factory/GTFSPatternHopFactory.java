@@ -12,6 +12,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.core.Graph;
@@ -179,6 +180,25 @@ public class GTFSPatternHopFactory {
                         }
                     }
                 }
+            }
+        }
+        loadTransfers(graph);
+    }
+    
+    private void loadTransfers(Graph graph) {
+        Collection<Transfer> transfers = _dao.getAllTransfers();        
+        for (Transfer t : transfers) {
+            Stop fromStop = t.getFromStop();
+            Stop toStop = t.getToStop();
+            Vertex fromStation = graph.getVertex(id(fromStop.getId()));
+            Vertex toStation = graph.getVertex(id(toStop.getId()));
+            int transferTime = 0;
+            if (t.getTransferType() < 3) {
+                if (t.getTransferType() == 2) {
+                    transferTime = t.getMinTransferTime();
+                }
+                org.opentripplanner.routing.edgetype.Transfer edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation, toStation, transferTime);
+                graph.addEdge(edge);
             }
         }
     }

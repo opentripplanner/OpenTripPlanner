@@ -17,6 +17,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.Transfer;
 import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -174,6 +175,21 @@ public class TestPatternHopLoader extends TestCase {
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
         assertTrue(geometry.getLength() < 2.0);
+    }
+
+    public void testTransfers() throws Exception {
+        Vertex stop_k = graph.getVertex("agency_K");
+        Vertex stop_l = graph.getVertex("agency_L");
+        Vertex stop_m = graph.getVertex("agency_M");
+        Edge hop = null;
+        int transfers = 0;
+        for (Edge e : stop_k.getOutgoing()) {
+            if (e instanceof Transfer) {
+                assertEquals(e.getToVertex(), stop_l);
+                transfers += 1;
+            }
+        }
+        assertTrue(transfers > 0);
     }
 
 }
