@@ -49,5 +49,12 @@
       <scope>test</scope>
     </dependency>    
   </dependencies>
-
+  <repositories>
+    <repository>
+      <id>Grizzly</id>
+      <name>Sun Grizzly Web server</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+  </repositories>
+							 
 </project>
