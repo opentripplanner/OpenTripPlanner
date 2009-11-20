@@ -90,7 +90,7 @@ public class PatternHop extends AbstractEdge {
             Coordinate c1 = new Coordinate(start.getLon(), start.getLat());
             Coordinate c2 = new Coordinate(end.getLon(), end.getLat());
 
-            return factory.createLineString(new Coordinate[] { c1, c2 });
+            geometry = factory.createLineString(new Coordinate[] { c1, c2 });
         }
         return geometry;
     }
