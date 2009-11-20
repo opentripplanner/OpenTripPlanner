@@ -58,8 +58,7 @@ public class Board extends AbstractEdge {
     }
 
     public String getName() {
-        // "Enter 7th Avenue Station"
-        return "leave street network for transit network";
+        return "board vehicle";
     }
 
     public String getStart() {

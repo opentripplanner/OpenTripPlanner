@@ -50,9 +50,8 @@ public class Alight extends AbstractEdge {
     }
 
     public String getName() {
-        // TODO Auto-generated method stub -- need to say something like,
-        // "Exit 7th Avenue Station"
-        return "leave transit network for street network";
+        //this text won't be used -- the streetTransitLink or StationEntrance's text will 
+        return "alight from vehicle";
     }
 
     public String getStart() {
