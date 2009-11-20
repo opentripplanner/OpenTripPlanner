@@ -68,7 +68,7 @@ public class TestShapefileLoader extends TestCase {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.NY_GTFS));
 
-        GTFSHopLoader hl = new GTFSHopLoader(gg, context);
+        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
         hl.load();
 
         NetworkLinker nl = new NetworkLinker(gg);
@@ -87,7 +87,7 @@ public class TestShapefileLoader extends TestCase {
                    new State(new GregorianCalendar(2009,8,7,12,2,0).getTimeInMillis()), 
                    new TraverseOptions(context));
         GraphPath path = spt.getPath(end);
-        
+
         assertNotNull(path);
 
     }
