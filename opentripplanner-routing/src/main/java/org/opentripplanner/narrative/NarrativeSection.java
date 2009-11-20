@@ -1,16 +1,20 @@
 package org.opentripplanner.narrative;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.operation.linemerge.LineMerger;
 
 /**
  * A narrative section represents the portion of a trip which takes place on a single conveyance.
@@ -72,28 +76,46 @@ public class NarrativeSection {
         items = new Vector<NarrativeItem>();
         Edge graphEdge = edges.firstElement().payload;
         mode = graphEdge.getMode();
-        geometry = graphEdge.getGeometry();
-        for (SPTEdge edge : edges.subList(1, edges.size())) {
-            geometry = geometry.union(edge.payload.getGeometry());
+        direction = graphEdge.getDirection();
+        
+        LineMerger merger = new LineMerger();
+        GeometryFactory factory = null;
+        for (SPTEdge edge : edges) {
+            
+            Geometry geom = edge.payload.getGeometry();
+            if (geom != null) {
+                merger.add(geom);
+                factory = geom.getFactory();
+            }
         }
-
-        if (graphEdge instanceof Hop) {
+        if (factory != null) {
+            Collection collection = merger.getMergedLineStrings();
+            geometry = factory.buildGeometry(collection);
+        }
+        if (graphEdge instanceof Hop || graphEdge instanceof PatternHop) {
             name = graphEdge.getName();
             direction = graphEdge.getDirection();
             BasicNarrativeItem item = new BasicNarrativeItem();
             item.setDirection(graphEdge.getDirection());
             item.setName(graphEdge.getName());
             String end = graphEdge.getEnd();
-            Geometry geom = graphEdge.getGeometry();
 
             double totalDistance = graphEdge.getDistance();
+            merger = new LineMerger();
             for (SPTEdge edge : edges.subList(1, edges.size())) {
                 graphEdge = edge.payload;
                 totalDistance += graphEdge.getDistance();
-                geom = geom.union(graphEdge.getGeometry());
+                Geometry geom = edge.payload.getGeometry();
+                if (geom != null) {
+                    merger.add(geom);
+                    factory = geom.getFactory();
+                }
                 end = graphEdge.getEnd();
             }
-            item.setGeometry(geom);
+            if (factory != null) {
+                Collection collection = merger.getMergedLineStrings();
+                item.setGeometry(factory.buildGeometry(collection));
+            }
             item.setDistance(totalDistance);
             item.setEnd(end);
             items.add(item);
