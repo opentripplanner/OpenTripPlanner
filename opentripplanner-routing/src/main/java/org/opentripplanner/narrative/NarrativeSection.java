@@ -128,7 +128,7 @@ public class NarrativeSection {
         }
     }
 
-    public String asText() {
+    public String toString() {
         if (mode == TransportationMode.TRANSFER) {
             return "transfer";
         }

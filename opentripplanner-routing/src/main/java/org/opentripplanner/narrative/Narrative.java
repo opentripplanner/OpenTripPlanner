@@ -137,7 +137,7 @@ public class Narrative {
             return "No path";
         String out = "";
         for (NarrativeSection section : sections) {
-            out += section.asText() + "\n";
+            out += section.toString() + "\n";
         }
         return out;
     }
