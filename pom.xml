@@ -11,8 +11,9 @@
 
   <modules>
       <module>opentripplanner-api-webapp</module>
+      <module>opentripplanner-graph-builder</module>
       <module>opentripplanner-routing</module>
-    <module>opentripplanner-webapp</module>
+      <module>opentripplanner-webapp</module>
   </modules>
 
   <build>
