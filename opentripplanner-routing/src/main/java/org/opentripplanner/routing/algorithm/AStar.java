@@ -1,10 +1,11 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -110,7 +111,7 @@ public class AStar {
         return getShortestPathTree(gg, origin.vertex, target.vertex, init, options, extraEdges);
     }
     
-    private static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
+    public static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
             State init, TraverseOptions options, Map<Vertex, Edge> extraEdges) {
 
 
@@ -136,10 +137,16 @@ public class AStar {
             if (spt_u.mirror == target)
                 break;
 
-            Collection<Edge> outgoing = spt_u.mirror.getOutgoing();
+            
+           
+            Iterable<Edge> outgoing = spt_u.mirror.getOutgoing();
+            
             if (extraEdges.containsKey(spt_u.mirror)) {
-                outgoing = new Vector<Edge>(outgoing);
-                outgoing.add(extraEdges.get(spt_u.mirror));
+                List<Edge> newOutgoing = new ArrayList<Edge>();
+                for( Edge edge : spt_u.mirror.getOutgoing())
+                    newOutgoing.add(edge);
+                newOutgoing.add(extraEdges.get(spt_u.mirror));
+                outgoing = newOutgoing;
             }
             
             for (Edge edge : outgoing) {

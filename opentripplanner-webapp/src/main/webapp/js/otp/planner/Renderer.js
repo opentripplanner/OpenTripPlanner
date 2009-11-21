@@ -40,11 +40,12 @@ otp.planner.Renderer = {
     clear : function()
     {
         console.log("enter planner.Renderer.clear");
-        if(this.m_vectorLayer)
-            otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer);
+        // TODO - the clearVectorLayer method does not exist - bdferris
+        //if(this.m_vectorLayer)
+        //    otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer);
 
         if(this.m_markerLayer && this.m_itinerary)
-            otp.planner.OpenLayersUtils.clearMarkerLayer(this.m_markerLayer, this.m_itinerary.getMarkers());
+            otp.util.OpenLayersUtils.clearMarkerLayer(this.m_markerLayer, this.m_itinerary.getMarkers());
 
         console.log("exit planner.Renderer.clear");
     },
@@ -71,7 +72,7 @@ otp.planner.Renderer = {
         this.map.zoomToExtent(this.m_itinerary.getExtent());
 
         // draw text plan on the ui (tree)
-        otp.planner.ExtUtils.clearTreeNodes(this.m_tree);
+        otp.util.ExtUtils.clearTreeNodes(this.m_tree);
         var n = this.m_itinerary.getTreeNodes(this.legClick, this);
         this.m_tree.root.appendChild(n);
 
@@ -101,7 +102,7 @@ otp.planner.Renderer = {
 
         if(node.id.indexOf(otp.planner.Utils.TRIP_ID) >= 0)
         {
-            otp.planner.OpenLayersUtils.zoomToMarkerLayerExtent(this.map, this.m_markerLayer);
+            otp.util.OpenLayersUtils.zoomToMarkerLayerExtent(this.map, this.m_markerLayer);
         }
         else
         {

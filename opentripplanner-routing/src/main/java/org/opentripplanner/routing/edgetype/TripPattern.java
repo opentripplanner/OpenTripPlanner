@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,10 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
-public class TripPattern {
+public final class TripPattern implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     /*
      * Represents a class of trips distinguished by service id, list of stops, dwell time at stops,
      * and running time between stops.
@@ -17,9 +21,9 @@ public class TripPattern {
 
     public Trip exemplar;
 
-    private Vector<Integer> [] departureTimes;
-    private Vector<Integer> [] runningTimes;
+    private Vector<Integer>[] departureTimes;
 
+    private Vector<Integer>[] runningTimes;
 
     class PatternStop {
         public int arrivalTimeOffset;
@@ -37,25 +41,24 @@ public class TripPattern {
         this.exemplar = exemplar;
         departureTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
         runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
-        
+
         for (int i = 0; i < stopTimes.size(); ++i) {
             departureTimes[i] = new Vector<Integer>();
             runningTimes[i] = new Vector<Integer>();
-            
+
         }
     }
 
     public void removeHop(int stopindex, int hop) {
-        
-        
+
     }
-    
+
     public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
-        
-        //throw an exception when this departure time is not between the departure times it 
-        //should be between, indicating a trip that overtakes another.
+
+        // throw an exception when this departure time is not between the departure times it
+        // should be between, indicating a trip that overtakes another.
 
         if (insertionPoint > 0) {
             if (stopDepartureTimes.elementAt(insertionPoint - 1) > departureTime) {
@@ -74,7 +77,7 @@ public class TripPattern {
     public int getNextPattern(int stopIndex, int afterTime) {
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
         int index = Collections.binarySearch(stopDepartureTimes, afterTime);
-        if (index == - stopDepartureTimes.size() - 1) 
+        if (index == -stopDepartureTimes.size() - 1)
             return -1;
 
         if (index >= 0) {
@@ -96,7 +99,7 @@ public class TripPattern {
 
     public int getInsertionPoint(int departureTime) {
         Vector<Integer> stopDepartureTimes = departureTimes[0];
-        int index = Collections.binarySearch(stopDepartureTimes, departureTime); 
-        return -index - 1;  
+        int index = Collections.binarySearch(stopDepartureTimes, departureTime);
+        return -index - 1;
     }
 }

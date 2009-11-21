@@ -7,23 +7,29 @@ import org.opentripplanner.util.Constants;
 /**
  *
  */
-public class Point {
+public class Place {
 
-    protected static final Logger LOGGER = Logger.getLogger(Point.class.getCanonicalName());
+    protected static final Logger LOGGER = Logger.getLogger(Place.class.getCanonicalName());
 
     public String name = null;
+    
+    public String description = "here";
+
+    public String stopId = "123";
+
     public String city = null;
+    
     public String geometry = null;
+    
+    public Double lon = null;
+    public Double lat = null;
+    public Double x = null;
+    public Double y = null;
 
-    private Double lon = null;
-    private Double lat = null;
-    private Double x = null;
-    private Double y = null;
-
-    public Point() {
+    public Place() {
     }
 
-    public Point(Double X, Double Y) {
+    public Place(Double X, Double Y) {
         if (X == null)
             X = -0.0;
         if (Y == null)
@@ -40,11 +46,11 @@ public class Point {
         }
     }
 
-    public Point(Double X, Double Y, String n) {
+    public Place(Double X, Double Y, String n) {
         this(X, Y, n, null);
     }
 
-    public Point(Double X, Double Y, String n, String c) {
+    public Place(Double X, Double Y, String n, String c) {
         this(X, Y);
         name = n;
         city = c;

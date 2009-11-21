@@ -2,11 +2,10 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.List;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.Transfer;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.opentripplanner.routing.vertextypes.TransitStop;
 
@@ -53,7 +52,7 @@ public class NetworkLinker {
                     coord = nv.getCoordinate();
                     double lat2 = coord.y;
                     double lon2 = coord.x;
-                    double distance = GtfsLibrary.distance(lat1, lon1, lat2, lon2) * 2;
+                    double distance = DistanceLibrary.distance(lat1, lon1, lat2, lon2) * 2;
 
                     if (nv.getType() == Intersection.class) {
                         if (distance < minDistance) {

@@ -40,6 +40,7 @@ public class StreetLocationFinder {
         intersections.build();
     }
 
+    @SuppressWarnings("unchecked")
     public StreetLocation findLocation(final Coordinate c, boolean incoming) {
         /*
          * Assume c is on a street.
@@ -80,22 +81,9 @@ public class StreetLocationFinder {
                     if (a == b) {
                         continue;
                     }
+
                     // search the edges for one where a connects to b
-                    Edge street = null;
-                    for (int j = 0; j < a.getOutgoing().size(); ++j) {
-                        street = a.getOutgoing().get(j);
-                        if (street.getToVertex() == b) {
-                            break;
-                        }
-                    }
-                    if (street == null) {
-                        for (int j = 0; j < a.getIncoming().size(); ++j) {
-                            street = a.getIncoming().get(j);
-                            if (street.getToVertex() == b) {
-                                break;
-                            }
-                        }
-                    }
+                    Edge street = getEdgeWithToVertex(a, b);
 
                     if (street != null) {
                         LineString g = (LineString) street.getGeometry();
@@ -112,4 +100,17 @@ public class StreetLocationFinder {
         throw new IntersectionNotFoundException("No intersection found near " + c
                 + " within envelope " + envelope);
     }
+
+    private Edge getEdgeWithToVertex(Vertex a, Vertex targetToVertex) {
+        for( Edge street : a.getOutgoing() ) {
+            if (street.getToVertex() == targetToVertex)
+                return street;
+        }
+        for( Edge street : a.getIncoming() ) {
+            if (street.getToVertex() == targetToVertex)
+                return street;
+        }
+        return null;
+    }
+    
 }

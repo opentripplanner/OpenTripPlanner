@@ -20,6 +20,5 @@ public class Response {
 
     public Response(Request req) {
         requestParameters = req.getParameters();
-        plan = new TripPlan();
     }
 }

@@ -15,12 +15,6 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Board extends AbstractEdge {
-    
-    /**
-     *  Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station on vehicle. When traversed forward,
-     *  the the resultant state has the time of the next departure. When traversed backward, the result state is unchanged. 
-     *  An boarding penalty can also be applied to discourage transfers.
-     */
 
     String start_id; // a street vertex's id
 
@@ -71,7 +65,7 @@ public class Board extends AbstractEdge {
         Date serviceDate = getServiceDate(currentTime, false);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
 
-        CalendarService service = wo.getGtfsContext().getCalendarService();
+        CalendarService service = wo.getCalendarService();
         Set<Date> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
         if (!serviceDates.contains(serviceDate))
             return null;
@@ -91,7 +85,7 @@ public class Board extends AbstractEdge {
         Date serviceDate = getServiceDate(currentTime, true);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
 
-        CalendarService service = wo.getGtfsContext().getCalendarService();
+        CalendarService service = wo.getCalendarService();
         if (!service.getServiceDatesForServiceId(hop.getServiceId()).contains(serviceDate))
             return null;
 

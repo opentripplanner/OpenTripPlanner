@@ -8,19 +8,18 @@ import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class PatternHop extends AbstractEdge {
+public class PatternHop extends AbstractEdge implements HoppableEdge {
 
     /**
-     *  Models traveling from one station on vehicle to another station on vehicle by incrementing the State.time by an amount contingent
-     *  upon the State.pattern
+     * 
      */
-    
     private static final long serialVersionUID = 1L;
 
     private TripPattern pattern;
@@ -45,7 +44,7 @@ public class PatternHop extends AbstractEdge {
     }
 
     public double getDistance() {
-        return GtfsLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
+        return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
     }
 
     public String getEnd() {

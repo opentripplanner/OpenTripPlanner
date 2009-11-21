@@ -4,7 +4,7 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -39,8 +39,8 @@ public class StreetLocation {
         String streetName = street.getName();
 
         vertex = new GenericVertex(streetName, x, y);
-        double weight1 = GtfsLibrary.distance(y, x, startCoord.y, startCoord.x);
-        double weight2 = GtfsLibrary.distance(y, x, endCoord.y, endCoord.x);
+        double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
+        double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
 
         if (incoming) {
             halfEdges = new Edge[] { new Street(fromv, vertex, streetName, streetName, weight1),

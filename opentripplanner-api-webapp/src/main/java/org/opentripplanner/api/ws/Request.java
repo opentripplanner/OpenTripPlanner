@@ -31,7 +31,7 @@ public class Request implements RequestInf {
 
     public Request() {
         m_modes = new ArrayList<ModeType>();
-        Collections.addAll(m_modes, ModeType.bus, ModeType.train, ModeType.walk);
+        Collections.addAll(m_modes, ModeType.bus, ModeType.train, ModeType.Walk);
 
         m_optimize = new ArrayList<OptimizeType>();
         Collections.addAll(m_optimize, OptimizeType.quick);

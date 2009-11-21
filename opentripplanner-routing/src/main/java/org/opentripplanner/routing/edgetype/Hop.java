@@ -6,7 +6,6 @@ import java.util.Comparator;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -14,18 +13,14 @@ import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
-    
-    /*
-     * Models traveling from one point to another in a fixed amount of time. This may be useful for its simplicity, but has been
-     * largely replaced by PatternHop
-     */
+public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, HoppableEdge {
 
     public static class HopArrivalTimeComparator implements Comparator<Hop> {
 
@@ -115,7 +110,7 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable {
     public double getDistance() {
         Stop stop1 = start.getStop();
         Stop stop2 = end.getStop();
-        return GtfsLibrary.distance(stop1.getLat(), stop1.getLon(), stop2.getLat(), stop2.getLon());
+        return DistanceLibrary.distance(stop1.getLat(), stop1.getLon(), stop2.getLat(), stop2.getLon());
     }
 
     public String getEnd() {

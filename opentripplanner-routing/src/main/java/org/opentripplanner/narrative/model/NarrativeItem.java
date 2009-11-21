@@ -1,4 +1,4 @@
-package org.opentripplanner.narrative;
+package org.opentripplanner.narrative.model;
 
 import com.vividsolutions.jts.geom.Geometry;
 

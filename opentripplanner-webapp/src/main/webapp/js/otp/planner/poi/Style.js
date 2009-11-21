@@ -17,7 +17,7 @@ otp.planner.poi.Style = {
               graphicHeight:    34,
               graphicXOffset:  -10,
               graphicYOffset:  -34,
-              externalGraphic: "/images/map/trip/start.png",
+              externalGraphic: "images/map/trip/start.png",
               cursor:          "pointer", 
               fillOpacity:     "1.0"
     },
@@ -26,7 +26,7 @@ otp.planner.poi.Style = {
               graphicHeight:    34,
               graphicXOffset:  -10,
               graphicYOffset:  -34,
-              externalGraphic: "/images/map/trip/end.png",
+              externalGraphic: "images/map/trip/end.png",
               cursor:          "pointer", 
               fillOpacity:     "1.0"
     },

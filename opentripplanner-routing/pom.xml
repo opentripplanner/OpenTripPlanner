@@ -60,8 +60,21 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2-SNAPSHOT</version>
         </dependency>
+        
+        <!-- Spring IoC Framework -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>2.5.6</version>
+        </dependency>
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -101,6 +114,7 @@
             </snapshots>
         </repository>
     </repositories>
+    <!--
     <build>
         <plugins>
             <plugin>
@@ -114,4 +128,5 @@
             </plugin>
         </plugins>
     </build>
+    -->
 </project>

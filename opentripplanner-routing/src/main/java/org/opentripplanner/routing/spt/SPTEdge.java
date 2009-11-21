@@ -11,6 +11,9 @@ import org.opentripplanner.routing.core.TraverseResult;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class SPTEdge extends AbstractEdge {
+    
+    private static final long serialVersionUID = 1L;
+
     public SPTVertex fromv;
 
     public SPTVertex tov;

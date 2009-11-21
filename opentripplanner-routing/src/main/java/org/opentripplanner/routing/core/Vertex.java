@@ -35,14 +35,14 @@ public interface Vertex extends Serializable {
 
     public void setOutgoing(Vector<Edge> outgoing);
 
-    public Vector<Edge> getOutgoing();
+    public Iterable<Edge> getOutgoing();
 
     public void setIncoming(Vector<Edge> incoming);
 
-    public Vector<Edge> getIncoming();
+    public Iterable<Edge> getIncoming();
 
-    public Class getType();
+    public Class<?> getType();
 
-    public void setType(Class type);
+    public void setType(Class<?> type);
 
 }

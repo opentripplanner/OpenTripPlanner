@@ -10,16 +10,9 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class Transfer extends AbstractEdge {
-    
-    /*
-     * Models traveling between two stops in a transfer complex, such as a large underground subway station. Increments the travel
-     * time by an amount determined by the distance and travel speed. 
-     * 
-     * Note that a transfer penalty is not applied by the Transfer edge-type because of the need to penalize transfers in situations
-     * where changing vehicles either involves the same physical stop or movement between two physical stops not intermediated by a 
-     * Transfer edge-type. Instead, penalties on transfers are applied at Board and Alight edge-types.
-     */
 
+    private static final long serialVersionUID = 1L;
+    
     double distance = 0;
 
     public Transfer(Vertex fromv, Vertex tov, double distance) {

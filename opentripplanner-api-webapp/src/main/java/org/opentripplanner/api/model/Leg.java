@@ -1,14 +1,20 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.api.ws.RequestInf.ModeType;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
  *
  */
 public class Leg {
-    public ModeType mode;
 
-    public Leg() {
-        mode = ModeType.bus;
-    }
+    @XmlAttribute
+    public String mode = "Walk";
+
+    public Place from = new Place();
+
+    public Place to = new Place();
+    
+    public String route = "156";
+    
+    public String legGeometry;
 }

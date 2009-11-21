@@ -14,12 +14,6 @@ public class Alight extends AbstractEdge {
     public Alight(Vertex fromv, Vertex tov) {
         super(fromv, tov);
     }
-    
-    /**
-     *  Models alighting a vehicle - that is to say, traveling from a station on vehicle to a station off vehicle. When traversed forward,
-     *  the the resultant state is unchanged. When traversed backward, the resultant state has the time of the last arrival 
-     *  before the input state. An alighting penalty can also be applied to discourage transfers.
-     */
 
     String start_id; // a street vertex's id
 

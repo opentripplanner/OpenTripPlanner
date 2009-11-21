@@ -79,7 +79,7 @@ otp.planner.Templates = {
         + '<tpl if="toStopId &gt; 0"><p><b>{endTime}</b> Arrive {toDescription}<br/>Stop ID {toStopId}</p></tpl>'
         + '<tpl if="alerts != null && alerts.length &gt; 0">'
         + '<tpl for="alerts">'
-        +   '<p><br/><img src="/images/ui/alert.gif" align="absmiddle"/> '
+        +   '<p><br/><img src="images/ui/alert.gif" align="absmiddle"/> '
         +   '<b>Alert for route {parent.routeNumber}: </b>{.}</p>'
         + '</tpl>'
         + '</tpl>',

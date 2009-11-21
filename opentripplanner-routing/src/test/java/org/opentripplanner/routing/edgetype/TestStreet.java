@@ -12,7 +12,7 @@ import org.geotools.data.shapefile.ShapefileDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.narrative.Narrative;
+import org.opentripplanner.narrative.model.Narrative;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -99,14 +99,14 @@ public class TestStreet extends TestCase {
             }
         }
 
-        Edge garfieldPlBack = eastVertex.getOutgoing().get(0);
+        Edge garfieldPlBack = eastVertex.getOutgoing().iterator().next();
         TraverseOptions toWalk = new TraverseOptions(TraverseMode.WALK);
         assertNotNull(garfieldPlBack.traverse(new State(), toWalk));
         
         TraverseOptions toCar = new TraverseOptions(TraverseMode.CAR);
         assertNull(garfieldPlBack.traverse(new State(), toCar));
         
-        Edge garfieldPl = eastVertex.getIncoming().get(0);
+        Edge garfieldPl = eastVertex.getIncoming().iterator().next();
         assertNotNull(garfieldPl.traverse(new State(), toCar));
         
         

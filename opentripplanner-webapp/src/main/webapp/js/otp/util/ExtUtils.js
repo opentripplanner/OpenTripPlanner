@@ -3,7 +3,7 @@ otp.namespace("otp.util");
 //EXT CONSTANTS
 try
 {
-    Ext.BLANK_IMAGE_URL = '/images/ui/s.gif';
+    Ext.BLANK_IMAGE_URL = 'images/ui/s.gif';
     Ext.form.Field.prototype.msgTarget = 'side';
     Ext.QuickTips.init();
 
@@ -589,7 +589,7 @@ otp.util.ExtUtils = {
           {name: 'id',          mapping: '@id'},
           {name: 'mode',        mapping: '@mode'},
           {name: 'order',       mapping: '@order'},
-          {name: 'routeID',     mapping: 'route/internalNumber'},
+          {name: 'routeID',     mapping: 'route'},
           {name: 'x',           mapping: typeID + 'pos/x'},
           {name: 'y',           mapping: typeID + 'pos/y'},
           {name: 'lat',         mapping: typeID + 'pos/lat'},
@@ -597,7 +597,8 @@ otp.util.ExtUtils = {
           {name: 'description', mapping: typeID + 'description'},
           {name: 'stopId',      mapping: typeID + 'stopId'}, 
           {name: 'areaKey',     mapping: typeID + '@areaKey'},
-          {name: 'areaValue',   mapping: typeID + '@areaValue'}
+          {name: 'areaValue',   mapping: typeID + '@areaValue'},
+          {name: 'geometry',    mapping: typeID + 'geometry', convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); } },
         ]);
         
         return POINT_RECORD;

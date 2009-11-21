@@ -26,10 +26,10 @@ otp.planner.Utils = {
                   {name: 'honoredFare',  mapping: 'fare/special[@id=honored]'},
                   {name: 'youthFare',    mapping: 'fare/special[@id=youth]'},
                   {name: 'tramFare',     mapping: 'fare/special[@id=tram]'},
-                  {name: 'date',         mapping: 'time-distance/date'},
-                  {name: 'duration',     mapping: 'time-distance/duration'},
-                  {name: 'startTime',    mapping: 'time-distance/startTime'},
-                  {name: 'endTime',      mapping: 'time-distance/endTime'},
+                  {name: 'date',         mapping: 'timeDistance/date'},
+                  {name: 'duration',     mapping: 'timeDistance/duration'},
+                  {name: 'startTime',    mapping: 'timeDistance/start'},
+                  {name: 'endTime',      mapping: 'timeDistance/end'},
                   {name: 'numTransfers', mapping: 'time-distance/numberOfTransfers'},
                   {name: 'numLegs',      mapping: 'time-distance/numberOfTripLegs'},
                   {name: 'walkTime',     mapping: 'time-distance/walkingTime'},
@@ -71,7 +71,9 @@ otp.planner.Utils = {
                   {name: 'fromCity',         mapping: 'from/@areaValue'},
                   {name: 'toDescription',    mapping: 'to/description'},
                   {name: 'toStopId',         mapping: 'to/stopId'},
-                  {name: 'toCity',           mapping: 'to/@areaValue'}
+                  {name: 'toCity',           mapping: 'to/@areaValue'},
+                  {name: 'leg-geometry',         mapping: 'legGeometry',
+                	                         convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); } },
     ]),
 
     /**

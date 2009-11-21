@@ -7,24 +7,24 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /* This represents the connection between a street vertex and a transit vertex
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink extends AbstractEdge {
+public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
+    private static GeometryFactory _geometryFactory = new GeometryFactory();
+    
     boolean isBoarding;
     
     public StreetTransitLink(Vertex fromv, Vertex tov, boolean isBoarding) {
         super(fromv, tov);
         this.isBoarding = isBoarding;
     }
-    
-    /*
-     * Models traveling between a station adjacent to the street and the street itself. Returns a clone of the state unaltered.
-     */
 
     private static final long serialVersionUID = -3311099256178798981L;
 
@@ -41,13 +41,13 @@ public class StreetTransitLink extends AbstractEdge {
         return null;
     }
 
-    public Geometry getGeometry() {
-        return null;
+    public LineString getGeometry() {
+        Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate()};
+        return _geometryFactory.createLineString(coordinates);
     }
 
     public TransportationMode getMode() {
-        // TODO Auto-generated method stub
-        return null;
+        return TransportationMode.WALK;
     }
 
     public String getName() {

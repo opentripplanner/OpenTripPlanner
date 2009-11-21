@@ -4,13 +4,13 @@ import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.StreetLocationFinder;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -59,19 +59,19 @@ public class TestHalfEdges extends TestCase {
         Vertex br = graph.addVertex("br", -73, 40);
         br.setType(Intersection.class);
 
-        double td = GtfsLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
+        double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
         top = new Street(tl, tr, td);
         top.setGeometry(createGeometry(tl, tr));
         graph.addEdge(top);
 
-        double bd = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, br
+        double bd = DistanceLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, br
                 .getCoordinate().y, br.getCoordinate().x);
         bottom = new Street(bl, br, bd);
         bottom.setGeometry(createGeometry(bl, br));
         graph.addEdge(bottom);
 
-        double d = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, tl
+        double d = DistanceLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, tl
                 .getCoordinate().y, tl.getCoordinate().x);
 
         leftDown = new Street(tl, bl, d);

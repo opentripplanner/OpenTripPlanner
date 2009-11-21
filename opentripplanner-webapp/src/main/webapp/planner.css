@@ -58,58 +58,58 @@ div.olControlMousePosition {
 
 /* buttons */
 .clear-button {
-    background-image:url(/images/ui/buttons/clear.gif)  !important;
+    background-image:url(images/ui/buttons/clear.gif)  !important;
 }
 .print-button {
-    background-image:url(/images/ui/buttons/print.gif)  !important;
+    background-image:url(images/ui/buttons/print.gif)  !important;
 }
 .feedback-button {
-    background-image:url(/images/ui/buttons/feedback.gif)  !important;
+    background-image:url(images/ui/buttons/feedback.gif)  !important;
 }
 .fullScreen-button {
-    background-image:url(/images/ui/buttons/fullscreen.gif)  !important;
+    background-image:url(images/ui/buttons/fullscreen.gif)  !important;
 }
 .measure-button {
-    background-image:url(/images/ui/buttons/measure.gif)  !important;
+    background-image:url(images/ui/buttons/measure.gif)  !important;
 }
 .reverse-button {
-   background-image: url(/images/ui/buttons/reverse.png) !important;
+   background-image: url(images/ui/buttons/reverse.png) !important;
 }
 .edit-button {
-   background-image: url(/images/ui/buttons/edit.png) !important;
+   background-image: url(images/ui/buttons/edit.png) !important;
 }
 
 button.home {
-   background-image: url(/images/ui/buttons/logoSmall.gif);
+   background-image: url(images/ui/buttons/logoSmall.gif);
    background-repeat: no-repeat;
 }
 
 /* context menu */ 
 .cFromHere {
-    background: transparent url(/images/ui/buttons/from_here.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/from_here.png) no-repeat scroll 0%;
 }
 .cToHere {
-    background: transparent url(/images/ui/buttons/to_here.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/to_here.png) no-repeat scroll 0%;
 }
 .cCenterMap {
-    background: transparent url(/images/ui/buttons/center.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/center.png) no-repeat scroll 0%;
 }
 .cZoomIn {
-    background: transparent url(/images/ui/buttons/zoom_in.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/zoom_in.png) no-repeat scroll 0%;
 }
 .cZoomOut {
-    background: transparent url(/images/ui/buttons/zoom_out.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/zoom_out.png) no-repeat scroll 0%;
 }
 .cPrevious {
-    background: transparent url(/images/ui/buttons/previous.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/previous.png) no-repeat scroll 0%;
 }
 .cNext {
-    background: transparent url(/images/ui/buttons/next.png) no-repeat scroll 0%;
+    background: transparent url(images/ui/buttons/next.png) no-repeat scroll 0%;
 }
 
 
 .planner-panel {
-    background-image:url(/images/ui/buttons/tripplaner.gif) !important;
+    background-image:url(images/ui/buttons/tripplaner.gif) !important;
 }
 
 #trip-details {
@@ -174,7 +174,7 @@ button.home {
 
 /* FRANK ADDED schedules.css OVERRIDE */
 .duration {
-    background-image:url(/images/ui/trip/tdots.gif) !important;
+    background-image:url(images/ui/trip/tdots.gif) !important;
     background-repeat: no-repeat;
     background-position:left center;
     color:#888888;
@@ -229,7 +229,7 @@ img.x-tree-node-icon, img.x-tree-ec-icon {margin:0px 7px 0px 0px !important;}
 }
 
 .x-tree-node div.itinys-node{
-    background:#eee url(/images/ui/bg.gif) repeat-x;
+    background:#eee url(images/ui/bg.gif) repeat-x;
     margin-top:1px;
     border-top:1px solid #ddd;
     border-bottom:1px solid #ccc;
@@ -269,8 +269,8 @@ img.x-tree-node-icon, img.x-tree-ec-icon {margin:0px 7px 0px 0px !important;}
 /*.itiny-node  {padding: 7px;}*/
 .itiny .x-tree-ec-icon {display:none;}
 
-.new-tab {background-image:url(/images/ui/trip/triangle.png) !important;}
-.load-icon {background-image:url(/images/ui/trip/triangle.png) !important;}
+.new-tab {background-image:url(images/ui/trip/triangle.png) !important;}
+.load-icon {background-image:url(images/ui/trip/triangle.png) !important;}
 
 li.x-tree-node{margin:0px;padding:0px;}
 
@@ -278,25 +278,25 @@ li.x-tree-node{margin:0px;padding:0px;}
 {padding:0px!important;border:0!important;}
 
 .itinys-icon {display: none; visibility: collapse;}
-.start-icon {background-image:url(/images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
-.end-icon {background-image:url(/images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
-.bus-icon {background-image:url(/images/ui/trip/mode/bus.gif) !important;float:left;width:16px!important;height:17px!important;}
-.ltrail-icon {background-image:url(/images/ui/trip/mode/rail.gif) !important;float:left;}
-.commrail-icon {background-image:url(/images/ui/trip/mode/cr.gif) !important;float:left;}
-.tram-icon {background-image:url(/images/ui/trip/mode/tram.gif) !important;float:left;}
-.streetcar-icon {background-image:url(/images/ui/trip/mode/streetcar.gif) !important;float:left;}
-.walk-icon {background-image:url(/images/ui/trip/mode/walk.gif) !important;float:left;}
+.start-icon {background-image:url(images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
+.end-icon {background-image:url(images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
+.bus-icon {background-image:url(images/ui/trip/mode/bus.gif) !important;float:left;width:16px!important;height:17px!important;}
+.ltrail-icon {background-image:url(images/ui/trip/mode/rail.gif) !important;float:left;}
+.commrail-icon {background-image:url(images/ui/trip/mode/cr.gif) !important;float:left;}
+.tram-icon {background-image:url(images/ui/trip/mode/tram.gif) !important;float:left;}
+.streetcar-icon {background-image:url(images/ui/trip/mode/streetcar.gif) !important;float:left;}
+.walk-icon {background-image:url(images/ui/trip/mode/walk.gif) !important;float:left;}
 .x-tree-elbow-minus, .x-tree-elbow-plus	{float: left;}
 
 .x-tree-no-lines .x-tree-elbow-minus {
   vertical-align: top;
   background-position:1pt 50%;
-  background-image:url(/images/ui/buttons/zip-minus.gif);
+  background-image:url(images/ui/buttons/zip-minus.gif);
 }
 .x-tree-no-lines .x-tree-elbow-plus {
   vertical-align: top;
   background-position:1pt 50%;
-  background-image:url(/images/ui/buttons/zip-plus.gif);
+  background-image:url(images/ui/buttons/zip-plus.gif);
 }
 
 
@@ -316,7 +316,7 @@ li.x-tree-node{margin:0px;padding:0px;}
 }
 .x-grid3-td-title .topic {
     padding-left:20px;
-    background:transparent url(/images/ui/bg.gif) no-repeat 0 2px;
+    background:transparent url(images/ui/bg.gif) no-repeat 0 2px;
 }
 .x-grid3-td-title .x-grid3-cell-inner {
     white-space:normal;
@@ -329,7 +329,7 @@ li.x-tree-node{margin:0px;padding:0px;}
     text-decoration:underline;
 }
 .details .x-btn-text {
-    background-image: url(/images/ui/bg.gif);
+    background-image: url(images/ui/bg.gif);
 }
 
 .x-grid3-row-body p {
@@ -340,7 +340,7 @@ li.x-tree-node{margin:0px;padding:0px;}
     background:transparent;
 }
 body.x-border-layout-ct {
-    background:#EBEEF4 url(/images/ui/bg.gif) repeat-x left top !important;
+    background:#EBEEF4 url(images/ui/bg.gif) repeat-x left top !important;
 }
 .x-layout-split {
     background-color:transparent !important;

@@ -11,12 +11,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
-public class Street extends AbstractEdge {
-    
-    /*
-     * Models traveling between two points on a street. Increments the travel state by a time determined from the street length and
-     * the traverse options speed.
-     */
+public class Street extends AbstractEdge implements WalkableEdge {
 
     private static final long serialVersionUID = -3215764532108343102L;
 
@@ -47,6 +42,13 @@ public class Street extends AbstractEdge {
         this.permission = StreetTraversalPermission.ALL;
     }
 
+    public Street(Vertex start, Vertex end, String id, String name, double length, StreetTraversalPermission permission) {
+        super(start, end);
+        this.id = id;
+        this.name = name;
+        this.length = length;
+        this.permission = permission;
+    }
     public void setGeometry(LineString g) {
         geometry = g;
     }

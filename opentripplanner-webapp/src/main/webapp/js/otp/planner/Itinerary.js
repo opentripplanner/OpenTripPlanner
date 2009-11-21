@@ -248,28 +248,39 @@ otp.planner.Itinerary = {
     {
         console.log("enter Itinerary.makeRouteLines");
 
-        // step 1: build the URL to Guy's Geo Service
-        var param  = null;
-        var endIndex = this.m_legStore.getCount();
-        for (var i = 0; i < endIndex; i++) 
+        var vectors  = new Array();
+        
+        var endIndex = this.m_fromStore.getCount() - 1;
+        for(var i = 0; i <= endIndex; i++) 
         {
-            // we're looping thru the legs, looking for params to the route segment 
-            // geo service...we'll build up the parameter to that service
+            var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
-            var url = leg.get('urlParam');
-            if(url != null && url.length > 0)
+            
+            var mode = from.get('mode');
+            if(mode == 'Bus') 
             {
-                if(param == null)
-                    param = url;
-                else
-                    param = param + ";" + url;
+                try
+                {
+                	var geoLine = new OpenLayers.Feature.Vector(leg.get('leg-geometry'),
+                			null,
+                			otp.util.OpenLayersUtils.RED_STYLE);
+                			
+                    var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
+                    vectors.push(geoLine);
+                }
+                catch(e)
+                {
+                    console.log("exception Itinerary.makeRouteLines " + e);
+                }
             }
         }
-
-        // step 2: call the Geo Service via AJAX
-        // NOTE: this call will make a call back to concatVectors(OpenLayers.Vector) to cache the line
-        var url = this.geoURL + "?bksTsIDeTeID=" + param;
-        otp.util.OpenLayersUtils.drawLinesViaAjax(url, vLayer, this.lineStyle, this);
+      
+        if(vectors.length > 0)
+        {
+            this.concatVectors(vectors);
+            if(vLayer)
+                vLayer.addFeatures(vectors);
+        }
 
         console.log("exit Itinerary.makeRouteLines");
     },
@@ -284,17 +295,24 @@ otp.planner.Itinerary = {
         console.log("enter Itinerary.makeWalkLines");
 
         var vectors  = new Array();
+        
         var endIndex = this.m_fromStore.getCount() - 1;
         for(var i = 0; i <= endIndex; i++) 
         {
             var from = this.m_fromStore.getAt(i);
+            var leg = this.m_legStore.getAt(i);
+            
             var mode = from.get('mode');
             if(mode == 'Walk') 
             {
                 try
                 {
+                	var geoLine = new OpenLayers.Feature.Vector(leg.get('leg-geometry'),
+                			null,
+                			otp.util.OpenLayersUtils.BLACK_DASH_STYLE);
+                			
                     var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
-                    vectors.push(newLine);
+                    vectors.push(geoLine);
                 }
                 catch(e)
                 {
@@ -328,28 +346,30 @@ otp.planner.Itinerary = {
 
             // do the FROM marker 
             var from = this.m_fromStore.getAt(startIndex);
+            var fromP = from.get('geometry');
             var mode = from.get('mode');
             if(mode != 'Walk') 
             {
                 // if the first leg isn't a walk, then assume it's a tranist leg
                 // so paint the route icon (eg: fromStore.getAt(0))
                 startIndex = 0;
-                otp.util.OpenLayersUtils.makeFromMarker(from.get('x'), from.get('y'), this.m_markers);
+                otp.util.OpenLayersUtils.makeFromMarker(fromP.x, fromP.y, this.m_markers);
             }
             else
             {
                 // first leg is a walk leg, so mark this point with the from icon that has the walking guy, and move on to next leg in store...
                 startIndex = 1;
-                otp.util.OpenLayersUtils.makeFromWalkingMarker(from.get('x'), from.get('y'), this.m_markers);
+                otp.util.OpenLayersUtils.makeFromWalkingMarker(fromP.x, fromP.y, this.m_markers);
             }
 
             // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
             var walk = this.m_fromStore.getAt(endIndex);
+            var walkP = walk.get('geometry');
             var mode = walk.get('mode');
             if(mode == 'Walk')
             {
                 endIndex--;
-                otp.util.OpenLayersUtils.makeWalkMarker(walk.get('x'), walk.get('y'), this.m_markers);
+                otp.util.OpenLayersUtils.makeWalkMarker(walkP.x, walkP.y, this.m_markers);
             }
 
             // save the list of routes for this itinerary the first time around
@@ -367,6 +387,9 @@ otp.planner.Itinerary = {
                 var to    = this.m_toStore.getAt(i);
                 var thru  = from.get('order')
                 var route = from.get('routeID');
+                
+                var fromP = from.get('geometry');
+                var toP = to.get('geometry');
 
                 // save the route number off (eg: used to show vehicles on the map for these routes, etc...)
                 if(doRoutes && route != null && route.length > 0)
@@ -375,17 +398,18 @@ otp.planner.Itinerary = {
                 // only show the route bubble if we're drawing the begining of the block (eg not a thru route transfer / stay on bus)
                 if(thru == null || thru != 'thru-route')
                 {
-                    otp.util.OpenLayersUtils.makeDiskMarker(from.get('x'),  from.get('y'), this.m_markers);
-                    otp.util.OpenLayersUtils.makeRouteMarker(from.get('x'), from.get('y'), route, this.m_markers);
+                    otp.util.OpenLayersUtils.makeDiskMarker(fromP.x,  fromP.y, this.m_markers);
+                    otp.util.OpenLayersUtils.makeRouteMarker(fromP.x, fromP.y, route, this.m_markers);
                 }
 
                 // put a disk at the end of this route segment
-                otp.util.OpenLayersUtils.makeDiskMarker(to.get('x'), to.get('y'), this.m_markers);
+                otp.util.OpenLayersUtils.makeDiskMarker(toP.x, toP.y, this.m_markers);
             }
 
             // do the TO (end) marker 
             var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
-            otp.util.OpenLayersUtils.makeToMarker(to.get('x'), to.get('y'), this.m_markers);
+            var toP = to.get('geometry');
+            otp.util.OpenLayersUtils.makeToMarker(toP.x, toP.y, this.m_markers);
         }
         catch(e)
         {

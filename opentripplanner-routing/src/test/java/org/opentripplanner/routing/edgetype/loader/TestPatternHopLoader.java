@@ -53,7 +53,7 @@ public class TestPatternHopLoader extends TestCase {
             assertEquals(PatternBoard.class, e.getClass());
         }
 
-        Vertex journey_a_1 = stop_a.getOutgoing().get(0).getToVertex();
+        Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
@@ -143,7 +143,6 @@ public class TestPatternHopLoader extends TestCase {
 
     public Edge getHopOut(Vertex v) {
 
-        Edge hop = null;
         for (Edge e : v.getOutgoing()) {
             if (e instanceof PatternBoard) {
                 for (Edge f : e.getToVertex().getOutgoing()) {

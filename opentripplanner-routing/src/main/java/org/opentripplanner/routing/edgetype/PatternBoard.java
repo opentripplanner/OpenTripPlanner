@@ -14,12 +14,6 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class PatternBoard extends AbstractEdge {
-    
-    /**
-     *  Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station on vehicle. When traversed forward,
-     *  the the resultant state has the time of the next departure, in addition the pattern that was boarded. When traversed backward, 
-     *  the result state is unchanged. An boarding penalty can also be applied to discourage transfers.
-     */
 
     private static final long serialVersionUID = 1042740795612978747L;
 

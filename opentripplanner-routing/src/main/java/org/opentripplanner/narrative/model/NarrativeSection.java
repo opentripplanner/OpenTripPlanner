@@ -1,20 +1,20 @@
-package org.opentripplanner.narrative;
+package org.opentripplanner.narrative.model;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TransportationMode;
-import org.opentripplanner.routing.edgetype.Hop;
-import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.HoppableEdge;
 import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.WalkableEdge;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.operation.linemerge.LineMerger;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * A narrative section represents the portion of a trip which takes place on a single conveyance.
@@ -24,6 +24,9 @@ import com.vividsolutions.jts.operation.linemerge.LineMerger;
  * the Prince St station to the final destination.
  */
 public class NarrativeSection {
+    
+    private static GeometryFactory _geometryFactory = new GeometryFactory();
+    
     public Vector<NarrativeItem> items;
 
     TransportationMode mode;
@@ -76,53 +79,35 @@ public class NarrativeSection {
         items = new Vector<NarrativeItem>();
         Edge graphEdge = edges.firstElement().payload;
         mode = graphEdge.getMode();
-        direction = graphEdge.getDirection();
-        
-        LineMerger merger = new LineMerger();
-        GeometryFactory factory = null;
-        for (SPTEdge edge : edges) {
-            
-            Geometry geom = edge.payload.getGeometry();
-            if (geom != null) {
-                merger.add(geom);
-                factory = geom.getFactory();
-            }
+        geometry = graphEdge.getGeometry();
+        for (SPTEdge edge : edges.subList(1, edges.size())) {
+            geometry = joinGeometries(geometry,edge.payload.getGeometry());
         }
-        if (factory != null) {
-            Collection collection = merger.getMergedLineStrings();
-            geometry = factory.buildGeometry(collection);
-        }
-        if (graphEdge instanceof Hop || graphEdge instanceof PatternHop) {
+
+        if (graphEdge instanceof HoppableEdge) {
             name = graphEdge.getName();
             direction = graphEdge.getDirection();
             BasicNarrativeItem item = new BasicNarrativeItem();
             item.setDirection(graphEdge.getDirection());
             item.setName(graphEdge.getName());
             String end = graphEdge.getEnd();
+            Geometry geom = graphEdge.getGeometry();
 
             double totalDistance = graphEdge.getDistance();
-            merger = new LineMerger();
             for (SPTEdge edge : edges.subList(1, edges.size())) {
                 graphEdge = edge.payload;
                 totalDistance += graphEdge.getDistance();
-                Geometry geom = edge.payload.getGeometry();
-                if (geom != null) {
-                    merger.add(geom);
-                    factory = geom.getFactory();
-                }
+                geom = geom.union(graphEdge.getGeometry());
                 end = graphEdge.getEnd();
             }
-            if (factory != null) {
-                Collection collection = merger.getMergedLineStrings();
-                item.setGeometry(factory.buildGeometry(collection));
-            }
+            item.setGeometry(geom);
             item.setDistance(totalDistance);
             item.setEnd(end);
             items.add(item);
-        } else if (graphEdge instanceof Street) {
+        } else if (graphEdge instanceof WalkableEdge) {
             name = "walk";
-            Street street1 = (Street) edges.firstElement().payload;
-            Street street2 = (Street) edges.lastElement().payload;
+            WalkableEdge street1 = (WalkableEdge) edges.firstElement().payload;
+            WalkableEdge street2 = (WalkableEdge) edges.lastElement().payload;
             direction = Street.computeDirection(street1.getGeometry().getStartPoint(), street2
                     .getGeometry().getEndPoint());
 
@@ -150,10 +135,42 @@ public class NarrativeSection {
         }
     }
 
-    public String toString() {
+
+    public String asText() {
         if (mode == TransportationMode.TRANSFER) {
             return "transfer";
         }
         return direction + " on " + name + " via " + mode + "(" + items.size() + " items)";
     }
+    
+    private Geometry joinGeometries(Geometry g1, Geometry g2){
+        
+        // TODO - Maybe there is a better way of doing this?
+        if( (g1 instanceof LineString) && (g2 instanceof LineString) ) {
+            LineString ls1 = (LineString) g1;
+            LineString ls2 = (LineString) g2;
+            
+            Coordinate[] from = ls1.getCoordinates();
+            Coordinate[] to = ls2.getCoordinates();
+            
+            if( from.length == 0)
+                return g2;
+            
+            if( to.length == 0)
+                return g1;
+            
+            Coordinate prevPoint = from[from.length-1];
+            Coordinate nextPoint = to[0];
+            
+            if( prevPoint.x == nextPoint.x && prevPoint.y == nextPoint.y ) {
+                Coordinate[] joint = new Coordinate[from.length + to.length -1];
+                System.arraycopy(from, 0, joint, 0, from.length);
+                System.arraycopy(to, 0, joint, from.length - 1, to.length);
+                return _geometryFactory.createLineString(joint);
+            }
+        }
+        
+        return g1.union(g2);
+    }
+
 }

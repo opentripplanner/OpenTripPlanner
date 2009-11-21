@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -17,13 +18,11 @@ public class TraverseOptions {
 
     public double transferPenalty = 600;
 
-    private GtfsContext _context;
-
     public Calendar calendar;
 
     private CalendarService calendarService;
 
-    private Map<AgencyAndId, Set<Date>> serviceDatesByServiceId;
+    private Map<AgencyAndId, Set<Date>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -39,19 +38,19 @@ public class TraverseOptions {
 
     public TraverseOptions(GtfsContext context) {
         this();
-        _context = context;
-        calendarService = context.getCalendarService();
-        serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
-    }
-
-    public GtfsContext getGtfsContext() {
-        return _context;
+        setGtfsContext(context);
     }
 
     public void setGtfsContext(GtfsContext context) {
-        _context = context;
         calendarService = context.getCalendarService();
-        serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
+    }
+    
+    public void setCalendarService(CalendarServiceImpl calendarService) {
+        this.calendarService = calendarService;
+    }
+    
+    public CalendarService getCalendarService() {
+        return calendarService;
     }
 
     public boolean serviceOn(AgencyAndId serviceId, Date serviceDate) {
@@ -62,4 +61,6 @@ public class TraverseOptions {
         }
         return dates.contains(serviceDate);
     }
+
+
 }

@@ -23,7 +23,7 @@ try
     // WMS -- I avoid pink tiles, baby
     OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
     OpenLayers.Util.onImageLoadErrorColor = "";
-    OpenLayers.ImgPath = "/images/map/controls/";
+    OpenLayers.ImgPath = "images/map/controls/";
 } 
 catch (e) 
 {
@@ -305,12 +305,12 @@ otp.util.OpenLayersUtils = {
     RTE_ICON_SIZE   : new OpenLayers.Size(105, 34),
     RTE_ICON_OFFSET : new OpenLayers.Pixel(0, -34),  
 
-    FROM_WALK_ICON  : '/images/map/trip/start-walk.png',
-    FROM_ICON       : '/images/map/trip/start.png',
-    TO_ICON         : '/images/map/trip/end.png',
-    DISK_ICON       : '/images/map/trip/xferdisk.png',
-    WALK_ICON       : '/images/map/trip/mode/walk.png',
-    ROUTE_DIR       : '/images/map/trip/rte/',
+    FROM_WALK_ICON  : 'images/map/trip/start-walk.png',
+    FROM_ICON       : 'images/map/trip/start.png',
+    TO_ICON         : 'images/map/trip/end.png',
+    DISK_ICON       : 'images/map/trip/xferdisk.png',
+    WALK_ICON       : 'images/map/trip/mode/walk.png',
+    ROUTE_DIR       : 'images/map/trip/rte/',
 
     ST_END_SIZE     : new OpenLayers.Size(20, 34),
     ST_END_OFFSET   : new OpenLayers.Pixel(-10, -34),
@@ -723,6 +723,11 @@ otp.util.OpenLayersUtils = {
         {
             
         }
+    },
+    
+    geo_json_converter: function(n,p) {
+    	var formatter = new OpenLayers.Format.GeoJSON();
+    	return formatter.read(n,'Geometry');
     },
 
     CLASS_NAME: "otp.util.OpenLayersUtils"

@@ -16,7 +16,7 @@ otp.planner.StaticForms = {
     contextMenu      : null,
     poi              : null,
 
-    url              : '/plan',
+    url              : '/opentripplanner-api-webapp/ws/plan',
 
     // forms & stores
     m_panel          : null,

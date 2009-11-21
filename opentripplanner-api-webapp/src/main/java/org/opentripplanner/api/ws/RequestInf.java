@@ -7,14 +7,14 @@ import javax.ws.rs.core.MediaType;
 public interface RequestInf {
 
     public static enum ModeType {
-        walk, bus, train, bike
+        Walk, bus, train, bike
     }
     public static enum OptimizeType {
         transfers, quick, flat
     }
 
-    public static String FROM = "from";
-    public static String TO = "to";
+    public static String FROM = "fromPlace";
+    public static String TO = "toPlace";
     public static String DATE = "date";
     public static String TIME = "time";
 

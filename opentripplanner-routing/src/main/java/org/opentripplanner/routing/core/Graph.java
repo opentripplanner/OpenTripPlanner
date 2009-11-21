@@ -3,12 +3,15 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
 
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
+    
+    private Map<Class<?>,Object> _services = new HashMap<Class<?>, Object>();
 
     HashMap<String, Vertex> vertices;
 
@@ -88,6 +91,20 @@ public class Graph implements Serializable {
                 }
             }
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T putService(Class<T> serviceType, T service) {
+        return (T) _services.put(serviceType, service);
+    }
+    
+    public boolean hasService(Class<?> serviceType) {
+        return _services.containsKey(serviceType);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public <T> T getService(Class<T> serviceType) {
+        return (T) _services.get(serviceType);
     }
 
 }

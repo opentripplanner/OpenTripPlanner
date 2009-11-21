@@ -2,7 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.util.Vector;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -46,7 +46,7 @@ public class GenericVertex implements Vertex {
     
 
     public double distance(Coordinate c) {
-        return GtfsLibrary.distance(getY(), getX(), c.y, c.x);
+        return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
     }
 
     public Coordinate getCoordinate() {
@@ -111,12 +111,12 @@ public class GenericVertex implements Vertex {
     }
 
     @Override
-    public Class getType() {
+    public Class<?> getType() {
         return type;
     }
 
     @Override
-    public void setType(Class type) {
+    public void setType(Class<?> type) {
         this.type = type;
     }
 

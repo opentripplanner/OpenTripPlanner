@@ -2,7 +2,6 @@ package org.opentripplanner.routing.edgetype.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +16,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
@@ -25,7 +25,6 @@ import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +32,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LengthIndexedLine;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -100,8 +98,19 @@ public class GTFSPatternHopFactory {
 
         HashMap<StopPattern2, TripPattern> patterns = new HashMap<StopPattern2, TripPattern>();
 
+        int index = 0;
+        
         for (Trip trip : trips) {
+            
+            if( index % 1000 == 0)
+                _log.debug("trips=" + index + "/" + trips.size());
+            index++;
+            
             List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+            
+            if( stopTimes.isEmpty() )
+                continue;
+            
             StopPattern2 stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
             int lastStop = stopTimes.size() - 1;
@@ -299,7 +308,8 @@ public class GTFSPatternHopFactory {
                             coords.add(c);
                         }
                         prev = point;
-                        point = it.next();
+                        if( it.hasNext())
+                            point = it.next();
                     } while (it.hasNext());
                     break;
                 }
@@ -307,7 +317,11 @@ public class GTFSPatternHopFactory {
             }
             GeometryFactory factory = new GeometryFactory();
             if (coords.size() < 2) {
-                throw new RuntimeException("Not enough points when interpolating geometry by shape_dist_traveled");
+                Coordinate p0 = new Coordinate(st0.getStop().getLon(),st0.getStop().getLat());
+                Coordinate p1 = new Coordinate(st1.getStop().getLon(),st1.getStop().getLat());
+                return factory.createLineString(new Coordinate[] { p0, p1 } );
+                // TODO Not all feeds are going to have Shape data... 
+                // throw new RuntimeException("Not enough points when interpolating geometry by shape_dist_traveled");
             }
             return factory.createLineString(coords.toArray(new Coordinate[0]));
         }

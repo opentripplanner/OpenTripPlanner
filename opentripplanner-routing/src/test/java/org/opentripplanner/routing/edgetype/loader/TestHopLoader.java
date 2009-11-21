@@ -50,7 +50,7 @@ public class TestHopLoader extends TestCase {
             assertEquals(Board.class, e.getClass());
         }
 
-        Vertex journey_a_1 = stop_a.getOutgoing().get(0).getToVertex();
+        Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
