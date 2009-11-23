@@ -65,7 +65,6 @@ public class StreetLocationFinder {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
-
             nearby = intersections.query(envelope);
 
             Collections.sort(nearby, new Comparator<Vertex>() {
@@ -75,7 +74,6 @@ public class StreetLocationFinder {
                 }
 
             });
-
             for (Vertex a : nearby) {
                 for (Vertex b : nearby) {
                     if (a == b) {
@@ -112,5 +110,4 @@ public class StreetLocationFinder {
         }
         return null;
     }
-    
 }

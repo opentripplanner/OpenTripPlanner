@@ -99,18 +99,6 @@ public class TestHalfEdges extends TestCase {
         Vertex bl = new Vertex("bl", -74, 40);
         Vertex br = new Vertex("bl", -73, 40);
 
-        double td = GtfsLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr.getCoordinate().y, tr.getCoordinate().x);
-        graph.addEdge(tl, tr, new Street(td));
-        double bd = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, br.getCoordinate().y, br.getCoordinate().x);
-        graph.addEdge(bl, br, new Street(bd));
-
-        double d = GtfsLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, tl.getCoordinate().y, tl.getCoordinate().x);
-        graph.addEdge(tl, bl, new Street(d));
-        Edge startEdge = graph.addEdge(bl, tl, new Street(d));
-        
-        graph.addEdge(tr, br, new Street(d));
-        Edge endEdge = graph.addEdge(br, tr, new Street(d));
-        
         StreetLocation start = new StreetLocation(startEdge, 0.6, false);
         StreetLocation end = new StreetLocation(endEdge, 0.8, true);
         // the shortest half-edge from the start vertex takes you down, but the shortest total path

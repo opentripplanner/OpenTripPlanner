@@ -11,6 +11,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class StreetLocation {
     /*
      * Represents a location on a street, somewhere between the two end points. This is used when
+<<<<<<< refs/remotes/trunk:opentripplanner-routing/src/main/java/org/opentripplanner/routing/location/StreetLocation.java
      * computing the first and last segments of a trip, for trips that start between two
      * intersections.
      */
