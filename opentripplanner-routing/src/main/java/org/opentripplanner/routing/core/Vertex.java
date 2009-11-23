@@ -3,8 +3,6 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Vector;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface Vertex extends Serializable {
@@ -29,7 +27,9 @@ public interface Vertex extends Serializable {
 
     public void setX(double x);
 
-    public double getX();   
+    public double getX();
+
+    public void setY(double y);
 
     public double getY();
 

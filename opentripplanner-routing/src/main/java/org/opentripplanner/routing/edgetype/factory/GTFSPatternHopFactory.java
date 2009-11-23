@@ -21,10 +21,8 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
@@ -130,49 +128,34 @@ public class GTFSPatternHopFactory {
                     Stop s0 = st0.getStop();
                     StopTime st1 = stopTimes.get(i + 1);
                     Stop s1 = st1.getStop();
-                    int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                     int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
                     // create journey vertices
+                    Vertex startJourney = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId()),
+                            s0.getLon(), s0.getLat());
+                    Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId()), s1
+                            .getLon(), s1.getLat());
 
-                    Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_"
-                            + id(trip.getId()) + "_D", s0.getLon(), s0.getLat());
-                    Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_"
-                            + id(trip.getId()) + "_A", s1.getLon(), s1.getLat());
-                    Vertex startJourneyArrive;
-                    if (i != 0) {
-                        startJourneyArrive = graph.addVertex(id(s0.getId()) + "_"
-                                + id(trip.getId()) + "_A", s0.getLon(), s0.getLat());
-
-                        PatternDwell dwell = new PatternDwell(startJourneyArrive,
-                                startJourneyDepart, i, tripPattern);
-                        graph.addEdge(dwell);
-                    }
-
-                    PatternHop hop = new PatternHop(startJourneyDepart, endJourneyArrive, s0, s1,
-                            i, tripPattern);
-
+                    PatternHop hop = new PatternHop(startJourney, endJourney, s0, s1, i,
+                            tripPattern);
                     if (geometry != null) {
-                        hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1,
-                                startJourneyDepart, endJourneyArrive));
+                        hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1, startJourney, endJourney));
                     }
-
-                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime, st0
-                            .getArrivalTime(), dwellTime);
+                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime);
                     graph.addEdge(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));
                     Vertex endStation = graph.getVertex(id(s1.getId()));
 
-                    PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart,
+                    PatternBoard boarding = new PatternBoard(startStation, startJourney,
                             tripPattern, i);
                     graph.addEdge(boarding);
-                    graph.addEdge(new Alight(endJourneyArrive, endStation));
+                    graph.addEdge(new Alight(endJourney, endStation));
 
                 }
                 patterns.put(stopPattern, tripPattern);
             } else {
-                int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
+                int insertionPoint = tripPattern.getInsertionPoint(stopTimes.get(0)
                         .getDepartureTime());
                 if (insertionPoint < 0) {
                     // There's already a departure at this time on this trip pattern. This means
@@ -190,11 +173,10 @@ public class GTFSPatternHopFactory {
                     for (int i = 0; i < lastStop; i++) {
                         StopTime st0 = stopTimes.get(i);
                         StopTime st1 = stopTimes.get(i + 1);
-                        int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                         try {
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                    runningTime, st0.getArrivalTime(), dwellTime);
+                                    runningTime);
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "
@@ -213,10 +195,10 @@ public class GTFSPatternHopFactory {
         }
         loadTransfers(graph);
     }
-
+    
     private void loadTransfers(Graph graph) {
         Collection<Transfer> transfers = _dao.getAllTransfers();
-        Set<org.opentripplanner.routing.edgetype.Transfer> createdTransfers = new HashSet<org.opentripplanner.routing.edgetype.Transfer>();
+        Set<org.opentripplanner.routing.edgetype.Transfer> createdTransfers = new HashSet<org.opentripplanner.routing.edgetype.Transfer>();  
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
@@ -227,8 +209,7 @@ public class GTFSPatternHopFactory {
                 if (t.getTransferType() == 2) {
                     transferTime = t.getMinTransferTime();
                 }
-                org.opentripplanner.routing.edgetype.Transfer edge = new org.opentripplanner.routing.edgetype.Transfer(
-                        fromStation, toStation, transferTime);
+                org.opentripplanner.routing.edgetype.Transfer edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation, toStation, transferTime);
                 if (createdTransfers.contains(edge)) {
                     continue;
                 }
@@ -267,7 +248,7 @@ public class GTFSPatternHopFactory {
         LocationIndexedLine lol = null;
         List<ShapePoint> shapePoints = null;
         if (geometry != null) {
-            shapePoints = _dao.getShapePointsForShapeId(trip.getShapeId());
+            shapePoints  = _dao.getShapePointsForShapeId(trip.getShapeId());
             lol = new LocationIndexedLine(geometry);
         }
         for (int i = 0; i < stopTimes.size() - 1; i++) {
@@ -279,22 +260,17 @@ public class GTFSPatternHopFactory {
             Vertex endStation = graph.getVertex(id(s1.getId()));
 
             // create journey vertices
-            Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getLon(),
-                    s0.getLat());
-            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getLon(),
-                    s0.getLat());
+            Vertex startJourney = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getLon(), s0
+                    .getLat());
             Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + tripId, s1.getLon(), s1
                     .getLat());
 
-            Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);
-            graph.addEdge(dwell);
-            Hop hop = new Hop(startJourneyDepart, endJourney, st0, st1);
+            Hop hop = new Hop(startJourney, endJourney, st0, st1);
             if (geometry != null) {
-                hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1, startJourneyDepart,
-                        endJourney));
+                hop.setGeometry(getHopGeometry(shapePoints, lol, st0, st1, startJourney, endJourney));
             }
             hops.add(hop);
-            Board boarding = new Board(startStation, startJourneyDepart, hop);
+            Board boarding = new Board(startStation, startJourney, hop);
             graph.addEdge(boarding);
             graph.addEdge(new Alight(endJourney, endStation));
 
@@ -314,17 +290,16 @@ public class GTFSPatternHopFactory {
         } else {
             double endDt = st1.getShapeDistTraveled();
 
-            // find the line segment that startDt is in
+            //find the line segment that startDt is in
             ArrayList<Coordinate> coords = new ArrayList<Coordinate>();
-            ShapePoint prev = null;
-            ;
+            ShapePoint prev = null;;
             Iterator<ShapePoint> it = points.iterator();
             while (it.hasNext()) {
                 ShapePoint point = it.next();
                 if (point.getDistTraveled() >= startDt) {
                     Coordinate c = interpolatePoint(startDt, prev, point);
                     coords.add(c);
-                    // now, find end
+                    //now, find end
                     do {
                         if (point.getDistTraveled() < endDt) {
                             coords.add(new Coordinate(point.getLon(), point.getLat()));

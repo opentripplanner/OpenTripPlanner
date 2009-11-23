@@ -92,17 +92,11 @@ public class TestHalfEdges extends TestCase {
     }
 
     public void testHalfEdges() {
-        Graph graph = new Graph();
-        //a 1 degree x 1 degree box
-        Vertex tl = new Vertex("tl", -74, 41);
-        Vertex tr = new Vertex("tr", -73, 41);
-        Vertex bl = new Vertex("bl", -74, 40);
-        Vertex br = new Vertex("bl", -73, 40);
-
-        StreetLocation start = new StreetLocation(startEdge, 0.6, false);
-        StreetLocation end = new StreetLocation(endEdge, 0.8, true);
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
+
+        StreetLocation start = new StreetLocation(leftUp, 0.4, false);
+        StreetLocation end = new StreetLocation(rightUp, 0.8, true);
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
