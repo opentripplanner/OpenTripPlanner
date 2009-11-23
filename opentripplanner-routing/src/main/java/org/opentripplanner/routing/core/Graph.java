@@ -8,6 +8,8 @@ import java.util.Map;
 import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
     
@@ -71,13 +73,12 @@ public class Graph implements Serializable {
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
+        Coordinate c = new Coordinate(lon, lat);
         for (Vertex vv : this.vertices.values()) {
-            if (vv instanceof Locatable) {
-                double dist = ((Locatable) vv).distance(lon, lat);
-                if (dist < minDist) {
-                    ret = vv;
-                    minDist = dist;
-                }
+            double dist = vv.distance(c);
+            if (dist < minDist) {
+                ret = vv;
+                minDist = dist;
             }
         }
         return ret;
