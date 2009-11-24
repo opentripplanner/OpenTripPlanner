@@ -97,7 +97,7 @@ public class NarrativeSection {
             for (SPTEdge edge : edges.subList(1, edges.size())) {
                 graphEdge = edge.payload;
                 totalDistance += graphEdge.getDistance();
-                geom = geom.union(graphEdge.getGeometry());
+                geom = joinGeometries(geom,graphEdge.getGeometry());
                 end = graphEdge.getEnd();
             }
             item.setGeometry(geom);
@@ -169,7 +169,11 @@ public class NarrativeSection {
                 return _geometryFactory.createLineString(joint);
             }
         }
-        
+        if (g1 == null) {
+            return g2;
+        } else if (g2 == null) {
+            return g1;
+        }
         return g1.union(g2);
     }
 
