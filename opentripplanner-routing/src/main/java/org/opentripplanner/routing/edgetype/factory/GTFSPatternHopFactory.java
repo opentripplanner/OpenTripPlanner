@@ -297,7 +297,7 @@ public class GTFSPatternHopFactory {
             hops.add(hop);
             Board boarding = new Board(startStation, startJourneyDepart, hop);
             graph.addEdge(boarding);
-            graph.addEdge(new Alight(endJourney, endStation));
+            graph.addEdge(new Alight(endJourney, endStation, hop));
 
         }
     }

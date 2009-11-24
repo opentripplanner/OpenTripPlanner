@@ -22,7 +22,7 @@ public class Board extends AbstractEdge {
 
     public Hop hop;
 
-    private static final int SECS_IN_DAY = 86400;
+    public static final int SECS_IN_DAY = 86400;
 
     private static final long serialVersionUID = 2L;
 
@@ -76,27 +76,13 @@ public class Board extends AbstractEdge {
         }
 
         State state1 = state0.clone();
-        state1.incrementTimeInSeconds(wait);
+        state1.incrementTimeInSeconds(-wait);
         return new TraverseResult(wait, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        long currentTime = state0.getTime();
-        Date serviceDate = getServiceDate(currentTime, true);
-        int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
-
-        CalendarService service = wo.getCalendarService();
-        if (!service.getServiceDatesForServiceId(hop.getServiceId()).contains(serviceDate))
-            return null;
-
-        int wait = secondsSinceMidnight - hop.getEndStopTime().getArrivalTime();
-        if (wait < 0) {
-            return null;
-        }
-
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait, state1);
+        State s1 = state0.clone();
+        return new TraverseResult(1, s1);
     }
 
     private Date getServiceDate(long currentTime, boolean useArrival) {
