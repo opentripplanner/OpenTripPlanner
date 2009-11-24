@@ -29,8 +29,8 @@ public class RoutingServiceImpl implements RoutingService {
 
         HashMap<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
 
-        ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex, toVertex, state,
-                options, extraEdges);
+        ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex.getLabel(), toVertex.getLabel(), state,
+                options);
         return spt.getPath(toVertex);
     }
 
