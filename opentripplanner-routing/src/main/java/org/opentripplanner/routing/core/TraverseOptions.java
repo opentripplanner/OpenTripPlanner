@@ -29,7 +29,7 @@ public class TraverseOptions {
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        mode = TraverseMode.WALK;
+        mode = TraverseMode.WALK_AND_TRANSIT;
         calendar = Calendar.getInstance();
     }
     
