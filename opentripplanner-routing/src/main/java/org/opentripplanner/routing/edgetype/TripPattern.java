@@ -25,6 +25,8 @@ public final class TripPattern implements Serializable {
 
     private Vector<Integer>[] runningTimes;
 
+    private Vector<Integer>[] arrivalTimes;
+
     private Vector<Integer>[] dwellTimes;
 
     @SuppressWarnings("unchecked")
@@ -33,11 +35,14 @@ public final class TripPattern implements Serializable {
         departureTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
         runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
         dwellTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
+        arrivalTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
 
         for (int i = 0; i < stopTimes.size(); ++i) {
             departureTimes[i] = new Vector<Integer>();
             runningTimes[i] = new Vector<Integer>();
             dwellTimes[i] = new Vector<Integer>();
+            arrivalTimes[i] = new Vector<Integer>();
+            
         }
     }
 
@@ -49,6 +54,7 @@ public final class TripPattern implements Serializable {
             int arrivalTime, int dwellTime) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
+        Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
         Vector<Integer> stopDwellTimes = dwellTimes[stopIndex];
 
         // throw an exception when this departure time is not between the departure times it
@@ -66,6 +72,7 @@ public final class TripPattern implements Serializable {
         }
         stopDepartureTimes.insertElementAt(departureTime, insertionPoint);
         stopRunningTimes.insertElementAt(runningTime, insertionPoint);
+        stopArrivalTimes.insertElementAt(arrivalTime, insertionPoint);
         stopDwellTimes.insertElementAt(dwellTime, insertionPoint);
     }
 
@@ -96,6 +103,24 @@ public final class TripPattern implements Serializable {
         Vector<Integer> stopDepartureTimes = departureTimes[0];
         int index = Collections.binarySearch(stopDepartureTimes, departureTime);
         return -index - 1;
+    }
+
+    public int getPreviousPattern(int stopIndex, int beforeTime) {
+        Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
+        int index = Collections.binarySearch(stopArrivalTimes, beforeTime);
+        if (index == -stopArrivalTimes.size() - 1)
+            return -1;
+
+        if (index >= 0) {
+            return index;
+        } else {
+            return -index - 2;
+        }
+    }
+
+    public int getArrivalTime(int stopIndex, int pattern) {
+        Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
+        return stopArrivalTimes.get(pattern);
     }
 
     public int getDwellTime(int stopIndex, int pattern) {

@@ -14,7 +14,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -55,11 +55,29 @@ public class TestHopLoader extends TestCase {
 
         for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex().getType() == TransitStop.class) {
-                assertEquals(Alight.class, e.getClass());
+                assertEquals(PatternAlight.class, e.getClass());
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }
         }
+    }
+
+    public void testDwell() throws Exception {
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_c = graph.getVertex("agency_C");
+
+        TraverseOptions options = new TraverseOptions(context);
+
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_c
+                .getLabel(),
+                new State(new GregorianCalendar(2009, 8, 7, 8, 0, 0).getTimeInMillis()), options);
+
+        GraphPath path = spt.getPath(stop_c);
+        assertNotNull(path);
+        assertEquals(6, path.vertices.size());
+        long endTime = new GregorianCalendar(2009, 8, 7, 8, 30, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+
     }
 
     public void testRouting() throws Exception {

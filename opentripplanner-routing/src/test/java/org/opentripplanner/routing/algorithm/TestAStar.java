@@ -16,6 +16,8 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
+import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TestAStar extends TestCase {
@@ -36,9 +38,22 @@ public class TestAStar extends TestCase {
 
         GraphPath path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
 
-        GregorianCalendar endTime = new GregorianCalendar(2009, 8, 7, 13, 29);
+        long endTime = new GregorianCalendar(2009, 8, 7, 13, 29).getTimeInMillis();
 
-        assertEquals(path.vertices.lastElement().state.getTime(), endTime.getTimeInMillis());
+        assertEquals(path.vertices.lastElement().state.getTime(), endTime);
+        
+        /* test backwards traversal */
+        options.back = true;
+        spt = AStar.getShortestPathTreeBack(gg, "Caltrain_Millbrae Caltrain",
+                "Caltrain_Mountain View Caltrain", new State(endTime), options);
+
+        path = spt.getPath(gg.getVertex("Caltrain_Millbrae Caltrain"));
+
+        long expectedStartTime = new GregorianCalendar(2009, 8, 7, 12, 39).getTimeInMillis();
+
+        /* note that path is backwards */
+        assertEquals(path.vertices.lastElement().state.getTime(), expectedStartTime);
+
     }
 
     public void testCompareSpeed() throws Exception {

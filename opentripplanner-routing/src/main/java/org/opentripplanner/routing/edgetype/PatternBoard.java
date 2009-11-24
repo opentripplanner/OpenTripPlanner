@@ -15,6 +15,13 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class PatternBoard extends AbstractEdge {
 
+    /**
+     * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
+     * on vehicle. When traversed forward, the the resultant state has the time of the next
+     * departure, in addition the pattern that was boarded. When traversed backward, the result
+     * state is unchanged. An boarding penalty can also be applied to discourage transfers.
+     */
+
     private static final long serialVersionUID = 1042740795612978747L;
 
     private static final long MILLI_IN_DAY = 24 * 60 * 60 * 1000;
@@ -61,7 +68,7 @@ public class PatternBoard extends AbstractEdge {
         return null;
     }
 
-    private TraverseResult computeWait(State state0, TraverseOptions wo, boolean back) {
+    public TraverseResult traverse(State state0, TraverseOptions wo) {
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, wo.calendar);
         Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
@@ -72,18 +79,20 @@ public class PatternBoard extends AbstractEdge {
         AgencyAndId service = pattern.exemplar.getServiceId();
         if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight);
+            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight);
             if (patternIndex >= 0) {
-                wait = pattern.getDepartureTime(stopIndex,patternIndex) - secondsSinceMidnight;
+                wait = pattern.getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
         }
         if (wo.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
-            int yesterdayPatternIndex = pattern.getNextPattern(stopIndex,secondsSinceMidnight - SEC_IN_DAY);
+            int yesterdayPatternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight
+                    - SEC_IN_DAY);
             if (yesterdayPatternIndex >= 0) {
-                int waitYesterday = pattern.getDepartureTime(stopIndex,yesterdayPatternIndex) - (secondsSinceMidnight - SEC_IN_DAY);
+                int waitYesterday = pattern.getDepartureTime(stopIndex, yesterdayPatternIndex)
+                        - (secondsSinceMidnight - SEC_IN_DAY);
                 if (wait < 0 || waitYesterday < wait) {
                     // choose the better time
                     wait = waitYesterday;
@@ -97,16 +106,13 @@ public class PatternBoard extends AbstractEdge {
         }
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
-        state1.incrementTimeInSeconds(back ? -wait : wait);
+        state1.incrementTimeInSeconds(wait);
         return new TraverseResult(wait + BOARD_COST, state1);
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        return computeWait(state0, wo, false);        
-    }
-
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        return computeWait(state0, wo, true);
+        State s1 = state0.clone();
+        return new TraverseResult(1, s1);
     }
 
     private Date getServiceDate(long currentTime, Calendar c) {

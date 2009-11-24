@@ -23,6 +23,7 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -167,7 +168,7 @@ public class GTFSPatternHopFactory {
                     PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart,
                             tripPattern, i);
                     graph.addEdge(boarding);
-                    graph.addEdge(new Alight(endJourneyArrive, endStation));
+                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i + 1));
 
                 }
                 patterns.put(stopPattern, tripPattern);

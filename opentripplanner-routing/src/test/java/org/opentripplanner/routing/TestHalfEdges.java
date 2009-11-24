@@ -113,6 +113,29 @@ public class TestHalfEdges extends TestCase {
 
     }
 
+    public void testHalfEdgesBack() {
+        // the shortest half-edge from the start vertex takes you down, but the shortest total path
+        // is up and over
+
+        StreetLocation start = new StreetLocation(leftUp, 0.4, false);
+        StreetLocation end = new StreetLocation(rightUp, 0.8, true);
+
+        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+
+        ShortestPathTree spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
+                .getTimeInMillis()), new TraverseOptions());
+
+        GraphPath path = spt.getPath(start.vertex);
+        assertNotNull(path);
+
+        // the bottom-left point is not part of the shortest path
+        for (SPTVertex v : path.vertices) {
+            assertNotSame(v.mirror, graph.getVertex("bl"));
+        }
+
+    }
+
+    
     public void testStreetLocationFinder() {
         StreetLocationFinder finder = new StreetLocationFinder(graph);
 

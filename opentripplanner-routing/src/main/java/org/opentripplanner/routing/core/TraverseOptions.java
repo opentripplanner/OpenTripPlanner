@@ -23,6 +23,8 @@ public class TraverseOptions {
     private CalendarService calendarService;
 
     private Map<AgencyAndId, Set<Date>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
+
+    public boolean back = false;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
