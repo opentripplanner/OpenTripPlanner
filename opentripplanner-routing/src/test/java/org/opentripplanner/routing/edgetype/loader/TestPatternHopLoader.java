@@ -94,7 +94,7 @@ public class TestPatternHopLoader extends TestCase {
 
         path = spt.getPath(stop_c);
         assertNotNull(path);
-        assertEquals(5, path.vertices.size());
+        assertEquals(6, path.vertices.size());
 
         // A to D
         spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
@@ -102,14 +102,14 @@ public class TestPatternHopLoader extends TestCase {
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertEquals(8, path.vertices.size());
+        assertEquals(9, path.vertices.size());
 
         spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertEquals(9, path.vertices.size());
+        assertEquals(11, path.vertices.size());
     }
 
     public void testRoutingOverMidnight() throws Exception {
@@ -142,7 +142,6 @@ public class TestPatternHopLoader extends TestCase {
     }
 
     public Edge getHopOut(Vertex v) {
-
         for (Edge e : v.getOutgoing()) {
             if (e instanceof PatternBoard) {
                 for (Edge f : e.getToVertex().getOutgoing()) {

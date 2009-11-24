@@ -15,9 +15,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Hop;
-import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextypes.TransitStop;
@@ -33,7 +32,7 @@ public class TestHopLoader extends TestCase {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSHopLoader hl = new GTFSHopLoader(graph, context);
+        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(graph, context);
         hl.load();
 
     }
@@ -43,11 +42,11 @@ public class TestHopLoader extends TestCase {
         Vertex stop_a = graph.getVertex("agency_A");
         Vertex stop_b = graph.getVertex("agency_B");
 
-        assertEquals(2, stop_a.getDegreeOut());
-        assertEquals(6, stop_b.getDegreeOut());
+        assertEquals(1, stop_a.getDegreeOut());
+        assertEquals(3, stop_b.getDegreeOut());
 
         for (Edge e : stop_a.getOutgoing()) {
-            assertEquals(Board.class, e.getClass());
+            assertEquals(PatternBoard.class, e.getClass());
         }
 
         Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
@@ -58,7 +57,7 @@ public class TestHopLoader extends TestCase {
             if (e.getToVertex().getType() == TransitStop.class) {
                 assertEquals(Alight.class, e.getClass());
             } else {
-                assertEquals(Hop.class, e.getClass());
+                assertEquals(PatternHop.class, e.getClass());
             }
         }
     }
@@ -91,7 +90,7 @@ public class TestHopLoader extends TestCase {
 
         path = spt.getPath(stop_c);
         assertNotNull(path);
-        assertEquals(5, path.vertices.size());
+        assertEquals(6, path.vertices.size());
 
         // A to D
         spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
@@ -99,7 +98,7 @@ public class TestHopLoader extends TestCase {
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertEquals(8, path.vertices.size());
+        assertEquals(9, path.vertices.size());
 
         // A to E
         spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
@@ -107,6 +106,6 @@ public class TestHopLoader extends TestCase {
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertEquals(9, path.vertices.size());
+        assertEquals(11, path.vertices.size());
     }
 }
