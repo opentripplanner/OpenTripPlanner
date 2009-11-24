@@ -20,14 +20,14 @@ public class Alight extends AbstractEdge {
     String end_id; // a street vertex's id
 
     public Hop hop;
-    
+
     private static final long serialVersionUID = 1L;
 
     public Alight(Vertex fromv, Vertex tov, Hop hop) {
         super(fromv, tov);
         this.hop = hop;
     }
-    
+
     public String getDirection() {
         return null;
     }
@@ -51,7 +51,7 @@ public class Alight extends AbstractEdge {
     }
 
     public String getName() {
-        //this text won't be used -- the streetTransitLink or StationEntrance's text will 
+        // this text won't be used -- the streetTransitLink or StationEntrance's text will
         return "alight from vehicle";
     }
 
@@ -65,6 +65,9 @@ public class Alight extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+        if (!wo.transitAllowed()) {
+            return null;
+        }
         long currentTime = s0.getTime();
         Date serviceDate = getServiceDate(currentTime, true);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);

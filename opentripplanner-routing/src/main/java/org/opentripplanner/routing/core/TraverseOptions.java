@@ -64,5 +64,16 @@ public class TraverseOptions {
         return dates.contains(serviceDate);
     }
 
+    public boolean transitAllowed() {
+        switch (mode) {
+        case CAR:
+        case WALK:
+        case BICYCLE:
+            return false;
+        default:
+            return true;
+        }
+    }
+
 
 }

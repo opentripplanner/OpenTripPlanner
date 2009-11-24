@@ -60,7 +60,9 @@ public class Board extends AbstractEdge {
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-
+        if (!wo.transitAllowed()) {
+            return null;
+        }
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, false);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);

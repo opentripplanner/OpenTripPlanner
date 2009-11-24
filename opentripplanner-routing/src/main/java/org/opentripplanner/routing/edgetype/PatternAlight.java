@@ -70,6 +70,9 @@ public class PatternAlight extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
+        if (!wo.transitAllowed()) {
+            return null;
+        }
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, wo.calendar);
         Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
