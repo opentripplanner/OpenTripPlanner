@@ -8,7 +8,6 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.edgetype.loader.ShapefileStreetLoader;
 import org.opentripplanner.routing.spt.SPTEdge;
