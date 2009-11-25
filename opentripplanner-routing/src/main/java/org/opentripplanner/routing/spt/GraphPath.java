@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.spt;
 
+import java.util.Collections;
 import java.util.Vector;
 
 public class GraphPath {
@@ -14,5 +15,15 @@ public class GraphPath {
 
     public String toString() {
         return vertices.toString();
+    }
+
+    public void reverse() {
+        Collections.reverse(vertices);
+        Collections.reverse(edges);
+        for (SPTEdge e: edges) {
+            SPTVertex tmp = e.fromv;
+            e.fromv = e.tov;
+            e.tov = tmp;
+        }
     }
 }

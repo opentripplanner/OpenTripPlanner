@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.spt;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class SPTEdge extends AbstractEdge {
-    
+public class SPTEdge implements Edge {
+
     private static final long serialVersionUID = 1L;
 
     public SPTVertex fromv;
@@ -21,7 +21,6 @@ public class SPTEdge extends AbstractEdge {
     public Edge payload;
 
     SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep) {
-        super(fromv, tov);
         this.fromv = fromv;
         this.tov = tov;
         this.payload = ep;
@@ -78,5 +77,15 @@ public class SPTEdge extends AbstractEdge {
 
     public SPTVertex getFromSPTVertex() {
         return fromv;
+    }
+
+    @Override
+    public Vertex getFromVertex() {
+        return fromv;
+    }
+
+    @Override
+    public Vertex getToVertex() {
+        return tov;
     }
 }

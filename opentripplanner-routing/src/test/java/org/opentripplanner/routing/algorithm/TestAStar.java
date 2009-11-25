@@ -41,7 +41,7 @@ public class TestAStar extends TestCase {
         long endTime = new GregorianCalendar(2009, 8, 7, 13, 29).getTimeInMillis();
 
         assertEquals(path.vertices.lastElement().state.getTime(), endTime);
-        
+
         /* test backwards traversal */
         options.back = true;
         spt = AStar.getShortestPathTreeBack(gg, "Caltrain_Millbrae Caltrain",
@@ -51,8 +51,13 @@ public class TestAStar extends TestCase {
 
         long expectedStartTime = new GregorianCalendar(2009, 8, 7, 12, 39).getTimeInMillis();
 
-        /* note that path is backwards */
-        assertEquals(path.vertices.lastElement().state.getTime(), expectedStartTime);
+        path.reverse();
+
+        SPTVertex start = path.vertices.firstElement();
+        assertEquals(start.state.getTime(), expectedStartTime);
+
+        assertEquals(start, path.edges.firstElement().getFromVertex());
+        assertEquals(start.mirror, path.edges.firstElement().payload.getFromVertex());
 
     }
 
