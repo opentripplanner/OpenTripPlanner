@@ -41,7 +41,7 @@ public class StreetLocationFinder {
     }
 
     @SuppressWarnings("unchecked")
-    public StreetLocation findLocation(final Coordinate c, boolean incoming) {
+    public StreetLocation findLocation(String name, final Coordinate c, boolean incoming) {
         /*
          * Assume c is on a street.
          * 
@@ -91,7 +91,7 @@ public class StreetLocationFinder {
                         if (g.distance(factory.createPoint(c)) < 0.00000001) {
                             LengthIndexedLine l = new LengthIndexedLine(g);
                             double location = l.indexOf(c);
-                            return new StreetLocation(street, location, incoming);
+                            return StreetLocation.createStreetLocation(name, street, location, incoming);
                         }
                     }
                 }

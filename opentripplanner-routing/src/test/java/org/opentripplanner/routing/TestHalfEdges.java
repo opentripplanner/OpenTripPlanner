@@ -95,15 +95,15 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
-        StreetLocation start = new StreetLocation(leftUp, 0.4, false);
-        StreetLocation end = new StreetLocation(rightUp, 0.8, true);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.4, false);
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.8, true);
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
                 .getTimeInMillis()), new TraverseOptions());
 
-        GraphPath path = spt.getPath(end.vertex);
+        GraphPath path = spt.getPath(end);
         assertNotNull(path);
 
         // the bottom-left point is not part of the shortest path
@@ -114,18 +114,15 @@ public class TestHalfEdges extends TestCase {
     }
 
     public void testHalfEdgesBack() {
-        // the shortest half-edge from the start vertex takes you down, but the shortest total path
-        // is up and over
-
-        StreetLocation start = new StreetLocation(leftUp, 0.4, false);
-        StreetLocation end = new StreetLocation(rightUp, 0.8, true);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.8, false);
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.4, true);
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         ShortestPathTree spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
                 .getTimeInMillis()), new TraverseOptions());
 
-        GraphPath path = spt.getPath(start.vertex);
+        GraphPath path = spt.getPath(start);
         assertNotNull(path);
 
         // the bottom-left point is not part of the shortest path
@@ -139,8 +136,8 @@ public class TestHalfEdges extends TestCase {
     public void testStreetLocationFinder() {
         StreetLocationFinder finder = new StreetLocationFinder(graph);
 
-        StreetLocation start = finder.findLocation(new Coordinate(-74.0, 40.4), false);
-        StreetLocation end = finder.findLocation(new Coordinate(-73.0, 40.8), true);
+        StreetLocation start = finder.findLocation("start", new Coordinate(-74.0, 40.4), false);
+        StreetLocation end = finder.findLocation("end", new Coordinate(-73.0, 40.8), true);
 
         if (start.street == leftUp) {
             assertTrue(start.location - 0.4 < 0.00001);
@@ -148,7 +145,7 @@ public class TestHalfEdges extends TestCase {
             assertTrue(start.location - 0.6 < 0.00001);
             assertEquals(leftDown, start.street);
         }
-        assertTrue(start.vertex.getDegreeOut() == 2);
+        assertTrue(start.getDegreeOut() == 2);
 
         if (end.street == rightUp) {
             assertTrue(end.location - 0.2 < 0.00001);
@@ -156,6 +153,6 @@ public class TestHalfEdges extends TestCase {
             assertTrue(end.location - 0.8 < 0.00001);
             assertEquals(rightDown, end.street);
         }
-        assertTrue(end.vertex.getDegreeIn() == 2);
+        assertTrue(end.getDegreeIn() == 2);
     }
 }

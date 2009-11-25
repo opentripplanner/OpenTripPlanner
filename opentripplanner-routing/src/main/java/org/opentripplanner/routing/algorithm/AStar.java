@@ -93,8 +93,7 @@ public class AStar {
         Vertex origin = gg.getVertex(origin_label);
         Vertex target = gg.getVertex(target_label);
 
-        Map<Vertex, Edge> extraEdges = new NullExtraEdges();
-        return getShortestPathTree(gg, origin, target, init, options, extraEdges);
+        return getShortestPathTree(gg, origin, target, init, options);
     }
 
     public static ShortestPathTree getShortestPathTreeBack(Graph gg, String from_label,
@@ -107,38 +106,11 @@ public class AStar {
         Vertex origin = gg.getVertex(origin_label);
         Vertex target = gg.getVertex(target_label);
 
-        Map<Vertex, Edge> extraEdges = new NullExtraEdges();
-        return getShortestPathTreeBack(gg, origin, target, init, options, extraEdges);
-    }
-    
-    public static ShortestPathTree getShortestPathTree(Graph gg, StreetLocation origin,
-            StreetLocation target, State init, TraverseOptions options) {
-
-        Map<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
-
-        Edge toEdge = target.getToEdge();
-        extraEdges.put(target.street.getToVertex(), toEdge);
-        Edge fromEdge = target.getFromEdge();
-        extraEdges.put(target.street.getFromVertex(), fromEdge);
-
-        return getShortestPathTree(gg, origin.vertex, target.vertex, init, options, extraEdges);
+        return getShortestPathTreeBack(gg, origin, target, init, options);
     }
 
-    public static ShortestPathTree getShortestPathTreeBack(Graph gg, StreetLocation origin,
-            StreetLocation target, State init, TraverseOptions options) {
-
-        Map<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
-
-        Edge toEdge = origin.getToEdge();
-        extraEdges.put(origin.street.getToVertex(), toEdge);
-        Edge fromEdge = origin.getFromEdge();
-        extraEdges.put(origin.street.getFromVertex(), fromEdge);
-
-        return getShortestPathTree(gg, origin.vertex, target.vertex, init, options, extraEdges);
-    }
-    
-    private static ShortestPathTree getShortestPathTreeBack(Graph gg, Vertex origin, Vertex target,
-            State init, TraverseOptions options, Map<Vertex, Edge> extraEdges) {
+    public static ShortestPathTree getShortestPathTreeBack(Graph gg, Vertex origin, Vertex target,
+            State init, TraverseOptions options) {
 
         if (origin == null) {
             return null;
@@ -148,6 +120,16 @@ public class AStar {
         origin = target;
         target = tmp;
 
+        Map<Vertex, Edge> extraEdges;
+        if (target instanceof StreetLocation) {
+            extraEdges = new HashMap<Vertex, Edge>();
+            Iterable<Edge> outgoing = target.getOutgoing();
+            for (Edge edge : outgoing) {
+                extraEdges.put(edge.getToVertex(), edge);
+            }
+        } else {
+            extraEdges = new NullExtraEdges();
+        }
         // Return Tree
         ShortestPathTree spt = new ShortestPathTree();
 
@@ -167,10 +149,10 @@ public class AStar {
                 break;
 
             Iterable<Edge> incoming = spt_u.mirror.getIncoming();
-            
+
             if (extraEdges.containsKey(spt_u.mirror)) {
                 List<Edge> newIncoming = new ArrayList<Edge>();
-                for( Edge edge : spt_u.mirror.getOutgoing()) {
+                for (Edge edge : spt_u.mirror.getOutgoing()) {
                     newIncoming.add(edge);
                 }
                 newIncoming.add(extraEdges.get(spt_u.mirror));
@@ -223,11 +205,22 @@ public class AStar {
         return spt;
     }
 
-    private static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
-            State init, TraverseOptions options, Map<Vertex, Edge> extraEdges) {
+    public static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
+            State init, TraverseOptions options) {
 
         if (origin == null) {
             return null;
+        }
+
+        Map<Vertex, Edge> extraEdges;
+        if (origin instanceof StreetLocation) {
+            extraEdges = new HashMap<Vertex, Edge>();
+            Iterable<Edge> incoming = target.getIncoming();
+            for (Edge edge : incoming) {
+                extraEdges.put(edge.getFromVertex(), edge);
+            }
+        } else {
+            extraEdges = new NullExtraEdges();
         }
 
         // Return Tree
@@ -248,13 +241,11 @@ public class AStar {
             if (spt_u.mirror == target)
                 break;
 
-            
-           
             Iterable<Edge> outgoing = spt_u.mirror.getOutgoing();
-            
+
             if (extraEdges.containsKey(spt_u.mirror)) {
                 List<Edge> newOutgoing = new ArrayList<Edge>();
-                for( Edge edge : spt_u.mirror.getOutgoing())
+                for (Edge edge : spt_u.mirror.getOutgoing())
                     newOutgoing.add(edge);
                 newOutgoing.add(extraEdges.get(spt_u.mirror));
                 outgoing = newOutgoing;
