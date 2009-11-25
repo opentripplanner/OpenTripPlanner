@@ -85,7 +85,7 @@ public class Planner {
         request.setOutputFormat(MediaType.valueOf(of));
 
         List<Narrative> narratives = _narrativeService.plan(request.getFrom(), request.getTo(),
-                request.getDateTime());
+                request.getDateTime(), request.isArriveBy());
 
         TripPlan plan = new TripPlan();
 

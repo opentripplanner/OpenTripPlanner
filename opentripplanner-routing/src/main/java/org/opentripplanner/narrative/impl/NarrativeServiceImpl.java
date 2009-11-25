@@ -61,7 +61,7 @@ public class NarrativeServiceImpl implements NarrativeService {
     }
 
     @Override
-    public List<Narrative> plan(String fromPlace, String toPlace, Date targetTime) {
+    public List<Narrative> plan(String fromPlace, String toPlace, Date targetTime, boolean arriveBy) {
 
         Vertex fromVertex = getVertexForPlace(fromPlace);
         Vertex toVertex = getVertexForPlace(toPlace);
@@ -70,6 +70,8 @@ public class NarrativeServiceImpl implements NarrativeService {
         TraverseOptions options = new TraverseOptions();
         if( _calendarService != null)
             options.setCalendarService(_calendarService);
+
+        options.back = arriveBy;
 
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
 

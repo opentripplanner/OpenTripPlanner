@@ -26,12 +26,20 @@ public class RoutingServiceImpl implements RoutingService {
 
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options) {
-
+        
         HashMap<Vertex, Edge> extraEdges = new HashMap<Vertex, Edge>();
 
-        ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex.getLabel(), toVertex.getLabel(), state,
-                options);
-        return spt.getPath(toVertex);
+        if (options.back) {
+            ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex, state,
+                    options);
+            GraphPath path = spt.getPath(fromVertex);
+            path.reverse();
+            return path;
+        } else {
+            ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex, toVertex, state,
+                    options);
+            return spt.getPath(toVertex);
+        }
     }
 
 }

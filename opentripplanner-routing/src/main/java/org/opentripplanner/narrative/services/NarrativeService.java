@@ -6,5 +6,5 @@ import java.util.List;
 import org.opentripplanner.narrative.model.Narrative;
 
 public interface NarrativeService {
-    public List<Narrative> plan(String fromPlace, String toPlace, Date targetTime);
+    public List<Narrative> plan(String fromPlace, String toPlace, Date targetTime, boolean arriveBy);
 }
