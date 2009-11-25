@@ -8,12 +8,15 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class Transfer extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
     
     double distance = 0;
+
+    private Geometry geometry = null;
 
     public Transfer(Vertex fromv, Vertex tov, double distance) {
         super(fromv, tov);
@@ -35,8 +38,7 @@ public class Transfer extends AbstractEdge {
     }
 
     public Geometry getGeometry() {
-        // TODO Auto-generated method stub
-        return null;
+        return geometry;
     }
 
     public TransportationMode getMode() {
@@ -75,5 +77,9 @@ public class Transfer extends AbstractEdge {
     
     public int hashCode() {
         return getToVertex().hashCode() ^ getFromVertex().hashCode();
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry  = geometry;
     }
 }

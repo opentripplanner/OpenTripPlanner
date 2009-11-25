@@ -233,6 +233,12 @@ public class GTFSPatternHopFactory {
                 if (createdTransfers.contains(edge)) {
                     continue;
                 }
+                GeometryFactory factory = new GeometryFactory();
+                LineString geometry = factory.createLineString(new Coordinate[] {
+                        new Coordinate(fromStop.getLon(), fromStop.getLat()),
+                        new Coordinate(toStop.getLon(), toStop.getLat())
+                });
+                edge.setGeometry(geometry);
                 createdTransfers.add(edge);
                 graph.addEdge(edge);
             }
