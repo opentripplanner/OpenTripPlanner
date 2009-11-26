@@ -41,8 +41,8 @@ otp.planner.Renderer = {
     {
         console.log("enter planner.Renderer.clear");
         // TODO - the clearVectorLayer method does not exist - bdferris
-        //if(this.m_vectorLayer)
-        //    otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer);
+        if(this.m_vectorLayer)
+            otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer,this.m_itinerary.getVectors());
 
         if(this.m_markerLayer && this.m_itinerary)
             otp.util.OpenLayersUtils.clearMarkerLayer(this.m_markerLayer, this.m_itinerary.getMarkers());

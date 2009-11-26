@@ -23,6 +23,7 @@ import org.opentripplanner.narrative.model.NarrativeItem;
 import org.opentripplanner.narrative.model.NarrativeSection;
 import org.opentripplanner.narrative.services.NarrativeService;
 import org.opentripplanner.util.GeoJSONBuilder;
+import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -95,10 +96,10 @@ public class Planner {
             plan.addItinerary(itinerary);
 
             for (NarrativeSection section : narrative.getSections()) {
-
                 Leg leg = new Leg();
                 leg.mode = getTransportationModeForSection(section);
-                leg.legGeometry= GeoJSONBuilder.getGeometryAsJsonString(section.getGeometry());
+
+                leg.legGeometry = PolylineEncoder.createEncodings(section.getGeometry());
                 leg.from = getPlaceForSection(section, true);
                 leg.to = getPlaceForSection(section, false);
                 itinerary.addLeg(leg);
@@ -111,7 +112,7 @@ public class Planner {
     }
 
     private String getTransportationModeForSection(NarrativeSection section) {
-        if( section.getMode() == null)
+        if (section.getMode() == null)
             return "Bus";
         switch (section.getMode()) {
         case WALK:
@@ -136,9 +137,9 @@ public class Planner {
     }
 
     private Point getEndPoint(NarrativeSection section, boolean first) {
-        
+
         Geometry geometry = getGeometry(section, first);
-        
+
         if (geometry instanceof Point) {
             return (Point) geometry;
         } else if (geometry instanceof LineString) {
@@ -148,9 +149,9 @@ public class Planner {
             return geometry.getCentroid();
         }
     }
-    
+
     private Geometry getGeometry(NarrativeSection section, boolean first) {
-        if( section.getGeometry() != null)
+        if (section.getGeometry() != null)
             return section.getGeometry();
         Vector<NarrativeItem> items = section.getItems();
         NarrativeItem item = first ? items.get(0) : items.get(items.size() - 1);

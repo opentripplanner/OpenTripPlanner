@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype.loader;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Graph;
@@ -8,12 +9,17 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 public class NetworkLinker {
+    
+    private static Logger _log = LoggerFactory.getLogger(NetworkLinker.class);
+    
     private Graph graph;
 
     public NetworkLinker(Graph graph) {
@@ -24,11 +30,23 @@ public class NetworkLinker {
     public void createLinkage() {
 
         STRtree index = new STRtree();
-        for (Vertex v : graph.getVertices()) {
+        Collection<Vertex> vertices = graph.getVertices();
+
+        _log.debug("constructing index...");
+        
+        for (Vertex v : vertices) {
             index.insert(new Envelope(v.getCoordinate()), v);
         }
-
-        for (Vertex v : graph.getVertices()) {
+        
+        _log.debug("creating linkages...");
+        int i = 0;
+        
+        for (Vertex v : vertices) {
+            
+            if( i % 100 == 0)
+                _log.debug("vertices=" + i + "/" + vertices.size());
+            i++;
+            
             if (v.getType() == TransitStop.class) {
                 // find nearby vertices
 

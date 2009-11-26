@@ -94,12 +94,13 @@ otp.planner.Itinerary = {
                 this.makeWalkLines(vLayer);
                 this.makeMarkers();
                 otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
-                this.m_extent = mLayer.getDataExtent();
+                this.m_extent = vLayer.getDataExtent();
             }
             else
             {
                 vLayer.addFeatures(this.m_vectors);
                 otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
+                this.m_extent = vLayer.getDataExtent();
             }
         }
         catch(e)
@@ -257,11 +258,13 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
             
             var mode = from.get('mode');
-            if(mode == 'Bus') 
+            if(mode == 'Bus' || mode == 'Tram') 
             {
                 try
                 {
-                	var geoLine = new OpenLayers.Feature.Vector(leg.get('leg-geometry'),
+                	var geoJson = leg.get('leg-geometry');
+                	var raw = leg.get('leg-geometry-raw');
+                	var geoLine = new OpenLayers.Feature.Vector(geoJson,
                 			null,
                 			otp.util.OpenLayersUtils.RED_STYLE);
                 			
@@ -309,7 +312,7 @@ otp.planner.Itinerary = {
                 {
                 	var geoLine = new OpenLayers.Feature.Vector(leg.get('leg-geometry'),
                 			null,
-                			otp.util.OpenLayersUtils.BLACK_DASH_STYLE);
+                			otp.util.OpenLayersUtils.BLACK_STYLE);
                 			
                     var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                     vectors.push(geoLine);

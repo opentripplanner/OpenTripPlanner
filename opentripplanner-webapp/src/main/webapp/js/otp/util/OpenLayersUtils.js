@@ -406,6 +406,20 @@ otp.util.OpenLayersUtils = {
         return mark;
     },
 
+    clearVectorLayer : function(vLayer, vectors) {
+        for(var x = 0; x < 5; x++)
+        {
+            try
+            {
+            	vLayer.removeFeatures(vectors);
+            }
+            catch(Ez)
+            {
+            }
+        }
+        vLayer.redraw();
+    },
+    
     /** */
     clearMarkerLayer : function(mLayer, markers)
     {
@@ -727,7 +741,72 @@ otp.util.OpenLayersUtils = {
     
     geo_json_converter: function(n,p) {
     	var formatter = new OpenLayers.Format.GeoJSON();
-    	return formatter.read(n,'Geometry');
+    	var geoJsonObj = formatter.read(n,'Geometry');
+    	return geoJsonObj;
+    },
+    
+    encoded_polyline_converter: function(n,p) {
+
+        var lat = 0;
+        var lon = 0;
+
+        var strIndex = 0;
+        var points = new Array();
+
+        while (strIndex < n.length) {
+
+          var rLat = this.decodeSignedNumberWithIndex(n, strIndex);
+          lat = lat + rLat.number * 1e-5;
+          strIndex = rLat.index;
+
+          var rLon = this.decodeSignedNumberWithIndex(n, strIndex);
+          lon = lon + rLon.number * 1e-5;
+          strIndex = rLon.index;
+
+          var p = new OpenLayers.Geometry.Point(lon,lat);
+          points.push(p);
+        }
+
+        return new OpenLayers.Geometry.LineString(points);
+     },
+    
+    decodeSignedNumber: function(value) {
+    	var r = this.decodeSignedNumberWithIndex(value, 0);
+        return r.number;
+    },
+    
+    decodeSignedNumberWithIndex: function(value,index) {
+        var r = this.decodeNumberWithIndex(value, index);
+        var sgn_num = r.number;
+        if ((sgn_num & 0x01) > 0) {
+          sgn_num = ~(sgn_num);
+        }
+        r.number = sgn_num >> 1;
+        return r;
+    },
+    
+    decodeNumber: function(value) {
+        var r = this.decodeNumberWithIndex(value, 0);
+        return r.number;
+    },
+
+    decodeNumberWithIndex: function(value, index) {
+
+        if (value.length == 0)
+        	throw "string is empty";
+
+        var num = 0;
+        var v = 0;
+        var shift = 0;
+
+        do {
+          v1 = value.charCodeAt(index++);
+          v = v1 - 63;
+          num |= (v & 0x1f) << shift;
+          shift += 5;
+        } while (v >= 0x20);
+
+        return {"number": num, "index": index};
     },
 
     CLASS_NAME: "otp.util.OpenLayersUtils"

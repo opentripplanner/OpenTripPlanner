@@ -19,12 +19,16 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextypes.Intersection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
+    
+    private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
 
     private static final GeometryFactory _geometryFactory = new GeometryFactory();
     
@@ -41,8 +45,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph) {
         Handler handler = new Handler();
-        for (OpenStreetMapProvider provider : _providers)
+        for (OpenStreetMapProvider provider : _providers) {
+            _log.debug("gathering osm from provider: " + provider);
             provider.readOSM(handler);
+        }
+        _log.debug("building osm street graph");
         handler.buildGraph(graph);
     }
 
@@ -65,8 +72,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             // Remove all island
             _nodes.keySet().retainAll(nodesWithNeighbors);
-
+            
+            int nodeIndex = 0;
+            
             for (OSMNode node : _nodes.values()) {
+                
+                if( nodeIndex % 1000 == 0)
+                    _log.debug("nodes=" + nodeIndex + "/" + _nodes.size());
+                nodeIndex++;
+                
                 int nodeId = node.getId();
                 String id = getVertexIdForNodeId(nodeId);
                 Vertex vertex = graph.getVertex(id);
@@ -80,7 +94,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             }
 
+            int wayIndex = 0;
+            
             for (OSMWay way : _ways.values()) {
+                
+                if( wayIndex % 1000 == 0)
+                    _log.debug("ways=" + wayIndex + "/" + _ways.size());
+                wayIndex++;
+                
                 StreetTraversalPermission permissions = getPermissionsForWay(way);
                 List<Integer> nodes = way.getNodeRefs();
                 for (int i = 0; i < nodes.size() - 1; i++) {
@@ -104,12 +125,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             _nodes.put(node.getId(), node);
+            
+            if( _nodes.size() % 1000 == 0)
+                _log.debug("nodes=" + _nodes.size());
         }
 
         public void addWay(OSMWay way) {
             if (_ways.containsKey(way.getId()))
                 return;
             _ways.put(way.getId(), way);
+            
+            if( _ways.size() % 1000 == 0)
+                _log.debug("ways=" + _ways.size());
         }
 
         public void addRelation(OSMRelation relation) {

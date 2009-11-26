@@ -72,8 +72,11 @@ otp.planner.Utils = {
                   {name: 'toDescription',    mapping: 'to/description'},
                   {name: 'toStopId',         mapping: 'to/stopId'},
                   {name: 'toCity',           mapping: 'to/@areaValue'},
-                  {name: 'leg-geometry',         mapping: 'legGeometry',
-                	                         convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); } },
+                  {name: 'leg-geometry-raw', mapping: 'legGeometry'},
+                  {name: 'leg-geometry',         mapping: 'legGeometry/points',
+                	                         convert: function(n,p) {
+                	  							return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
+                	 					     } },
     ]),
 
     /**

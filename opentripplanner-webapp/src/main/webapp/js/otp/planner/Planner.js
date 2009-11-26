@@ -74,6 +74,11 @@ otp.planner.Planner = {
         this.m_forms.submitSuccess = function(){ thisObj.formSuccessCB() };
         this.m_forms.submitFailure = function(){ thisObj.formFailureCB() };
 
+        m = this.map.getMap();
+        m.events.register('click', m, function (e) {
+            
+        });
+
         console.log("exit planner.Planner constructor");
     },
 

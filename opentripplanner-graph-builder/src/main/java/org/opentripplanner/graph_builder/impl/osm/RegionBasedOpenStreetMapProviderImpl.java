@@ -8,10 +8,14 @@ import java.util.Set;
 import org.opentripplanner.graph_builder.services.RegionsSource;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
+    
+    private static Logger _log = LoggerFactory.getLogger(RegionBasedOpenStreetMapProviderImpl.class);
 
     private RegionsSource _regionsSource;
 
@@ -36,8 +40,12 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
         DownloadHandler downloadHandler = new DownloadHandler(handler);
 
         try {
-            for (Envelope region : _regionsSource.getRegions())
+            int regionIndex = 0;
+            for (Envelope region : _regionsSource.getRegions()) {
                 downloader.visitRegion(region, downloadHandler);
+                _log.debug("regions=" + regionIndex);
+                regionIndex++;
+            }
         } catch (IOException ex) {
             throw new IllegalStateException("error downloading osm", ex);
         }

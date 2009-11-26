@@ -34,12 +34,16 @@ public class OSMMap implements OpenStreetMapContentHandler {
     return _nodes;
   }
 
-  public OSMNode getNodeById(int nodeId) {
+  public OSMNode getNodeForId(int nodeId) {
     return _nodes.get(nodeId);
   }
 
   public Map<Integer, OSMWay> getWays() {
     return _ways;
+  }
+  
+  public OSMWay getWayForId(int wayId) {
+      return _ways.get(wayId);
   }
 
   public void pruneUnusedNodes() {
