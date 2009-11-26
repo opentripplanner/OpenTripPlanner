@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.Vector;
 
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -119,5 +121,10 @@ public class GenericVertex implements Vertex {
     public void setType(Class<?> type) {
         this.type = type;
     }
-
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        incoming.trimToSize();
+        outgoing.trimToSize();
+        out.defaultWriteObject();
+    }
 }
