@@ -15,8 +15,8 @@ import org.opentripplanner.graph_builder.model.osm.OSMWay;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.SameInAndOutVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -102,8 +102,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (vertex != null)
                     throw new IllegalStateException("osm node already loaded: id=" + id);
 
-                vertex = new SameInAndOutVertex(id, Intersection.class, node.getLon(), node
+                vertex = new GenericVertex(id, node.getLon(), node
                         .getLat());
+                vertex.setType(Intersection.class);
                 graph.addVertex(vertex);
 
             }
@@ -121,13 +122,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 for (int i = 0; i < nodes.size() - 1; i++) {
                     String vFromId = getVertexIdForNodeId(nodes.get(i));
                     String vToId = getVertexIdForNodeId(nodes.get(i + 1));
-                    SameInAndOutVertex from = (SameInAndOutVertex) graph.getVertex(vFromId);
-                    SameInAndOutVertex to = (SameInAndOutVertex) graph.getVertex(vToId);
+                    Vertex from = graph.getVertex(vFromId);
+                    Vertex to = graph.getVertex(vToId);
                     if (from == null || to == null)
                         continue;
                     double d = from.distance(to);
-                    from.addEdge(getEdgeForStreet(from, to, way, d, permissions));
-                    to.addEdge(getEdgeForStreet(to, from, way, d, permissions));
+                    graph.addEdge(getEdgeForStreet(from, to, way, d, permissions));
+                    graph.addEdge(getEdgeForStreet(to, from, way, d, permissions));
                 }
             }
 
@@ -161,7 +162,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return "osm node " + nodeId;
         }
 
-        private Street getEdgeForStreet(SameInAndOutVertex from, SameInAndOutVertex to, OSMWay way, double d,
+        private Street getEdgeForStreet(Vertex from, Vertex to, OSMWay way, double d,
                 StreetTraversalPermission permissions) {
             
             String id = "way " + way.getId();
