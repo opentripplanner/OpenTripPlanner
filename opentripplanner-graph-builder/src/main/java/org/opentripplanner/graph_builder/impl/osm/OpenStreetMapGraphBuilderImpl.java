@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence.Float;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
@@ -33,6 +35,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private static final GeometryFactory _geometryFactory = new GeometryFactory();
     
     private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
+    
+    private Map<Object,Object> _uniques = new HashMap<Object, Object>();
 
     public void setProvider(OpenStreetMapProvider provider) {
         _providers.add(provider);
@@ -51,6 +55,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
         _log.debug("building osm street graph");
         handler.buildGraph(graph);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T unique(T value) {
+        Object v = _uniques.get(value);
+        if( v == null) {
+            _uniques.put(value,value);
+            v = value;
+        }
+        return (T) v;
     }
 
     private class Handler implements OpenStreetMapContentHandler {
@@ -151,9 +165,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 StreetTraversalPermission permissions) {
             
             String id = "way " + way.getId();
+            
+            id = unique(id);
+            
             Street street = new Street(from, to, id, id, d, permissions);
             
-            LineString lineString = _geometryFactory.createLineString(new Coordinate[] { from.getCoordinate(), to.getCoordinate()});
+            Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate()};
+            Float sequence = new PackedCoordinateSequence.Float(coordinates, 2);
+            LineString lineString = _geometryFactory.createLineString(sequence);
+            
             street.setGeometry(lineString);
             
             return street;
