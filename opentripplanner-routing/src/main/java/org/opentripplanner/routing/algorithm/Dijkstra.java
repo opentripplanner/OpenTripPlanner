@@ -27,7 +27,7 @@ public class Dijkstra {
 
         // Return Tree
         ShortestPathTree spt = new ShortestPathTree();
-        SPTVertex spt_origin = spt.addVertex(origin, init, 0);
+        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
         FibHeap pq = new FibHeap(gg.getVertices().size());
@@ -63,7 +63,7 @@ public class Dijkstra {
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
                     old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(tov, wr.state, new_w);
+                    spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 } else {
                     old_w = spt_v.weightSum;
                 }

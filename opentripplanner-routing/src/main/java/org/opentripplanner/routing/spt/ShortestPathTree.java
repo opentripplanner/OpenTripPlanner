@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
@@ -17,8 +18,8 @@ public class ShortestPathTree {
         vertices = new HashMap<Vertex, SPTVertex>();
     }
 
-    public SPTVertex addVertex(Vertex vv, State ss, double weightSum) {
-        SPTVertex ret = new SPTVertex(vv, ss, weightSum);
+    public SPTVertex addVertex(Vertex vv, State ss, double weightSum, TraverseOptions options) {
+        SPTVertex ret = new SPTVertex(vv, ss, weightSum, options);
         this.vertices.put(vv, ret);
         return ret;
     }

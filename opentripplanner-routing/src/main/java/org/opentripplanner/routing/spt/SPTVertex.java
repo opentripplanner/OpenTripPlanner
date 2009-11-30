@@ -3,6 +3,7 @@ package org.opentripplanner.routing.spt;
 import java.util.Vector;
 
 import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
@@ -18,14 +19,17 @@ public class SPTVertex extends GenericVertex {
     public Vertex mirror;
 
     public State state;
+    
+    public TraverseOptions options;
 
     public double weightSum;
 
-    SPTVertex(Vertex mirror, State state, double weightSum) {
+    SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options) {
         super(mirror.getLabel(), mirror.getX(), mirror.getY());
         this.mirror = mirror;
         this.state = state;
         this.weightSum = weightSum;
+        this.options = options;
         this.outgoing = new Vector<SPTEdge>();
     }
 

@@ -134,7 +134,7 @@ public class AStar {
         ShortestPathTree spt = new ShortestPathTree();
 
         double distance = origin.distance(target) / MAX_SPEED;
-        SPTVertex spt_origin = spt.addVertex(origin, init, 0);
+        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
         FibHeap pq = new FibHeap(gg.getVertices().size() + extraEdges.size());
@@ -182,7 +182,7 @@ public class AStar {
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
                     old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(fromv, wr.state, new_w);
+                    spt_v = spt.addVertex(fromv, wr.state, new_w, options);
                 } else {
                     old_w = spt_v.weightSum + distance;
                 }
@@ -227,7 +227,7 @@ public class AStar {
         ShortestPathTree spt = new ShortestPathTree();
 
         double distance = origin.distance(target) / MAX_SPEED;
-        SPTVertex spt_origin = spt.addVertex(origin, init, 0);
+        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
         FibHeap pq = new FibHeap(gg.getVertices().size() + extraEdges.size());
@@ -274,7 +274,7 @@ public class AStar {
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
                     old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(tov, wr.state, new_w);
+                    spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 } else {
                     old_w = spt_v.weightSum + distance;
                 }

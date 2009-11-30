@@ -166,7 +166,7 @@ public class GTFSPatternHopFactory {
                     hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                             endJourneyArrive));
 
-                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime, st0
+                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime, st1
                             .getArrivalTime(), dwellTime);
                     graph.addEdge(hop);
 
@@ -177,7 +177,7 @@ public class GTFSPatternHopFactory {
                             tripPattern, i);
                     graph.addEdge(boarding);
                     graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern,
-                            i + 1));
+                            i));
 
                 }
                 patterns.put(stopPattern, tripPattern);
@@ -204,7 +204,7 @@ public class GTFSPatternHopFactory {
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                         try {
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                    runningTime, st0.getArrivalTime(), dwellTime);
+                                    runningTime, st1.getArrivalTime(), dwellTime);
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "

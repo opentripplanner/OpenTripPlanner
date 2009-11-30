@@ -32,12 +32,13 @@ public final class TripPattern implements Serializable {
     @SuppressWarnings("unchecked")
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
-        departureTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
-        runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
-        dwellTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
-        arrivalTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, stopTimes.size());
+        int hops = stopTimes.size() - 1;
+        departureTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
+        runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
+        dwellTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
+        arrivalTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
 
-        for (int i = 0; i < stopTimes.size(); ++i) {
+        for (int i = 0; i < hops; ++i) {
             departureTimes[i] = new Vector<Integer>();
             runningTimes[i] = new Vector<Integer>();
             dwellTimes[i] = new Vector<Integer>();
