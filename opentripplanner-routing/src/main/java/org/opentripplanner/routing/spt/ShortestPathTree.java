@@ -33,6 +33,10 @@ public class ShortestPathTree {
     }
 
     public GraphPath getPath(Vertex dest) {
+        return getPath(dest, true);
+    }
+    
+    public GraphPath getPath(Vertex dest, boolean optimize) {
         SPTVertex end = this.getVertex(dest);
         if (end == null) {
             return null;
@@ -47,7 +51,9 @@ public class ShortestPathTree {
             ret.edges.add(0, end.incoming);
             end = end.incoming.fromv;
         }
-
+        if (optimize) {
+            ret.optimize();
+        }
         return ret;
     }
 

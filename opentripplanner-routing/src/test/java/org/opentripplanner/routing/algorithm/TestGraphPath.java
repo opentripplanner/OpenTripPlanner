@@ -44,7 +44,7 @@ public class TestGraphPath extends TestCase {
         spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
-        path = spt.getPath(stop_e);
+        path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
         assertEquals(11, path.vertices.size());
 

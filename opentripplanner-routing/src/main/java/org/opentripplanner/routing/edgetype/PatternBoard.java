@@ -92,10 +92,10 @@ public class PatternBoard extends AbstractEdge {
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight
-                    - SEC_IN_DAY);
+                    + SEC_IN_DAY);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getDepartureTime(stopIndex, yesterdayPatternIndex)
-                        - (secondsSinceMidnight - SEC_IN_DAY);
+                        - secondsSinceMidnight - SEC_IN_DAY;
                 if (wait < 0 || waitYesterday < wait) {
                     // choose the better time
                     wait = waitYesterday;

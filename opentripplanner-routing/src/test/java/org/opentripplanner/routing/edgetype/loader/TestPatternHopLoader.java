@@ -132,13 +132,16 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(4, path.vertices.size());
 
         // Saturday morning
+        long startTime = new GregorianCalendar(2009, 8, 19, 0, 5, 0).getTimeInMillis();
+        
         spt = Dijkstra.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 19, 0, 5, 0).getTimeInMillis()), options);
+                startTime), options);
 
         path = spt.getPath(stop_h);
         assertNotNull(path);
         assertEquals(4, path.vertices.size());
-
+        long endTime = path.vertices.lastElement().state.getTime();
+        assertTrue(endTime < startTime + 1000 * 60 * 60 );
     }
 
     public Edge getHopOut(Vertex v) {

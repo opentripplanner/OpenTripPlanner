@@ -20,6 +20,12 @@ public class GraphPath {
 
     public void optimize() {
         State state = vertices.lastElement().state;
+        State state0 = vertices.firstElement().state;
+        if (state0.getTime() >= state.getTime()) {
+            // reversed paths are already optimized, because preferences are asymmetric -- people
+            // want to arrive as late as possible, but also want to leave as late as possible.
+            return;
+        }
         TraverseOptions options = vertices.lastElement().options;
         ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
         while (iterator.hasPrevious()) {
