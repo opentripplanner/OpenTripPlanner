@@ -302,7 +302,7 @@ public class GTFSPatternHopFactory {
     private Geometry getHopGeometry(AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
-        if (shapeId == null || shapeId.getId() == null)
+        if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
             return null;
 
         double startDistance = st0.getShapeDistTraveled();
@@ -339,7 +339,7 @@ public class GTFSPatternHopFactory {
         LinearLocation endCoord = lol.indexOf(endJourney.getCoordinate());
 
         double distanceFrom = startCoord.getSegmentLength(line);
-        double distanceTo = startCoord.getSegmentLength(line);
+        double distanceTo = endCoord.getSegmentLength(line);
 
         return getSegmentGeometry(shapeId, lol, startCoord, endCoord, distanceFrom, distanceTo);
     }
