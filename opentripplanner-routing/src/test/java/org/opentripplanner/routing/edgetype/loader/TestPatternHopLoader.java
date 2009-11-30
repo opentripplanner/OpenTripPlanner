@@ -167,7 +167,7 @@ public class TestPatternHopLoader extends TestCase {
         assertTrue(geometry.getLength() < 1.001);
 
     }
-    public void testShapeBydistance() throws Exception {
+    public void testShapeByDistance() throws Exception {
         Vertex stop_i = graph.getVertex("agency_I");
         Edge hop = getHopOut(stop_i);
         Geometry geometry = hop.getGeometry();
@@ -178,8 +178,6 @@ public class TestPatternHopLoader extends TestCase {
     public void testTransfers() throws Exception {
         Vertex stop_k = graph.getVertex("agency_K");
         Vertex stop_l = graph.getVertex("agency_L");
-        Vertex stop_m = graph.getVertex("agency_M");
-        Edge hop = null;
         int transfers = 0;
         for (Edge e : stop_k.getOutgoing()) {
             if (e instanceof Transfer) {
