@@ -74,7 +74,7 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        if (isBoarding) {
+        if (!isBoarding) {
             s1.setJustBoarded(true);
         } else {
             if (s0.getJustBoarded()) { 
