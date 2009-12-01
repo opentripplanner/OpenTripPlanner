@@ -91,7 +91,7 @@ public class NarrativeSection {
             item.setDirection(graphEdge.getDirection());
             item.setName(graphEdge.getName());
             item.setStart(((HoppableEdge) graphEdge).getStartStop().getName());
-            item.setEnd(((HoppableEdge) edges.lastElement().payload).getStartStop().getName());
+            item.setEnd(((HoppableEdge) edges.lastElement().payload).getEndStop().getName());
             
             Geometry geom = graphEdge.getGeometry();
             double totalDistance = graphEdge.getDistance();
