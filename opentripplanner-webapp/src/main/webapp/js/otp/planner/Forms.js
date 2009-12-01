@@ -605,7 +605,7 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getMapCoordinate();
-                this.setFrom(ll.lon + "," + ll.lat, ll.lon, ll.lat);
+                this.setFrom(ll.lat+ "," + ll.lon, ll.lat, ll.lon);
             }
         },
         {
@@ -614,7 +614,7 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getMapCoordinate();
-                this.setTo(ll.lon + "," + ll.lat, ll.lon, ll.lat);
+                this.setTo(ll.lat + "," + ll.lon, ll.lat, ll.lon);
             }
         }
         ];
