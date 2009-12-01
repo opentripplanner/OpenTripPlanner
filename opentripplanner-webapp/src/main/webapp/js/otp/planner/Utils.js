@@ -30,22 +30,22 @@ otp.planner.Utils = {
                   {name: 'duration',     mapping: 'timeDistance/duration'},
                   {name: 'startTime',    mapping: 'timeDistance/start'},
                   {name: 'endTime',      mapping: 'timeDistance/end'},
-                  {name: 'numTransfers', mapping: 'time-distance/numberOfTransfers'},
-                  {name: 'numLegs',      mapping: 'time-distance/numberOfTripLegs'},
-                  {name: 'walkTime',     mapping: 'time-distance/walkingTime'},
-                  {name: 'walkDistance', mapping: 'time-distance/distance'},
-                  {name: 'transitTime',  mapping: 'time-distance/transitTime'},
-                  {name: 'waitingTime',  mapping: 'time-distance/waitingTime'}
+                  {name: 'numTransfers', mapping: 'timeDistance/numberOfTransfers'},
+                  {name: 'numLegs',      mapping: 'timeDistance/numberOfTripLegs'},
+                  {name: 'walkTime',     mapping: 'timeDistance/walking'},
+                  {name: 'walkDistance', mapping: 'timeDistance/distance'},
+                  {name: 'transitTime',  mapping: 'timeDistance/transit'},
+                  {name: 'waitingTime',  mapping: 'timeDistance/waiting'}
     ]),
     
     LEG_RECORD : new Ext.data.Record.create([
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
                   {name: 'order',            mapping: '@order'},
-                  {name: 'startTime',        mapping: 'time-distance/startTime'},
-                  {name: 'endTime',          mapping: 'time-distance/endTime'},
-                  {name: 'duration',         mapping: 'time-distance/duration'},
-                  {name: 'distance',         mapping: 'time-distance/distance'},
+                  {name: 'startTime',        mapping: 'timeDistance/startTime'},
+                  {name: 'endTime',          mapping: 'timeDistance/endTime'},
+                  {name: 'duration',         mapping: 'timeDistance/duration'},
+                  {name: 'distance',         mapping: 'timeDistance/distance'},
                   {name: 'direction',        mapping: 'direction'},
                   {name: 'key',              mapping: 'key'},
                   {name: 'alerts',           mapping: 'route', convert: function(n, p)

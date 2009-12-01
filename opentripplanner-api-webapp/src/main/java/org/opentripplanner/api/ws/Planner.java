@@ -1,5 +1,6 @@
 package org.opentripplanner.api.ws;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
 
@@ -15,6 +16,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.TimeDistance;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.ws.RequestInf.ModeType;
 import org.opentripplanner.api.ws.RequestInf.OptimizeType;
@@ -22,6 +24,7 @@ import org.opentripplanner.narrative.model.Narrative;
 import org.opentripplanner.narrative.model.NarrativeItem;
 import org.opentripplanner.narrative.model.NarrativeSection;
 import org.opentripplanner.narrative.services.NarrativeService;
+import org.opentripplanner.routing.core.TransportationMode;
 import org.opentripplanner.util.GeoJSONBuilder;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,12 +93,45 @@ public class Planner {
 
         TripPlan plan = new TripPlan();
 
+        Calendar calendar = Calendar.getInstance();
+
         for (Narrative narrative : narratives) {
 
             Itinerary itinerary = new Itinerary();
             plan.addItinerary(itinerary);
 
-            for (NarrativeSection section : narrative.getSections()) {
+            Vector<NarrativeSection> sections = narrative.getSections();
+            TimeDistance timeDistance = new TimeDistance();
+            long startTime = sections.firstElement().getStartTime();
+            long endTime = sections.lastElement().getEndTime();
+
+            timeDistance.duration = (endTime - startTime) / 1000.0;
+
+            calendar.setTimeInMillis(startTime);
+            timeDistance.start = calendar.getTime();
+            calendar.setTimeInMillis(endTime);
+            timeDistance.end = calendar.getTime();
+            timeDistance.legs = sections.size();
+
+            itinerary.timeDistance = timeDistance;
+
+            plan.addItinerary(itinerary);
+
+            for (NarrativeSection section : sections) {
+                TransportationMode mode = section.getMode();
+                long sectionTime = (section.getEndTime() - section.getStartTime()) / 1000;
+                if (mode.isTransitMode()) {
+                    timeDistance.transit += sectionTime;
+                }
+                switch (mode) {
+                case TRANSFER:
+                    timeDistance.transfers += 1;
+                    timeDistance.waiting += sectionTime;
+                    break;
+                case WALK:
+                    timeDistance.walk += sectionTime;
+                }
+
                 Leg leg = new Leg();
                 leg.mode = getTransportationModeForSection(section);
 
@@ -114,16 +150,7 @@ public class Planner {
     private String getTransportationModeForSection(NarrativeSection section) {
         if (section.getMode() == null)
             return "Bus";
-        switch (section.getMode()) {
-        case WALK:
-            return "Walk";
-        case BUS:
-            return "Bus";
-        case TRAM:
-            return "Tram";
-        default:
-            return "Other";
-        }
+        return section.getMode().toString();
     }
 
     private Place getPlaceForSection(NarrativeSection section, boolean isFrom) throws JSONException {

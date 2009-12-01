@@ -25,6 +25,7 @@ public class TimeDistance {
         duration = 1.1;
         walk = 1.2;
         transit = 1.2;
+        waiting = 1.2;
         legs = 2;
         transfers = 3;
         start = new Date();
