@@ -27,7 +27,7 @@ public class NarrativeServiceImpl implements NarrativeService {
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("^(" + _doublePattern + ")\\s+("
+    private static final Pattern _latLonPattern = Pattern.compile("^(" + _doublePattern + ")(\\s*,\\s*|\\s+)("
             + _doublePattern + ")$");
 
     private Graph _graph;
@@ -70,7 +70,7 @@ public class NarrativeServiceImpl implements NarrativeService {
         TraverseOptions options = new TraverseOptions();
         if( _calendarService != null)
             options.setCalendarService(_calendarService);
-
+        
         options.back = arriveBy;
 
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
@@ -86,7 +86,7 @@ public class NarrativeServiceImpl implements NarrativeService {
         
         if( matcher.matches() ) {
             double lat = Double.parseDouble(matcher.group(1));
-            double lon = Double.parseDouble(matcher.group(3));
+            double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
             return _indexService.getClosestVertex(location);
         }
