@@ -90,19 +90,18 @@ public class NarrativeSection {
             BasicNarrativeItem item = new BasicNarrativeItem();
             item.setDirection(graphEdge.getDirection());
             item.setName(graphEdge.getName());
-            String end = graphEdge.getEnd();
+            item.setStart(((HoppableEdge) graphEdge).getStartStop().getName());
+            item.setEnd(((HoppableEdge) edges.lastElement().payload).getStartStop().getName());
+            
             Geometry geom = graphEdge.getGeometry();
-
             double totalDistance = graphEdge.getDistance();
             for (SPTEdge edge : edges.subList(1, edges.size())) {
                 graphEdge = edge.payload;
                 totalDistance += graphEdge.getDistance();
                 geom = joinGeometries(geom,graphEdge.getGeometry());
-                end = graphEdge.getEnd();
             }
             item.setGeometry(geom);
-            item.setDistance(totalDistance);
-            item.setEnd(end);
+            item.setDistance(totalDistance);            
             items.add(item);
         } else if (graphEdge instanceof WalkableEdge) {
             name = "walk";
@@ -121,17 +120,17 @@ public class NarrativeSection {
                     totalDistance += graphEdge.getDistance();
                     item.setDistance(totalDistance);
                     item.setGeometry(item.getGeometry().union(graphEdge.getGeometry()));
-                    item.setEnd(graphEdge.getStart());
+                    item.setEnd(graphEdge.getToVertex().getLabel());
                     continue;
                 }
                 item = new BasicNarrativeItem();
                 item.setName(streetName);
                 item.setDirection(graphEdge.getDirection());
                 item.setGeometry(graphEdge.getGeometry());
-                item.setStart(graphEdge.getStart());
-                item.setEnd(graphEdge.getEnd());
+                item.setStart(graphEdge.getFromVertex().getLabel());
+                item.setEnd(graphEdge.getToVertex().getLabel());
                 items.add(item);
-            }
+            } 
         }
     }
 

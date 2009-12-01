@@ -149,8 +149,11 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
         geometry = line;
     }
 
-    /****
-     * Private Methods
-     ****/
+    public Stop getEndStop() {
+       return end.getStop();
+    }
 
+    public Stop getStartStop() {
+        return start.getStop();
+    }
 }

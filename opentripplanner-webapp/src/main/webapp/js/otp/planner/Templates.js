@@ -74,9 +74,9 @@ otp.planner.Templates = {
     ).compile(),
 
     TP_LEG_BASE_STR : ''
-        + '<tpl if="fromStopId != null"><p><b>{startTime}</b> Depart {fromDescription}<br/>Stop ID {fromStopId}</p></tpl>'
+        + '<tpl if="fromStopId != null"><p><b>{startTime}</b> Depart {fromName}<br/>Stop ID {fromStopId}</p></tpl>'
         + '<tpl if="duration != null"><div class="duration">{duration} minute<tpl if="duration != 1.0">s</tpl></div></tpl>'
-        + '<tpl if="toStopId &gt; 0"><p><b>{endTime}</b> Arrive {toDescription}<br/>Stop ID {toStopId}</p></tpl>'
+        + '<tpl if="toStopId &gt; 0"><p><b>{endTime}</b> Arrive {toName}<br/>Stop ID {toStopId}</p></tpl>'
         + '<tpl if="alerts != null && alerts.length &gt; 0">'
         + '<tpl for="alerts">'
         +   '<p><br/><img src="images/ui/alert.gif" align="absmiddle"/> '

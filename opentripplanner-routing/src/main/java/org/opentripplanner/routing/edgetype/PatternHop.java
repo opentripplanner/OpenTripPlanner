@@ -94,4 +94,12 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
         return geometry;
     }
 
+    public Stop getEndStop() {
+        return end;
+    }
+
+    public Stop getStartStop() {
+        return end;
+    }
+
 }

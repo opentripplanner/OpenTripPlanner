@@ -111,7 +111,7 @@ public class Planner {
             timeDistance.start = calendar.getTime();
             calendar.setTimeInMillis(endTime);
             timeDistance.end = calendar.getTime();
-            timeDistance.legs = sections.size();
+            
 
             itinerary.timeDistance = timeDistance;
 
@@ -127,9 +127,11 @@ public class Planner {
                 case TRANSFER:
                     timeDistance.transfers += 1;
                     timeDistance.waiting += sectionTime;
-                    break;
+                    continue; //transfers don't get legs
                 case WALK:
                     timeDistance.walk += sectionTime;
+                    break;
+                    
                 }
 
                 Leg leg = new Leg();
@@ -140,8 +142,8 @@ public class Planner {
                 leg.to = getPlaceForSection(section, false);
                 itinerary.addLeg(leg);
             }
+            timeDistance.legs = itinerary.leg.size();
         }
-
         Response response = new Response(request);
         response.plan = plan;
         return response;
@@ -158,8 +160,13 @@ public class Planner {
         Point point = getEndPoint(section, isFrom);
 
         Place place = new Place();
-        place.name = "name";
         place.geometry = GeoJSONBuilder.getGeometryAsJsonString(point);
+        
+        if (isFrom) {
+            place.name = section.getItems().firstElement().getStart();
+        } else {
+            place.name = section.getItems().lastElement().getEnd();
+        }
         return place;
     }
 
