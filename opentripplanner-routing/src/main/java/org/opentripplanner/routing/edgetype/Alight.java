@@ -15,10 +15,6 @@ import com.vividsolutions.jts.geom.Geometry;
 
 public class Alight extends AbstractEdge {
 
-    String start_id; // a transit vertex's id
-
-    String end_id; // a street vertex's id
-
     public Hop hop;
 
     private static final long serialVersionUID = 1L;
@@ -41,8 +37,6 @@ public class Alight extends AbstractEdge {
     }
 
     public Geometry getGeometry() {
-        // TODO Auto-generated method stub -- need to provide link between
-        // location of street node and location of transit node.
         return null;
     }
 
