@@ -99,7 +99,7 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
     }
 
     public Stop getStartStop() {
-        return end;
+        return start;
     }
 
 }
