@@ -109,7 +109,7 @@ public final class TripPattern implements Serializable {
     public int getPreviousPattern(int stopIndex, int beforeTime) {
         Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
         int index = Collections.binarySearch(stopArrivalTimes, beforeTime);
-        if (index == -stopArrivalTimes.size() - 1)
+        if (index == -1)
             return -1;
 
         if (index >= 0) {
