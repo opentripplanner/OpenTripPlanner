@@ -14,7 +14,6 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         Graph gg = new Graph();
 
         File file = new File("src/test/resources/nyc_streets/streets.shp");
-        file = new File("/Users/bdferris/oba/data/opentripplanner-data/nyc/streets/nyc_streets/streets.shp");
 
         if (!file.exists()) {
             System.out.println("No New York City basemap; skipping; see comment here for details");
