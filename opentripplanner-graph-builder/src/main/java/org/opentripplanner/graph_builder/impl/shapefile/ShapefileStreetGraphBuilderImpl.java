@@ -14,6 +14,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
@@ -75,10 +76,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             SimpleFeatureConverter<String> streetIdConverter = _schema.getIdConverter();
             SimpleFeatureConverter<String> streetNameConverter = _schema.getNameConverter();
-            SimpleFeatureConverter<StreetTraversalPermission> forwardPermissionConverter = _schema
-                    .getForwardPermissionConverter();
-            SimpleFeatureConverter<StreetTraversalPermission> reversePermissionConverter = _schema
-                    .getForwardPermissionConverter();
+            SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = _schema
+                    .getPermissionConverter();
 
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
@@ -127,14 +126,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 backStreet.setGeometry(geom.reverse());
                 graph.addEdge(backStreet);
 
-                StreetTraversalPermission forwardPermission = forwardPermissionConverter
-                        .convert(feature);
-                StreetTraversalPermission reversePermission = reversePermissionConverter
+                P2<StreetTraversalPermission> pair = permissionConverter
                         .convert(feature);
 
-                street.setTraversalPermission(forwardPermission);
-                backStreet.setTraversalPermission(reversePermission);
-
+                street.setTraversalPermission(pair.getFirst());
+                backStreet.setTraversalPermission(pair.getSecond());
             }
 
             features.close(it2);

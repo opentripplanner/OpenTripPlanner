@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
@@ -9,9 +10,7 @@ public class ShapefileStreetSchema {
 
     private SimpleFeatureConverter<String> nameConverter;
 
-    private SimpleFeatureConverter<StreetTraversalPermission> forwardPermissionConverter = new CaseBasedTraversalPermissionConverter();
-
-    private SimpleFeatureConverter<StreetTraversalPermission> reversePermissionConverter = new CaseBasedTraversalPermissionConverter();
+    private SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = new CaseBasedTraversalPermissionConverter();
 
     public SimpleFeatureConverter<String> getIdConverter() {
         return idConverter;
@@ -20,8 +19,8 @@ public class ShapefileStreetSchema {
     public void setIdConverter(SimpleFeatureConverter<String> idConverter) {
         this.idConverter = idConverter;
     }
-    
-    public void setIdAttribute(String attributeName){
+
+    public void setIdAttribute(String attributeName) {
         this.idConverter = new AttributeFeatureConverter<String>(attributeName);
     }
 
@@ -29,30 +28,20 @@ public class ShapefileStreetSchema {
         return nameConverter;
     }
 
-    public void setNameAttribute(String attributeName){
+    public void setNameAttribute(String attributeName) {
         this.nameConverter = new AttributeFeatureConverter<String>(attributeName);
     }
-    
+
     public void setNameConverter(SimpleFeatureConverter<String> nameConverter) {
         this.nameConverter = nameConverter;
     }
 
-    public SimpleFeatureConverter<StreetTraversalPermission> getForwardPermissionConverter() {
-        return forwardPermissionConverter;
+    public SimpleFeatureConverter<P2<StreetTraversalPermission>> getPermissionConverter() {
+        return permissionConverter;
     }
 
-    public void setForwardPermissionConverter(
-            SimpleFeatureConverter<StreetTraversalPermission> forwardPermissionConverter) {
-        this.forwardPermissionConverter = forwardPermissionConverter;
+    public void setPermissionConverter(
+            SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter) {
+        this.permissionConverter = permissionConverter;
     }
-
-    public SimpleFeatureConverter<StreetTraversalPermission> getReversePermissionConverter() {
-        return reversePermissionConverter;
-    }
-
-    public void setReversePermissionConverter(
-            SimpleFeatureConverter<StreetTraversalPermission> reversePermissionConverter) {
-        this.reversePermissionConverter = reversePermissionConverter;
-    }
-
 }

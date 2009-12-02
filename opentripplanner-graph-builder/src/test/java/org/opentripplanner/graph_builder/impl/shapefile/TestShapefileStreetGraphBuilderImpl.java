@@ -39,31 +39,25 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         schema.setIdAttribute("StreetCode");
         schema.setNameAttribute("Street");
 
-        CaseBasedTraversalPermissionConverter reverse = new CaseBasedTraversalPermissionConverter(
+        CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
                 "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
-        CaseBasedTraversalPermissionConverter forward = new CaseBasedTraversalPermissionConverter(
-                "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
-        
-        forward.addPermission("W", StreetTraversalPermission.ALL);
-        reverse.addPermission("W", StreetTraversalPermission.PEDESTRIAN_ONLY);
-        
-        forward.addPermission("A", StreetTraversalPermission.PEDESTRIAN_ONLY);
-        reverse.addPermission("A", StreetTraversalPermission.ALL);
-        
-        forward.addPermission("T", StreetTraversalPermission.ALL);
-        reverse.addPermission("T", StreetTraversalPermission.ALL);
-        
-        schema.setForwardPermissionConverter(forward);
-        schema.setReversePermissionConverter(reverse);
+
+        perms.addPermission("W", StreetTraversalPermission.ALL,
+                StreetTraversalPermission.PEDESTRIAN_ONLY);
+        perms.addPermission("A", StreetTraversalPermission.PEDESTRIAN_ONLY,
+                StreetTraversalPermission.ALL);
+        perms.addPermission("T", StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
+
+        schema.setPermissionConverter(perms);
 
         ShapefileStreetGraphBuilderImpl loader = new ShapefileStreetGraphBuilderImpl();
         loader.setFeatureSourceFactory(factory);
         loader.setSchema(schema);
 
         loader.buildGraph(gg);
-        
-        assertEquals(104910,gg.getVertices().size());
-        
+
+        assertEquals(104910, gg.getVertices().size());
+
         Vertex start = gg.getVertex("PARK PL at VANDERBILT AV");
         Vertex end = gg.getVertex("GRAND ST at LAFAYETTE ST");
 
