@@ -90,18 +90,17 @@ otp.planner.Itinerary = {
         {
             if(this.m_vectors.length < 1)
             {
-                this.makeRouteLines(vLayer);
-                this.makeWalkLines(vLayer);
+                this.makeRouteLines();
+                this.makeWalkLines();
+            }
+            
+            if( this.m_markers.length < 1) {
                 this.makeMarkers();
-                otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
-                this.m_extent = vLayer.getDataExtent();
             }
-            else
-            {
-                vLayer.addFeatures(this.m_vectors);
-                otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
-                this.m_extent = vLayer.getDataExtent();
-            }
+            
+            vLayer.addFeatures(this.m_vectors);
+            otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
+            this.m_extent = vLayer.getDataExtent();
         }
         catch(e)
         {
@@ -306,7 +305,7 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
             
             var mode = from.get('mode');
-            if(mode == 'Walk') 
+            if(mode == 'walk') 
             {
                 try
                 {
