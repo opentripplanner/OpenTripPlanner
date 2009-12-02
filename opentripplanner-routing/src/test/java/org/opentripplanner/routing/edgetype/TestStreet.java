@@ -1,33 +1,26 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.File;
 import java.util.GregorianCalendar;
-import java.util.Vector;
 
 import junit.framework.TestCase;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.FeatureSource;
-import org.geotools.data.shapefile.ShapefileDataStore;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.narrative.model.Narrative;
-import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.routing.edgetype.loader.ShapefileStreetLoader;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.impl.DistanceLibrary;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 public class TestStreet extends TestCase {
+
+    private static GeometryFactory _geomFactory = new GeometryFactory();
 
     public void testStreetWalk() {
         Graph gg = new Graph();
@@ -66,65 +59,47 @@ public class TestStreet extends TestCase {
 
     public void testStreetDirection() {
 
-        Graph gg = new Graph();
-        try {
-            File file = new File("src/test/resources/simple_streets/simple_streets.shp");
-            DataStore dataStore = new ShapefileDataStore(file.toURI().toURL());
-            // we are now connected
-            String[] typeNames = dataStore.getTypeNames();
-            String typeName = typeNames[0];
+        Street streetN = createStreet(47.670300419806246, -122.28909730911255, 47.67212102588157,
+                -122.28914022445679);
+        assertEquals("north", streetN.getDirection());
 
-            FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
+        Street streetNE = createStreet(47.670300419806246, -122.28909730911255, 47.67209212786854,
+                -122.28796005249023);
+        assertEquals("northeast", streetNE.getDirection());
 
-            featureSource = dataStore.getFeatureSource(typeName);
+        Street streetE = createStreet(47.670300419806246, -122.28909730911255, 47.670285970297634,
+                -122.28796005249023);
+        assertEquals("east", streetE.getDirection());
 
-            ShapefileStreetLoader loader = new ShapefileStreetLoader(gg, featureSource);
-            loader.load();
-        } catch (Exception e) {
-            e.printStackTrace();
-            assertNull("got an exception");
-        }
+        Street streetSE = createStreet(47.670300419806246, -122.28909730911255, 47.66850865023101,
+                -122.28802442550659);
+        assertEquals("southeast", streetSE.getDirection());
 
-        Vertex northVertex = null;
-        for (Vertex v : gg.getVertices()) {
-            if (northVertex == null || v.getCoordinate().y > northVertex.getCoordinate().y) {
-                northVertex = v;
-            }
-        }
+        Street streetS = createStreet(47.670300419806246, -122.28909730911255, 47.668494200226334,
+                -122.28914022445679);
+        assertEquals("south", streetS.getDirection());
 
-        Vertex eastVertex = null;
-        for (Vertex v : gg.getVertices()) {
-            if (eastVertex == null || v.getCoordinate().x > eastVertex.getCoordinate().x) {
-                eastVertex = v;
-            }
-        }
+        Street streetSW = createStreet(47.670300419806246, -122.28909730911255, 47.66855200022105,
+                -122.2901701927185);
+        assertEquals("southwest", streetSW.getDirection());
 
-        Edge garfieldPlBack = eastVertex.getOutgoing().iterator().next();
-        TraverseOptions toWalk = new TraverseOptions(TraverseMode.WALK);
-        assertNotNull(garfieldPlBack.traverse(new State(), toWalk));
-        
-        TraverseOptions toCar = new TraverseOptions(TraverseMode.CAR);
-        assertNull(garfieldPlBack.traverse(new State(), toCar));
-        
-        Edge garfieldPl = eastVertex.getIncoming().iterator().next();
-        assertNotNull(garfieldPl.traverse(new State(), toCar));
-        
-        
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, northVertex.getLabel(),
-                eastVertex.getLabel(), new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0)
-                        .getTimeInMillis()), new TraverseOptions());
+        Street streetW = createStreet(47.670300419806246, -122.28909730911255, 47.670300419806246,
+                -122.29019165039062);
+        assertEquals("west", streetW.getDirection());
 
-        GraphPath path = spt.getPath(eastVertex);
-        assertNotNull(path);
+        Street streetNW = createStreet(47.670300419806246, -122.28909730911255, 47.67214992387863,
+                -122.29019165039062);
+        assertEquals("northwest", streetNW.getDirection());
+    }
 
-        Vector<SPTEdge> edges = path.edges;
-        SPTEdge seventhAve = edges.elementAt(0);
-        assertEquals("south", seventhAve.payload.getDirection());
-        SPTEdge sptGarfieldPl = edges.elementAt(1);
-        assertEquals("east", sptGarfieldPl.payload.getDirection());
-
-        Narrative narrative = new Narrative(path);
-        String direction = narrative.getSections().elementAt(0).getDirection();
-        assertEquals("southeast", direction);
+    private Street createStreet(double latFrom, double lonFrom, double latTo, double lonTo) {
+        Vertex from = new GenericVertex("from", lonFrom, latFrom);
+        Vertex to = new GenericVertex("to", lonTo, latTo);
+        double len = DistanceLibrary.distance(latFrom, lonFrom, latTo, lonTo);
+        Street street = new Street(from, to, len);
+        LineString line = _geomFactory.createLineString(new Coordinate[] { from.getCoordinate(),
+                to.getCoordinate() });
+        street.setGeometry(line);
+        return street;
     }
 }
