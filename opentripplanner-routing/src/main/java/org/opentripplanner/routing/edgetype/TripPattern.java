@@ -51,7 +51,7 @@ public final class TripPattern implements Serializable {
 
     }
 
-    public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
+    public int addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
             int arrivalTime, int dwellTime) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
@@ -75,6 +75,7 @@ public final class TripPattern implements Serializable {
         stopRunningTimes.insertElementAt(runningTime, insertionPoint);
         stopArrivalTimes.insertElementAt(arrivalTime, insertionPoint);
         stopDwellTimes.insertElementAt(dwellTime, insertionPoint);
+        return insertionPoint;
     }
 
     public int getNextPattern(int stopIndex, int afterTime) {
@@ -127,5 +128,10 @@ public final class TripPattern implements Serializable {
     public int getDwellTime(int stopIndex, int pattern) {
         Vector<Integer> stopDwellTimes = dwellTimes[stopIndex];
         return stopDwellTimes.get(pattern);
+    }
+
+    public void setDwellTime(int stopIndex, int pattern, int dwellTime) {
+        Vector<Integer> stopDwellTimes = dwellTimes[stopIndex];
+        stopDwellTimes.set(pattern, dwellTime);
     }
 }

@@ -15,11 +15,14 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.Transfer;
 import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextypes.TransitStop;
 
@@ -133,7 +136,7 @@ public class TestPatternHopLoader extends TestCase {
 
         // Saturday morning
         long startTime = new GregorianCalendar(2009, 8, 19, 0, 5, 0).getTimeInMillis();
-        
+
         spt = Dijkstra.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
                 startTime), options);
 
@@ -141,7 +144,7 @@ public class TestPatternHopLoader extends TestCase {
         assertNotNull(path);
         assertEquals(4, path.vertices.size());
         long endTime = path.vertices.lastElement().state.getTime();
-        assertTrue(endTime < startTime + 1000 * 60 * 60 );
+        assertTrue(endTime < startTime + 1000 * 60 * 60);
     }
 
     public Edge getHopOut(Vertex v) {
@@ -156,13 +159,13 @@ public class TestPatternHopLoader extends TestCase {
         }
         return null;
     }
-    
+
     public void testShapeByLocation() throws Exception {
         Vertex stop_g = graph.getVertex("agency_G");
         Edge hop = getHopOut(stop_g);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
-        
+
         Vertex stop_a = graph.getVertex("agency_A");
         hop = getHopOut(stop_a);
         geometry = hop.getGeometry();
@@ -170,6 +173,7 @@ public class TestPatternHopLoader extends TestCase {
         assertTrue(geometry.getLength() < 1.001);
 
     }
+
     public void testShapeByDistance() throws Exception {
         Vertex stop_i = graph.getVertex("agency_I");
         Edge hop = getHopOut(stop_i);
@@ -191,4 +195,28 @@ public class TestPatternHopLoader extends TestCase {
         assertTrue(transfers > 0);
     }
 
+    public void testInterlining() throws Exception {
+        Vertex stop_i = graph.getVertex("agency_I");
+        Vertex stop_k = graph.getVertex("agency_K");
+
+        long startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 0).getTimeInMillis();
+        TraverseOptions options = new TraverseOptions(context);
+
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, stop_i.getLabel(), stop_k
+                .getLabel(), new State(startTime), options);
+        GraphPath path = spt.getPath(stop_k);
+        int num_alights = 0;
+        for (SPTEdge e : path.edges) {
+            if (e.payload instanceof PatternAlight || e.payload instanceof Alight) {
+                num_alights += 1;
+            }
+            if (e.payload instanceof PatternDwell) {
+                State state0 = e.fromv.state;
+                State state1 = e.tov.state;
+                assertEquals(10 * 60 * 1000, state1.getTime() - state0.getTime());
+            }
+        }
+        assertEquals(1, num_alights);
+
+    }
 }

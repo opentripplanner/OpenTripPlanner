@@ -70,6 +70,32 @@ class StopPattern2 {
     }
 }
 
+class EncodedTrip {
+    Trip trip;
+
+    int patternIndex;
+
+    TripPattern pattern;
+
+    public EncodedTrip(Trip trip, int i, TripPattern pattern) {
+        this.trip = trip;
+        this.patternIndex = i;
+        this.pattern = pattern;
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof EncodedTrip))
+            return false;
+        EncodedTrip eto = (EncodedTrip) o;
+        return trip.equals(eto.trip) && patternIndex == eto.patternIndex
+                && pattern.equals(eto.pattern);
+    }
+
+    public String toString() {
+        return "EncodedTrip(" + this.trip + ", " + this.patternIndex + ", " + this.pattern + ")";
+    }
+}
+
 public class GTFSPatternHopFactory {
 
     private final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
@@ -118,6 +144,8 @@ public class GTFSPatternHopFactory {
 
         int index = 0;
 
+        HashMap<String, ArrayList<EncodedTrip>> tripsByBlock = new HashMap<String, ArrayList<EncodedTrip>>();
+
         for (Trip trip : trips) {
 
             if (index % 100 == 0)
@@ -135,6 +163,7 @@ public class GTFSPatternHopFactory {
             if (tripPattern == null) {
 
                 tripPattern = new TripPattern(trip, stopTimes);
+                int patternIndex = -1;
 
                 for (int i = 0; i < lastStop; i++) {
                     StopTime st0 = stopTimes.get(i);
@@ -166,8 +195,8 @@ public class GTFSPatternHopFactory {
                     hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                             endJourneyArrive));
 
-                    tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime, st1
-                            .getArrivalTime(), dwellTime);
+                    patternIndex = tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime,
+                            st1.getArrivalTime(), dwellTime);
                     graph.addEdge(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));
@@ -176,11 +205,19 @@ public class GTFSPatternHopFactory {
                     PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart,
                             tripPattern, i);
                     graph.addEdge(boarding);
-                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern,
-                            i));
-
+                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i));
                 }
                 patterns.put(stopPattern, tripPattern);
+
+                String blockId = trip.getBlockId();
+                if (blockId != null && !blockId.equals("")) {
+                    ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
+                    if (blockTrips == null) {
+                        blockTrips = new ArrayList<EncodedTrip>();
+                        tripsByBlock.put(blockId, blockTrips);
+                    }
+                    blockTrips.add(new EncodedTrip(trip, patternIndex, tripPattern));
+                }
             } else {
                 int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
                         .getDepartureTime());
@@ -197,6 +234,7 @@ public class GTFSPatternHopFactory {
                 } else {
 
                     // try to insert this trip at this location
+                    boolean simple = false;
                     for (int i = 0; i < lastStop; i++) {
                         StopTime st0 = stopTimes.get(i);
                         StopTime st1 = stopTimes.get(i + 1);
@@ -215,9 +253,60 @@ public class GTFSPatternHopFactory {
                                 tripPattern.removeHop(i, insertionPoint);
                             }
                             createSimpleHops(graph, trip, stopTimes);
+                            simple = true;
                             break;
                         }
                     }
+                    if (!simple) {
+                        String blockId = trip.getBlockId();
+                        if (blockId != null && !blockId.equals("")) {
+                            ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
+                            if (blockTrips == null) {
+                                blockTrips = new ArrayList<EncodedTrip>();
+                                tripsByBlock.put(blockId, blockTrips);
+                            }
+                            blockTrips.add(new EncodedTrip(trip, 0, tripPattern));
+                        }
+                    }
+                }
+            }
+        }
+
+        /* for interlined trips, add final dwell edge */
+        for (ArrayList<EncodedTrip> blockTrips : tripsByBlock.values()) {
+            HashMap<Stop, EncodedTrip> starts = new HashMap<Stop, EncodedTrip>();
+            for (EncodedTrip encoded : blockTrips) {
+                Trip trip = encoded.trip;
+                List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+                Stop start = stopTimes.get(0).getStop();
+                starts.put(start, encoded);
+            }
+            for (EncodedTrip encoded : blockTrips) {
+                Trip trip = encoded.trip;
+                List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+                StopTime endTime = stopTimes.get(stopTimes.size() - 1);
+                Stop end = endTime.getStop();
+
+                if (starts.containsKey(end)) {
+                    EncodedTrip nextTrip = starts.get(end);
+
+                    Vertex arrive = graph.addVertex(
+                            id(end.getId()) + "_" + id(trip.getId()) + "_A", end.getLon(), end
+                                    .getLat());
+
+                    Vertex depart = graph.addVertex(id(end.getId()) + "_"
+                            + id(nextTrip.trip.getId()) + "_D", end.getLon(), end.getLat());
+                    PatternDwell dwell = new PatternDwell(arrive, depart, nextTrip.patternIndex,
+                            encoded.pattern);
+
+                    graph.addEdge(dwell);
+
+                    List<StopTime> nextStopTimes = _dao.getStopTimesForTrip(nextTrip.trip);
+                    StopTime startTime = nextStopTimes.get(0);
+                    int dwellTime = startTime.getDepartureTime() - endTime.getArrivalTime();
+                    encoded.pattern.setDwellTime(stopTimes.size() - 2, encoded.patternIndex,
+                            dwellTime);
+
                 }
             }
         }
@@ -320,7 +409,7 @@ public class GTFSPatternHopFactory {
             double[] distances = getDistanceForShapeId(shapeId);
 
             if (distances != null) {
-                
+
                 LinearLocation startIndex = getSegmentFraction(distances, startDistance);
                 LinearLocation endIndex = getSegmentFraction(distances, endDistance);
 
@@ -352,13 +441,14 @@ public class GTFSPatternHopFactory {
 
         LineString geometry = _geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
-            
+
             geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
 
             // Pack the resulting line string
-            CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry.getCoordinates(), 2);
+            CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
+                    .getCoordinates(), 2);
             geometry = _factory.createLineString(sequence);
-            
+
             _geometriesByShapeSegmentKey.put(key, geometry);
         }
 
@@ -420,6 +510,6 @@ public class GTFSPatternHopFactory {
 
         double indexPart = (distance - distances[index - 1])
                 / (distances[index] - distances[index - 1]);
-        return new LinearLocation(index-1,indexPart);
+        return new LinearLocation(index - 1, indexPart);
     }
 }
