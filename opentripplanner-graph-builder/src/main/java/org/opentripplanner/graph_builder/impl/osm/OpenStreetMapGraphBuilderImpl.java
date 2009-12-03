@@ -195,7 +195,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             
             id = unique(id);
             
-            Street street = new Street(from, to, id, id, d, permissions);
+            String name = way.getTags().get("name");
+            if (name == null) {
+                name = id;
+            }
+            Street street = new Street(from, to, id, name, d, permissions);
             
             Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate()};
             Float sequence = new PackedCoordinateSequence.Float(coordinates, 2);
