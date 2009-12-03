@@ -50,4 +50,7 @@ public class SPTVertex extends GenericVertex {
         return this.mirror.getLabel() + " (" + this.weightSum + ")";
     }
 
+    public String getName() {
+        return this.mirror.getName();
+    }
 }

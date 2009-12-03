@@ -17,6 +17,8 @@ public class GenericVertex implements Vertex {
     private Vector<Edge> incoming;
 
     public String label;
+    
+    private String name;
 
     public Class<?> type;
 
@@ -36,6 +38,11 @@ public class GenericVertex implements Vertex {
         this.setIncoming(new Vector<Edge>());
     }
 
+    public GenericVertex(String label, double x, double y, String name) {
+        this(label, x, y);
+        this.name = name;
+    }
+    
     public double distance(Vertex v) {
 
         double xd = v.getX() - getX();
@@ -126,5 +133,10 @@ public class GenericVertex implements Vertex {
         incoming.trimToSize();
         outgoing.trimToSize();
         out.defaultWriteObject();
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

@@ -21,7 +21,12 @@ public final class DummyReferenceVertex implements Vertex {
     public String getLabel() {
         return this.vertexId;
     }
-
+    
+    @Override
+    public String getName() {
+        return this.vertexId;
+    }
+    
     @Override
     public void addIncoming(Edge ee) {
         throw new UnsupportedOperationException();

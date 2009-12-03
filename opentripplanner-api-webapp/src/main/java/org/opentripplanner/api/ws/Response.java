@@ -18,7 +18,8 @@ public class Response {
     public Response() {
     }
 
-    public Response(Request req) {
+    public Response(Request req, TripPlan plan) {
         requestParameters = req.getParameters();
+        this.plan = plan;
     }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.api.model;
 
+import java.util.Currency;
 import java.util.Hashtable;
 import java.util.logging.Logger;
 
@@ -9,16 +10,17 @@ import java.util.logging.Logger;
 public class Fare {
     protected static final Logger LOGGER = Logger.getLogger(Fare.class.getCanonicalName());
 
-    protected static enum FareType {
+    public static enum FareType {
         regular, student, senior, tram, special
     }
 
-    public Hashtable<FareType, String> fare;
+    public Hashtable<FareType, Money> fare;
 
     public Fare() {
-        fare = new Hashtable<FareType, String>();
-        fare.put(FareType.regular, "$2.22");
-        fare.put(FareType.senior, "$3.33");
-        fare.put(FareType.student, "$4.44");
+        fare = new Hashtable<FareType, Money>();
+    }
+
+    public void addFare(FareType fareType, Currency currency, int cents) {
+        fare.put(fareType, new Money(currency, cents));
     }
 }

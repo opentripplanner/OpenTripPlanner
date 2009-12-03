@@ -45,4 +45,6 @@ public interface Vertex extends Serializable {
 
     public void setType(Class<?> type);
 
+    public String getName();
+
 }

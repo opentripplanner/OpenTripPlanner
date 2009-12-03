@@ -1,9 +1,9 @@
 package org.opentripplanner.api.ws;
 
-import java.util.Calendar;
+import java.util.Currency;
+import java.util.Date;
 import java.util.List;
 import java.util.Vector;
-
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -13,26 +13,27 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.opentripplanner.api.model.Fare;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.TimeDistance;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.ws.RequestInf.ModeType;
 import org.opentripplanner.api.ws.RequestInf.OptimizeType;
-import org.opentripplanner.narrative.model.Narrative;
-import org.opentripplanner.narrative.model.NarrativeItem;
-import org.opentripplanner.narrative.model.NarrativeSection;
-import org.opentripplanner.narrative.services.NarrativeService;
+import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
+import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
-import org.opentripplanner.util.GeoJSONBuilder;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
 
 /**
  *
@@ -43,11 +44,11 @@ import com.vividsolutions.jts.geom.Point;
 @Autowire
 public class Planner {
 
-    private NarrativeService _narrativeService;
+    private PathService pathservice;
 
     @Autowired
-    public void setNarrativeService(NarrativeService narrativeService) {
-        _narrativeService = narrativeService;
+    public void setPathService(PathService pathService) {
+        this.pathservice = pathService;
     }
 
     @GET
@@ -88,107 +89,123 @@ public class Planner {
 
         request.setOutputFormat(MediaType.valueOf(of));
 
-        List<Narrative> narratives = _narrativeService.plan(request.getFrom(), request.getTo(),
-                request.getDateTime(), request.isArriveBy());
+        List<GraphPath> paths = pathservice.plan(request.getFrom(), request.getTo(), request
+                .getDateTime(), request.isArriveBy());
 
-        TripPlan plan = new TripPlan();
+        Vector<SPTVertex> vertices = paths.get(0).vertices;
+        SPTVertex tripStartVertex = vertices.firstElement();
+        SPTVertex tripEndVertex = vertices.lastElement();
+        Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), request.getFrom());
+        Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), request.getTo());
 
-        Calendar calendar = Calendar.getInstance();
+        TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
-        for (Narrative narrative : narratives) {
+        for (GraphPath path : paths) {
 
             Itinerary itinerary = new Itinerary();
             plan.addItinerary(itinerary);
 
-            Vector<NarrativeSection> sections = narrative.getSections();
-            TimeDistance timeDistance = new TimeDistance();
-            long startTime = sections.firstElement().getStartTime();
-            long endTime = sections.lastElement().getEndTime();
+            SPTVertex startVertex = path.vertices.firstElement();
+            State startState = startVertex.state;
+            SPTVertex endVertex = path.vertices.lastElement();
+            State endState = endVertex.state;
 
-            timeDistance.duration = (endTime - startTime) / 1000.0;
+            itinerary.startTime = new Date(startState.getTime());
+            itinerary.endTime = new Date(endState.getTime());
+            itinerary.duration = endState.getTime() - startState.getTime();
+            itinerary.fare = new Fare();
+            itinerary.fare.addFare(Fare.FareType.regular, Currency.getInstance("USD"), 225);
 
-            calendar.setTimeInMillis(startTime);
-            timeDistance.start = calendar.getTime();
-            calendar.setTimeInMillis(endTime);
-            timeDistance.end = calendar.getTime();
-            
+            Leg leg = null;
+            TransportationMode mode = null;
+            Geometry geometry = null;
+            String name = null;
 
-            itinerary.timeDistance = timeDistance;
+            for (SPTEdge edge : path.edges) {
+                Edge graphEdge = edge.payload;
 
-            plan.addItinerary(itinerary);
+                TransportationMode edgeMode = graphEdge.getMode();
+                double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
 
-            for (NarrativeSection section : sections) {
-                TransportationMode mode = section.getMode();
-                long sectionTime = (section.getEndTime() - section.getStartTime()) / 1000;
-                if (mode.isTransitMode()) {
-                    timeDistance.transit += sectionTime;
+                if (!edgeMode.isTransitMode() && edgeMode != TransportationMode.ALIGHTING) {
+                    if (edgeMode != mode
+                            || (mode != TransportationMode.WALK && graphEdge.getName() != name)) {
+                        name = graphEdge.getName();
+                        if (leg != null) {
+                            /* finalize leg */
+                            Vertex fromv = graphEdge.getFromVertex();
+                            Coordinate endCoord = fromv.getCoordinate();
+                            leg.to = new Place(endCoord.x, endCoord.y, fromv.getName());
+                            leg.end = new Date(edge.tov.state.getTime());
+                            leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+                            leg.duration = edge.tov.state.getTime() - leg.start.getTime();
+                            leg = null;
+                        }
+
+                        leg = new Leg();
+                        itinerary.addLeg(leg);
+
+                        leg.start = new Date(edge.fromv.state.getTime());
+                        leg.route = graphEdge.getName();
+                        mode = graphEdge.getMode();
+                        leg.mode = mode.toString();
+                        leg.distance = edge.getDistance();
+                        Vertex fromv = graphEdge.getFromVertex();
+                        Coordinate endCoord = fromv.getCoordinate();
+                        leg.from = new Place(endCoord.x, endCoord.y, fromv.getName());
+                    }
                 }
-                switch (mode) {
-                case TRANSFER:
-                    timeDistance.transfers += 1;
-                    timeDistance.waiting += sectionTime;
-                    continue; //transfers don't get legs
-                case WALK:
-                    timeDistance.walk += sectionTime;
-                    break;
-                    
+                Geometry edgeGeometry = graphEdge.getGeometry();
+                if (geometry == null) {
+                    geometry = edgeGeometry;
+                } else {
+                    if (edgeGeometry != null) {
+                        geometry = geometry.union(edgeGeometry);
+                    }
                 }
 
-                Leg leg = new Leg();
-                leg.mode = getTransportationModeForSection(section);
+                if (edgeMode == TransportationMode.TRANSFER) {
 
-                leg.legGeometry = PolylineEncoder.createEncodings(section.getGeometry());
-                leg.from = getPlaceForSection(section, true);
-                leg.to = getPlaceForSection(section, false);
-                itinerary.addLeg(leg);
+                    itinerary.transfers++;
+                    itinerary.walkTime += edgeTime;
+                    itinerary.walkDistance += graphEdge.getDistance();
+                    continue;
+                }
+
+                if (edgeMode == TransportationMode.BOARDING) {
+                    itinerary.waitingTime += edgeTime;
+                    continue;
+                }
+
+                if (edgeMode == TransportationMode.WALK) {
+                    itinerary.walkTime += edgeTime;
+                    itinerary.walkDistance += graphEdge.getDistance();
+                }
+
+                if (edgeMode.isTransitMode()) {
+                    itinerary.transitTime += edgeTime;
+                    mode = graphEdge.getMode();
+                    leg.mode = mode.toString();
+                    leg.route = graphEdge.getName();
+                }
             }
-            timeDistance.legs = itinerary.leg.size();
+
+            SPTEdge edge = path.edges.lastElement();
+            Edge graphEdge = edge.payload;
+
+            if (leg != null) {
+                /* finalize leg */
+                Vertex tov = graphEdge.getToVertex();
+                Coordinate endCoord = tov.getCoordinate();
+                leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
+                leg.end = new Date(edge.tov.state.getTime());
+                leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+                leg.duration = edge.tov.state.getTime() - leg.start.getTime();
+                leg = null;
+            }
+
         }
-        Response response = new Response(request);
-        response.plan = plan;
+        Response response = new Response(request, plan);
         return response;
-    }
-
-    private String getTransportationModeForSection(NarrativeSection section) {
-        if (section.getMode() == null)
-            return "Bus";
-        return section.getMode().toString();
-    }
-
-    private Place getPlaceForSection(NarrativeSection section, boolean isFrom) throws JSONException {
-
-        Point point = getEndPoint(section, isFrom);
-
-        Place place = new Place();
-        place.geometry = GeoJSONBuilder.getGeometryAsJsonString(point);
-        
-        if (isFrom) {
-            place.name = section.getItems().firstElement().getStart();
-        } else {
-            place.name = section.getItems().lastElement().getEnd();
-        }
-        return place;
-    }
-
-    private Point getEndPoint(NarrativeSection section, boolean first) {
-
-        Geometry geometry = getGeometry(section, first);
-
-        if (geometry instanceof Point) {
-            return (Point) geometry;
-        } else if (geometry instanceof LineString) {
-            LineString lineString = (LineString) geometry;
-            return first ? lineString.getStartPoint() : lineString.getEndPoint();
-        } else {
-            return geometry.getCentroid();
-        }
-    }
-
-    private Geometry getGeometry(NarrativeSection section, boolean first) {
-        if (section.getGeometry() != null)
-            return section.getGeometry();
-        Vector<NarrativeItem> items = section.getItems();
-        NarrativeItem item = first ? items.get(0) : items.get(items.size() - 1);
-        return item.getGeometry();
     }
 }

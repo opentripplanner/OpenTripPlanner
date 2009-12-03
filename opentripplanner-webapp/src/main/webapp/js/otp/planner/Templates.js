@@ -106,18 +106,18 @@ otp.planner.Templates = {
     },
 
     TP_WALK_LEG : new Ext.XTemplate(
-          '<h4><a href="#">Walk</a> {[otp.util.StringFormattingUtils.getDirection(values.direction)]} to {toDescription}</h4>',
+          '<h4><a href="#">Walk</a> {[otp.util.StringFormattingUtils.getDirection(values.direction)]} to {toName}</h4>',
           '<tpl if="toStopId &gt; 0"><p>Stop ID {toStopId}</p></tpl>',
           '<p class="transfers">About {duration} minute<tpl if="duration != 1.0">s</tpl> - {distance} miles</p>'
     ).compile(),
     
     
     TP_START : new Ext.XTemplate(
-          '<h4><a href="#">Start at</a> {description}</h4>'
+          '<h4><a href="#">Start at</a> {from}</h4>'
     ).compile(), 
 
     TP_END : new Ext.XTemplate(
-          '<h4><a href="#">End at</a> {description}</h4>'
+          '<h4><a href="#">End at</a> {to}</h4>'
     ).compile(), 
 
     CLASS_NAME: "otp.planner.Templates"

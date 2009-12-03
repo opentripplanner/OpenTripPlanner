@@ -1,4 +1,4 @@
-package org.opentripplanner.narrative.impl;
+package org.opentripplanner.routing.impl;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -8,12 +8,11 @@ import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
-import org.opentripplanner.narrative.model.Narrative;
-import org.opentripplanner.narrative.services.NarrativeService;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -23,7 +22,7 @@ import org.springframework.stereotype.Component;
 import com.vividsolutions.jts.geom.Coordinate;
 
 @Component
-public class NarrativeServiceImpl implements NarrativeService {
+public class PathServiceImpl implements PathService {
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
@@ -61,7 +60,7 @@ public class NarrativeServiceImpl implements NarrativeService {
     }
 
     @Override
-    public List<Narrative> plan(String fromPlace, String toPlace, Date targetTime, boolean arriveBy) {
+    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime, boolean arriveBy) {
 
         Vertex fromVertex = getVertexForPlace(fromPlace);
         Vertex toVertex = getVertexForPlace(toPlace);
@@ -75,9 +74,7 @@ public class NarrativeServiceImpl implements NarrativeService {
 
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
 
-        Narrative narrative = getGraphPathAsNarrative(path);
-
-        return Arrays.asList(narrative);
+        return Arrays.asList(path);
     }
 
     private Vertex getVertexForPlace(String place) {
@@ -94,7 +91,4 @@ public class NarrativeServiceImpl implements NarrativeService {
         return _graph.getVertex(place);
     }
 
-    private Narrative getGraphPathAsNarrative(GraphPath path) {
-        return new Narrative(path);
-    }
 }

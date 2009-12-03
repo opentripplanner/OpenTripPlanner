@@ -350,7 +350,7 @@ otp.planner.Itinerary = {
             var from = this.m_fromStore.getAt(startIndex);
             var fromP = from.get('geometry');
             var mode = from.get('mode');
-            if(mode != 'Walk') 
+            if(mode != 'walk') 
             {
                 // if the first leg isn't a walk, then assume it's a tranist leg
                 // so paint the route icon (eg: fromStore.getAt(0))
@@ -368,7 +368,7 @@ otp.planner.Itinerary = {
             var walk = this.m_fromStore.getAt(endIndex);
             var walkP = walk.get('geometry');
             var mode = walk.get('mode');
-            if(mode == 'Walk')
+            if(mode == 'walk')
             {
                 endIndex--;
                 otp.util.OpenLayersUtils.makeWalkMarker(walkP.x, walkP.y, this.m_markers);
@@ -475,7 +475,7 @@ otp.planner.Itinerary = {
             var hasKids = true;
             var iconCLS = 'bus-icon';
             var sched = null;
-            if (leg.get('mode') == 'Walk') 
+            if (leg.get('mode') == 'walk') 
             {
                 text = otp.planner.Templates.TP_WALK_LEG.applyTemplate(leg.data);
                 hasKids = false;
@@ -492,13 +492,13 @@ otp.planner.Itinerary = {
                     //sched = otp.planner.Templates.makeTTPUBLinkFromData(leg.data);
                 }
 
-                if(leg.get('mode') == 'Bus')
+                if(leg.get('mode') == 'bus')
                     iconCLS = 'bus-icon';
-                else if(leg.get('mode') == 'Tram')
+                else if(leg.get('mode') == 'tram')
                     iconCLS = 'tram-icon';
-                else if(leg.get('mode') == 'Streetcar')
+                else if(leg.get('mode') == 'streetcar')
                     iconCLS = 'streetcar-icon';
-                else if(leg.get('mode') == 'Commuter Rail')
+                else if(leg.get('mode') == 'rail')
                     iconCLS = 'commrail-icon';
                 else
                     iconCLS = 'ltrail-icon';

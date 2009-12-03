@@ -108,11 +108,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
                 Vertex startCorner = new GenericVertex(startIntersectionName, startCoordinate.x,
-                        startCoordinate.y);
+                        startCoordinate.y, startIntersectionName);
                 startCorner = graph.addVertex(startCorner);
                 startCorner.setType(Intersection.class);
                 Vertex endCorner = new GenericVertex(endIntersectionName, endCoordinate.x,
-                        endCoordinate.y);
+                        endCoordinate.y, endIntersectionName);
                 endCorner = graph.addVertex(endCorner);
                 endCorner.setType(Intersection.class);
 

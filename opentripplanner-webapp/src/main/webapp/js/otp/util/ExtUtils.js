@@ -548,22 +548,14 @@ otp.util.ExtUtils = {
     },
     
     /** */
-    getCoordinate: function(record, defVal, isLatLon)
+    getCoordinate: function(record, defVal)
     {
         var retVal = defVal;
 
-        var x = 'x';
-        var y = 'y';
-        if(isLatLon)
-        {
-            x = 'lon';
-            y = 'lat';
-        }
-
         try
         {
-            var x = record.get(x);
-            var y = record.get(y);
+            var x = record.get('lon');
+            var y = record.get('lat');
             
             retVal = x + "," + y;
         }
@@ -590,11 +582,9 @@ otp.util.ExtUtils = {
           {name: 'mode',        mapping: '@mode'},
           {name: 'order',       mapping: '@order'},
           {name: 'routeID',     mapping: 'route'},
-          {name: 'x',           mapping: typeID + 'pos/x'},
-          {name: 'y',           mapping: typeID + 'pos/y'},
           {name: 'lat',         mapping: typeID + 'pos/lat'},
           {name: 'lon',         mapping: typeID + 'pos/lon'},
-          {name: 'description', mapping: typeID + 'description'},
+          {name: 'name',        mapping: typeID + 'name'},
           {name: 'stopId',      mapping: typeID + 'stopId'}, 
           {name: 'areaKey',     mapping: typeID + '@areaKey'},
           {name: 'areaValue',   mapping: typeID + '@areaValue'},

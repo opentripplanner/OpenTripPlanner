@@ -5,6 +5,15 @@ otp.namespace("otp.planner");
   */
 try
 {
+function millisToMinutes (n, p) {
+	return parseInt(n / 60000);
+}
+
+function metersToMiles (n, p) {
+	var miles = n / 1609.344;
+	return miles.toFixed(2);
+}
+
 otp.planner.Utils = {
 
     // constants
@@ -17,7 +26,7 @@ otp.planner.Utils = {
     FROM_ID            : 'from',
     TRIP_ID            : 'trip',
     TO_ID              : 'to',
-
+    
     ITIN_RECORD : new Ext.data.Record.create([
                   'id',
                   'description',
@@ -26,26 +35,25 @@ otp.planner.Utils = {
                   {name: 'honoredFare',  mapping: 'fare/special[@id=honored]'},
                   {name: 'youthFare',    mapping: 'fare/special[@id=youth]'},
                   {name: 'tramFare',     mapping: 'fare/special[@id=tram]'},
-                  {name: 'date',         mapping: 'timeDistance/date'},
-                  {name: 'duration',     mapping: 'timeDistance/duration'},
-                  {name: 'startTime',    mapping: 'timeDistance/start'},
-                  {name: 'endTime',      mapping: 'timeDistance/end'},
-                  {name: 'numTransfers', mapping: 'timeDistance/numberOfTransfers'},
-                  {name: 'numLegs',      mapping: 'timeDistance/numberOfTripLegs'},
-                  {name: 'walkTime',     mapping: 'timeDistance/walking'},
-                  {name: 'walkDistance', mapping: 'timeDistance/distance'},
-                  {name: 'transitTime',  mapping: 'timeDistance/transit'},
-                  {name: 'waitingTime',  mapping: 'timeDistance/waiting'}
+                  {name: 'duration',     mapping: 'duration', convert: millisToMinutes},
+                  {name: 'startTime',    mapping: 'startTime'},
+                  {name: 'endTime',      mapping: 'endTime'},
+                  {name: 'numTransfers', mapping: 'transfers'},
+                  {name: 'numLegs',      mapping: 'legs', convert : function (n, p) { return p.length; }},
+                  {name: 'walkTime',     mapping: 'walkTime', convert: millisToMinutes},
+                  {name: 'walkDistance', mapping: 'walkDistance', convert: metersToMiles},
+                  {name: 'transitTime',  mapping: 'transitTime', convert: millisToMinutes},
+                  {name: 'waitingTime',  mapping: 'waitingTime', convert: millisToMinutes}
     ]),
     
     LEG_RECORD : new Ext.data.Record.create([
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
                   {name: 'order',            mapping: '@order'},
-                  {name: 'startTime',        mapping: 'timeDistance/startTime'},
-                  {name: 'endTime',          mapping: 'timeDistance/endTime'},
-                  {name: 'duration',         mapping: 'timeDistance/duration'},
-                  {name: 'distance',         mapping: 'timeDistance/distance'},
+                  {name: 'startTime',        mapping: 'startTime'},
+                  {name: 'endTime',          mapping: 'endTime'},
+                  {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
+                  {name: 'distance',         mapping: 'distance', convert: millisToMinutes},
                   {name: 'direction',        mapping: 'direction'},
                   {name: 'key',              mapping: 'key'},
                   {name: 'alerts',           mapping: 'route', convert: function(n, p)
@@ -63,7 +71,7 @@ otp.planner.Utils = {
                       }
                       return alerts;
                   }},
-                  {name: 'routeName',        mapping: 'route/name'},
+                  {name: 'routeName',        mapping: '@route'},
                   {name: 'routeNumber',      mapping: 'route/number'},
                   {name: 'urlParam',         mapping: 'lineURL/@param'},
                   {name: 'fromName',         mapping: 'from/name'},
@@ -78,9 +86,8 @@ otp.planner.Utils = {
                   {name: 'leg-geometry',         mapping: 'legGeometry/points',
                 	                         convert: function(n,p) {
                 	  							return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
-                	 					     } },
+                	 					     } }
     ]),
-
     /**
      * utility to select a dom element
      * 
@@ -175,9 +182,9 @@ otp.planner.Utils = {
     },
 
     CLASS_NAME: "otp.planner.Utils"
-}
+};
 }
 catch(e)
 {
-    console.log("planner.Utils Ext exception can be ignored -- just means you aren't including Ext.js in your app, which is OK");
+    console.log("planner.Utils Ext exception can be ignored -- just means you aren't including Ext.js in your app, which is OK:" + e);
 }

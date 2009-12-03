@@ -76,10 +76,10 @@ otp.planner.TripTab = {
         // step B: from & to nodes
         this.m_from = otp.util.ExtUtils.loadPointRecord('from', this.xml);
         this.m_to   = otp.util.ExtUtils.loadPointRecord('to',   this.xml);
-        if(this.m_from && this.m_from.get('description'))
-            this.m_title += this.m_from.get('description');
-        if(this.m_to && this.m_to.get('description'))
-            this.m_title += " to " + this.m_to.get('description');
+        if(this.m_from && this.m_from.get('name'))
+            this.m_title += this.m_from.get('name');
+        if(this.m_to && this.m_to.get('name'))
+            this.m_title += " to " + this.m_to.get('name');
 
         // step C: create itinerary nodes from the store (to be placed into trees ... see below)
         var z = new Array();

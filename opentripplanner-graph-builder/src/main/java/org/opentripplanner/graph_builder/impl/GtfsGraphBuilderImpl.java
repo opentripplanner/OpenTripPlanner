@@ -95,7 +95,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
                 String id = GtfsLibrary.convertIdToString(stop.getId());
                 Vertex vertex = graph
-                        .addVertex(new GenericVertex(id, stop.getLon(), stop.getLat()));
+                        .addVertex(new GenericVertex(id, stop.getLon(), stop.getLat(), stop.getName()));
                 vertex.setType(TransitStop.class);
             }
 
