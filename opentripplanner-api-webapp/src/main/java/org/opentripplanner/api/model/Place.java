@@ -2,7 +2,6 @@ package org.opentripplanner.api.model;
 
 import java.util.logging.Logger;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.opentripplanner.util.Constants;
