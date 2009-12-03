@@ -69,7 +69,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Vertex getClosestVertex(Coordinate location) {
         
         Envelope env = new Envelope(location);
-        env.expandBy(0.0018); 
+        env.expandBy(0.0036); 
         List<Vertex> nearby = (List<Vertex>) _index.query(env);
 
         Vertex minVertex = null;
