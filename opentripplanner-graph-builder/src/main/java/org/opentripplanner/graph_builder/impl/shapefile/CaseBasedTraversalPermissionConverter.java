@@ -66,7 +66,7 @@ public class CaseBasedTraversalPermissionConverter implements
         _defaultPermission = P2.createPair(permission, permission);
     }
 
-    public void setPermisssions(Map<String, String> permissions) {
+    public void setPermissions(Map<String, String> permissions) {
         for (Map.Entry<String, String> entry : permissions.entrySet()) {
             String attributeValue = entry.getKey();
             String perms = entry.getValue();
