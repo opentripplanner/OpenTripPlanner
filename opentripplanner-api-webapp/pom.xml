@@ -5,6 +5,7 @@
     <artifactId>opentripplanner-api-webapp</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>war</packaging>
+    <name>opentripplanner-api-webapp</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
