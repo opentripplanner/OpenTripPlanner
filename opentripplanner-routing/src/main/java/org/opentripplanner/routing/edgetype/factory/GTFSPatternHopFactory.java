@@ -273,9 +273,9 @@ public class GTFSPatternHopFactory {
                             _log
                                     .warn("trip "
                                             + trip.getId()
-                                            + "overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
+                                            + " overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
                             // back out trips and revert to the simple method
-                            for (; i >= 0; --i) {
+                            for (i=i-1; i >= 0; --i) {
                                 tripPattern.removeHop(i, insertionPoint);
                             }
                             createSimpleHops(graph, trip, stopTimes);

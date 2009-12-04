@@ -74,7 +74,10 @@ public final class TripPattern implements Serializable {
     }
 
     public void removeHop(int stopindex, int hop) {
-
+        runningTimes[stopindex].removeElementAt(hop);
+        departureTimes[stopindex].removeElementAt(hop);
+        dwellTimes[stopindex].removeElementAt(hop);
+        arrivalTimes[stopindex].removeElementAt(hop);
     }
 
     public int addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
