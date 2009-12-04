@@ -104,30 +104,11 @@ public class Street extends AbstractEdge implements WalkableEdge {
     private boolean canTraverse(TraverseOptions wo) {
         switch (permission) {
         case BICYCLE_ONLY:
-            switch (wo.mode) {
-            case CAR:
-            case CAR_AND_TRANSIT:
-            case WALK:
-            case WALK_AND_TRANSIT:
-                return false;
-            }
-            break;
+            return wo.modes.getBicycle();
         case PEDESTRIAN_AND_BICYCLE_ONLY:
-            switch (wo.mode) {
-            case CAR:
-            case CAR_AND_TRANSIT:
-                return false;
-            }
-            break;
+            return wo.modes.getBicycle() || wo.modes.getWalk();
         case PEDESTRIAN_ONLY:
-            switch (wo.mode) {
-            case CAR:
-            case CAR_AND_TRANSIT:
-            case BICYCLE:
-            case BICYCLE_AND_TRANSIT:
-                return false;
-            }
-            break;
+            return wo.modes.getWalk();
         case ALL:
         case CROSSHATCHED:
             /* everything is allowed */

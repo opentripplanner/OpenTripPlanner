@@ -28,13 +28,15 @@ package org.opentripplanner.api.ws;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+
 import javax.ws.rs.core.MediaType;
+
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 
 public interface RequestInf {
 
-    public static enum ModeType {
-        Walk, bus, train, bike
-    }
     public static enum OptimizeType {
         transfers, quick, flat
     }
@@ -46,7 +48,7 @@ public interface RequestInf {
 
     public static String WALK = "walk";
     public static String OPTIMIZE = "optimize";
-    public static String MODE = "mode";
+    public static String MODE = "Mode";
     public static String NUMBER_ITINERARIES = "numItineraries";
     public static String OUTPUT_FORMAT = "outputFormat";
 
@@ -88,21 +90,21 @@ public interface RequestInf {
     /**
      * @return the modes
      */
-    public List<ModeType> getModes();
-
+    public TraverseModeSet getModes();
+    
     /**
      * @param modes
      *            the modes to set
      */
-    public void addMode(ModeType mode);
+    public void addMode(TraverseMode mode);
 
     /** */
-    public void addMode(List<ModeType> mList);
+    public void setModes(TraverseModeSet mode);
 
     /**
      * @return the optimize
      */
-    public List<OptimizeType> getOptimize();
+    public Set<OptimizeType> getOptimize();
 
     /**
      * @param optimize
@@ -161,5 +163,7 @@ public interface RequestInf {
      *            the numItineraries to set
      */
     public void setNumItineraries(Integer numItineraries);
+
+    public void removeMode(TraverseMode car);
 
 }

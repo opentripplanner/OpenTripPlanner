@@ -44,7 +44,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.ws.RequestInf.ModeType;
 import org.opentripplanner.api.ws.RequestInf.OptimizeType;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -53,6 +52,8 @@ import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,11 +88,12 @@ public class Planner {
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @QueryParam(RequestInf.WALK) Double walk,
             @QueryParam(RequestInf.OPTIMIZE) List<OptimizeType> optList,
-            @QueryParam(RequestInf.MODE) List<ModeType> modeList,
+            @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
             @DefaultValue(MediaType.APPLICATION_JSON) @QueryParam(RequestInf.OUTPUT_FORMAT) String of)
             throws JSONException {
 
+        /* create request */
         Request request = new Request();
         request.setFrom(fromPlace);
         request.setTo(toPlace);
@@ -107,13 +109,23 @@ public class Planner {
         if (optList != null && optList.size() > 0)
             request.addOptimize(optList);
 
-        if (modeList != null && modeList.size() > 0)
-            request.addMode(modeList);
-
+        request.setModes(modes);
         request.setOutputFormat(MediaType.valueOf(of));
+        
+        /* use request to generate trip */
+        
+        TripPlan plan = generatePlan(request);
+        Response response = new Response(request, plan);
+        return response;
+    }
 
+    private TripPlan generatePlan(Request request) {
+        TraverseModeSet modeSet = request.getModeSet();
+        assert(modeSet.isValid());
+        TraverseOptions options = new TraverseOptions(modeSet);
+        options.back = request.isArriveBy();
         List<GraphPath> paths = pathservice.plan(request.getFrom(), request.getTo(), request
-                .getDateTime(), request.isArriveBy());
+                .getDateTime(), options);
 
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
@@ -228,7 +240,6 @@ public class Planner {
             }
 
         }
-        Response response = new Response(request, plan);
-        return response;
+        return plan;
     }
 }

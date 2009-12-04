@@ -40,7 +40,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 public class TraverseOptions {
     public double speed; // in meters/second
 
-    public TraverseMode mode;
+    public TraverseModeSet modes;
 
     public double transferPenalty = 600;
 
@@ -55,13 +55,13 @@ public class TraverseOptions {
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        mode = TraverseMode.WALK_AND_TRANSIT;
+        modes = new TraverseModeSet(new TraverseMode[]{TraverseMode.WALK, TraverseMode.TRAIN, TraverseMode.BUS});
         calendar = Calendar.getInstance();
     }
     
-    public TraverseOptions(TraverseMode mode) {
+    public TraverseOptions(TraverseModeSet modes) {
         this();
-        this.mode = mode;
+        this.modes = modes;
     }
 
     public TraverseOptions(GtfsContext context) {
@@ -91,14 +91,7 @@ public class TraverseOptions {
     }
 
     public boolean transitAllowed() {
-        switch (mode) {
-        case CAR:
-        case WALK:
-        case BICYCLE:
-            return false;
-        default:
-            return true;
-        }
+        return modes.getTransit();
     }
 
 

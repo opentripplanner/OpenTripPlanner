@@ -26,14 +26,17 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.ws;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.util.DateUtils;
 
 /**
@@ -44,9 +47,8 @@ public class Request implements RequestInf {
     private String m_from;
     private String m_to;
     private Double m_walk = 0.50;
-    private List<ModeType> m_modes; // defaults in constructor
-    private boolean m_modesEmpty = true;
-    private List<OptimizeType> m_optimize; // default in constructor
+    private TraverseModeSet m_modes; // defaults in constructor
+    private Set<OptimizeType> m_optimize; // default in constructor
     private boolean m_optimizeEmpty = true;
     private Date m_dateTime = new Date();
     private boolean m_arriveBy = false;
@@ -56,10 +58,9 @@ public class Request implements RequestInf {
     private final Hashtable<String, String> m_parameters = new Hashtable<String, String>();
 
     public Request() {
-        m_modes = new ArrayList<ModeType>();
-        Collections.addAll(m_modes, ModeType.bus, ModeType.train, ModeType.Walk);
+        m_modes = new TraverseModeSet("BUS,TRAIN,WALK");
 
-        m_optimize = new ArrayList<OptimizeType>();
+        m_optimize = new HashSet<OptimizeType>();
         Collections.addAll(m_optimize, OptimizeType.quick);
     }
 
@@ -124,14 +125,14 @@ public class Request implements RequestInf {
     /**
      * @return the modes
      */
-    public List<ModeType> getModes() {
+    public TraverseModeSet getModes() {
         return m_modes;
     }
 
     /** */
     public String getModesAsStr() {
         String retVal = null;
-        for (ModeType m : m_modes) {
+        for (TraverseMode m : m_modes.getModes()) {
             if (retVal == null)
                 retVal = "";
             else
@@ -146,27 +147,23 @@ public class Request implements RequestInf {
      * @param modes
      *            the modes to set
      */
-    public void addMode(ModeType mode) {
-        if (m_modesEmpty) {
-            m_modesEmpty = false;
-            m_modes = new ArrayList<ModeType>();
-        }
-        paramPush(MODE, mode);
-        m_modes.add(mode);
+    public void addMode(TraverseMode mode) {
+        m_modes.setMode(mode, true);
+        paramPush(MODE, m_modes);
     }
 
     /** */
-    public void addMode(List<ModeType> mList) {
-        if (mList != null && mList.size() > 0) {
-            for (ModeType m : mList)
-                addMode(m);
+    public void addMode(List<TraverseMode> mList) {
+        for (TraverseMode m : mList) {
+            addMode(m);
         }
+        paramPush(MODE, m_modes);
     }
 
     /**
      * @return the optimize
      */
-    public List<OptimizeType> getOptimize() {
+    public Set<OptimizeType> getOptimize() {
         return m_optimize;
     }
 
@@ -191,10 +188,10 @@ public class Request implements RequestInf {
     public void addOptimize(OptimizeType opt) {
         if (m_optimizeEmpty) {
             m_optimizeEmpty = false;
-            m_optimize = new ArrayList<OptimizeType>();
+            m_optimize = new HashSet<OptimizeType>();
         }
-        paramPush(OPTIMIZE, opt);
         m_optimize.add(opt);
+        paramPush(OPTIMIZE, m_optimize);
     }
 
     /** */
@@ -292,4 +289,21 @@ public class Request implements RequestInf {
                 + isArriveBy() + sep + getOptimizeAsStr() + sep + getModesAsStr() + sep
                 + getNumItineraries() + sep + getOutputFormat();
     }
+
+    public TraverseModeSet getModeSet() {
+        return m_modes;
+    }
+
+    @Override
+    public void removeMode(TraverseMode mode) {
+        m_modes.setMode(mode, false);
+        paramPush(MODE, m_modes);
+    }
+
+    public void setModes(TraverseModeSet modes) {
+        m_modes = modes;
+        paramPush(MODE, m_modes);
+        
+    }
+
 }

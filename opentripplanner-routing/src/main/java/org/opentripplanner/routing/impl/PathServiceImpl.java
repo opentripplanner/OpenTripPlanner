@@ -86,18 +86,16 @@ public class PathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime, boolean arriveBy) {
+    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime, TraverseOptions options) {
 
         Vertex fromVertex = getVertexForPlace(fromPlace);
         Vertex toVertex = getVertexForPlace(toPlace);
 
         State state = new State(targetTime.getTime());
-        TraverseOptions options = new TraverseOptions();
+
         if( _calendarService != null)
             options.setCalendarService(_calendarService);
         
-        options.back = arriveBy;
-
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
 
         return Arrays.asList(path);
