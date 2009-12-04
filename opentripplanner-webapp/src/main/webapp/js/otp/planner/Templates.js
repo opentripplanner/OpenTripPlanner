@@ -41,7 +41,7 @@ otp.planner.Templates = {
         '&to={[values.to.replace(/&/g,"@")]}',
         '&min={optParam}&walk={walkParam}&mode={modeParam}&id={id}',
         '&on={date}',
-        '&{[values.arrParam=="D" ? "after" : "by"]}={time}'
+        '&{[values.arrParam=="false" ? "after" : "by"]}={time}'
     ).compile(),
 
     tripPrintTemplate : new Ext.XTemplate( 

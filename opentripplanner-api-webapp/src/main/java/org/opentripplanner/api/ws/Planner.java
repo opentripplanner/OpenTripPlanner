@@ -84,7 +84,6 @@ public class Planner {
             @QueryParam(RequestInf.TO) String toPlace,
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
-            @QueryParam(RequestInf.DEPART_AFTER) Boolean departAfter,
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @QueryParam(RequestInf.WALK) Double walk,
             @QueryParam(RequestInf.OPTIMIZE) List<OptimizeType> optList,
@@ -103,9 +102,7 @@ public class Planner {
         if (walk != null)
             request.setWalk(walk);
         if (arriveBy != null && arriveBy)
-            request.setArriveBy();
-        else if (departAfter != null && departAfter)
-            request.setDepartAfter();
+            request.setArriveBy(true);
 
         if (optList != null && optList.size() > 0)
             request.addOptimize(optList);

@@ -50,8 +50,7 @@ public interface RequestInf {
     public static String NUMBER_ITINERARIES = "numItineraries";
     public static String OUTPUT_FORMAT = "outputFormat";
 
-    public static String DEPART_AFTER = "after";
-    public static String ARRIVE_BY = "by";
+    public static String ARRIVE_BY = "Arr";
 
     /**
      * @return the from
@@ -132,26 +131,14 @@ public interface RequestInf {
     public void setDateTime(String date, String time);
 
     /**
-     * @return the departAfter
-     */
-    public boolean isDepartAfter();
-
-    /**
-     * @return the departAfter
+     * @return whether the trip is an arriveBy trip (true) or a departAfter trip (false)
      */
     public boolean isArriveBy();
 
     /**
-     * @param departAfter
-     *            the departAfter to set
+     * Sets the trip to an arriveBy trip (true) or a departAfter trip (false)
      */
-    public void setDepartAfter();
-
-    /**
-     * @param departAfter
-     *            the departAfter to set
-     */
-    public void setArriveBy();
+    public void setArriveBy(boolean arriveBy);
 
     /**
      * @return the outputFormat

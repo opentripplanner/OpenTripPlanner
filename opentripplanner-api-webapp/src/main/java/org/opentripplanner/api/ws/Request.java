@@ -49,7 +49,7 @@ public class Request implements RequestInf {
     private List<OptimizeType> m_optimize; // default in constructor
     private boolean m_optimizeEmpty = true;
     private Date m_dateTime = new Date();
-    private boolean m_departAfter = true;
+    private boolean m_arriveBy = false;
     private MediaType m_outputFormat = MediaType.APPLICATION_JSON_TYPE;
     private Integer m_numItineraries = 3;
 
@@ -233,33 +233,13 @@ public class Request implements RequestInf {
     /**
      * @return the departAfter
      */
-    public boolean isDepartAfter() {
-        return m_departAfter;
-    }
-
-    /**
-     * @return the departAfter
-     */
     public boolean isArriveBy() {
-        return !m_departAfter;
+        return m_arriveBy;
     }
 
-    /**
-     * @param departAfter
-     *            the departAfter to set
-     */
-    public void setDepartAfter() {
-        paramPush(DEPART_AFTER, "true");
-        m_departAfter = true;
-    }
-
-    /**
-     * @param departAfter
-     *            the departAfter to set
-     */
-    public void setArriveBy() {
-        paramPush(ARRIVE_BY, "true");
-        m_departAfter = false;
+    public void setArriveBy(boolean arriveBy) {
+        paramPush(ARRIVE_BY, arriveBy);
+        m_arriveBy = arriveBy;
     }
 
     /**

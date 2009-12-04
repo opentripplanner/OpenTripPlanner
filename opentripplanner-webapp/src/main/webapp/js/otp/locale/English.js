@@ -131,8 +131,8 @@ otp.locale.English = {
     
         arriveDepart: 
         [
-          ['D', 'Depart'], 
-          ['A', 'Arrive']
+          ['false', 'Depart'], 
+          ['true', 'Arrive']
         ],
     
         walkDistance : 

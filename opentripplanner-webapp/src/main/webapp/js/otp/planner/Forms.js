@@ -464,14 +464,14 @@ otp.planner.StaticForms = {
             {
                 time = params.after.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('D');
+                forms.m_arrForm.setValue('false');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('A');
+                forms.m_arrForm.setValue('true');
                 time = true;
             }
 
