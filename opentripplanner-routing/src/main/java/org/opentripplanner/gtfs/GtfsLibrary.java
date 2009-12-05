@@ -37,7 +37,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
 
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,24 +108,24 @@ public class GtfsLibrary {
         return route.getLongName();
     }
 
-    public static TransportationMode getTransportationMode(Route route) {
+    public static TraverseMode getTraverseMode(Route route) {
         switch (route.getType()) {
         case 0:
-            return TransportationMode.TRAM;
+            return TraverseMode.TRAM;
         case 1:
-            return TransportationMode.SUBWAY;
+            return TraverseMode.SUBWAY;
         case 2:
-            return TransportationMode.RAIL;
+            return TraverseMode.RAIL;
         case 3:
-            return TransportationMode.BUS;
+            return TraverseMode.BUS;
         case 4:
-            return TransportationMode.FERRY;
+            return TraverseMode.FERRY;
         case 5:
-            return TransportationMode.CABLE_CAR;
+            return TraverseMode.CABLE_CAR;
         case 6:
-            return TransportationMode.GONDOLA;
+            return TraverseMode.GONDOLA;
         case 7:
-            return TransportationMode.FUNICULAR;
+            return TraverseMode.FUNICULAR;
         default:
             throw new IllegalArgumentException("unknown gtfs route type " + route.getType());
         }

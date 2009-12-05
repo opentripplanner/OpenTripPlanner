@@ -32,7 +32,8 @@ import java.util.Date;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -60,11 +61,14 @@ public class PatternAlight extends AbstractEdge {
 
     private int stopIndex;
 
+    private int modeMask;
+    
     public PatternAlight(Vertex startStation, Vertex startJourney, TripPattern pattern,
-            int stopIndex) {
+            int stopIndex, TraverseMode mode) {
         super(startStation, startJourney);
         this.pattern = pattern;
         this.stopIndex = stopIndex;
+        this.modeMask = new TraverseModeSet(mode).getMask();
     }
 
     public String getDirection() {
@@ -83,8 +87,8 @@ public class PatternAlight extends AbstractEdge {
         return null;
     }
 
-    public TransportationMode getMode() {
-        return TransportationMode.ALIGHTING;
+    public TraverseMode getMode() {
+        return TraverseMode.ALIGHTING;
     }
 
     public String getName() {
@@ -96,7 +100,7 @@ public class PatternAlight extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        if (!wo.transitAllowed()) {
+        if (!wo.modes.get(modeMask)) {
             return null;
         }
         long currentTime = state0.getTime();

@@ -33,7 +33,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -73,8 +73,8 @@ public class Board extends AbstractEdge {
         return null;
     }
 
-    public TransportationMode getMode() {
-        return TransportationMode.BOARDING;
+    public TraverseMode getMode() {
+        return TraverseMode.BOARDING;
     }
 
     public String getName() {
@@ -86,7 +86,7 @@ public class Board extends AbstractEdge {
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        if (!wo.transitAllowed()) {
+        if (!wo.modes.contains(hop.getMode())) {
             return null;
         }
         long currentTime = state0.getTime();

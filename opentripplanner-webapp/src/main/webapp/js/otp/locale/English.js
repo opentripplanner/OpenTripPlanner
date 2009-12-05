@@ -146,9 +146,9 @@ otp.locale.English = {
     
         mode : 
         [
-            ['BUS,TRAIN', 'Bus & Train'],
-            ['BUS', 'Bus only'],
-            ['TRAIN', 'Train only']
+            ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
+            ['BUSISH,WALK', 'Bus only'],
+            ['TRAINISH,WALK', 'Train only']
         ]
     },
 

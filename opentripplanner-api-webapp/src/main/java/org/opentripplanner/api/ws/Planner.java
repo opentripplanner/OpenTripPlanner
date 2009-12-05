@@ -51,7 +51,7 @@ import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -152,19 +152,19 @@ public class Planner {
             itinerary.fare.addFare(Fare.FareType.regular, Currency.getInstance("USD"), 225);
 
             Leg leg = null;
-            TransportationMode mode = null;
+            TraverseMode mode = null;
             Geometry geometry = null;
             String name = null;
 
             for (SPTEdge edge : path.edges) {
                 Edge graphEdge = edge.payload;
 
-                TransportationMode edgeMode = graphEdge.getMode();
+                TraverseMode edgeMode = graphEdge.getMode();
                 double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
 
-                if (!edgeMode.isTransitMode() && edgeMode != TransportationMode.ALIGHTING) {
+                if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
                     if (edgeMode != mode
-                            || (mode != TransportationMode.WALK && graphEdge.getName() != name)) {
+                            || (!mode.isOnStreetNonTransit() && graphEdge.getName() != name)) {
                         name = graphEdge.getName();
                         if (leg != null) {
                             /* finalize leg */
@@ -199,7 +199,7 @@ public class Planner {
                     }
                 }
 
-                if (edgeMode == TransportationMode.TRANSFER) {
+                if (edgeMode == TraverseMode.TRANSFER) {
 
                     itinerary.transfers++;
                     itinerary.walkTime += edgeTime;
@@ -207,17 +207,17 @@ public class Planner {
                     continue;
                 }
 
-                if (edgeMode == TransportationMode.BOARDING) {
+                if (edgeMode == TraverseMode.BOARDING) {
                     itinerary.waitingTime += edgeTime;
                     continue;
                 }
 
-                if (edgeMode == TransportationMode.WALK) {
+                if (edgeMode == TraverseMode.WALK) {
                     itinerary.walkTime += edgeTime;
                     itinerary.walkDistance += graphEdge.getDistance();
                 }
 
-                if (edgeMode.isTransitMode()) {
+                if (edgeMode.isTransit()) {
                     itinerary.transitTime += edgeTime;
                     mode = graphEdge.getMode();
                     leg.mode = mode.toString();

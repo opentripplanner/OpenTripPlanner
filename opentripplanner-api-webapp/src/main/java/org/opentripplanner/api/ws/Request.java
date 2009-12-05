@@ -58,7 +58,7 @@ public class Request implements RequestInf {
     private final Hashtable<String, String> m_parameters = new Hashtable<String, String>();
 
     public Request() {
-        m_modes = new TraverseModeSet("BUS,TRAIN,WALK");
+        m_modes = new TraverseModeSet("TRANSIT,WALK");
 
         m_optimize = new HashSet<OptimizeType>();
         Collections.addAll(m_optimize, OptimizeType.quick);

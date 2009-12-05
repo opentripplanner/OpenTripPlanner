@@ -28,7 +28,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -156,9 +156,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
         return geometry;
     }
 
-    public TransportationMode getMode() {
+    public TraverseMode getMode() {
         // this is actually WALK or BICYCLE depending on the TraverseOptions
-        return TransportationMode.WALK;
+        return TraverseMode.WALK;
     }
 
     public String getName() {

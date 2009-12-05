@@ -35,7 +35,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -143,8 +143,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
         return end.getStopHeadsign();
     }
 
-    public TransportationMode getMode() {
-        return GtfsLibrary.getTransportationMode(start.getTrip().getRoute());
+    public TraverseMode getMode() {
+        return GtfsLibrary.getTraverseMode(start.getTrip().getRoute());
     }
 
     public String getStart() {

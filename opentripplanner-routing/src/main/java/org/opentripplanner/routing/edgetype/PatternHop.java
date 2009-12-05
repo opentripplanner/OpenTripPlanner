@@ -30,7 +30,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -77,8 +77,8 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
         return end.getName();
     }
 
-    public TransportationMode getMode() {
-        return GtfsLibrary.getTransportationMode(pattern.exemplar.getRoute());
+    public TraverseMode getMode() {
+        return GtfsLibrary.getTraverseMode(pattern.exemplar.getRoute());
     }
 
     public String getStart() {

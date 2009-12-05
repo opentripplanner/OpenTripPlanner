@@ -38,6 +38,7 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
@@ -243,6 +244,27 @@ public class TestPatternHopLoader extends TestCase {
             }
         }
         assertEquals(1, num_alights);
+    }
+    
+    public void testTraverseMode() throws Exception {
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
 
+        ShortestPathTree spt;
+
+        TraverseOptions options = new TraverseOptions(context);
+        options.modes = new TraverseModeSet("TRAINISH");
+
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
+
+        //a to b is bus only
+        assertNull(spt.getPath(stop_b));
+        
+        options.modes = new TraverseModeSet("TRAINISH,BUSISH");
+        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
+
+        assertNotNull(spt.getPath(stop_b));
     }
 }

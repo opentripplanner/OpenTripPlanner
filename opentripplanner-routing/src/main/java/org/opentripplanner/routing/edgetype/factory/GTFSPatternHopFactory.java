@@ -47,6 +47,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
@@ -186,6 +187,7 @@ public class GTFSPatternHopFactory {
             StopPattern2 stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
             int lastStop = stopTimes.size() - 1;
+            TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
             if (tripPattern == null) {
 
                 tripPattern = new TripPattern(trip, stopTimes);
@@ -229,9 +231,9 @@ public class GTFSPatternHopFactory {
                     Vertex endStation = graph.getVertex(id(s1.getId()));
 
                     PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart,
-                            tripPattern, i);
+                            tripPattern, i, mode);
                     graph.addEdge(boarding);
-                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i));
+                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
                 }
                 patterns.put(stopPattern, tripPattern);
 

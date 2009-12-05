@@ -29,7 +29,7 @@ package org.opentripplanner.routing.spt;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransportationMode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -73,7 +73,7 @@ public class SPTEdge implements Edge {
     }
 
     @Override
-    public TransportationMode getMode() {
+    public TraverseMode getMode() {
         return payload.getMode();
     }
 

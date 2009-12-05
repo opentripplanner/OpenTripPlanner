@@ -40,7 +40,7 @@ public interface Edge {
         
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException;
 
-    public TransportationMode getMode();
+    public TraverseMode getMode();
 
     public String getName();
 
