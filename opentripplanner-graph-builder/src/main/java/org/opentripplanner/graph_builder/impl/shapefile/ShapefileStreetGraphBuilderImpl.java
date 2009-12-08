@@ -111,7 +111,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 SimpleFeature feature = it2.next();
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
-                String id = streetIdConverter.convert(feature);
+                Object o = streetIdConverter.convert(feature);
+                String id = "" + o;
                 String name = streetNameConverter.convert(feature);
                 Coordinate[] coordinates = geom.getCoordinates();
 
