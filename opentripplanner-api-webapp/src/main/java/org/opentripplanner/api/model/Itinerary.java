@@ -47,6 +47,9 @@ public class Itinerary {
     
     public Double walkDistance = 0.0;
 
+    public Double elevationLost = 0.0;
+    public Double elevationGained = 0.0;
+
     public Integer transfers = 0;
 
     public Fare fare = new Fare();
