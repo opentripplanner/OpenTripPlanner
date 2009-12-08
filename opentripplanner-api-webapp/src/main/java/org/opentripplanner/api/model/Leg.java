@@ -27,8 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
  *
@@ -43,7 +45,7 @@ public class Leg {
 
     @XmlAttribute
     public String mode = "Walk";
-    
+
     @XmlAttribute
     public String route = "";
 
@@ -52,4 +54,7 @@ public class Leg {
     public Place to = null;
 
     public EncodedPolylineBean legGeometry;
+
+    @XmlElementWrapper(name = "steps")
+    public List<WalkStep> walkSteps;
 }

@@ -53,7 +53,7 @@ public class Itinerary {
 
     @XmlElementWrapper(name = "legs")
     public List<Leg> leg = new ArrayList<Leg>();
-    
+
     public void addLeg(Leg leg) {
         this.leg.add(leg);
     }
