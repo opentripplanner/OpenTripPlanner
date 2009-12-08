@@ -138,7 +138,7 @@ public class AStar {
     public static ShortestPathTree getShortestPathTreeBack(Graph gg, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
-        if (origin == null) {
+        if (origin == null || target == null) {
             return null;
         }
 
@@ -234,7 +234,7 @@ public class AStar {
     public static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
-        if (origin == null) {
+        if (origin == null || target == null) {
             return null;
         }
 

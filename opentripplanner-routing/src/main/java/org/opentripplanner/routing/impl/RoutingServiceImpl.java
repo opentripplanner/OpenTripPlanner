@@ -56,12 +56,18 @@ public class RoutingServiceImpl implements RoutingService {
         if (options.back) {
             ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex, state,
                     options);
+            if (spt == null) {
+                return null;
+            }
             GraphPath path = spt.getPath(fromVertex);
             path.reverse();
             return path;
         } else {
             ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex, toVertex, state,
                     options);
+            if (spt == null) {
+                return null;
+            }
             return spt.getPath(toVertex);
         }
     }
