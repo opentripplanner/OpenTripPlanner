@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.location;
 
 import java.util.ArrayList;
-import java.util.Vector;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
@@ -37,12 +36,13 @@ import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/**
+ * Represents a location on a street, somewhere between the two corners.
+ * This is used when computing the first and last segments of a trip, for 
+ * trips that start or end between two intersections.
+ */
 public class StreetLocation extends GenericVertex {
-    /*
-     * Represents a location on a street, somewhere between the two end points. This is used when
-     * computing the first and last segments of a trip, for trips that start between two
-     * intersections.
-     */
+    
     public Edge street;
 
     public double location; /* a number from 0 to 1 representing how far along the street the
@@ -52,6 +52,18 @@ public class StreetLocation extends GenericVertex {
 
     ArrayList<Edge> outgoing = new ArrayList<Edge>();
 
+    /**
+     * Creates a StreetLocation on the given street.  How far along is
+     * controlled by the location parameter, which represents a distance 
+     * along the edge between 0 (the from vertex) and 1 (the to vertex).
+     *   
+     * @param name
+     * @param street
+     * @param location
+     * @param incoming true if the StartLocation is a target vertex, false 
+     *                 if it is an origin vertex
+     * @return the new StreetLocation
+     */
     public static StreetLocation createStreetLocation(String name, Edge street, double location,
             boolean incoming) {
 

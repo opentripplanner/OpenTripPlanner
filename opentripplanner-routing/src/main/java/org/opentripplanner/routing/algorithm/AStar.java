@@ -44,6 +44,13 @@ import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
+/** 
+ * 
+ * NullExtraEdges is used to speed up checks for extra edges in the (common) case 
+ * where there are none. Extra edges come from StreetLocationFinder, where 
+ * they represent the edges between a location on a street segment and the 
+ * corners at the ends of that segment. 
+ */
 class NullExtraEdges implements Map<Vertex, Edge> {
 
     @Override
@@ -105,10 +112,24 @@ class NullExtraEdges implements Map<Vertex, Edge> {
     }
 }
 
+/**
+ * Find the shortest path between graph vertices using A*. 
+ */
 public class AStar {
 
     static final double MAX_SPEED = 10.0;
 
+    /**
+     * Plots a path on graph from origin to target, departing at the time 
+     * given in state and with the options options.
+     * 
+     * @param graph
+     * @param origin
+     * @param target
+     * @param init
+     * @param options
+     * @return the shortest path, or null if none is found
+     */
     public static ShortestPathTree getShortestPathTree(Graph gg, String from_label,
             String to_label, State init, TraverseOptions options) {
         // Goal Variables
@@ -135,17 +156,30 @@ public class AStar {
         return getShortestPathTreeBack(gg, origin, target, init, options);
     }
 
-    public static ShortestPathTree getShortestPathTreeBack(Graph gg, Vertex origin, Vertex target,
+    /**
+     * Plots a path on graph from origin to target, arriving at the time 
+     * given in state and with the options options.  
+     * 
+     * @param graph
+     * @param origin
+     * @param target
+     * @param init
+     * @param options
+     * @return the shortest path, or null if none is found
+     */
+    public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
         if (origin == null || target == null) {
             return null;
         }
 
+        /* Run backwards from the target to the origin */
         Vertex tmp = origin;
         origin = target;
         target = tmp;
 
+        /* generate extra edges for StreetLocations */ 
         Map<Vertex, Edge> extraEdges;
         if (target instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, Edge>();
@@ -163,7 +197,7 @@ public class AStar {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap pq = new FibHeap(gg.getVertices().size() + extraEdges.size());
+        FibHeap pq = new FibHeap(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         // Iteration Variables
@@ -231,13 +265,14 @@ public class AStar {
         return spt;
     }
 
-    public static ShortestPathTree getShortestPathTree(Graph gg, Vertex origin, Vertex target,
+    public static ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
         if (origin == null || target == null) {
             return null;
         }
 
+        /* generate extra edges for StreetLocations */
         Map<Vertex, Edge> extraEdges;
         if (origin instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, Edge>();
@@ -256,7 +291,7 @@ public class AStar {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap pq = new FibHeap(gg.getVertices().size() + extraEdges.size());
+        FibHeap pq = new FibHeap(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         // Iteration Variables

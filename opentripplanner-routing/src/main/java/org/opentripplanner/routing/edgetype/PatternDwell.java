@@ -39,8 +39,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class PatternDwell extends AbstractEdge {
 
     /**
-     *  Models traveling from one station on vehicle to another station on vehicle by incrementing the State.time by an amount contingent
-     *  upon the State.pattern
+     *  Models waiting in a station on a vehicle.  The vehicle may change 
+     *  names during this time (interlining).
      */
     
     private static final long serialVersionUID = 1L;
