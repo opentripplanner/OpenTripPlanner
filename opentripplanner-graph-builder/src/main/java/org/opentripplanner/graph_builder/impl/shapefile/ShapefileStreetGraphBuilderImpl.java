@@ -135,13 +135,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
                 Vertex startCorner = new GenericVertex(startIntersectionName, startCoordinate.x,
-                        startCoordinate.y, startIntersectionName);
+                        startCoordinate.y, startIntersectionName, Intersection.class);
                 startCorner = graph.addVertex(startCorner);
-                startCorner.setType(Intersection.class);
                 Vertex endCorner = new GenericVertex(endIntersectionName, endCoordinate.x,
-                        endCoordinate.y, endIntersectionName);
+                        endCoordinate.y, endIntersectionName, Intersection.class);
                 endCorner = graph.addVertex(endCorner);
-                endCorner.setType(Intersection.class);
 
                 double length = JTS.orthodromicDistance(coordinates[0],
                         coordinates[coordinates.length - 1], worldCRS);

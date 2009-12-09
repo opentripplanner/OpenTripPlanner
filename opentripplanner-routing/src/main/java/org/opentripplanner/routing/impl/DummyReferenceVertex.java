@@ -122,20 +122,4 @@ public final class DummyReferenceVertex implements Vertex {
     public void setOutgoing(Vector<Edge> outgoing) {
         throw new UnsupportedOperationException();
     }
-
-    @Override
-    public void setType(Class<?> type) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setX(double x) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setY(double y) {
-        throw new UnsupportedOperationException();
-    }
-
 }

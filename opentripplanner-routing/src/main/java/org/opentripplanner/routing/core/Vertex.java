@@ -51,11 +51,7 @@ public interface Vertex extends Serializable {
 
     public String toString();
 
-    public void setX(double x);
-
     public double getX();
-
-    public void setY(double y);
 
     public double getY();
 
@@ -68,8 +64,6 @@ public interface Vertex extends Serializable {
     public Iterable<Edge> getIncoming();
 
     public Class<?> getType();
-
-    public void setType(Class<?> type);
 
     public String getName();
 

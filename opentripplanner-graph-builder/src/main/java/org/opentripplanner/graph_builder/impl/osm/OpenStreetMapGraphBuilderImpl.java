@@ -128,10 +128,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (vertex != null)
                     throw new IllegalStateException("osm node already loaded: id=" + id);
 
-                vertex = new GenericVertex(id, node.getLon(), node
+                GenericVertex newVertex = new GenericVertex(id, node.getLon(), node
                         .getLat());
-                vertex.setType(Intersection.class);
-                graph.addVertex(vertex);
+                newVertex.setType(Intersection.class);
+                graph.addVertex(newVertex);
 
             }
 

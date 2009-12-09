@@ -58,10 +58,10 @@ public class GenericVertex implements Vertex {
 
     public GenericVertex(String label, double x, double y) {
         this.label = label;
-        this.setX(x);
-        this.setY(y);
-        this.setOutgoing(new Vector<Edge>());
-        this.setIncoming(new Vector<Edge>());
+        this.x = x;
+        this.y = y;
+        this.outgoing = new Vector<Edge>();
+        this.incoming = new Vector<Edge>();
     }
 
     public GenericVertex(String label, double x, double y, String name) {
@@ -69,6 +69,11 @@ public class GenericVertex implements Vertex {
         this.name = name;
     }
     
+    public GenericVertex(String label, double x, double y, String name, Class<?> type) {
+        this(label, x, y);
+        this.name = name;
+        this.type = type;
+    }
     public double distance(Vertex v) {
 
         double xd = v.getX() - getX();
@@ -150,7 +155,6 @@ public class GenericVertex implements Vertex {
         return type;
     }
 
-    @Override
     public void setType(Class<?> type) {
         this.type = type;
     }

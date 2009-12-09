@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -76,14 +77,10 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 1 degree x 1 degree square
-        Vertex tl = graph.addVertex("tl", -74, 41);
-        tl.setType(Intersection.class);
-        Vertex tr = graph.addVertex("tr", -73, 41);
-        tr.setType(Intersection.class);
-        Vertex bl = graph.addVertex("bl", -74, 40);
-        bl.setType(Intersection.class);
-        Vertex br = graph.addVertex("br", -73, 40);
-        br.setType(Intersection.class);
+        Vertex tl = graph.addVertex(new GenericVertex("tl", -74, 41, "tl", Intersection.class));
+        Vertex tr = graph.addVertex(new GenericVertex("tr", -73, 41, "tr", Intersection.class));
+        Vertex bl = graph.addVertex(new GenericVertex("bl", -74, 40, "bl", Intersection.class));
+        Vertex br = graph.addVertex(new GenericVertex("br", -73, 40, "br", Intersection.class));
 
         double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
