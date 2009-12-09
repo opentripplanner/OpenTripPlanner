@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model;
 
-/* represents one instruction in walking directions.  
+/** Represents one instruction in walking directions.  
  * Three examples from New York City: 
  * 
  * Turn onto Broadway from W 57th St (coming from 7th Ave):
