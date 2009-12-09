@@ -190,16 +190,16 @@ public class Planner {
                             Vertex fromv = graphEdge.getFromVertex();
                             Coordinate endCoord = fromv.getCoordinate();
                             leg.to = new Place(endCoord.x, endCoord.y, fromv.getName());
-                            leg.end = new Date(edge.tov.state.getTime());
+                            leg.endTime = new Date(edge.tov.state.getTime());
                             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                            leg.duration = edge.tov.state.getTime() - leg.start.getTime();
+                            leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
                             leg = null;
                         }
 
                         leg = new Leg();
                         itinerary.addLeg(leg);
 
-                        leg.start = new Date(edge.fromv.state.getTime());
+                        leg.startTime = new Date(edge.fromv.state.getTime());
                         leg.route = graphEdge.getName();
                         mode = graphEdge.getMode();
                         leg.mode = mode.toString();
@@ -257,9 +257,9 @@ public class Planner {
                 Vertex tov = graphEdge.getToVertex();
                 Coordinate endCoord = tov.getCoordinate();
                 leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
-                leg.end = new Date(edge.tov.state.getTime());
+                leg.endTime = new Date(edge.tov.state.getTime());
                 leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                leg.duration = edge.tov.state.getTime() - leg.start.getTime();
+                leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
                 if (startWalk != -1) {
                     leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
                 }

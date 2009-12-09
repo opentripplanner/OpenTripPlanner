@@ -148,7 +148,9 @@ otp.locale.English = {
         [
             ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
             ['BUSISH,WALK', 'Bus only'],
-            ['TRAINISH,WALK', 'Train only']
+            ['TRAINISH,WALK', 'Train only'],
+            ['WALK', 'Walk only'],
+            ['BICYCLE', 'Bicycle']
         ]
     },
 

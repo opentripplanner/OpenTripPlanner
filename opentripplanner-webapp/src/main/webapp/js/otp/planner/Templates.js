@@ -73,20 +73,6 @@ otp.planner.Templates = {
     '</table></div>'
     ).compile(),
 
-    // TODO - does Date().format() exist on all browsers????  IE 7 and FF seem OK, but...
-    TP_TRIPDETAILS_OOOLLLLLDDDDDD : new Ext.XTemplate(
-        '<H4>Trip Details</H4>',
-        '<P><B>Travel on:</B> {date} @ {startTime}</P>',
-        '<P><B>Valid:</B> {[new Date().format("F jS, Y @ g:ia")]}</P>',
-        '<P><B>Transit time:</B> {transitTime} minute<tpl if="transitTime != 1">s</tpl></P>',
-        '<tpl if="waitingTime &gt; 0">', '<P><B>Waiting time:</B> </P>', '</tpl>',
-        '<P><B>Total walk:</B> {walkDistance} mile<tpl if="walkDistance != 1.0">s</tpl></P>',
-          '<P><B>Fares: </B><tpl if="regularFare &gt; 0.00">Adult <tpl if="regularFare == 2.30">All Zone</tpl> (${regularFare}), Youth/Student (${youthFare}) or Honored Citizen (${honoredFare})</tpl>',
-          '<tpl if="regularFare == \'\'">This trip is within Fareless Square, so no fare is required.</tpl>',
-          '<tpl if="tramFare &gt; 0"> <I>+ Tram Fare</I> (${tramFare} round-trip)</tpl>',
-        '</P>'
-    ).compile(),
-
     TP_LEG_BASE_STR : ''
         + '<tpl if="fromStopId != null"><p><b>{startTime}</b> Depart {fromName}<br/>Stop ID {fromStopId}</p></tpl>'
         + '<tpl if="duration != null"><div class="duration">{duration} minute<tpl if="duration != 1.0">s</tpl></div></tpl>'

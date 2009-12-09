@@ -28,6 +28,15 @@ function metersToMiles (n, p) {
 	return miles.toFixed(2);
 }
 
+/** Make a Date object from an ISO 8601 date string (ignoring time zone)*/
+function isoDateStringToDate (str) {
+	if (!str) return null;
+	var tokens = str.split(/[\-T:]/);
+	var date = new Date(tokens[0], tokens[1] - 1, tokens[2],
+			        tokens[3], tokens[4], tokens[5], 0);
+	return date;
+}
+
 otp.planner.Utils = {
 
     // constants
@@ -50,8 +59,8 @@ otp.planner.Utils = {
                   {name: 'youthFare',    mapping: 'fare/special[@id=youth]'},
                   {name: 'tramFare',     mapping: 'fare/special[@id=tram]'},
                   {name: 'duration',     mapping: 'duration', convert: millisToMinutes},
-                  {name: 'startTime',    mapping: 'startTime'},
-                  {name: 'endTime',      mapping: 'endTime'},
+                  {name: 'startTime',    mapping: 'startTime', convert: isoDateStringToDate},
+                  {name: 'endTime',      mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'numTransfers', mapping: 'transfers'},
                   {name: 'numLegs',      mapping: 'legs', convert : function (n, p) { return p.length; }},
                   {name: 'walkTime',     mapping: 'walkTime', convert: millisToMinutes},
@@ -64,8 +73,8 @@ otp.planner.Utils = {
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
                   {name: 'order',            mapping: '@order'},
-                  {name: 'startTime',        mapping: 'startTime'},
-                  {name: 'endTime',          mapping: 'endTime'},
+                  {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
+                  {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
                   {name: 'distance',         mapping: 'distance', convert: millisToMinutes},
                   {name: 'direction',        mapping: 'direction'},

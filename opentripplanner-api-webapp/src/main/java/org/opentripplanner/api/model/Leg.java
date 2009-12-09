@@ -38,8 +38,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 
 public class Leg {
     public long duration = 0;
-    public Date start = null;
-    public Date end = null;
+    public Date startTime = null;
+    public Date endTime = null;
 
     public Double distance = null;
 
