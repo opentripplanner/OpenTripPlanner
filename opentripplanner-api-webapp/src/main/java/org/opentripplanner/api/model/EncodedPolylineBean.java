@@ -31,6 +31,10 @@ package org.opentripplanner.api.model;
 
 import java.io.Serializable;
 
+/**
+ *  A list of coordinates encoded as a string. 
+ */
+
 public class EncodedPolylineBean implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -51,6 +55,10 @@ public class EncodedPolylineBean implements Serializable {
     this.length = length;
   }
 
+  /**
+   * 
+   * @return the encoded points
+   */
   public String getPoints() {
     return points;
   }
@@ -78,6 +86,10 @@ public class EncodedPolylineBean implements Serializable {
     this.levels = levels;
   }
 
+  /**
+   * 
+   * @return the number of points in the string
+   */
   public int getLength() {
     return length;
   }

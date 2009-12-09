@@ -31,7 +31,7 @@ import java.util.Hashtable;
 import java.util.logging.Logger;
 
 /**
- *
+ * Fare is a set of fares for different classes of users. 
  */
 public class Fare {
     protected static final Logger LOGGER = Logger.getLogger(Fare.class.getCanonicalName());
