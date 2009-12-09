@@ -289,43 +289,39 @@ public class Planner {
             Edge edge = sptEdge.payload;
             String streetName = edge.getName();
             if (step == null) {
+                //first step
                 step = new WalkStep();
                 steps.add(step);
-                step.absoluteDirection = edge.getDirection();
                 step.streetName = streetName;
+                step.x = edge.getFromVertex().getX();
+                step.y = edge.getFromVertex().getY();
+                double thisAngle = getFirstAngle(edge.getGeometry());
+                step.setAbsoluteDirection(thisAngle);
             } else if (!step.streetName.equals(streetName)) {
+                // change of street name
                 step = new WalkStep();
                 steps.add(step);
-                step.absoluteDirection = edge.getDirection();
                 step.streetName = streetName;
                 double thisAngle = getFirstAngle(edge.getGeometry());
-                step.setRelativeDirection(lastAngle, thisAngle);
+                step.setDirections(lastAngle, thisAngle);
+                step.x = edge.getFromVertex().getX();
+                step.y = edge.getFromVertex().getY();
+                step.becomes = !multipleOptionsbefore(edge);
             } else {
                 /* generate turn-to-stay-on directions, where needed */
                 double thisAngle = getFirstAngle(edge.getGeometry());
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
                 if (direction != RelativeDirection.CONTINUE) {
                     // figure out if there was another way we could have turned
-                    Vertex start = edge.getFromVertex();
-                    boolean foundAlternatePaths = false;
-                    for (Edge out : start.getOutgoing()) {
-                        if (out == edge) {
-                            continue;
-                        }
-                        if (!(out instanceof Street)) {
-                            continue;
-                        }
-                        // there were paths we didn't take.
-                        foundAlternatePaths = true;
-                        break;
-                    }
-                    if (foundAlternatePaths) {
+                    boolean optionsBefore = multipleOptionsbefore(edge);
+                    if (optionsBefore) {
                         step = new WalkStep();
                         steps.add(step);
-                        step.absoluteDirection = edge.getDirection();
                         step.streetName = streetName;
-                        step.relativeDirection = direction;
+                        step.setDirections(lastAngle, thisAngle);
                         step.stayOn = true;
+                        step.x = edge.getFromVertex().getX();
+                        step.y = edge.getFromVertex().getY();
                     }
                 }
             }
@@ -335,6 +331,23 @@ public class Planner {
             lastAngle = getLastAngle(edge.getGeometry());
         }
         return steps;
+    }
+
+    private boolean multipleOptionsbefore(Edge edge) {
+        boolean foundAlternatePaths = false;
+        Vertex start = edge.getFromVertex();
+        for (Edge out : start.getOutgoing()) {
+            if (out == edge) {
+                continue;
+            }
+            if (!(out instanceof Street)) {
+                continue;
+            }
+            // there were paths we didn't take.
+            foundAlternatePaths = true;
+            break;
+        }
+        return foundAlternatePaths;
     }
 
     /**

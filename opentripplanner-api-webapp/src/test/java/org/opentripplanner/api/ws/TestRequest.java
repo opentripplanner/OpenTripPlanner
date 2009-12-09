@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.ws.RequestInf;
@@ -93,7 +94,7 @@ public class TestRequest extends TestCase {
         WalkStep step0 = steps.get(0);
         WalkStep step1 = steps.get(1);
         WalkStep step2 = steps.get(2);
-        assertEquals("north", step0.absoluteDirection);
+        assertEquals(AbsoluteDirection.NORTH, step0.absoluteDirection);
         assertEquals("NE 43RD AVE", step0.streetName);
         
         assertEquals("NE 43RD AVE", step1.streetName);
@@ -103,5 +104,5 @@ public class TestRequest extends TestCase {
         assertEquals("NE 43RD AVE", step2.streetName);
         assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
         assertTrue(step2.stayOn);
-    }    
+    }   
 }
