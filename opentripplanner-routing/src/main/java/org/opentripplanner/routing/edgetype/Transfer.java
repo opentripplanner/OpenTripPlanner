@@ -82,12 +82,18 @@ public class Transfer extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
+        if (!s0.getTransferAllowed()) {
+            return null;
+        }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds((int)(distance / wo.speed));
         return new TraverseResult(distance / wo.speed, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+        if (!s0.getTransferAllowed()) {
+            return null;
+        }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-(int)(distance / wo.speed));
         return new TraverseResult(distance / wo.speed, s1);

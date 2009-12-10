@@ -44,12 +44,9 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
     private static GeometryFactory _geometryFactory = new GeometryFactory();
-    
-    boolean isBoarding;
-    
+        
     public StreetTransitLink(Vertex fromv, Vertex tov, boolean isBoarding) {
         super(fromv, tov);
-        this.isBoarding = isBoarding;
     }
 
     private static final long serialVersionUID = -3311099256178798981L;
@@ -88,25 +85,11 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        if (isBoarding) {
-            s1.setJustBoarded(true);
-        } else {
-            if (s0.getJustBoarded()) { 
-                return null;
-            }
-        }
         return new TraverseResult(0, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         State s1 = s0.clone();
-        if (!isBoarding) {
-            s1.setJustBoarded(true);
-        } else {
-            if (s0.getJustBoarded()) { 
-                return null;
-            }
-        }
         return new TraverseResult(0, s1);
     }
 

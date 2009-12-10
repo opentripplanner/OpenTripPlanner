@@ -211,11 +211,11 @@ public class TestPatternHopLoader extends TestCase {
 
     public void testTransfers() throws Exception {
         Vertex stop_k = graph.getVertex("agency_K");
-        Vertex stop_l = graph.getVertex("agency_L");
+        Vertex stop_n = graph.getVertex("agency_N");
         int transfers = 0;
-        for (Edge e : stop_k.getOutgoing()) {
+        for (Edge e : stop_n.getOutgoing()) {
             if (e instanceof Transfer) {
-                assertEquals(e.getToVertex(), stop_l);
+                assertEquals(e.getToVertex(), stop_k);
                 transfers += 1;
             }
         }

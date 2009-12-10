@@ -179,6 +179,9 @@ public class AStar {
         origin = target;
         target = tmp;
 
+        // Allow transfers from initial station
+        init.setTransferAllowed(true);
+        
         /* generate extra edges for StreetLocations */ 
         Map<Vertex, Edge> extraEdges;
         if (target instanceof StreetLocation) {

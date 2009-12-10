@@ -32,14 +32,14 @@ public class State {
 
     private long _time;
     private int curPattern = -1;
-    private boolean justBoarded = false;
+    private boolean transferAllowed = false;
     
-    public boolean getJustBoarded() {
-        return justBoarded;
+    public boolean getTransferAllowed() {
+        return transferAllowed;
     }
 
-    public void setJustBoarded(boolean justBoarded) {
-        this.justBoarded = justBoarded;
+    public void setTransferAllowed(boolean transferAllowed) {
+        this.transferAllowed = transferAllowed;
     }
 
     public State() {
