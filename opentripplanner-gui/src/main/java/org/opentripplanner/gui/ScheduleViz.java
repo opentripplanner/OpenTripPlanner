@@ -40,7 +40,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
 import org.opentripplanner.routing.edgetype.DrawablePoint;
-import org.opentripplanner.routing.edgetype.loader.GTFSHopLoader;
+import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import processing.core.*;
@@ -130,9 +130,9 @@ public class ScheduleViz extends PApplet {
         try {
             GtfsContext context = GtfsLibrary.readGtfs(new File("../../caltrain_gtfs.zip"));
             gg = new Graph();
-            GTFSHopLoader hl = new GTFSHopLoader(gg, context);
+            GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
             System.out.println("Loading feed to graph");
-            hl.load(new LoadDrawHandler(), true);
+            hl.load(true);
             System.out.println("Done");
 
             setTransformation(left, bottom, right, top);
@@ -212,7 +212,7 @@ public class ScheduleViz extends PApplet {
             now.add(GregorianCalendar.SECOND, (int) time);
 
             State s0 = new State(now.getTimeInMillis());
-            spt = Dijkstra.getShortestPathTree(gg, startVertex.label, null, s0, new TraverseOptions());
+            spt = Dijkstra.getShortestPathTree(gg, startVertex.getLabel(), null, s0, new TraverseOptions());
 
         }
 
