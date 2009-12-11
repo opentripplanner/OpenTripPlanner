@@ -72,8 +72,7 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
         return _serviceId;
     }
 
-    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end)
-            throws Exception {
+    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end) {
         super(startJourney, endJourney);
         this.start = start;
         this.end = end;

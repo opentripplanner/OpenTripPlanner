@@ -69,19 +69,26 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
-class StopPattern2 {
+/** 
+ * 
+ * A StopPattern is an intermediate object used when processing GTFS files.  It represents an ordered list 
+ * of stops and a service ID.  Any two trips with the same stops in the same order, and that operates on the 
+ * same days, can be combined using a TripPattern to save memory.  
+ */
+
+class StopPattern {
     Vector<Stop> stops;
 
     AgencyAndId calendarId;
 
-    public StopPattern2(Vector<Stop> stops, AgencyAndId calendarId) {
+    public StopPattern(Vector<Stop> stops, AgencyAndId calendarId) {
         this.stops = stops;
         this.calendarId = calendarId;
     }
 
     public boolean equals(Object other) {
-        if (other instanceof StopPattern2) {
-            StopPattern2 pattern = (StopPattern2) other;
+        if (other instanceof StopPattern) {
+            StopPattern pattern = (StopPattern) other;
             return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId);
         } else {
             return false;
@@ -97,6 +104,11 @@ class StopPattern2 {
     }
 }
 
+/**
+ * An EncodedTrip is an intermediate object used during GTFS processing.  It represents a trip as it will be 
+ * put into a TripPattern.  It's used during interlining processing, to create that the extra PatternDwell edges
+ * where someone stays on a vehicle as its number changes.
+ */
 class EncodedTrip {
     Trip trip;
 
@@ -123,6 +135,9 @@ class EncodedTrip {
     }
 }
 
+/**
+ * Generates a set of edges from GTFS.
+ */
 public class GTFSPatternHopFactory {
 
     private final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
@@ -137,17 +152,17 @@ public class GTFSPatternHopFactory {
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
 
-    public GTFSPatternHopFactory(GtfsContext context) throws Exception {
+    public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
     }
 
-    public static StopPattern2 stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
+    public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
         Vector<Stop> stops = new Vector<Stop>();
 
         for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
             stops.add(stoptime.getStop());
         }
-        StopPattern2 pattern = new StopPattern2(stops, trip.getServiceId());
+        StopPattern pattern = new StopPattern(stops, trip.getServiceId());
         return pattern;
     }
 
@@ -155,7 +170,10 @@ public class GTFSPatternHopFactory {
         return GtfsLibrary.convertIdToString(id);
     }
 
-    public void run(Graph graph) throws Exception {
+    /**
+     * Generate the edges.  Assumes that there are already vertices in the graph for the stops.
+     */
+    public void run(Graph graph) {
 
         clearCachedData();
 
@@ -167,7 +185,7 @@ public class GTFSPatternHopFactory {
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
 
-        HashMap<StopPattern2, TripPattern> patterns = new HashMap<StopPattern2, TripPattern>();
+        HashMap<StopPattern, TripPattern> patterns = new HashMap<StopPattern, TripPattern>();
 
         int index = 0;
 
@@ -184,7 +202,7 @@ public class GTFSPatternHopFactory {
             if (stopTimes.isEmpty())
                 continue;
 
-            StopPattern2 stopPattern = stopPatternfromTrip(trip, _dao);
+            StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
             int lastStop = stopTimes.size() - 1;
             TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
@@ -421,8 +439,7 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes)
-            throws Exception {
+    private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes) {
 
         String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();

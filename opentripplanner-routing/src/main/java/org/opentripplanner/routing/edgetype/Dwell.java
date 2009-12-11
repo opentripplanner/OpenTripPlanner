@@ -58,8 +58,7 @@ public class Dwell extends AbstractEdge {
         return _serviceId;
     }
 
-    public Dwell(Vertex startJourney, Vertex endJourney, StopTime stopTime)
-            throws Exception {
+    public Dwell(Vertex startJourney, Vertex endJourney, StopTime stopTime) {
         super(startJourney, endJourney);
         this.stopTime = stopTime;
         this._serviceId = stopTime.getTrip().getServiceId();
