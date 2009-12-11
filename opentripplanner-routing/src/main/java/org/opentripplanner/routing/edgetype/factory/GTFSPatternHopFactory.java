@@ -331,7 +331,7 @@ public class GTFSPatternHopFactory {
 
                     List<StopTime> nextStopTimes = _dao.getStopTimesForTrip(nextTrip.trip);
                     StopTime startTime = nextStopTimes.get(0);
-                    int dwellTime = startTime.getDepartureTime() - endTime.getArrivalTime();
+                    int dwellTime = startTime.getDepartureTime() - startTime.getArrivalTime();
                     encoded.pattern.setDwellTime(stopTimes.size() - 2, encoded.patternIndex,
                             dwellTime);
 
