@@ -16,6 +16,11 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 
 import processing.core.PApplet;
 
+/**
+ * Show a map of the graph, intersections and TransitStops only.  The user can drag to zoom.
+ * The user can also click, and a list of nearby vertices will be sent to the associated  
+ * VertexSelectionListener
+ */
 public class ShowGraph extends PApplet {
 
     private static final long serialVersionUID = -8336165356756970127L;
@@ -34,11 +39,11 @@ public class ShowGraph extends PApplet {
 
     Envelope screenBounds;
 
-    VertexSelector selector;
+    VertexSelectionListener selector;
 
     private String graphObj;
     
-    public ShowGraph(VertexSelector selector, String graphObj) {
+    public ShowGraph(VertexSelectionListener selector, String graphObj) {
         super();
         this.selector = selector;
         this.graphObj = graphObj;

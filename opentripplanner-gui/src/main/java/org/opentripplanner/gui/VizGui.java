@@ -4,16 +4,12 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Vector;
-
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -33,12 +29,18 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
+/** 
+ * Exit on window close.
+ *
+ */
 class ExitListener extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
         System.exit(0);
     }
 }
-
+/**
+ *  DisplayVertex holds a vertex, but has a toString value that's a little more useful.  
+ */ 
 class DisplayVertex {
     public Vertex vertex;
 
@@ -51,6 +53,10 @@ class DisplayVertex {
     }
 }
 
+/** 
+ * This is a ListModel that holds Edges.  It gets its edges from a PatternBoard/PatternAlight,
+ * hence the iterable.
+ */
 class EdgeListModel extends AbstractListModel {
     private ArrayList<Edge> edges;
 
@@ -70,6 +76,9 @@ class EdgeListModel extends AbstractListModel {
     }
 }
 
+/**
+ * This is a ListModel that shows a TripPattern's departure times from a particular stop 
+ */
 class TripPatternListModel extends AbstractListModel {
 
     ArrayList<String> departureTimes = new ArrayList<String>();
@@ -95,7 +104,14 @@ class TripPatternListModel extends AbstractListModel {
 
 }
 
-public class VizGui extends JFrame implements VertexSelector {
+/** 
+ * A simple visualizer for graphs.  It shows (using ShowGraph) a map of the graph, intersections and
+ * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
+ * examine trip patterns.  It's meant mainly for debugging, so it's totally OK if it develops (say)
+ * a bunch of weird buttons designed to debug specific cases.
+ *
+ */
+public class VizGui extends JFrame implements VertexSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
