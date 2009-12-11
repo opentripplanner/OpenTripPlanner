@@ -147,6 +147,28 @@ public class ShowGraph extends PApplet {
             y1 = y2;
             y2 = tmp;
         }
+        
+        double yDist = y2 - y1;
+        double xDist = x2 - x1;
+        
+        if (yDist < 0.00001 || xDist < 0.00001) { 
+            startDragX = startDragY = -1;
+            return;
+        }
+        
+        //fix ratio
+        double originalAspectRatio = modelOuterBounds.getWidth() / modelOuterBounds.getHeight();
+        double zoomBoxAspectRatio = xDist / yDist;
+        if (zoomBoxAspectRatio > originalAspectRatio) {
+            double desiredYDist = yDist * zoomBoxAspectRatio / originalAspectRatio;
+            y1 -= (desiredYDist - yDist) / 2;
+            y2 += (desiredYDist - yDist) / 2;
+        } else {
+            double desiredXDist = xDist *  originalAspectRatio / zoomBoxAspectRatio;
+            x1 -= (desiredXDist - xDist) / 2;
+            x2 += (desiredXDist - xDist) / 2;
+        }
+        
         modelBounds = new Envelope(x1, x2, y1, y2);
     }
     
