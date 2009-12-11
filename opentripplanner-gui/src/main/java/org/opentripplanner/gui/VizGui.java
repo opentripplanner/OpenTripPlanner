@@ -69,14 +69,14 @@ public class VizGui extends JFrame implements VertexSelector {
     private JList outgoingEdges;
     private JList incomingEdges;
     
-    public VizGui() {
+    public VizGui(String graphObj) {
         super();
         
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
         Container pane = getContentPane();
 
-        showGraph = new ShowGraph(this);
+        showGraph = new ShowGraph(this, graphObj);
         pane.add(showGraph, BorderLayout.CENTER);
         
         /* left panel, top-to-bottom: list of nearby vertices, list of edges for selected vertex, buttons */
@@ -145,7 +145,7 @@ public class VizGui extends JFrame implements VertexSelector {
     }
     
     public static void main(String args[]) {
-        VizGui gui = new VizGui();
+        VizGui gui = new VizGui(args[0]);
         gui.setVisible(true);
         
     }

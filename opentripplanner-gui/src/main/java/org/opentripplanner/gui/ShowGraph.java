@@ -35,10 +35,13 @@ public class ShowGraph extends PApplet {
     Envelope screenBounds;
 
     VertexSelector selector;
+
+    private String graphObj;
     
-    public ShowGraph(VertexSelector selector) {
+    public ShowGraph(VertexSelector selector, String graphObj) {
         super();
         this.selector = selector;
+        this.graphObj = graphObj;
     }
     
     public void setup() {
@@ -48,7 +51,7 @@ public class ShowGraph extends PApplet {
 
         try {
             graph = GraphSerializationLibrary.readGraph(new File(
-                    "/home/novalis/otp/opentripplanner/graph-bundle/Graph.obj"));
+                    graphObj));
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
