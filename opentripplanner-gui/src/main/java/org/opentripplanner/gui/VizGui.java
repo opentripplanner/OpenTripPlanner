@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -91,17 +92,23 @@ public class VizGui extends JFrame implements VertexSelector {
         JLabel nvLabel = new JLabel("Vertices"); 
         vertexDataPanel.add(nvLabel);
         nearbyVertices = new JList();
-        vertexDataPanel.add(nearbyVertices);
+        nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
+        nearbyVertices.setVisibleRowCount(4);
+        JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
+        vertexDataPanel.add(nvScrollPane);
         
         JLabel ogeLabel = new JLabel("Outgoing edges"); 
         vertexDataPanel.add(ogeLabel);
         outgoingEdges = new JList();
-        vertexDataPanel.add(outgoingEdges);
+        outgoingEdges.setVisibleRowCount(4);
+        JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
+        vertexDataPanel.add(ogeScrollPane);
         
         JLabel iceLabel = new JLabel("Incoming edges"); 
         vertexDataPanel.add(iceLabel);
         incomingEdges = new JList();
-        vertexDataPanel.add(incomingEdges);
+        JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
+        vertexDataPanel.add(iceScrollPane);
         
         nearbyVertices.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
