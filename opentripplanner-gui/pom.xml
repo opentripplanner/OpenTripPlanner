@@ -4,7 +4,7 @@
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-gui</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>opentripplanner-gui</name>
 
     <parent>
