@@ -107,9 +107,12 @@ public class VizGui extends JFrame implements VertexSelector {
             public void valueChanged(ListSelectionEvent e) {
                 outgoingEdges.removeAll();
                 incomingEdges.removeAll();
-                Vertex nowSelected = ((DisplayVertex) nearbyVertices.getSelectedValue()).vertex;
-                outgoingEdges.setModel(new EdgeListModel(nowSelected.getOutgoing()));
-                incomingEdges.setModel(new EdgeListModel(nowSelected.getIncoming()));
+                DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                    Vertex nowSelected = selected.vertex;
+                    outgoingEdges.setModel(new EdgeListModel(nowSelected.getOutgoing()));
+                    incomingEdges.setModel(new EdgeListModel(nowSelected.getIncoming()));
+                }
             }
         });
         
