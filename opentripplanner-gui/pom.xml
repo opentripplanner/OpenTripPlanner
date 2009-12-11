@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.opentripplanner</groupId>
+    <artifactId>opentripplanner-gui</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
+    <name>opentripplanner-gui</name>
+
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <geotools.version>2.5.7</geotools.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>download.java.net</id>
+            <url>http://download.java.net/maven/2</url>
+        </repository>
+
+        <repository>
+          <id>opengeo</id>
+          <name>OpenGeo Maven Repository</name>
+          <url>http://repo.opengeo.org/</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-routing</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-graph-builder</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.processing</groupId>
+          <artifactId>core</artifactId>
+          <version>1.0.7</version>
+        </dependency>
+    </dependencies>
+
+</project>
