@@ -158,4 +158,12 @@ public class PatternAlight extends AbstractEdge {
         c.set(Calendar.MILLISECOND, 0);
         return c.getTime();
     }
+
+    public TripPattern getPattern() {
+        return pattern;
+    }
+    
+    public int getStopIndex() {
+        return stopIndex;
+    }
 }

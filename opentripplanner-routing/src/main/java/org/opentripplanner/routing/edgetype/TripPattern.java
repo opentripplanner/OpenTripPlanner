@@ -163,4 +163,8 @@ public final class TripPattern implements Serializable {
         Vector<Integer> stopDwellTimes = dwellTimes[stopIndex];
         stopDwellTimes.set(pattern, dwellTime);
     }
+
+    public Vector<Integer> getDepartureTimes(int stopIndex) {
+        return departureTimes[stopIndex];
+    }
 }
