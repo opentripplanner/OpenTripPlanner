@@ -116,7 +116,6 @@ public class ShowGraph extends PApplet {
     public void mouseClicked() {
         double x = toModelX(mouseX);
         double y = toModelY(mouseY);
-        System.out.println ("x, y: " + x + ", " + y);
         Envelope env = new Envelope(new Coordinate(x, y));
         env.expandBy(0.001);
         List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);

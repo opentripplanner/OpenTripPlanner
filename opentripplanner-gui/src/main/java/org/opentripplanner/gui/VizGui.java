@@ -158,6 +158,5 @@ public class VizGui extends JFrame implements VertexSelector {
         };
 
         nearbyVertices.setModel(data);
-        System.out.println(selected);
     }
 }
