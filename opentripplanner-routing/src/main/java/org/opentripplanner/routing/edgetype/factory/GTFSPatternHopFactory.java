@@ -188,6 +188,10 @@ public class GTFSPatternHopFactory {
             TripPattern tripPattern = patterns.get(stopPattern);
             int lastStop = stopTimes.size() - 1;
             TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
+            int departureTime = -1, prevDepartureTime = -1;
+            int numInterpStops = -1, firstInterpStop = -1; 
+            int interpStep = 0;
+            
             if (tripPattern == null) {
 
                 tripPattern = new TripPattern(trip, stopTimes);
@@ -199,8 +203,6 @@ public class GTFSPatternHopFactory {
                     StopTime st1 = stopTimes.get(i + 1);
                     Stop s1 = st1.getStop();
                     int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-                    int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-
                     // create journey vertices
 
                     Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_"
@@ -223,8 +225,46 @@ public class GTFSPatternHopFactory {
                     hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                             endJourneyArrive));
 
-                    patternIndex = tripPattern.addHop(i, 0, st0.getDepartureTime(), runningTime,
-                            st1.getArrivalTime(), dwellTime);
+                    prevDepartureTime = departureTime;
+                    departureTime = st0.getDepartureTime();
+                    int arrivalTime = st1.getArrivalTime();
+                    
+                    /* Interpolate, if necessary, the times of non-timepoint stops */
+                    if (arrivalTime == -1 || departureTime == -1) {
+                        
+                        if (numInterpStops == -1) {
+                            //figure out how many such stops there are in a row.
+                            int j; 
+                            for (j = i + 1; j < lastStop + 1; ++j) {
+                                StopTime st = stopTimes.get(j);
+                                if (st.getDepartureTime() != -1) {
+                                    break;
+                                }
+                            }
+                            if (j == lastStop + 1) {
+                                throw new RuntimeException ("Could not interpolate arrival/departure time on stop " + i + " on trip " + trip);
+                            }
+                            StopTime st = stopTimes.get(j);
+                            numInterpStops = j - i - 1;
+                            firstInterpStop = i + 1;
+                            interpStep = (st.getArrivalTime() - departureTime) / (numInterpStops + 2);
+                        }
+                        if (i >= firstInterpStop) {
+                            departureTime = prevDepartureTime + interpStep * (i + 1 - firstInterpStop);
+                        } 
+                        if (i < firstInterpStop + numInterpStops - 1) {
+                            arrivalTime = departureTime + interpStep;
+                        }
+                        if (i == firstInterpStop + numInterpStops - 1) {
+                            // done interpolating
+                            numInterpStops = -1; 
+                        }
+                    }
+                    
+                    int runningTime = arrivalTime - departureTime;
+
+                    patternIndex = tripPattern.addHop(i, 0, departureTime, runningTime,
+                            arrivalTime, dwellTime);
                     graph.addEdge(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));

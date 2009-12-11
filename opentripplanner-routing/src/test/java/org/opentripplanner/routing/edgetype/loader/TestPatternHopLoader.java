@@ -267,4 +267,17 @@ public class TestPatternHopLoader extends TestCase {
 
         assertNotNull(spt.getPath(stop_b));
     }
+    
+    public void testTimelessStops() throws Exception {
+        Vertex stop_d = graph.getVertex("agency_D");
+        Vertex stop_c = graph.getVertex("agency_C");
+        TraverseOptions options = new TraverseOptions(context);
+        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, stop_d.getLabel(), stop_c.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 1, 10, 0, 0).getTimeInMillis()), options);
+
+        GraphPath path = spt.getPath(stop_c);
+        assertNotNull(path);
+        State endState = path.vertices.lastElement().state;
+        assertEquals(new GregorianCalendar(2009, 8, 1, 11, 0, 0).getTimeInMillis(), endState.getTime());
+    }
 }
