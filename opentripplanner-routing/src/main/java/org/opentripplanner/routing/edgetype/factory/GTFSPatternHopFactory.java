@@ -389,7 +389,11 @@ public class GTFSPatternHopFactory {
 
                     List<StopTime> nextStopTimes = _dao.getStopTimesForTrip(nextTrip.trip);
                     StopTime startTime = nextStopTimes.get(0);
-                    int dwellTime = startTime.getDepartureTime() - startTime.getArrivalTime();
+                    // startTime.getArrivalTime() is the arrival time of the *next* trip (i.e.,
+                    // right when the bus changes to its new trip). endtime.getDepartureTime() is
+                    // the final time point along its current trip; the difference is the dwell
+                    // time.
+                    int dwellTime = startTime.getArrivalTime() - endTime.getDepartureTime();
                     encoded.pattern.setDwellTime(stopTimes.size() - 2, encoded.patternIndex,
                             dwellTime);
 
