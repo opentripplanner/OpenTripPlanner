@@ -1,0 +1,160 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.opentripplanner</groupId>
+    <artifactId>opentripplanner-integration</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>opentripplanner-integration</name>
+
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <tomcat.version>5.5.28</tomcat.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-graph-builder</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-api-webapp</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-webapp</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <type>war</type>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- We use the Ant copy task to copy in a couple of default resources if they are not already present -->
+            <!-- Note that we used this instead of resources:copy-resources because it wasn't supported in m2eclipse -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy todir="${basedir}/src/main/resources">
+                                    <fileset dir="${basedir}/src/defaults/resources" />
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--  Build a graph -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>graph-builder-execution</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <arguments>
+                                <argument>-Xmx1G</argument>
+                                <argument>-classpath</argument>
+                                <classpath />
+                                <argument>org.opentripplanner.integration.graph_builder.GraphBuilderIntegrationMain</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Create a custom opentriplanner-api-webapp war with the path to our graph -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>tomcat-execution</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>opentripplanner-api-webapp</finalName>
+                            <descriptors>
+                                <descriptor>src/package/resources/opentripplanner-api-webapp.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Start up tomcat with our custom wars and graph -->
+            <plugin>
+                <groupId>org.codehaus.cargo</groupId>
+                <artifactId>cargo-maven2-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>tomcat-execution</id>
+                        <phase>pre-integration-test</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                        <configuration>
+
+                            <wait>true</wait>
+
+                            <container>
+                                <containerId>tomcat5x</containerId>
+                                <log>${project.build.directory}/tomcat5x/cargo.log</log>
+                                <zipUrlInstaller>
+                                    <url>http://www.apache.org/dist/tomcat/tomcat-5/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip</url>
+                                    <installDir>${installDir}</installDir>
+                                </zipUrlInstaller>
+                            </container>
+
+                            <configuration>
+                                <home>${project.build.directory}/tomcat5x/container</home>
+                                <properties>
+                                    <cargo.servlet.port>8080</cargo.servlet.port>
+                                    <cargo.logging>high</cargo.logging>
+                                    <cargo.jvmargs>-Xmx1G</cargo.jvmargs>
+                                </properties>
+                                <deployables>
+                                    <deployable>
+                                        <location>${project.build.directory}/opentripplanner-api-webapp-integration.war</location>
+                                        <type>war</type>
+                                        <properties>
+                                            <context>opentripplanner-api-webapp</context>
+                                        </properties>
+                                    </deployable>
+                                    <deployable>
+                                        <groupId>org.opentripplanner</groupId>
+                                        <artifactId>opentripplanner-webapp</artifactId>
+                                        <type>war</type>
+                                    </deployable>
+                                </deployables>
+                            </configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
