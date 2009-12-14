@@ -248,14 +248,14 @@ public class GTFSPatternHopFactory {
                     int arrivalTime = st1.getArrivalTime();
                     
                     /* Interpolate, if necessary, the times of non-timepoint stops */
-                    if (arrivalTime == -1 || departureTime == -1) {
+                    if (!(st0.isDepartureTimeSet() && st1.isArrivalTimeSet() ) ) {
                         
                         if (numInterpStops == -1) {
                             //figure out how many such stops there are in a row.
                             int j; 
                             for (j = i + 1; j < lastStop + 1; ++j) {
                                 StopTime st = stopTimes.get(j);
-                                if (st.getDepartureTime() != -1) {
+                                if (st.isDepartureTimeSet()) {
                                     break;
                                 }
                             }
@@ -482,7 +482,7 @@ public class GTFSPatternHopFactory {
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
 
-        boolean hasShapeDist = startDistance != -1 && endDistance != -1;
+        boolean hasShapeDist = st0.isShapeDistTraveledSet() && st1.isShapeDistTraveledSet();
 
         if (hasShapeDist) {
 
@@ -527,7 +527,7 @@ public class GTFSPatternHopFactory {
         LineString geometry = _geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
 
-            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
+            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex); 
 
             // Pack the resulting line string
             CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
@@ -557,7 +557,7 @@ public class GTFSPatternHopFactory {
         for (ShapePoint point : points) {
             coordinates[i] = new Coordinate(point.getLon(), point.getLat());
             distances[i] = point.getDistTraveled();
-            if (point.getDistTraveled() == -1)
+            if (! point.isDistTraveledSet() )
                 hasAllDistances = false;
             i++;
         }
