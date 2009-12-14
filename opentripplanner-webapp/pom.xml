@@ -18,6 +18,10 @@
 
     </dependencies>
 
+    <build>
+        <finalName>opentripplanner-webapp</finalName>
+    </build>
+
     <!-- If we are running in hudson use cobertura. -->
     <profiles>
         <profile>

@@ -13,8 +13,15 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -75,6 +82,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
 
+    private File _cacheDirectory;
+
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
     }
@@ -89,6 +98,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     public void setEntityReplacementStrategy(EntityReplacementStrategy strategy) {
         _entityReplacementStrategy = strategy;
+    }
+
+    public void setCacheDirectory(File cacheDirectory) {
+        _cacheDirectory = cacheDirectory;
     }
 
     @Override
@@ -138,10 +151,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
 
-            _log.info("gtfs=" + gtfsBundle.getPath());
+            File path = getPathForGtfsBundle(gtfsBundle);
+            _log.info("gtfs=" + path);
 
             GtfsReader reader = new GtfsReader();
-            reader.setInputLocation(gtfsBundle.getPath());
+            reader.setInputLocation(path);
             reader.setEntityStore(store);
 
             if (gtfsBundle.getDefaultAgencyId() != null)
@@ -187,6 +201,60 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         }
 
         store.close();
+    }
+
+    private File getPathForGtfsBundle(GtfsBundle gtfsBundle) throws IOException {
+
+        File path = gtfsBundle.getPath();
+        if (path != null)
+            return path;
+
+        URL url = gtfsBundle.getUrl();
+
+        if (url != null) {
+
+            File tmpDir = getTemporaryDirectory();
+            File gtfsFile = new File(tmpDir, "gtfs_file.zip");
+
+            if (gtfsFile.exists()) {
+                _log.info("using already downloaded gtfs file: path=" + gtfsFile);
+                return gtfsFile;
+            }
+
+            _log.info("downloading gtfs: url=" + url + " path=" + gtfsFile);
+
+            BufferedInputStream in = new BufferedInputStream(url.openStream());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
+
+            copyStreams(in, out);
+
+            return gtfsFile;
+        }
+
+        throw new IllegalStateException("GtfsBundle did not include a path or a url");
+    }
+
+    private void copyStreams(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        while (true) {
+            int rc = in.read(buffer);
+            if (rc == -1)
+                break;
+            out.write(buffer, 0, rc);
+        }
+        in.close();
+        out.close();
+    }
+
+    private File getTemporaryDirectory() {
+
+        if (_cacheDirectory != null) {
+            if (!_cacheDirectory.exists())
+                _cacheDirectory.mkdirs();
+            return _cacheDirectory;
+        }
+
+        return new File(System.getProperty("java.io.tmpdir"));
     }
 
     private class StoreImpl implements GenericMutableDao {
@@ -253,7 +321,13 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         public void handleEntity(Object bean) {
             int count = incrementCount(bean.getClass());
             if (count % 1000 == 0)
-                _log.debug("loaded: " + count);
+                if( _log.isDebugEnabled() ) {
+                    String name = bean.getClass().getName();
+                    int index = name.lastIndexOf('.');
+                    if( index != -1)
+                        name = name.substring(index+1);
+                    _log.debug("loading " + name + ": " + count);
+                }
         }
 
         private int incrementCount(Class<?> entityType) {

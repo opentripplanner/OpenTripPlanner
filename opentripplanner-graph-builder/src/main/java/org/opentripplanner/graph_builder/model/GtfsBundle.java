@@ -14,38 +14,49 @@
 package org.opentripplanner.graph_builder.model;
 
 import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GtfsBundle {
 
-  private File path;
+    private File path;
+    
+    private URL url;
 
-  private String defaultAgencyId;
+    private String defaultAgencyId;
 
-  private Map<String, String> agencyIdMappings = new HashMap<String, String>();
+    private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
-  public File getPath() {
-    return path;
-  }
+    public File getPath() {
+        return path;
+    }
 
-  public void setPath(File path) {
-    this.path = path;
-  }
+    public void setPath(File path) {
+        this.path = path;
+    }
 
-  public String getDefaultAgencyId() {
-    return defaultAgencyId;
-  }
+    public URL getUrl() {
+        return url;
+    }
 
-  public void setDefaultAgencyId(String defaultAgencyId) {
-    this.defaultAgencyId = defaultAgencyId;
-  }
+    public void setUrl(URL url) {
+        this.url = url;
+    }
 
-  public Map<String, String> getAgencyIdMappings() {
-    return agencyIdMappings;
-  }
+    public String getDefaultAgencyId() {
+        return defaultAgencyId;
+    }
 
-  public void setAgencyIdMappings(Map<String, String> agencyIdMappings) {
-    this.agencyIdMappings = agencyIdMappings;
-  }
+    public void setDefaultAgencyId(String defaultAgencyId) {
+        this.defaultAgencyId = defaultAgencyId;
+    }
+
+    public Map<String, String> getAgencyIdMappings() {
+        return agencyIdMappings;
+    }
+
+    public void setAgencyIdMappings(Map<String, String> agencyIdMappings) {
+        this.agencyIdMappings = agencyIdMappings;
+    }
 }

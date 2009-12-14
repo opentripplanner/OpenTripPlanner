@@ -11,10 +11,11 @@
 
   <modules>
       <module>opentripplanner-api-webapp</module>
+      <module>opentripplanner-gui</module>
       <module>opentripplanner-graph-builder</module>
+      <module>opentripplanner-integration</module>
       <module>opentripplanner-routing</module>
       <module>opentripplanner-webapp</module>
-      <module>opentripplanner-gui</module>
   </modules>
 
   <build>
