@@ -43,11 +43,14 @@ public class Alight extends AbstractEdge {
 
     public Hop hop;
 
+    private boolean wheelchairAccessible;
+
     private static final long serialVersionUID = 1L;
 
-    public Alight(Vertex fromv, Vertex tov, Hop hop) {
+    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible) {
         super(fromv, tov);
         this.hop = hop;
+	this.wheelchairAccessible = wheelchairAccessible;
     }
 
     public String getDirection() {
@@ -80,6 +83,9 @@ public class Alight extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
+	if (wo.wheelchairAccessible && !wheelchairAccessible) {
+	    return null;
+	}
         State s1 = s0.clone();
         s1.setTransferAllowed(true);
         return new TraverseResult(1, s1);
@@ -89,6 +95,9 @@ public class Alight extends AbstractEdge {
         if (!wo.modes.contains(hop.getMode())) {
             return null;
         }
+	if (wo.wheelchairAccessible && !wheelchairAccessible) {
+	    return null;
+	}
         long currentTime = s0.getTime();
         Date serviceDate = getServiceDate(currentTime, true);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);

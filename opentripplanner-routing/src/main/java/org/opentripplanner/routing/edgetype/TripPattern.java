@@ -55,6 +55,8 @@ public final class TripPattern implements Serializable {
 
     private Vector<Integer>[] dwellTimes;
 
+    private Vector<Boolean>[] wheelchairAccessibles;
+
     @SuppressWarnings("unchecked")
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
@@ -63,14 +65,17 @@ public final class TripPattern implements Serializable {
         runningTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
         dwellTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
         arrivalTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
+        wheelchairAccessibles = (Vector<Boolean>[]) Array.newInstance(Vector.class, hops + 1);
 
-        for (int i = 0; i < hops; ++i) {
+        int i;
+        for (i = 0; i < hops; ++i) {
             departureTimes[i] = new Vector<Integer>();
             runningTimes[i] = new Vector<Integer>();
             dwellTimes[i] = new Vector<Integer>();
             arrivalTimes[i] = new Vector<Integer>();
-            
+            wheelchairAccessibles[i] = new Vector<Boolean>();            
         }
+        wheelchairAccessibles[i] = new Vector<Boolean>();
     }
 
     public void removeHop(int stopindex, int hop) {
@@ -78,15 +83,16 @@ public final class TripPattern implements Serializable {
         departureTimes[stopindex].removeElementAt(hop);
         dwellTimes[stopindex].removeElementAt(hop);
         arrivalTimes[stopindex].removeElementAt(hop);
+        wheelchairAccessibles[stopindex].removeElementAt(hop);
     }
 
     public int addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
-            int arrivalTime, int dwellTime) {
+            int arrivalTime, int dwellTime, boolean wheelchairAccessible) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
         Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
         Vector<Integer> stopDwellTimes = dwellTimes[stopIndex];
-
+        Vector<Boolean> stopWheelchairAccessibles = wheelchairAccessibles[stopIndex];
         // throw an exception when this departure time is not between the departure times it
         // should be between, indicating a trip that overtakes another.
 
@@ -104,20 +110,30 @@ public final class TripPattern implements Serializable {
         stopRunningTimes.insertElementAt(runningTime, insertionPoint);
         stopArrivalTimes.insertElementAt(arrivalTime, insertionPoint);
         stopDwellTimes.insertElementAt(dwellTime, insertionPoint);
+        stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, insertionPoint);
         return insertionPoint;
     }
 
-    public int getNextPattern(int stopIndex, int afterTime) {
+    public int getNextPattern(int stopIndex, int afterTime, boolean wheelchairAccessible) {
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
         int index = Collections.binarySearch(stopDepartureTimes, afterTime);
         if (index == -stopDepartureTimes.size() - 1)
             return -1;
 
-        if (index >= 0) {
-            return index;
-        } else {
-            return -index - 1;
+        if (index < 0) {
+            index = -index - 1;
         }
+
+	if (wheelchairAccessible) {
+	    Vector<Boolean> stopWheelchairAccessibles = wheelchairAccessibles[stopIndex];
+	    while (!stopWheelchairAccessibles.get(index)) {
+		index ++;
+		if (index == stopWheelchairAccessibles.size()) {
+		    return -1;
+		}
+	    }
+	}
+	return index;
     }
 
     public int getRunningTime(int stopIndex, int pattern) {
@@ -136,17 +152,27 @@ public final class TripPattern implements Serializable {
         return -index - 1;
     }
 
-    public int getPreviousPattern(int stopIndex, int beforeTime) {
+    public int getPreviousPattern(int stopIndex, int beforeTime, boolean wheelchairAccessible) {
         Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
         int index = Collections.binarySearch(stopArrivalTimes, beforeTime);
         if (index == -1)
             return -1;
 
-        if (index >= 0) {
-            return index;
-        } else {
-            return -index - 2;
+        if (index < 0) {
+            index = -index - 2;
         }
+
+
+	if (wheelchairAccessible) {
+	    Vector<Boolean> stopWheelchairAccessibles = wheelchairAccessibles[stopIndex + 1];
+	    while (!stopWheelchairAccessibles.get(index)) {
+		index --;
+		if (index == -1) {
+		    return -1;
+		}
+	    }
+	}
+	return index;
     }
 
     public int getArrivalTime(int stopIndex, int pattern) {
@@ -164,7 +190,25 @@ public final class TripPattern implements Serializable {
         stopDwellTimes.set(pattern, dwellTime);
     }
 
+
     public Vector<Integer> getDepartureTimes(int stopIndex) {
         return departureTimes[stopIndex];
+    }
+
+    public boolean getWheelchairAccessible(int stopIndex, int pattern) {
+        Vector<Boolean> stopWheelchairAcessibles = wheelchairAccessibles[stopIndex];
+        return stopWheelchairAcessibles.get(pattern);
+    }
+
+    public void setWheelchairAccessible(int stopIndex, int pattern, boolean wheelchairAccessible) {
+        Vector<Boolean> stopWheelchairAccessibles = wheelchairAccessibles[stopIndex];
+        if (pattern > stopWheelchairAccessibles.size()) {
+            throw new RuntimeException("Pattern index out of bounds: " + pattern + " / " + stopWheelchairAccessibles.size());
+        }
+        if (pattern == stopWheelchairAccessibles.size() || true) {
+            stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, pattern);
+        } else {
+            stopWheelchairAccessibles.set(pattern, wheelchairAccessible);
+        }
     }
 }

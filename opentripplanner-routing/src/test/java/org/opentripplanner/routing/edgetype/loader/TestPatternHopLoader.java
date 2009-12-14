@@ -27,6 +27,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.io.File;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
@@ -34,6 +35,7 @@ import junit.framework.TestCase;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -279,5 +281,42 @@ public class TestPatternHopLoader extends TestCase {
         assertNotNull(path);
         State endState = path.vertices.lastElement().state;
         assertEquals(new GregorianCalendar(2009, 8, 1, 11, 0, 0).getTimeInMillis(), endState.getTime());
+    }
+
+    public void testWheelchairAccessible() throws Exception {
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+
+        TraverseOptions options = new TraverseOptions(context);
+        options.wheelchairAccessible = true;
+
+        ShortestPathTree spt;
+        GraphPath path;
+        // stop B is accessible, so there should be a path.
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_b, new State(new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_b);
+        assertNotNull(path);
+
+        // stop C is not accessible, so there should be no path.
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_c, new State(new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_c);
+        assertNull(path);
+
+        // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
+        // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
+        GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_d, new State(time
+                .getTimeInMillis()), options);
+        
+        time.add(Calendar.HOUR, 1);
+        path = spt.getPath(stop_d);
+        assertNotNull(path);
+        assertEquals(time.getTimeInMillis(), path.vertices.lastElement().state.getTime());
     }
 }

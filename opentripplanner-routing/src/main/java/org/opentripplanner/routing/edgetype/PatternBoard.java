@@ -112,7 +112,7 @@ public class PatternBoard extends AbstractEdge {
         AgencyAndId service = pattern.exemplar.getServiceId();
         if (wo.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight);
+            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight, wo.wheelchairAccessible);
             if (patternIndex >= 0) {
                 wait = pattern.getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
@@ -122,7 +122,7 @@ public class PatternBoard extends AbstractEdge {
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight
-                    + SEC_IN_DAY);
+                    + SEC_IN_DAY, wo.wheelchairAccessible);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getDepartureTime(stopIndex, yesterdayPatternIndex)
                         - secondsSinceMidnight - SEC_IN_DAY;
@@ -144,6 +144,11 @@ public class PatternBoard extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
+	if (wo.wheelchairAccessible) {
+	    if (! pattern.getWheelchairAccessible(stopIndex, state0.getPattern())) {
+		return null;
+	    }
+	}
         State s1 = state0.clone();
         s1.setTransferAllowed(true);
         return new TraverseResult(1, s1);

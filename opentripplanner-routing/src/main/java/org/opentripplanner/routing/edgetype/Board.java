@@ -48,13 +48,16 @@ public class Board extends AbstractEdge {
 
     public Hop hop;
 
+    private boolean wheelchairAccessible;
+
     public static final int SECS_IN_DAY = 86400;
 
     private static final long serialVersionUID = 2L;
 
-    public Board(Vertex startStation, Vertex startJourney, Hop hop) {
+    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible) {
         super(startStation, startJourney);
         this.hop = hop;
+	this.wheelchairAccessible = wheelchairAccessible;
     }
 
     public String getDirection() {
@@ -89,6 +92,11 @@ public class Board extends AbstractEdge {
         if (!wo.modes.contains(hop.getMode())) {
             return null;
         }
+
+	if (wo.wheelchairAccessible && !wheelchairAccessible) {
+	    return null;
+	}
+
         long currentTime = state0.getTime();
         Date serviceDate = getServiceDate(currentTime, false);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
@@ -109,6 +117,9 @@ public class Board extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
+	if (wo.wheelchairAccessible && !wheelchairAccessible) {
+	    return null;
+	}
         State s1 = state0.clone();
         s1.setTransferAllowed(true);
         return new TraverseResult(1, s1);

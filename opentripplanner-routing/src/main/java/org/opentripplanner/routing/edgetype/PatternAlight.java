@@ -99,31 +99,31 @@ public class PatternAlight extends AbstractEdge {
         return null;
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        if (!wo.modes.get(modeMask)) {
+    public TraverseResult traverseBack(State state0, TraverseOptions options) {
+        if (!options.modes.get(modeMask)) {
             return null;
         }
         long currentTime = state0.getTime();
-        Date serviceDate = getServiceDate(currentTime, wo.calendar);
-        Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
+        Date serviceDate = getServiceDate(currentTime, options.calendar);
+        Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
 
         int wait = 1;
         int patternIndex = -1;
         AgencyAndId service = pattern.exemplar.getServiceId();
-        if (wo.serviceOn(service, serviceDate)) {
+        if (options.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight);
+            patternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible);
             if (patternIndex >= 0) {
                 wait = pattern.getArrivalTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
         }
-        if (wo.serviceOn(service, serviceDateYesterday)) {
+        if (options.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight
-                    + SEC_IN_DAY);
+                    + SEC_IN_DAY, options.wheelchairAccessible);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getArrivalTime(stopIndex, yesterdayPatternIndex)
                         - secondsSinceMidnight - SEC_IN_DAY;
@@ -144,7 +144,12 @@ public class PatternAlight extends AbstractEdge {
         return new TraverseResult(-wait + BOARD_COST, state1);
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
+    public TraverseResult traverse(State state0, TraverseOptions options) {
+	if (options.wheelchairAccessible) {
+	    if (! pattern.getWheelchairAccessible(stopIndex + 1, state0.getPattern())) {
+		return null;
+	    }
+	}
         State s1 = state0.clone();
         s1.setTransferAllowed(true);
         return new TraverseResult(1, s1);

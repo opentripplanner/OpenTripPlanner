@@ -209,17 +209,19 @@ public class GTFSPatternHopFactory {
             int departureTime = -1, prevDepartureTime = -1;
             int numInterpStops = -1, firstInterpStop = -1; 
             int interpStep = 0;
-            
+            boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
             if (tripPattern == null) {
 
                 tripPattern = new TripPattern(trip, stopTimes);
                 int patternIndex = -1;
 
-                for (int i = 0; i < lastStop; i++) {
+                int i;
+                Stop s1 = null;
+                for (i = 0; i < lastStop; i++) {
                     StopTime st0 = stopTimes.get(i);
                     Stop s0 = st0.getStop();
                     StopTime st1 = stopTimes.get(i + 1);
-                    Stop s1 = st1.getStop();
+                    s1 = st1.getStop();
                     int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                     // create journey vertices
 
@@ -281,8 +283,10 @@ public class GTFSPatternHopFactory {
                     
                     int runningTime = arrivalTime - departureTime;
 
+		    boolean stopWheelchairBoarding = s0.getWheelchairBoarding() != 0;
                     patternIndex = tripPattern.addHop(i, 0, departureTime, runningTime,
-                            arrivalTime, dwellTime);
+                            arrivalTime, dwellTime, 
+                            stopWheelchairBoarding && tripWheelchairAccessible);
                     graph.addEdge(hop);
 
                     Vertex startStation = graph.getVertex(id(s0.getId()));
@@ -295,6 +299,9 @@ public class GTFSPatternHopFactory {
                 }
                 patterns.put(stopPattern, tripPattern);
 
+		boolean stopWheelchairBoarding = s1.getWheelchairBoarding() != 0;
+                tripPattern.setWheelchairAccessible(i, 0, stopWheelchairBoarding && tripWheelchairAccessible);
+
                 String blockId = trip.getBlockId();
                 if (blockId != null && !blockId.equals("")) {
                     ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
@@ -303,7 +310,7 @@ public class GTFSPatternHopFactory {
                         tripsByBlock.put(blockId, blockTrips);
                     }
                     blockTrips.add(new EncodedTrip(trip, patternIndex, tripPattern));
-                }
+                }                
             } else {
                 int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
                         .getDepartureTime());
@@ -321,14 +328,18 @@ public class GTFSPatternHopFactory {
 
                     // try to insert this trip at this location
                     boolean simple = false;
-                    for (int i = 0; i < lastStop; i++) {
+                    StopTime st1 = null;
+                    int i;
+                    for (i = 0; i < lastStop; i++) {
                         StopTime st0 = stopTimes.get(i);
-                        StopTime st1 = stopTimes.get(i + 1);
+                        st1 = stopTimes.get(i + 1);
                         int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                         try {
+			    boolean s0WheelchairBoarding = st0.getStop().getWheelchairBoarding() != 0;
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                    runningTime, st1.getArrivalTime(), dwellTime);
+                                    runningTime, st1.getArrivalTime(), dwellTime, s0WheelchairBoarding
+                                            && tripWheelchairAccessible);
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "
@@ -344,6 +355,8 @@ public class GTFSPatternHopFactory {
                         }
                     }
                     if (!simple) {
+			boolean s1WheelchairBoarding = st1.getStop().getWheelchairBoarding() != 0;
+                        tripPattern.setWheelchairAccessible(i, insertionPoint, s1WheelchairBoarding && tripWheelchairAccessible);
                         String blockId = trip.getBlockId();
                         if (blockId != null && !blockId.equals("")) {
                             ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
@@ -443,7 +456,8 @@ public class GTFSPatternHopFactory {
 
         String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();
-
+        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
+        
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
@@ -466,10 +480,9 @@ public class GTFSPatternHopFactory {
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourney));
             hops.add(hop);
-            Board boarding = new Board(startStation, startJourneyDepart, hop);
+            Board boarding = new Board(startStation, startJourneyDepart, hop, tripWheelchairAccessible && s0.getWheelchairBoarding() != 0);
             graph.addEdge(boarding);
-            graph.addEdge(new Alight(endJourney, endStation, hop));
-
+            graph.addEdge(new Alight(endJourney, endStation, hop, tripWheelchairAccessible && s1.getWheelchairBoarding() != 0));
         }
     }
 

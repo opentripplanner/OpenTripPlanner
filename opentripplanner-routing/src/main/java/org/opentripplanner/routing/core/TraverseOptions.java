@@ -51,6 +51,8 @@ public class TraverseOptions {
     private Map<AgencyAndId, Set<Date>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
 
     public boolean back = false;
+
+    public boolean wheelchairAccessible = false;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
