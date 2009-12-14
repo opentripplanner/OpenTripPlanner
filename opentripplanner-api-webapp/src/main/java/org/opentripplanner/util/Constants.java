@@ -23,7 +23,7 @@ package org.opentripplanner.util;
 public interface Constants {
 
     // geo json stuff
-    public static final String GEO_JSON = "{\"type\": \"Point\", \"coordinates\": [";
+    public static final String GEO_JSON_POINT = "{\"type\": \"Point\", \"coordinates\": [";
     public static final String GEO_JSON_TAIL = "]}";
 
     // PostGIS POINT(x, y) construct

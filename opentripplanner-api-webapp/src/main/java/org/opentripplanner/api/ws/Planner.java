@@ -279,8 +279,8 @@ public class Planner {
                 step = new WalkStep();
                 steps.add(step);
                 step.streetName = streetName;
-                step.x = edge.getFromVertex().getX();
-                step.y = edge.getFromVertex().getY();
+                step.lon = edge.getFromVertex().getX();
+                step.lat = edge.getFromVertex().getY();
                 double thisAngle = getFirstAngle(edge.getGeometry());
                 step.setAbsoluteDirection(thisAngle);
             } else if (!step.streetName.equals(streetName)) {
@@ -290,8 +290,8 @@ public class Planner {
                 step.streetName = streetName;
                 double thisAngle = getFirstAngle(edge.getGeometry());
                 step.setDirections(lastAngle, thisAngle);
-                step.x = edge.getFromVertex().getX();
-                step.y = edge.getFromVertex().getY();
+                step.lon = edge.getFromVertex().getX();
+                step.lat = edge.getFromVertex().getY();
                 step.becomes = !multipleOptionsbefore(edge);
             } else {
                 /* generate turn-to-stay-on directions, where needed */
@@ -306,8 +306,8 @@ public class Planner {
                         step.streetName = streetName;
                         step.setDirections(lastAngle, thisAngle);
                         step.stayOn = true;
-                        step.x = edge.getFromVertex().getX();
-                        step.y = edge.getFromVertex().getY();
+                        step.lon = edge.getFromVertex().getX();
+                        step.lat = edge.getFromVertex().getY();
                     }
                 }
             }

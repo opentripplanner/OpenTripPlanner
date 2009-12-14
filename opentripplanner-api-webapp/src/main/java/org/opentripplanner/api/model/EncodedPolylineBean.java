@@ -11,15 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-/**
- * 
- */
 package org.opentripplanner.api.model;
 
 import java.io.Serializable;
 
 /**
- *  A list of coordinates encoded as a string. 
+ *  A list of coordinates encoded as a string. See 
+ *  http://code.google.com/apis/maps/documentation/polylinealgorithm.html
  */
 
 public class EncodedPolylineBean implements Serializable {
@@ -54,6 +52,11 @@ public class EncodedPolylineBean implements Serializable {
     this.points = points;
   }
 
+  /**
+   * Levels describes which points should be shown at various zoom levels. Presently, we show all points
+   * at all zoom levels.
+   * @return
+   */
   public String getLevels() {
     return levels;
   }

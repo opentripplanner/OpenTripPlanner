@@ -78,11 +78,11 @@ public class WalkStep {
     /**
      * longitude of start of step
      */
-    public double x;
+    public double lon;
     /**
      * latitude of start of step
      */
-    public double y;
+    public double lat;
 
     public void setDirections(double lastAngle, double thisAngle) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle);

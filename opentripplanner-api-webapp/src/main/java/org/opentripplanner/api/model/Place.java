@@ -20,22 +20,40 @@ import javax.xml.bind.annotation.XmlElement;
 import org.opentripplanner.util.Constants; 
 
 /** 
-* 
+* A Place is where a journey starts or ends, or a transit stop along the way.
 */ 
 public class Place {
     protected static final Logger LOGGER = Logger.getLogger(Place.class.getCanonicalName());
 
+    /** 
+     * For transit stops, the name of the stop.  For POIs, the name of the POI.
+     */
     public String name = null;
 
+    /** 
+     * The ID of the stop.  Depending on the transit agency, this may or may not be something that
+     * users care about.
+     */
     public String stopId = "123";
 
+    /**
+     * The longitude of the place
+     */
     public Double lon = null;
+    
+    /**
+     * The latitude of the place
+     */
     public Double lat = null;
 
+    /**
+     * Returns the geometry in GeoJSON format
+     * @return
+     */
     @XmlElement
     String getGeometry() {
 
-        return Constants.GEO_JSON + lon + "," + lat + Constants.GEO_JSON_TAIL;
+        return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 
     public Place() {
