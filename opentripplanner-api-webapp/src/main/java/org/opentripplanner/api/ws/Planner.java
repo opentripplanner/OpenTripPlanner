@@ -78,7 +78,8 @@ public class Planner {
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
-            @QueryParam(RequestInf.WALK) Double walk,
+            @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double max_walk_distance,
+            @QueryParam(RequestInf.WALK_SPEED) Double walk_speed,
             @QueryParam(RequestInf.OPTIMIZE) List<OptimizeType> optList,
             @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
@@ -93,8 +94,8 @@ public class Planner {
 
         if (max != null)
             request.setNumItineraries(max);
-        if (walk != null)
-            request.setWalk(walk);
+        if (max_walk_distance != null)
+            request.setWalk(max_walk_distance);
         if (arriveBy != null && arriveBy)
             request.setArriveBy(true);
 

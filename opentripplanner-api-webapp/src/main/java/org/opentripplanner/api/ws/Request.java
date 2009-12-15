@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.ws;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -27,45 +28,48 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.util.DateUtils;
 
 /**
- *
+ * A trip planning request. Some parameters may not be honored by the trip planner for some or
+ * all itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide
+ * a route.
  */
 public class Request implements RequestInf {
 
-    private String m_from;
-    private String m_to;
-    private Double m_walk = 0.50;
-    private TraverseModeSet m_modes; // defaults in constructor
-    private Set<OptimizeType> m_optimize; // default in constructor
-    private boolean m_optimizeEmpty = true;
-    private Date m_dateTime = new Date();
-    private boolean m_arriveBy = false;
-    private MediaType m_outputFormat = MediaType.APPLICATION_JSON_TYPE;
-    private Integer m_numItineraries = 3;
+    private String from;
+    private String to;
+    private List<String> intermediatePlaces;
+    private Double maxWalkDistance = 804.0; // half a mile in meters
+    private TraverseModeSet modes; // defaults in constructor
+    private Set<OptimizeType> optimize; // default in constructor
+    private Date dateTime = new Date();
+    private boolean arriveBy = false;
+    private MediaType outputFormat = MediaType.APPLICATION_JSON_TYPE;
+    private Integer numItineraries = 3;
 
-    private final Hashtable<String, String> m_parameters = new Hashtable<String, String>();
+    private final Hashtable<String, String> parameters = new Hashtable<String, String>();
 
     public Request() {
-        m_modes = new TraverseModeSet("TRANSIT,WALK");
+        modes = new TraverseModeSet("TRANSIT,WALK");
 
-        m_optimize = new HashSet<OptimizeType>();
-        Collections.addAll(m_optimize, OptimizeType.quick);
+        optimize = new HashSet<OptimizeType>();
+        intermediatePlaces = new ArrayList<String> ();
+        Collections.addAll(optimize, OptimizeType.QUICK);
     }
 
     public Hashtable<String, String> getParameters() {
-        return m_parameters;
+        return parameters;
     }
 
     /** add stuff to the inputs array */
     private void paramPush(String param, Object o) {
         if (o != null)
-            m_parameters.put(param, o.toString());
+            parameters.put(param, o.toString());
     }
 
     /**
      * @return the from
      */
     public String getFrom() {
-        return m_from;
+        return from;
     }
 
     /**
@@ -74,14 +78,14 @@ public class Request implements RequestInf {
      */
     public void setFrom(String from) {
         paramPush(FROM, from);
-        m_from = from;
+        this.from = from;
     }
 
     /**
      * @return the to
      */
     public String getTo() {
-        return m_to;
+        return to;
     }
 
     /**
@@ -90,14 +94,14 @@ public class Request implements RequestInf {
      */
     public void setTo(String to) {
         paramPush(TO, to);
-        m_to = to;
+        this.to = to;
     }
 
     /**
      * @return the walk
      */
     public Double getWalk() {
-        return m_walk;
+        return maxWalkDistance;
     }
 
     /**
@@ -105,21 +109,21 @@ public class Request implements RequestInf {
      *            the walk to set
      */
     public void setWalk(Double walk) {
-        paramPush(WALK, walk);
-        m_walk = walk;
+        paramPush(MAX_WALK_DISTANCE, walk);
+        this.maxWalkDistance = walk;
     }
 
     /**
      * @return the modes
      */
     public TraverseModeSet getModes() {
-        return m_modes;
+        return modes;
     }
 
     /** */
     public String getModesAsStr() {
         String retVal = null;
-        for (TraverseMode m : m_modes.getModes()) {
+        for (TraverseMode m : modes.getModes()) {
             if (retVal == null)
                 retVal = "";
             else
@@ -135,8 +139,8 @@ public class Request implements RequestInf {
      *            the modes to set
      */
     public void addMode(TraverseMode mode) {
-        m_modes.setMode(mode, true);
-        paramPush(MODE, m_modes);
+        modes.setMode(mode, true);
+        paramPush(MODE, modes);
     }
 
     /** */
@@ -144,20 +148,20 @@ public class Request implements RequestInf {
         for (TraverseMode m : mList) {
             addMode(m);
         }
-        paramPush(MODE, m_modes);
+        paramPush(MODE, modes);
     }
 
     /**
      * @return the optimize
      */
     public Set<OptimizeType> getOptimize() {
-        return m_optimize;
+        return optimize;
     }
 
     /** */
     public String getOptimizeAsStr() {
         String retVal = null;
-        for (OptimizeType o : m_optimize) {
+        for (OptimizeType o : optimize) {
             if (retVal == null)
                 retVal = "";
             else
@@ -173,12 +177,8 @@ public class Request implements RequestInf {
      *            the optimize to set
      */
     public void addOptimize(OptimizeType opt) {
-        if (m_optimizeEmpty) {
-            m_optimizeEmpty = false;
-            m_optimize = new HashSet<OptimizeType>();
-        }
-        m_optimize.add(opt);
-        paramPush(OPTIMIZE, m_optimize);
+        optimize.add(opt);
+        paramPush(OPTIMIZE, optimize);
     }
 
     /** */
@@ -193,7 +193,7 @@ public class Request implements RequestInf {
      * @return the dateTime
      */
     public Date getDateTime() {
-        return m_dateTime;
+        return dateTime;
     }
 
     /**
@@ -201,7 +201,7 @@ public class Request implements RequestInf {
      *            the dateTime to set
      */
     public void setDateTime(Date dateTime) {
-        m_dateTime = dateTime;
+        this.dateTime = dateTime;
     }
 
     /**
@@ -211,26 +211,26 @@ public class Request implements RequestInf {
     public void setDateTime(String date, String time) {
         paramPush(DATE, date);
         paramPush(TIME, time);
-        m_dateTime = DateUtils.toDate(date, time);
+        dateTime = DateUtils.toDate(date, time);
     }
 
     /**
      * @return the departAfter
      */
     public boolean isArriveBy() {
-        return m_arriveBy;
+        return arriveBy;
     }
 
     public void setArriveBy(boolean arriveBy) {
         paramPush(ARRIVE_BY, arriveBy);
-        m_arriveBy = arriveBy;
+        this.arriveBy = arriveBy;
     }
 
     /**
      * @return the outputFormat
      */
     public MediaType getOutputFormat() {
-        return m_outputFormat;
+        return outputFormat;
     }
 
     /**
@@ -239,14 +239,14 @@ public class Request implements RequestInf {
      */
     public void setOutputFormat(MediaType outputFormat) {
         paramPush(OUTPUT_FORMAT, outputFormat);
-        m_outputFormat = outputFormat;
+        this.outputFormat = outputFormat;
     }
 
     /**
      * @return the numItineraries
      */
     public Integer getNumItineraries() {
-        return m_numItineraries;
+        return numItineraries;
     }
 
     /**
@@ -257,7 +257,7 @@ public class Request implements RequestInf {
         if (numItineraries < 1 || numItineraries > 10)
             numItineraries = 3;
         paramPush(NUMBER_ITINERARIES, numItineraries);
-        m_numItineraries = numItineraries;
+        this.numItineraries = numItineraries;
     }
 
     /** */
@@ -278,19 +278,19 @@ public class Request implements RequestInf {
     }
 
     public TraverseModeSet getModeSet() {
-        return m_modes;
+        return modes;
     }
 
     @Override
     public void removeMode(TraverseMode mode) {
-        m_modes.setMode(mode, false);
-        paramPush(MODE, m_modes);
+        modes.setMode(mode, false);
+        paramPush(MODE, modes);
     }
 
     public void setModes(TraverseModeSet modes) {
-        m_modes = modes;
-        paramPush(MODE, m_modes);
-        
+        this.modes = modes;
+        paramPush(MODE, modes);
+
     }
 
 }

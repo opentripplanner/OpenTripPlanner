@@ -43,11 +43,11 @@ otp.planner.StaticForms = {
     m_toForm         : null,
     m_date           : null,
     m_time           : null,
-    m_arrStore       : null,
-    m_arrForm        : null,
+    m_arriveByStore       : null,
+    m_arriveByForm        : null,
 
-    m_walkStore      : null,
-    m_walkForm       : null,
+    m_maxWalkDistanceStore      : null,
+    m_maxWalkDistanceForm       : null,
     m_optimizeStore  : null,
     m_optimizeForm   : null,
     m_modeStore      : null,
@@ -435,12 +435,7 @@ otp.planner.StaticForms = {
             if(params.toCoord && params.toCoord.indexOf('0.0') != 0)
                 this.m_toCoord = params.toCoord;
 
-
-            // IMPORTANT NOTE: the order of the operations below is important to making reverse directions
-            // work properly. Note especially how xxxParam comes after the xxx varient (this precedence sets 
-            // these forms up for success)
-
-            // TODO - should find a way to make the xxx (String value, vs coded value) work propertly in submit
+            // TODO - should find a way to make the xxx (String value, vs coded value) work properly in submit
             var time=false;
             var date=false;
 
@@ -454,27 +449,9 @@ otp.planner.StaticForms = {
                 forms.m_date.setRawValue(params.on);
                 date = true;
             }
-            if(params.arrParam)
-                forms.m_arrForm.setValue(params.arrParam);
-            if(params.arr)
-                forms.m_arrForm.setValue(params.arr);
-            if(params.Arr)
-                forms.m_arrForm.setValue(params.Arr);
-            if(params.after)
-            {
-                time = params.after.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('false');
-                time = true;
-            }
-            else if(params.by)
-            {
-                time = params.by.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('true');
-                time = true;
-            }
-
+            if(params.arriveBy)
+                forms.m_arriveByForm.setValue(params.arriveBy);
+            
             if(params.time)
             {
                 time = params.time.replace(/\./g, "");
@@ -483,33 +460,14 @@ otp.planner.StaticForms = {
             }
             if(params.opt)
                 forms.m_optimizeForm.setValue(params.opt);
-            if(params.optParam)
-                forms.m_optimizeForm.setValue(params.optParam);
             if(params.min)
                 forms.m_optimizeForm.setValue(params.min);
-            if(params.minParam)
-                forms.m_optimizeForm.setValue(params.minParam);
-            if(params.walk)
-                forms.m_walkForm.setValue(params.walk);
-            if(params.Walk)
-                forms.m_walkForm.setValue(params.Walk);
-            if(params.walkParam)
-                forms.m_walkForm.setValue(params.walkParam);
+            if(params.max_walk_distance)
+                forms.m_maxWalkDistanceForm.setValue(params.max_walk_distance);
             if(params.mode)
                 forms.m_modeForm.setValue(params.mode);
-            if(params.modeParam)
-                forms.m_modeForm.setValue(params.modeParam);
-
+            
             // stupid trip planner form processing...
-
-            // Hour=7&Minute=02&AmPm=pm
-            if(!time && params.Hour && params.Minute && params.AmPm)
-            {
-                time = params.Hour + ":" +  params.Minute + " " + params.AmPm.toLowerCase();
-                time = time.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
-                time = true;
-            }
 
             // &month=Oct&day=7
             if(!date && params.month && params.day)
@@ -549,14 +507,10 @@ otp.planner.StaticForms = {
         retVal.toCoord   = this.m_toCoord;
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = this.m_time.getRawValue();
-        retVal.arr       = this.m_arrForm.getRawValue();
-        retVal.arrParam  = this.m_arrForm.getValue();
+        retVal.arriveBy       = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getRawValue();
-        retVal.optParam  = this.m_optimizeForm.getValue(); 
-        retVal.walk      = this.m_walkForm.getRawValue();
-        retVal.walkParam = this.m_walkForm.getValue();
+        retVal.max_walk_distance      = this.m_maxWalkDistanceForm.getRawValue();
         retVal.mode      = this.m_modeForm.getRawValue();
-        retVal.modeParam = this.m_modeForm.getValue();
 
         try
         {
@@ -741,14 +695,14 @@ otp.planner.StaticForms = {
             value:      new Date().format('m/d/Y')
         });
 
-        this.m_arrStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
-        this.m_arrForm  = new Ext.form.ComboBox({
+        this.m_arriveByStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
+        this.m_arriveByForm  = new Ext.form.ComboBox({
             id:             'trip-arrive-form',
-                name:           'Arr',
-                hiddenName:     'Arr',
+                name:           'arriveBy',
+                hiddenName:     'arriveBy',
                 fieldLabel:     this.locale.tripPlanner.labels.when,
-                store:          this.m_arrStore,
-                value:          this.m_arrStore.getAt(0).get('opt'),
+                store:          this.m_arriveByStore,
+                value:          this.m_arriveByStore.getAt(0).get('opt'),
                 displayField:   'text',
                 valueField:     'opt',
                 anchor:         this.FIELD_ANCHOR,
@@ -782,7 +736,7 @@ otp.planner.StaticForms = {
                     columnWidth: 0.37,
                     layout: 'form',
                     border: false,
-                    items: [this.m_arrForm]
+                    items: [this.m_arriveByForm]
                 }
                 ,
                 {
@@ -816,14 +770,14 @@ otp.planner.StaticForms = {
     {
         console.log("enter Forms.makeOptionsForms()");
         
-        this.m_walkStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.walkDistance);
+        this.m_maxWalkDistanceStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
 
         this.m_optimizeForm = new Ext.form.ComboBox({
             id:             'trip-optimize-form',
-            name:           'Min',
-            hiddenName:     'Min',
+            name:           'optimize',
+            hiddenName:     'optimize',
             fieldLabel:     this.locale.tripPlanner.labels.minimize,
             store:          this.m_optimizeStore,
             value:          this.m_optimizeStore.getAt(1).get('opt'),
@@ -840,13 +794,13 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        this.m_walkForm = new Ext.form.ComboBox({
+        this.m_maxWalkDistanceForm = new Ext.form.ComboBox({
             id:             'trip-walking-form',
-            name:           'Walk',
-            hiddenName:     'Walk',
-            fieldLabel:     this.locale.tripPlanner.labels.walk,
-            store:          this.m_walkStore,
-            value:          this.m_walkStore.getAt(2).get('opt'),
+            name:           'maxWalkDistance',
+            hiddenName:     'maxWalkDistance',
+            fieldLabel:     this.locale.tripPlanner.labels.max_walk_distance,
+            store:          this.m_maxWalkDistanceStore,
+            value:          this.m_maxWalkDistanceStore.getAt(2).get('opt'),
             displayField:   'text',
             valueField:     'opt',
             anchor:         this.FIELD_ANCHOR,
@@ -862,8 +816,8 @@ otp.planner.StaticForms = {
 
         this.m_modeForm  = new Ext.form.ComboBox({
             id:             'trip-mode-form',
-            name:           'Mode',
-            hiddenName:     'Mode',
+            name:           'mode',
+            hiddenName:     'mode',
             fieldLabel:     this.locale.tripPlanner.labels.mode,
             store:          this.m_modeStore,
             value:          this.m_modeStore.getAt(0).get('opt'),
@@ -882,7 +836,7 @@ otp.planner.StaticForms = {
 
         console.log("exit Forms.makeOptionsForms()");
 
-        return [this.m_optimizeForm, this.m_walkForm, this.m_modeForm];
+        return [this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_modeForm];
     },
 
     CLASS_NAME: "otp.planner.Forms"

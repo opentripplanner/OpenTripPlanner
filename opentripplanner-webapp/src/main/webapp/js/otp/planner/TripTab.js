@@ -224,7 +224,7 @@ otp.planner.TripTab = {
         if(this.m_activeItinerary && this.m_activeItinerary.m_endTime)
         {
             rev.time = this.m_activeItinerary.m_endTime.format("g:i a");
-            rev.arrParam  = false; // when setting time for a reverse trip, always set plan
+            rev.arriveBy  = false; // when setting time for a reverse trip, always set plan
         }
 
         this.planner.populateFormTab(rev);

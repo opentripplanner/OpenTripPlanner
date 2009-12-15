@@ -269,16 +269,13 @@ otp.planner.Itinerary = {
         {
             var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
-            console.log ("from" , from);
-            console.log ("leg", leg);
             var mode = from.get('mode');
-            console.log ("mode", mode);
+
             if(mode == 'BUS' || mode == 'TRAM' || mode == 'RAIL' || mode == 'SUBWAY' || mode == 'GONDOLA') 
             {
                 try
                 {
                 	var geoJson = leg.get('legGeometry');
-                	console.log ("geoJson", geoJson);
                 	var geoLine = new OpenLayers.Feature.Vector(geoJson,
                 			null,
                 			otp.util.OpenLayersUtils.RED_STYLE);

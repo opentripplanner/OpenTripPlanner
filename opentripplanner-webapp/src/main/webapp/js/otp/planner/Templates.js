@@ -39,9 +39,9 @@ otp.planner.Templates = {
         '{url}?',
         'from={[values.from.replace(/&/g,"@")]}',
         '&to={[values.to.replace(/&/g,"@")]}',
-        '&min={optParam}&walk={walkParam}&mode={modeParam}&id={id}',
+        '&min={opt}&walk_speed={walk_speed}&mode={mode}&id={id}',
         '&on={date}',
-        '&{[values.arrParam=="false" ? "after" : "by"]}={time}'
+        '&{[values.arriveBy=="false" ? "after" : "by"]}={time}'
     ).compile(),
 
     tripPrintTemplate : new Ext.XTemplate( 
@@ -50,7 +50,7 @@ otp.planner.Templates = {
         '&toPlace={[values.to.replace(/&/g,"@")]}',
         '<tpl if="fromCoord != null">&fromCoord={fromCoord}</tpl>',
         '<tpl if="toCoord   != null">&toCoord={toCoord}</tpl>',
-        '&arr={arrParam}&min={optParam}&walk={walkParam}&mode={modeParam}&itinID={itinID}&submit',
+        '&arr={arriveBy}&min={opt}&max_walk_distance={max_walk_distance}&mode={mode}&itinID={itinID}&submit',
         '&date={date}',
         '&time={time}'
     ).compile(),

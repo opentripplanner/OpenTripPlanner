@@ -25,21 +25,23 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 public interface RequestInf {
 
     public static enum OptimizeType {
-        transfers, quick, flat
+        TRANSFERS, QUICK, FLAT
     }
 
     public static String FROM = "fromPlace";
     public static String TO = "toPlace";
+    public static String INTERMEDIATE_PLACES = "intermediate_places";
     public static String DATE = "date";
     public static String TIME = "time";
 
-    public static String WALK = "walk";
+    public static String MAX_WALK_DISTANCE = "max_walk_distance";
     public static String OPTIMIZE = "optimize";
-    public static String MODE = "Mode";
+    public static String MODE = "mode";
     public static String NUMBER_ITINERARIES = "numItineraries";
     public static String OUTPUT_FORMAT = "outputFormat";
 
-    public static String ARRIVE_BY = "Arr";
+    public static String ARRIVE_BY = "arriveBy";
+    public static String WALK_SPEED = "walk_speed";
 
     /**
      * @return the from

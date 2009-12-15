@@ -106,13 +106,12 @@ otp.locale.English = {
             to            : "To",
             toHere        : "To here",
             minimize      : "Show me the",
-            walk          : "Maximum walk",
-            arriveDepart  : "DELETE ME",
+            maxWalkDistance: "Maximum walk",
+            arriveDepart  : "Arrive by/Depart at",
             mode          : "Travel by",
             go            : "Go",
             planTrip      : "Plan Your Trip",
-            newTrip       : "New Trip",
-            tripOnTrimet  : "Plan a trip on TriMet"
+            newTrip       : "New Trip"
         },
 
         error:
@@ -125,8 +124,8 @@ otp.locale.English = {
 
         options: 
         [
-          ['X', 'Fewest Transfers'],
-          ['T', 'Quickest Trip'] 
+          ['TRANSFERS', 'Fewest Transfers'],
+          ['QUICK', 'Quickest Trip'] 
         ],
     
         arriveDepart: 
@@ -135,13 +134,13 @@ otp.locale.English = {
           ['true', 'Arrive']
         ],
     
-        walkDistance : 
+        maxWalkDistance : 
         [
-            ['0.10',   '1/10 mile'],
-            ['0.25',   '1/4 mile'],
-            ['0.50',   '1/2 mile'],
-            ['0.75',   '3/4 mile'],
-            ['0.9999', '1 mile']
+            ['160',   '1/10 mile'],
+            ['420',   '1/4 mile'],
+            ['840',   '1/2 mile'],
+            ['1260',  '3/4 mile'],
+            ['1600',  '1 mile']
         ],
     
         mode : 
