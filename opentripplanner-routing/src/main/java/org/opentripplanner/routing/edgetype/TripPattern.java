@@ -28,8 +28,11 @@ public final class TripPattern implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /*
-     * Represents a class of trips distinguished by service id, list of stops, dwell time at stops,
-     * and running time between stops.
+     * Represents a class of trips distinguished by service id and list of stops.  For each stop,
+     * there is a list of departure times, running times, arrival times, dwell times, and wheelchair
+     * accessibility information (one of each of these per trip per stop).  An exemplar trip is also
+     * included so that information such as route name can be found.  Trips are assumed to be 
+     * non-overtaking, so that an earlier trip never arrives after a later trip.      
      */
 
     public Trip exemplar;
@@ -65,6 +68,10 @@ public final class TripPattern implements Serializable {
         wheelchairAccessibles[i] = new Vector<Boolean>();
     }
 
+    /**
+     * Remove a stop from a given trip.  This is useful when, while adding hops iteratively,
+     * it turns out that the trip is an overtaking trip.
+     */
     public void removeHop(int stopindex, int hop) {
         runningTimes[stopindex].removeElementAt(hop);
         departureTimes[stopindex].removeElementAt(hop);
@@ -73,7 +80,11 @@ public final class TripPattern implements Serializable {
         wheelchairAccessibles[stopindex].removeElementAt(hop);
     }
 
-    public int addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
+    /** 
+     * Insert a hop at the correct point in the list of hops for a given pattern.
+     * @return 
+     */
+    public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
             int arrivalTime, int dwellTime, boolean wheelchairAccessible) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
@@ -98,7 +109,6 @@ public final class TripPattern implements Serializable {
         stopArrivalTimes.insertElementAt(arrivalTime, insertionPoint);
         stopDwellTimes.insertElementAt(dwellTime, insertionPoint);
         stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, insertionPoint);
-        return insertionPoint;
     }
 
     public int getNextPattern(int stopIndex, int afterTime, boolean wheelchairAccessible) {
@@ -192,10 +202,6 @@ public final class TripPattern implements Serializable {
         if (pattern > stopWheelchairAccessibles.size()) {
             throw new RuntimeException("Pattern index out of bounds: " + pattern + " / " + stopWheelchairAccessibles.size());
         }
-        if (pattern == stopWheelchairAccessibles.size() || true) {
-            stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, pattern);
-        } else {
-            stopWheelchairAccessibles.set(pattern, wheelchairAccessible);
-        }
+        stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, pattern);
     }
 }

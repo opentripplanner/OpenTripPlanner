@@ -200,7 +200,6 @@ public class GTFSPatternHopFactory {
             if (tripPattern == null) {
 
                 tripPattern = new TripPattern(trip, stopTimes);
-                int patternIndex = -1;
 
                 int i;
                 Stop s1 = null;
@@ -271,7 +270,7 @@ public class GTFSPatternHopFactory {
                     int runningTime = arrivalTime - departureTime;
 
 		    boolean stopWheelchairBoarding = s0.getWheelchairBoarding() != 0;
-                    patternIndex = tripPattern.addHop(i, 0, departureTime, runningTime,
+                    tripPattern.addHop(i, 0, departureTime, runningTime,
                             arrivalTime, dwellTime, 
                             stopWheelchairBoarding && tripWheelchairAccessible);
                     graph.addEdge(hop);
@@ -296,7 +295,7 @@ public class GTFSPatternHopFactory {
                         blockTrips = new ArrayList<EncodedTrip>();
                         tripsByBlock.put(blockId, blockTrips);
                     }
-                    blockTrips.add(new EncodedTrip(trip, patternIndex, tripPattern));
+                    blockTrips.add(new EncodedTrip(trip, 0, tripPattern));
                 }                
             } else {
                 int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
