@@ -21,19 +21,37 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
 
 public class Transfer extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
     
-    double distance = 0;
+    int time = 0;
+    
+    double distance;
 
     private Geometry geometry = null;
 
+    /**
+     * @see Transfer(Vertex, Vertex, double, int)
+     */
     public Transfer(Vertex fromv, Vertex tov, double distance) {
         super(fromv, tov);
         this.distance = distance;
+        this.time = (int) distance * 3;
+    }
+    
+    /**
+     * Creates a new Transfer edge.
+     * @param fromv     the Vertex where the transfer originates
+     * @param tov       the Vertex where the transfer ends
+     * @param distance  the distance in meters from the origin Vertex to the destination
+     * @param time      the minimum time in seconds it takes to complete this transfer
+     */
+    public Transfer(Vertex fromv, Vertex tov, double distance, int time) {
+        super(fromv, tov);
+        this.distance = distance;
+        this.time = time;
     }
 
     public String getDirection() {
@@ -69,21 +87,15 @@ public class Transfer extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
-        if (!s0.getTransferAllowed()) {
-            return null;
-        }
         State s1 = s0.clone();
-        s1.incrementTimeInSeconds((int)(distance / wo.speed));
-        return new TraverseResult(distance / wo.speed, s1);
+        s1.incrementTimeInSeconds(time);
+        return new TraverseResult(time, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
-        if (!s0.getTransferAllowed()) {
-            return null;
-        }
         State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-(int)(distance / wo.speed));
-        return new TraverseResult(distance / wo.speed, s1);
+        s1.incrementTimeInSeconds(-time);
+        return new TraverseResult(time, s1);
     }
     
     public boolean equals(Object o) {

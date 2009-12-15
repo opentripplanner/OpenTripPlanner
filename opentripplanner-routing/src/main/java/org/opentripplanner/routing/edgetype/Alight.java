@@ -74,7 +74,6 @@ public class Alight extends AbstractEdge {
 	    return null;
 	}
         State s1 = s0.clone();
-        s1.setTransferAllowed(true);
         return new TraverseResult(1, s1);
     }
 

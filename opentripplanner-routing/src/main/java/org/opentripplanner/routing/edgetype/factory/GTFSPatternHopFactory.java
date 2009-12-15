@@ -427,13 +427,17 @@ public class GTFSPatternHopFactory {
             Stop toStop = t.getToStop();
             Vertex fromStation = graph.getVertex(id(fromStop.getId()));
             Vertex toStation = graph.getVertex(id(toStop.getId()));
-            int transferTime = 0;
+            double distance = fromStation.distance(toStation);
             if (t.getTransferType() < 3) {
-                if (t.getTransferType() == 2) {
-                    transferTime = t.getMinTransferTime();
+                org.opentripplanner.routing.edgetype.Transfer edge;
+                if (t.getTransferType() == 2) { // transfer has minimum transfer time
+                    edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation,
+                            toStation, distance, t.getMinTransferTime());
+                } else {
+                    edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation,
+                            toStation, distance);
                 }
-                org.opentripplanner.routing.edgetype.Transfer edge = new org.opentripplanner.routing.edgetype.Transfer(
-                        fromStation, toStation, transferTime);
+
                 if (createdTransfers.contains(edge)) {
                     continue;
                 }

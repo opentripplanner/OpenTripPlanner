@@ -41,9 +41,6 @@ public class GraphPath {
         }
         TraverseOptions options = vertices.lastElement().options;
         ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-        // The following line makes it so that the last edge of a trip is always allowed to be a
-        // transfer. See http://opentripplanner.org/ticket/87
-        state.setTransferAllowed(true);
         while (iterator.hasPrevious()) {
             SPTEdge edge = iterator.previous();
             TraverseResult result = edge.payload.traverseBack(state, options);
