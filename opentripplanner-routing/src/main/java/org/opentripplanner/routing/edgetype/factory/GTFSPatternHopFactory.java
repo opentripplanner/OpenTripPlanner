@@ -188,10 +188,16 @@ public class GTFSPatternHopFactory {
 
             if (stopTimes.isEmpty())
                 continue;
-
+            
+            int lastStop = stopTimes.size() - 1;
+            if (lastStop == 0) {
+                _log.warn("Trip " + trip + 
+                        " has only one stop.  We will not use it for routing.  This is probably an error in your data");
+                continue;
+            }
+            
             StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
-            int lastStop = stopTimes.size() - 1;
             TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
             int departureTime = -1, prevDepartureTime = -1;
             int numInterpStops = -1, firstInterpStop = -1; 
