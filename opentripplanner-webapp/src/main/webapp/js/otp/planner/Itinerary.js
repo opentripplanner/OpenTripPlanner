@@ -269,14 +269,16 @@ otp.planner.Itinerary = {
         {
             var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
-            
+            console.log ("from" , from);
+            console.log ("leg", leg);
             var mode = from.get('mode');
-            if(mode == 'Bus' || mode == 'Tram') 
+            console.log ("mode", mode);
+            if(mode == 'BUS' || mode == 'TRAM' || mode == 'RAIL' || mode == 'SUBWAY' || mode == 'GONDOLA') 
             {
                 try
                 {
-                	var geoJson = leg.get('leg-geometry');
-                	var raw = leg.get('leg-geometry-raw');
+                	var geoJson = leg.get('legGeometry');
+                	console.log ("geoJson", geoJson);
                 	var geoLine = new OpenLayers.Feature.Vector(geoJson,
                 			null,
                 			otp.util.OpenLayersUtils.RED_STYLE);
@@ -319,11 +321,11 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
             
             var mode = from.get('mode');
-            if(mode == 'walk') 
+            if(mode == 'WALK') 
             {
                 try
                 {
-                	var geoLine = new OpenLayers.Feature.Vector(leg.get('leg-geometry'),
+                	var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'),
                 			null,
                 			otp.util.OpenLayersUtils.BLACK_STYLE);
                 			
@@ -366,7 +368,7 @@ otp.planner.Itinerary = {
             var mode = from.get('mode');
             if(mode != 'walk') 
             {
-                // if the first leg isn't a walk, then assume it's a tranist leg
+                // if the first leg isn't a walk, then assume it's a transit leg
                 // so paint the route icon (eg: fromStore.getAt(0))
                 startIndex = 0;
                 otp.util.OpenLayersUtils.makeFromMarker(fromP.x, fromP.y, this.m_markers);
@@ -411,7 +413,7 @@ otp.planner.Itinerary = {
                 if(doRoutes && route != null && route.length > 0)
                    this.m_routes.push(route);
 
-                // only show the route bubble if we're drawing the begining of the block (eg not a thru route transfer / stay on bus)
+                // only show the route bubble if we're drawing the beginning of the block (eg not a thru route transfer / stay on bus)
                 if(thru == null || thru != 'thru-route')
                 {
                     otp.util.OpenLayersUtils.makeDiskMarker(fromP.x,  fromP.y, this.m_markers);

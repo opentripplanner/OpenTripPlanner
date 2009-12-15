@@ -105,8 +105,7 @@ otp.planner.Utils = {
                   {name: 'toDescription',    mapping: 'to/description'},
                   {name: 'toStopId',         mapping: 'to/stopId'},
                   {name: 'toCity',           mapping: 'to/@areaValue'},
-                  {name: 'leg-geometry-raw', mapping: 'legGeometry'},
-                  {name: 'leg-geometry',         mapping: 'legGeometry/points',
+                  {name: 'legGeometry',         mapping: 'legGeometry/points',
                 	                         convert: function(n,p) {
                 	  							return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
                 	 					     } }
