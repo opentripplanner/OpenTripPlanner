@@ -2,6 +2,7 @@ package org.opentripplanner.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Graph;
@@ -41,12 +42,13 @@ public class ShowGraph extends PApplet {
 
     VertexSelectionListener selector;
 
-    private String graphObj;
+    private ArrayList<VertexSelectionListener> selectors;
     
-    public ShowGraph(VertexSelectionListener selector, String graphObj) {
+    public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
+        this.graph = graph;
         this.selector = selector;
-        this.graphObj = graphObj;
+        this.selectors = new ArrayList<VertexSelectionListener>();
     }
     
     public void setup() {
@@ -54,16 +56,6 @@ public class ShowGraph extends PApplet {
         background(0);
         size(700, 700, P2D);
 
-        try {
-            graph = GraphSerializationLibrary.readGraph(new File(
-                    graphObj));
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
         vertexIndex = new STRtree();
         for (Vertex v : graph.getVertices()) {
             Envelope env = new Envelope(v.getCoordinate());
@@ -189,7 +181,31 @@ public class ShowGraph extends PApplet {
                 modelBounds.getMaxX());
     }
 
+    /**
+     * A version of ellipse that takes double args, because apparently Java is too stupid to downgrade automatically. 
+     * @param d
+     * @param e
+     * @param f
+     * @param g
+     */
     private void ellipse(double d, double e, double f, double g) {
         ellipse((float) d, (float) e, (float) f, (float) g);
+    }
+    
+    /**
+     * Set the Vertex selector to newSelector, and store the old selector on the stack of selectors
+     * @param newSelector
+     */
+    public void pushSelector(VertexSelectionListener newSelector) {
+        selectors.add(selector);
+        selector = newSelector;
+    }
+    
+    /**
+     * Restore the previous vertexSelector
+     */
+    public void popSelector() {
+        selector = selectors.get(selectors.size() - 1);
+        selectors.remove(selectors.size() - 1);
     }
 }

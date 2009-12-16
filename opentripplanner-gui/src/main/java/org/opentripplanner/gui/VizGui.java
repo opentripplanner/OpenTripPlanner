@@ -6,10 +6,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Vector;
+
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -24,10 +29,18 @@ import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.GraphSerializationLibrary;
+import org.opentripplanner.routing.impl.PathServiceImpl;
+import org.opentripplanner.routing.impl.RoutingServiceImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTVertex;
 
 /** 
  * Exit on window close.
@@ -135,15 +148,34 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     private JList departurePattern;
 
     private JLabel serviceIdLabel;
+    
+    private PathServiceImpl pathservice;
 
-    public VizGui(String graphObj) {
+    private Graph graph;
+
+    private StreetVertexIndexServiceImpl indexService;
+
+    private RoutingServiceImpl routingService;
+
+    public VizGui(String graphName) {
         super();
 
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
         Container pane = getContentPane();
 
-        showGraph = new ShowGraph(this, graphObj);
+
+        try {
+            graph = GraphSerializationLibrary.readGraph(new File(
+                    graphName));
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        showGraph = new ShowGraph(this, graph);
         pane.add(showGraph, BorderLayout.CENTER);
 
         /*
@@ -240,7 +272,24 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(zoomDefaultButton);
-
+        
+        zoomDefaultButton = new JButton("Route");
+        final JFrame frame = this;
+        zoomDefaultButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String initialFrom = "";
+                Object selected = nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                    initialFrom = selected.toString();
+                }
+                RouteDialog dlg = new RouteDialog(frame, initialFrom); //modal
+                String from = dlg.from;
+                String to = dlg.to;
+                route(from, to);
+            }
+        });
+        buttonPanel.add(zoomDefaultButton);
+        
         /* right panel holds trip pattern info */
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
@@ -253,9 +302,35 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
         rightPanel.add(dpScrollPane);
 
+        pathservice = new PathServiceImpl();
+        pathservice.setGraph(graph);
+        indexService = new StreetVertexIndexServiceImpl();
+        indexService.setGraph(graph);
+        indexService.setup();
+        pathservice.setIndexService(indexService);
+        routingService = new RoutingServiceImpl();
+        routingService.setGraph(graph);
+        pathservice.setRoutingService(routingService);
+        
+        
         showGraph.init();
         addWindowListener(new ExitListener());
         pack();
+    }
+
+    protected void route(String from, String to) {
+        TraverseOptions options = new TraverseOptions();
+        Date now = new Date();
+        List<GraphPath> paths = pathservice.plan(from, to, now , options);
+        if (paths.get(0) == null) {
+            System.out.println ("no path");
+            return;
+        }
+        Vector<SPTVertex> vertices = paths.get(0).vertices;
+        
+        for (Vertex v : vertices) {
+            System.out.println (v);
+        }
     }
 
     public static void main(String args[]) {
