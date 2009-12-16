@@ -78,12 +78,12 @@ public class Planner {
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
-            @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double max_walk_distance,
-            @QueryParam(RequestInf.WALK_SPEED) Double walk_speed,
+            @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
+            @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
-            @DefaultValue(MediaType.APPLICATION_JSON) @QueryParam(RequestInf.OUTPUT_FORMAT) String of)
+            @DefaultValue(MediaType.APPLICATION_JSON) @QueryParam(RequestInf.OUTPUT_FORMAT) String outputFormat)
             throws JSONException {
 
         /* create request */
@@ -94,15 +94,15 @@ public class Planner {
 
         if (max != null)
             request.setNumItineraries(max);
-        if (max_walk_distance != null)
-            request.setWalk(max_walk_distance);
+        if (maxWalkDistance != null)
+            request.setWalk(maxWalkDistance);
         if (arriveBy != null && arriveBy)
             request.setArriveBy(true);
 
         request.setOptimize(optimize);
 
         request.setModes(modes);
-        request.setOutputFormat(MediaType.valueOf(of));
+        request.setOutputFormat(MediaType.valueOf(outputFormat));
 
         /* use request to generate trip */
 

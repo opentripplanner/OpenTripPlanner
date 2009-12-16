@@ -25,18 +25,18 @@ public interface RequestInf {
 
     public static String FROM = "fromPlace";
     public static String TO = "toPlace";
-    public static String INTERMEDIATE_PLACES = "intermediate_places";
+    public static String INTERMEDIATE_PLACES = "intermediatePlaces";
     public static String DATE = "date";
     public static String TIME = "time";
 
-    public static String MAX_WALK_DISTANCE = "max_walk_distance";
+    public static String MAX_WALK_DISTANCE = "maxWalkDistance";
     public static String OPTIMIZE = "optimize";
     public static String MODE = "mode";
     public static String NUMBER_ITINERARIES = "numItineraries";
     public static String OUTPUT_FORMAT = "outputFormat";
 
     public static String ARRIVE_BY = "arriveBy";
-    public static String WALK_SPEED = "walk_speed";
+    public static String WALK_SPEED = "walkSpeed";
 
     /**
      * @return the from

@@ -50,7 +50,7 @@ otp.planner.Templates = {
         '&toPlace={[values.to.replace(/&/g,"@")]}',
         '<tpl if="fromCoord != null">&fromCoord={fromCoord}</tpl>',
         '<tpl if="toCoord   != null">&toCoord={toCoord}</tpl>',
-        '&arr={arriveBy}&min={opt}&max_walk_distance={max_walk_distance}&mode={mode}&itinID={itinID}&submit',
+        '&arr={arriveBy}&min={opt}&maxWalkDistance={maxWalkDistance}&mode={mode}&itinID={itinID}&submit',
         '&date={date}',
         '&time={time}'
     ).compile(),

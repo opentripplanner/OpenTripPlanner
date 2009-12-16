@@ -462,8 +462,8 @@ otp.planner.StaticForms = {
                 forms.m_optimizeForm.setValue(params.opt);
             if(params.min)
                 forms.m_optimizeForm.setValue(params.min);
-            if(params.max_walk_distance)
-                forms.m_maxWalkDistanceForm.setValue(params.max_walk_distance);
+            if(params.maxWalkDistance)
+                forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
             if(params.mode)
                 forms.m_modeForm.setValue(params.mode);
             
@@ -509,7 +509,7 @@ otp.planner.StaticForms = {
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy       = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getRawValue();
-        retVal.max_walk_distance      = this.m_maxWalkDistanceForm.getRawValue();
+        retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getRawValue();
         retVal.mode      = this.m_modeForm.getRawValue();
 
         try
@@ -798,7 +798,7 @@ otp.planner.StaticForms = {
             id:             'trip-walking-form',
             name:           'maxWalkDistance',
             hiddenName:     'maxWalkDistance',
-            fieldLabel:     this.locale.tripPlanner.labels.max_walk_distance,
+            fieldLabel:     this.locale.tripPlanner.labels.maxWalkDistance,
             store:          this.m_maxWalkDistanceStore,
             value:          this.m_maxWalkDistanceStore.getAt(2).get('opt'),
             displayField:   'text',
