@@ -33,12 +33,12 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.ws.RequestInf.OptimizeType;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -80,7 +80,7 @@ public class Planner {
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double max_walk_distance,
             @QueryParam(RequestInf.WALK_SPEED) Double walk_speed,
-            @QueryParam(RequestInf.OPTIMIZE) List<OptimizeType> optList,
+            @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
             @DefaultValue(MediaType.APPLICATION_JSON) @QueryParam(RequestInf.OUTPUT_FORMAT) String of)
@@ -99,8 +99,7 @@ public class Planner {
         if (arriveBy != null && arriveBy)
             request.setArriveBy(true);
 
-        if (optList != null && optList.size() > 0)
-            request.addOptimize(optList);
+        request.setOptimize(optimize);
 
         request.setModes(modes);
         request.setOutputFormat(MediaType.valueOf(of));
@@ -123,6 +122,7 @@ public class Planner {
         TraverseModeSet modeSet = request.getModeSet();
         assert (modeSet.isValid());
         TraverseOptions options = new TraverseOptions(modeSet);
+        options.optimizeFor = request.getOptimize();
         options.back = request.isArriveBy();
         List<GraphPath> paths = pathservice.plan(request.getFrom(), request.getTo(), request
                 .getDateTime(), options);

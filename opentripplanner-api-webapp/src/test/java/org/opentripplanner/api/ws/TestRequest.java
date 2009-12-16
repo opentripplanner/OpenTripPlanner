@@ -1,7 +1,6 @@
 package org.opentripplanner.api.ws;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -10,13 +9,13 @@ import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.ws.RequestInf;
-import org.opentripplanner.api.ws.RequestInf.OptimizeType;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.Vertex;
@@ -85,7 +84,7 @@ public class TestRequest extends TestCase {
                 false,
                 840.0,
                 1.33,
-                new ArrayList<OptimizeType>(),
+                OptimizeType.QUICK,
                 new TraverseModeSet("WALK"),
                 1,
                 MediaType.APPLICATION_JSON);

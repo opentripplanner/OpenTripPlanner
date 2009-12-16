@@ -13,7 +13,7 @@
 
 package org.opentripplanner.api.ws;
 
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -25,7 +25,7 @@ import org.opentripplanner.api.model.TripPlan;
 @XmlRootElement
 public class Response {
 
-    public Hashtable<String, String> requestParameters;
+    public HashMap<String, String> requestParameters;
     public TripPlan plan;
 
     public Response() {

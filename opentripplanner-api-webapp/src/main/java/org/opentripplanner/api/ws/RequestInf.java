@@ -14,19 +14,14 @@
 package org.opentripplanner.api.ws;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 public interface RequestInf {
-
-    public static enum OptimizeType {
-        TRANSFERS, QUICK, FLAT
-    }
 
     public static String FROM = "fromPlace";
     public static String TO = "toPlace";
@@ -93,16 +88,13 @@ public interface RequestInf {
     /**
      * @return the optimize
      */
-    public Set<OptimizeType> getOptimize();
+    public OptimizeType getOptimize();
 
     /**
      * @param optimize
      *            the optimize to set
      */
-    public void addOptimize(OptimizeType opt);
-
-    /** */
-    public void addOptimize(List<OptimizeType> oList);
+    public void setOptimize(OptimizeType opt);
 
     /**
      * @return the dateTime

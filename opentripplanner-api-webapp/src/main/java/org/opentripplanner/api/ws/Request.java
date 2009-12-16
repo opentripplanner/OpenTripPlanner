@@ -14,48 +14,80 @@
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.util.DateUtils;
 
 /**
- * A trip planning request. Some parameters may not be honored by the trip planner for some or
- * all itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide
- * a route.
+ * A trip planning request. Some parameters may not be honored by the trip planner for some or all
+ * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
+ * route.
  */
 public class Request implements RequestInf {
 
+    /**
+     * The start location -- either a Vertex name or latitude, longitude in degrees
+     */
     private String from;
+    /**
+     * The end location (see the from field for format).
+     */
     private String to;
+    /**
+     * An unordered list of intermediate locations to be visited (see the from field for format).
+     * Presently unused.
+     */
     private List<String> intermediatePlaces;
+    /**
+     * The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile.
+     */
     private Double maxWalkDistance = 804.0; // half a mile in meters
+    /**
+     * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
+     */
     private TraverseModeSet modes; // defaults in constructor
-    private Set<OptimizeType> optimize; // default in constructor
+    /**
+     * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
+     * optimize for transit time.
+     */
+    private OptimizeType optimize = OptimizeType.QUICK;
+    
+    /**
+     * The date/time that the trip should depart (or arrive, for requests where arriveBy is true)
+     */
     private Date dateTime = new Date();
+    /**
+     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
+     */
     private boolean arriveBy = false;
+    /**
+     * The format of the output.
+     */
     private MediaType outputFormat = MediaType.APPLICATION_JSON_TYPE;
+    
+    /**
+     * The maximum number of possible itineraries to return.
+     */
     private Integer numItineraries = 3;
 
-    private final Hashtable<String, String> parameters = new Hashtable<String, String>();
+    /** 
+     * The complete list of parameters.
+     */
+    private final HashMap<String, String> parameters = new HashMap<String, String>();
 
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
-
-        optimize = new HashSet<OptimizeType>();
-        intermediatePlaces = new ArrayList<String> ();
-        Collections.addAll(optimize, OptimizeType.QUICK);
+        intermediatePlaces = new ArrayList<String>();
     }
 
-    public Hashtable<String, String> getParameters() {
+    public HashMap<String, String> getParameters() {
         return parameters;
     }
 
@@ -152,41 +184,19 @@ public class Request implements RequestInf {
     }
 
     /**
-     * @return the optimize
+     * @return the optimization type
      */
-    public Set<OptimizeType> getOptimize() {
+    public OptimizeType getOptimize() {
         return optimize;
-    }
-
-    /** */
-    public String getOptimizeAsStr() {
-        String retVal = null;
-        for (OptimizeType o : optimize) {
-            if (retVal == null)
-                retVal = "";
-            else
-                retVal += ", ";
-            retVal += o;
-        }
-
-        return retVal;
     }
 
     /**
      * @param optimize
      *            the optimize to set
      */
-    public void addOptimize(OptimizeType opt) {
-        optimize.add(opt);
+    public void setOptimize(OptimizeType opt) {
+        optimize = opt;
         paramPush(OPTIMIZE, optimize);
-    }
-
-    /** */
-    public void addOptimize(List<OptimizeType> oList) {
-        if (oList != null && oList.size() > 0) {
-            for (OptimizeType o : oList)
-                addOptimize(o);
-        }
     }
 
     /**
@@ -273,7 +283,7 @@ public class Request implements RequestInf {
     /** */
     public String toString(String sep) {
         return getFrom() + sep + getTo() + sep + getWalk() + sep + getDateTime() + sep
-                + isArriveBy() + sep + getOptimizeAsStr() + sep + getModesAsStr() + sep
+                + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
                 + getNumItineraries() + sep + getOutputFormat();
     }
 

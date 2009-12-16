@@ -22,6 +22,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
 
 public class TraverseOptions {
@@ -40,6 +41,8 @@ public class TraverseOptions {
     public boolean back = false;
 
     public boolean wheelchairAccessible = false;
+
+    public OptimizeType optimizeFor;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
