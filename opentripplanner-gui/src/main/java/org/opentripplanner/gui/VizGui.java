@@ -58,6 +58,9 @@ class DisplayVertex {
  * hence the iterable.
  */
 class EdgeListModel extends AbstractListModel {
+
+    private static final long serialVersionUID = 1L;
+
     private ArrayList<Edge> edges;
 
     EdgeListModel(Iterable<Edge> edges) {
@@ -80,6 +83,8 @@ class EdgeListModel extends AbstractListModel {
  * This is a ListModel that shows a TripPattern's departure times from a particular stop 
  */
 class TripPatternListModel extends AbstractListModel {
+
+    private static final long serialVersionUID = 1L;
 
     ArrayList<String> departureTimes = new ArrayList<String>();
 
@@ -262,6 +267,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     @Override
     public void verticesSelected(final List<Vertex> selected) {
         ListModel data = new AbstractListModel() {
+
+            private static final long serialVersionUID = 1L;
+
             public int getSize() {
                 return selected.size();
             }

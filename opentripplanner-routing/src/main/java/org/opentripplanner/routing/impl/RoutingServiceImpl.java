@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.HashMap;
-
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;

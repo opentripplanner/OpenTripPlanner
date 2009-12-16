@@ -30,6 +30,8 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class StreetLocation extends GenericVertex {
     
+    private static final long serialVersionUID = 1L;
+
     public Edge street;
 
     public double location; /* a number from 0 to 1 representing how far along the street the
