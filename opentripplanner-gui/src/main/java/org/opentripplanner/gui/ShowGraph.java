@@ -1,13 +1,10 @@
 package org.opentripplanner.gui;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.opentripplanner.routing.vertextypes.TransitStop;
 
@@ -43,6 +40,10 @@ public class ShowGraph extends PApplet {
     VertexSelectionListener selector;
 
     private ArrayList<VertexSelectionListener> selectors;
+
+    int startDragX, startDragY;
+
+    private Vertex highlightedVertex;
     
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
@@ -88,12 +89,17 @@ public class ShowGraph extends PApplet {
             double y = v.getY();
             x = toScreenX(x);
             y = toScreenY(y);
-            if (v.getType() == TransitStop.class) {
+            if (v == highlightedVertex) {
+                stroke(255, 255, 30);
+                fill(255, 255, 30);
+                ellipse(x, y, 7.0, 7.0);
+                noFill();
+            } else if (v.getType() == TransitStop.class) {
                 stroke(255, 30, 255);
-                ellipse(x - 2, y - 2, 5.0, 5.0);
+                ellipse(x, y, 5.0, 5.0);
             } else {
                 stroke(255);
-                ellipse(x - 1, y - 1, 3.0, 3.0);
+                ellipse(x, y, 3.0, 3.0);
             }
             
         }
@@ -111,15 +117,14 @@ public class ShowGraph extends PApplet {
 
     @SuppressWarnings("unchecked")
     public void mouseClicked() {
-        double x = toModelX(mouseX);
-        double y = toModelY(mouseY);
-        Envelope env = new Envelope(new Coordinate(x, y));
-        env.expandBy(0.001);
+        Envelope screenEnv = new Envelope(new Coordinate(mouseX, mouseY));
+        screenEnv.expandBy(3, 3);
+        Envelope env = new Envelope(toModelX(screenEnv.getMinX()), toModelX(screenEnv.getMaxX()), 
+                toModelY(screenEnv.getMinY()), toModelY(screenEnv.getMaxY()));
+        
         List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);
         selector.verticesSelected(nearby);
     }
-
-    int startDragX, startDragY;
     
     public void mousePressed() {
         startDragX = mouseX;
@@ -207,5 +212,17 @@ public class ShowGraph extends PApplet {
     public void popSelector() {
         selector = selectors.get(selectors.size() - 1);
         selectors.remove(selectors.size() - 1);
+    }
+
+    public void highlightVertex(Vertex v) {
+        Coordinate c = v.getCoordinate();
+        double xd = 0, yd = 0;
+        while (!modelBounds.contains(c)) {
+            xd = modelBounds.getWidth() / 100;
+            yd = modelBounds.getHeight() / 100;
+            modelBounds.expandBy(xd, yd);
+        }
+        modelBounds.expandBy(xd, yd);
+        highlightedVertex = v;
     }
 }

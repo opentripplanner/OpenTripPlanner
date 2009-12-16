@@ -21,6 +21,7 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListModel;
@@ -42,18 +43,19 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 
-/** 
+/**
  * Exit on window close.
- *
+ * 
  */
 class ExitListener extends WindowAdapter {
     public void windowClosing(WindowEvent event) {
         System.exit(0);
     }
 }
+
 /**
- *  DisplayVertex holds a vertex, but has a toString value that's a little more useful.  
- */ 
+ * DisplayVertex holds a vertex, but has a toString value that's a little more useful.
+ */
 class DisplayVertex {
     public Vertex vertex;
 
@@ -66,9 +68,9 @@ class DisplayVertex {
     }
 }
 
-/** 
- * This is a ListModel that holds Edges.  It gets its edges from a PatternBoard/PatternAlight,
- * hence the iterable.
+/**
+ * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence
+ * the iterable.
  */
 class EdgeListModel extends AbstractListModel {
 
@@ -93,7 +95,7 @@ class EdgeListModel extends AbstractListModel {
 }
 
 /**
- * This is a ListModel that shows a TripPattern's departure times from a particular stop 
+ * This is a ListModel that shows a TripPattern's departure times from a particular stop
  */
 class TripPatternListModel extends AbstractListModel {
 
@@ -122,12 +124,12 @@ class TripPatternListModel extends AbstractListModel {
 
 }
 
-/** 
- * A simple visualizer for graphs.  It shows (using ShowGraph) a map of the graph, intersections and
+/**
+ * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and
  * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
- * examine trip patterns.  It's meant mainly for debugging, so it's totally OK if it develops (say)
- * a bunch of weird buttons designed to debug specific cases.
- *
+ * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
+ * bunch of weird buttons designed to debug specific cases.
+ * 
  */
 public class VizGui extends JFrame implements VertexSelectionListener {
 
@@ -148,7 +150,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     private JList departurePattern;
 
     private JLabel serviceIdLabel;
-    
+
     private PathServiceImpl pathservice;
 
     private Graph graph;
@@ -164,10 +166,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         setLayout(layout);
         Container pane = getContentPane();
 
-
         try {
-            graph = GraphSerializationLibrary.readGraph(new File(
-                    graphName));
+            graph = GraphSerializationLibrary.readGraph(new File(graphName));
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
@@ -255,6 +255,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
                 if (selected != null) {
                     Vertex nowSelected = selected.vertex;
+                    showGraph.highlightVertex(nowSelected);
                     outgoingEdges.setModel(new EdgeListModel(nowSelected.getOutgoing()));
                     incomingEdges.setModel(new EdgeListModel(nowSelected.getIncoming()));
                 }
@@ -272,24 +273,42 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(zoomDefaultButton);
-        
-        zoomDefaultButton = new JButton("Route");
+
+        JButton routeButton = new JButton("Route");
         final JFrame frame = this;
-        zoomDefaultButton.addActionListener(new ActionListener() {
+        routeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String initialFrom = "";
                 Object selected = nearbyVertices.getSelectedValue();
                 if (selected != null) {
                     initialFrom = selected.toString();
                 }
-                RouteDialog dlg = new RouteDialog(frame, initialFrom); //modal
+                RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
                 String from = dlg.from;
                 String to = dlg.to;
                 route(from, to);
             }
         });
-        buttonPanel.add(zoomDefaultButton);
-        
+        buttonPanel.add(routeButton);
+
+        JButton findButton = new JButton("Find node");
+        findButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
+                        JOptionPane.PLAIN_MESSAGE);
+                Vertex v = graph.getVertex(nodeName);
+                if (v == null) {
+                    System.out.println ("no such node " + nodeName);
+                } else {
+                    showGraph.highlightVertex(v);
+                    ArrayList<Vertex> l = new ArrayList<Vertex>();
+                    l.add(v);
+                    verticesSelected(l);
+                }
+            }
+        });
+        buttonPanel.add(findButton);
+
         /* right panel holds trip pattern info */
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
@@ -311,8 +330,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingService = new RoutingServiceImpl();
         routingService.setGraph(graph);
         pathservice.setRoutingService(routingService);
-        
-        
+
         showGraph.init();
         addWindowListener(new ExitListener());
         pack();
@@ -320,16 +338,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     protected void route(String from, String to) {
         TraverseOptions options = new TraverseOptions();
-        Date now = new Date();
-        List<GraphPath> paths = pathservice.plan(from, to, now , options);
+        Date now = new Date(1260994200000L);
+        System.out.println("Path from " + from + " to " + to);
+        List<GraphPath> paths = pathservice.plan(from, to, now, options);
         if (paths.get(0) == null) {
-            System.out.println ("no path");
+            System.out.println("no path");
             return;
         }
         Vector<SPTVertex> vertices = paths.get(0).vertices;
-        
+
         for (Vertex v : vertices) {
-            System.out.println (v);
+            System.out.println(v);
         }
     }
 
