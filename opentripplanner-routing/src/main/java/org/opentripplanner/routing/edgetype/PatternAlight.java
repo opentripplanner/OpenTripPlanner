@@ -157,4 +157,8 @@ public class PatternAlight extends AbstractEdge {
     public int getStopIndex() {
         return stopIndex;
     }
+
+    public String toString() {
+        return "PatternAlight(" + super.toString() + ")";
+    }
 }

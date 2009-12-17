@@ -156,4 +156,8 @@ public class PatternBoard extends AbstractEdge {
     public int getStopIndex() {
         return stopIndex;
     }
+
+    public String toString() {
+        return "PatternBoard(" + super.toString() + ")";
+    }
 }

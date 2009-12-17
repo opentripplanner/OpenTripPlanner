@@ -115,4 +115,7 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
         return start;
     }
 
+    public String toString() {
+        return "PatternHop(" + super.toString() + ")";
+    }
 }

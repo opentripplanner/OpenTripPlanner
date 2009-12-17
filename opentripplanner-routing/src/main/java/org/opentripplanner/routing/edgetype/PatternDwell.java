@@ -83,4 +83,7 @@ public class PatternDwell extends AbstractEdge {
         return null;
     }
 
+    public String toString() {
+        return "PatternDwell(" + super.toString() + ")";
+    }
 }
