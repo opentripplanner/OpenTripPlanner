@@ -217,7 +217,7 @@ public class AStar {
                 }
 
                 if (wr.weight < 0) {
-                    throw new NegativeWeightException(String.valueOf(wr.weight));
+                    throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge " + edge);
                 }
 
                 Vertex fromv = edge.getFromVertex();
