@@ -125,6 +125,28 @@ class TripPatternListModel extends AbstractListModel {
 }
 
 /**
+ * A list of vertices where the internal container is exposed.
+ */
+class VertexList extends AbstractListModel {
+
+    private static final long serialVersionUID = 1L;
+
+    public List<Vertex> selected;
+
+    VertexList(List<Vertex> selected) {
+        this.selected = selected;
+    }
+
+    public int getSize() {
+        return selected.size();
+    }
+
+    public Object getElementAt(int index) {
+        return new DisplayVertex(selected.get(index));
+    }
+};
+
+/**
  * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and
  * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
  * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
@@ -212,14 +234,34 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
         vertexDataPanel.add(iceScrollPane);
 
-        /* when a different edge is selected, change up the pattern pane */
+        /*
+         * when a different edge is selected, change up the pattern pane and list of nearby nodes
+         */
         ListSelectionListener edgeChanged = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
+
                 JList edgeList = (JList) e.getSource();
                 Edge selected = (Edge) edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
+                }
+
+                VertexList nearbyModel = (VertexList) nearbyVertices.getModel();
+                List<Vertex> vertices = nearbyModel.selected;
+
+                Vertex v;
+                if (edgeList == outgoingEdges) {
+                    v = selected.getToVertex();
+                } else {
+                    v = selected.getFromVertex();
+                }
+                if (!vertices.contains(v)) {
+                    vertices.add(v);
+                    nearbyModel = new VertexList(vertices);
+                    nearbyVertices.setModel(nearbyModel); // this should just be an event, but for
+                                                          // some reason, JList doesn't implement
+                                                          // the right event.
                 }
                 // figure out the pattern, if any
                 TripPattern pattern = null;
@@ -236,11 +278,11 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     departurePattern.removeAll();
                     return;
                 }
+                ListModel model = new TripPatternListModel(pattern, stopIndex);
+                departurePattern.setModel(model);
+
                 Trip trip = pattern.exemplar;
                 serviceIdLabel.setText(trip.getServiceId().toString());
-                ListModel model = new TripPatternListModel(pattern, stopIndex);
-
-                departurePattern.setModel(model);
 
             }
         };
@@ -298,7 +340,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                         JOptionPane.PLAIN_MESSAGE);
                 Vertex v = graph.getVertex(nodeName);
                 if (v == null) {
-                    System.out.println ("no such node " + nodeName);
+                    System.out.println("no such node " + nodeName);
                 } else {
                     showGraph.highlightVertex(v);
                     ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -360,19 +402,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     @Override
     public void verticesSelected(final List<Vertex> selected) {
-        ListModel data = new AbstractListModel() {
-
-            private static final long serialVersionUID = 1L;
-
-            public int getSize() {
-                return selected.size();
-            }
-
-            public Object getElementAt(int index) {
-                return new DisplayVertex(selected.get(index));
-            }
-        };
-
+        ListModel data = new VertexList(selected);
         nearbyVertices.setModel(data);
     }
 }
