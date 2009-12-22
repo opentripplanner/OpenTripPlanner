@@ -150,6 +150,12 @@ otp.locale.English = {
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
             ['BICYCLE', 'Bicycle']
+        ],
+
+        wheelchair :
+        [
+            ['false', 'Accessible trip not required'],
+            ['true', 'Wheelchair accessible trip required']
         ]
     },
 

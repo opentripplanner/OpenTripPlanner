@@ -78,6 +78,7 @@ public class Planner {
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
+            @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
             @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
@@ -91,6 +92,7 @@ public class Planner {
         request.setFrom(fromPlace);
         request.setTo(toPlace);
         request.setDateTime(date, time);
+        request.setWheelchair(wheelchair);
 
         if (max != null)
             request.setNumItineraries(max);
@@ -124,6 +126,7 @@ public class Planner {
         TraverseOptions options = new TraverseOptions(modeSet);
         options.optimizeFor = request.getOptimize();
         options.back = request.isArriveBy();
+        options.wheelchairAccessible = request.getWheelchair();
         List<GraphPath> paths = pathservice.plan(request.getFrom(), request.getTo(), request
                 .getDateTime(), options);
 

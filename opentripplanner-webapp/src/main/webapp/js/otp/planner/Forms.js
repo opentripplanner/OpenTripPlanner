@@ -52,6 +52,8 @@ otp.planner.StaticForms = {
     m_optimizeForm   : null,
     m_modeStore      : null,
     m_modeForm       : null,
+    m_wheelchairForm : null,
+    m_wheelchairStore: null,
 
     // buttons
     m_submitButton   : null,
@@ -466,6 +468,8 @@ otp.planner.StaticForms = {
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
             if(params.mode)
                 forms.m_modeForm.setValue(params.mode);
+            if(params.wheelchair)
+                forms.m_wheelchairForm.setValue(params.wheelchair);
             
             // stupid trip planner form processing...
 
@@ -511,7 +515,7 @@ otp.planner.StaticForms = {
         retVal.opt       = this.m_optimizeForm.getRawValue();
         retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getRawValue();
         retVal.mode      = this.m_modeForm.getRawValue();
-
+        retVal.wheelchair      = this.m_wheelchairForm.getRawValue();
         try
         {
             retVal.time = retVal.time.replace(/\./g, "");
@@ -773,6 +777,7 @@ otp.planner.StaticForms = {
         this.m_maxWalkDistanceStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
+        this.m_wheelchairStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.wheelchair);
 
         this.m_optimizeForm = new Ext.form.ComboBox({
             id:             'trip-optimize-form',
@@ -834,9 +839,31 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
+
+        this.m_wheelchairForm = new Ext.form.ComboBox({
+            id:             'trip-wheelchair-form',
+            name:           'wheelchair',
+            hiddenName:     'wheelchair',
+            fieldLabel:     this.locale.tripPlanner.labels.wheelchair,
+            store:          this.m_wheelchairStore,
+            value:          this.m_wheelchairStore.getAt(0).get('opt'),
+            displayField:   'text',
+            valueField:     'opt',
+            anchor:         this.FIELD_ANCHOR,
+            mode:           'local',
+            triggerAction:  'all',
+            editable:       false,
+            allowBlank:     false,
+            lazyRender:     false,
+            typeAhead:      true,
+            forceSelection: true,
+            selectOnFocus:  true
+        });
+
+
         console.log("exit Forms.makeOptionsForms()");
 
-        return [this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_modeForm];
+        return [this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_modeForm, this.m_wheelchairForm];
     },
 
     CLASS_NAME: "otp.planner.Forms"

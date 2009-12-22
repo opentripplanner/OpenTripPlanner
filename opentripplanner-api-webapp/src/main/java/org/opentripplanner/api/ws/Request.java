@@ -68,6 +68,10 @@ public class Request implements RequestInf {
      */
     private boolean arriveBy = false;
     /**
+     * Whether the trip must be wheelchair accessible.
+     */
+    private boolean wheelchair = false;
+    /**
      * The format of the output.
      */
     private MediaType outputFormat = MediaType.APPLICATION_JSON_TYPE;
@@ -303,4 +307,14 @@ public class Request implements RequestInf {
 
     }
 
+    /** Set whether the trip must be wheelchair accessible */
+    public void setWheelchair(boolean wheelchair) {
+        this.wheelchair = wheelchair;
+        paramPush(WHEELCHAIR, wheelchair);
+    }
+
+    /** return whether the trip must be wheelchair accessible */
+    public boolean getWheelchair() {
+        return wheelchair;
+    }
 }
