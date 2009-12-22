@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
@@ -47,6 +48,8 @@ public final class TripPattern implements Serializable {
 
     private Vector<Boolean>[] wheelchairAccessibles;
 
+    private Vector<AgencyAndId> tripIds;
+
     @SuppressWarnings("unchecked")
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
@@ -56,7 +59,7 @@ public final class TripPattern implements Serializable {
         dwellTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
         arrivalTimes = (Vector<Integer>[]) Array.newInstance(Vector.class, hops);
         wheelchairAccessibles = (Vector<Boolean>[]) Array.newInstance(Vector.class, hops + 1);
-
+        tripIds = new Vector<AgencyAndId>();
         int i;
         for (i = 0; i < hops; ++i) {
             departureTimes[i] = new Vector<Integer>();
@@ -72,12 +75,15 @@ public final class TripPattern implements Serializable {
      * Remove a stop from a given trip.  This is useful when, while adding hops iteratively,
      * it turns out that the trip is an overtaking trip.
      */
-    public void removeHop(int stopindex, int hop) {
-        runningTimes[stopindex].removeElementAt(hop);
-        departureTimes[stopindex].removeElementAt(hop);
-        dwellTimes[stopindex].removeElementAt(hop);
-        arrivalTimes[stopindex].removeElementAt(hop);
-        wheelchairAccessibles[stopindex].removeElementAt(hop);
+    public void removeHop(int stopIndex, int hop) {
+        runningTimes[stopIndex].removeElementAt(hop);
+        departureTimes[stopIndex].removeElementAt(hop);
+        dwellTimes[stopIndex].removeElementAt(hop);
+        arrivalTimes[stopIndex].removeElementAt(hop);
+        wheelchairAccessibles[stopIndex].removeElementAt(hop);
+        if (stopIndex == 0) {
+            tripIds.removeElementAt(hop);
+        }
     }
 
     /** 
@@ -85,7 +91,7 @@ public final class TripPattern implements Serializable {
      * @return 
      */
     public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
-            int arrivalTime, int dwellTime, boolean wheelchairAccessible) {
+            int arrivalTime, int dwellTime, boolean wheelchairAccessible, AgencyAndId tripId) {
         Vector<Integer> stopRunningTimes = runningTimes[stopIndex];
         Vector<Integer> stopDepartureTimes = departureTimes[stopIndex];
         Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
@@ -103,6 +109,9 @@ public final class TripPattern implements Serializable {
             if (stopDepartureTimes.elementAt(insertionPoint) < departureTime) {
                 throw new TripOvertakingException();
             }
+        }
+        if (stopIndex == 0) {
+            tripIds.insertElementAt(tripId, insertionPoint);
         }
         stopDepartureTimes.insertElementAt(departureTime, insertionPoint);
         stopRunningTimes.insertElementAt(runningTime, insertionPoint);
@@ -203,5 +212,9 @@ public final class TripPattern implements Serializable {
             throw new RuntimeException("Pattern index out of bounds: " + pattern + " / " + stopWheelchairAccessibles.size());
         }
         stopWheelchairAccessibles.insertElementAt(wheelchairAccessible, pattern);
+    }
+
+    public AgencyAndId getTripId(int patternIndex) {
+        return tripIds.get(patternIndex);
     }
 }

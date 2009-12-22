@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,11 +58,11 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
-/** 
+/**
  * 
- * A StopPattern is an intermediate object used when processing GTFS files.  It represents an ordered list 
- * of stops and a service ID.  Any two trips with the same stops in the same order, and that operates on the 
- * same days, can be combined using a TripPattern to save memory.  
+ * A StopPattern is an intermediate object used when processing GTFS files. It represents an ordered
+ * list of stops and a service ID. Any two trips with the same stops in the same order, and that
+ * operates on the same days, can be combined using a TripPattern to save memory.
  */
 
 class StopPattern {
@@ -92,11 +94,11 @@ class StopPattern {
 }
 
 /**
- * An EncodedTrip is an intermediate object used during GTFS processing.  It represents a trip as it will be 
- * put into a TripPattern.  It's used during interlining processing, to create that the extra PatternDwell edges
- * where someone stays on a vehicle as its number changes.
+ * An EncodedTrip is an intermediate object used during GTFS processing. It represents a trip as it
+ * will be put into a TripPattern. It's used during interlining processing, to create that the extra
+ * PatternDwell edges where someone stays on a vehicle as its number changes.
  */
-class EncodedTrip {
+class EncodedTrip implements Comparable<EncodedTrip> {
     Trip trip;
 
     int patternIndex;
@@ -119,6 +121,21 @@ class EncodedTrip {
 
     public String toString() {
         return "EncodedTrip(" + this.trip + ", " + this.patternIndex + ", " + this.pattern + ")";
+    }
+
+    @Override
+    public int compareTo(EncodedTrip other) {
+        return patternIndex - other.patternIndex;
+    }
+
+    public StopTime getLastStop(GtfsRelationalDao dao) {
+        List<StopTime> stops = dao.getStopTimesForTrip(trip);
+        return stops.get(stops.size() - 1);
+    }
+
+    public StopTime getFirstStop(GtfsRelationalDao dao) {
+        List<StopTime> stops = dao.getStopTimesForTrip(trip);
+        return stops.get(0);
     }
 }
 
@@ -158,7 +175,7 @@ public class GTFSPatternHopFactory {
     }
 
     /**
-     * Generate the edges.  Assumes that there are already vertices in the graph for the stops.
+     * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      */
     public void run(Graph graph) {
 
@@ -176,7 +193,23 @@ public class GTFSPatternHopFactory {
 
         int index = 0;
 
-        HashMap<String, ArrayList<EncodedTrip>> tripsByBlock = new HashMap<String, ArrayList<EncodedTrip>>();
+        /*
+         * To handle interlining, we need some fairly complex machinery.
+         * 
+         * Keep in mind that the block_id represents a trip that is on a particular vehicle. There
+         * are cases where a vehicle's route is a loop, and when it hits the end, it simply starts
+         * over. Then there are cases where a bus goes from A to B on trip 1, then from B to C on
+         * trip 2, then from C to A on trip 3. This may or may not repeat.
+         * 
+         * When we see a trip on a given block, we add it to a set of trips on that block starting
+         * at a given stop, ordered by its departure time.
+         * 
+         * In post-processing, we then take each trip, and try to hook it up to its next trip, if
+         * any, by looking up its last stop, and finding the first trip with a later departure time
+         * and the same block_id from that stop.
+         */
+
+        HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart = new HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>>();
 
         for (Trip trip : trips) {
 
@@ -186,123 +219,27 @@ public class GTFSPatternHopFactory {
 
             List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
 
-            if (stopTimes.isEmpty())
-                continue;
-            
-            int lastStop = stopTimes.size() - 1;
-            if (lastStop == 0) {
-                _log.warn("Trip " + trip + 
-                        " has only one stop.  We will not use it for routing.  This is probably an error in your data");
+            if (stopTimes.size() < 2) {
+                _log
+                        .warn("Trip "
+                                + trip
+                                + " has fewer than two stops.  We will not use it for routing.  This is probably an error in your data");
                 continue;
             }
-            
+
             StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
-            TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
-            int departureTime = -1, prevDepartureTime = -1;
-            int numInterpStops = -1, firstInterpStop = -1; 
-            int interpStep = 0;
-            boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
+            String blockId = trip.getBlockId();
+            boolean simple = false;
+
             if (tripPattern == null) {
+                tripPattern = makeTripPattern(graph, trip, stopTimes);
 
-                tripPattern = new TripPattern(trip, stopTimes);
-
-                int i;
-                Stop s1 = null;
-                for (i = 0; i < lastStop; i++) {
-                    StopTime st0 = stopTimes.get(i);
-                    Stop s0 = st0.getStop();
-                    StopTime st1 = stopTimes.get(i + 1);
-                    s1 = st1.getStop();
-                    int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-                    // create journey vertices
-
-                    Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_"
-                            + id(trip.getId()) + "_D", s0.getLon(), s0.getLat());
-                    Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_"
-                            + id(trip.getId()) + "_A", s1.getLon(), s1.getLat());
-                    Vertex startJourneyArrive;
-                    if (i != 0) {
-                        startJourneyArrive = graph.addVertex(id(s0.getId()) + "_"
-                                + id(trip.getId()) + "_A", s0.getLon(), s0.getLat());
-
-                        PatternDwell dwell = new PatternDwell(startJourneyArrive,
-                                startJourneyDepart, i, tripPattern);
-                        graph.addEdge(dwell);
-                    }
-
-                    PatternHop hop = new PatternHop(startJourneyDepart, endJourneyArrive, s0, s1,
-                            i, tripPattern);
-
-                    hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
-                            endJourneyArrive));
-
-                    prevDepartureTime = departureTime;
-                    departureTime = st0.getDepartureTime();
-                    int arrivalTime = st1.getArrivalTime();
-                    
-                    /* Interpolate, if necessary, the times of non-timepoint stops */
-                    if (!(st0.isDepartureTimeSet() && st1.isArrivalTimeSet() ) ) {
-                        
-                        if (numInterpStops == -1) {
-                            //figure out how many such stops there are in a row.
-                            int j; 
-                            for (j = i + 1; j < lastStop + 1; ++j) {
-                                StopTime st = stopTimes.get(j);
-                                if (st.isDepartureTimeSet()) {
-                                    break;
-                                }
-                            }
-                            if (j == lastStop + 1) {
-                                throw new RuntimeException ("Could not interpolate arrival/departure time on stop " + i + " on trip " + trip);
-                            }
-                            StopTime st = stopTimes.get(j);
-                            numInterpStops = j - i - 1;
-                            firstInterpStop = i + 1;
-                            interpStep = (st.getArrivalTime() - departureTime) / (numInterpStops + 2);
-                        }
-                        if (i >= firstInterpStop) {
-                            departureTime = prevDepartureTime + interpStep * (i + 1 - firstInterpStop);
-                        } 
-                        if (i < firstInterpStop + numInterpStops - 1) {
-                            arrivalTime = departureTime + interpStep;
-                        }
-                        if (i == firstInterpStop + numInterpStops - 1) {
-                            // done interpolating
-                            numInterpStops = -1; 
-                        }
-                    }
-                    
-                    int runningTime = arrivalTime - departureTime;
-
-		    boolean stopWheelchairBoarding = s0.getWheelchairBoarding() != 0;
-                    tripPattern.addHop(i, 0, departureTime, runningTime,
-                            arrivalTime, dwellTime, 
-                            stopWheelchairBoarding && tripWheelchairAccessible);
-                    graph.addEdge(hop);
-
-                    Vertex startStation = graph.getVertex(id(s0.getId()));
-                    Vertex endStation = graph.getVertex(id(s1.getId()));
-
-                    PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart,
-                            tripPattern, i, mode);
-                    graph.addEdge(boarding);
-                    graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
-                }
                 patterns.put(stopPattern, tripPattern);
-
-		boolean stopWheelchairBoarding = s1.getWheelchairBoarding() != 0;
-                tripPattern.setWheelchairAccessible(i, 0, stopWheelchairBoarding && tripWheelchairAccessible);
-
-                String blockId = trip.getBlockId();
                 if (blockId != null && !blockId.equals("")) {
-                    ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
-                    if (blockTrips == null) {
-                        blockTrips = new ArrayList<EncodedTrip>();
-                        tripsByBlock.put(blockId, blockTrips);
-                    }
-                    blockTrips.add(new EncodedTrip(trip, 0, tripPattern));
-                }                
+                    addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
+                            blockId);
+                }
             } else {
                 int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
                         .getDepartureTime());
@@ -319,26 +256,27 @@ public class GTFSPatternHopFactory {
                 } else {
 
                     // try to insert this trip at this location
-                    boolean simple = false;
+
+                    boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
                     StopTime st1 = null;
                     int i;
-                    for (i = 0; i < lastStop; i++) {
+                    for (i = 0; i < stopTimes.size() - 1; i++) {
                         StopTime st0 = stopTimes.get(i);
                         st1 = stopTimes.get(i + 1);
                         int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                         try {
-			    boolean s0WheelchairBoarding = st0.getStop().getWheelchairBoarding() != 0;
+                            boolean s0WheelchairBoarding = st0.getStop().getWheelchairBoarding() != 0;
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                    runningTime, st1.getArrivalTime(), dwellTime, s0WheelchairBoarding
-                                            && tripWheelchairAccessible);
+                                    runningTime, st1.getArrivalTime(), dwellTime,
+                                    s0WheelchairBoarding && tripWheelchairAccessible, trip.getId());
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "
                                             + trip.getId()
                                             + " overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
                             // back out trips and revert to the simple method
-                            for (i=i-1; i >= 0; --i) {
+                            for (i = i - 1; i >= 0; --i) {
                                 tripPattern.removeHop(i, insertionPoint);
                             }
                             createSimpleHops(graph, trip, stopTimes);
@@ -347,68 +285,216 @@ public class GTFSPatternHopFactory {
                         }
                     }
                     if (!simple) {
-			boolean s1WheelchairBoarding = st1.getStop().getWheelchairBoarding() != 0;
-                        tripPattern.setWheelchairAccessible(i, insertionPoint, s1WheelchairBoarding && tripWheelchairAccessible);
-                        String blockId = trip.getBlockId();
-                        if (blockId != null && !blockId.equals("")) {
-                            ArrayList<EncodedTrip> blockTrips = tripsByBlock.get(blockId);
-                            if (blockTrips == null) {
-                                blockTrips = new ArrayList<EncodedTrip>();
-                                tripsByBlock.put(blockId, blockTrips);
-                            }
-                            blockTrips.add(new EncodedTrip(trip, 0, tripPattern));
-                        }
+                        boolean s1WheelchairBoarding = st1.getStop().getWheelchairBoarding() != 0;
+                        tripPattern.setWheelchairAccessible(i, insertionPoint, s1WheelchairBoarding
+                                && tripWheelchairAccessible);
+                    }
+                }
+                if (!simple) {
+                    if (blockId != null && !blockId.equals("")) {
+
+                        addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
+                                blockId);
                     }
                 }
             }
         }
 
+        HashMap<TripPattern, HashMap<TripPattern, PatternInterlineDwell>> dwellEdges = new HashMap<TripPattern, HashMap<TripPattern, PatternInterlineDwell>>();
+
         /* for interlined trips, add final dwell edge */
-        for (ArrayList<EncodedTrip> blockTrips : tripsByBlock.values()) {
-            HashMap<Stop, EncodedTrip> starts = new HashMap<Stop, EncodedTrip>();
-            for (EncodedTrip encoded : blockTrips) {
-                Trip trip = encoded.trip;
-                List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
-                Stop start = stopTimes.get(0).getStop();
-                starts.put(start, encoded);
-            }
-            for (EncodedTrip encoded : blockTrips) {
-                Trip trip = encoded.trip;
-                List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
-                StopTime endTime = stopTimes.get(stopTimes.size() - 1);
-                Stop end = endTime.getStop();
+        for (HashMap<Stop, TreeSet<EncodedTrip>> blockStops : tripsByBlockAndStart.values()) {
+            for (Stop stop : blockStops.keySet()) {
+                TreeSet<EncodedTrip> tripsStartingAt = blockStops.get(stop);
 
-                if (starts.containsKey(end)) {
-                    EncodedTrip nextTrip = starts.get(end);
+                // now we would like to find a list of trips which might follow
+                // these trips
 
-                    Vertex arrive = graph.addVertex(
-                            id(end.getId()) + "_" + id(trip.getId()) + "_A", end.getLon(), end
-                                    .getLat());
+                for (EncodedTrip eTrip : tripsStartingAt) {
+                    Trip trip = eTrip.trip;
+                    List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+                    StopTime lastStopTime = stopTimes.get(stopTimes.size() - 1);
+                    Stop lastStop = lastStopTime.getStop();
+                    TreeSet<EncodedTrip> possiblePosts = null;
+                    if (blockStops.containsKey(lastStop)) {
+                        possiblePosts = blockStops.get(lastStop);
+                    } else {
+                        continue;
+                    }
 
-                    Vertex depart = graph.addVertex(id(end.getId()) + "_"
-                            + id(nextTrip.trip.getId()) + "_D", end.getLon(), end.getLat());
-                    PatternDwell dwell = new PatternDwell(arrive, depart, nextTrip.patternIndex,
-                            encoded.pattern);
+                    EncodedTrip[] postArray = possiblePosts.toArray(new EncodedTrip[0]);
+                    int postIndex = 0;
 
-                    graph.addEdge(dwell);
+                    // find the actual posts
+                    int arrivalTime = lastStopTime.getArrivalTime();
+                    EncodedTrip post;
+                    do {
+                        post = postArray[postIndex];
+                        ++postIndex;
+                    } while (postIndex < postArray.length
+                            && postArray[postIndex].getFirstStop(_dao).getDepartureTime() < arrivalTime);
 
-                    List<StopTime> nextStopTimes = _dao.getStopTimesForTrip(nextTrip.trip);
-                    StopTime startTime = nextStopTimes.get(0);
-                    // startTime.getArrivalTime() is the arrival time of the *next* trip (i.e.,
-                    // right when the bus changes to its new trip). endtime.getDepartureTime() is
-                    // the final time point along its current trip; the difference is the dwell
-                    // time.
-                    int dwellTime = startTime.getArrivalTime() - endTime.getDepartureTime();
-                    encoded.pattern.setDwellTime(stopTimes.size() - 2, encoded.patternIndex,
-                            dwellTime);
+                    if (post == null || post.getFirstStop(_dao).getDepartureTime() < arrivalTime) {
+                        continue;
+                    }
 
+                    // now create or update dwell edge between prior and this
+
+                    // does the dwell edge already exist?
+                    PatternInterlineDwell dwell = null;
+
+                    HashMap<TripPattern, PatternInterlineDwell> edges = dwellEdges
+                            .get(eTrip.pattern);
+
+                    if (edges != null) {
+                        dwell = edges.get(post.pattern);
+                    }
+                    if (dwell == null) {
+                        Vertex arrive = graph.addVertex(id(lastStop.getId()) + "_"
+                                + id(trip.getId()) + "_A", lastStop.getLon(), lastStop.getLat());
+
+                        Vertex depart = graph.addVertex(id(lastStop.getId()) + "_"
+                                + id(post.trip.getId()) + "_D", lastStop.getLon(), lastStop
+                                .getLat());
+
+                        dwell = new PatternInterlineDwell(arrive, depart, trip);
+                        graph.addEdge(dwell);
+
+                        if (edges == null) {
+                            edges = new HashMap<TripPattern, PatternInterlineDwell>();
+                            dwellEdges.put(eTrip.pattern, edges);
+                        }
+                        edges.put(eTrip.pattern, dwell);
+                    }
+                    int departureTime = post.getFirstStop(_dao).getArrivalTime();
+                    int dwellTime = departureTime - arrivalTime;
+                    dwell.addTrip(trip.getId(), post.trip.getId(), dwellTime);
                 }
+
             }
         }
 
         loadTransfers(graph);
 
         clearCachedData();
+    }
+
+    private void addTripToInterliningMap(
+            HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart, Trip trip,
+            List<StopTime> stopTimes, TripPattern tripPattern, String blockId) {
+        HashMap<Stop, TreeSet<EncodedTrip>> blockStops = tripsByBlockAndStart.get(blockId);
+        if (blockStops == null) {
+            blockStops = new HashMap<Stop, TreeSet<EncodedTrip>>();
+            tripsByBlockAndStart.put(blockId, blockStops);
+        }
+        Stop firstStop = stopTimes.get(0).getStop();
+        TreeSet<EncodedTrip> stopTrips = blockStops.get(firstStop);
+        if (stopTrips == null) {
+            stopTrips = new TreeSet<EncodedTrip>();
+            blockStops.put(firstStop, stopTrips);
+        }
+        stopTrips.add(new EncodedTrip(trip, 0, tripPattern));
+    }
+
+    private TripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
+        TripPattern tripPattern = new TripPattern(trip, stopTimes);
+
+        TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
+        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
+        int lastStop = stopTimes.size() - 1;
+        int departureTime = -1, prevDepartureTime = -1;
+        int numInterpStops = -1, firstInterpStop = -1;
+        int interpStep = 0;
+
+        int i;
+        Stop s1 = null;
+        for (i = 0; i < lastStop; i++) {
+            StopTime st0 = stopTimes.get(i);
+            Stop s0 = st0.getStop();
+            StopTime st1 = stopTimes.get(i + 1);
+            s1 = st1.getStop();
+            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
+            // create journey vertices
+
+            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId())
+                    + "_D", s0.getLon(), s0.getLat());
+            Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId())
+                    + "_A", s1.getLon(), s1.getLat());
+            Vertex startJourneyArrive;
+            if (i != 0) {
+                startJourneyArrive = graph.addVertex(
+                        id(s0.getId()) + "_" + id(trip.getId()) + "_A", s0.getLon(), s0.getLat());
+
+                PatternDwell dwell = new PatternDwell(startJourneyArrive, startJourneyDepart, i,
+                        tripPattern);
+                graph.addEdge(dwell);
+            }
+
+            PatternHop hop = new PatternHop(startJourneyDepart, endJourneyArrive, s0, s1, i,
+                    tripPattern);
+
+            hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
+                    endJourneyArrive));
+
+            prevDepartureTime = departureTime;
+            departureTime = st0.getDepartureTime();
+            int arrivalTime = st1.getArrivalTime();
+
+            /* Interpolate, if necessary, the times of non-timepoint stops */
+            if (!(st0.isDepartureTimeSet() && st1.isArrivalTimeSet())) {
+
+                if (numInterpStops == -1) {
+                    // figure out how many such stops there are in a row.
+                    int j;
+                    for (j = i + 1; j < lastStop + 1; ++j) {
+                        StopTime st = stopTimes.get(j);
+                        if (st.isDepartureTimeSet()) {
+                            break;
+                        }
+                    }
+                    if (j == lastStop + 1) {
+                        throw new RuntimeException(
+                                "Could not interpolate arrival/departure time on stop " + i
+                                        + " on trip " + trip);
+                    }
+                    StopTime st = stopTimes.get(j);
+                    numInterpStops = j - i - 1;
+                    firstInterpStop = i + 1;
+                    interpStep = (st.getArrivalTime() - departureTime) / (numInterpStops + 2);
+                }
+                if (i >= firstInterpStop) {
+                    departureTime = prevDepartureTime + interpStep * (i + 1 - firstInterpStop);
+                }
+                if (i < firstInterpStop + numInterpStops - 1) {
+                    arrivalTime = departureTime + interpStep;
+                }
+                if (i == firstInterpStop + numInterpStops - 1) {
+                    // done interpolating
+                    numInterpStops = -1;
+                }
+            }
+
+            int runningTime = arrivalTime - departureTime;
+
+            boolean stopWheelchairBoarding = s0.getWheelchairBoarding() != 0;
+            tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
+                    stopWheelchairBoarding && tripWheelchairAccessible, trip.getId());
+            graph.addEdge(hop);
+
+            Vertex startStation = graph.getVertex(id(s0.getId()));
+            Vertex endStation = graph.getVertex(id(s1.getId()));
+
+            PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart, tripPattern,
+                    i, mode);
+            graph.addEdge(boarding);
+            graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
+        }
+
+        boolean stopWheelchairBoarding = s1.getWheelchairBoarding() != 0;
+        tripPattern.setWheelchairAccessible(i, 0, stopWheelchairBoarding
+                && tripWheelchairAccessible);
+
+        return tripPattern;
     }
 
     private void clearCachedData() {
@@ -457,7 +543,7 @@ public class GTFSPatternHopFactory {
         String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();
         boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
-        
+
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
@@ -480,9 +566,11 @@ public class GTFSPatternHopFactory {
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourney));
             hops.add(hop);
-            Board boarding = new Board(startStation, startJourneyDepart, hop, tripWheelchairAccessible && s0.getWheelchairBoarding() != 0);
+            Board boarding = new Board(startStation, startJourneyDepart, hop,
+                    tripWheelchairAccessible && s0.getWheelchairBoarding() != 0);
             graph.addEdge(boarding);
-            graph.addEdge(new Alight(endJourney, endStation, hop, tripWheelchairAccessible && s1.getWheelchairBoarding() != 0));
+            graph.addEdge(new Alight(endJourney, endStation, hop, tripWheelchairAccessible
+                    && s1.getWheelchairBoarding() != 0));
         }
     }
 
@@ -540,7 +628,7 @@ public class GTFSPatternHopFactory {
         LineString geometry = _geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
 
-            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex); 
+            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
 
             // Pack the resulting line string
             CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
@@ -570,7 +658,7 @@ public class GTFSPatternHopFactory {
         for (ShapePoint point : points) {
             coordinates[i] = new Coordinate(point.getLon(), point.getLat());
             distances[i] = point.getDistTraveled();
-            if (! point.isDistTraveledSet() )
+            if (!point.isDistTraveledSet())
                 hasAllDistances = false;
             i++;
         }

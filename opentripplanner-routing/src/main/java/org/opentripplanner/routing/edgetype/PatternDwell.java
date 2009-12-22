@@ -26,8 +26,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class PatternDwell extends AbstractEdge {
 
     /**
-     *  Models waiting in a station on a vehicle.  The vehicle may change 
-     *  names during this time (interlining).
+     *  Models waiting in a station on a vehicle.  The vehicle may not change 
+     *  names during this time -- PatternInterlineDwell represents that case.
      */
     
     private static final long serialVersionUID = 1L;

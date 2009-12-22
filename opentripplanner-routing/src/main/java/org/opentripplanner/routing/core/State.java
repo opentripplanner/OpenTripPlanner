@@ -15,10 +15,13 @@ package org.opentripplanner.routing.core;
 
 import java.util.Date;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+
 public class State {
 
     private long _time;
     private int curPattern = -1;
+    public AgencyAndId tripId = null;
     
     public State() {
         this(System.currentTimeMillis());
@@ -28,9 +31,10 @@ public class State {
         _time = time;
     }    
 
-    public State(long time, int pattern) {
+    public State(long time, int pattern, AgencyAndId tripId) {
         _time = time;
         curPattern = pattern;
+        this.tripId = tripId;
     }
 
     public long getTime() {
@@ -42,7 +46,7 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time, curPattern);
+        State ret = new State(_time, curPattern, tripId);
         return ret;
     }
 

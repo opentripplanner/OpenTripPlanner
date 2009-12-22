@@ -128,6 +128,7 @@ public class PatternAlight extends AbstractEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
+        state1.tripId = pattern.getTripId(patternIndex);
         return new TraverseResult(-wait + BOARD_COST, state1);
     }
 
@@ -138,6 +139,7 @@ public class PatternAlight extends AbstractEdge {
 	    }
 	}
         State s1 = state0.clone();
+        s1.tripId = null;
         return new TraverseResult(1, s1);
     }
 
