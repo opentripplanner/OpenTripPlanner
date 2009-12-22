@@ -82,6 +82,7 @@ public class TestRequest extends TestCase {
                 "2009-01-01", 
                 "11:11:11",
                 false,
+                false,
                 840.0,
                 1.33,
                 OptimizeType.QUICK,
