@@ -161,6 +161,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         public void addWay(OSMWay way) {
             if (_ways.containsKey(way.getId()))
                 return;
+            if (!way.getTags().containsKey("highway")) {
+                return;
+            }
+
             _ways.put(way.getId(), way);
             
             if( _ways.size() % 1000 == 0)
