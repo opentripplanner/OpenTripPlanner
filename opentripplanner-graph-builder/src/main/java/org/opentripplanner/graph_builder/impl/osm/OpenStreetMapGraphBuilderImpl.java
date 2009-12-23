@@ -16,8 +16,10 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -87,7 +89,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private Map<Integer, OSMWay> _ways = new HashMap<Integer, OSMWay>();
 
         public void buildGraph(Graph graph) {
-
+            
             // We want to prune nodes that don't have any edges
             Set<Integer> nodesWithNeighbors = new HashSet<Integer>();
 
@@ -97,8 +99,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     nodesWithNeighbors.addAll(nodes);
             }
 
-            // Remove all island
+            // Remove all simple islands
             _nodes.keySet().retainAll(nodesWithNeighbors);
+            
+            pruneFloatingIslands();
             
             int nodeIndex = 0;
             
@@ -145,6 +149,57 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
+        }
+
+        private void pruneFloatingIslands() {
+            Map<Integer, HashSet<Integer>> subgraphs = new HashMap<Integer, HashSet<Integer>>();
+            Map<Integer, ArrayList<Integer>> neighborsForNode = new HashMap<Integer, ArrayList<Integer>>();
+            for (OSMWay way : _ways.values()) {
+                List<Integer> nodes = way.getNodeRefs();
+                for (int node : nodes) {
+                    ArrayList<Integer> nodelist = neighborsForNode.get(node);
+                    if (nodelist == null) {
+                        nodelist = new ArrayList<Integer>();
+                        neighborsForNode.put(node, nodelist);                        
+                    }
+                    nodelist.addAll(nodes);
+                }
+            }
+            /* associate each node with a subgraph */
+            for (int node : _nodes.keySet()) {
+                if (subgraphs.containsKey(node)) {
+                    continue;
+                }
+                HashSet<Integer> subgraph = computeConnectedSubgraph(neighborsForNode, node);
+                for (int subnode : subgraph) {
+                    subgraphs.put(subnode, subgraph);                    
+                }
+            }        
+            /* find the largest subgraph */
+            HashSet<Integer> largestSubgraph = null;
+            for (HashSet<Integer> subgraph : subgraphs.values()) {
+                if (largestSubgraph == null || largestSubgraph.size() < subgraph.size()) {
+                    largestSubgraph = subgraph;
+                }
+            }
+            /* delete the rest */
+            _nodes.keySet().retainAll(largestSubgraph);
+        }
+        
+        private HashSet<Integer> computeConnectedSubgraph(Map<Integer, ArrayList<Integer>> neighborsForNode, int startNode) {
+            HashSet<Integer> subgraph = new HashSet<Integer>();
+            Queue<Integer> q = new LinkedList<Integer>();
+            q.add(startNode);
+            while (!q.isEmpty()) {
+                int node = q.poll();
+                for (int neighbor : neighborsForNode.get(node)) {
+                    if (!subgraph.contains(neighbor)) {
+                        subgraph.add(neighbor);
+                        q.add(neighbor);
+                    }
+                }
+            }
+            return subgraph;
         }
 
         public void addNode(OSMNode node) {
