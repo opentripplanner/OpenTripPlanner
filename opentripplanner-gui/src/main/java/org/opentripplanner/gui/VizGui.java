@@ -2,17 +2,23 @@ package org.opentripplanner.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Vector;
 
 import javax.swing.AbstractListModel;
@@ -106,9 +112,8 @@ class TripPatternListModel extends AbstractListModel {
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
         for (int dt : pattern.getDepartureTimes(stopIndex)) {
             Calendar c = new GregorianCalendar();
-            c.setTimeInMillis(dt * 1000);
-            departureTimes.add(String.format("%02d:%02d:%02d", c.get(Calendar.HOUR), c
-                    .get(Calendar.MINUTE), c.get(Calendar.SECOND)));
+            c.setTimeInMillis((dt + 5 * 3600) * 1000);
+            departureTimes.add(DateFormat.getTimeInstance().format(c.getTime()));
         }
     }
 
@@ -306,6 +311,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         /* buttons at bottom */
         JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(0, 3));
         leftPanel.add(buttonPanel, BorderLayout.PAGE_END);
 
         JButton zoomDefaultButton = new JButton("Zoom to default");
@@ -351,6 +357,23 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(findButton);
 
+        JButton checkButton = new JButton("Check graph");
+        checkButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                checkGraph();
+            }
+        });
+        buttonPanel.add(checkButton);
+
+        JButton traceButton = new JButton("Trace");
+        traceButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                trace();
+            }
+        });
+        buttonPanel.add(traceButton);
+        
+        
         /* right panel holds trip pattern info */
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
@@ -378,10 +401,67 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         pack();
     }
 
+    protected void trace() {
+        HashSet<Vertex> seenVertices = new HashSet<Vertex>();
+        DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+        if (selected == null) {
+            System.out.println ("no vertex selected");
+            return;
+        }
+        Vertex v = selected.vertex;
+        System.out.println ("initial vertex: " + v);
+        Queue<Vertex> toExplore = new LinkedList<Vertex>();
+        toExplore.add(v);
+        seenVertices.add(v);
+        while (!toExplore.isEmpty()) {
+            Vertex src = toExplore.poll();
+            for (Edge e : src.getOutgoing()) {
+                Vertex tov = e.getToVertex();
+                if (!seenVertices.contains(tov)) {
+                    seenVertices.add(tov);
+                    toExplore.add(tov);
+                }
+            }
+        }
+        showGraph.setHighlighed(seenVertices);
+        
+    }
+
+    protected void checkGraph() {
+        
+        HashSet<Vertex> seenVertices = new HashSet<Vertex>();
+        Collection<Vertex> allVertices = graph.getVertices();
+        Vertex v = allVertices.iterator().next();
+        System.out.println ("initial vertex: " + v);
+        Queue<Vertex> toExplore = new LinkedList<Vertex>();
+        toExplore.add(v);
+        seenVertices.add(v);
+        while (!toExplore.isEmpty()) {
+            Vertex src = toExplore.poll();
+            for (Edge e : src.getOutgoing()) {
+                Vertex tov = e.getToVertex();
+                if (!seenVertices.contains(tov)) {
+                    seenVertices.add(tov);
+                    toExplore.add(tov);
+                }
+            }
+        }
+
+        System.out.println("After investigation, visited " + seenVertices.size() + " of " + allVertices.size());
+        
+        /*now, let's find an unvisited vertex */
+        for (Vertex u : allVertices) {
+            if (!seenVertices.contains(u)) {
+                System.out.println ("unknown vertex" + u);
+                break;
+            }
+        }
+    }
+
     protected void route(String from, String to) {
         TraverseOptions options = new TraverseOptions();
         Date now = new Date(1260994200000L);
-        System.out.println("Path from " + from + " to " + to);
+        System.out.println("Path from " + from + " to " + to + " at " + now);
         List<GraphPath> paths = pathservice.plan(from, to, now, options);
         if (paths.get(0) == null) {
             System.out.println("no path");

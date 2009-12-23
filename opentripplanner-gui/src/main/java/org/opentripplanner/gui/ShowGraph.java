@@ -1,7 +1,9 @@
 package org.opentripplanner.gui;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
@@ -44,6 +46,8 @@ public class ShowGraph extends PApplet {
     int startDragX, startDragY;
 
     private Vertex highlightedVertex;
+
+    private Set<Vertex> highlighted = new HashSet<Vertex>();
     
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
@@ -97,6 +101,9 @@ public class ShowGraph extends PApplet {
             } else if (v.getType() == TransitStop.class) {
                 stroke(255, 30, 255);
                 ellipse(x, y, 5.0, 5.0);
+            } else if (highlighted.contains(v)) {
+                stroke(0, 255, 0);
+                ellipse(x, y, 3.0, 3.0);
             } else {
                 stroke(255);
                 ellipse(x, y, 3.0, 3.0);
@@ -224,5 +231,9 @@ public class ShowGraph extends PApplet {
         }
         modelBounds.expandBy(xd, yd);
         highlightedVertex = v;
+    }
+
+    public void setHighlighed(Set<Vertex> vertices) {
+        highlighted  = vertices;        
     }
 }
