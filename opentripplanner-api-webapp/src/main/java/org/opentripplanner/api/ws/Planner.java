@@ -33,6 +33,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -45,6 +46,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -108,9 +110,7 @@ public class Planner {
 
         /* use request to generate trip */
 
-        TripPlan plan = generatePlan(request);
-        Response response = new Response(request, plan);
-        return response;
+        return generatePlan(request);
     }
 
     /**
@@ -120,16 +120,38 @@ public class Planner {
      * @return
      */
 
-    private TripPlan generatePlan(Request request) {
+    private Response generatePlan(Request request) {
         TraverseModeSet modeSet = request.getModeSet();
         assert (modeSet.isValid());
         TraverseOptions options = new TraverseOptions(modeSet);
         options.optimizeFor = request.getOptimize();
         options.back = request.isArriveBy();
         options.wheelchairAccessible = request.getWheelchair();
-        List<GraphPath> paths = pathservice.plan(request.getFrom(), request.getTo(), request
+        List<GraphPath> paths = null;
+        try {
+            paths = pathservice.plan(request.getFrom(), request.getTo(), request
                 .getDateTime(), options);
-
+        } catch (VertexNotFoundException e) {
+            Response response = new Response(request, null);
+            PlannerError.ErrorCode code;
+            if (e.fromMissing) {
+                if (e.toMissing) {
+                    code = PlannerError.ErrorCode.START_AND_END_NOT_FOUND;
+                } else {
+                    code = PlannerError.ErrorCode.START_NOT_FOUND;
+                }
+            } else {
+                code = PlannerError.ErrorCode.END_NOT_FOUND;
+            }
+            
+            response.error = new PlannerError(code);
+            return response;
+        }
+        if (paths.size() == 0) {
+            Response response = new Response(request, null);
+            response.error = new PlannerError(PlannerError.ErrorCode.NO_PATH);
+            return response;
+        }
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
         SPTVertex tripEndVertex = vertices.lastElement();
@@ -257,7 +279,8 @@ public class Planner {
             }
 
         }
-        return plan;
+        Response response = new Response(request, plan);
+        return response;
     }
 
     /**

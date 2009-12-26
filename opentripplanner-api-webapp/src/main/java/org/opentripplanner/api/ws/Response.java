@@ -18,6 +18,7 @@ import java.util.HashMap;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.error.PlannerError;
 
 /**
  *
@@ -27,7 +28,11 @@ public class Response {
 
     public HashMap<String, String> requestParameters;
     public TripPlan plan;
-
+    /**
+     * The error (if any) that this response raised
+     */
+    public PlannerError error = null;
+    
     public Response() {
     }
 

@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -78,6 +79,10 @@ public class PathServiceImpl implements PathService {
         Vertex fromVertex = getVertexForPlace(fromPlace);
         Vertex toVertex = getVertexForPlace(toPlace);
 
+        if (fromVertex == null || toVertex == null) {
+            throw new VertexNotFoundException(fromVertex == null, toVertex == null);
+        }
+        
         State state = new State(targetTime.getTime());
 
         if( _calendarService != null)
