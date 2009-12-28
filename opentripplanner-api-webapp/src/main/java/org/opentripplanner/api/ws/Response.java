@@ -15,6 +15,7 @@ package org.opentripplanner.api.ws;
 
 import java.util.HashMap;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.TripPlan;
@@ -31,6 +32,7 @@ public class Response {
     /**
      * The error (if any) that this response raised
      */
+    @XmlElement(required=false)
     public PlannerError error = null;
     
     public Response() {

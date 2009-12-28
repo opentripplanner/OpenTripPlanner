@@ -24,10 +24,14 @@ public class PlannerError {
     
     private ErrorCode code;
 
+    /** We need this for JAXB, but never use it */
+    @SuppressWarnings("unused")
+    private PlannerError() {}
+
     public PlannerError(ErrorCode code) {
         this.code = code;
     }
-    
+
     /**
      * @param code the error code to set
      */
