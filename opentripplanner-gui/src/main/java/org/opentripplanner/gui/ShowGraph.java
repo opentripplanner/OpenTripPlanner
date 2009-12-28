@@ -1,5 +1,8 @@
 package org.opentripplanner.gui;
 
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +18,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 import processing.core.PApplet;
+import processing.core.PFont;
 
 /**
  * Show a map of the graph, intersections and TransitStops only.  The user can drag to zoom.
@@ -48,6 +52,10 @@ public class ShowGraph extends PApplet {
     private Vertex highlightedVertex;
 
     private Set<Vertex> highlighted = new HashSet<Vertex>();
+
+    protected double mouseModelX;
+
+    protected double mouseModelY;
     
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
@@ -76,6 +84,33 @@ public class ShowGraph extends PApplet {
         modelBounds.expandBy(0.02);
         modelOuterBounds = new Envelope(modelBounds);
         vertexIndex.build();
+
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                Point p = e.getLocationOnScreen();
+                mouseModelX = toModelX(p.x);
+                mouseModelY = toModelY(p.y);
+            }
+        });
+
+        /* find and set up the appropriate font */
+        String[] fonts = PFont.list();
+        String[] preferredFonts = {"Courier", "Mono"};
+        PFont font = null;
+        for (String preferredFontName : preferredFonts) {
+            for (String fontName : fonts) {
+                if (fontName.contains(preferredFontName)) {
+                    font = createFont(fontName, 16);
+                    break;
+                }
+            }
+            if (font != null) {
+                break;
+            }
+        }
+        textFont(font);
     }
 
     public void zoomToDefault() {
@@ -110,6 +145,8 @@ public class ShowGraph extends PApplet {
             }
             
         }
+        fill(255, 0, 0);
+        text(mouseModelX + ", " + mouseModelY, 0, 10);
     }
 
     private double toScreenY(double y) {
