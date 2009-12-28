@@ -54,29 +54,34 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     @SuppressWarnings("unchecked")
     @Override
     public Vertex getClosestVertex(Coordinate location) {
-        
-        Envelope env = new Envelope(location);
-        env.expandBy(0.0036); 
-        List<Vertex> nearby = (List<Vertex>) _index.query(env);
 
-        Vertex minVertex = null;
-        double minDistance = Double.POSITIVE_INFINITY;
-        
-        double lat1 = location.y;
-        double lon1 = location.x;
-        
-        for (Vertex nv : nearby) {
-            Coordinate coord = nv.getCoordinate();
-            double lat2 = coord.y;
-            double lon2 = coord.x;
-            double distance = DistanceLibrary.distance(lat1, lon1, lat2, lon2);
-            if( distance < minDistance ) {
-                minVertex = nv;
-                minDistance = distance;
+        Envelope env = new Envelope(location);
+        for (int i = 0; i < 10; ++i) {
+            env.expandBy(0.0036);
+            System.out.println ("env = " + env);
+            List<Vertex> nearby = (List<Vertex>) _index.query(env);
+
+            Vertex minVertex = null;
+            double minDistance = Double.POSITIVE_INFINITY;
+
+            double lat1 = location.y;
+            double lon1 = location.x;
+
+            for (Vertex nv : nearby) {
+                Coordinate coord = nv.getCoordinate();
+                double lat2 = coord.y;
+                double lon2 = coord.x;
+                double distance = DistanceLibrary.distance(lat1, lon1, lat2, lon2);
+                if (distance < minDistance) {
+                    minVertex = nv;
+                    minDistance = distance;
+                }
+            }
+            if (minVertex != null) {
+                return minVertex;
             }
         }
-        
-        return minVertex;
+        return null;
     }
 
 }
