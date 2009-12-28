@@ -33,6 +33,8 @@ public class GenericVertex implements Vertex {
     
     private String name;
 
+    private String stopId = null;
+
     public Class<?> type;
 
     private double y;
@@ -61,6 +63,14 @@ public class GenericVertex implements Vertex {
         this.name = name;
         this.type = type;
     }
+
+    public GenericVertex(String label, double x, double y, String name, String stopId, Class<?> type) {
+        this(label, x, y);
+        this.name = name;
+        this.stopId = stopId;
+        this.type = type;
+    }
+
     public double distance(Vertex v) {
 
         double xd = v.getX() - getX();
@@ -70,7 +80,6 @@ public class GenericVertex implements Vertex {
         /* This is more accurate but slower */
         // return GtfsLibrary.distance(y, x, v.y, v.x);
     }
-    
 
     public double distance(Coordinate c) {
         return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
@@ -155,5 +164,10 @@ public class GenericVertex implements Vertex {
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getStopId() {
+        return stopId;
     }
 }

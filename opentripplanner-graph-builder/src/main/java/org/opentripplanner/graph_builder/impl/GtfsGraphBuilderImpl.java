@@ -123,7 +123,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             for (Stop stop : _dao.getAllStops()) {
 
                 String id = GtfsLibrary.convertIdToString(stop.getId());
-                graph.addVertex(new GenericVertex(id, stop.getLon(), stop.getLat(), stop.getName(),
+                graph.addVertex(new GenericVertex(id, stop.getLon(), stop.getLat(), stop.getName(), stop.getId().getId(),
                         TransitStop.class));
             }
 

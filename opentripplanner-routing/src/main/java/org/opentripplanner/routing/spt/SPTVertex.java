@@ -66,4 +66,8 @@ public class SPTVertex extends GenericVertex {
     public String getName() {
         return this.mirror.getName();
     }
+
+    public String getStopId() {
+        return this.mirror.getStopId();
+    }
 }

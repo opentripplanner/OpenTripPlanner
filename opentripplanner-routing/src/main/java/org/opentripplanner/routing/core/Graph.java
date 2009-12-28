@@ -56,6 +56,18 @@ public class Graph implements Serializable {
         return ret;
     }
 
+    public Vertex addVertex(String id, String name, String stopId, double x, double y) {
+        Vertex exists = this.vertices.get(id);
+        if (exists != null) {
+            assert exists.getX() == x && exists.getY() == y;
+            return exists;
+        }
+
+        Vertex ret = new GenericVertex(id, x, y, name, stopId, null);
+        this.vertices.put(id, ret);
+        return ret;
+    }
+
     public Vertex getVertex(String label) {
         return this.vertices.get(label);
     }

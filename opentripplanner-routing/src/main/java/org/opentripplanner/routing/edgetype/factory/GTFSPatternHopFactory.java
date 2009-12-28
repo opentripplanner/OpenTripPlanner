@@ -417,13 +417,13 @@ public class GTFSPatternHopFactory {
             // create journey vertices
 
             Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + id(trip.getId())
-                    + "_D", s0.getLon(), s0.getLat());
+                    + "_D", s0.getName(), s0.getId().getId(), s0.getLon(), s0.getLat());
             Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_" + id(trip.getId())
-                    + "_A", s1.getLon(), s1.getLat());
+                    + "_A", s1.getName(), s1.getId().getId(), s1.getLon(), s1.getLat());
             Vertex startJourneyArrive;
             if (i != 0) {
                 startJourneyArrive = graph.addVertex(
-                        id(s0.getId()) + "_" + id(trip.getId()) + "_A", s0.getLon(), s0.getLat());
+                        id(s0.getId()) + "_" + id(trip.getId()) + "_A", s0.getName(), s0.getId().getId(), s0.getLon(), s0.getLat());
 
                 PatternDwell dwell = new PatternDwell(startJourneyArrive, startJourneyDepart, i,
                         tripPattern);
@@ -553,11 +553,11 @@ public class GTFSPatternHopFactory {
             Vertex endStation = graph.getVertex(id(s1.getId()));
 
             // create journey vertices
-            Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getLon(),
+            Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId,  s0.getName(), s0.getId().getId(), s0.getLon(),
                     s0.getLat());
-            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getLon(),
+            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + tripId, s0.getName(), s0.getId().getId(), s0.getLon(),
                     s0.getLat());
-            Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + tripId, s1.getLon(), s1
+            Vertex endJourney = graph.addVertex(id(s1.getId()) + "_" + tripId,  s1.getName(), s1.getId().getId(), s1.getLon(), s1
                     .getLat());
 
             Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);

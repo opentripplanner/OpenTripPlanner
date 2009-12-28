@@ -22,6 +22,8 @@ public interface Vertex extends Serializable {
 
     public String getLabel();
 
+    public String getStopId();
+
     public double distance(Vertex v);
 
     public double distance(Coordinate c);

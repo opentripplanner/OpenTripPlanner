@@ -41,7 +41,7 @@ public class GTFSPatternHopLoader {
         // Load stops
         for (Stop stop : _dao.getAllStops()) {
             _graph.addVertex(new GenericVertex(id(stop.getId()), stop.getLon(),
-                    stop.getLat(), stop.getName(), TransitStop.class));
+                    stop.getLat(), stop.getName(), stop.getId().getId(), TransitStop.class));
         }
 
         // Load hops

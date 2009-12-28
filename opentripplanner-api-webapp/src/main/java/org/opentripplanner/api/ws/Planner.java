@@ -202,6 +202,7 @@ public class Planner {
                             Vertex fromv = graphEdge.getFromVertex();
                             Coordinate endCoord = fromv.getCoordinate();
                             leg.to = new Place(endCoord.x, endCoord.y, fromv.getName());
+                            leg.to.stopId = fromv.getStopId();
                             leg.endTime = new Date(edge.tov.state.getTime());
                             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                             leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
@@ -224,6 +225,7 @@ public class Planner {
                         Vertex fromv = graphEdge.getFromVertex();
                         Coordinate endCoord = fromv.getCoordinate();
                         leg.from = new Place(endCoord.x, endCoord.y, fromv.getName());
+                        leg.from.stopId = fromv.getStopId();
                     }
                 }
                 Geometry edgeGeometry = graphEdge.getGeometry();
@@ -269,6 +271,7 @@ public class Planner {
                 Vertex tov = graphEdge.getToVertex();
                 Coordinate endCoord = tov.getCoordinate();
                 leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
+                leg.to.stopId = tov.getStopId();
                 leg.endTime = new Date(edge.tov.state.getTime());
                 leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                 leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();

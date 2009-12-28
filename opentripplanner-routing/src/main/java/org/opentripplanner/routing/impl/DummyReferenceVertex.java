@@ -39,6 +39,11 @@ public final class DummyReferenceVertex implements Vertex {
     public String getName() {
         return this.vertexId;
     }
+
+    @Override
+    public String getStopId() {
+        throw new UnsupportedOperationException();
+    }
     
     @Override
     public void addIncoming(Edge ee) {
