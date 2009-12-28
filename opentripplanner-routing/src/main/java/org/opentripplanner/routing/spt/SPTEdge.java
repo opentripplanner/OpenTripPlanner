@@ -50,11 +50,6 @@ public class SPTEdge implements Edge {
     }
 
     @Override
-    public String getEnd() {
-        return payload.getEnd();
-    }
-
-    @Override
     public Geometry getGeometry() {
         return payload.getGeometry();
     }
@@ -67,11 +62,6 @@ public class SPTEdge implements Edge {
     @Override
     public String getName() {
         return payload.getName();
-    }
-
-    @Override
-    public String getStart() {
-        return payload.getStart();
     }
 
     @Override

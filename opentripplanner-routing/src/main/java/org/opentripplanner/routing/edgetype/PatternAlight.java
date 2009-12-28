@@ -66,10 +66,6 @@ public class PatternAlight extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public Geometry getGeometry() {
         return null;
     }
@@ -82,9 +78,6 @@ public class PatternAlight extends AbstractEdge {
         return "leave transit network for street network";
     }
 
-    public String getStart() {
-        return null;
-    }
 
     public TraverseResult traverseBack(State state0, TraverseOptions options) {
         if (!options.modes.get(modeMask)) {

@@ -134,11 +134,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
         return length;
     }
 
-    public String getEnd() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public LineString getGeometry() {
         return geometry;
     }
@@ -150,11 +145,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public String getName() {
         return name;
-    }
-
-    public String getStart() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public void setTraversalPermission(StreetTraversalPermission permission) {

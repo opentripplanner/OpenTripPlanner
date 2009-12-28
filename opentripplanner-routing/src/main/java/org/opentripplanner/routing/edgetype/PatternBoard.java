@@ -65,10 +65,6 @@ public class PatternBoard extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public Geometry getGeometry() {
         return null;
     }
@@ -79,10 +75,6 @@ public class PatternBoard extends AbstractEdge {
 
     public String getName() {
         return "leave street network for transit network";
-    }
-
-    public String getStart() {
-        return null;
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {

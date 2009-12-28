@@ -63,11 +63,6 @@ public class Transfer extends AbstractEdge {
         return distance;
     }
 
-    public String getEnd() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public Geometry getGeometry() {
         return geometry;
     }
@@ -79,11 +74,6 @@ public class Transfer extends AbstractEdge {
     public String getName() {
         // TODO Auto-generated method stub
         return "transfer";
-    }
-
-    public String getStart() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {

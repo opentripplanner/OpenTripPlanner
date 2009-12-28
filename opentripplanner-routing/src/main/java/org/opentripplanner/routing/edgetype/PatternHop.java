@@ -60,16 +60,8 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
         return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
     }
 
-    public String getEnd() {
-        return end.getName();
-    }
-
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(pattern.exemplar.getRoute());
-    }
-
-    public String getStart() {
-        return start.getName();
     }
 
     public String getName() {

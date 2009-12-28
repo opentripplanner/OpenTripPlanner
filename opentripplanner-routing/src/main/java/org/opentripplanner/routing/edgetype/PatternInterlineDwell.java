@@ -48,16 +48,8 @@ public class PatternInterlineDwell extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(targetTrip.getRoute());
-    }
-
-    public String getStart() {
-        return null;
     }
 
     public String getName() {

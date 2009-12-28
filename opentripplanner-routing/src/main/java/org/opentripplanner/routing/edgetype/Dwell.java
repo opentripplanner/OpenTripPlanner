@@ -76,16 +76,8 @@ public class Dwell extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(stopTime.getTrip().getRoute());
-    }
-
-    public String getStart() {
-        return null;
     }
 
     public String getName() {

@@ -48,10 +48,6 @@ public class Alight extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public Geometry getGeometry() {
         return null;
     }
@@ -63,10 +59,6 @@ public class Alight extends AbstractEdge {
     public String getName() {
         // this text won't be used -- the streetTransitLink or StationEntrance's text will
         return "alight from vehicle";
-    }
-
-    public String getStart() {
-        return null;
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {

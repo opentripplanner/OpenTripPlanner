@@ -55,10 +55,6 @@ public class Board extends AbstractEdge {
         return 0;
     }
 
-    public String getEnd() {
-        return null;
-    }
-
     public Geometry getGeometry() {
         return null;
     }
@@ -69,10 +65,6 @@ public class Board extends AbstractEdge {
 
     public String getName() {
         return "board vehicle";
-    }
-
-    public String getStart() {
-        return null;
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {

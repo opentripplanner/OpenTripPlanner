@@ -125,16 +125,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
         return DistanceLibrary.distance(stop1.getLat(), stop1.getLon(), stop2.getLat(), stop2.getLon());
     }
 
-    public String getEnd() {
-        return end.getStopHeadsign();
-    }
-
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(start.getTrip().getRoute());
-    }
-
-    public String getStart() {
-        return start.getStopHeadsign();
     }
 
     public String getName() {

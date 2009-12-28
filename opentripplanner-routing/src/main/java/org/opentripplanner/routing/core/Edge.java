@@ -35,9 +35,5 @@ public interface Edge {
 
     public Geometry getGeometry();
 
-    public String getStart();
-
-    public String getEnd();
-
     public double getDistance();
 }

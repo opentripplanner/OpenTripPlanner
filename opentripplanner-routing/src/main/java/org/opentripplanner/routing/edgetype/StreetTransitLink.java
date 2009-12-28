@@ -46,11 +46,6 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
         return 0;
     }
 
-    public String getEnd() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate()};
         return _geometryFactory.createLineString(coordinates);
@@ -63,11 +58,6 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
     public String getName() {
         // TODO Auto-generated method stub
         return "street transit link";
-    }
-
-    public String getStart() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
