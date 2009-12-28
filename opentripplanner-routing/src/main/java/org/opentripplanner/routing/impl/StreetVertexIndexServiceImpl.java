@@ -58,7 +58,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Envelope env = new Envelope(location);
         for (int i = 0; i < 10; ++i) {
             env.expandBy(0.0036);
-            System.out.println ("env = " + env);
             List<Vertex> nearby = (List<Vertex>) _index.query(env);
 
             Vertex minVertex = null;
