@@ -40,8 +40,8 @@ public class PathServiceImpl implements PathService {
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("^(" + _doublePattern + ")(\\s*,\\s*|\\s+)("
-            + _doublePattern + ")$");
+    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern + ")(\\s*,\\s*|\\s+)("
+            + _doublePattern + ")\\s*$");
 
     private Graph _graph;
 
