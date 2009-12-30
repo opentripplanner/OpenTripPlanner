@@ -21,6 +21,13 @@ try
     Ext.form.Field.prototype.msgTarget = 'side';
     Ext.QuickTips.init();
 
+    // Set the HTTP accept header for AJAX requests to make sure we get XML
+    // (If we don't set this, the accept header is not consistently set across
+    // browsers, with Safari/Chrome accepting JSON, which causes our XHR
+    // requests to fail. See http://opentripplanner.org/ticket/84)
+    Ext.Ajax.defaultHeaders = {
+        'Accept': 'application/xml'
+    };
     // fixes the Permission denied to access property 'dom' from a non-chrome context bug from Ext 3.0
     // http://extjs.com/forum/showthread.php?p=366510#post366510
     // August 10, 2009
