@@ -85,8 +85,7 @@ public class Planner {
             @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
-            @DefaultValue(MediaType.APPLICATION_JSON) @QueryParam(RequestInf.OUTPUT_FORMAT) String outputFormat)
+            @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max)
             throws JSONException {
 
         /* create request */
@@ -106,7 +105,6 @@ public class Planner {
         request.setOptimize(optimize);
 
         request.setModes(modes);
-        request.setOutputFormat(MediaType.valueOf(outputFormat));
 
         /* use request to generate trip */
 

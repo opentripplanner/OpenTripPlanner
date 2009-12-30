@@ -18,8 +18,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -71,11 +69,7 @@ public class Request implements RequestInf {
      * Whether the trip must be wheelchair accessible.
      */
     private boolean wheelchair = false;
-    /**
-     * The format of the output.
-     */
-    private MediaType outputFormat = MediaType.APPLICATION_JSON_TYPE;
-    
+  
     /**
      * The maximum number of possible itineraries to return.
      */
@@ -241,22 +235,6 @@ public class Request implements RequestInf {
     }
 
     /**
-     * @return the outputFormat
-     */
-    public MediaType getOutputFormat() {
-        return outputFormat;
-    }
-
-    /**
-     * @param outputFormat
-     *            the outputFormat to set
-     */
-    public void setOutputFormat(MediaType outputFormat) {
-        paramPush(OUTPUT_FORMAT, outputFormat);
-        this.outputFormat = outputFormat;
-    }
-
-    /**
      * @return the numItineraries
      */
     public Integer getNumItineraries() {
@@ -288,7 +266,7 @@ public class Request implements RequestInf {
     public String toString(String sep) {
         return getFrom() + sep + getTo() + sep + getWalk() + sep + getDateTime() + sep
                 + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
-                + getNumItineraries() + sep + getOutputFormat();
+                + getNumItineraries();
     }
 
     public TraverseModeSet getModeSet() {

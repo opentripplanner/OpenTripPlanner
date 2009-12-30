@@ -3,8 +3,6 @@ package org.opentripplanner.api.ws;
 import java.io.File;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
@@ -87,8 +85,7 @@ public class TestRequest extends TestCase {
                 1.33,
                 OptimizeType.QUICK,
                 new TraverseModeSet("WALK"),
-                1,
-                MediaType.APPLICATION_JSON);
+                1);
         
         List<WalkStep> steps = response.plan.itinerary.get(0).leg.get(0).walkSteps;
         assertEquals(3, steps.size());

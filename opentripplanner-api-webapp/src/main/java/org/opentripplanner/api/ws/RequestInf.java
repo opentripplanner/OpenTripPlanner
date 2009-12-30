@@ -15,8 +15,6 @@ package org.opentripplanner.api.ws;
 
 import java.util.Date;
 
-import javax.ws.rs.core.MediaType;
-
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -33,7 +31,6 @@ public interface RequestInf {
     public static String OPTIMIZE = "optimize";
     public static String MODE = "mode";
     public static String NUMBER_ITINERARIES = "numItineraries";
-    public static String OUTPUT_FORMAT = "outputFormat";
 
     public static String ARRIVE_BY = "arriveBy";
     public static String WALK_SPEED = "walkSpeed";
@@ -123,17 +120,6 @@ public interface RequestInf {
      * Sets the trip to an arriveBy trip (true) or a departAfter trip (false)
      */
     public void setArriveBy(boolean arriveBy);
-
-    /**
-     * @return the outputFormat
-     */
-    public MediaType getOutputFormat();
-
-    /**
-     * @param outputFormat
-     *            the outputFormat to set
-     */
-    public void setOutputFormat(MediaType outputFormat);
 
     /**
      * @return the numItineraries
