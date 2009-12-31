@@ -512,10 +512,10 @@ otp.planner.StaticForms = {
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy       = this.m_arriveByForm.getRawValue();
-        retVal.opt       = this.m_optimizeForm.getRawValue();
-        retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getRawValue();
-        retVal.mode      = this.m_modeForm.getRawValue();
-        retVal.wheelchair      = this.m_wheelchairForm.getRawValue();
+        retVal.opt       = this.m_optimizeForm.getValue();
+        retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getValue();
+        retVal.mode      = this.m_modeForm.getValue();
+        retVal.wheelchair      = this.m_wheelchairForm.getValue();
         retVal.intermediate_places = ''; //TODO: intermediate stops
         try
         {
