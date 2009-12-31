@@ -14,36 +14,51 @@
 
 package org.opentripplanner.api.model.error;
 
+import java.util.List;
+
 /**
  * This represents an error in trip planning.
  *
  */
 public class PlannerError {
 
-    public enum ErrorCode { START_NOT_FOUND, END_NOT_FOUND, START_AND_END_NOT_FOUND, NO_PATH };
-    
-    private ErrorCode code;
+    private List<String> missing = null;
+    private boolean noPath = false;
 
-    /** We need this for JAXB, but never use it */
-    @SuppressWarnings("unused")
-    private PlannerError() {}
+    /** An error where no path has been found, but no points are missing */
+    public PlannerError() {
+        noPath = true;
+    }
 
-    public PlannerError(ErrorCode code) {
-        this.code = code;
+    public PlannerError(List<String> missing) {
+        this.setMissing(missing);
+    }
+    /**
+     * @param missing the list of point names which cannot be found (from, to, intermediate.n)
+     */
+    public void setMissing(List<String> missing) {
+        this.missing = missing;
     }
 
     /**
-     * @param code the error code to set
+     * @return the list of point names which cannot be found (from, to, intermediate.n)
      */
-    public void setCode(ErrorCode code) {
-        this.code = code;
+    public List<String> getMissing() {
+        return missing;
     }
 
     /**
-     * @return the error code
+     * @param noPath whether no path has been found
      */
-    public ErrorCode getCode() {
-        return code;
+    public void setNoPath(boolean noPath) {
+        this.noPath = noPath;
+    }
+
+    /**
+     * @return whether no path has been found
+     */
+    public boolean getNoPath() {
+        return noPath;
     }
     
 }

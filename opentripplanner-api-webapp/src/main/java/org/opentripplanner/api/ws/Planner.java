@@ -77,6 +77,7 @@ public class Planner {
     public Response getItineraries(
             @QueryParam(RequestInf.FROM) String fromPlace,
             @QueryParam(RequestInf.TO) String toPlace,
+            @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces, 
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
@@ -127,27 +128,23 @@ public class Planner {
         options.wheelchairAccessible = request.getWheelchair();
         List<GraphPath> paths = null;
         try {
-            paths = pathservice.plan(request.getFrom(), request.getTo(), request
-                .getDateTime(), options);
+            List<String> intermediates = request.getIntermediatePlaces();
+            if (intermediates.size() == 0) {
+                paths = pathservice.plan(request.getFrom(), request.getTo(), 
+                        request.getDateTime(), options);
+            } else {
+                paths = pathservice.plan(request.getFrom(), request.getTo(),
+                        intermediates, request.getDateTime(), options);
+            }
         } catch (VertexNotFoundException e) {
             Response response = new Response(request, null);
-            PlannerError.ErrorCode code;
-            if (e.fromMissing) {
-                if (e.toMissing) {
-                    code = PlannerError.ErrorCode.START_AND_END_NOT_FOUND;
-                } else {
-                    code = PlannerError.ErrorCode.START_NOT_FOUND;
-                }
-            } else {
-                code = PlannerError.ErrorCode.END_NOT_FOUND;
-            }
-            
-            response.error = new PlannerError(code);
+
+            response.error = new PlannerError(e.getMissing());
             return response;
         }
         if (paths.size() == 0) {
             Response response = new Response(request, null);
-            response.error = new PlannerError(PlannerError.ErrorCode.NO_PATH);
+            response.error = new PlannerError();
             return response;
         }
         Vector<SPTVertex> vertices = paths.get(0).vertices;

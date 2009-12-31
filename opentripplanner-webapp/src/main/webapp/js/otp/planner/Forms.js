@@ -516,6 +516,7 @@ otp.planner.StaticForms = {
         retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getRawValue();
         retVal.mode      = this.m_modeForm.getRawValue();
         retVal.wheelchair      = this.m_wheelchairForm.getRawValue();
+        retVal.intermediate_places = ''; //TODO: intermediate stops
         try
         {
             retVal.time = retVal.time.replace(/\./g, "");
@@ -633,7 +634,8 @@ otp.planner.StaticForms = {
             items:       [  fromToFP,
                             optFP,
                             new Ext.form.Hidden({name: 'toCoord',   value: ''}),
-                            new Ext.form.Hidden({name: 'fromCoord', value: ''})
+                            new Ext.form.Hidden({name: 'fromCoord', value: ''}),
+            				new Ext.form.Hidden({name: 'intermediatePlaces', value: ''})
                          ],
             buttons:     [this.m_submitButton],
 

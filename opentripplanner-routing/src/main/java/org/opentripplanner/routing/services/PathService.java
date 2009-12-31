@@ -21,4 +21,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
     public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime, TraverseOptions options);
+
+    public List<GraphPath> plan(String from, String to, List<String> intermediates, Date dateTime,
+            TraverseOptions options);
 }

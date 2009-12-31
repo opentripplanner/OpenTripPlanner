@@ -50,13 +50,14 @@ public class SPTVertex extends GenericVertex {
         this.outgoing.add(ee);
     }
 
-    public void setParent(SPTVertex parent, Edge ep) {
+    public SPTEdge setParent(SPTVertex parent, Edge ep) {
         // remove this edge from outgoing list of previous parent
         if (incoming != null) {
             incoming.fromv.outgoing.remove(incoming);
         }
         incoming = new SPTEdge(parent, this, ep);
         parent.outgoing.add(incoming);
+        return incoming;
     }
 
     public String toString() {

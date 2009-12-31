@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -40,8 +41,8 @@ public class PathServiceImpl implements PathService {
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern + ")(\\s*,\\s*|\\s+)("
-            + _doublePattern + ")\\s*$");
+    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
+            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
 
     private Graph _graph;
 
@@ -54,8 +55,8 @@ public class PathServiceImpl implements PathService {
     @Autowired
     public void setGraph(Graph graph) {
         _graph = graph;
-        
-        if( _graph.hasService(CalendarServiceData.class)) {
+
+        if (_graph.hasService(CalendarServiceData.class)) {
             CalendarServiceData data = _graph.getService(CalendarServiceData.class);
             CalendarServiceImpl calendarService = new CalendarServiceImpl();
             calendarService.setServiceCalendarData(data);
@@ -74,36 +75,84 @@ public class PathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime, TraverseOptions options) {
+    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
+            TraverseOptions options) {
 
+        ArrayList<String> notFound = new ArrayList<String>();
         Vertex fromVertex = getVertexForPlace(fromPlace);
-        Vertex toVertex = getVertexForPlace(toPlace);
-
-        if (fromVertex == null || toVertex == null) {
-            throw new VertexNotFoundException(fromVertex == null, toVertex == null);
+        if (fromVertex == null) {
+            notFound.add("from");
         }
-        
+        Vertex toVertex = getVertexForPlace(toPlace);
+        if (toVertex == null) {
+            notFound.add("to");
+        }
+
+        if (notFound.size() > 0) {
+            throw new VertexNotFoundException(notFound);
+        }
+
         State state = new State(targetTime.getTime());
 
-        if( _calendarService != null)
+        if (_calendarService != null)
             options.setCalendarService(_calendarService);
-        
+
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
 
         return Arrays.asList(path);
     }
 
+    @Override
+    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
+            Date targetTime, TraverseOptions options) {
+
+        ArrayList<String> notFound = new ArrayList<String>();
+        Vertex fromVertex = getVertexForPlace(fromPlace);
+        if (fromVertex == null) {
+            notFound.add("from");
+        }
+        Vertex toVertex = getVertexForPlace(toPlace);
+        if (toVertex == null) {
+            notFound.add("to");
+        }
+        ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
+
+        int i = 0;
+        for (String intermediate : intermediates) {
+            Vertex vertex = getVertexForPlace(intermediate);
+            if (vertex == null) {
+                notFound.add("intermediate." + i);
+            } else {
+                intermediateVertices.add(vertex);
+            }
+            i += 1;
+        }
+
+        if (notFound.size() > 0) {
+            throw new VertexNotFoundException(notFound);
+        }
+
+        State state = new State(targetTime.getTime());
+
+        if (_calendarService != null)
+            options.setCalendarService(_calendarService);
+
+        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state, options);
+
+        return Arrays.asList(path);
+    }
+
     private Vertex getVertexForPlace(String place) {
-        
+
         Matcher matcher = _latLonPattern.matcher(place);
-        
-        if( matcher.matches() ) {
+
+        if (matcher.matches()) {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
             return _indexService.getClosestVertex(location);
         }
-        
+
         return _graph.getVertex(place);
     }
 

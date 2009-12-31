@@ -82,7 +82,7 @@ public class Request implements RequestInf {
 
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
-        intermediatePlaces = new ArrayList<String>();
+        setIntermediatePlaces(new ArrayList<String>());
     }
 
     public HashMap<String, String> getParameters() {
@@ -294,5 +294,19 @@ public class Request implements RequestInf {
     /** return whether the trip must be wheelchair accessible */
     public boolean getWheelchair() {
         return wheelchair;
+    }
+
+    /**
+     * @param intermediatePlaces the intermediatePlaces to set
+     */
+    public void setIntermediatePlaces(List<String> intermediatePlaces) {
+        this.intermediatePlaces = intermediatePlaces;
+    }
+
+    /**
+     * @return the intermediatePlaces
+     */
+    public List<String> getIntermediatePlaces() {
+        return intermediatePlaces;
     }
 }

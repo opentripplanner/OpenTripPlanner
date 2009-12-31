@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.error;
 
+import java.util.List;
+
 /**
  * Indicates that a vertex requested by name or lat/long could not be located.
  * This might be thrown if a user enters a location outside the street/transit network.
@@ -7,15 +9,14 @@ package org.opentripplanner.routing.error;
 public class VertexNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    /** The departure vertex is missing */
-    public boolean fromMissing;
+    List<String> notFound;
     
-    /** The arrival vertex is missing */
-    public boolean toMissing;
-    
-    public VertexNotFoundException(boolean fromMissing, boolean toMissing) {
-        this.fromMissing = fromMissing;
-        this.toMissing = toMissing;
+    public VertexNotFoundException(List<String> notFound) {
+        this.notFound = notFound;
+    }
+
+    public List<String> getMissing() {
+        return notFound;
     }
     
 }

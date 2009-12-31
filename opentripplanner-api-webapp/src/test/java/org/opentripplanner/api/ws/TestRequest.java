@@ -1,6 +1,8 @@
 package org.opentripplanner.api.ws;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.api.model.AbsoluteDirection;
@@ -16,15 +18,37 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.PathServiceImpl;
 import org.opentripplanner.routing.impl.RoutingServiceImpl;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.util.DateUtils;
 
 import junit.framework.TestCase;
 
+class DataHolder {
+    public Graph graph = null;
+    public Planner planner = null;
+    public PathServiceImpl pathService = null;
+    
+    private static DataHolder instance = null;
+    public static DataHolder getInstance() {
+        if (instance == null) {
+            instance = new DataHolder();
+        }
+        return instance;
+    }
+}
+
 public class TestRequest extends TestCase {
 
+    private PathServiceImpl pathService;
+    private Graph graph;
+    private Planner planner;
+    
     public void testRequest() {
         RequestInf request = new Request();
         
@@ -38,11 +62,18 @@ public class TestRequest extends TestCase {
         assertTrue(request.getModes().getBicycle());
         assertTrue(request.getModes().getWalk());
     }
-    
-    public void testPlanner() throws Exception {
-        Planner planner = new Planner();
-        PathServiceImpl pathService = new PathServiceImpl();
-        Graph graph = new Graph();
+
+    public void setUp() {
+        DataHolder holder = DataHolder.getInstance();
+        graph = holder.graph;
+        planner = holder.planner;
+        pathService = holder.pathService;
+        if (graph != null) {
+            return;
+        }
+        planner = new Planner();
+        pathService = new PathServiceImpl();
+        graph = new Graph();
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
@@ -68,6 +99,13 @@ public class TestRequest extends TestCase {
         routingService.setGraph(graph);
         pathService.setRoutingService(routingService);
         planner.setPathService(pathService);
+
+        holder.graph = graph;
+        holder.planner = planner;
+        holder.pathService = pathService;
+    }
+    
+    public void testPlanner() throws Exception {
         
         Vertex v1 = graph.getVertex("NE 43RD AVE at NE FLANDERS ST");
         Vertex v2 = graph.getVertex("NE 43RD AVE at NE ROYAL CT");
@@ -77,6 +115,7 @@ public class TestRequest extends TestCase {
         Response response = planner.getItineraries(
                 v1.getLabel(),
                 v2.getLabel(),
+                new ArrayList<String>(),
                 "2009-01-01", 
                 "11:11:11",
                 false,
@@ -102,5 +141,37 @@ public class TestRequest extends TestCase {
         assertEquals("NE 43RD AVE", step2.streetName);
         assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
         assertTrue(step2.stayOn);
-    }   
+    }
+    
+
+    public void testIntermediate() throws Exception {
+        
+        Vertex v1 = graph.getVertex("NW 10TH AVE at W BURNSIDE ST");
+        Vertex v2 = graph.getVertex("NE 21ST AVE at NE MASON ST");
+        Vertex v3 = graph.getVertex("SE 82ND AVE at SE ASH ST");
+        Vertex v4 = graph.getVertex("SE 92ND AVE at SE FLAVEL ST");
+        Vertex[] vertices = {v1, v2, v3, v4};
+        assertNotNull(v1);
+        assertNotNull(v2);
+        assertNotNull(v3);
+        assertNotNull(v4);
+        
+        ArrayList<String> intermediates = new ArrayList<String>();
+        intermediates.add(v3.getLabel());
+        intermediates.add(v2.getLabel());
+        Date dateTime = DateUtils.toDate("2009-01-01", "10:00:00");
+        TraverseOptions options = new TraverseOptions();
+        List<GraphPath> paths = pathService.plan(v1.getLabel(), v4.getLabel(),
+                intermediates, dateTime, options);
+        
+        assertTrue(paths.size() > 0);
+        GraphPath path = paths.get(0);
+        int curVertex = 0;
+        for (SPTVertex v: path.vertices) {
+            if (v.mirror.equals(vertices[curVertex])) {
+                curVertex += 1;
+            }
+        }
+        assertEquals(4, curVertex); //found all four, in the correct order
+    }
 }
