@@ -17,7 +17,9 @@ import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
-import javax.ws.rs.DefaultValue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -64,6 +66,8 @@ import com.vividsolutions.jts.geom.MultiLineString;
 @XmlRootElement
 @Autowire
 public class Planner {
+
+    private static final Logger LOGGER = Logger.getLogger(Planner.class.getCanonicalName());
 
     private PathService pathservice;
 
@@ -137,12 +141,14 @@ public class Planner {
                         intermediates, request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
+            LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : " + request.getTo(), e);
             Response response = new Response(request, null);
 
             response.error = new PlannerError(e.getMissing());
             return response;
         }
         if (paths.size() == 0) {
+            LOGGER.log(Level.INFO, "Path not found: " + request.getFrom() + " : " + request.getTo());
             Response response = new Response(request, null);
             response.error = new PlannerError();
             return response;
