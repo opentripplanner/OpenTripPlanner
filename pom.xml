@@ -30,7 +30,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <!-- Hudson by default defines a property BUILD_NUMBER which is used to enable the profile. -->
     <profile>
@@ -64,6 +64,35 @@
           </plugins>
         </pluginManagement>
       </build>
+        
+      <distributionManagement>
+        <site>
+            <id>opentripplanner-docs</id> 
+            <name>OpenTripPlanner Docs</name>
+            <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
+        </site>
+      </distributionManagement>
+      <reporting>
+        <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-project-info-reports-plugin</artifactId>
+              <reportSets>
+                  <reportSet></reportSet>
+              </reportSets>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.6.1</version>
+            <configuration>
+                <links>
+                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.0.1/</link>
+                </links>
+            </configuration>
+          </plugin>
+        </plugins>
+      </reporting>
     </profile>
   </profiles>
 
