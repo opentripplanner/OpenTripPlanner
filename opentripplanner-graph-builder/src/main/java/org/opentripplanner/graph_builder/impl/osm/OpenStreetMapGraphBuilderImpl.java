@@ -216,7 +216,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         public void addWay(OSMWay way) {
             if (_ways.containsKey(way.getId()))
                 return;
-            if (!way.getTags().containsKey("highway")) {
+
+            if (!(way.getTags().containsKey("highway") || "platform".equals(way.getTags().get("railway")))) {
                 return;
             }
 
@@ -265,6 +266,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (value == null || value.equals("motorway") || value.equals("motorway_link"))
                 return StreetTraversalPermission.CAR_ONLY;
+
+            if ("platform".equals(way.getTags().get("railway"))) {
+                return StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY;
+            }
 
             return StreetTraversalPermission.ALL;
         }
