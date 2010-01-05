@@ -13,12 +13,17 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,61 +31,136 @@ import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
+/**
+ * This creates a StreetLocation representing a location on a street that's not at an intersection,
+ * based on input latitude and longitude. Instantiating this class is expensive, because it creates
+ * a spatial index of all of the intersections in the graph.
+ */
 @Component
 public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
-    private Graph _graph;
+    private Graph graph;
 
-    private STRtree _index;
+    private STRtree intersections;
 
-    @Autowired
-    public void setGraph(Graph graph) {
-        _graph = graph;
+    public static final double MAX_DISTANCE_FROM_STREET = 0.002;
+
+    public StreetVertexIndexServiceImpl() {
+    }
+
+    public StreetVertexIndexServiceImpl(Graph graph) {
+        this.graph = graph;
     }
 
     @PostConstruct
     public void setup() {
-
-        _index = new STRtree();
-
-        for (Vertex v : _graph.getVertices()) {
-            if (v.getType() == Intersection.class)
-                _index.insert(new Envelope(v.getCoordinate()), v);
+        intersections = new STRtree();
+        for (Vertex v : graph.getVertices()) {
+            if (v.getType() == Intersection.class) {
+                Envelope env = new Envelope(v.getCoordinate());
+                intersections.insert(env, v);
+            }
         }
+        intersections.build();
     }
 
     @SuppressWarnings("unchecked")
-    @Override
-    public Vertex getClosestVertex(Coordinate location) {
+    public StreetLocation getClosestVertex(final Coordinate c) {
+        /*
+         * Assume c is on a street.
+         *
+         * Find the nearest two vertices such that (a) those vertices share an edge, and (b) that
+         * edge is roughly nearby this point.
+         *
+         * This is technically O(n^2) in nearby points, but pretty often, the nearest two points
+         * will do you. The case that you have to watch out for is:
+         *
+         *     |
+         *     |
+         * +-- p --+
+         *     |
+         *     |
+         *
+         * Here, two roads dead end near the middle of a long road; they do not share an edge, and p
+         * is on the long road. P's closest two vertices are the ends of the dead ends.
+         */
 
-        Envelope env = new Envelope(location);
-        for (int i = 0; i < 10; ++i) {
-            env.expandBy(0.0036);
-            List<Vertex> nearby = (List<Vertex>) _index.query(env);
+        Envelope envelope = new Envelope(c);
+        List<Vertex> nearby = new LinkedList<Vertex>();
+        int i = 0;
+        double envelopeGrowthRate = 0.0018;
+        GeometryFactory factory = new GeometryFactory();
+        Point p = factory.createPoint(c);
+        while (nearby.size() < 2 && i < 8) {
+            ++i;
+            envelope.expandBy(envelopeGrowthRate);
+            envelopeGrowthRate *= 2;
 
-            Vertex minVertex = null;
-            double minDistance = Double.POSITIVE_INFINITY;
+            nearby = intersections.query(envelope);
 
-            double lat1 = location.y;
-            double lon1 = location.x;
+            Collections.sort(nearby, new Comparator<Vertex>() {
+                public int compare(Vertex a, Vertex b) {
+                    double distance = (a.distance(c) - b.distance(c));
+                    return (int) (Math.abs(distance) / distance);
+                }
 
-            for (Vertex nv : nearby) {
-                Coordinate coord = nv.getCoordinate();
-                double lat2 = coord.y;
-                double lon2 = coord.x;
-                double distance = DistanceLibrary.distance(lat1, lon1, lat2, lon2);
-                if (distance < minDistance) {
-                    minVertex = nv;
-                    minDistance = distance;
+            });
+
+            Edge bestStreet = null;
+            double bestDistance = Double.MAX_VALUE;
+            for (Vertex a : nearby) {
+                for (Vertex b : nearby) {
+                    if (a == b) {
+                        continue;
+                    }
+
+                    // search the edges for one where a connects to b
+                    Edge street = getEdgeWithToVertex(a, b);
+
+                    if (street != null) {
+                        LineString g = (LineString) street.getGeometry();
+                        double distance = g.distance(p);
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                            bestStreet = street;
+                        }
+                    }
                 }
             }
-            if (minVertex != null) {
-                return minVertex;
+            if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                LineString g = (LineString) bestStreet.getGeometry();
+                LengthIndexedLine l = new LengthIndexedLine(g);
+                double location = l.indexOf(c);
+                return StreetLocation.createStreetLocation(c.toString(), bestStreet, location);
             }
         }
         return null;
     }
 
+    private Edge getEdgeWithToVertex(Vertex a, Vertex targetToVertex) {
+        for( Edge street : a.getOutgoing() ) {
+            if (street.getToVertex() == targetToVertex)
+                return street;
+        }
+        for( Edge street : a.getIncoming() ) {
+            if (street.getToVertex() == targetToVertex)
+                return street;
+        }
+        return null;
+    }
+
+    @Autowired
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
 }

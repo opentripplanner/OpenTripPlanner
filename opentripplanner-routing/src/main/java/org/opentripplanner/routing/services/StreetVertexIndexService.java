@@ -18,5 +18,5 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface StreetVertexIndexService {
-    public Vertex getClosestVertex(Coordinate location);
+    public Vertex getClosestVertex(final Coordinate location);
 }

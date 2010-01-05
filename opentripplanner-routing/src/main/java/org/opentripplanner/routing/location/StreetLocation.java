@@ -22,6 +22,12 @@ import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
 /**
  * Represents a location on a street, somewhere between the two corners.
@@ -53,8 +59,7 @@ public class StreetLocation extends GenericVertex {
      *                 if it is an origin vertex
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String name, Edge street, double location,
-            boolean incoming) {
+    public static StreetLocation createStreetLocation(String name, Edge street, double location) {
 
         Vertex fromv = street.getFromVertex();
         Vertex tov = street.getToVertex();
@@ -63,10 +68,10 @@ public class StreetLocation extends GenericVertex {
         double x = startCoord.x * (1 - location) + endCoord.x * location;
         double y = startCoord.y * (1 - location) + endCoord.y * location;
 
-        return new StreetLocation(name, street, location, incoming, x, y);
+        return new StreetLocation(name, street, location, x, y);
     }
 
-    private StreetLocation(String name, Edge street, double location, boolean incoming, double x,
+    private StreetLocation(String name, Edge street, double location, double x,
             double y) {
         super(name, x, y);
 
@@ -85,16 +90,34 @@ public class StreetLocation extends GenericVertex {
         double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
         double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
 
-        if (incoming) {
-            Street e1 = new Street(fromv, this, streetName, streetName, weight1);
-            addIncoming(e1);
-            Street e2 = new Street(tov, this, streetName, streetName, weight2);
-            addIncoming(e2);
+        Geometry originalGeometry = street.getGeometry();
+        LengthIndexedLine lil = new LengthIndexedLine(originalGeometry);
+
+        Street e1 = new Street(fromv, this, streetName, streetName, weight1);
+        e1.setGeometry(toLineString(lil.extractLine(0, location)));
+        addIncoming(e1);
+
+        Street e2 = new Street(tov, this, streetName, streetName, weight2);
+        e2.setGeometry(toLineString(lil.extractLine(1, location)));
+        addIncoming(e2);
+
+        Street e3 = new Street(this, fromv, streetName, streetName, weight1);
+        addOutgoing(e3);
+        e3.setGeometry(toLineString(lil.extractLine(location, 0)));
+
+        Street e4 = new Street(this, tov, streetName, streetName, weight2);
+        addOutgoing(e4);
+        e4.setGeometry(toLineString(lil.extractLine(location, 1)));
+    }
+
+    private LineString toLineString(Geometry g) {
+        if (g instanceof LineString) {
+            return (LineString) g;
         } else {
-            Street e1 = new Street(this, fromv, streetName, streetName, weight1);
-            addOutgoing(e1);
-            Street e2 = new Street(this, tov, streetName, streetName, weight2);
-            addOutgoing(e2);
+            Coordinate[] coords = g.getCoordinates();
+            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
+                    PrecisionModel.FLOATING), 4326);
+            return factory.createLineString(coords);
         }
     }
 }

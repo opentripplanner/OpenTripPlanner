@@ -25,8 +25,8 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.location.StreetLocationFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -64,10 +64,10 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 1 degree x 1 degree square
-        Vertex tl = graph.addVertex(new GenericVertex("tl", -74, 41, "tl", Intersection.class));
-        Vertex tr = graph.addVertex(new GenericVertex("tr", -73, 41, "tr", Intersection.class));
-        Vertex bl = graph.addVertex(new GenericVertex("bl", -74, 40, "bl", Intersection.class));
-        Vertex br = graph.addVertex(new GenericVertex("br", -73, 40, "br", Intersection.class));
+        Vertex tl = graph.addVertex(new GenericVertex("tl", -74.1, 40.1, "tl", Intersection.class));
+        Vertex tr = graph.addVertex(new GenericVertex("tr", -74, 40.1, "tr", Intersection.class));
+        Vertex bl = graph.addVertex(new GenericVertex("bl", -74.1, 40, "bl", Intersection.class));
+        Vertex br = graph.addVertex(new GenericVertex("br", -74, 40, "br", Intersection.class));
 
         double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
@@ -105,8 +105,8 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
-        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.4, false);
-        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.8, true);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.4);
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.8);
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
@@ -124,8 +124,8 @@ public class TestHalfEdges extends TestCase {
     }
 
     public void testHalfEdgesBack() {
-        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.8, false);
-        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.4, true);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.8);
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.4);
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
@@ -144,10 +144,13 @@ public class TestHalfEdges extends TestCase {
 
     
     public void testStreetLocationFinder() {
-        StreetLocationFinder finder = new StreetLocationFinder(graph);
+        StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
+        finder.setup();
 
-        StreetLocation start = finder.findLocation("start", new Coordinate(-74.0, 40.4), false);
-        StreetLocation end = finder.findLocation("end", new Coordinate(-73.0, 40.8), true);
+        StreetLocation start = finder.getClosestVertex(new Coordinate(-74.1, 40.04));
+        assertNotNull(start);
+        StreetLocation end = finder.getClosestVertex(new Coordinate(-74.0, 40.08));
+        assertNotNull(end);
 
         if (start.street == leftUp) {
             assertTrue(start.location - 0.4 < 0.00001);
