@@ -22,6 +22,7 @@ public class State {
     private long _time;
     private int curPattern = -1;
     public AgencyAndId tripId = null;
+    public double walkDistance = 0;
     
     public State() {
         this(System.currentTimeMillis());
@@ -31,10 +32,11 @@ public class State {
         _time = time;
     }    
 
-    public State(long time, int pattern, AgencyAndId tripId) {
+    public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
         _time = time;
         curPattern = pattern;
         this.tripId = tripId;
+        this.walkDistance = walkDistance;
     }
 
     public long getTime() {
@@ -46,7 +48,7 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time, curPattern, tripId);
+        State ret = new State(_time, curPattern, tripId, walkDistance);
         return ret;
     }
 

@@ -43,6 +43,8 @@ public class TraverseOptions {
     public boolean wheelchairAccessible = false;
 
     public OptimizeType optimizeFor;
+
+    public double maxWalkDistance = Double.MAX_VALUE;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
