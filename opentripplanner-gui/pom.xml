@@ -3,14 +3,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-gui</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>opentripplanner-gui</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -35,12 +35,12 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-routing</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

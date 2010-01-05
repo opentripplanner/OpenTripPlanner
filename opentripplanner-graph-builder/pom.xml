@@ -4,14 +4,14 @@
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-graph-builder</artifactId>
     <packaging>jar</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.2-SNAPSHOT</version>
     <name>opentripplanner-graph-builder</name>
     <url>http://maven.apache.org</url>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.2-SNAPSHOT</version>
     </parent>
 
 
@@ -20,7 +20,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-routing</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.2-SNAPSHOT</version>
         </dependency>
 
         <dependency>
