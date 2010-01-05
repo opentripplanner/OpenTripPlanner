@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -26,6 +27,10 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -114,5 +119,72 @@ public class TestStreet extends TestCase {
                 to.getCoordinate() });
         street.setGeometry(line);
         return street;
+    }
+
+    public void testMaxWalkDistance() {
+        /* create a square */
+
+        Graph graph = new Graph();
+        // a 1 degree x 1 degree square, right edge missing
+        Vertex tl = graph.addVertex(new GenericVertex("tl", -74, 41, "tl", Intersection.class));
+        Vertex tr = graph.addVertex(new GenericVertex("tr", -73, 41, "tr", Intersection.class));
+        Vertex bl = graph.addVertex(new GenericVertex("bl", -74, 40, "bl", Intersection.class));
+        Vertex br = graph.addVertex(new GenericVertex("br", -73, 40, "br", Intersection.class));
+
+        Street top = new Street(tl, tr, 20000);
+        top.setGeometry(createGeometry(tl, tr));
+        graph.addEdge(top);
+
+        Street bottom = new Street(bl, br, 20000);
+        bottom.setGeometry(createGeometry(bl, br));
+        graph.addEdge(bottom);
+
+        Street left = new Street(bl, tl, 20000);
+        left.setGeometry(createGeometry(bl, tl));
+        graph.addEdge(left);
+
+        // now a very slow transfer edge spanning the right edge of the square
+        Transfer transfer = new Transfer(br, tr, 99999);
+        graph.addEdge(transfer);
+
+        // with no maxWalkDistance, the transfer will not be taken
+
+        TraverseOptions options = new TraverseOptions();
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, bl, tr, new State(0), options);
+
+        GraphPath path = spt.getPath(tr);
+        assertNotNull(path);
+
+        boolean found = false;
+        for (SPTVertex v : path.vertices) {
+            if (v.mirror == br) {
+                found = true;
+            }
+        }
+        assertFalse(found);
+
+        // with a maxWalkDistance, the transfer will be taken.
+        options.maxWalkDistance = 10000;
+        spt = AStar.getShortestPathTree(graph, bl, tr, new State(0), options);
+
+        path = spt.getPath(tr);
+        assertNotNull(path);
+
+        found = false;
+        for (SPTVertex v : path.vertices) {
+            if (v.mirror == br) {
+                found = true;
+            }
+        }
+        assertTrue(found);
+    }
+
+    private LineString createGeometry(Vertex a, Vertex b) {
+
+        GeometryFactory factory = new GeometryFactory();
+        Coordinate[] cs = new Coordinate[2];
+        cs[0] = a.getCoordinate();
+        cs[1] = b.getCoordinate();
+        return factory.createLineString(cs);
     }
 }

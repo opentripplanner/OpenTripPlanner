@@ -77,6 +77,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         if (s0.walkDistance > wo.maxWalkDistance) {
             weight *= 100;
         }
+        s1.walkDistance += this.length;
         return new TraverseResult(weight, s1);
     }
 
@@ -91,6 +92,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         if (s0.walkDistance > wo.maxWalkDistance) {
             weight *= 100;
         }
+        s1.walkDistance += this.length;
         return new TraverseResult(weight, s1);
     }
 
