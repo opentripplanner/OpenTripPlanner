@@ -13,5 +13,7 @@ http://opentripplanner.org/wiki/Install
 opentripplanner-routing       - Core routing algorithms, data-structures, and libraries
 opentripplanner-api-webapp    - Webapp providing a REST web api to the trip planning engine
 opentripplanner-webapp        - Webapp providing web-based user interface to trip planning engine
-opentripplanner-graph-builder - command line tool for configuring and building the trip planner graph
+opentripplanner-graph-builder - Command line tool for configuring and building the trip planner graph
+opentripplanner-gui           - Graph visualizer primarily useful for development and troubleshooting
+opentripplanner-integration   - Integration tests
 
