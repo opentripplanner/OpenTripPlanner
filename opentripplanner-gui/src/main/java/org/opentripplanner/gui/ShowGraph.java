@@ -8,8 +8,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.opentripplanner.routing.vertextypes.TransitStop;
 
@@ -32,6 +35,8 @@ public class ShowGraph extends PApplet {
     Graph graph;
 
     STRtree vertexIndex;
+    
+    STRtree edgeIndex;
 
     /*
      * static public void main(String args[]) { PApplet.main(new String[] {"ShowGraph"}); }
@@ -70,6 +75,7 @@ public class ShowGraph extends PApplet {
         size(700, 700, P2D);
 
         vertexIndex = new STRtree();
+        edgeIndex = new STRtree();
         for (Vertex v : graph.getVertices()) {
             Envelope env = new Envelope(v.getCoordinate());
             if (v.getType() == TransitStop.class) {
@@ -80,10 +86,19 @@ public class ShowGraph extends PApplet {
             } else {
                 //a street-transit link, or a journey vertex.  no need for them in the ui.
             }
+            
+            for (Edge e : v.getOutgoing()) {
+            	if (e instanceof Street || e instanceof StreetTransitLink) {
+            		env = new Envelope(e.getFromVertex().getCoordinate());
+            		env.expandToInclude(e.getToVertex().getCoordinate());
+            		edgeIndex.insert(env, e);
+            	}
+            }
         }
         modelBounds.expandBy(0.02);
         modelOuterBounds = new Envelope(modelBounds);
         vertexIndex.build();
+        edgeIndex.build();
 
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
@@ -117,6 +132,13 @@ public class ShowGraph extends PApplet {
         modelBounds = new Envelope(modelOuterBounds);
     }
     
+    public void zoomToVertex(Vertex v) {
+    	Envelope e = new Envelope();
+    	e.expandToInclude(v.getCoordinate());
+    	e.expandBy(0.002);
+    	modelBounds = e;
+    }
+    
     @SuppressWarnings("unchecked")
     public void draw() {
         fill(0);
@@ -145,6 +167,22 @@ public class ShowGraph extends PApplet {
             }
             
         }
+        
+        List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
+        for (Edge e : edges) {
+        	double x1 = toScreenX(e.getFromVertex().getX());
+        	double y1 = toScreenY(e.getFromVertex().getY());
+        	double x2 = toScreenX(e.getToVertex().getX());
+        	double y2 = toScreenY(e.getToVertex().getY());
+        	
+        	if (e instanceof StreetTransitLink) {
+        		stroke(75, 150, 255);
+        	} else {
+        		stroke(30, 255, 255);
+        	}
+        	line((float)x1, (float)y1, (float)x2, (float)y2);
+        }
+        
         fill(255, 0, 0);
         text(mouseModelX + ", " + mouseModelY, 0, 10);
     }

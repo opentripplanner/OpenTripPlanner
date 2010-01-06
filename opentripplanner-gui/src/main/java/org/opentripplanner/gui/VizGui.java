@@ -322,8 +322,23 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(zoomDefaultButton);
 
-        JButton routeButton = new JButton("Route");
         final JFrame frame = this;
+
+        JButton zoomToNodeButton = new JButton("Zoom to node");
+        zoomToNodeButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id", JOptionPane.PLAIN_MESSAGE);
+        		Vertex v = graph.getVertex(nodeName);
+        		if (v == null) {
+        			System.out.println("no such node " + nodeName);
+        		} else {
+        			showGraph.zoomToVertex(v);
+        		}
+        	}
+        });
+        buttonPanel.add(zoomToNodeButton);
+        
+        JButton routeButton = new JButton("Route");
         routeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String initialFrom = "";
