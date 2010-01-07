@@ -13,13 +13,10 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DecimalFormat;
@@ -103,11 +100,19 @@ public class OSMDownloader {
 
             URL url = constructUrl(r);
             System.out.println(url);
-            String value = getUrlAsString(url);
 
-            PrintWriter writer = new PrintWriter(new FileWriter(path));
-            writer.println(value);
-            writer.close();
+            FileOutputStream out = new FileOutputStream(path);
+            InputStream in = url.openStream();
+            byte[] data = new byte[4096];
+            while (true) {
+                int numBytes = in.read(data);
+                if (numBytes == -1) {
+                    break;
+                }
+                out.write(data, 0, numBytes);
+            }
+            in.close();
+            out.close();
         }
 
         return path;
@@ -133,19 +138,6 @@ public class OSMDownloader {
                 return true;
         }
         return false;
-    }
-
-    private String getUrlAsString(URL url) throws IOException {
-        InputStream in = url.openStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-        String line = null;
-        StringBuilder b = new StringBuilder();
-        while ((line = reader.readLine()) != null) {
-            b.append(line);
-            b.append("\n");
-        }
-        reader.close();
-        return b.toString();
     }
 
     private URL constructUrl(Envelope r) {
