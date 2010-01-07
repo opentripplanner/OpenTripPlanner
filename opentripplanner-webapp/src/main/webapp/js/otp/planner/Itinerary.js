@@ -363,7 +363,7 @@ otp.planner.Itinerary = {
             var from = this.m_fromStore.getAt(startIndex);
             var fromP = from.get('geometry');
             var mode = from.get('mode');
-            if(mode != 'walk') 
+            if(mode != 'WALK') 
             {
                 // if the first leg isn't a walk, then assume it's a transit leg
                 // so paint the route icon (eg: fromStore.getAt(0))
@@ -381,7 +381,7 @@ otp.planner.Itinerary = {
             var walk = this.m_fromStore.getAt(endIndex);
             var walkP = walk.get('geometry');
             var mode = walk.get('mode');
-            if(mode == 'walk')
+            if(mode == 'WALK')
             {
                 endIndex--;
                 otp.util.OpenLayersUtils.makeWalkMarker(walkP.x, walkP.y, this.m_markers);
@@ -400,7 +400,7 @@ otp.planner.Itinerary = {
             {
                 var from  = this.m_fromStore.getAt(i);
                 var to    = this.m_toStore.getAt(i);
-                var thru  = from.get('order')
+                var thru  = from.get('order');
                 var route = from.get('routeID');
                 
                 var fromP = from.get('geometry');
