@@ -208,6 +208,7 @@ public class Planner {
                             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                             leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
                             leg = null;
+                            geometry = null;
                         }
 
                         leg = new Leg();
