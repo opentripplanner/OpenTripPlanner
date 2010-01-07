@@ -122,6 +122,27 @@
                     </plugin>
                 </plugins>
             </build>
+
+            <distributionManagement>
+                <site>
+                    <id>opentripplanner-docs</id> 
+                    <name>OpenTripPlanner Docs</name>
+                    <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site/webapi</url>
+                </site>
+            </distributionManagement>
+
+            <reporting>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.enunciate</groupId>
+                        <artifactId>maven-enunciate-plugin</artifactId>
+                        <version>1.17</version>
+                        <configuration>
+                            <configFile>enunciate.xml</configFile> 
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </reporting>
         </profile>
     </profiles>
 
