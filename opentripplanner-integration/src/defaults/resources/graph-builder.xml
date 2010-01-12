@@ -15,7 +15,7 @@
                     <list>
                         <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
                             <property name="url"
-                                value="http://developer.trimet.org/schedule/GTFS/20091213/google_transit.zip" />
+                                value="http://developer.trimet.org/schedule/GTFS/20100103/google_transit.zip" />
                         </bean>
                     </list>
                 </property>
@@ -24,13 +24,29 @@
         <property name="cacheDirectory" value="/tmp/graph-builder/gtfs" />
     </bean>
 
-    <bean id="osmBuilder" class="org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl">
-        <property name="provider">
-            <bean class="org.opentripplanner.graph_builder.impl.osm.RegionBasedOpenStreetMapProviderImpl">
-                <property name="regionsSource">
-                    <bean class="org.opentripplanner.graph_builder.impl.TransitStopsRegionsSourceImpl" />
+    <bean id="streetBuilder" class="org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl">
+        <property name="featureSourceFactory">
+            <bean class="org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl">
+                <property name="path" value="../opentripplanner-api-webapp/src/test/resources/portland/Streets_pdx.shp" />
+            </bean>
+        </property>
+        <property name="schema">
+            <bean class="org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema">
+                <property name="idAttribute" value="FULL_NAME" />
+                <property name="nameAttribute" value="FULL_NAME" />
+                <property name="permissionConverter">
+                    <bean class="org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter">
+                        <property name="attributeName" value="DIRECTION" />
+                        <property name="defaultPermission" value="PEDESTRIAN_AND_BICYCLE_ONLY" />
+                        <property name="permissions">
+                            <map>
+                                <entry key="1" value="ALL,PEDESTRIAN_ONLY" />
+                                <entry key="2" value="PEDESTRIAN_ONLY,ALL" />
+                                <entry key="3" value="ALL,ALL" />
+                            </map>
+                        </property>
+                    </bean>
                 </property>
-                <property name="cacheDirectory" value="/tmp/graph-builder/osm" />
             </bean>
         </property>
     </bean>
@@ -42,10 +58,8 @@
         <property name="graphBuilders">
             <list>
                 <ref bean="gtfsBuilder" />
-                <!-- 
-                <ref bean="osmBuilder" />
+                <ref bean="streetBuilder" />
                 <ref bean="transitStreetLink" />
-                -->
             </list>
         </property>
     </bean>
