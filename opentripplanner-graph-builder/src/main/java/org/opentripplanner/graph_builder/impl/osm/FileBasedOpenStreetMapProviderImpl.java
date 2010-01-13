@@ -14,6 +14,9 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
@@ -30,7 +33,12 @@ public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
             OpenStreetMapParser parser = new OpenStreetMapParser();
-            parser.parseMap(_path, handler);
+            if (_path.getName().endsWith(".gz")) {
+                InputStream in = new GZIPInputStream(new FileInputStream(_path));
+                parser.parseMap(in, handler);
+            } else {
+                parser.parseMap(_path, handler);
+            }
         } catch (Exception ex) {
             throw new IllegalStateException("error loading OSM from path " + _path, ex);
         }

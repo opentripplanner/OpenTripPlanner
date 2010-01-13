@@ -98,7 +98,9 @@ public class PathServiceImpl implements PathService {
             options.setCalendarService(_calendarService);
 
         GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
-
+        if (path == null) {
+            return null;
+        }
         return Arrays.asList(path);
     }
 

@@ -30,11 +30,13 @@ import org.opentripplanner.graph_builder.model.osm.OSMWay;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.vertextypes.Intersection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,28 +105,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _nodes.keySet().retainAll(nodesWithNeighbors);
             
             pruneFloatingIslands();
-            
-            int nodeIndex = 0;
-            
-            for (OSMNode node : _nodes.values()) {
-                
-                if( nodeIndex % 1000 == 0)
-                    _log.debug("nodes=" + nodeIndex + "/" + _nodes.size());
-                nodeIndex++;
-                
-                int nodeId = node.getId();
-                String id = getVertexIdForNodeId(nodeId);
-                Vertex vertex = graph.getVertex(id);
 
-                if (vertex != null)
-                    throw new IllegalStateException("osm node already loaded: id=" + id);
-
-                GenericVertex newVertex = new GenericVertex(id, node.getLon(), node
-                        .getLat());
-                newVertex.setType(Intersection.class);
-                graph.addVertex(newVertex);
-
-            }
+            HashMap<Integer, ArrayList<Edge>> edgesByLocation = new HashMap<Integer, ArrayList<Edge>>();
 
             int wayIndex = 0;
             
@@ -137,18 +119,68 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 StreetTraversalPermission permissions = getPermissionsForWay(way);
                 List<Integer> nodes = way.getNodeRefs();
                 for (int i = 0; i < nodes.size() - 1; i++) {
-                    String vFromId = getVertexIdForNodeId(nodes.get(i));
-                    String vToId = getVertexIdForNodeId(nodes.get(i + 1));
-                    Vertex from = graph.getVertex(vFromId);
-                    Vertex to = graph.getVertex(vToId);
-                    if (from == null || to == null)
+                    Integer startNode = nodes.get(i);
+                    String vFromId = getVertexIdForNodeId(startNode) + "_" + i + "_" + way.getId();
+                    Integer endNode = nodes.get(i + 1);
+                    String vToId = getVertexIdForNodeId(endNode) + "_" + i + "_" + way.getId();
+
+                    OSMNode osmStartNode = _nodes.get(startNode);
+                    OSMNode osmEndNode = _nodes.get(endNode);
+
+                    if (osmStartNode == null || osmEndNode == null)
                         continue;
+                    Vertex from = addVertex(graph, vFromId, osmStartNode);
+                    Vertex to = addVertex(graph, vToId, osmEndNode);
+
                     double d = from.distance(to);
-                    graph.addEdge(getEdgeForStreet(from, to, way, d, permissions));
-                    graph.addEdge(getEdgeForStreet(to, from, way, d, permissions));
+                    Street street = getEdgeForStreet(from, to, way, d, permissions);
+                    graph.addEdge(street);
+                    Street backStreet = getEdgeForStreet(to, from, way, d, permissions);
+                    graph.addEdge(backStreet);
+
+                    ArrayList<Edge> startEdges = edgesByLocation.get(startNode);
+                    if (startEdges == null) {
+                        startEdges = new ArrayList<Edge>();
+                        edgesByLocation.put(startNode, startEdges);
+                    }
+                    startEdges.add(street);
+                    startEdges.add(backStreet);
+
+                    ArrayList<Edge> endEdges = edgesByLocation.get(endNode);
+                    if (endEdges == null) {
+                        endEdges = new ArrayList<Edge>();
+                        edgesByLocation.put(endNode, endEdges);
+                    }
+                    endEdges.add(street);
+                    endEdges.add(backStreet);
                 }
             }
 
+            //add turns
+            for (ArrayList<Edge> edges : edgesByLocation.values()) {
+                for (Edge in : edges) {
+                    Vertex tov = in.getToVertex();
+                    Coordinate c = tov.getCoordinate();
+                    ArrayList<Edge> outEdges = edgesByLocation.get(c);
+                    if (outEdges != null) {
+                        for (Edge out : outEdges) {
+                            if (tov != out.getFromVertex() && out instanceof Street && out.getFromVertex().getCoordinate().equals(c)) {
+                                graph.addEdge(new Turn(in, out));
+                            }
+                        }
+                    }
+                }
+            }
+
+
+        }
+
+        private Vertex addVertex(Graph graph, String vertexId, OSMNode node) {
+            GenericVertex newVertex = new GenericVertex(vertexId, node.getLon(), node
+                    .getLat());
+            newVertex.setType(Intersection.class);
+            graph.addVertex(newVertex);
+            return newVertex;
         }
 
         private void pruneFloatingIslands() {

@@ -26,7 +26,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
     public void testBasic() throws Exception {
         Graph gg = new Graph();
 
-        File file = new File("src/test/resources/nyc_streets/streets.shp");
+        File file = new File("/home/novalis/otp/opentripplanner/opentripplanner-routing/src/test/resources/nyc_streets/streets.shp");
 
         if (!file.exists()) {
             System.out.println("No New York City basemap; skipping; see comment here for details");
@@ -69,11 +69,20 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
         loader.buildGraph(gg);
 
-        assertEquals(104910, gg.getVertices().size());
+        assertEquals(237064, gg.getVertices().size());
 
-        Vertex start = gg.getVertex("PARK PL at VANDERBILT AV");
-        Vertex end = gg.getVertex("GRAND ST at LAFAYETTE ST");
-
+        //find start and end vertices
+        Vertex start = null;
+        Vertex end = null;
+        for (Vertex v : gg.getVertices()) {
+            if (v.getLabel().startsWith("PARK PL at VANDERBILT AV")) {
+                start = v;
+            } else {
+                if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST")) {
+                    end = v;
+                }
+            }
+        }
         assertNotNull(start);
         assertNotNull(end);
     }

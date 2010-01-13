@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.TreeSet;
@@ -31,11 +32,13 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.vertextypes.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -92,6 +95,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = _schema
                     .getPermissionConverter();
 
+            HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
+
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
 
@@ -121,10 +126,14 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
-                Vertex startCorner = new GenericVertex(startIntersectionName, startCoordinate.x,
+
+                String uid = "_" + Math.random();
+
+                Vertex startCorner = new GenericVertex(startIntersectionName + uid, startCoordinate.x,
                         startCoordinate.y, startIntersectionName, Intersection.class);
                 startCorner = graph.addVertex(startCorner);
-                Vertex endCorner = new GenericVertex(endIntersectionName, endCoordinate.x,
+
+                Vertex endCorner = new GenericVertex(endIntersectionName + uid, endCoordinate.x,
                         endCoordinate.y, endIntersectionName, Intersection.class);
                 endCorner = graph.addVertex(endCorner);
 
@@ -138,11 +147,41 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 backStreet.setGeometry(geom.reverse());
                 graph.addEdge(backStreet);
 
-                P2<StreetTraversalPermission> pair = permissionConverter
-                        .convert(feature);
+                ArrayList<Edge> startEdges = edgesByLocation.get(startCoordinate);
+                if (startEdges == null) {
+                    startEdges = new ArrayList<Edge>();
+                    edgesByLocation.put(startCoordinate, startEdges);
+                }
+                startEdges.add(street);
+                startEdges.add(backStreet);
+
+                ArrayList<Edge> endEdges = edgesByLocation.get(endCoordinate);
+                if (endEdges == null) {
+                    endEdges = new ArrayList<Edge>();
+                    edgesByLocation.put(endCoordinate, endEdges);
+                }
+                endEdges.add(street);
+                endEdges.add(backStreet);
+
+                P2<StreetTraversalPermission> pair = permissionConverter.convert(feature);
 
                 street.setTraversalPermission(pair.getFirst());
                 backStreet.setTraversalPermission(pair.getSecond());
+            }
+
+            for (ArrayList<Edge> edges : edgesByLocation.values()) {
+                for (Edge in : edges) {
+                    Vertex tov = in.getToVertex();
+                    Coordinate c = tov.getCoordinate();
+                    ArrayList<Edge> outEdges = edgesByLocation.get(c);
+                    if (outEdges != null) {
+                        for (Edge out : outEdges) {
+                            if (tov != out.getFromVertex() && out instanceof Street && out.getFromVertex().getCoordinate().equals(c)) {
+                                graph.addEdge(new Turn(in, out));
+                            }
+                        }
+                    }
+                }
             }
 
             features.close(it2);
@@ -185,12 +224,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
     private String getIntersectionName(HashMap<Coordinate, TreeSet<String>> coordinateToStreets,
             HashMap<String, HashMap<Coordinate, Integer>> intersectionNameToId,
             Coordinate coordinate) {
-        
+
         TreeSet<String> streets = coordinateToStreets.get(coordinate);
         if (streets == null) {
             return "null";
         }
-        
+
         String intersection = streets.first() + " at " + streets.last();
 
         HashMap<Coordinate, Integer> possibleIntersections = intersectionNameToId.get(intersection);

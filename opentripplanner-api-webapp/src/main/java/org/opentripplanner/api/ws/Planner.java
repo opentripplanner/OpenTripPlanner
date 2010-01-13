@@ -36,6 +36,7 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -47,7 +48,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +56,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.MultiLineString;
 
 /**
  *
@@ -136,6 +135,10 @@ public class Planner {
             if (intermediates.size() == 0) {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), 
                         request.getDateTime(), options);
+                if (paths == null) {
+                    paths = pathservice.plan(request.getFrom(), request.getTo(),
+                            request.getDateTime(), options);
+                }
             } else {
                 paths = pathservice.plan(request.getFrom(), request.getTo(),
                         intermediates, request.getDateTime(), options);
@@ -147,7 +150,7 @@ public class Planner {
             response.error = new PlannerError(e.getMissing());
             return response;
         }
-        if (paths.size() == 0) {
+        if (paths == null || paths.size() == 0) {
             LOGGER.log(Level.INFO, "Path not found: " + request.getFrom() + " : " + request.getTo());
             Response response = new Response(request, null);
             response.error = new PlannerError();
@@ -184,9 +187,15 @@ public class Planner {
 
             int startWalk = -1;
             int i = -1;
+            SPTEdge lastEdge = null;
             for (SPTEdge edge : path.edges) {
                 i++;
                 Edge graphEdge = edge.payload;
+
+                if (graphEdge instanceof Turn) {
+                    continue;
+                }
+                lastEdge = edge;
 
                 TraverseMode edgeMode = graphEdge.getMode();
                 double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
@@ -265,8 +274,7 @@ public class Planner {
                 }
             }
 
-            SPTEdge edge = path.edges.lastElement();
-            Edge graphEdge = edge.payload;
+            Edge graphEdge = lastEdge.payload;
 
             if (leg != null) {
                 /* finalize leg */
@@ -274,9 +282,9 @@ public class Planner {
                 Coordinate endCoord = tov.getCoordinate();
                 leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
                 leg.to.stopId = tov.getStopId();
-                leg.endTime = new Date(edge.tov.state.getTime());
+                leg.endTime = new Date(lastEdge.tov.state.getTime());
                 leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
+                leg.duration = lastEdge.tov.state.getTime() - leg.startTime.getTime();
                 if (startWalk != -1) {
                     leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
                 }
@@ -305,6 +313,10 @@ public class Planner {
 
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
+            if (edge instanceof Turn) {
+                //Turns do not exist outside of routing
+                continue;
+            }
             String streetName = edge.getName();
             if (step == null) {
                 //first step
@@ -313,25 +325,25 @@ public class Planner {
                 step.streetName = streetName;
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
-                double thisAngle = getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
                 step.setAbsoluteDirection(thisAngle);
             } else if (!step.streetName.equals(streetName)) {
                 // change of street name
                 step = new WalkStep();
                 steps.add(step);
                 step.streetName = streetName;
-                double thisAngle = getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
                 step.setDirections(lastAngle, thisAngle);
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
-                step.becomes = !multipleOptionsbefore(edge);
+                step.becomes = !multipleOptionsBefore(edge);
             } else {
                 /* generate turn-to-stay-on directions, where needed */
-                double thisAngle = getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
                 if (direction != RelativeDirection.CONTINUE) {
                     // figure out if there was another way we could have turned
-                    boolean optionsBefore = multipleOptionsbefore(edge);
+                    boolean optionsBefore = multipleOptionsBefore(edge);
                     if (optionsBefore) {
                         step = new WalkStep();
                         steps.add(step);
@@ -346,19 +358,19 @@ public class Planner {
 
             step.distance += edge.getDistance();
 
-            lastAngle = getLastAngle(edge.getGeometry());
+            lastAngle = DirectionUtils.getLastAngle(edge.getGeometry());
         }
         return steps;
     }
 
-    private boolean multipleOptionsbefore(Edge edge) {
+    private boolean multipleOptionsBefore(Edge edge) {
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();
         for (Edge out : start.getOutgoing()) {
             if (out == edge) {
                 continue;
             }
-            if (!(out instanceof Street)) {
+            if (!(out instanceof Turn)) {
                 continue;
             }
             // there were paths we didn't take.
@@ -366,47 +378,5 @@ public class Planner {
             break;
         }
         return foundAlternatePaths;
-    }
-
-    /**
-     * Computes the angle of the last segment of a LineString or MultiLineString
-     * 
-     * @param geometry
-     *            a LineString or a MultiLineString
-     * @return
-     */
-    private double getLastAngle(Geometry geometry) {
-        LineString line;
-        if (geometry instanceof MultiLineString) {
-            line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
-        } else {
-            assert geometry instanceof LineString;
-            line = (LineString) geometry;
-        }
-        int numPoints = line.getNumPoints();
-        Coordinate coord0 = line.getCoordinateN(numPoints - 2);
-        Coordinate coord1 = line.getCoordinateN(numPoints - 1);
-        return Math.atan2(coord1.y - coord0.y, coord1.x - coord0.x);
-    }
-
-    /**
-     * Computes the angle of the first segment of a LineString or MultiLineString
-     * 
-     * @param geometry
-     *            a LineString or a MultiLineString
-     * @return
-     */
-    private double getFirstAngle(Geometry geometry) {
-        LineString line;
-        if (geometry instanceof MultiLineString) {
-            line = (LineString) geometry.getGeometryN(0);
-        } else {
-            assert geometry instanceof LineString;
-            line = (LineString) geometry;
-        }
-
-        Coordinate coord0 = line.getCoordinateN(0);
-        Coordinate coord1 = line.getCoordinateN(1);
-        return Math.atan2(coord1.y - coord0.y, coord1.x - coord0.x);
     }
 }

@@ -6,6 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.api.model.AbsoluteDirection;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.ws.RequestInf;
@@ -105,10 +107,19 @@ public class TestRequest extends TestCase {
         holder.pathService = pathService;
     }
     
+    private Vertex getVertexByPrefix(String prefix) {
+        for (Vertex v : graph.getVertices()) {
+            if (v.getLabel().startsWith(prefix)) {
+                return v;
+            }
+        }
+        return null;
+    }
+
     public void testPlanner() throws Exception {
         
-        Vertex v1 = graph.getVertex("NE 43RD AVE at NE FLANDERS ST");
-        Vertex v2 = graph.getVertex("NE 43RD AVE at NE ROYAL CT");
+        Vertex v1 = getVertexByPrefix("NE 43RD AVE at NE FLANDERS ST");
+        Vertex v2 = getVertexByPrefix("NE 43RD AVE at NE ROYAL CT");
         assertNotNull(v1);
         assertNotNull(v2);
         
@@ -126,7 +137,9 @@ public class TestRequest extends TestCase {
                 new TraverseModeSet("WALK"),
                 1);
         
-        List<WalkStep> steps = response.plan.itinerary.get(0).leg.get(0).walkSteps;
+        Itinerary itinerary = response.plan.itinerary.get(0);
+        Leg leg = itinerary.leg.get(0);
+        List<WalkStep> steps = leg.walkSteps;
         assertEquals(3, steps.size());
         WalkStep step0 = steps.get(0);
         WalkStep step1 = steps.get(1);
@@ -146,10 +159,10 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
-        Vertex v1 = graph.getVertex("NW 10TH AVE at W BURNSIDE ST");
-        Vertex v2 = graph.getVertex("NE 21ST AVE at NE MASON ST");
-        Vertex v3 = graph.getVertex("SE 82ND AVE at SE ASH ST");
-        Vertex v4 = graph.getVertex("SE 92ND AVE at SE FLAVEL ST");
+        Vertex v1 = getVertexByPrefix("NW 10TH AVE at W BURNSIDE ST");
+        Vertex v2 = getVertexByPrefix("NE 21ST AVE at NE MASON ST");
+        Vertex v3 = getVertexByPrefix("SE 82ND AVE at SE ASH ST");
+        Vertex v4 = getVertexByPrefix("SE 92ND AVE at SE FLAVEL ST");
         Vertex[] vertices = {v1, v2, v3, v4};
         assertNotNull(v1);
         assertNotNull(v2);
