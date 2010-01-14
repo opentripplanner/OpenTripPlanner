@@ -33,13 +33,12 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.Turn;
-import org.opentripplanner.routing.vertextypes.Intersection;
+import org.opentripplanner.routing.core.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -131,12 +130,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 String uid = "_" + Math.random();
 
-                Vertex startCorner = new GenericVertex(startIntersectionName + uid, startCoordinate.x,
-                        startCoordinate.y, startIntersectionName, Intersection.class);
+                Vertex startCorner = new Intersection(startIntersectionName + uid, startCoordinate.x,
+                        startCoordinate.y);
                 startCorner = graph.addVertex(startCorner);
 
-                Vertex endCorner = new GenericVertex(endIntersectionName + uid, endCoordinate.x,
-                        endCoordinate.y, endIntersectionName, Intersection.class);
+                Vertex endCorner = new Intersection(endIntersectionName + uid, endCoordinate.x,
+                        endCoordinate.y);
                 endCorner = graph.addVertex(endCorner);
 
                 double length = JTS.orthodromicDistance(coordinates[0],

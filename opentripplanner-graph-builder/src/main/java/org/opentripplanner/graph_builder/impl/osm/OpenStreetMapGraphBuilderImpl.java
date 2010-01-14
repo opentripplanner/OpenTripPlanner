@@ -31,13 +31,12 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.Turn;
-import org.opentripplanner.routing.vertextypes.Intersection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,9 +175,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private Vertex addVertex(Graph graph, String vertexId, OSMNode node) {
-            GenericVertex newVertex = new GenericVertex(vertexId, node.getLon(), node
+            Intersection newVertex = new Intersection(vertexId, node.getLon(), node
                     .getLat());
-            newVertex.setType(Intersection.class);
             graph.addVertex(newVertex);
             return newVertex;
         }
