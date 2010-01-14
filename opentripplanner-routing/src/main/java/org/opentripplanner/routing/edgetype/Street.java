@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -41,6 +42,14 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     StreetTraversalPermission permission;
 
+    /**
+     * Streets with bike lanes are safer -- about twice as safe as streets without.
+     * This is how long the street would have to be without bike lanes, to kill as many
+     * people as it presently kills with bike lanes, statistically speaking.
+     */
+
+    private double bicycleSafetyEffectiveLength;
+
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
         this.length = length;
@@ -62,6 +71,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.length = length;
         this.permission = permission;
     }
+
     public void setGeometry(LineString g) {
         geometry = g;
     }
@@ -71,13 +81,19 @@ public class Street extends AbstractEdge implements WalkableEdge {
             return null;
         }
         State s1 = s0.clone();
-        double weight = this.length / wo.speed;
-        // it takes time to walk/bike along a street, so update state accordingly
-        s1.incrementTimeInSeconds((int) weight);
+        double time = this.length / wo.speed;
+        double weight;
+        if (wo.modes.contains(TraverseMode.BICYCLE) && wo.optimizeFor.equals(OptimizeType.SAFE)) {
+            weight = this.bicycleSafetyEffectiveLength / wo.speed;
+        } else {
+            weight = time;
+        }
         if (s0.walkDistance > wo.maxWalkDistance) {
             weight *= 100;
         }
         s1.walkDistance += this.length;
+        // it takes time to walk/bike along a street, so update state accordingly
+        s1.incrementTimeInSeconds((int) time);
         return new TraverseResult(weight, s1);
     }
 
@@ -86,13 +102,19 @@ public class Street extends AbstractEdge implements WalkableEdge {
             return null;
         }
         State s1 = s0.clone();
-        double weight = this.length / wo.speed;
-        // time moves *backwards* when traversing an edge in the opposite direction
-        s1.incrementTimeInSeconds(-(int) weight);
+        double time = this.length / wo.speed;
+        double weight;
+        if (wo.modes.contains(TraverseMode.BICYCLE) && wo.optimizeFor.equals(OptimizeType.SAFE)) {
+            weight = this.bicycleSafetyEffectiveLength / wo.speed;
+        } else {
+            weight = time;
+        }
         if (s0.walkDistance > wo.maxWalkDistance) {
             weight *= 100;
         }
         s1.walkDistance += this.length;
+        // time moves *backwards* when traversing an edge in the opposite direction
+        s1.incrementTimeInSeconds(-(int) time);
         return new TraverseResult(weight, s1);
     }
 
@@ -157,6 +179,14 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public void setTraversalPermission(StreetTraversalPermission permission) {
         this.permission = permission;
+    }
+
+    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
+        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+    }
+
+    public double getBicycleSafetyEffectiveLength() {
+        return bicycleSafetyEffectiveLength;
     }
 
 }

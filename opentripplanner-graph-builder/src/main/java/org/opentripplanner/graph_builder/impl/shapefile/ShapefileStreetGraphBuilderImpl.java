@@ -97,6 +97,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
 
+            SimpleFeatureConverter<Double> safetyConverter = _schema.getBicycleSafetyConverter();
+
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
 
@@ -167,6 +169,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 street.setTraversalPermission(pair.getFirst());
                 backStreet.setTraversalPermission(pair.getSecond());
+
+                double effectiveLength = safetyConverter.convert(feature) * length;
+                street.setBicycleSafetyEffectiveLength(effectiveLength);
+                backStreet.setBicycleSafetyEffectiveLength(effectiveLength);
             }
 
             for (ArrayList<Edge> edges : edgesByLocation.values()) {
