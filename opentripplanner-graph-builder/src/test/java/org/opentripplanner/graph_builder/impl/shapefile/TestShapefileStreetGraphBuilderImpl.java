@@ -17,16 +17,18 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.junit.Test;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
+    @Test
     public void testBasic() throws Exception {
         Graph gg = new Graph();
 
-        File file = new File("/home/novalis/otp/opentripplanner/opentripplanner-routing/src/test/resources/nyc_streets/streets.shp");
+        File file = new File(getClass().getResource("nyc_streets/streets.shp").getFile());
 
         if (!file.exists()) {
             System.out.println("No New York City basemap; skipping; see comment here for details");
