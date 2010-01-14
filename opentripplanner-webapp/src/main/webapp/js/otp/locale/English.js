@@ -54,6 +54,9 @@ otp.locale.English = {
         reverseTip    : "<b>Reverse directions</b><br/>Plan a return trip by reversing this trip's start and end points, and adjusting the time forward.",
         reverseMiniTip: "Reverse directions",
 
+        edit          : "Edit",
+        editTip       : "<b>Edit trip</b><br/>Return to the main trip planner input form with the details of this trip.",
+
         clear         : "Clear",
         clearTip      : "<b>Clear</b><br/>Clear the map and all active tools.",
 
@@ -61,7 +64,7 @@ otp.locale.English = {
         fullScreenTip : "<b>Full Screen</b><br/>Show -or- hide tool panels",
         
         print         : "Print",
-        printTip      : "<b>Print</b><br/>Print this trip plan with stop maps.",
+        printTip      : "<b>Print</b><br/>Print friendly version of the trip plan (without map).",
         
         feedback      : "Feedback",
         feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
@@ -109,6 +112,7 @@ otp.locale.English = {
             maxWalkDistance: "Maximum walk",
             arriveDepart  : "Arrive by/Depart at",
             mode          : "Travel by",
+            wheelchair    : "Wheelchair accessible trip", 
             go            : "Go",
             planTrip      : "Plan Your Trip",
             newTrip       : "New Trip"
@@ -140,7 +144,18 @@ otp.locale.English = {
             ['420',   '1/4 mile'],
             ['840',   '1/2 mile'],
             ['1260',  '3/4 mile'],
-            ['1600',  '1 mile']
+            ['1600',  '1 mile'],
+            ['3200',  '2 miles'],
+            ['4800',  '3 miles'],
+            ['6400',  '4 miles'],
+            ['7600',  '5 miles'],
+            ['7601',  '10 miles'],
+            ['7602',  '15 miles'],
+            ['7603',  '20 miles'],
+            ['7604',  '30 miles'],
+            ['7605',  '40 miles'],
+            ['7606',  '50 miles'],
+            ['7607',  '100 miles'],
         ],
     
         mode : 
@@ -154,8 +169,8 @@ otp.locale.English = {
 
         wheelchair :
         [
-            ['false', 'Accessible trip not required'],
-            ['true', 'Wheelchair accessible trip required']
+            ['false', 'Not required'],
+            ['true', 'Required']
         ]
     },
 

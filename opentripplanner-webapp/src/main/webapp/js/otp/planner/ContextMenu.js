@@ -84,7 +84,7 @@ otp.planner.ContextMenu = {
 
 
     /**
-     * get map coordinate lon/lat given the position of the context menu click 
+     * get map coordinate lat/lon given the position of the context menu click 
      */
     getMapCoordinate : function ()
     {

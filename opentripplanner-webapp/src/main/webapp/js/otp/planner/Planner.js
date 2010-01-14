@@ -28,6 +28,7 @@ otp.planner.Planner = {
 
     // pointer to the map / components
     map           : null,
+    url           : null,
     poi           : null,
     planner       : null,
     controller    : null,

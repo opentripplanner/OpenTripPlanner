@@ -28,29 +28,34 @@ otp.core.MapStatic = {
     locale            : otp.locale.English,
 
     map               : null,
-    url               : "http://maps.opengeo.org/geowebcache/service/wms",
-    mapDiv            : "map",
     baseLayer         : null,
 
     // config for 4326
+    mapDiv            : "map",
+    url               : "http://maps.opengeo.org/geowebcache/service/wms",
     srsName           : "EPSG:4326",
-    units             : "meters",
-    maxResolution     : 0.703125,
-    maxExtent         : new OpenLayers.Bounds(-180.0,-90.0,180.0,90.0),
     center            : {x:-122.66, y:45.53},
+    layerNames        : ['openstreetmap'], 
+    units             : null,
+    numZoomLevels     : null,
+    maxResolution     : null,
+    maxExtent         : null,
 
 /*
+    // config for 4326
+    maxResolution     : 0.703125,
+    maxExtent         : new OpenLayers.Bounds(-180.0,-90.0,180.0,90.0),
+    units             : "meters", // note meters & feed cause line to be NaN
+    numZoomLevels     : 19,
+
     // config for google's projection
     srsName           : "EPSG:900913",
     units             : "meters",
+    //maxResolution     : 156543.03396025,
     maxResolution     : 156543.03396025,
     maxExtent         : new OpenLayers.Bounds(-2.003750834E7,-2.003750834E7, 2.003750834E7,2.003750834E7),
     center            : {x:-13655812, y:5704158},
 */
-    layerNames        : ['openstreetmap'], 
-
-    // config vars
-    numZoomLevels     : 0,
 
     /** use attribution if you want the same attribute on both tile sets */
     attribution       : null,
@@ -76,7 +81,7 @@ otp.core.MapStatic = {
         console.log("enter Map constructor");
         otp.configure(this, config);
 
-        this.map       = otp.util.OpenLayersUtils.makeMap(this.controls, this.maxExtent, this.srsName, this.mapDiv, this.numZoomLevels, this.units, this.maxResolution);
+        this.map       = otp.util.OpenLayersUtils.makeMap(this.controls, this.srsName, this.mapDiv, this.numZoomLevels, this.units, this.maxExtent, this.maxResolution);
         this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.url, this.layerNames, this.tileBuffer, this.transitionEffect, this.attribution);
         this.map.setBaseLayer(this.baseLayer, true);
 

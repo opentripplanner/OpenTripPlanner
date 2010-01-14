@@ -110,6 +110,12 @@ otp.planner.poi.Control = {
         try
         {
             var ll = otp.util.OpenLayersUtils.getLatLonOfPixel(this.map, px.x, px.y);
+
+            //NOTE rev X & Y to lat,lon done (remove these 3 lines if we go back to X,Y) 
+            var tmp = ll.lon;
+            ll.lon = ll.lat;
+            ll.lat = tmp; 
+
             f.attributes.m_text = ll.lon + "," + ll.lat
             if(f.attributes.m_to)
                 otp.planner.StaticForms.setTo(f.attributes.m_text, ll.lon, ll.lat, true, true);

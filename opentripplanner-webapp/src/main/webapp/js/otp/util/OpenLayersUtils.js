@@ -54,21 +54,25 @@ otp.util.OpenLayersUtils = {
      * static function to make the OpenLayers map object
      *   example: makeMap();
      */
-    makeMap : function(controls, maxExtent, epsg, div, numZoomLevels, units, maxResolution)
+    makeMap : function(controls, epsg, div, numZoomLevels, units,  maxExtent, maxResolution)
     {
         var map = null;
-        
+
         var options = {
             controls:      controls,
-            maxExtent:     maxExtent,
-            projection:    epsg,
-            units:         units,
-            theme:         null,
-            maxResolution: maxResolution
+            projection:    epsg
         };
+
+        if(units != null)
+            options.units = units;
+        if(maxExtent != null)
+            options.maxExtent = maxExtent;
+        if(maxResolution != null)
+            options.maxResolution = maxResolution;
+        if(numZoomLevels && numZoomLevels > 0)
+            options.numZoomLevels = numZoomLevels;
+
         map = new OpenLayers.Map(div, options);
-        if(numZoomLevels > 0)
-            map.numZoomLevels = numZoomLevels;
 
         return map;
     },

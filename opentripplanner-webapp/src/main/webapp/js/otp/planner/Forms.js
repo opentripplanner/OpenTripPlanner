@@ -371,29 +371,31 @@ otp.planner.StaticForms = {
 
     /**
      * set from form with either/both a string and X/Y
+     * NOTE: x & y are reversed -- really are lat,lon
      */
     setFrom : function(fString, x, y, moveMap, noPoi)
     {
         this.focus();
         this.m_fromForm.setRawValue(fString);
-        if(x && x > -180.1 && y && y > -90.1) 
+        if(x && x > -181.1 && y && y > -181.1) 
         {
             this.m_fromCoord = x + ',' + y;
-            if(this.poi && !noPoi) this.poi.setFrom(x, y, fString, moveMap);
+            if(this.poi && !noPoi) this.poi.setFrom(y, x, fString, moveMap);
         }
     },
 
     /**
      * set to form with either/both a string and X/Y
+     * NOTE: x & y are reversed -- really are lat,lon
      */
     setTo : function(tString, x, y, moveMap, noPoi)
     {
         this.focus();
         this.m_toForm.setRawValue(tString);
-        if(x && x > -180.1 && y && y > -90.1) 
+        if(x && x > -180.1 && y && y > -181.1) 
         {
             this.m_toCoord = x + ',' + y;
-            if(this.poi && !noPoi) this.poi.setTo(x, y, tString, moveMap);
+            if(this.poi && !noPoi) this.poi.setTo(y, x, tString, moveMap);
         }
     },
 
