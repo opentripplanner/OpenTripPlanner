@@ -76,7 +76,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx1G</argument>
+                                <argument>-Xmx1500m</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
                                 <argument>org.opentripplanner.integration.graph_builder.GraphBuilderIntegrationMain</argument>
@@ -131,7 +131,7 @@
                                 <properties>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>high</cargo.logging>
-                                    <cargo.jvmargs>-Xmx1G</cargo.jvmargs>
+                                    <cargo.jvmargs>-Xmx1500m</cargo.jvmargs>
                                 </properties>
                                 <deployables>
                                     <deployable>
