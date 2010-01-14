@@ -30,8 +30,6 @@ public class Turn extends AbstractEdge {
 
     int turnAngle;
 
-    String from, to;
-
     public Turn(Edge in, Edge out) {
         super(in.getToVertex(), out.getFromVertex());
 
@@ -41,8 +39,6 @@ public class Turn extends AbstractEdge {
         if (turnAngle > 180) {
             turnAngle = 360 - turnAngle;
         }
-        from = in.getName();
-        to = out.getName();
     }
 
     @Override
@@ -84,7 +80,4 @@ public class Turn extends AbstractEdge {
         return new TraverseResult(turnAngle / 20.0, s1);
     }
 
-    public String toString() {
-        return "Turn(" + from + " to " + to + ")";
-    }
 }
