@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.io.File;
+import java.net.URL;
 
 import junit.framework.TestCase;
 
@@ -28,9 +29,12 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
     public void testBasic() throws Exception {
         Graph gg = new Graph();
 
-        File file = new File(getClass().getResource("nyc_streets/streets.shp").getFile());
-
-        if (!file.exists()) {
+        URL resource = getClass().getResource("nyc_streets/streets.shp");
+        File file = null;
+        if (resource != null) {
+            file = new File(resource.getFile());
+        }
+        if (file == null || !file.exists()) {
             System.out.println("No New York City basemap; skipping; see comment here for details");
             /*
              * This test requires the New York City base map, available at:
