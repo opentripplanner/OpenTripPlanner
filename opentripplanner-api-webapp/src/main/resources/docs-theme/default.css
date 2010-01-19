@@ -1,0 +1,264 @@
+/*#############################################################
+Name: Streamline
+Date: 2010-01-13
+Description: Simple, lightweight theme for API docs.
+Author: Chris Patterson
+#############################################################*/
+@import url(chrome/tripoli.base.css);
+
+@font-face {
+	font-family: 'DroidSansRegular';
+	src: url('chrome/DroidSans.eot');
+	src: local('Droid Sans Regular'), local('DroidSans'), url('chrome/DroidSans.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'DroidSansBold';
+	src: url('chrome/DroidSans-Bold.eot');
+	src: local('Droid Sans Bold'), local('DroidSans-Bold'), url('chrome/DroidSans-Bold.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'BitstreamVeraSansMonoRoman';
+	src: url('chrome/VeraMono.eot');
+	src: local('Bitstream Vera Sans Mono Roman'), local('BitstreamVeraSansMono-Roman'), url('chrome/VeraMono.ttf') format('truetype');
+}
+
+body {
+font-family: Helvetica, Arial, sans-serif;
+padding: 0;
+margin: 0;
+color: #222;
+background: #fafafa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+color: #000;
+}
+
+code {
+font-family: BitstreamVeraSansMonoRoman, monospace;
+display: block;
+padding: 5px;
+margin: 1em 0;
+background-color: #ffffe6;
+border: 2px solid #001;
+border-width: 2px 0;
+color: #000;
+white-space: pre-wrap;       /* css-3 */
+white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+white-space: -o-pre-wrap;    /* Opera 7 */
+word-wrap: break-word;       /* Internet Explorer 5.5+ */
+-webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-o-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+}
+
+a:link, 
+a:visited {
+color: #e51c0c;
+text-decoration: none;
+}
+
+a:hover {
+color: #da1000;
+text-decoration: underline;
+}
+
+.content {
+font-size: 0.9em; /* override tripoli */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+select:focus,
+textarea:focus {
+outline-width: 0; /* override tripoli */
+}
+
+/*-----------------------
+Utility Classes
+-----------------------*/
+
+/* misc */
+.clearer {
+clear: both;
+}
+
+.deprecated {
+color: #600;
+}
+
+/*-----------------------
+Structural Elements
+-----------------------*/
+.container {
+width: 60em;
+min-width: 800px;
+max-width: 1800px;
+margin: 0 auto;
+}
+
+* html .container { 
+width: expression(document.documentElement.clientWidth > 1800 ? "1800px" : (document.documentElement.clientWidth < 800 ? "800px" : "60em"));
+}
+
+.container:hover {
+background: #fff;	
+}
+
+.header {
+border-bottom: 3px double #000;
+margin: 0 0 1em;
+}
+
+.title h1 {
+font-family: 'DroidSansBold', Helvetica, Arial, sans-serif;
+font-weight: normal;
+text-align: center;
+margin: 0;
+padding: 1em 0 0.2em;
+}
+
+/* content */
+.content {
+width: 78%;
+float: right;
+}
+
+.content .item {
+padding: 0 0 1em;
+margin: 1em 0 0;
+border-bottom: 1px solid #e6e6e6;
+}
+
+.content .item:first-child {
+margin: 0;	
+}
+
+.content table {
+border-collapse: collapse;
+}
+.content table tr th {
+border-bottom: 1px solid #000;
+color: #1a1a1a;
+}
+
+.content table tr td {
+background: #e6e6e6;
+padding: 0.3em;
+}
+
+.content table tr:nth-child(even) td {
+background: #fff;
+}
+
+.content h1 {
+font-size: 1.5em;
+margin-top: 0;
+font-family: 'DroidSansBold', Helvetica, Arial, sans-serif;
+font-weight: normal;
+}
+
+.content h2 {
+font-size: 1em;
+}
+
+.content h1 a {
+color: #000;
+text-decoration: none;
+}
+
+/* sidebar */
+.sidenav {
+float: left;
+width: 18%;
+font-size: 0.8em;
+}
+
+.sidenav h1 {
+background: #001;
+color: #fff;
+font-weight: normal;
+font-size: 1em;
+margin:0;
+padding: 0.3em 0.5em;
+-webkit-border-radius: 0 5px 0 0;
+-o-border-radius: 0 5px 0 0;
+-moz-border-radius: 0 5px 0 0;
+border-radius: 0 5px 0 0;
+-webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-o-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+}
+
+.sidenav ul {
+margin: 0 0 1em;
+padding: 0;
+overflow: auto;
+background: #eaeaea;
+-webkit-border-radius: 0 0 5px 0;
+-o-border-radius: 0 0 5px 0;
+-moz-border-radius: 0 0 5px 0;
+border-radius: 0 0 5px 0;
+-webkit-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-o-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+-moz-box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+box-shadow: 0.1em 0.1em 0.2em rgba(0,0, 0, 0.3);
+}
+
+.sidenav:hover h1,
+.sidenav:hover ul {
+-webkit-box-shadow: 0.2em 0.2em 0.4em rgba(0,0, 0, 0.3);
+-o-box-shadow: 0.2em 0.2em 0.4em rgba(0,0, 0, 0.3);
+-moz-box-shadow: 0.2em 0.2em 0.4em rgba(0,0, 0, 0.3);
+box-shadow: 0.2em 0.2em 0.4em rgba(0,0, 0, 0.3);
+}
+
+.sidenav li {
+list-style: none;
+display: inline;
+margin: 0;
+}
+
+.sidenav li a {
+font-size: 0.9em;
+display: block;
+border-top: 1px solid #f7f7f7;
+border-bottom: 1px solid #dedede;
+padding: 0.3em 0.75em;
+text-decoration: none;
+}
+
+.sidenav li a:hover {
+background: #d2e3fb;
+}
+
+.sidenav li:last-child a {
+-webkit-border-radius: 0 0 5px 0;
+-o-border-radius: 0 0 5px 0;
+-moz-border-radius: 0 0 5px 0;
+border-radius: 0 0 5px 0;
+}
+
+/* slightly clumsy suppression of downloads link */
+.sidenav a[href="index.html"] {
+-webkit-border-radius: 0 0 5px 0;
+-o-border-radius: 0 0 5px 0;
+-moz-border-radius: 0 0 5px 0;
+border-radius: 0 0 5px 0;
+}
+
+.sidenav a[href="downloads.html"] {
+display: none;
+}
+
+/* footer */
+.footer {
+padding: 1em 0;
+font-size: 0.8em;
+color: #444;
+display: none;
+}
