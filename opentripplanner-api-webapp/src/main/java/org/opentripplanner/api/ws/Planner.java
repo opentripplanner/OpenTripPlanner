@@ -179,6 +179,7 @@ public class Planner {
             itinerary.duration = endState.getTime() - startState.getTime();
             itinerary.fare = new Fare();
             itinerary.fare.addFare(Fare.FareType.regular, Currency.getInstance("USD"), 225);
+            itinerary.transfers = -1;
 
             Leg leg = null;
             TraverseMode mode = null;
@@ -249,14 +250,13 @@ public class Planner {
                 }
 
                 if (edgeMode == TraverseMode.TRANSFER) {
-
-                    itinerary.transfers++;
                     itinerary.walkTime += edgeTime;
                     itinerary.walkDistance += graphEdge.getDistance();
                     continue;
                 }
 
                 if (edgeMode == TraverseMode.BOARDING) {
+                    itinerary.transfers++;
                     itinerary.waitingTime += edgeTime;
                     continue;
                 }
@@ -289,6 +289,9 @@ public class Planner {
                     leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
                 }
                 leg = null;
+            }
+            if (itinerary.transfers == -1) {
+                itinerary.transfers = 0;
             }
 
         }
