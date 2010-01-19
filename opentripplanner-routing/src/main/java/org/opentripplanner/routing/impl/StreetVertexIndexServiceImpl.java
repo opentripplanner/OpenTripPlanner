@@ -13,8 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import javax.annotation.PostConstruct;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextypes.Intersection;
@@ -47,9 +47,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private Graph graph;
 
-    private STRtree intersections;
+    private STRtree edgeTree;
 
-    public static final double MAX_DISTANCE_FROM_STREET = 0.002;
+    public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -60,14 +60,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @PostConstruct
     public void setup() {
-        intersections = new STRtree();
+        edgeTree = new STRtree();
+        HashSet<Edge> edges = new HashSet<Edge>();
         for (Vertex v : graph.getVertices()) {
             if (v.getType() == Intersection.class) {
-                Envelope env = new Envelope(v.getCoordinate());
-                intersections.insert(env, v);
+                for (Edge e: v.getOutgoing()) {
+                    if (e instanceof Street){
+                        edges.add(e);
+                        Envelope env = new Envelope(v.getCoordinate(), e.getToVertex().getCoordinate());
+                        edgeTree.insert(env, e);
+                    }
+                }
             }
         }
-        intersections.build();
+        edgeTree.build();
     }
 
     @SuppressWarnings("unchecked")
@@ -92,45 +98,26 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
          */
 
         Envelope envelope = new Envelope(c);
-        List<Vertex> nearby = new LinkedList<Vertex>();
+        List<Edge> nearby = new LinkedList<Edge>();
         int i = 0;
         double envelopeGrowthRate = 0.0018;
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(c);
-        while (nearby.size() < 2 && i < 8) {
+        while (nearby.size() < 1 && i < 4) {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
 
-            nearby = intersections.query(envelope);
-
-            Collections.sort(nearby, new Comparator<Vertex>() {
-                public int compare(Vertex a, Vertex b) {
-                    double distance = (a.distance(c) - b.distance(c));
-                    return (int) (Math.abs(distance) / distance);
-                }
-
-            });
+            nearby = edgeTree.query(envelope);
 
             Edge bestStreet = null;
             double bestDistance = Double.MAX_VALUE;
-            for (Vertex a : nearby) {
-                for (Vertex b : nearby) {
-                    if (a == b) {
-                        continue;
-                    }
-
-                    // search the edges for one where a connects to b
-                    Edge street = getEdgeWithToVertex(a, b);
-
-                    if (street != null) {
-                        LineString g = (LineString) street.getGeometry();
-                        double distance = g.distance(p);
-                        if (distance < bestDistance) {
-                            bestDistance = distance;
-                            bestStreet = street;
-                        }
-                    }
+            for (Edge e: nearby) {
+                LineString g = (LineString) e.getGeometry();
+                double distance = g.distance(p);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestStreet = e;
                 }
             }
             if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
@@ -139,18 +126,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 double location = l.indexOf(c);
                 return StreetLocation.createStreetLocation(c.toString(), bestStreet, location);
             }
-        }
-        return null;
-    }
-
-    private Edge getEdgeWithToVertex(Vertex a, Vertex targetToVertex) {
-        for( Edge street : a.getOutgoing() ) {
-            if (street.getToVertex() == targetToVertex)
-                return street;
-        }
-        for( Edge street : a.getIncoming() ) {
-            if (street.getToVertex() == targetToVertex)
-                return street;
         }
         return null;
     }
