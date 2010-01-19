@@ -16,6 +16,6 @@
     <csharp disabled="true"/> 
     <jaxws-client disabled="true"/> 
     <docs title="OpenTripPlanner API"
-          base="src/main/resources/docs-theme"/>
+          css="src/main/resources/docs-theme/default.css"/>
   </modules> 
 </enunciate> 
