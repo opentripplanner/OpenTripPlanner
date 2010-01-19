@@ -105,7 +105,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             
             pruneFloatingIslands();
 
-            HashMap<Integer, ArrayList<Edge>> edgesByLocation = new HashMap<Integer, ArrayList<Edge>>();
+            HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
 
             int wayIndex = 0;
             
@@ -137,18 +137,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     Street backStreet = getEdgeForStreet(to, from, way, d, permissions);
                     graph.addEdge(backStreet);
 
-                    ArrayList<Edge> startEdges = edgesByLocation.get(startNode);
+                    ArrayList<Edge> startEdges = edgesByLocation.get(from.getCoordinate());
                     if (startEdges == null) {
                         startEdges = new ArrayList<Edge>();
-                        edgesByLocation.put(startNode, startEdges);
+                        edgesByLocation.put(from.getCoordinate(), startEdges);
                     }
                     startEdges.add(street);
                     startEdges.add(backStreet);
 
-                    ArrayList<Edge> endEdges = edgesByLocation.get(endNode);
+                    ArrayList<Edge> endEdges = edgesByLocation.get(to.getCoordinate());
                     if (endEdges == null) {
                         endEdges = new ArrayList<Edge>();
-                        edgesByLocation.put(endNode, endEdges);
+                        edgesByLocation.put(to.getCoordinate(), endEdges);
                     }
                     endEdges.add(street);
                     endEdges.add(backStreet);
@@ -163,6 +163,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     ArrayList<Edge> outEdges = edgesByLocation.get(c);
                     if (outEdges != null) {
                         for (Edge out : outEdges) {
+                            /* Only create a turn edge if:
+                             * (a) the edge is not the one we are coming from
+                             * (b) the edge is a Street
+                             * (c) the edge is an outgoing edge from this location
+                             */
                             if (tov != out.getFromVertex() && out instanceof Street && out.getFromVertex().getCoordinate().equals(c)) {
                                 graph.addEdge(new Turn(in, out));
                             }
