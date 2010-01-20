@@ -128,7 +128,28 @@ public class TestPatternHopLoader extends TestCase {
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertEquals(11, path.vertices.size());
+        assertEquals(10, path.vertices.size());
+    }
+
+    /**
+     * Test that useless dwell edges are in fact removed.
+     */
+    public void testDwellSimplification() {
+        Vertex stop_f = graph.getVertex("agency_F");
+        Vertex stop_h = graph.getVertex("agency_H");
+
+        TraverseOptions options = new TraverseOptions();
+        options.setGtfsContext(context);
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        spt = Dijkstra.getShortestPathTree(graph, stop_f.getLabel(), stop_h.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 18, 5, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_h);
+        assertNotNull(path);
+        assertEquals(5, path.vertices.size());
     }
 
     public void testRoutingOverMidnight() throws Exception {

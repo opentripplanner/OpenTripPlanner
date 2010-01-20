@@ -137,6 +137,6 @@ public class TestHopLoader extends TestCase {
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertEquals(11, path.vertices.size());
+        assertEquals(10, path.vertices.size());
     }
 }

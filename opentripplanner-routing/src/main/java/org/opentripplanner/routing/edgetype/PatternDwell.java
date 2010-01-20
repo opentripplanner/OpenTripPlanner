@@ -78,4 +78,20 @@ public class PatternDwell extends AbstractEdge {
     public String toString() {
         return "PatternDwell(" + super.toString() + ")";
     }
+
+    public void setPattern(TripPattern pattern) {
+        this.pattern = pattern;
+    }
+
+    public TripPattern getPattern() {
+        return pattern;
+    }
+
+    public void setStopIndex(int stopIndex) {
+        this.stopIndex = stopIndex;
+    }
+
+    public int getStopIndex() {
+        return stopIndex;
+    }
 }

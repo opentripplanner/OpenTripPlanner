@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
@@ -159,7 +160,12 @@ public final class TripPattern implements Serializable {
     }
 
     public int getPreviousPattern(int stopIndex, int beforeTime, boolean wheelchairAccessible) {
-        Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
+        Vector<Integer>[] arrivals = arrivalTimes;
+        if (arrivals == null) {
+            arrivals = departureTimes;
+            stopIndex += 1;
+        }
+        Vector<Integer> stopArrivalTimes = arrivals[stopIndex];
         int index = Collections.binarySearch(stopArrivalTimes, beforeTime);
         if (index == -1)
             return -1;
@@ -182,7 +188,12 @@ public final class TripPattern implements Serializable {
     }
 
     public int getArrivalTime(int stopIndex, int pattern) {
-        Vector<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
+        Vector<Integer>[] arrivals = arrivalTimes;
+        if (arrivals == null) {
+            arrivals = departureTimes;
+            stopIndex += 1;
+        }
+        Vector<Integer> stopArrivalTimes = arrivals[stopIndex];
         return stopArrivalTimes.get(pattern);
     }
 
@@ -216,5 +227,31 @@ public final class TripPattern implements Serializable {
 
     public AgencyAndId getTripId(int patternIndex) {
         return tripIds.get(patternIndex);
+    }
+
+    public int getNumDwells() {
+        return dwellTimes[0].size();
+    }
+
+    /*
+     * Attempt to simplify this pattern by removing dwell times and using arrival times for
+     * departure times. For transit agencies that do not distinguish arrival and departure times,
+     * such as New York, this will save memory.
+     */
+    public void simplify() {
+
+        for (int stopId = 0; stopId < departureTimes.length; ++stopId) {
+            Vector<Integer> stopDwells = dwellTimes[stopId];
+            for (int pattern = 0; pattern < stopDwells.size(); ++pattern) {
+                if (stopDwells.get(pattern) > 0) {
+                    return;
+                }
+            }
+        }
+
+        dwellTimes = null;
+        departureTimes = Arrays.copyOf(departureTimes, departureTimes.length + 1);
+        departureTimes[departureTimes.length - 1] = arrivalTimes[arrivalTimes.length - 1];
+        arrivalTimes = null;
     }
 }

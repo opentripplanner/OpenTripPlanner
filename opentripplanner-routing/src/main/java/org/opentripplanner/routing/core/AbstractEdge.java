@@ -51,6 +51,14 @@ public abstract class AbstractEdge implements Edge, Serializable {
         return tov;
     }
 
+    public void setFromVertex(Vertex fromv) {
+        this.fromv = fromv;
+    }
+
+    public void setToVertex(Vertex tov) {
+        this.tov = tov;
+    }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         if( fromv != null)
             fromv = new DummyReferenceVertex(fromv.getLabel());

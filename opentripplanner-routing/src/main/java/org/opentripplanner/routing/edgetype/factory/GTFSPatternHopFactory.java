@@ -34,6 +34,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
@@ -155,6 +156,8 @@ public class GTFSPatternHopFactory {
     private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
+
+    private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -375,8 +378,41 @@ public class GTFSPatternHopFactory {
         }
 
         loadTransfers(graph);
+        deleteUselessDwells(graph);
 
         clearCachedData();
+
+    }
+
+    /**
+     * Delete dwell edges that take no time, and merge their start and end vertices.
+     * For trip patterns that have no trips with dwells, remove the dwell data, and merge the arrival
+     * and departure times.
+     */
+    private void deleteUselessDwells(Graph graph) {
+        HashSet<TripPattern> possiblySimplePatterns = new HashSet<TripPattern>();
+        for (PatternDwell dwell : potentiallyUselessDwells) {
+            TripPattern pattern = dwell.getPattern();
+            boolean useless = true;
+            for (int i = 0; i < pattern.getNumDwells(); ++i) {
+                if (pattern.getDwellTime(dwell.getStopIndex(), i) != 0) {
+                    useless = false;
+                    break;
+                }
+            }
+
+            if (!useless) {
+                possiblySimplePatterns.remove(pattern);
+                continue;
+            }
+
+            GenericVertex v = (GenericVertex) dwell.getFromVertex();
+            v.mergeFrom(graph, (GenericVertex) dwell.getToVertex());
+            possiblySimplePatterns.add(pattern);
+        }
+        for (TripPattern pattern: possiblySimplePatterns) {
+            pattern.simplify();
+        }
     }
 
     private void addTripToInterliningMap(
@@ -427,6 +463,9 @@ public class GTFSPatternHopFactory {
 
                 PatternDwell dwell = new PatternDwell(startJourneyArrive, startJourneyDepart, i,
                         tripPattern);
+                if (dwellTime == 0) {
+                    potentiallyUselessDwells.add(dwell);
+                }
                 graph.addEdge(dwell);
             }
 
@@ -503,6 +542,7 @@ public class GTFSPatternHopFactory {
         _geometriesByShapeId.clear();
         _distancesByShapeId.clear();
         _geometriesByShapeSegmentKey.clear();
+        potentiallyUselessDwells.clear();
     }
 
     private void loadTransfers(Graph graph) {

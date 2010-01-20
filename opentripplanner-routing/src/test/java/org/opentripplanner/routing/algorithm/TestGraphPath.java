@@ -70,7 +70,7 @@ public class TestGraphPath extends TestCase {
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
-        assertEquals(11, path.vertices.size());
+        assertEquals(10, path.vertices.size());
 
         long bestStart = new GregorianCalendar(2009, 8, 7, 0, 20, 0).getTimeInMillis();
         assertNotSame(bestStart, path.vertices.firstElement().state.getTime());
