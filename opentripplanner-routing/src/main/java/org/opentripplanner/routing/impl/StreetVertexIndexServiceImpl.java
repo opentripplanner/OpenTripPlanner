@@ -31,11 +31,12 @@ import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import com.vividsolutions.jts.linearref.LengthIndexedLine;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
  * This creates a StreetLocation representing a location on a street that's not at an intersection,
@@ -50,6 +51,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private STRtree edgeTree;
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.005;
+
+    private static final double MAX_SNAP_TO_INTERSECTION_DISTANCE = 0.00005;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -77,7 +80,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @SuppressWarnings("unchecked")
-    public StreetLocation getClosestVertex(final Coordinate c) {
+    public Vertex getClosestVertex(final Coordinate c) {
         /*
          * Assume c is on a street.
          *
@@ -113,7 +116,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             Edge bestStreet = null;
             double bestDistance = Double.MAX_VALUE;
             for (Edge e: nearby) {
-                LineString g = (LineString) e.getGeometry();
+                Geometry g = e.getGeometry();
                 double distance = g.distance(p);
                 if (distance < bestDistance) {
                     bestDistance = distance;
@@ -121,9 +124,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
             }
             if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                LineString g = (LineString) bestStreet.getGeometry();
-                LengthIndexedLine l = new LengthIndexedLine(g);
-                double location = l.indexOf(c);
+                Geometry g = bestStreet.getGeometry();
+                LocationIndexedLine l = new LocationIndexedLine(g);
+                LinearLocation location = l.project(c);
+
+                Coordinate start = bestStreet.getFromVertex().getCoordinate();
+                Coordinate end = bestStreet.getToVertex().getCoordinate();
+                Coordinate nearestPoint = location.getCoordinate(g);
+                if (nearestPoint.distance(start) < MAX_SNAP_TO_INTERSECTION_DISTANCE) {
+                    return bestStreet.getFromVertex();
+                } else if (nearestPoint.distance(end) < MAX_SNAP_TO_INTERSECTION_DISTANCE) {
+                    return bestStreet.getToVertex();
+                }
                 return StreetLocation.createStreetLocation(c.toString(), bestStreet, location);
             }
         }

@@ -261,7 +261,7 @@ public class AStar {
 
         /* generate extra edges for StreetLocations */
         Map<Vertex, Edge> extraEdges;
-        if (origin instanceof StreetLocation) {
+        if (target instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, Edge>();
             Iterable<Edge> incoming = target.getIncoming();
             for (Edge edge : incoming) {
@@ -321,7 +321,7 @@ public class AStar {
                 spt_v = spt.getVertex(tov);
                 // if this is the first time edge.tov has been visited
                 if (spt_v == null) {
-                    old_w = Integer.MAX_VALUE;
+                    old_w = Double.MAX_VALUE;
                     spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 } else {
                     old_w = spt_v.weightSum + distance;

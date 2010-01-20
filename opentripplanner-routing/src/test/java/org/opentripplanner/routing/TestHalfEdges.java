@@ -35,6 +35,7 @@ import org.opentripplanner.routing.vertextypes.Intersection;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
 
 public class TestHalfEdges extends TestCase {
 
@@ -63,11 +64,11 @@ public class TestHalfEdges extends TestCase {
 
     public void setUp() {
         graph = new Graph();
-        // a 1 degree x 1 degree square
+        // a 0.1 degree x 0.1 degree square
         Vertex tl = graph.addVertex(new GenericVertex("tl", -74.1, 40.1, "tl", Intersection.class));
-        Vertex tr = graph.addVertex(new GenericVertex("tr", -74, 40.1, "tr", Intersection.class));
-        Vertex bl = graph.addVertex(new GenericVertex("bl", -74.1, 40, "bl", Intersection.class));
-        Vertex br = graph.addVertex(new GenericVertex("br", -74, 40, "br", Intersection.class));
+        Vertex tr = graph.addVertex(new GenericVertex("tr", -74.0, 40.1, "tr", Intersection.class));
+        Vertex bl = graph.addVertex(new GenericVertex("bl", -74.1, 40.0, "bl", Intersection.class));
+        Vertex br = graph.addVertex(new GenericVertex("br", -74.0, 40.0, "br", Intersection.class));
 
         double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
@@ -97,7 +98,7 @@ public class TestHalfEdges extends TestCase {
         graph.addEdge(rightDown);
 
         rightUp = new Street(br, tr, d);
-        rightUp.setGeometry(createGeometry(tr, br));
+        rightUp.setGeometry(createGeometry(br, tr));
         graph.addEdge(rightUp);
     }
 
@@ -105,8 +106,8 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
-        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.4);
-        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.8);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, new LinearLocation(0, 0.4));
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, new LinearLocation(0, 0.8));
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
@@ -124,8 +125,8 @@ public class TestHalfEdges extends TestCase {
     }
 
     public void testHalfEdgesBack() {
-        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, 0.8);
-        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, 0.4);
+        StreetLocation start = StreetLocation.createStreetLocation("start", leftUp, new LinearLocation(0, 0.4));
+        StreetLocation end = StreetLocation.createStreetLocation("end", rightUp, new LinearLocation(0, 0.8));
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
@@ -147,23 +148,23 @@ public class TestHalfEdges extends TestCase {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
 
-        StreetLocation start = finder.getClosestVertex(new Coordinate(-74.1, 40.04));
+        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.1, 40.04));
         assertNotNull(start);
-        StreetLocation end = finder.getClosestVertex(new Coordinate(-74.0, 40.08));
+        StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.08));
         assertNotNull(end);
 
         if (start.street == leftUp) {
-            assertTrue(start.location - 0.4 < 0.00001);
+            assertTrue(Math.abs(start.location.getSegmentFraction() - 0.4) < 0.00001);
         } else {
-            assertTrue(start.location - 0.6 < 0.00001);
+            assertTrue(Math.abs(start.location.getSegmentFraction() - 0.6) < 0.00001);
             assertEquals(leftDown, start.street);
         }
         assertTrue(start.getDegreeOut() == 2);
 
         if (end.street == rightUp) {
-            assertTrue(end.location - 0.2 < 0.00001);
+            assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.2 < 0.00001);
         } else {
-            assertTrue(end.location - 0.8 < 0.00001);
+            assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.8 < 0.00001);
             assertEquals(rightDown, end.street);
         }
         assertTrue(end.getDegreeIn() == 2);

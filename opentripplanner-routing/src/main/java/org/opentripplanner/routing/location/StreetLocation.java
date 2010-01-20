@@ -22,9 +22,11 @@ import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.linearref.LinearLocation;
 
 /**
  * Represents a location on a street, somewhere between the two corners.
@@ -37,7 +39,7 @@ public class StreetLocation extends GenericVertex {
 
     public Edge street;
 
-    public double location; /* a number from 0 to 1 representing how far along the street the
+    public LinearLocation location; /* a number from 0 to 1 representing how far along the street the
                                location is; 0 means the start vertex and 1 means the end vertex */
 
     ArrayList<Edge> incoming = new ArrayList<Edge>();
@@ -56,24 +58,17 @@ public class StreetLocation extends GenericVertex {
      *                 if it is an origin vertex
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String name, Edge street, double location) {
+    public static StreetLocation createStreetLocation(String name, Edge street, LinearLocation location) {
 
-        Vertex fromv = street.getFromVertex();
-        Vertex tov = street.getToVertex();
-        Coordinate startCoord = fromv.getCoordinate();
-        Coordinate endCoord = tov.getCoordinate();
-        double x = startCoord.x * (1 - location) + endCoord.x * location;
-        double y = startCoord.y * (1 - location) + endCoord.y * location;
+        Geometry g = street.getGeometry();
+        Coordinate nearestPoint = location.getCoordinate(g);
 
-        return new StreetLocation(name, street, location, x, y);
+        return new StreetLocation(name, street, location, nearestPoint.x, nearestPoint.y);
     }
 
-    private StreetLocation(String name, Edge street, double location, double x,
+    private StreetLocation(String name, Edge street, LinearLocation location, double x,
             double y) {
         super(name, x, y);
-
-        assert 0 <= location;
-        assert location <= 1;
 
         Vertex fromv = street.getFromVertex();
         Vertex tov = street.getToVertex();
