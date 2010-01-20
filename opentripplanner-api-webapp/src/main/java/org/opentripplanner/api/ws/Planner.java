@@ -20,6 +20,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -57,10 +58,8 @@ import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
-/**
- *
- */
 // NOTE - /ws/plan is the full path -- see web.xml
+
 @Path("/plan")
 @XmlRootElement
 @Autowire
@@ -75,21 +74,72 @@ public class Planner {
         this.pathservice = pathService;
     }
 
+    /**
+     * This is the primary entry point for the web service and is used for requesting trip plans.
+     * All parameters are passed in the query string.
+     * 
+     * Some parameters may not be honored by the trip planner for some or all itineraries. For
+     * example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
+     * 
+     * @param fromPlace
+     *            The start location -- either latitude, longitude pair in degrees or a Vertex
+     *            label. For example, <code>40.714476,-74.005966</code> or <code>mtanyctsubway_A27_S</code>.
+     * 
+     * @param toPlace
+     *            The end location (see fromPlace for format).
+     * 
+     * @param intermediatePlaces
+     *            An unordered list of intermediate locations to be visited (see the fromPlace for
+     *            format). <strong>Presently unused.</strong>
+     * 
+     * @param date
+     *            The date that the trip should depart (or arrive, for requests where arriveBy is
+     *            true).
+     * 
+     * @param time
+     *            The time that the trip should depart (or arrive, for requests where arriveBy is
+     *            true).
+     * 
+     * @param arriveBy
+     *            Whether the trip should depart or arrive at the specified date and time.
+     * 
+     * @param wheelchair
+     *            Whether the trip must be wheelchair accessible.
+     * 
+     * @param maxWalkDistance
+     *            The maximum distance (in meters) the user is willing to walk. Defaults to
+     *            approximately 1/2 mile.
+     * 
+     * @param walkSpeed
+     *            The user's walking speed in meters/second. Defaults to approximately 3 MPH.
+     * 
+     * @param optimize
+     *            The set of characteristics that the user wants to optimize for. @See OptimizeType
+     * 
+     * @param modes
+     *            The set of modes that a user is willing to use.
+     * 
+     * @param max
+     *            The maximum number of possible itineraries to return.
+     * 
+     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+     *         client making the request.
+     * 
+     * @throws JSONException
+     */
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getItineraries(
-            @QueryParam(RequestInf.FROM) String fromPlace,
+    public Response getItineraries(@QueryParam(RequestInf.FROM) String fromPlace,
             @QueryParam(RequestInf.TO) String toPlace,
-            @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces, 
-            @QueryParam(RequestInf.DATE) String date,
-            @QueryParam(RequestInf.TIME) String time,
-            @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
-            @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
-            @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
-            @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
-            @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
-            @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max)
+            @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
+            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time,
+            @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
+            @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
+            @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
+            @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
+            @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
+            @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
+            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max)
             throws JSONException {
 
         /* create request */
@@ -133,25 +183,28 @@ public class Planner {
         try {
             List<String> intermediates = request.getIntermediatePlaces();
             if (intermediates.size() == 0) {
-                paths = pathservice.plan(request.getFrom(), request.getTo(), 
-                        request.getDateTime(), options);
+                paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
+                        options);
                 if (paths == null) {
-                    paths = pathservice.plan(request.getFrom(), request.getTo(),
-                            request.getDateTime(), options);
+                    paths = pathservice.plan(request.getFrom(), request.getTo(), request
+                            .getDateTime(), options);
                 }
             } else {
-                paths = pathservice.plan(request.getFrom(), request.getTo(),
-                        intermediates, request.getDateTime(), options);
+                paths = pathservice.plan(request.getFrom(), request.getTo(), intermediates, request
+                        .getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
-            LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : " + request.getTo(), e);
+            LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
+                    + request.getTo(), e);
             Response response = new Response(request, null);
 
             response.error = new PlannerError(e.getMissing());
             return response;
         }
         if (paths == null || paths.size() == 0) {
-            LOGGER.log(Level.INFO, "Path not found: " + request.getFrom() + " : " + request.getTo());
+            LOGGER
+                    .log(Level.INFO, "Path not found: " + request.getFrom() + " : "
+                            + request.getTo());
             Response response = new Response(request, null);
             response.error = new PlannerError();
             return response;
@@ -320,12 +373,12 @@ public class Planner {
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
             if (edge instanceof Turn) {
-                //Turns do not exist outside of routing
+                // Turns do not exist outside of routing
                 continue;
             }
             String streetName = edge.getName();
             if (step == null) {
-                //first step
+                // first step
                 step = new WalkStep();
                 steps.add(step);
                 step.streetName = streetName;

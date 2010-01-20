@@ -19,7 +19,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
- * An Itinerary is one complete way of getting from start to end.
+ * An Itinerary is one complete way of getting from the start location to the end location.
  */
 public class Itinerary {
 
@@ -29,29 +29,29 @@ public class Itinerary {
     public long duration = 0;
 
     /**
-     * Time that the trip departs
+     * Time that the trip departs.
      */
     public Date startTime = null;
     /**
-     * time that the trip arrives
+     * Time that the trip arrives.
      */
     public Date endTime = null;
 
     /**
-     * How much time is spent walking, in milliseconds
+     * How much time is spent walking, in milliseconds.
      */
     public long walkTime = 0;
     /**
-     * How much time is spent on transit, in milliseconds
+     * How much time is spent on transit, in milliseconds.
      */
     public long transitTime = 0;
     /**
-     * How much time is spent waiting for transit to arrive, in milliseconds
+     * How much time is spent waiting for transit to arrive, in milliseconds.
      */
     public long waitingTime = 0;
 
     /**
-     * How far the user has to walk, in meters
+     * How far the user has to walk, in meters.
      */
     public Double walkDistance = 0.0;
 

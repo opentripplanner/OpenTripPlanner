@@ -16,71 +16,72 @@ package org.opentripplanner.api.model;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
- * 
- * Turn onto Broadway from W 57th St (coming from 7th Ave): 
- * distance = 100 (say) 
- * walkDirection = RIGHT
- * streetName = Broadway
- * everything else null/false
- * 
- * Now, turn from Broadway onto Central Park S via Columbus Circle
- * distance = 200 (say)
- * walkDirection = CIRCLE_COUNTERCLOCKWISE
- * streetName = Central Park S
- * exit = 1 (first exit)
- * immediately everything else false
- * 
- * Instead, go through the circle to continue on Broadway 
- * distance = 100 (say) 
- * walkDirection = CIRCLE_COUNTERCLOCKWISE 
- * streetName = Broadway 
- * exit = 3 
- * stayOn = true 
- * everything else false
+ * <p>
+ * Turn onto Broadway from W 57th St (coming from 7th Ave): <br/>
+ * distance = 100 (say) <br/>
+ * walkDirection = RIGHT <br/>
+ * streetName = Broadway <br/>
+ * everything else null/false <br/>
+ * </p><p>
+ * Now, turn from Broadway onto Central Park S via Columbus Circle <br/>
+ * distance = 200 (say) <br/>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br/>
+ * streetName = Central Park S <br/>
+ * exit = 1 (first exit) <br/>
+ * immediately everything else false <br/>
+ * </p><p>
+ * Instead, go through the circle to continue on Broadway <br/>
+ * distance = 100 (say) <br/>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br/>
+ * streetName = Broadway <br/>
+ * exit = 3 <br/>
+ * stayOn = true <br/>
+ * everything else false <br/>
+ * </p>
  * */
 public class WalkStep {
 
     /**
-     * The distance in meters that this step takes
+     * The distance in meters that this step takes.
      */
     public double distance = 0;
 
     /** 
-     * The relative direction of this step
+     * The relative direction of this step.
      */
     public RelativeDirection relativeDirection;
     /**
-     * The name of the street
+     * The name of the street.
      */
     public String streetName;
 
-    /* 
+    /**
      * The absolute direction of this step. 
      */
     public AbsoluteDirection absoluteDirection;
     
     /**  
-     * when exiting a highway or traffic circle, the exit name/number
+     * When exiting a highway or traffic circle, the exit name/number.
      */
 
     public String exit;
     /**
-     * a street changes direction at an intersection
+     * Indicates whether or not a street changes direction at an intersection.
      */
     public Boolean stayOn = false;
     
     /**
-     * a case where there is both a change of direction and a change
+     * A case where there is both a change of direction and a change
      * of street name, but not an intersection.
      */
     public Boolean becomes = false; 
 
     /**
-     * longitude of start of step
+     * The longitude of start of the step
      */
     public double lon;
     /**
-     * latitude of start of step
+     * The latitude of start of the step
      */
     public double lat;
 

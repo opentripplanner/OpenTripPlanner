@@ -24,24 +24,58 @@ import javax.xml.bind.annotation.XmlElementWrapper;
  */
 
 public class Leg {
-    public long duration = 0;
-    public Date startTime = null;
-    public Date endTime = null;
 
+    /**
+     * The amount of time in milliseconds it takes to traverse this leg.
+     */
+    public long duration = 0;
+    
+    /**
+     * The date and time this leg begins.
+     */
+    public Date startTime = null;
+    
+    /**
+     * The date and time this leg ends.
+     */
+    public Date endTime = null;
+    
+    /**
+     * The distance traveled while traversing the leg in meters.
+     */
     public Double distance = null;
 
+    /**
+     * The mode (e.g., <code>Walk</code>) used when traversing this leg.
+     */
     @XmlAttribute
     public String mode = "Walk";
 
+    /**
+     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
+     * the street being traversed.
+     */
     @XmlAttribute
     public String route = "";
 
+    /**
+     * The Place where the leg originates.
+     */
     public Place from = null;
-
+    
+    /**
+     * The Place where the leg begins.
+     */
     public Place to = null;
 
+    /**
+     * The leg's geometry.
+     */
     public EncodedPolylineBean legGeometry;
 
+    /**
+     * A series of turn by turn instructions used for walking, biking and driving. 
+     */
     @XmlElementWrapper(name = "steps")
     public List<WalkStep> walkSteps;
 }

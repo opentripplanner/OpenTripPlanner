@@ -27,10 +27,16 @@ import org.opentripplanner.api.model.error.PlannerError;
 @XmlRootElement
 public class Response {
 
+    /**
+     * A dictionary of the parameters provided in the request that triggered this response.
+     */
     public HashMap<String, String> requestParameters;
+    /**
+     * The actual trip plan.
+     */
     public TripPlan plan;
     /**
-     * The error (if any) that this response raised
+     * The error (if any) that this response raised.
      */
     @XmlElement(required=false)
     public PlannerError error = null;

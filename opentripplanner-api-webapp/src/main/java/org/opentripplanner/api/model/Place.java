@@ -26,7 +26,7 @@ public class Place {
     protected static final Logger LOGGER = Logger.getLogger(Place.class.getCanonicalName());
 
     /** 
-     * For transit stops, the name of the stop.  For POIs, the name of the POI.
+     * For transit stops, the name of the stop.  For points of interest, the name of the POI.
      */
     public String name = null;
 
@@ -37,12 +37,12 @@ public class Place {
     public String stopId = "123";
 
     /**
-     * The longitude of the place
+     * The longitude of the place.
      */
     public Double lon = null;
     
     /**
-     * The latitude of the place
+     * The latitude of the place.
      */
     public Double lat = null;
 
