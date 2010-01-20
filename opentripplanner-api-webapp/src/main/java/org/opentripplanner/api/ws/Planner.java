@@ -221,6 +221,7 @@ public class Planner {
                             geometry = null;
                         }
 
+                        /* initialize new leg */
                         leg = new Leg();
                         itinerary.addLeg(leg);
 
@@ -233,7 +234,7 @@ public class Planner {
                         } else {
                             startWalk = -1;
                         }
-                        leg.distance = edge.getDistance();
+                        leg.distance = 0.0;
                         Vertex fromv = graphEdge.getFromVertex();
                         Coordinate endCoord = fromv.getCoordinate();
                         leg.from = new Place(endCoord.x, endCoord.y, fromv.getName());
@@ -248,6 +249,8 @@ public class Planner {
                         geometry = geometry.union(edgeGeometry);
                     }
                 }
+
+                leg.distance += edge.getDistance();
 
                 if (edgeMode == TraverseMode.TRANSFER) {
                     itinerary.walkTime += edgeTime;
