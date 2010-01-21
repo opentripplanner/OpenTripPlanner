@@ -489,6 +489,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     }
 
     public static void main(String args[]) {
+    	if (args.length == 0) {
+    		System.out.println("Usage: VizGui /path/to/Graph.obj");
+    		System.exit(1);
+    	}
         VizGui gui = new VizGui(args[0]);
         gui.setVisible(true);
 
