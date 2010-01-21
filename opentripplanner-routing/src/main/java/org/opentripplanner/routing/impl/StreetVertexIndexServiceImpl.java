@@ -86,8 +86,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         transitStopTree.build();
     }
 
-    @SuppressWarnings("unchecked")
     public Vertex getClosestVertex(final Coordinate c) {
+        return getClosestVertex(c, true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Vertex getClosestVertex(final Coordinate c, boolean includeTransitStops) {
 
         Envelope envelope = new Envelope(c);
         List<Edge> nearby = new LinkedList<Edge>();
@@ -100,22 +104,23 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
-
-            List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
-
-            Vertex bestStop = null;
+            
             double bestDistance = Double.MAX_VALUE;
+            if (includeTransitStops) {
+                List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
 
-            for (Vertex v: nearbyTransitStops) {
-                Coordinate sc = v.getCoordinate();
-                double distance = sc.distance(c);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestStop = v;
+                Vertex bestStop = null;
+                for (Vertex v: nearbyTransitStops) {
+                    Coordinate sc = v.getCoordinate();
+                    double distance = sc.distance(c);
+                    if (distance < bestDistance) {
+                        bestDistance = distance;
+                        bestStop = v;
+                    }
                 }
-            }
-            if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                return bestStop;
+                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                    return bestStop;
+                }
             }
 
             nearby = edgeTree.query(envelope);

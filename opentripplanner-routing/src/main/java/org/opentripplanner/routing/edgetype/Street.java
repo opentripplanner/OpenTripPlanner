@@ -189,4 +189,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
         return bicycleSafetyEffectiveLength;
     }
 
+    public double getLength() {
+        return length;
+    }
+
 }

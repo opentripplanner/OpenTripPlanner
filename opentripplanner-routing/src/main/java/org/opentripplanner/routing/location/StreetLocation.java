@@ -13,10 +13,9 @@
 
 package org.opentripplanner.routing.location;
 
-import java.util.ArrayList;
-
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -41,10 +40,6 @@ public class StreetLocation extends GenericVertex {
 
     public LinearLocation location; /* a number from 0 to 1 representing how far along the street the
                                location is; 0 means the start vertex and 1 means the end vertex */
-
-    ArrayList<Edge> incoming = new ArrayList<Edge>();
-
-    ArrayList<Edge> outgoing = new ArrayList<Edge>();
 
     /**
      * Creates a StreetLocation on the given street.  How far along is
@@ -104,5 +99,26 @@ public class StreetLocation extends GenericVertex {
         GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING),
                 4326);
         return factory.createLineString(coords);
+    }
+
+    public Vertex reify(Graph graph) {
+        String name = getName();
+        GenericVertex reified = new GenericVertex(getLabel(), getX(), getY(), name);
+        graph.addVertex(reified);
+        for (Edge e : getIncoming()) {
+            Street s = (Street) e;
+            Vertex fromv = e.getFromVertex();
+            Street street = new Street(fromv, reified, name, name, s.getLength());
+            street.setGeometry(s.getGeometry());
+            graph.addEdge(street);
+        }
+        for (Edge e : getOutgoing()) {
+            Street s = (Street) e;
+            Vertex tov = e.getToVertex();
+            Street street = new Street(reified, tov, name, name, s.getLength());
+            street.setGeometry(s.getGeometry());
+            graph.addEdge(street);
+        }
+        return reified;
     }
 }

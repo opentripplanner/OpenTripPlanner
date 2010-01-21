@@ -37,6 +37,9 @@ import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextypes.Intersection;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+
 import junit.framework.TestCase;
 
 public class TestGraphPath extends TestCase {
@@ -90,6 +93,9 @@ public class TestGraphPath extends TestCase {
         graph.addVertex(v1);
         graph.addVertex(v2);
         Street street = new Street(v1, v2, "fake_street", "fake_street", 10);
+        GeometryFactory gf = new GeometryFactory();
+        street.setGeometry(gf.createLineString(new Coordinate[] { new Coordinate(-74, 41), new Coordinate(-73.000002, 41.000001)}));
+        
         graph.addEdge(street);
         
         NetworkLinker nl = new NetworkLinker(graph);
