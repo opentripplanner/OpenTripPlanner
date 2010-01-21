@@ -31,6 +31,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextypes.Intersection;
+import org.opentripplanner.routing.vertextypes.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -69,6 +70,8 @@ public class TestHalfEdges extends TestCase {
         Vertex tr = graph.addVertex(new GenericVertex("tr", -74.0, 40.1, "tr", Intersection.class));
         Vertex bl = graph.addVertex(new GenericVertex("bl", -74.1, 40.0, "bl", Intersection.class));
         Vertex br = graph.addVertex(new GenericVertex("br", -74.0, 40.0, "br", Intersection.class));
+
+        graph.addVertex(new GenericVertex("transitVertex", -74.05, 40.1, "transitVertex", TransitStop.class));
 
         double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
@@ -168,5 +171,7 @@ public class TestHalfEdges extends TestCase {
             assertEquals(rightDown, end.street);
         }
         assertTrue(end.getDegreeIn() == 2);
+
+        assertEquals(TransitStop.class, finder.getClosestVertex(new Coordinate(-74.05000001, 40.1)).getType());
     }
 }

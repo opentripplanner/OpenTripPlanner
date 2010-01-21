@@ -26,6 +26,7 @@ import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextypes.Intersection;
+import org.opentripplanner.routing.vertextypes.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private Graph graph;
 
     private STRtree edgeTree;
+    private STRtree transitStopTree;
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
@@ -64,6 +66,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     @PostConstruct
     public void setup() {
         edgeTree = new STRtree();
+        transitStopTree = new STRtree();
         HashSet<Edge> edges = new HashSet<Edge>();
         for (Vertex v : graph.getVertices()) {
             if (v.getType() == Intersection.class) {
@@ -74,34 +77,21 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         edgeTree.insert(env, e);
                     }
                 }
+            } else if (v.getType() == TransitStop.class) {
+                Envelope env = new Envelope(v.getCoordinate());
+                transitStopTree.insert(env, v);
             }
         }
         edgeTree.build();
+        transitStopTree.build();
     }
 
     @SuppressWarnings("unchecked")
     public Vertex getClosestVertex(final Coordinate c) {
-        /*
-         * Assume c is on a street.
-         *
-         * Find the nearest two vertices such that (a) those vertices share an edge, and (b) that
-         * edge is roughly nearby this point.
-         *
-         * This is technically O(n^2) in nearby points, but pretty often, the nearest two points
-         * will do you. The case that you have to watch out for is:
-         *
-         *     |
-         *     |
-         * +-- p --+
-         *     |
-         *     |
-         *
-         * Here, two roads dead end near the middle of a long road; they do not share an edge, and p
-         * is on the long road. P's closest two vertices are the ends of the dead ends.
-         */
 
         Envelope envelope = new Envelope(c);
         List<Edge> nearby = new LinkedList<Edge>();
+
         int i = 0;
         double envelopeGrowthRate = 0.0018;
         GeometryFactory factory = new GeometryFactory();
@@ -111,10 +101,25 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
 
-            nearby = edgeTree.query(envelope);
+            List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
 
-            Edge bestStreet = null;
+            Vertex bestStop = null;
             double bestDistance = Double.MAX_VALUE;
+
+            for (Vertex v: nearbyTransitStops) {
+                Coordinate sc = v.getCoordinate();
+                double distance = sc.distance(c);
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestStop = v;
+                }
+            }
+            if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                return bestStop;
+            }
+
+            nearby = edgeTree.query(envelope);
+            Edge bestStreet = null;
             for (Edge e: nearby) {
                 Geometry g = e.getGeometry();
                 double distance = g.distance(p);
