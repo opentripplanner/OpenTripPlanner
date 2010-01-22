@@ -148,7 +148,7 @@ public class TestRequest extends TestCase {
         assertEquals("NE 43RD AVE", step0.streetName);
         
         assertEquals("NE 43RD AVE", step1.streetName);
-        assertEquals(RelativeDirection.RIGHT, step1.relativeDirection);
+        assertEquals(RelativeDirection.SLIGHTLY_RIGHT, step1.relativeDirection);
         assertTrue(step1.stayOn);
         
         assertEquals("NE 43RD AVE", step2.streetName);

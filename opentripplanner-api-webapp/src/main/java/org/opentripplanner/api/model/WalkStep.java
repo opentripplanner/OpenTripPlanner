@@ -109,22 +109,22 @@ public class WalkStep {
         if (angleDiff < 0.15 || ccwAngleDiff < 0.15) {
             return RelativeDirection.CONTINUE;
         } else if (angleDiff < 0.7) {
-            return RelativeDirection.SLIGHTLY_LEFT;
-        } else if (ccwAngleDiff < 0.7) {
             return RelativeDirection.SLIGHTLY_RIGHT;
+        } else if (ccwAngleDiff < 0.7) {
+            return RelativeDirection.SLIGHTLY_LEFT;
         } else if (angleDiff < 2) {
-            return RelativeDirection.LEFT;
-        } else if (ccwAngleDiff < 2) {
             return RelativeDirection.RIGHT;
+        } else if (ccwAngleDiff < 2) {
+            return RelativeDirection.LEFT;
         } else if (angleDiff < Math.PI) {
-            return RelativeDirection.HARD_LEFT;
-        } else {
             return RelativeDirection.HARD_RIGHT;
+        } else {
+            return RelativeDirection.HARD_LEFT;
         }
     }
 
     public void setAbsoluteDirection(double thisAngle) {
-        int octant = (int) (10 - Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
+        int octant = (int) (Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
         absoluteDirection = AbsoluteDirection.values()[octant];
     }
 }
