@@ -78,8 +78,8 @@ public class ShowGraph extends PApplet {
         edgeIndex = new STRtree();
         for (Vertex v : graph.getVertices()) {
             Envelope env = new Envelope(v.getCoordinate());
+            modelBounds.expandToInclude(env);
             if (v.getType() == TransitStop.class) {
-                modelBounds.expandToInclude(env);
                 vertexIndex.insert(env, v);
             } else if(v.getType() == Intersection.class) { 
                 vertexIndex.insert(env, v);
@@ -90,12 +90,28 @@ public class ShowGraph extends PApplet {
             for (Edge e : v.getOutgoing()) {
             	if (e instanceof Street || e instanceof StreetTransitLink) {
             		env = new Envelope(e.getFromVertex().getCoordinate());
-            		env.expandToInclude(e.getToVertex().getCoordinate());
             		edgeIndex.insert(env, e);
             	}
             }
         }
         modelBounds.expandBy(0.02);
+        /* fix aspect ratio */
+        double yCenter = (modelBounds.getMaxY() + modelBounds.getMinY()) / 2;
+        float xScale = cos((float) (yCenter * Math.PI / 180));
+        double xSize = modelBounds.getMaxX() - modelBounds.getMinX();
+        double ySize = modelBounds.getMaxY() - modelBounds.getMinY();
+        double actualXSize = xSize * xScale;
+        System.out.println ("xs, ys, axs: " + xSize + ", " + ySize + "," + actualXSize);
+        if (ySize > actualXSize) {
+            //too tall, stretch horizontally
+            System.out.println ("stretching x by " + (ySize / xScale - actualXSize));
+            modelBounds.expandBy((ySize / xScale - actualXSize) / 2, 0);
+        } else {
+            //too wide, stretch vertically
+            System.out.println ("stretching y by " + (actualXSize - ySize));
+            modelBounds.expandBy(0, (actualXSize - ySize) / 2);
+        }
+
         modelOuterBounds = new Envelope(modelBounds);
         vertexIndex.build();
         edgeIndex.build();
