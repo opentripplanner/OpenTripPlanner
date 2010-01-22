@@ -28,13 +28,13 @@ public class Turn extends AbstractEdge {
 
     private static final long serialVersionUID = 5348819949436171603L;
 
-    int turnAngle;
+    public int turnAngle;
 
     public Turn(Edge in, Edge out) {
         super(in.getToVertex(), out.getFromVertex());
 
-        double angleDiff = Math.abs(DirectionUtils.getLastAngle(in.getGeometry())
-                - DirectionUtils.getFirstAngle(out.getGeometry()));
+        double angleDiff = Math.abs(DirectionUtils.getInstance().getLastAngle(in.getGeometry())
+                - DirectionUtils.getInstance().getFirstAngle(out.getGeometry()));
         turnAngle = (int) (180 * angleDiff / Math.PI);
         if (turnAngle > 180) {
             turnAngle = 360 - turnAngle;

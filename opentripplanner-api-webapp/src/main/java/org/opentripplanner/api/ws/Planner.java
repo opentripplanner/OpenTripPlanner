@@ -384,21 +384,21 @@ public class Planner {
                 step.streetName = streetName;
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
-                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
                 step.setAbsoluteDirection(thisAngle);
             } else if (!step.streetName.equals(streetName)) {
                 // change of street name
                 step = new WalkStep();
                 steps.add(step);
                 step.streetName = streetName;
-                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
                 step.setDirections(lastAngle, thisAngle);
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
                 step.becomes = !multipleOptionsBefore(edge);
             } else {
                 /* generate turn-to-stay-on directions, where needed */
-                double thisAngle = DirectionUtils.getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
                 if (direction != RelativeDirection.CONTINUE) {
                     // figure out if there was another way we could have turned
@@ -417,7 +417,7 @@ public class Planner {
 
             step.distance += edge.getDistance();
 
-            lastAngle = DirectionUtils.getLastAngle(edge.getGeometry());
+            lastAngle = DirectionUtils.getInstance().getLastAngle(edge.getGeometry());
         }
         return steps;
     }
