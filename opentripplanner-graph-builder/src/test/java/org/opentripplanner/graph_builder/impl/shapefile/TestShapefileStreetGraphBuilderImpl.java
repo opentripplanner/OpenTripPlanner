@@ -19,9 +19,13 @@ import java.net.URL;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
@@ -91,5 +95,9 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         }
         assertNotNull(start);
         assertNotNull(end);
+
+        TraverseOptions wo = new TraverseOptions();
+        ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, new State(0), wo);
+        assertNotNull(spt);
     }
 }
