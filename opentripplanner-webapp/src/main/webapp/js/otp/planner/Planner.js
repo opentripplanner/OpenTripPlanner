@@ -28,10 +28,14 @@ otp.planner.Planner = {
 
     // pointer to the map / components
     map           : null,
-    url           : null,
-    poi           : null,
     planner       : null,
     controller    : null,
+
+    // configuration
+    url           : null,
+    poi           : null,
+    rteMapPngs    : false,  // false == use generic /image/map/trip/mode/<mode>.png icons
+                            // true  == use rte # /image/map/trip/rte/<number>.png icons 
 
     // new tab (itineraries tabs) management
     m_tabs        : null,

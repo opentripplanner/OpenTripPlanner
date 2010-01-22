@@ -22,15 +22,20 @@ otp.namespace("otp.planner");
   * Rendererer is created by Planner.  It is used by Planner & TripTab to produce output of the trip for the given endpoint.
   */
 otp.planner.Renderer = {
+
     map           : null,
     locale        : null,
+    rteMapPngs    : false,  // false == use generic /image/map/trip/mode/<mode>.png icons
+                            // true  == use rte # /image/map/trip/rte/<number>.png icons 
+
     m_markerLayer : null,
     m_vectorLayer : null,
 
     // these members are set & re-set by the TripTab routines 
     m_tree        : null,
     m_itinerary   : null,
-    
+
+    /** */
     initialize : function(config)
     {
         console.log("enter planner.Renderer constructor");
@@ -38,6 +43,7 @@ otp.planner.Renderer = {
         console.log("exit planner.Renderer constructor");
     },
 
+    /** */
     draw : function(itin, tree)
     {
         console.log("enter planner.Renderer.draw");
@@ -50,11 +56,11 @@ otp.planner.Renderer = {
         console.log("exit planner.Renderer.draw");
     },
 
-
+    /** */
     clear : function()
     {
         console.log("enter planner.Renderer.clear");
-        // TODO - the clearVectorLayer method does not exist - bdferris
+
         if(this.m_vectorLayer)
             otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer,this.m_itinerary.getVectors());
 
@@ -64,7 +70,7 @@ otp.planner.Renderer = {
         console.log("exit planner.Renderer.clear");
     },
 
-
+    /** */
     drawItineraryOntoMap : function()
     {
         console.log("enter Renderer.drawItineraryOntoMap");
@@ -74,7 +80,7 @@ otp.planner.Renderer = {
             this.m_vectorLayer = new OpenLayers.Layer.Vector();
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
-             
+
             this.m_markerLayer = new OpenLayers.Layer.Markers('tm-trip-marker-layer', {isBaseLayer: false });
             this.map.getMap().addLayer(this.m_markerLayer);
             this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clicability of other map layers
@@ -140,8 +146,7 @@ otp.planner.Renderer = {
 
         console.log("exit Renderer.legClick");
     },
-    
-    
+
     CLASS_NAME: "otp.planner.Renderer"
 }
 

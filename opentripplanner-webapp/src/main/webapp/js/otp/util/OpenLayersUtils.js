@@ -424,7 +424,9 @@ otp.util.OpenLayersUtils = {
         return mark;
     },
 
-    clearVectorLayer : function(vLayer, vectors) {
+    /** */
+    clearVectorLayer : function(vLayer, vectors)
+    {
         for(var x = 0; x < 5; x++)
         {
             try

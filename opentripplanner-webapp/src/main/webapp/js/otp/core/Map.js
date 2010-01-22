@@ -36,8 +36,8 @@ otp.core.MapStatic = {
     srsName           : "EPSG:4326",
     center            : {x:-122.66, y:45.53},
     layerNames        : ['openstreetmap'], 
+    numZoomLevels     : 19,
     units             : null,
-    numZoomLevels     : null,
     maxResolution     : null,
     maxExtent         : null,
 
