@@ -734,8 +734,13 @@ public class GTFSPatternHopFactory {
         if (index == distances.length)
             return new LinearLocation(distances.length, 0.0);
 
+        double prevDistance = distances[index - 1];
+        if (prevDistance == distances[index]) {
+            _log.warn("duplicate shape_dist_traveled value for some shape in shapes.,txt.  For what it's worth, the value is " + prevDistance);
+            return new LinearLocation(0, 0.0);
+        }
         double indexPart = (distance - distances[index - 1])
-                / (distances[index] - distances[index - 1]);
+                / (distances[index] - prevDistance);
         return new LinearLocation(index - 1, indexPart);
     }
 }
