@@ -202,11 +202,11 @@ otp.core.MapStatic = {
     zoom : function(x, y, zoom, minZoom, maxZoom)
     {
         if(minZoom == null)
-            minZoom = 4
+            minZoom = Math.floor(this.map.getNumZoomLevels() / 2);
         if(maxZoom == null)
-            maxZoom = minZoom + 3;
+        	maxZoom = this.map.getNumZoomLevels() - 1;
 
-        top.util.OpenLayersUtils.panZoomWithLimits(this.map, x, y, zoom, minZoom, maxZoom);
+        otp.util.OpenLayersUtils.panZoomWithLimits(this.map, x, y, zoom, minZoom, maxZoom);
     },
 
     /** */

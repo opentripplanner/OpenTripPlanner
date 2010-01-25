@@ -139,9 +139,8 @@ otp.planner.Renderer = {
             {
                 coord = this.m_itinerary.getLegStartPoint(node.id);
             }
-            var x = coord.get('x');
-            var y = coord.get('y');
-            this.map.zoom(x, y);
+            coord = coord.get('geometry');
+            this.map.zoom(coord.x, coord.y);
         }
 
         console.log("exit Renderer.legClick");
