@@ -62,8 +62,8 @@ public class NetworkLinker {
                     if (nearestIntersection instanceof StreetLocation) {
                         nearestIntersection = ((StreetLocation) nearestIntersection).reify(graph);
                     }
-                    graph.addEdge(new StreetTransitLink(nearestIntersection, v, true));
-                    graph.addEdge(new StreetTransitLink(v, nearestIntersection, false));
+                    graph.addEdge(new StreetTransitLink(nearestIntersection, v));
+                    graph.addEdge(new StreetTransitLink(v, nearestIntersection));
                 }
             }
         }

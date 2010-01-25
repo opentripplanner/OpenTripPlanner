@@ -32,7 +32,7 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
     private static GeometryFactory _geometryFactory = new GeometryFactory();
         
-    public StreetTransitLink(Vertex fromv, Vertex tov, boolean isBoarding) {
+    public StreetTransitLink(Vertex fromv, Vertex tov) {
         super(fromv, tov);
     }
 
