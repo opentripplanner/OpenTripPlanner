@@ -68,25 +68,29 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 class StopPattern {
     Vector<Stop> stops;
+    Vector<Boolean> pickups;
+    Vector<Boolean> dropoffs;
 
     AgencyAndId calendarId;
 
-    public StopPattern(Vector<Stop> stops, AgencyAndId calendarId) {
+    public StopPattern(Vector<Stop> stops, Vector<Boolean> pickups, Vector<Boolean> dropoffs, AgencyAndId calendarId) {
         this.stops = stops;
+        this.pickups = pickups;
+        this.dropoffs = dropoffs;
         this.calendarId = calendarId;
     }
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
             StopPattern pattern = (StopPattern) other;
-            return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId);
+            return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId) && pattern.pickups.equals(pickups) && pattern.dropoffs.equals(dropoffs);
         } else {
             return false;
         }
     }
 
     public int hashCode() {
-        return this.stops.hashCode() ^ this.calendarId.hashCode();
+        return this.stops.hashCode() ^ this.calendarId.hashCode() + this.pickups.hashCode() + this.dropoffs.hashCode();
     }
 
     public String toString() {
@@ -165,11 +169,14 @@ public class GTFSPatternHopFactory {
 
     public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
         Vector<Stop> stops = new Vector<Stop>();
-
+        Vector<Boolean> pickups = new Vector<Boolean>();
+        Vector<Boolean> dropoffs = new Vector<Boolean>();
         for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
             stops.add(stoptime.getStop());
+            pickups.add(stoptime.getPickupType() != 1);
+            dropoffs.add(stoptime.getDropOffType() != 1);
         }
-        StopPattern pattern = new StopPattern(stops, trip.getServiceId());
+        StopPattern pattern = new StopPattern(stops, pickups, dropoffs, trip.getServiceId());
         return pattern;
     }
 
@@ -260,7 +267,6 @@ public class GTFSPatternHopFactory {
 
                     // try to insert this trip at this location
 
-                    boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
                     StopTime st1 = null;
                     int i;
                     for (i = 0; i < stopTimes.size() - 1; i++) {
@@ -269,10 +275,9 @@ public class GTFSPatternHopFactory {
                         int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                         int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                         try {
-                            boolean s0WheelchairBoarding = st0.getStop().getWheelchairBoarding() != 0;
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
                                     runningTime, st1.getArrivalTime(), dwellTime,
-                                    s0WheelchairBoarding && tripWheelchairAccessible, trip.getId());
+                                    trip.getId());
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "
@@ -287,19 +292,14 @@ public class GTFSPatternHopFactory {
                             break;
                         }
                     }
-                    if (!simple) {
-                        boolean s1WheelchairBoarding = st1.getStop().getWheelchairBoarding() != 0;
-                        tripPattern.setWheelchairAccessible(i, insertionPoint, s1WheelchairBoarding
-                                && tripWheelchairAccessible);
-                    }
                 }
                 if (!simple) {
                     if (blockId != null && !blockId.equals("")) {
-
                         addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
                                 blockId);
                     }
                 }
+                tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
             }
         }
 
@@ -436,19 +436,18 @@ public class GTFSPatternHopFactory {
         TripPattern tripPattern = new TripPattern(trip, stopTimes);
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
-        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
         int lastStop = stopTimes.size() - 1;
         int departureTime = -1, prevDepartureTime = -1;
         int numInterpStops = -1, firstInterpStop = -1;
         int interpStep = 0;
 
         int i;
-        Stop s1 = null;
+        StopTime st1 = null;
         for (i = 0; i < lastStop; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
-            StopTime st1 = stopTimes.get(i + 1);
-            s1 = st1.getStop();
+            st1 = stopTimes.get(i + 1);
+            Stop s1 = st1.getStop();
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
             // create journey vertices
 
@@ -515,9 +514,8 @@ public class GTFSPatternHopFactory {
 
             int runningTime = arrivalTime - departureTime;
 
-            boolean stopWheelchairBoarding = s0.getWheelchairBoarding() != 0;
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
-                    stopWheelchairBoarding && tripWheelchairAccessible, trip.getId());
+                    trip.getId());
             graph.addEdge(hop);
 
             Vertex startStation = graph.getVertex(id(s0.getId()));
@@ -529,9 +527,7 @@ public class GTFSPatternHopFactory {
             graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
         }
 
-        boolean stopWheelchairBoarding = s1.getWheelchairBoarding() != 0;
-        tripPattern.setWheelchairAccessible(i, 0, stopWheelchairBoarding
-                && tripWheelchairAccessible);
+        tripPattern.setTripFlags(0, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
 
         return tripPattern;
     }

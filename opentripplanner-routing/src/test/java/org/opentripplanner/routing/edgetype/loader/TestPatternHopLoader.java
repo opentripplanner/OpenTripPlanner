@@ -219,6 +219,31 @@ public class TestPatternHopLoader extends TestCase {
         assertTrue(geometry.getLength() < 2.0);
     }
 
+    public void testPickupDropoff() throws Exception {
+        Vertex stop_o = graph.getVertex("agency_O");
+        Vertex stop_p = graph.getVertex("agency_P");
+        int i = 0;
+        for (@SuppressWarnings("unused") Edge e: stop_o.getOutgoing()) {
+            ++i;
+        }
+        assertTrue(i == 3);
+
+        long startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 0).getTimeInMillis();
+        TraverseOptions options = new TraverseOptions(context);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_o, stop_p, new State(startTime), options );
+        GraphPath path = spt.getPath(stop_p);
+        assertNotNull(path);
+        long endTime = new GregorianCalendar(2009, 8, 19, 12, 10, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+
+        startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 1).getTimeInMillis();
+        spt = AStar.getShortestPathTree(graph, stop_o, stop_p, new State(startTime), options );
+        path = spt.getPath(stop_p);
+        assertNotNull(path);
+        endTime = new GregorianCalendar(2009, 8, 19, 15, 10, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+    }
+
     public void testTransfers() throws Exception {
         Vertex stop_k = graph.getVertex("agency_K");
         Vertex stop_n = graph.getVertex("agency_N");

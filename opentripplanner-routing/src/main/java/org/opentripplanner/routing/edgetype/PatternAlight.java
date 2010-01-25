@@ -93,7 +93,7 @@ public class PatternAlight extends AbstractEdge {
         AgencyAndId service = pattern.exemplar.getServiceId();
         if (options.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible);
+            patternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, false);
             if (patternIndex >= 0) {
                 wait = pattern.getArrivalTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
@@ -103,7 +103,7 @@ public class PatternAlight extends AbstractEdge {
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight
-                    + SEC_IN_DAY, options.wheelchairAccessible);
+                    + SEC_IN_DAY, options.wheelchairAccessible, false);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getArrivalTime(stopIndex, yesterdayPatternIndex)
                         - secondsSinceMidnight - SEC_IN_DAY;
@@ -130,6 +130,9 @@ public class PatternAlight extends AbstractEdge {
 	    if (! pattern.getWheelchairAccessible(stopIndex + 1, state0.getPattern())) {
 		return null;
 	    }
+	}
+	if (!pattern.canAlight(stopIndex + 1)) {
+	    return null;
 	}
         State s1 = state0.clone();
         s1.tripId = null;
