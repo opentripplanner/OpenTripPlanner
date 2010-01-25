@@ -31,7 +31,7 @@ function metersToMiles (n, p) {
 /** Make a Date object from an ISO 8601 date string (ignoring time zone)*/
 function isoDateStringToDate (str) {
 	if (!str) return null;
-	var tokens = str.split(/[\-T:]/);
+	var tokens = str.split(/[\-\+T:]/);
 	var date = new Date(tokens[0], tokens[1] - 1, tokens[2],
 			        tokens[3], tokens[4], tokens[5], 0);
 	return date;
