@@ -84,42 +84,6 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <!--
-             Run the graph builder via a command line
-
-             Here's a sample of what has worked for TriMet data (on a Mac OS laptop-would expect that a PC with cygwin to be the same)
-               cd opentripplanner-graph-builder
-               emacs graph-config.xml
-               export MAVEN_OPTS=-Xmx2024m
-               mkdir /home/otp/gtfs
-	       mkdir /home/otp/osm
-               cd /home/otp/gtfs
-               wget http://developer.trimet.org/schedule/GTFS/20100103/google_transit.zip
-               cd -
-               mvn exec:java
-            -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.1</version>
-                <executions>
-                  <execution>
-                    <goals>
-                      <goal>exec</goal>
-                    </goals>
-                  </execution>
-                </executions>
-                <configuration>
-                  <executable>maven</executable>
-                  <workingDirectory>/tmp</workingDirectory>
-                  <mainClass>org.opentripplanner.graph_builder.GraphBuilderMain</mainClass>
-                  <!-- optional -->
-                  <arguments>
-                    <argument>graph-config.xml</argument>
-                  </arguments>
-                </configuration>
-          </plugin>
         </plugins>
     </build>
 
