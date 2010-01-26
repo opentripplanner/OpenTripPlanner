@@ -46,7 +46,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
      * A soft reference to the Coordinate[] representation of this sequence. Makes repeated
      * coordinate array accesses more efficient.
      */
-    protected SoftReference<Coordinate[]> coordRef;
+    transient protected SoftReference<Coordinate[]> coordRef;
 
     /**
      * @see com.vividsolutions.jts.geom.CoordinateSequence#getDimension()
