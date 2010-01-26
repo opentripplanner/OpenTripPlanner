@@ -470,79 +470,6 @@ otp.util.OpenLayersUtils = {
 
     ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS /////////////
 
-    /** */
-    zoomToBBox : function(map, bbox)
-    {
-        if(bbox == null || map == null) return;
-        try
-        {
-            var xy  = bbox.split(",");
-            var ext = new OpenLayers.Bounds(xy[0], xy[1], xy[2], xy[3]);
-            map.zoomToExtent(ext);
-        }
-        catch(e)
-        {
-            console.log("zoomToBBox exception: " + e);
-        }
-    },
-
-    /** */
-    growBBox : function(destBBox, srcBBox)
-    {
-        // might be sending in an empty dest...in that case, return the source
-        if(destBBox == null)
-            return srcBBox;
-
-        var retVal = destBBox;
-        try
-        {
-            // Bounds(left, bottom, top, right);
-            var d = destBBox.split(",");
-            var s = srcBBox.split(",");
-
-            if(d && d.length >= 4 && s && s.length >= 4)
-            {
-                retVal  = (d[0] * 1.0) < (s[0] * 1.0) ? d[0] : s[0]; retVal += ",";
-                retVal += (d[1] * 1.0) < (s[1] * 1.0) ? d[1] : s[1]; retVal += ",";
-                retVal += (d[2] * 1.0) > (s[2] * 1.0) ? d[2] : s[2]; retVal += ",";
-                retVal += (d[3] * 1.0) > (s[3] * 1.0) ? d[3] : s[3];
-            }
-
-            console.log("growBBox destBBox: " + srcBBox);
-            console.log("growBBox srcBBox:  " + destBBox);
-            console.log("growBBox retVal: "   + retVal);
-        }
-        catch(e)
-        {
-            console.log("growBBox exception: " + e);
-        }
-
-        return retVal;
-    },
-
-    /** */
-    zoomToGeometry : function(map, geometry, minZoom, maxZoom)
-    {
-        try 
-        {
-            var z = undefined;
-            if(minZoom || maxZoom)
-            {
-                var cz = map.getZoom();
-                if(minZoom && minZoom > cz) 
-                    z = minZoom;
-                else if(maxZoom && maxZoom < cz)
-                    z = maxZoom;
-            }
-
-            var c = geometry.getCentroid();
-            map.setCenter(new OpenLayers.LonLat(c.x, c.y), z);
-        }
-        catch(ex)
-        {
-        }
-    },
-
     /**
      * zoom utility that will zoom into a point at point X & Y, with optional limits to the zoom
      * 
@@ -582,7 +509,7 @@ otp.util.OpenLayersUtils = {
     /** will round the coordinates to just feet -- no decimal part */
     roundCoord : function(coord)
     {
-        var retVal = coord
+        var retVal = coord;
 
         try
         {
