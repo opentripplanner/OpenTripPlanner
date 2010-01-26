@@ -25,9 +25,7 @@ public class Metadata {
     }
 
     /**
-     *
-     * @param max
-     *            The maximum number of possible itineraries to return.
+     * Returns metadata about the graph -- presently, this is just the extent of the graph.
      *
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
@@ -36,7 +34,7 @@ public class Metadata {
      */
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public GraphMetadata getItineraries() throws JSONException {
+    public GraphMetadata getMetadata() throws JSONException {
 
         return new GraphMetadata(graph);
     }
