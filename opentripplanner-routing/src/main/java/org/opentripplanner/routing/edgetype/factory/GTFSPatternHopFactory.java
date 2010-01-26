@@ -261,6 +261,7 @@ public class GTFSPatternHopFactory {
                     _log.warn("duplicate first departure time for trip " + trip.getId()
                             + ".  This will be handled correctly but inefficiently.");
 
+                    simple = true;
                     createSimpleHops(graph, trip, stopTimes);
 
                 } else {
@@ -298,8 +299,8 @@ public class GTFSPatternHopFactory {
                         addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
                                 blockId);
                     }
+                    tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
                 }
-                tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
             }
         }
 
