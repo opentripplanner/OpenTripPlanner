@@ -31,6 +31,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.Vertex;
@@ -45,14 +46,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
-    
+
     private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
 
     private static final GeometryFactory _geometryFactory = new GeometryFactory();
-    
+
     private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
-    
-    private Map<Object,Object> _uniques = new HashMap<Object, Object>();
+
+    private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
     public void setProvider(OpenStreetMapProvider provider) {
         _providers.add(provider);
@@ -72,12 +73,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         _log.debug("building osm street graph");
         handler.buildGraph(graph);
     }
-    
+
     @SuppressWarnings("unchecked")
     private <T> T unique(T value) {
         Object v = _uniques.get(value);
-        if( v == null) {
-            _uniques.put(value,value);
+        if (v == null) {
+            _uniques.put(value, value);
             v = value;
         }
         return (T) v;
@@ -90,7 +91,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private Map<Integer, OSMWay> _ways = new HashMap<Integer, OSMWay>();
 
         public void buildGraph(Graph graph) {
-            
+
             // We want to prune nodes that don't have any edges
             Set<Integer> nodesWithNeighbors = new HashSet<Integer>();
 
@@ -102,19 +103,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             // Remove all simple islands
             _nodes.keySet().retainAll(nodesWithNeighbors);
-            
+
             pruneFloatingIslands();
 
             HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
 
             int wayIndex = 0;
-            
+
             for (OSMWay way : _ways.values()) {
-                
-                if( wayIndex % 1000 == 0)
+
+                if (wayIndex % 1000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
-                
+
                 StreetTraversalPermission permissions = getPermissionsForWay(way);
                 List<Integer> nodes = way.getNodeRefs();
                 for (int i = 0; i < nodes.size() - 1; i++) {
@@ -155,33 +156,46 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            //add turns
+            // add turns
             for (ArrayList<Edge> edges : edgesByLocation.values()) {
                 for (Edge in : edges) {
                     Vertex tov = in.getToVertex();
                     Coordinate c = tov.getCoordinate();
                     ArrayList<Edge> outEdges = edgesByLocation.get(c);
                     if (outEdges != null) {
-                        for (Edge out : outEdges) {
-                            /* Only create a turn edge if:
-                             * (a) the edge is not the one we are coming from
-                             * (b) the edge is a Street
-                             * (c) the edge is an outgoing edge from this location
-                             */
-                            if (tov != out.getFromVertex() && out instanceof Street && out.getFromVertex().getCoordinate().equals(c)) {
-                                graph.addEdge(new Turn(in, out));
+                        /* If this is not an intersection or street name change, unify the vertices */
+                        if (outEdges.size() == 2) {
+                            // this is a non-turn
+                            for (Edge out : outEdges) {
+                                Vertex fromVertex = out.getFromVertex();
+                                if (tov != fromVertex && out.getName() == in.getName()) {
+                                    Intersection v = (Intersection) tov;
+                                    v.mergeFrom(graph, (Intersection) fromVertex);
+                                    graph.removeVertex(fromVertex);
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (Edge out : outEdges) {
+                                /*
+                                 * Only create a turn edge if: (a) the edge is not the one we are
+                                 * coming from (b) the edge is a Street (c) the edge is an outgoing
+                                 * edge from this location
+                                 */
+                                if (tov != out.getFromVertex() && out instanceof Street
+                                        && out.getFromVertex().getCoordinate().equals(c)) {
+                                    graph.addEdge(new Turn(in, out));
+                                }
                             }
                         }
                     }
                 }
             }
 
-
         }
 
         private Vertex addVertex(Graph graph, String vertexId, OSMNode node) {
-            Intersection newVertex = new Intersection(vertexId, node.getLon(), node
-                    .getLat());
+            Intersection newVertex = new Intersection(vertexId, node.getLon(), node.getLat());
             graph.addVertex(newVertex);
             return newVertex;
         }
@@ -195,7 +209,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     ArrayList<Integer> nodelist = neighborsForNode.get(node);
                     if (nodelist == null) {
                         nodelist = new ArrayList<Integer>();
-                        neighborsForNode.put(node, nodelist);                        
+                        neighborsForNode.put(node, nodelist);
                     }
                     nodelist.addAll(nodes);
                 }
@@ -207,9 +221,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 HashSet<Integer> subgraph = computeConnectedSubgraph(neighborsForNode, node);
                 for (int subnode : subgraph) {
-                    subgraphs.put(subnode, subgraph);                    
+                    subgraphs.put(subnode, subgraph);
                 }
-            }        
+            }
             /* find the largest subgraph */
             HashSet<Integer> largestSubgraph = null;
             for (HashSet<Integer> subgraph : subgraphs.values()) {
@@ -220,8 +234,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             /* delete the rest */
             _nodes.keySet().retainAll(largestSubgraph);
         }
-        
-        private HashSet<Integer> computeConnectedSubgraph(Map<Integer, ArrayList<Integer>> neighborsForNode, int startNode) {
+
+        private HashSet<Integer> computeConnectedSubgraph(
+                Map<Integer, ArrayList<Integer>> neighborsForNode, int startNode) {
             HashSet<Integer> subgraph = new HashSet<Integer>();
             Queue<Integer> q = new LinkedList<Integer>();
             q.add(startNode);
@@ -243,8 +258,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             _nodes.put(node.getId(), node);
-            
-            if( _nodes.size() % 1000 == 0)
+
+            if (_nodes.size() % 1000 == 0)
                 _log.debug("nodes=" + _nodes.size());
         }
 
@@ -252,13 +267,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_ways.containsKey(way.getId()))
                 return;
 
-            if (!(way.getTags().containsKey("highway") || "platform".equals(way.getTags().get("railway")))) {
+            if (!(way.getTags().containsKey("highway") || "platform".equals(way.getTags().get(
+                    "railway")))) {
                 return;
             }
 
             _ways.put(way.getId(), way);
-            
-            if( _ways.size() % 1000 == 0)
+
+            if (_ways.size() % 1000 == 0)
                 _log.debug("ways=" + _ways.size());
         }
 
@@ -272,23 +288,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Street getEdgeForStreet(Vertex from, Vertex to, OSMWay way, double d,
                 StreetTraversalPermission permissions) {
-            
+
             String id = "way " + way.getId();
-            
+
             id = unique(id);
-            
+
             String name = way.getTags().get("name");
             if (name == null) {
                 name = id;
             }
             Street street = new Street(from, to, id, name, d, permissions);
-            
-            Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate()};
+
+            Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate() };
             Float sequence = new PackedCoordinateSequence.Float(coordinates, 2);
             LineString lineString = _geometryFactory.createLineString(sequence);
-            
+
             street.setGeometry(lineString);
-            
+
             return street;
         }
 

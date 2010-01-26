@@ -386,7 +386,7 @@ public class Planner {
                 step.lat = edge.getFromVertex().getY();
                 double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
                 step.setAbsoluteDirection(thisAngle);
-            } else if (!step.streetName.equals(streetName)) {
+            } else if (step.streetName != streetName && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
                 step = new WalkStep();
                 steps.add(step);

@@ -133,4 +133,8 @@ public class Graph implements Serializable {
         return (T) _services.get(serviceType);
     }
 
+    public void removeVertex(Vertex vertex) {
+        vertices.remove(vertex.getLabel());
+    }
+
 }

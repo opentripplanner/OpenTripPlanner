@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Iterator;
 import java.util.Vector;
 
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -128,5 +129,40 @@ public class Intersection implements Vertex {
     @Override
     public String getStopId() {
         return null;
+    }
+
+    public void mergeFrom(Graph graph, Intersection other) {
+        Iterator<Edge> it = incoming.iterator();
+        while(it.hasNext()) {
+            Edge edge = it.next();
+            if (edge.getFromVertex() == other) {
+                it.remove();
+            }
+        }
+        it = outgoing.iterator();
+        while(it.hasNext()) {
+            Edge edge = it.next();
+            if (edge.getToVertex() == other) {
+                it.remove();
+            }
+        }
+        for (Edge edge: other.getIncoming()) {
+            AbstractEdge aedge = (AbstractEdge) edge;
+            if (aedge.getFromVertex() == this) {
+                continue;
+            }
+
+            aedge.setToVertex(this);
+            this.addIncoming(aedge);
+        }
+        for (Edge edge : other.getOutgoing()) {
+            AbstractEdge aedge = (AbstractEdge) edge;
+            if (aedge.getToVertex() == this) {
+                continue;
+            }
+            aedge.setFromVertex(this);
+            this.addOutgoing(aedge);
+        }
+        graph.vertices.remove(other.label);
     }
 }
