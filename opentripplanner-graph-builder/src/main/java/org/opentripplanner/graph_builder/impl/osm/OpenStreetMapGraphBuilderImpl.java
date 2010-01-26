@@ -31,7 +31,6 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.Vertex;
@@ -144,14 +143,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         edgesByLocation.put(from.getCoordinate(), startEdges);
                     }
                     startEdges.add(street);
-                    startEdges.add(backStreet);
 
                     ArrayList<Edge> endEdges = edgesByLocation.get(to.getCoordinate());
                     if (endEdges == null) {
                         endEdges = new ArrayList<Edge>();
                         edgesByLocation.put(to.getCoordinate(), endEdges);
                     }
-                    endEdges.add(street);
                     endEdges.add(backStreet);
                 }
             }
@@ -165,7 +162,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (outEdges != null) {
                         /* If this is not an intersection or street name change, unify the vertices */
                         if (outEdges.size() == 2) {
-                            // this is a non-turn
                             for (Edge out : outEdges) {
                                 Vertex fromVertex = out.getFromVertex();
                                 if (tov != fromVertex && out.getName() == in.getName()) {
