@@ -219,10 +219,9 @@ otp.util.OpenLayersUtils = {
 
 
     /**
-     * makes a line from a list of points, returing the resulting Vecotor Feature
+     * Makes a line from a list of points, returning the resulting Vector Feature
      * 
      * @param {Object} pointLise
-     * @param {Object} 
      * @param {Object} style
      * 
      * @return {OpenLayers.Feature.Vector}
