@@ -467,29 +467,6 @@ otp.util.OpenLayersUtils = {
             mLayer.addMarker(markers[i]);
         }
     },
-        
-    /**
-     * for marker layers...provides a extent to zoom in on all the markers in the layer 
-     *  
-     * NOTE:  implementation of a routine that should (but does not appear to be) in OpenLayers
-     * @param {Object} layer
-     */
-    getMarkerLayerDataExtent : function(layer)
-    {
-        var maxExtent = layer.maxExtent;
-        var markers   = layer.markers; 
-        var length    = layer.markers.length; 
-        if(markers != null && length > 0) 
-        { 
-            var m = markers[0];
-            maxExtent = new OpenLayers.Bounds(m.lonlat.lon, m.lonlat.lat, m.lonlat.lon, m.lonlat.lat);
-            for(var i=0; i < length; i++) 
-            { 
-                maxExtent.extend(markers[i].lonlat); 
-            }
-        }
-        return maxExtent; 
-    }, 
 
     ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS /////////////
 
@@ -542,25 +519,6 @@ otp.util.OpenLayersUtils = {
 
         return retVal;
     },
-
-    /**
-     * will calculate the extent of the marker layer, and zoom into that point on the passed in map
-     *  
-     * @param {Object} map
-     * @param {Object} layer
-     */
-    zoomToMarkerLayerExtent : function(map, layer)
-    {
-        try
-        {
-            var bounds = this.getMarkerLayerDataExtent(layer);
-            map.zoomToExtent(bounds);
-        }
-        catch(exp)
-        {
-        }
-    },
-
 
     /** */
     zoomToGeometry : function(map, geometry, minZoom, maxZoom)

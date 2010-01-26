@@ -122,7 +122,7 @@ otp.planner.Renderer = {
 
         if(node.id.indexOf(otp.planner.Utils.TRIP_ID) >= 0)
         {
-            otp.util.OpenLayersUtils.zoomToMarkerLayerExtent(this.map, this.m_markerLayer);
+            this.map.zoomToExtent(this.m_markerLayer.getDataExtent());
         }
         else
         {
