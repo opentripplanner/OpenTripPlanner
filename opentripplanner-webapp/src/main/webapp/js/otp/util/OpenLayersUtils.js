@@ -419,7 +419,7 @@ otp.util.OpenLayersUtils = {
     makeMarker : function(x, y, icon)
     {
         var ll   = new OpenLayers.LonLat(x, y);
-        var mark = new OpenLayers.Marker(ll, icon)
+        var mark = new OpenLayers.Marker(ll, icon);
         
         return mark;
     },
