@@ -184,7 +184,7 @@ otp.util.OpenLayersUtils = {
     },
 
     /**
-     * makes a straight line from X to Y, returing the resulting Vecotor Feature
+     * Makes a straight line from <code>from</code> to <code>to</code>, returning the resulting Vector Feature
      * 
      * @param {Object} from
      * @param {Object} to
@@ -221,7 +221,7 @@ otp.util.OpenLayersUtils = {
     /**
      * Makes a line from a list of points, returning the resulting Vector Feature
      * 
-     * @param {Object} pointLise
+     * @param {Object} pointList
      * @param {Object} style
      * 
      * @return {OpenLayers.Feature.Vector}
@@ -262,15 +262,12 @@ otp.util.OpenLayersUtils = {
     },
 
     /**
-     * will grab a line geom from AJAX
-     * 
-     * vLayer - OpenLayers Vector Layer
-     * itin   - an object with a method itin.concatVectors(vectors), where the vectors can be given back to the caller
+     * Will grab a line geometry from AJAX
      * 
      * @param {Object} url
-     * @param {Object} vectorLayer
-     * @param {Object} itin
+     * @param {Object} vLayer OpenLayers.Layer.Vector
      * @param {Object} style
+     * @param {Object} itin an object with a method itin.concatVectors(vectors), where the vectors can be given back to the caller
      */
     drawLinesViaAjax : function(url, vLayer, style, itin)
     {
@@ -408,9 +405,8 @@ otp.util.OpenLayersUtils = {
     },
 
     /**
-     * create a new marker & add it to a given layer
+     * Create a new marker
      * 
-     * @param {Object} markerLayer
      * @param {Object} x
      * @param {Object} y
      * @param {Object} icon
