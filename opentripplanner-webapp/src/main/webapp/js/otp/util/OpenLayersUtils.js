@@ -460,23 +460,6 @@ otp.util.OpenLayersUtils = {
     },
 
     /** */
-    clearMarkerLayerZ : function(layer)
-    {
-        try 
-        {
-            for(var i in layer.markers)
-            {
-                var m = layer.markers[i];
-                m.destory();
-            }
-            layer.clearMarkers();
-        } 
-        catch(err) 
-        {
-        }
-    },
-
-    /** */
     drawMarkers : function(mLayer, markers)
     {
         for(var i = 0; i < markers.length; i++)
