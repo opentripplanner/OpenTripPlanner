@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
