@@ -160,6 +160,7 @@ otp.locale.English = {
     
         mode : 
         [
+            ['TRANSIT,WALK', 'Transit'],
             ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],

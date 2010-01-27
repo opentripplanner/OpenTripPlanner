@@ -146,6 +146,7 @@ otp.locale.Spanish = {
     
         mode : 
         [
+            ['TRANSIT,WALK', 'Tr‡nsito'],
             ['BUSISH,TRAINISH,WALK', 'Bus y Tren'],
             ['BUSISH,WALK', 'Solo Bus'],
             ['TRAINISH,WALK', 'Solo Tren'],
