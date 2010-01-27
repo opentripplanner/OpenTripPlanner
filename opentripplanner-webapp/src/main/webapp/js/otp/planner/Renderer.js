@@ -87,6 +87,7 @@ otp.planner.Renderer = {
         	
         	var layerOptions = {
         	        isBaseLayer: false,
+        	        rendererOptions: {yOrdering: true},
         	        styleMap: styleMap
         	};
             this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', layerOptions);
