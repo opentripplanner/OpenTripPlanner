@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.model.Fare;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -280,6 +281,10 @@ public class Planner {
 
                         leg.startTime = new Date(edge.fromv.state.getTime());
                         leg.route = graphEdge.getName();
+                        Trip trip = edge.getTrip();
+                        if (trip != null) {
+                            leg.headsign = trip.getTripHeadsign();
+                        }
                         mode = graphEdge.getMode();
                         leg.mode = mode.toString();
                         if (mode == TraverseMode.WALK) {

@@ -20,7 +20,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 /**
- *
+ * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
+ * particular vehicle (or on foot).
  */
 
 public class Leg {
@@ -57,6 +58,12 @@ public class Leg {
      */
     @XmlAttribute
     public String route = "";
+
+    /**
+     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null
+     */
+    @XmlAttribute
+    public String headsign = null;
 
     /**
      * The Place where the leg originates.
