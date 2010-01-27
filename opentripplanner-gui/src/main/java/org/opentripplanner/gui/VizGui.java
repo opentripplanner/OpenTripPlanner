@@ -110,7 +110,7 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
-        for (int dt : pattern.getDepartureTimes(stopIndex)) {
+    	for (Integer dt : pattern.getDepartureTimes(stopIndex)) {
             Calendar c = new GregorianCalendar();
             c.setTimeInMillis((dt + 5 * 3600) * 1000);
             departureTimes.add(DateFormat.getTimeInstance().format(c.getTime()));
