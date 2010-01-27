@@ -418,7 +418,7 @@ otp.planner.Itinerary = {
                 }
 
                 // put a disk at the end of this route segment
-                otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'diskmarker', this.m_markers);
+                otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'diskMarker', this.m_markers);
             }
 
             // do the TO (end) marker 
