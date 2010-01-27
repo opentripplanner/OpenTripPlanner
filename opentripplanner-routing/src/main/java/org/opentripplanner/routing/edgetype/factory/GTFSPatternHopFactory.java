@@ -36,6 +36,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
@@ -548,8 +549,8 @@ public class GTFSPatternHopFactory {
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
-            Vertex fromStation = graph.getVertex(id(fromStop.getId()));
-            Vertex toStation = graph.getVertex(id(toStop.getId()));
+            TransitStop fromStation = (TransitStop) graph.getVertex(id(fromStop.getId()));
+            TransitStop toStation = (TransitStop) graph.getVertex(id(toStop.getId()));
             double distance = fromStation.distance(toStation);
             if (t.getTransferType() < 3) {
                 org.opentripplanner.routing.edgetype.Transfer edge;

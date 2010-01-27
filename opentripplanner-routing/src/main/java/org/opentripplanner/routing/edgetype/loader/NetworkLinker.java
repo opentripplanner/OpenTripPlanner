@@ -16,11 +16,11 @@ package org.opentripplanner.routing.edgetype.loader;
 import java.util.ArrayList;
 
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.vertextypes.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,15 +54,17 @@ public class NetworkLinker {
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;
             
-            if (v.getType() == TransitStop.class) {
+            if (v instanceof TransitStop) {
                 Vertex nearestIntersection = index.getClosestVertex(v.getCoordinate(), false);
 
                 if (nearestIntersection != null) {
                     if (nearestIntersection instanceof StreetLocation) {
                         nearestIntersection = ((StreetLocation) nearestIntersection).reify(graph);
                     }
-                    graph.addEdge(new StreetTransitLink(nearestIntersection, v));
-                    graph.addEdge(new StreetTransitLink(v, nearestIntersection));
+                    TransitStop ts = (TransitStop) v;
+                    boolean wheelchairAccessible = ts.hasWheelchairEntrance();
+                    graph.addEdge(new StreetTransitLink(nearestIntersection, v, wheelchairAccessible));
+                    graph.addEdge(new StreetTransitLink(v, nearestIntersection, wheelchairAccessible));
                 }
             }
         }

@@ -32,7 +32,7 @@ import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.TransitStop;
 
 public class TestHopLoader extends TestCase {
 
@@ -67,7 +67,7 @@ public class TestHopLoader extends TestCase {
         assertEquals(1, journey_a_1.getDegreeIn());
 
         for (Edge e : journey_a_1.getOutgoing()) {
-            if (e.getToVertex().getType() == TransitStop.class) {
+            if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(PatternAlight.class, e.getClass());
             } else {
                 assertEquals(PatternHop.class, e.getClass());

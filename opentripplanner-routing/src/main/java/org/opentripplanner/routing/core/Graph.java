@@ -63,7 +63,7 @@ public class Graph implements Serializable {
             return exists;
         }
 
-        Vertex ret = new GenericVertex(id, x, y, name, stopId, null);
+        Vertex ret = new GenericVertex(id, x, y, name, stopId);
         this.vertices.put(id, ret);
         return ret;
     }

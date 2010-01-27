@@ -59,17 +59,10 @@ public class GenericVertex implements Vertex {
         this.name = name;
     }
     
-    public GenericVertex(String label, double x, double y, String name, Class<?> type) {
-        this(label, x, y);
-        this.name = name;
-        this.type = type;
-    }
-
-    public GenericVertex(String label, double x, double y, String name, String stopId, Class<?> type) {
+    public GenericVertex(String label, double x, double y, String name, String stopId) {
         this(label, x, y);
         this.name = name;
         this.stopId = stopId;
-        this.type = type;
     }
 
     public double distance(Vertex v) {
@@ -145,11 +138,6 @@ public class GenericVertex implements Vertex {
     @Override
     public String getLabel() {
         return label;
-    }
-
-    @Override
-    public Class<?> getType() {
-        return type;
     }
 
     public void setType(Class<?> type) {

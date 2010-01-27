@@ -10,11 +10,11 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.vertextypes.Intersection;
-import org.opentripplanner.routing.vertextypes.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -79,9 +79,9 @@ public class ShowGraph extends PApplet {
         for (Vertex v : graph.getVertices()) {
             Envelope env = new Envelope(v.getCoordinate());
             modelBounds.expandToInclude(env);
-            if (v.getType() == TransitStop.class) {
+            if (v instanceof TransitStop) {
                 vertexIndex.insert(env, v);
-            } else if(v.getType() == Intersection.class) { 
+            } else if(v instanceof Intersection) {
                 vertexIndex.insert(env, v);
             } else {
                 //a street-transit link, or a journey vertex.  no need for them in the ui.
@@ -171,7 +171,7 @@ public class ShowGraph extends PApplet {
                 fill(255, 255, 30);
                 ellipse(x, y, 7.0, 7.0);
                 noFill();
-            } else if (v.getType() == TransitStop.class) {
+            } else if (v instanceof TransitStop) {
                 stroke(255, 30, 255);
                 ellipse(x, y, 5.0, 5.0);
             } else if (highlighted.contains(v)) {

@@ -19,10 +19,13 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -30,9 +33,10 @@ import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextypes.Intersection;
+import org.opentripplanner.routing.core.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -126,10 +130,10 @@ public class TestStreet extends TestCase {
 
         Graph graph = new Graph();
         // a 1 degree x 1 degree square, right edge missing
-        Vertex tl = graph.addVertex(new GenericVertex("tl", -74, 41, "tl", Intersection.class));
-        Vertex tr = graph.addVertex(new GenericVertex("tr", -73, 41, "tr", Intersection.class));
-        Vertex bl = graph.addVertex(new GenericVertex("bl", -74, 40, "bl", Intersection.class));
-        Vertex br = graph.addVertex(new GenericVertex("br", -73, 40, "br", Intersection.class));
+        Vertex tl = graph.addVertex(new Intersection("tl", -74, 41));
+        Vertex tr = graph.addVertex(new Intersection("tr", -73, 41));
+        Vertex bl = graph.addVertex(new Intersection("bl", -74, 40));
+        Vertex br = graph.addVertex(new Intersection("br", -73, 40));
 
         Street top = new Street(tl, tr, 20000);
         top.setGeometry(createGeometry(tl, tr));
@@ -144,7 +148,7 @@ public class TestStreet extends TestCase {
         graph.addEdge(left);
 
         // now a very slow transfer edge spanning the right edge of the square
-        Transfer transfer = new Transfer(br, tr, 99999);
+        MockTransfer transfer = new MockTransfer(br, tr, 99999);
         graph.addEdge(transfer);
 
         // with no maxWalkDistance, the transfer will not be taken
@@ -156,7 +160,7 @@ public class TestStreet extends TestCase {
         assertNotNull(path);
 
         boolean found = false;
-        for (SPTVertex v : path.vertices) {
+        for (SPTVertex v : path.vertices)       {
             if (v.mirror == br) {
                 found = true;
             }
@@ -186,5 +190,55 @@ public class TestStreet extends TestCase {
         cs[0] = a.getCoordinate();
         cs[1] = b.getCoordinate();
         return factory.createLineString(cs);
+    }
+}
+
+class MockTransfer extends AbstractEdge {
+
+    private static final long serialVersionUID = 1L;
+    private int cost;
+
+    public MockTransfer(Vertex fromv, Vertex tov, int cost) {
+        super(fromv, tov);
+        this.cost = cost;
+    }
+
+    @Override
+    public String getDirection() {
+        return null;
+    }
+
+    @Override
+    public double getDistance() {
+        return 0;
+    }
+
+    @Override
+    public Geometry getGeometry() {
+        return null;
+    }
+
+    @Override
+    public TraverseMode getMode() {
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
+        State s1 = s0.clone();
+        s1.incrementTimeInSeconds(cost);
+        return new TraverseResult(cost, s1);
+    }
+
+    @Override
+    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
+        State s1 = s0.clone();
+        s1.incrementTimeInSeconds(-cost);
+        return new TraverseResult(cost, s1);
     }
 }

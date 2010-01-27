@@ -18,7 +18,6 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -30,8 +29,8 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextypes.Intersection;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -66,12 +65,12 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 0.1 degree x 0.1 degree square
-        Vertex tl = graph.addVertex(new GenericVertex("tl", -74.1, 40.1, "tl", Intersection.class));
-        Vertex tr = graph.addVertex(new GenericVertex("tr", -74.0, 40.1, "tr", Intersection.class));
-        Vertex bl = graph.addVertex(new GenericVertex("bl", -74.1, 40.0, "bl", Intersection.class));
-        Vertex br = graph.addVertex(new GenericVertex("br", -74.0, 40.0, "br", Intersection.class));
+        Vertex tl = graph.addVertex(new Intersection("tl", -74.1, 40.1));
+        Vertex tr = graph.addVertex(new Intersection("tr", -74.0, 40.1));
+        Vertex bl = graph.addVertex(new Intersection("bl", -74.1, 40.0));
+        Vertex br = graph.addVertex(new Intersection("br", -74.0, 40.0));
 
-        graph.addVertex(new GenericVertex("transitVertex", -74.05, 40.1, "transitVertex", TransitStop.class));
+        graph.addVertex(new TransitStop("transitVertex", -74.05, 40.1, "transitVertex", "fleem station", null));
 
         double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
                 .getCoordinate().y, tr.getCoordinate().x);
@@ -172,6 +171,6 @@ public class TestHalfEdges extends TestCase {
         }
         assertTrue(end.getDegreeIn() == 2);
 
-        assertEquals(TransitStop.class, finder.getClosestVertex(new Coordinate(-74.05000001, 40.1)).getType());
+        assertTrue(finder.getClosestVertex(new Coordinate(-74.05000001, 40.1)) instanceof TransitStop);
     }
 }

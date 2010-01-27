@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -35,14 +36,18 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.Transfer;
 import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.TransitStop;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class TestPatternHopLoader extends TestCase {
 
@@ -58,6 +63,31 @@ public class TestPatternHopLoader extends TestCase {
         GTFSPatternHopLoader hl = new GTFSPatternHopLoader(graph, context);
         hl.load();
 
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+
+        Vertex near_a = graph.addVertex(new Intersection("near_a", stop_a.getX() + 0.00001, stop_a.getY() + 0.00001));
+        Vertex near_b = graph.addVertex(new Intersection("near_b", stop_b.getX() + 0.00001, stop_b.getY() + 0.00001));
+        Vertex near_c = graph.addVertex(new Intersection("near_c", stop_c.getX() + 0.00001, stop_c.getY() + 0.00001));
+        Vertex near_d = graph.addVertex(new Intersection("near_d", stop_d.getX() + 0.00001, stop_d.getY() + 0.00001));
+
+        Vertex[] nearPoints = {near_a, near_b, near_c, near_d};
+
+        Vertex nowhere = graph.addVertex(new Intersection("nowhere", 0, 0));
+
+        GeometryFactory gf = new GeometryFactory();
+
+        for (int i = 0; i < nearPoints.length; ++i) {
+            Vertex a = nearPoints[i];
+            Street street = new Street(a, nowhere, 10000);
+            street.setGeometry(gf.createLineString(new Coordinate[] {a.getCoordinate(), nowhere.getCoordinate()}));
+            graph.addEdge(a, nowhere, street);
+        }
+
+        NetworkLinker nl = new NetworkLinker(graph);
+        nl.createLinkage();
     }
 
     public void testBoardAlight() throws Exception {
@@ -65,11 +95,11 @@ public class TestPatternHopLoader extends TestCase {
         Vertex stop_a = graph.getVertex("agency_A");
         Vertex stop_b = graph.getVertex("agency_B");
 
-        assertEquals(1, stop_a.getDegreeOut());
-        assertEquals(3, stop_b.getDegreeOut());
+        assertEquals(2, stop_a.getDegreeOut());
+        assertEquals(4, stop_b.getDegreeOut());
 
         for (Edge e : stop_a.getOutgoing()) {
-            assertEquals(PatternBoard.class, e.getClass());
+            assertTrue(e instanceof PatternBoard || e instanceof StreetTransitLink);
         }
 
         Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
@@ -77,7 +107,7 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(1, journey_a_1.getDegreeIn());
 
         for (Edge e : journey_a_1.getOutgoing()) {
-            if (e.getToVertex().getType() == TransitStop.class) {
+            if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(Alight.class, e.getClass());
             } else {
                 assertEquals(PatternHop.class, e.getClass());
@@ -317,10 +347,10 @@ public class TestPatternHopLoader extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
-        Vertex stop_c = graph.getVertex("agency_C");
-        Vertex stop_d = graph.getVertex("agency_D");
+        Vertex near_a = graph.getVertex("near_a");
+        Vertex near_b = graph.getVertex("near_b");
+        Vertex near_c = graph.getVertex("near_c");
+        Vertex near_d = graph.getVertex("near_d");
 
         TraverseOptions options = new TraverseOptions(context);
         options.wheelchairAccessible = true;
@@ -328,27 +358,27 @@ public class TestPatternHopLoader extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
         // stop B is accessible, so there should be a path.
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_b, new State(new GregorianCalendar(
+        spt = AStar.getShortestPathTree(graph, near_a, near_b, new State(new GregorianCalendar(
                 2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
 
-        path = spt.getPath(stop_b);
+        path = spt.getPath(near_b);
         assertNotNull(path);
 
         // stop C is not accessible, so there should be no path.
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_c, new State(new GregorianCalendar(
+        spt = AStar.getShortestPathTree(graph, near_a, near_c, new State(new GregorianCalendar(
                 2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
 
-        path = spt.getPath(stop_c);
+        path = spt.getPath(near_c);
         assertNull(path);
 
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_d, new State(time
+        spt = AStar.getShortestPathTree(graph, near_a, near_d, new State(time
                 .getTimeInMillis()), options);
         
         time.add(Calendar.HOUR, 1);
-        path = spt.getPath(stop_d);
+        path = spt.getPath(near_d);
         assertNotNull(path);
         assertEquals(time.getTimeInMillis(), path.vertices.lastElement().state.getTime());
     }

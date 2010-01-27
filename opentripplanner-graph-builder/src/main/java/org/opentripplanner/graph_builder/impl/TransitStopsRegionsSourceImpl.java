@@ -19,7 +19,7 @@ import java.util.List;
 import org.opentripplanner.graph_builder.services.RegionsSource;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -39,7 +39,7 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
         List<Envelope> regions = new ArrayList<Envelope>();
 
         for (Vertex vertex : _graph.getVertices()) {
-            if (vertex.getType()  == TransitStop.class) { 
+            if (vertex instanceof TransitStop) {
                 Envelope env = new Envelope(vertex.getCoordinate());
                 // TODO - Would be nice to express this in meters
                 env.expandBy(0.02);

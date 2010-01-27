@@ -126,11 +126,6 @@ public class PatternAlight extends AbstractEdge {
     }
 
     public TraverseResult traverse(State state0, TraverseOptions options) {
-	if (options.wheelchairAccessible) {
-	    if (! pattern.getWheelchairAccessible(stopIndex + 1, state0.getPattern())) {
-		return null;
-	    }
-	}
 	if (!pattern.canAlight(stopIndex + 1)) {
 	    return null;
 	}

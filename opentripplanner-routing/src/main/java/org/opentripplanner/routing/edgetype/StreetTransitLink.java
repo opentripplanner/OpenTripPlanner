@@ -31,9 +31,11 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
 
     private static GeometryFactory _geometryFactory = new GeometryFactory();
+    private boolean wheelchairAccessible;
         
-    public StreetTransitLink(Vertex fromv, Vertex tov) {
+    public StreetTransitLink(Vertex fromv, Vertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     private static final long serialVersionUID = -3311099256178798981L;
@@ -61,11 +63,17 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
+        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
         State s1 = s0.clone();
         return new TraverseResult(0, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
         State s1 = s0.clone();
         return new TraverseResult(0, s1);
     }

@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -32,10 +33,12 @@ public class Transfer extends AbstractEdge {
 
     private Geometry geometry = null;
 
+    private boolean wheelchairAccessible;
+
     /**
      * @see Transfer(Vertex, Vertex, double, int)
      */
-    public Transfer(Vertex fromv, Vertex tov, double distance) {
+    public Transfer(TransitStop fromv, TransitStop tov, double distance) {
         super(fromv, tov);
         this.distance = distance;
         this.time = (int) distance * 3;
@@ -52,6 +55,12 @@ public class Transfer extends AbstractEdge {
         super(fromv, tov);
         this.distance = distance;
         this.time = time;
+        /* Assume that if either stop is not accessible from the street, the
+         * transfer is not accessible.  This will need to be changed when GTFS
+         * and OneBusAway GTFS support accessible transfers.
+         */
+        wheelchairAccessible = ((TransitStop)getFromVertex()).hasWheelchairEntrance() &&
+            ((TransitStop)getToVertex()).hasWheelchairEntrance();
     }
 
     public String getDirection() {
@@ -77,12 +86,18 @@ public class Transfer extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
+        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(time);
         return new TraverseResult(time, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-time);
         return new TraverseResult(time, s1);

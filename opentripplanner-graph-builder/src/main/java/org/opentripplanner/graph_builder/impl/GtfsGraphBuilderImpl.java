@@ -47,10 +47,9 @@ import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -123,8 +122,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             for (Stop stop : _dao.getAllStops()) {
 
                 String id = GtfsLibrary.convertIdToString(stop.getId());
-                graph.addVertex(new GenericVertex(id, stop.getLon(), stop.getLat(), stop.getName(), stop.getId().getId(),
-                        TransitStop.class));
+                graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(), stop.getId().getId(),
+                        stop));
             }
 
             GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);

@@ -52,8 +52,6 @@ public interface Vertex extends Serializable {
 
     public Iterable<Edge> getIncoming();
 
-    public Class<?> getType();
-
     public String getName();
 
 }

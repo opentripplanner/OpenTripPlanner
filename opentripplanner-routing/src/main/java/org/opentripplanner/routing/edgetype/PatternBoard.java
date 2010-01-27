@@ -124,11 +124,6 @@ public class PatternBoard extends AbstractEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-	if (wo.wheelchairAccessible) {
-	    if (! pattern.getWheelchairAccessible(stopIndex, state0.getPattern())) {
-		return null;
-	    }
-	}
 	if (!pattern.canBoard(stopIndex)) {
             return null;
         }

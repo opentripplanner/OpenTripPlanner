@@ -25,8 +25,8 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.vertextypes.Intersection;
-import org.opentripplanner.routing.vertextypes.TransitStop;
+import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +69,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         transitStopTree = new STRtree();
         HashSet<Edge> edges = new HashSet<Edge>();
         for (Vertex v : graph.getVertices()) {
-            if (v.getType() == Intersection.class) {
+            if (v instanceof Intersection) {
                 for (Edge e: v.getOutgoing()) {
                     if (e instanceof Street){
                         edges.add(e);
@@ -77,7 +77,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         edgeTree.insert(env, e);
                     }
                 }
-            } else if (v.getType() == TransitStop.class) {
+            } else if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }

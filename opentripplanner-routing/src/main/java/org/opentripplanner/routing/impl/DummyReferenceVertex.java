@@ -91,11 +91,6 @@ public final class DummyReferenceVertex implements Vertex {
     }
 
     @Override
-    public Class<?> getType() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public double getX() {
         throw new UnsupportedOperationException();
     }
