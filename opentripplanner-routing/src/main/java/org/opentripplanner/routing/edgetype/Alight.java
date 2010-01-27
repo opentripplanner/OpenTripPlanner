@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -59,6 +60,10 @@ public class Alight extends AbstractEdge {
     public String getName() {
         // this text won't be used -- the streetTransitLink or StationEntrance's text will
         return "alight from vehicle";
+    }
+
+    public Trip getTrip() {
+        return hop.getTrip();
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {

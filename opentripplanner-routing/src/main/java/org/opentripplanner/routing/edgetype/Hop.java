@@ -19,6 +19,7 @@ import java.util.Comparator;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -159,5 +160,9 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
 
     public Stop getStartStop() {
         return start.getStop();
+    }
+
+    public Trip getTrip() {
+        return start.getTrip();
     }
 }

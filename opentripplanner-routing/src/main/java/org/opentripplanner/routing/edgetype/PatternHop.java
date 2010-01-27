@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -28,14 +27,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class PatternHop extends AbstractEdge implements HoppableEdge {
+public class PatternHop extends PatternEdge implements HoppableEdge {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-
-    private TripPattern pattern;
 
     private Stop start, end;
 
@@ -45,11 +42,10 @@ public class PatternHop extends AbstractEdge implements HoppableEdge {
 
     public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
-        super(startJourney, endJourney);
+        super(startJourney, endJourney, tripPattern);
         this.start = start;
         this.end = end;
         this.stopIndex = stopIndex;
-        this.pattern = tripPattern;
     }
 
     public String getDirection() {

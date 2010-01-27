@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -65,6 +66,10 @@ public class Board extends AbstractEdge {
 
     public String getName() {
         return "board vehicle";
+    }
+
+    public Trip getTrip() {
+        return hop.getTrip();
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.impl.DummyReferenceVertex;
 
 public abstract class AbstractEdge implements Edge, Serializable {
@@ -57,6 +58,10 @@ public abstract class AbstractEdge implements Edge, Serializable {
 
     public void setToVertex(Vertex tov) {
         this.tov = tov;
+    }
+
+    public Trip getTrip() {
+        return null;
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

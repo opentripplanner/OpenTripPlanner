@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.spt;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
@@ -20,6 +21,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.Board;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -62,6 +68,25 @@ public class SPTEdge implements Edge {
     @Override
     public String getName() {
         return payload.getName();
+    }
+
+    @Override
+    public Trip getTrip() {
+
+        if (payload instanceof Board || payload instanceof Hop || payload instanceof Alight) {
+            return payload.getTrip();
+        }
+
+        if (payload instanceof PatternEdge) {
+            int patternIndex = fromv.state.getPattern();
+            if (patternIndex == -1) {
+                patternIndex = tov.state.getPattern();
+            }
+
+            TripPattern pattern = ((PatternEdge)payload).getPattern();
+            return  pattern.getTrip(patternIndex);
+        }
+        return null;
     }
 
     @Override

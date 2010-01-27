@@ -20,7 +20,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
@@ -54,7 +53,7 @@ public final class TripPattern implements Serializable {
     private ArrayList<Integer> perTripFlags;
     private int[] perStopFlags;
 
-    private ArrayList<AgencyAndId> tripIds;
+    private ArrayList<Trip> trips;
 
     @SuppressWarnings("unchecked")
     public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
@@ -66,7 +65,7 @@ public final class TripPattern implements Serializable {
         arrivalTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         perTripFlags = new ArrayList<Integer>();
         perStopFlags = new int[hops + 1];
-        tripIds = new ArrayList<AgencyAndId>();
+        trips = new ArrayList<Trip>();
         int i;
         for (i = 0; i < hops; ++i) {
             departureTimes[i] = new ArrayList<Integer>();
@@ -101,7 +100,7 @@ public final class TripPattern implements Serializable {
         arrivalTimes[stopIndex].remove(hop);
         if (stopIndex == 0) {
             perTripFlags.remove(hop);
-            tripIds.remove(hop);
+            trips.remove(hop);
         }
     }
 
@@ -118,7 +117,7 @@ public final class TripPattern implements Serializable {
      * @return 
      */
     public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
-            int arrivalTime, int dwellTime, AgencyAndId tripId) {
+            int arrivalTime, int dwellTime, Trip trip) {
         ArrayList<Integer> stopRunningTimes = runningTimes[stopIndex];
         ArrayList<Integer> stopDepartureTimes = departureTimes[stopIndex];
         ArrayList<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
@@ -138,7 +137,7 @@ public final class TripPattern implements Serializable {
             }
         }
         if (stopIndex == 0) {
-            tripIds.add(insertionPoint, tripId);
+            trips.add(insertionPoint, trip);
             perTripFlags.add(insertionPoint, 0);
         }
         stopDepartureTimes.add(insertionPoint, departureTime);
@@ -258,8 +257,8 @@ public final class TripPattern implements Serializable {
         return true;
     }
 
-    public AgencyAndId getTripId(int patternIndex) {
-        return tripIds.get(patternIndex);
+    public Trip getTrip(int patternIndex) {
+        return trips.get(patternIndex);
     }
 
     public int getNumDwells() {

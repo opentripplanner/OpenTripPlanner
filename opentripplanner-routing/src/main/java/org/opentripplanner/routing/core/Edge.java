@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -36,4 +37,6 @@ public interface Edge {
     public Geometry getGeometry();
 
     public double getDistance();
+
+    public Trip getTrip();
 }

@@ -279,7 +279,7 @@ public class GTFSPatternHopFactory {
                         try {
                             tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
                                     runningTime, st1.getArrivalTime(), dwellTime,
-                                    trip.getId());
+                                    trip);
                         } catch (TripOvertakingException e) {
                             _log
                                     .warn("trip "
@@ -517,7 +517,7 @@ public class GTFSPatternHopFactory {
             int runningTime = arrivalTime - departureTime;
 
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
-                    trip.getId());
+                    trip);
             graph.addEdge(hop);
 
             Vertex startStation = graph.getVertex(id(s0.getId()));

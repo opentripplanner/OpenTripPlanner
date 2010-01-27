@@ -17,7 +17,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -27,7 +26,7 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternAlight extends AbstractEdge {
+public class PatternAlight extends PatternEdge {
 
     /**
      * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
@@ -44,16 +43,13 @@ public class PatternAlight extends AbstractEdge {
 
     private static final int BOARD_COST = 120;
 
-    private TripPattern pattern;
-
     private int stopIndex;
 
     private int modeMask;
     
     public PatternAlight(Vertex startStation, Vertex startJourney, TripPattern pattern,
             int stopIndex, TraverseMode mode) {
-        super(startStation, startJourney);
-        this.pattern = pattern;
+        super(startStation, startJourney, pattern);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
     }
@@ -121,7 +117,7 @@ public class PatternAlight extends AbstractEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
-        state1.tripId = pattern.getTripId(patternIndex);
+        state1.tripId = pattern.getTrip(patternIndex).getId();
         return new TraverseResult(-wait + BOARD_COST, state1);
     }
 
@@ -141,10 +137,6 @@ public class PatternAlight extends AbstractEdge {
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
         return c.getTime();
-    }
-
-    public TripPattern getPattern() {
-        return pattern;
     }
     
     public int getStopIndex() {
