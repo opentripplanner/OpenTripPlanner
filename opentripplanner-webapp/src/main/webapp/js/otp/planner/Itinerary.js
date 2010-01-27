@@ -155,7 +155,7 @@ otp.planner.Itinerary = {
         {
             if(this.m_vectors.length < 1)
             {
-                this.makeRouteLines()
+                this.makeRouteLines();
                 this.makeWalkLines();
             }
             retVal = this.m_vectors;
@@ -382,7 +382,7 @@ otp.planner.Itinerary = {
             // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
             var walk = this.m_fromStore.getAt(endIndex);
             var walkP = walk.get('geometry');
-            var mode = walk.get('mode');
+            mode = walk.get('mode');
             if(mode == 'WALK')
             {
                 endIndex--;
