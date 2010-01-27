@@ -19,7 +19,7 @@ otp.namespace("otp.planner");
   * 
   * Will render a trip itinerary into various mediums (Ext Trees, OL Map Layers, plain html page, email, etc...).
   * 
-  * Rendererer is created by Planner.  It is used by Planner & TripTab to produce output of the trip for the given endpoint.
+  * Renderer is created by Planner.  It is used by Planner & TripTab to produce output of the trip for the given endpoint.
   */
 otp.planner.Renderer = {
 
@@ -61,11 +61,13 @@ otp.planner.Renderer = {
     {
         console.log("enter planner.Renderer.clear");
 
-        if(this.m_vectorLayer)
-            otp.util.OpenLayersUtils.clearVectorLayer(this.m_vectorLayer,this.m_itinerary.getVectors());
+        if (this.m_vectorLayer && this.m_itinerary) {
+            this.m_vectorLayer.removeFeatures(this.m_itinerary.getVectors());
+        }
 
-        if(this.m_markerLayer && this.m_itinerary)
-            otp.util.OpenLayersUtils.clearMarkerLayer(this.m_markerLayer, this.m_itinerary.getMarkers());
+        if (this.m_markerLayer && this.m_itinerary) {
+            this.m_markerLayer.removeFeatures(this.m_itinerary.getMarkers());
+        }
 
         console.log("exit planner.Renderer.clear");
     },
@@ -76,12 +78,18 @@ otp.planner.Renderer = {
         console.log("enter Renderer.drawItineraryOntoMap");
         if(this.m_vectorLayer == null)
         {
-            this.m_vectorLayer = new OpenLayers.Layer.Vector('tm-trip-vector-layer', {isBaseLayer: false,  isFixed: false, visibility: true });
-            this.m_vectorLayer = new OpenLayers.Layer.Vector();
+            this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', {isBaseLayer: false,  isFixed: false, visibility: true });
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
 
-            this.m_markerLayer = new OpenLayers.Layer.Markers('tm-trip-marker-layer', {isBaseLayer: false });
+        	var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
+        	styleMap.addUniqueValueRules("default", "type", otp.util.OpenLayersUtils.getMarkerStyleLookup());
+        	
+        	var layerOptions = {
+        	        isBaseLayer: false,
+        	        styleMap: styleMap
+        	};
+            this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', layerOptions);
             this.map.getMap().addLayer(this.m_markerLayer);
             this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clicability of other map layers
         }

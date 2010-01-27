@@ -113,8 +113,8 @@ otp.planner.Itinerary = {
             }
             
             vLayer.addFeatures(this.m_vectors);
-            otp.util.OpenLayersUtils.drawMarkers(mLayer, this.m_markers);
-            this.m_extent = vLayer.getDataExtent();
+            mLayer.addFeatures(this.m_markers);
+            this.m_extent = mLayer.getDataExtent();
         }
         catch(e)
         {
@@ -368,13 +368,13 @@ otp.planner.Itinerary = {
                 // if the first leg isn't a walk, then assume it's a transit leg
                 // so paint the route icon (eg: fromStore.getAt(0))
                 startIndex = 0;
-                otp.util.OpenLayersUtils.makeFromMarker(fromP.x, fromP.y, this.m_markers);
+                otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'fromMarker', this.m_markers);
             }
             else
             {
                 // first leg is a walk leg, so mark this point with the from icon that has the walking guy, and move on to next leg in store...
                 startIndex = 1;
-                otp.util.OpenLayersUtils.makeFromWalkingMarker(fromP.x, fromP.y, this.m_markers);
+                otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'fromWalkMarker', this.m_markers);
             }
 
             // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
@@ -384,7 +384,7 @@ otp.planner.Itinerary = {
             if(mode == 'WALK')
             {
                 endIndex--;
-                otp.util.OpenLayersUtils.makeWalkMarker(walkP.x, walkP.y, this.m_markers);
+                otp.util.OpenLayersUtils.makeMarker(walkP.x, walkP.y, 'walkMarker', this.m_markers);
             }
 
             // save the list of routes for this itinerary the first time around
@@ -413,18 +413,18 @@ otp.planner.Itinerary = {
                 // only show the route bubble if we're drawing the beginning of the block (eg not a thru route transfer / stay on bus)
                 if(thru == null || thru != 'thru-route')
                 {
-                    otp.util.OpenLayersUtils.makeDiskMarker(fromP.x,  fromP.y, this.m_markers);
+                    otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'diskMarker', this.m_markers);
                     otp.util.OpenLayersUtils.makeRouteMarker(fromP.x, fromP.y, route, this.m_markers);
                 }
 
                 // put a disk at the end of this route segment
-                otp.util.OpenLayersUtils.makeDiskMarker(toP.x, toP.y, this.m_markers);
+                otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'diskmarker', this.m_markers);
             }
 
             // do the TO (end) marker 
             var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
             var toP = to.get('geometry');
-            otp.util.OpenLayersUtils.makeToMarker(toP.x, toP.y, this.m_markers);
+            otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'toMarker', this.m_markers);
         }
         catch(e)
         {

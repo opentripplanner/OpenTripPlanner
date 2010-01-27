@@ -331,136 +331,109 @@ otp.util.OpenLayersUtils = {
     DISK_SIZE       : new OpenLayers.Size(10, 10),
     DISK_OFFSET     : new OpenLayers.Pixel(-5, -5),
 
-
-    /** */
-    makeFromWalkingMarker : function(x, y, mArray)
+    /**
+     * Returns a lookup to be used by OpenLayers to determine how to render the various
+     * features (e.g., route and walking markers) on the map.
+     */
+    getMarkerStyleLookup :  function()
     {
-        var icon = new OpenLayers.Icon(this.FROM_WALK_ICON, this.ST_END_SIZE, this.ST_END_OFFSET);
-        var marker = this.makeMarker(x, y, icon);
-        if(mArray)
-            mArray.push(marker);
-            
-        return marker;
+        return {
+            'walkMarker': {
+                externalGraphic: this.WALK_ICON,
+                graphicWidth: this.RTE_ICON_SIZE.w,
+                graphicHeight: this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET.x,
+                graphicYOffset: this.RTE_ICON_OFFSET.y
+            },
+            'fromWalkMarker': {
+                externalGraphic: this.FROM_WALK_ICON,
+                graphicWidth: this.ST_END_SIZE.w,
+                graphicHeight: this.ST_END_SIZE.h,
+                graphicXOffset: this.ST_END_OFFSET.x,
+                graphicYOffset: this.ST_END_OFFSET.y
+            },
+            'toMarker': {
+                externalGraphic: this.TO_ICON,
+                graphicWidth: this.ST_END_SIZE.w,
+                graphicHeight: this.ST_END_SIZE.h,
+                graphicXOffset: this.ST_END_OFFSET.x,
+                graphicYOffset: this.ST_END_OFFSET.y
+            },
+            'fromMarker': {
+                externalGraphic: this.FROM_ICON,
+                graphicWidth: this.ST_END_SIZE.w,
+                graphicHeight: this.ST_END_SIZE.h,
+                graphicXOffset: this.ST_END_OFFSET.x,
+                graphicYOffset: this.ST_END_OFFSET.y
+            },
+            'diskMarker': {
+                externalGraphic: this.DISK_ICON,
+                graphicWidth: this.DISK_SIZE.w,
+                graphicHeight: this.DISK_SIZE.h,
+                graphicXOffset: this.DISK_OFFSET.x,
+                graphicYOffset: this.DISK_OFFSET.y
+            },
+            'routeMarker': {
+                // icon is determined by the value of feature.attributes.route
+                externalGraphic: this.ROUTE_DIR + "${route}.png",
+                graphicWidth: this.RTE_ICON_SIZE.w,
+                graphicHeight: this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET.x,
+                graphicYOffset: this.RTE_ICON_OFFSET.y
+            }
+        };
     },
-
-    /** */
-    makeFromMarker : function(x, y, mArray)
+    
+    /**
+     * Create a new route marker.
+     * 
+     * @param {Number}
+     *            x The horizontal coordinate of the marker.
+     * @param {Number}
+     *            y The vertical coordinate of the marker.
+     * @param {String}
+     *            route The route (e.g., 110 or M6) this marker is for.
+     * @param {Object}
+     *            mArray An array to add the new marker to. Optional.
+     */
+    makeRouteMarker : function(x, y, route, mArray)
     {
-        var icon = new OpenLayers.Icon(this.FROM_ICON, this.ST_END_SIZE, this.ST_END_OFFSET);
-        var marker = this.makeMarker(x, y, icon);
-        if(mArray)
-            mArray.push(marker);
-            
-        return marker;
-    },
-
-    /** */
-    makeToMarker : function(x, y, mArray)
-    {
-        var icon = new OpenLayers.Icon(this.TO_ICON, this.ST_END_SIZE, this.ST_END_OFFSET);
-        var marker = this.makeMarker(x, y, icon);
-        if(mArray)
-            mArray.push(marker);
-            
-        return marker;
-    },
-
-
-    /** */
-    makeWalkMarker : function(x, y, mArray)
-    {
-        var walk   = new OpenLayers.Icon(this.WALK_ICON, this.RTE_ICON_SIZE, this.RTE_ICON_OFFSET);
-        var marker = this.makeMarker(x, y, walk);
-        if(mArray)
-            mArray.push(marker);
-            
-        return marker;
-    },
-
-
-    /** */
-    makeDiskMarker : function(x, y, mArray)
-    {
-        var disk   = new OpenLayers.Icon(this.DISK_ICON, this.DISK_SIZE, this.DISK_OFFSET);
-        var circle = this.makeMarker(x, y, disk);
-        if(mArray)
-            mArray.push(circle);
-            
-        return circle;
-    },
-
-    /** */
-    makeRouteMarker : function(x, y, rtNum, mArray)
-    {
-        var route = null;
-        if(rtNum != null && rtNum.length >= 1)
-        {
-            var icon  = new OpenLayers.Icon(this.ROUTE_DIR + rtNum + '.png', this.RTE_ICON_SIZE, this.RTE_ICON_OFFSET);
-            route = this.makeMarker(x, y, icon);
-            if(mArray)
-                mArray.push(route);
+        // TODO: This should default to a mode-appropriate marker icon
+        // (right now this is just a filler so we don't have broken img links)
+        if (route == null || route === "") {
+            route = "default-route";
         }
+        var routeMarker = null;
+        routeMarker = this.makeMarker(x, y, 'routeMarker', mArray);
+        routeMarker.attributes.route = route;
             
-        return route;
+        return routeMarker;
     },
 
     /**
-     * Create a new marker
+     * Create a new marker.
      * 
-     * @param {Object} x
-     * @param {Object} y
-     * @param {Object} icon
+     * @param {Number}
+     *            x The horizontal coordinate of the marker.
+     * @param {Number}
+     *            y The vertical coordinate of the marker.
+     * @param {String}
+     *            type The type of the marker. This determines how it will be
+     *            displayed on the map, including what icon to use.
+     * @param {Object}
+     *            mArray An array to add the new marker to. Optional.
      */
-    makeMarker : function(x, y, icon)
+    makeMarker : function(x, y, type, mArray)
     {
-        var ll   = new OpenLayers.LonLat(x, y);
-        var mark = new OpenLayers.Marker(ll, icon);
+        var point = new OpenLayers.Geometry.Point(x, y);
+        var marker = new OpenLayers.Feature.Vector(point);
+        marker.attributes.type = type;
         
-        return mark;
-    },
-
-    /** */
-    clearVectorLayer : function(vLayer, vectors)
-    {
-        for(var x = 0; x < 5; x++)
-        {
-            try
-            {
-            	vLayer.removeFeatures(vectors);
-            }
-            catch(Ez)
-            {
-            }
+        if (mArray) {
+            mArray.push(marker);
         }
-        vLayer.redraw();
-    },
-    
-    /** */
-    clearMarkerLayer : function(mLayer, markers)
-    {
-        for(var x = 0; x < 5; x++)
-        {
-            try
-            {
-                for(var i = 0; i < markers.length; i++)
-                {
-                    mLayer.removeMarker(markers[i]);
-                }
-            }
-            catch(Ez)
-            {
-            }
-        }
-        mLayer.redraw();
-    },
-
-    /** */
-    drawMarkers : function(mLayer, markers)
-    {
-        for(var i = 0; i < markers.length; i++)
-        {
-            mLayer.addMarker(markers[i]);
-        }
+        
+        return marker;
     },
 
     ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS ///////////// ZOOM UTILS /////////////
