@@ -271,7 +271,9 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
             var mode = from.get('mode');
 
-            if(mode == 'BUS' || mode == 'TRAM' || mode == 'RAIL' || mode == 'SUBWAY' || mode == 'GONDOLA') 
+            if (mode == 'BUS' || mode == 'TRAM' || mode == 'RAIL'
+                    || mode == 'SUBWAY' || mode == 'GONDOLA'
+                    || mode == 'CABLE_CAR' || mode == 'FUNICULAR')
             {
                 try
                 {
