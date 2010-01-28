@@ -72,6 +72,7 @@ otp.planner.Utils = {
     LEG_RECORD : new Ext.data.Record.create([
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
+                  {name: 'headsign',         mapping: '@headsign'},
                   {name: 'order',            mapping: '@order'},
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
