@@ -363,7 +363,7 @@ otp.util.ExtUtils = {
                 header:    'Description',
                 width:     .9,
                 dataIndex: 'description'
-            }]
+            }];
 
         var c = {
             layout:      'auto',
@@ -371,7 +371,7 @@ otp.util.ExtUtils = {
             stripeRows:  true,
             autoShow:    true,
             columns:     cols
-        }
+        };
         otp.extend(c, config);
         otp.configure(c, config);
 
@@ -387,7 +387,7 @@ otp.util.ExtUtils = {
                 header:    'Description',
                 width:     .9,
                 dataIndex: 'description'
-            }]
+            }];
 
         var c = {
             layout:      'fit',
@@ -406,7 +406,7 @@ otp.util.ExtUtils = {
                   enableRowBody: true
             },
             columns:     cols
-        }
+        };
         otp.extend(c, config);
         otp.configure(c, config);
 
