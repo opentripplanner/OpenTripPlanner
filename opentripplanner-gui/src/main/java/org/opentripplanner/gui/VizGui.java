@@ -9,6 +9,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -21,8 +22,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Vector;
 
+import javassist.Modifier;
+
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,6 +34,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -70,7 +75,11 @@ class DisplayVertex {
     }
 
     public String toString() {
-        return vertex.getLabel() + " - " + vertex.getName();
+        String label = vertex.getLabel();
+        if (label.contains("osm node")) {
+            label = vertex.getName();
+        }
+        return label;
     }
 }
 
@@ -162,8 +171,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
-    private JPanel rightPanel;
-
     private JPanel leftPanel;
 
     private ShowGraph showGraph;
@@ -185,6 +192,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     private StreetVertexIndexServiceImpl indexService;
 
     private RoutingServiceImpl routingService;
+
+    private DefaultListModel metadataModel;
 
     public VizGui(String graphName) {
         super();
@@ -238,7 +247,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         incomingEdges = new JList();
         JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
         vertexDataPanel.add(iceScrollPane);
-
         /*
          * when a different edge is selected, change up the pattern pane and list of nearby nodes
          */
@@ -268,6 +276,31 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                                                           // some reason, JList doesn't implement
                                                           // the right event.
                 }
+
+                /* set up metadata tab */
+                metadataModel.clear();
+                Class<?> c = selected.getClass();
+                metadataModel.addElement("Class:" + c);
+                Field[] fields = c.getDeclaredFields();
+                for (int i = 0; i < fields.length; i++) {
+                    Field field = fields[i];
+                    int modifiers = field.getModifiers();
+                    if ((modifiers & Modifier.STATIC) != 0) {
+                        continue;
+                    }
+                    field.setAccessible(true);
+                    String name = field.getName();
+                    String value = "(unknown -- see console for stack trace)";
+                    try {
+                        value = "" + field.get(selected);
+                    } catch (IllegalArgumentException e1) {
+                        e1.printStackTrace();
+                    } catch (IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    }
+                    metadataModel.addElement(name + ": " + value);
+                }
+
                 // figure out the pattern, if any
                 TripPattern pattern = null;
                 int stopIndex = 0;
@@ -288,7 +321,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
                 Trip trip = pattern.exemplar;
                 serviceIdLabel.setText(trip.getServiceId().toString());
-
             }
         };
 
@@ -389,17 +421,21 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         buttonPanel.add(traceButton);
         
         
-        /* right panel holds trip pattern info */
-        rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.PAGE_AXIS));
-        serviceIdLabel = new JLabel("trip pattern");
-        rightPanel.add(serviceIdLabel);
+        /* right panel holds trip pattern and stop metadata */
+        JTabbedPane rightPanel = new JTabbedPane();
 
         pane.add(rightPanel, BorderLayout.LINE_END);
         departurePattern = new JList();
         departurePattern.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
-        rightPanel.add(dpScrollPane);
+        rightPanel.addTab("trip pattern", dpScrollPane);
+
+        JList metadataList = new JList();
+        metadataModel = new DefaultListModel();
+        metadataList.setModel(metadataModel);
+        metadataList.setPrototypeCellValue("bicycleSafetyEffectiveLength : 10.42468803");
+        JScrollPane mdScrollPane = new JScrollPane(metadataList);
+        rightPanel.addTab("metadata", mdScrollPane);
 
         pathservice = new PathServiceImpl();
         pathservice.setGraph(graph);
