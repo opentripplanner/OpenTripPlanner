@@ -78,19 +78,26 @@ otp.planner.Renderer = {
         console.log("enter Renderer.drawItineraryOntoMap");
         if(this.m_vectorLayer == null)
         {
-            this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', {isBaseLayer: false,  isFixed: false, visibility: true });
+            var vectorLayerOptions = {
+                    isBaseLayer: false,
+                    isFixed: false,
+                    visibility: true,
+                    projection: otp.core.MapStatic.dataProjection
+            };
+            this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
 
         	var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
         	styleMap.addUniqueValueRules("default", "type", otp.util.OpenLayersUtils.getMarkerStyleLookup());
         	
-        	var layerOptions = {
+        	var markerLayerOptions = {
         	        isBaseLayer: false,
         	        rendererOptions: {yOrdering: true},
+                    projection: otp.core.MapStatic.dataProjection,
         	        styleMap: styleMap
         	};
-            this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', layerOptions);
+            this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', markerLayerOptions);
             this.map.getMap().addLayer(this.m_markerLayer);
             this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clicability of other map layers
         }

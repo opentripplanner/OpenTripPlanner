@@ -112,6 +112,29 @@ otp.planner.Itinerary = {
                 this.makeMarkers();
             }
             
+            // Reproject layer data for display if necessary
+            if (otp.core.MapStatic.dataProjection != vLayer.map.getProjection()) {
+                for ( var i = 0; i < this.m_vectors.length; ++i) {
+                    if (!this.m_vectors[i].geometry._otp_reprojected) {
+                        this.m_vectors[i].geometry._otp_reprojected = true;
+                        this.m_vectors[i].geometry.transform(
+                                otp.core.MapStatic.dataProjection,
+                                vLayer.map.getProjectionObject());
+                    }
+                }
+            }
+
+            if (otp.core.MapStatic.dataProjection != mLayer.map.getProjection()) {
+                for ( var i = 0; i < this.m_markers.length; ++i) {
+                    if (!this.m_markers[i].geometry._otp_reprojected) {
+                        this.m_markers[i].geometry._otp_reprojected = true;
+                        this.m_markers[i].geometry.transform(
+                                otp.core.MapStatic.dataProjection,
+                                mLayer.map.getProjectionObject());
+                    }
+                }
+            }
+            
             vLayer.addFeatures(this.m_vectors);
             mLayer.addFeatures(this.m_markers);
             this.m_extent = mLayer.getDataExtent();

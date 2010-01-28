@@ -54,13 +54,14 @@ otp.util.OpenLayersUtils = {
      * static function to make the OpenLayers map object
      *   example: makeMap();
      */
-    makeMap : function(controls, epsg, div, numZoomLevels, units,  maxExtent, maxResolution)
+    makeMap : function(controls, epsg, div, numZoomLevels, units,  maxExtent, maxResolution, displayProjection)
     {
         var map = null;
 
         var options = {
-            controls:      controls,
-            projection:    epsg
+            displayProjection: displayProjection,
+            projection: new OpenLayers.Projection(epsg),
+            controls: controls
         };
 
         if(units != null)
@@ -80,7 +81,17 @@ otp.util.OpenLayersUtils = {
     /** */
     makeMapBaseLayer : function(map, urls, layer, tileBuffer, transitionEffect, attribution)
     {
-        var layer  = new OpenLayers.Layer.WMS("Map", urls, {layers: layer, format: 'image/png',  EXCEPTIONS: ''}, {buffer: tileBuffer, isBaseLayer: true, transitionEffect: transitionEffect, attribution: attribution});
+        var layer = new OpenLayers.Layer.WMS("Map", urls, {
+                layers : layer,
+                format : 'image/png'
+            }, {
+                buffer : tileBuffer,
+                isBaseLayer : true,
+                transitionEffect : transitionEffect,
+                attribution : attribution,
+                size : new OpenLayers.Size(512, 512)
+            }
+        );
         map.addLayer(layer);
 
         return layer;
@@ -97,7 +108,7 @@ otp.util.OpenLayersUtils = {
             scale : new OpenLayers.Control.ScaleLine(),
             arg   : new OpenLayers.Control.ArgParser(),
             nav   : new OpenLayers.Control.Navigation({zoomWheelEnabled : doZoomWheel, handleRightClicks : doRightClicks})
-        }
+        };
 
         map.addControl(retVal.pan   );
         map.addControl(retVal.mouse );
@@ -456,16 +467,19 @@ otp.util.OpenLayersUtils = {
             {
                 map.zoomTo(z);
             }
-            // TODO -- working OpenLayer??? http://trac.openlayers.org/ticket/719
-            //m_map.setCenter( new OpenLayers.LonLat(x, y), zoom, true, true);
-            // TODO: work around for the zoom bug #719
             else if (map.getZoom() > closeZoomLimit) 
+            {
                 map.zoomTo(closeZoomLimit);
-            else if(map.getZoom() < wideZoomLimit) 
+            } 
+            else if (map.getZoom() < wideZoomLimit)
+            {
                 map.zoomTo(wideZoomLimit);
+            }
             
-            if(x && y) 
-                map.setCenter(new OpenLayers.LonLat(x, y));
+            if (x && y) 
+            {
+                map.setCenter((new OpenLayers.LonLat(x, y)).transform(otp.core.MapStatic.dataProjection, map.getProjectionObject()));
+            }
         }
         catch(ex)
         {
@@ -492,7 +506,7 @@ otp.util.OpenLayersUtils = {
         }
         catch(e)
         {
-            console.log('OpenLayersUtils.getLatLonOfPixel exception ' + e)
+            console.log('OpenLayersUtils.getLatLonOfPixel exception ' + e);
            
         }
 
@@ -509,6 +523,7 @@ otp.util.OpenLayersUtils = {
         {
             var px     = new OpenLayers.Pixel(pixelX, pixelY);
             var lonLat = map.getLonLatFromPixel(px);
+            lonLat.transform(map.getProjectionObject(), otp.core.MapStatic.dataProjection);
             return this.roundCoord(lonLat);
         }
         catch(e)
@@ -536,16 +551,23 @@ otp.util.OpenLayersUtils = {
     {
         try
         {
-            if(zoom && (zoom < 0 || zoom > 9))
+            if (zoom && (zoom < 0 || zoom > 9))
+            {
                  zoom = 2;
+            }
 
-            if(x && y)
-                map.setCenter(new OpenLayers.LonLat(x, y), zoom);
-            else if(zoom)
+            if (x && y)
+            {
+                map.setCenter(new OpenLayers.LonLat(x, y).transform(otp.core.MapStatic.dataProjection, map.getProjectionObject()), zoom);
+            }
+            else if (zoom)
+            {
                 map.zoomTo(zoom);
+            }
         }
         catch(e)
         {
+            console.log('OpenLayersUtils.setCenter exception ' + e);
         }
     },
 

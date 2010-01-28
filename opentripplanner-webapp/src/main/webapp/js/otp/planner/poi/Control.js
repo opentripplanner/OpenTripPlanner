@@ -46,7 +46,7 @@ otp.planner.poi.Control = {
         otp.configure(this, config);
 
         // step 2: make layer
-        this.layer = new OpenLayers.Layer.Vector(this.name);
+        this.layer = new OpenLayers.Layer.Vector(this.name, {projection: otp.core.MapStatic.dataProjection});
         this.drag  = new OpenLayers.Control.DragFeature(this.layer);
 
         this.map.addLayer(this.layer);
@@ -206,7 +206,8 @@ otp.planner.poi.Control = {
     makeFeature : function(x, y, params, style)
     {
         var retVal = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point(x, y), 
+                (new OpenLayers.Geometry.Point(x, y))
+                .transform(otp.core.MapStatic.dataProjection, this.layer.map.getProjectionObject()), 
                 params,
                 style
         );

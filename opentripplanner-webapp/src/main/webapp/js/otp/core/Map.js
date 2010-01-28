@@ -68,6 +68,14 @@ otp.core.MapStatic = {
     historyEnabled    : true,
     controls          : [],
 
+    /*
+     * Projections - neither should need changing. displayProjection is only
+     * used within OpenLayers for now -- from/to form fields are populated using
+     * dataProjection
+     */
+    displayProjection : new OpenLayers.Projection("EPSG:4326"),
+    dataProjection : new OpenLayers.Projection("EPSG:4326"),
+    
     /** 
      * Creates a new Map -- called by default when a new map is created
      * 
@@ -81,7 +89,7 @@ otp.core.MapStatic = {
         console.log("enter Map constructor");
         otp.configure(this, config);
 
-        this.map       = otp.util.OpenLayersUtils.makeMap(this.controls, this.srsName, this.mapDiv, this.numZoomLevels, this.units, this.maxExtent, this.maxResolution);
+        this.map       = otp.util.OpenLayersUtils.makeMap(this.controls, this.srsName, this.mapDiv, this.numZoomLevels, this.units, this.maxExtent, this.maxResolution, this.displayProjection);
         this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.url, this.layerNames, this.tileBuffer, this.transitionEffect, this.attribution);
         this.map.setBaseLayer(this.baseLayer, true);
 
@@ -175,7 +183,10 @@ otp.core.MapStatic = {
     clear : function()
     {
         this.updateSize();
-        this.map.setCenter(new OpenLayers.LonLat(this.center.x, this.center.y), 11);
+        this.map.setCenter(
+                new OpenLayers.LonLat(this.center.x, this.center.y).transform(
+                        this.dataProjection, this.map.getProjectionObject()),
+                11);
     },
 
     /** */
