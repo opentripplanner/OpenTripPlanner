@@ -46,7 +46,9 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.impl.PathServiceImpl;
 import org.opentripplanner.routing.impl.RoutingServiceImpl;
@@ -259,7 +261,29 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     departurePattern.removeAll();
                     return;
                 }
+                showGraph.highlightEdge(selected);
 
+                /* for turns, highlight the outgoing street's ends */
+                if (selected instanceof Turn) {
+                    HashSet<Vertex> vertices = new HashSet<Vertex>();
+                    Vertex tov = selected.getToVertex();
+                    for (Edge og : tov.getOutgoing()) {
+                        if (og instanceof Street) {
+                            vertices.add (og.getToVertex());
+                            break;
+                        }
+                    }
+                    Vertex fromv = selected.getFromVertex();
+                    for (Edge ic : fromv.getIncoming()) {
+                        if (ic instanceof Street) {
+                            vertices.add (ic.getFromVertex());
+                            break;
+                        }
+                    }
+                    showGraph.setHighlighed(vertices);
+                }
+
+                /* add the connected vertices to the list of vertices */
                 VertexList nearbyModel = (VertexList) nearbyVertices.getModel();
                 List<Vertex> vertices = nearbyModel.selected;
 

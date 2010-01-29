@@ -54,14 +54,16 @@ public class ShowGraph extends PApplet {
 
     int startDragX, startDragY;
 
+    private Edge highlightedEdge;
+
     private Vertex highlightedVertex;
 
-    private Set<Vertex> highlighted = new HashSet<Vertex>();
+    private Set<Vertex> highlightedVertices = new HashSet<Vertex>();
 
     protected double mouseModelX;
 
     protected double mouseModelY;
-    
+
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
         this.graph = graph;
@@ -166,15 +168,10 @@ public class ShowGraph extends PApplet {
             double y = v.getY();
             x = toScreenX(x);
             y = toScreenY(y);
-            if (v == highlightedVertex) {
-                stroke(255, 255, 30);
-                fill(255, 255, 30);
-                ellipse(x, y, 7.0, 7.0);
-                noFill();
-            } else if (v instanceof TransitStop) {
+            if (v instanceof TransitStop) {
                 stroke(255, 30, 255);
                 ellipse(x, y, 5.0, 5.0);
-            } else if (highlighted.contains(v)) {
+            } else if (highlightedVertices.contains(v)) {
                 stroke(0, 255, 0);
                 ellipse(x, y, 3.0, 3.0);
             } else {
@@ -183,7 +180,7 @@ public class ShowGraph extends PApplet {
             }
             
         }
-        
+
         List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
         for (Edge e : edges) {
         	double x1 = toScreenX(e.getFromVertex().getX());
@@ -196,9 +193,24 @@ public class ShowGraph extends PApplet {
         	} else {
         		stroke(30, 255, 255);
         	}
+
         	line((float)x1, (float)y1, (float)x2, (float)y2);
         }
-        
+        if (highlightedEdge != null) {
+            double x1 = toScreenX(highlightedEdge.getFromVertex().getX());
+            double y1 = toScreenY(highlightedEdge.getFromVertex().getY());
+            double x2 = toScreenX(highlightedEdge.getToVertex().getX());
+            double y2 = toScreenY(highlightedEdge.getToVertex().getY());
+            stroke (255, 70, 70);
+            line((float)x1, (float)y1, (float)x2, (float)y2);
+        }
+
+        if (highlightedVertex != null) {
+            stroke(255, 255, 30);
+            fill(255, 255, 30);
+            ellipse(toScreenX(highlightedVertex.getX()), toScreenY(highlightedVertex.getY()), 7.0, 7.0);
+            noFill();
+        }
         fill(255, 0, 0);
         text(mouseModelX + ", " + mouseModelY, 0, 10);
     }
@@ -325,6 +337,10 @@ public class ShowGraph extends PApplet {
     }
 
     public void setHighlighed(Set<Vertex> vertices) {
-        highlighted  = vertices;        
+        highlightedVertices  = vertices;
+    }
+
+    public void highlightEdge(Edge selected) {
+        highlightedEdge = selected;
     }
 }
