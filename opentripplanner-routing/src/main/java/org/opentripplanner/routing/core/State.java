@@ -23,8 +23,6 @@ public class State {
     private int curPattern = -1;
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
-    
-    FareStatus fareStatus;
 
     public State() {
         this(System.currentTimeMillis());
