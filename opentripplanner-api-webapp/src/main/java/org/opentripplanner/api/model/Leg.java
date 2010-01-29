@@ -60,11 +60,18 @@ public class Leg {
     public String route = "";
 
     /**
-     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null
+     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
     @XmlAttribute
     public String headsign = null;
 
+    /**
+     * For transit legs, the ID of the transit agency that operates the service used for this leg.
+     * For non-transit legs, null.
+     */
+    @XmlAttribute
+    public String agencyId = null;
+    
     /**
      * The Place where the leg originates.
      */

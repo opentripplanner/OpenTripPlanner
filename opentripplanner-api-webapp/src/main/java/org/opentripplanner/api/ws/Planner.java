@@ -284,6 +284,7 @@ public class Planner {
                         Trip trip = edge.getTrip();
                         if (trip != null) {
                             leg.headsign = trip.getTripHeadsign();
+                            leg.agencyId = trip.getId().getAgencyId();
                         }
                         mode = graphEdge.getMode();
                         leg.mode = mode.toString();
