@@ -47,6 +47,7 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+
 public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
     private FeatureSourceFactory _featureSourceFactory;
@@ -96,7 +97,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
 
-            SimpleFeatureConverter<Double> safetyConverter = _schema.getBicycleSafetyConverter();
+            SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
 
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
@@ -169,9 +170,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 street.setTraversalPermission(pair.getFirst());
                 backStreet.setTraversalPermission(pair.getSecond());
 
-                double effectiveLength = safetyConverter.convert(feature) * length;
-                street.setBicycleSafetyEffectiveLength(effectiveLength);
-                backStreet.setBicycleSafetyEffectiveLength(effectiveLength);
+                P2<Double> effectiveLength;
+                if (safetyConverter != null) {
+                    effectiveLength = safetyConverter.convert(feature);
+                    street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
+                    backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                }
             }
 
             for (ArrayList<Edge> edges : edgesByLocation.values()) {

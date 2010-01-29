@@ -67,12 +67,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public void setup() {
         edgeTree = new STRtree();
         transitStopTree = new STRtree();
-        HashSet<Edge> edges = new HashSet<Edge>();
+        HashSet<Street> edges = new HashSet<Street>();
         for (Vertex v : graph.getVertices()) {
             if (v instanceof Intersection) {
                 for (Edge e: v.getOutgoing()) {
                     if (e instanceof Street){
-                        edges.add(e);
+                        edges.add((Street) e);
                         Envelope env = new Envelope(v.getCoordinate(), e.getToVertex().getCoordinate());
                         edgeTree.insert(env, e);
                     }
@@ -94,7 +94,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Vertex getClosestVertex(final Coordinate c, boolean includeTransitStops) {
 
         Envelope envelope = new Envelope(c);
-        List<Edge> nearby = new LinkedList<Edge>();
+        List<Street> nearby = new LinkedList<Street>();
 
         int i = 0;
         double envelopeGrowthRate = 0.0018;
@@ -124,8 +124,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
 
             nearby = edgeTree.query(envelope);
-            Edge bestStreet = null;
-            for (Edge e: nearby) {
+            Street bestStreet = null;
+            for (Street e: nearby) {
                 Geometry g = e.getGeometry();
                 double distance = g.distance(p);
                 if (distance < bestDistance) {

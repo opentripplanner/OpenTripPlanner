@@ -129,6 +129,7 @@ otp.locale.English = {
         options: 
         [
           ['TRANSFERS', 'Fewest Transfers'],
+          ['SAFE', 'Safest Trip'],
           ['QUICK', 'Quickest Trip'] 
         ],
     

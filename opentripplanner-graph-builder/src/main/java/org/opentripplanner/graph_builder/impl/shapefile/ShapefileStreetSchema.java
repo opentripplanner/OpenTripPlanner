@@ -25,7 +25,7 @@ public class ShapefileStreetSchema {
 
     private SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = new CaseBasedTraversalPermissionConverter();
 
-    private SimpleFeatureConverter<Double> bicycleSafetyConverter = new CaseBasedBicycleSafetyFeatureConverter();
+    private SimpleFeatureConverter<P2<Double>> bicycleSafetyConverter = null;
 
     public SimpleFeatureConverter<String> getIdConverter() {
         return idConverter;
@@ -60,11 +60,11 @@ public class ShapefileStreetSchema {
         this.permissionConverter = permissionConverter;
     }
 
-    public void setBicycleSafetyConverter(SimpleFeatureConverter<Double> safetyConverter) {
+    public void setBicycleSafetyConverter(SimpleFeatureConverter<P2<Double>> safetyConverter) {
         this.bicycleSafetyConverter = safetyConverter;
     }
 
-    public SimpleFeatureConverter<Double> getBicycleSafetyConverter() {
+    public SimpleFeatureConverter<P2<Double>> getBicycleSafetyConverter() {
         return bicycleSafetyConverter;
     }
 }

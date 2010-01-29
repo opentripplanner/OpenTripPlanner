@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -53,7 +54,7 @@ public class StreetLocation extends GenericVertex {
      *                 if it is an origin vertex
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String name, Edge street, LinearLocation location) {
+    public static StreetLocation createStreetLocation(String name, Street street, LinearLocation location) {
 
         Geometry g = street.getGeometry();
         Coordinate nearestPoint = location.getCoordinate(g);
@@ -61,7 +62,7 @@ public class StreetLocation extends GenericVertex {
         return new StreetLocation(name, street, location, nearestPoint.x, nearestPoint.y);
     }
 
-    private StreetLocation(String name, Edge street, LinearLocation location, double x,
+    private StreetLocation(String name, Street street, LinearLocation location, double x,
             double y) {
         super(name, x, y);
 
@@ -75,21 +76,23 @@ public class StreetLocation extends GenericVertex {
         String streetName = street.getName();
 
         double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
+        double bicycleWeight1 = weight1 * street.bicycleSafetyEffectiveLength / street.length;
         double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
+        double bicycleWeight2 = weight2 * street.bicycleSafetyEffectiveLength / street.length;
 
-        Street e1 = new Street(fromv, this, streetName, streetName, weight1);
+        Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, StreetTraversalPermission.ALL);
         e1.setGeometry(toLineString(fromv.getCoordinate(), this.getCoordinate()));
         addIncoming(e1);
 
-        Street e2 = new Street(tov, this, streetName, streetName, weight2);
+        Street e2 = new Street(tov, this, streetName, streetName, weight2, bicycleWeight2, StreetTraversalPermission.ALL);
         e2.setGeometry(toLineString(tov.getCoordinate(), this.getCoordinate()));
         addIncoming(e2);
 
-        Street e3 = new Street(this, fromv, streetName, streetName, weight1);
+        Street e3 = new Street(this, fromv, streetName, streetName, weight1, bicycleWeight1, StreetTraversalPermission.ALL);
         addOutgoing(e3);
         e3.setGeometry(toLineString(this.getCoordinate(), fromv.getCoordinate()));
 
-        Street e4 = new Street(this, tov, streetName, streetName, weight2);
+        Street e4 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, StreetTraversalPermission.ALL);
         addOutgoing(e4);
         e4.setGeometry(toLineString(this.getCoordinate(), tov.getCoordinate()));
     }

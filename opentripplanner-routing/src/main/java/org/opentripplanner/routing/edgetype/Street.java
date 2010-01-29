@@ -38,9 +38,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     LineString geometry;
 
-    double length;
+    public double length;
 
-    StreetTraversalPermission permission;
+    public StreetTraversalPermission permission;
 
     /**
      * Streets with bike lanes are safer -- about twice as safe as streets without.
@@ -48,7 +48,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
      * people as it presently kills with bike lanes, statistically speaking.
      */
 
-    private double bicycleSafetyEffectiveLength;
+    public double bicycleSafetyEffectiveLength;
 
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
@@ -72,6 +72,15 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.permission = permission;
     }
 
+    public Street(Vertex start, Vertex end, String id, String name, double length, double bicycleSafetyEffectiveLength, StreetTraversalPermission permission) {
+        super(start, end);
+        this.id = id;
+        this.name = name;
+        this.length = length;
+        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+        this.permission = permission;
+    }
+
     public void setGeometry(LineString g) {
         geometry = g;
     }
@@ -84,14 +93,14 @@ public class Street extends AbstractEdge implements WalkableEdge {
         double time = this.length / wo.speed;
         double weight;
         if (wo.modes.contains(TraverseMode.BICYCLE) && wo.optimizeFor.equals(OptimizeType.SAFE)) {
-            weight = this.bicycleSafetyEffectiveLength / wo.speed;
+            weight = bicycleSafetyEffectiveLength / wo.speed;
         } else {
             weight = time;
         }
-        if (s0.walkDistance > wo.maxWalkDistance) {
+        if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
             weight *= 100;
         }
-        s1.walkDistance += this.length;
+        s1.walkDistance += length;
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) time);
         return new TraverseResult(weight, s1);
@@ -102,14 +111,17 @@ public class Street extends AbstractEdge implements WalkableEdge {
             return null;
         }
         State s1 = s0.clone();
-        double time = this.length / wo.speed;
+        double time = length / wo.speed;
         double weight;
         if (wo.modes.contains(TraverseMode.BICYCLE) && wo.optimizeFor.equals(OptimizeType.SAFE)) {
-            weight = this.bicycleSafetyEffectiveLength / wo.speed;
+            if (bicycleSafetyEffectiveLength < length * 0.99) {
+                System.out.println ("a shorter path on : " + getName() + ": " + bicycleSafetyEffectiveLength + " / " + length);
+            }
+            weight = bicycleSafetyEffectiveLength / wo.speed;
         } else {
             weight = time;
         }
-        if (s0.walkDistance > wo.maxWalkDistance) {
+        if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
             weight *= 100;
         }
         s1.walkDistance += this.length;
