@@ -24,6 +24,8 @@ public class State {
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
     
+    FareStatus fareStatus;
+
     public State() {
         this(System.currentTimeMillis());
     }

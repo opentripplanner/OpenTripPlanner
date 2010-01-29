@@ -373,7 +373,7 @@ public class GTFSPatternHopFactory {
                     }
                     int departureTime = post.getFirstStop(_dao).getArrivalTime();
                     int dwellTime = departureTime - arrivalTime;
-                    dwell.addTrip(trip.getId(), post.trip.getId(), dwellTime);
+                    dwell.addTrip(trip.getId(), post.trip.getId(), dwellTime, eTrip.patternIndex, post.patternIndex);
                 }
 
             }

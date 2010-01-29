@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,29 +16,40 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+class InterlineDwellData implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+    public int dwellTime;
+    public int patternIndex;
+    public InterlineDwellData(int dwellTime, int patternIndex) {
+        this.dwellTime = dwellTime;
+        this.patternIndex = patternIndex;
+    }
+}
+
 public class PatternInterlineDwell extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<AgencyAndId, Integer> tripIdToDwellTime;
+    private Map<AgencyAndId, InterlineDwellData> tripIdToInterlineDwellData;
 
-    private Map<AgencyAndId, Integer> reverseTripIdToDwellTime;
+    private Map<AgencyAndId, InterlineDwellData> reverseTripIdToInterlineDwellData;
 
     private Trip targetTrip;
 
     public PatternInterlineDwell(Vertex startJourney, Vertex endJourney, Trip targetTrip) {
         super(startJourney, endJourney);
-        this.tripIdToDwellTime = new HashMap<AgencyAndId, Integer>();
-        this.reverseTripIdToDwellTime = new HashMap<AgencyAndId, Integer>();
+        this.tripIdToInterlineDwellData = new HashMap<AgencyAndId, InterlineDwellData>();
+        this.reverseTripIdToInterlineDwellData = new HashMap<AgencyAndId, InterlineDwellData>();
         this.targetTrip = targetTrip;
     }
 
-    public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime) {
+    public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime, int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
             throw new RuntimeException("Negative dwell time");
         }
-        tripIdToDwellTime.put(trip, dwellTime);
-        reverseTripIdToDwellTime.put(reverseTrip, dwellTime);
+        tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
+        reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime, newPatternIndex));
     }
 
     public String getDirection() {
@@ -60,26 +72,29 @@ public class PatternInterlineDwell extends AbstractEdge {
         State state1 = state0.clone();
 
         AgencyAndId tripId = state0.tripId;
-        Integer dwellTime = tripIdToDwellTime.get(tripId);
-        if (dwellTime == null) {
+        InterlineDwellData dwellData = tripIdToInterlineDwellData.get(tripId);
+        if (dwellData == null) {
             return null;
         }
-        state1.incrementTimeInSeconds(dwellTime);
+        state1.incrementTimeInSeconds(dwellData.dwellTime);
         state1.tripId = targetTrip.getId();
-        return new TraverseResult(dwellTime, state1);
+        state1.setPattern(dwellData.patternIndex);
+
+        return new TraverseResult(dwellData.dwellTime, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
 
         AgencyAndId tripId = state0.tripId;
-        Integer dwellTime = reverseTripIdToDwellTime.get(tripId);
-        if (dwellTime == null) {
+        InterlineDwellData dwellData = reverseTripIdToInterlineDwellData.get(tripId);
+        if (dwellData == null) {
             return null;
         }
-        state1.incrementTimeInSeconds(-dwellTime);
+        state1.incrementTimeInSeconds(-dwellData.dwellTime);
         state1.tripId = targetTrip.getId();
-        return new TraverseResult(dwellTime, state1);
+        state1.setPattern(dwellData.patternIndex);
+        return new TraverseResult(dwellData.dwellTime, state1);
     }
 
     public Geometry getGeometry() {
@@ -87,6 +102,6 @@ public class PatternInterlineDwell extends AbstractEdge {
     }
 
     public String toString() {
-        return "PatternDwell(" + super.toString() + ")";
+        return "PatterninterlineDwell(" + super.toString() + ")";
     }
 }
