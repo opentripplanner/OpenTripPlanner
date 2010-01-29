@@ -34,7 +34,6 @@ otp.core.MapStatic = {
     mapDiv            : "map",
     url               : "http://maps.opengeo.org/geowebcache/service/wms",
     srsName           : "EPSG:4326",
-    center            : {x:-122.66, y:45.53},
     layerNames        : ['openstreetmap'], 
     numZoomLevels     : 19,
     units             : null,
@@ -57,6 +56,16 @@ otp.core.MapStatic = {
     center            : {x:-13655812, y:5704158},
 */
 
+    /**
+     * An OpenLayers.Bounds object that defines the default extent used when
+     * displaying the map.
+     * 
+     * Setting this to "automatic" will cause the trip planner to set this to
+     * the extent of the data being routed on from the server.
+     * 
+     */
+    defaultExtent : "automatic",
+    
     /** use attribution if you want the same attribute on both tile sets */
     attribution       : null,
     transitionEffect  :'resize',
@@ -100,8 +109,10 @@ otp.core.MapStatic = {
             this.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
         }
 
-        this.clear();
         otp.core.MapSingleton = this;
+        
+        this.clear();
+
         console.log("exit Map constructor");
     },
 
@@ -182,13 +193,56 @@ otp.core.MapStatic = {
     /** */
     clear : function()
     {
+        if (this.defaultExtent == "automatic")
+        {
+            // If we're set to automatically get the default extent from the
+            // server and we don't have it yet, request it and set a timeout to
+            // come back to call this function again soon.
+            this.getDefaultExtentFromServer();
+            var self = this;
+            setTimeout(function() {self.clear();}, 10);
+            return;
+        }
         this.updateSize();
-        this.map.setCenter(
-                new OpenLayers.LonLat(this.center.x, this.center.y).transform(
-                        this.dataProjection, this.map.getProjectionObject()),
-                11);
+        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection,
+                this.map.getProjectionObject()));
     },
 
+    /**
+     * Requests the extent of the region being routed on from the server and
+     * caches it locally.
+     */
+    getDefaultExtentFromServer : function()
+    {
+        if (this.defaultExtent != "automatic" && this.defaultExtent != null)
+        {
+            return this.defaultExtent;
+        }
+        Ext.Ajax.request({
+            // TODO: store the base /ws URL someplace else
+            url : '/opentripplanner-api-webapp/ws/metadata',
+            method : 'GET',
+            // TODO: switch other ajax requests from XML to JSON?
+            headers: 'Accept: application/json',
+            success : function(result, request) 
+                      {
+                          var metadata = Ext.util.JSON.decode(result.responseText);
+                          otp.core.MapSingleton.defaultExtent = new OpenLayers.Bounds(
+                                  metadata.minLongitude,
+                                  metadata.minLatitude,
+                                  metadata.maxLongitude,
+                                  metadata.maxLatitude
+                          );
+                      },
+            failure : function(result, request)
+                      {
+                          console.log("getRoutingExtent error:");
+                          console.log(result);
+                      }
+        });
+        return null;
+    },
+    
     /** */
     centerMapAtPixel: function(x, y)
     {
