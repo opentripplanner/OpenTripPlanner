@@ -404,6 +404,25 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(findButton);
 
+        JButton findEdgeButton = new JButton("Find edge");
+        findEdgeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
+                        JOptionPane.PLAIN_MESSAGE);
+                for (Vertex v : graph.getVertices()) {
+                    for (Edge edge: v.getOutgoing()) {
+                        if (edge.getName() != null && edge.getName().contains(edgeName)) {
+                            showGraph.highlightVertex(v);
+                            ArrayList<Vertex> l = new ArrayList<Vertex>();
+                            l.add(v);
+                            verticesSelected(l);
+                        }
+                    }
+                }
+            }
+        });
+        buttonPanel.add(findEdgeButton);
+
         JButton checkButton = new JButton("Check graph");
         checkButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
