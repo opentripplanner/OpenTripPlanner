@@ -161,6 +161,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     ArrayList<Edge> outEdges = edgesByLocation.get(c);
                     if (outEdges != null) {
                         /* If this is not an intersection or street name change, unify the vertices */
+                        boolean unified = false;
                         if (outEdges.size() == 2) {
                             for (Edge out : outEdges) {
                                 Vertex fromVertex = out.getFromVertex();
@@ -168,10 +169,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                     Intersection v = (Intersection) tov;
                                     v.mergeFrom(graph, (Intersection) fromVertex);
                                     graph.removeVertex(fromVertex);
+                                    unified = true;
                                     break;
                                 }
                             }
-                        } else {
+                        }
+                        if (!unified) {
                             for (Edge out : outEdges) {
                                 /*
                                  * Only create a turn edge if: (a) the edge is not the one we are
