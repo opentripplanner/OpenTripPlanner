@@ -191,16 +191,21 @@ otp.core.MapStatic = {
     },
 
     /** */
-    clear : function()
+    clear : function(timeout)
     {
-        if (this.defaultExtent == "automatic")
+    	if (this.defaultExtent == "automatic")
         {
             // If we're set to automatically get the default extent from the
             // server and we don't have it yet, request it and set a timeout to
             // come back to call this function again soon.
-            this.getDefaultExtentFromServer();
+    	    this.getDefaultExtentFromServer();
             var self = this;
-            setTimeout(function() {self.clear();}, 10);
+            if (!timeout)
+            {
+                timeout = 100;
+            }
+            var newTimeout = timeout+timeout;
+            setTimeout(function() {self.clear(newTimeout);}, newTimeout);
             return;
         }
         this.updateSize();
@@ -218,15 +223,14 @@ otp.core.MapStatic = {
         {
             return this.defaultExtent;
         }
-        Ext.Ajax.request({
+        OpenLayers.Request.GET({
             // TODO: store the base /ws URL someplace else
             url : '/opentripplanner-api-webapp/ws/metadata',
-            method : 'GET',
             // TODO: switch other ajax requests from XML to JSON?
-            headers: 'Accept: application/json',
-            success : function(result, request) 
+            headers: {Accept: 'application/json'},
+            success : function(xhr) 
                       {
-                          var metadata = Ext.util.JSON.decode(result.responseText);
+                          var metadata = Ext.util.JSON.decode(xhr.responseText);
                           otp.core.MapSingleton.defaultExtent = new OpenLayers.Bounds(
                                   metadata.minLongitude,
                                   metadata.minLatitude,
@@ -234,10 +238,10 @@ otp.core.MapStatic = {
                                   metadata.maxLatitude
                           );
                       },
-            failure : function(result, request)
+            failure : function(xhr)
                       {
                           console.log("getRoutingExtent error:");
-                          console.log(result);
+                          console.log(xhr);
                       }
         });
         return null;
