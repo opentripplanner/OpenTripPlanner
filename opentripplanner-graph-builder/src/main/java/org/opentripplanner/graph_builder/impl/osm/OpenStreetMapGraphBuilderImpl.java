@@ -162,28 +162,22 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (osmStartNode == null || osmEndNode == null)
                         continue;
+
                     Vertex from = addVertex(graph, vFromId, osmStartNode);
                     Vertex to = addVertex(graph, vToId, osmEndNode);
 
-                    double d = from.distance(to);
-                    Street street = getEdgeForStreet(from, to, way, d, permissions);
-                    graph.addEdge(street);
-                    Street backStreet = getEdgeForStreet(to, from, way, d, permissions);
-                    graph.addEdge(backStreet);
+                    ArrayList<Street> streets = getEdgesForStreet(from, to, way, permissions);
+                    for(Street street : streets) {
+                        graph.addEdge(street);
+                        Vertex start = street.getFromVertex();
 
-                    ArrayList<Edge> startEdges = edgesByLocation.get(from.getCoordinate());
-                    if (startEdges == null) {
-                        startEdges = new ArrayList<Edge>();
-                        edgesByLocation.put(from.getCoordinate(), startEdges);
+                        ArrayList<Edge> edges = edgesByLocation.get(start.getCoordinate());
+                        if (edges == null) {
+                            edges = new ArrayList<Edge>();
+                            edgesByLocation.put(start.getCoordinate(), edges);
+                        }
+                        edges.add(street);
                     }
-                    startEdges.add(street);
-
-                    ArrayList<Edge> endEdges = edgesByLocation.get(to.getCoordinate());
-                    if (endEdges == null) {
-                        endEdges = new ArrayList<Edge>();
-                        edgesByLocation.put(to.getCoordinate(), endEdges);
-                    }
-                    endEdges.add(backStreet);
                 }
             }
 
@@ -317,6 +311,41 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private String getVertexIdForNodeId(int nodeId) {
             return "osm node " + nodeId;
+        }
+
+        /* Attempt at handling oneway streets, cycleways, and whatnot. See
+         * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios,
+         * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. */
+        private ArrayList<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
+                StreetTraversalPermission permissions) {
+            ArrayList<Street> streets = new ArrayList<Street>();
+            double d = from.distance(to);
+
+            Map<String, String> tags = way.getTags();
+
+            if(permissions == StreetTraversalPermission.NONE)
+                return streets;
+
+            /* Three basic cases, 1) bidirectonal for everyone, 2) unidirctional for cars only,
+             * 3) biderectional for pedestrians only. */
+            if("yes".equals(tags.get("oneway")) &&
+                    ("no".equals(tags.get("oneway:bicycle"))
+                     || "opposite_lane".equals(tags.get("cycleway"))
+                     || "opposite".equals(tags.get("cycleway")))) { // 2.
+                streets.add(getEdgeForStreet(from, to, way, d, permissions));
+                if(permissions.remove(StreetTraversalPermission.CAR) != StreetTraversalPermission.NONE)
+                    streets.add(getEdgeForStreet(to, from, way, d, permissions.remove(StreetTraversalPermission.CAR)));
+            } else if ("yes".equals(tags.get("oneway")) || "roundabout".equals(tags.get("junction"))) { // 3
+                streets.add(getEdgeForStreet(from, to, way, d, permissions));
+                if(permissions.allows(StreetTraversalPermission.PEDESTRIAN))
+                    streets.add(getEdgeForStreet(to, from, way, d, StreetTraversalPermission.PEDESTRIAN));
+            } else { // 1.
+                streets.add(getEdgeForStreet(from, to, way, d, permissions));
+                streets.add(getEdgeForStreet(to, from, way, d, permissions));
+            }
+
+
+            return streets;
         }
 
         private Street getEdgeForStreet(Vertex from, Vertex to, OSMWay way, double d,
