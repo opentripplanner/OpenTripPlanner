@@ -155,19 +155,19 @@ public class TestHalfEdges extends TestCase {
         StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.08));
         assertNotNull(end);
 
-        if (start.street == leftUp) {
+        if (start.streets.get(0) == leftUp) {
             assertTrue(Math.abs(start.location.getSegmentFraction() - 0.4) < 0.00001);
         } else {
             assertTrue(Math.abs(start.location.getSegmentFraction() - 0.6) < 0.00001);
-            assertEquals(leftDown, start.street);
+            assertEquals(leftDown, start.streets.get(0));
         }
         assertTrue(start.getDegreeOut() == 2);
 
-        if (end.street == rightUp) {
+        if (end.streets.get(0) == rightUp) {
             assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.2 < 0.00001);
         } else {
             assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.8 < 0.00001);
-            assertEquals(rightDown, end.street);
+            assertEquals(rightDown, end.streets.get(0));
         }
         assertTrue(end.getDegreeIn() == 2);
 

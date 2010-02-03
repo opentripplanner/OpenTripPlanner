@@ -123,17 +123,32 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
             }
 
+            /* It is presumed, that edges which are the exact same distance from the examined
+             * coordinate are parallel (coincident) edges. If this is wrong in too many cases,
+             * than some finer logic will need to be added
+             *
+             * Parallel edges are needed to account for (oneway) streets with varying permissions.
+             * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
+             * a pedestrian should be able to go in any direction. */
+
             nearby = edgeTree.query(envelope);
-            Street bestStreet = null;
             for (Street e: nearby) {
                 Geometry g = e.getGeometry();
                 double distance = g.distance(p);
                 if (distance < bestDistance) {
                     bestDistance = distance;
-                    bestStreet = e;
+                }
+            }
+            List<Street> parallel = new LinkedList<Street>();
+            for (Street e: nearby) {
+                Geometry g = e.getGeometry();
+                double distance = g.distance(p);
+                if (distance == bestDistance) {
+                    parallel.add(e);
                 }
             }
             if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                Street bestStreet = parallel.get(0);
                 Geometry g = bestStreet.getGeometry();
                 LocationIndexedLine l = new LocationIndexedLine(g);
                 LinearLocation location = l.project(c);
@@ -146,7 +161,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 } else if (nearestPoint.distance(end) < MAX_SNAP_TO_INTERSECTION_DISTANCE) {
                     return bestStreet.getToVertex();
                 }
-                return StreetLocation.createStreetLocation(c.toString(), bestStreet, location);
+                return StreetLocation.createStreetLocation(c.toString(), parallel, location);
             }
         }
         return null;

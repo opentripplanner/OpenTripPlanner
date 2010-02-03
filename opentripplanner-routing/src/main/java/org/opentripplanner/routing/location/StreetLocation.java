@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.location;
 
+import java.util.List;
+import java.util.LinkedList;
+
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -37,7 +40,7 @@ public class StreetLocation extends GenericVertex {
     
     private static final long serialVersionUID = 1L;
 
-    public Edge street;
+    public List<Street> streets;
 
     public LinearLocation location; /* a number from 0 to 1 representing how far along the street the
                                location is; 0 means the start vertex and 1 means the end vertex */
@@ -48,53 +51,55 @@ public class StreetLocation extends GenericVertex {
      * along the edge between 0 (the from vertex) and 1 (the to vertex).
      *   
      * @param name
-     * @param street
+     * @param streets A List of nearby streets (which are presumed to be coincident/parallel edges).
+     *                i.e. a list of edges which represent a physical real-world street.
      * @param location
-     * @param incoming true if the StartLocation is a target vertex, false 
-     *                 if it is an origin vertex
+     *
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String name, Street street, LinearLocation location) {
+    public static StreetLocation createStreetLocation(String name, List<Street> streets, LinearLocation location) {
 
-        Geometry g = street.getGeometry();
+        Geometry g = streets.get(0).getGeometry();
         Coordinate nearestPoint = location.getCoordinate(g);
 
-        return new StreetLocation(name, street, location, nearestPoint.x, nearestPoint.y);
+        return new StreetLocation(name, streets, location, nearestPoint.x, nearestPoint.y);
     }
 
-    private StreetLocation(String name, Street street, LinearLocation location, double x,
+    public static StreetLocation createStreetLocation(String name, Street street, LinearLocation location) {
+        List<Street> streets = new LinkedList<Street>();
+        streets.add(street);
+        return createStreetLocation(name, streets, location);
+    }
+
+    private StreetLocation(String name, List<Street> streets, LinearLocation location, double x,
             double y) {
         super(name, x, y);
-
-        Vertex fromv = street.getFromVertex();
-        Vertex tov = street.getToVertex();
-        Coordinate startCoord = fromv.getCoordinate();
-        Coordinate endCoord = tov.getCoordinate();
-        this.street = street;
+        this.streets = streets;
         this.location = location;
 
-        String streetName = street.getName();
+        for( Street street : streets ) {
+            Vertex fromv = street.getFromVertex();
+            Vertex tov = street.getToVertex();
+            Coordinate startCoord = fromv.getCoordinate();
+            Coordinate endCoord = tov.getCoordinate();
 
-        double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
-        double bicycleWeight1 = weight1 * street.bicycleSafetyEffectiveLength / street.length;
-        double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
-        double bicycleWeight2 = weight2 * street.bicycleSafetyEffectiveLength / street.length;
+            String streetName = street.getName();
 
-        Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, StreetTraversalPermission.ALL);
-        e1.setGeometry(toLineString(fromv.getCoordinate(), this.getCoordinate()));
-        addIncoming(e1);
+            double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
+            double bicycleWeight1 = weight1 * street.bicycleSafetyEffectiveLength / street.length;
 
-        Street e2 = new Street(tov, this, streetName, streetName, weight2, bicycleWeight2, StreetTraversalPermission.ALL);
-        e2.setGeometry(toLineString(tov.getCoordinate(), this.getCoordinate()));
-        addIncoming(e2);
+            double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
+            double bicycleWeight2 = weight2 * street.bicycleSafetyEffectiveLength / street.length;
 
-        Street e3 = new Street(this, fromv, streetName, streetName, weight1, bicycleWeight1, StreetTraversalPermission.ALL);
-        addOutgoing(e3);
-        e3.setGeometry(toLineString(this.getCoordinate(), fromv.getCoordinate()));
+            Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, street.getTraversalPermission(), street.getWheelchairAccessible());
+            e1.setGeometry(toLineString(fromv.getCoordinate(), this.getCoordinate()));
+            addIncoming(e1);
 
-        Street e4 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, StreetTraversalPermission.ALL);
-        addOutgoing(e4);
-        e4.setGeometry(toLineString(this.getCoordinate(), tov.getCoordinate()));
+
+            Street e2 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, street.getTraversalPermission(), street.getWheelchairAccessible());
+            e2.setGeometry(toLineString(this.getCoordinate(), tov.getCoordinate()));
+            addOutgoing(e2);
+        }
     }
 
     private LineString toLineString(Coordinate start, Coordinate end) {
@@ -111,14 +116,14 @@ public class StreetLocation extends GenericVertex {
         for (Edge e : getIncoming()) {
             Street s = (Street) e;
             Vertex fromv = e.getFromVertex();
-            Street street = new Street(fromv, reified, name, name, s.getLength());
+            Street street = new Street(fromv, reified, name, name, s.getLength(), s.getBicycleSafetyEffectiveLength(), s.getTraversalPermission(), s.getWheelchairAccessible());
             street.setGeometry(s.getGeometry());
             graph.addEdge(street);
         }
         for (Edge e : getOutgoing()) {
             Street s = (Street) e;
             Vertex tov = e.getToVertex();
-            Street street = new Street(reified, tov, name, name, s.getLength());
+            Street street = new Street(reified, tov, name, name, s.getLength(), s.getBicycleSafetyEffectiveLength(), s.getTraversalPermission(), s.getWheelchairAccessible());
             street.setGeometry(s.getGeometry());
             graph.addEdge(street);
         }

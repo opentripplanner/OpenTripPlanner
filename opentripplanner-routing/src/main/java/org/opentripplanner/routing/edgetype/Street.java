@@ -97,6 +97,16 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.wheelchairAccessible = true;
     }
 
+    public Street(Vertex start, Vertex end, String id, String name, double length, double bicycleSafetyEffectiveLength, StreetTraversalPermission permission, boolean wheelchairAccessible) {
+        super(start, end);
+        this.id = id;
+        this.name = name;
+        this.length = length;
+        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+        this.permission = permission;
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
+
     public void setGeometry(LineString g) {
         geometry = g;
     }
@@ -207,6 +217,10 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public void setTraversalPermission(StreetTraversalPermission permission) {
         this.permission = permission;
+    }
+
+    public StreetTraversalPermission getTraversalPermission() {
+        return permission;
     }
 
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
