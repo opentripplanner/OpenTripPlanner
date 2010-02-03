@@ -8,13 +8,6 @@
     <meta name="keywords"    content="multi modal trip planner tripplanner bike tranist map" />
     <meta content="tripplanner v0.3 - January 2010"/>
 
-    <!--
-    * Browser Support (as of Nov 2007):
-    *   Internet Explorer 6+
-    *   FireFox 1.5+ (PC, Mac)
-    *   Safari 2+
-    *   Opera 9+ (PC, Mac)
-    -->    
     <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/ext-all-notheme.css" />
     <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/xtheme-gray-extend.css" />
     <link rel="stylesheet" type="text/css" href="js/lib/openlayers/theme/default/style.css" />
@@ -38,8 +31,10 @@
     <script src="js/otp/otp.js"></script>
     <script src="js/otp/util/OpenLayersUtils.js"></script>
     <script src="js/otp/util/ExtUtils.js"></script>
+    <script src="js/otp/util/Modes.js"></script>
     <script src="js/otp/locale/English.js"></script>
     <script src="js/otp/planner/Utils.js"></script>
+    <script src="js/otp/util/ParseUrlParams.js"></script>
     <script src="js/otp/planner/ContextMenu.js"></script>
     <script src="js/otp/core/ComboBox.js"></script>
     <script src="js/otp/core/Map.js"></script>
@@ -59,7 +54,7 @@
     <script src="js/otp/planner/poi/Control.js"></script>
     <script src="js/otp/planner/poi/Popup.js"></script>
     <script src="js/otp/planner/poi/Style.js"></script>
-    
+    <script src="js/otp/application/Controller.js"></script>
 </head>
 <style>
 </style>
@@ -67,17 +62,17 @@
     <div class="logo" id="logo"> 
         <a href="http://opentripplanner.org" title="OpenTripPlanner Home"><img src="images/ui/logoSmall.png" alt="OpenTripPlanner home"/></a>
     </div> 
+    <script>otp.util.AnalyticsUtils.importGoogleAnalytics();</script>
     <script type="text/javascript">
     Ext.onReady(function()
     {
-        var map  = new otp.core.Map({attribution:otp.util.ExtUtils.MAP_ATTRIBUTION}); 
-        var ui   = new otp.core.UI({map:map});
-
-        ////////// trip planner ///////////
-        var poi  = new otp.planner.poi.Control({map:map.getMap()});
-        var plan = new otp.planner.Planner({url:'/js/otp/planner/test/test.xml', map:map, poi:poi});
-        var cm   = new otp.planner.ContextMenu({map:map, forms:plan.getForms()});
-        ui.accordion.add(plan.getPanel());
+        otp.util.AnalyticsUtils.initGoogleAnalytics();
+        var pdx  = new OpenLayers.Bounds(-122.661,45.5222,-122.662,45.5224); 
+        new otp.application.Controller({
+            extent     : pdx,
+            url        : '/js/otp/planner/test/test.xml',
+            rteMapPngs : true
+        });
     });
     </script>
 </body>

@@ -106,5 +106,5 @@ otp.util.AnalyticsUtils = {
         }
     },
 
-    CLASS_NAME : "otp.utl.AnalyticsUtils"
+    CLASS_NAME : "otp.util.AnalyticsUtils"
 };

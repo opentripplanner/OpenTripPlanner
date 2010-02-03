@@ -24,7 +24,9 @@ otp.namespace("otp.planner");
   */
 
 otp.planner.Itinerary = {
-    
+    // config
+    map            : null,
+
     // raw data
     xml            : null,
     from           : null,
@@ -113,23 +115,25 @@ otp.planner.Itinerary = {
             }
             
             // Reproject layer data for display if necessary
-            if (otp.core.MapStatic.dataProjection != vLayer.map.getProjection()) {
+            if(this.map.dataProjection != vLayer.map.getProjection())
+            {
                 for ( var i = 0; i < this.m_vectors.length; ++i) {
                     if (!this.m_vectors[i].geometry._otp_reprojected) {
                         this.m_vectors[i].geometry._otp_reprojected = true;
                         this.m_vectors[i].geometry.transform(
-                                otp.core.MapStatic.dataProjection,
+                                this.map.dataProjection,
                                 vLayer.map.getProjectionObject());
                     }
                 }
             }
 
-            if (otp.core.MapStatic.dataProjection != mLayer.map.getProjection()) {
+            if(this.map.dataProjection != mLayer.map.getProjection())
+            {
                 for ( var i = 0; i < this.m_markers.length; ++i) {
                     if (!this.m_markers[i].geometry._otp_reprojected) {
                         this.m_markers[i].geometry._otp_reprojected = true;
                         this.m_markers[i].geometry.transform(
-                                otp.core.MapStatic.dataProjection,
+                                this.map.dataProjection,
                                 mLayer.map.getProjectionObject());
                     }
                 }
@@ -294,17 +298,15 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
             var mode = from.get('mode');
 
-            if (mode == 'BUS' || mode == 'TRAM' || mode == 'RAIL'
-                    || mode == 'SUBWAY' || mode == 'GONDOLA'
-                    || mode == 'CABLE_CAR' || mode == 'FUNICULAR')
+            if(otp.util.Modes.isTransit(mode))
             {
                 try
                 {
-                	var geoJson = leg.get('legGeometry');
-                	var geoLine = new OpenLayers.Feature.Vector(geoJson,
-                			null,
-                			otp.util.OpenLayersUtils.RED_STYLE);
-                			
+                    var geoJson = leg.get('legGeometry');
+                    var geoLine = new OpenLayers.Feature.Vector(geoJson,
+                            null,
+                            otp.util.OpenLayersUtils.RED_STYLE
+                    );
                     var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                     vectors.push(geoLine);
                 }
@@ -341,16 +343,16 @@ otp.planner.Itinerary = {
         {
             var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
-            
+
             var mode = from.get('mode');
             if(mode == 'WALK') 
             {
                 try
                 {
-                	var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'),
-                			null,
-                			otp.util.OpenLayersUtils.BLACK_STYLE);
-                			
+                    var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'),
+                            null,
+                            otp.util.OpenLayersUtils.BLACK_STYLE
+                    );
                     var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                     vectors.push(geoLine);
                 }
@@ -427,7 +429,7 @@ otp.planner.Itinerary = {
                 var to    = this.m_toStore.getAt(i);
                 var thru  = from.get('order');
                 var route = from.get('routeID');
-                
+
                 var fromP = from.get('geometry');
                 var toP = to.get('geometry');
 
@@ -513,7 +515,8 @@ otp.planner.Itinerary = {
             var hasKids = true;
             var iconCLS = 'bus-icon';
             var sched = null;
-            if (leg.get('mode') == 'walk') 
+            var mode  = leg.get('mode').toLowerCase();
+            if(mode == 'walk') 
             {
                 text = otp.planner.Templates.TP_WALK_LEG.applyTemplate(leg.data);
                 hasKids = false;
@@ -521,25 +524,15 @@ otp.planner.Itinerary = {
             }
             else
             {
-                if (leg.get('order') == 'thru-route') {
+                var order = leg.get('order');
+                if (order == 'thru-route') {
                     text = otp.planner.Templates.getInterlineLeg().applyTemplate(leg.data);
                 }
                 else 
                 {
                     text  = otp.planner.Templates.getTransitLeg().applyTemplate(leg.data);
-                    //sched = otp.planner.Templates.makeTTPUBLinkFromData(leg.data);
                 }
-
-                if(leg.get('mode') == 'bus')
-                    iconCLS = 'bus-icon';
-                else if(leg.get('mode') == 'tram')
-                    iconCLS = 'tram-icon';
-                else if(leg.get('mode') == 'streetcar')
-                    iconCLS = 'streetcar-icon';
-                else if(leg.get('mode') == 'rail')
-                    iconCLS = 'commrail-icon';
-                else
-                    iconCLS = 'ltrail-icon';
+                iconCLS = mode + '-icon';
             }
             retVal.push(otp.util.ExtUtils.makeTreeNode(this.id + this.LEG_ID + i, text, 'itiny', iconCLS, hasKids, clickCallback, scope));
         }

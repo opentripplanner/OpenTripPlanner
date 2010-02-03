@@ -34,8 +34,7 @@ otp.planner.Planner = {
     // configuration
     url           : null,
     poi           : null,
-    rteMapPngs    : false,  // false == use generic /image/map/trip/mode/<mode>.png icons
-                            // true  == use rte # /image/map/trip/rte/<number>.png icons 
+    rteMapPngs    : false,  // needed here...sent down to Renderer constructor
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -95,7 +94,6 @@ otp.planner.Planner = {
 
         m = this.map.getMap();
         m.events.register('click', m, function (e) {
-            
         });
 
         console.log("exit planner.Planner constructor");

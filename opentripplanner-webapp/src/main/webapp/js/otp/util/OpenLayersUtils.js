@@ -336,6 +336,7 @@ otp.util.OpenLayersUtils = {
     DISK_ICON       : 'images/map/trip/xferdisk.png',
     WALK_ICON       : 'images/map/trip/mode/walk.png',
     ROUTE_DIR       : 'images/map/trip/rte/',
+    MODE_DIR        : 'images/map/trip/mode/',
 
     ST_END_SIZE     : new OpenLayers.Size(20, 34),
     ST_END_OFFSET   : new OpenLayers.Pixel(-10, -34),
@@ -346,7 +347,38 @@ otp.util.OpenLayersUtils = {
      * Returns a lookup to be used by OpenLayers to determine how to render the various
      * features (e.g., route and walking markers) on the map.
      */
-    getMarkerStyleLookup :  function()
+    getRouteNumberMarkerStyle :  function()
+    {
+        var retVal = this.getBaseMarkerStyle();
+
+        retVal.routeMarker = {
+                // icon is determined by the value of feature.attributes.route
+                externalGraphic: this.ROUTE_DIR + "${route}.png",
+                graphicWidth:   this.RTE_ICON_SIZE.w,
+                graphicHeight:  this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET.x,
+                graphicYOffset: this.RTE_ICON_OFFSET.y
+        };
+
+        return retVal; 
+    },
+
+    getRouteModeMarkerStyle :  function()
+    {
+        var retVal = this.getBaseMarkerStyle();
+        retVal.routeMarker = {
+                // icon is determined by the value of feature.attributes.route
+                externalGraphic: this.MODE_DIR + "${mode}.png",
+                graphicWidth:   this.RTE_ICON_SIZE.w,
+                graphicHeight:  this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET.x,
+                graphicYOffset: this.RTE_ICON_OFFSET.y
+            };
+
+        return retVal; 
+    },
+
+    getBaseMarkerStyle : function()
     {
         return {
             'walkMarker': {
@@ -383,18 +415,10 @@ otp.util.OpenLayersUtils = {
                 graphicHeight: this.DISK_SIZE.h,
                 graphicXOffset: this.DISK_OFFSET.x,
                 graphicYOffset: this.DISK_OFFSET.y
-            },
-            'routeMarker': {
-                // icon is determined by the value of feature.attributes.route
-                externalGraphic: this.ROUTE_DIR + "${route}.png",
-                graphicWidth: this.RTE_ICON_SIZE.w,
-                graphicHeight: this.RTE_ICON_SIZE.h,
-                graphicXOffset: this.RTE_ICON_OFFSET.x,
-                graphicYOffset: this.RTE_ICON_OFFSET.y
             }
         };
     },
-    
+
     /**
      * Create a new route marker.
      * 
@@ -459,10 +483,13 @@ otp.util.OpenLayersUtils = {
      * @param {Object} wideZoomLimit
      * @param {Object} closeZoomLimit
      */
-    panZoomWithLimits : function(map, x, y, z, wideZoomLimit, closeZoomLimit)
+    panZoomWithLimits : function(map, x, y, z, wideZoomLimit, closeZoomLimit, prj)
     {
         try 
         {
+            if(prj == null)
+                prj = otp.core.MapStatic.dataProjection;
+
             if(z && z >= wideZoomLimit && z <= closeZoomLimit)
             {
                 map.zoomTo(z);
@@ -478,7 +505,7 @@ otp.util.OpenLayersUtils = {
             
             if (x && y) 
             {
-                map.setCenter((new OpenLayers.LonLat(x, y)).transform(otp.core.MapStatic.dataProjection, map.getProjectionObject()));
+                map.setCenter((new OpenLayers.LonLat(x, y)).transform(prj, map.getProjectionObject()));
             }
         }
         catch(ex)
@@ -517,13 +544,16 @@ otp.util.OpenLayersUtils = {
     /**
      * given a map, and a pixel coordinate, return back a map coordinate
      */
-    getLatLonOfPixel: function(map, pixelX, pixelY)
+    getLatLonOfPixel: function(map, pixelX, pixelY, prj)
     {
         try
         {
+            if(prj == null)
+                prj = otp.core.MapStatic.dataProjection;
+        
             var px     = new OpenLayers.Pixel(pixelX, pixelY);
             var lonLat = map.getLonLatFromPixel(px);
-            lonLat.transform(map.getProjectionObject(), otp.core.MapStatic.dataProjection);
+            lonLat.transform(map.getProjectionObject(), prj);
             return this.roundCoord(lonLat);
         }
         catch(e)
@@ -547,10 +577,13 @@ otp.util.OpenLayersUtils = {
     ///////////// MISC UTILS ///////////// MISC UTILS ///////////// MISC UTILS ///////////// MISC UTILS /////////////
 
     /** */
-    setCenter : function(map, x, y, zoom)
+    setCenter : function(map, x, y, zoom, prj)
     {
         try
         {
+            if(prj == null)
+                prj = otp.core.MapStatic.dataProjection;
+
             if (zoom && (zoom < 0 || zoom > 9))
             {
                  zoom = 2;
@@ -558,7 +591,7 @@ otp.util.OpenLayersUtils = {
 
             if (x && y)
             {
-                map.setCenter(new OpenLayers.LonLat(x, y).transform(otp.core.MapStatic.dataProjection, map.getProjectionObject()), zoom);
+                map.setCenter(new OpenLayers.LonLat(x, y).transform(prj, map.getProjectionObject()), zoom);
             }
             else if (zoom)
             {

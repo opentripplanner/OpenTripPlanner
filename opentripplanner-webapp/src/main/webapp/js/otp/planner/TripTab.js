@@ -24,6 +24,9 @@ otp.planner.PrintTripWin = null;
   * given set of itineraries (eg: which is selected, etc).
   */
 otp.planner.TripTab = {
+
+    // config
+    map        : null,
     locale     : otp.locale.English,
 
     planner    : null,
@@ -297,7 +300,7 @@ otp.planner.TripTab = {
             if(retVal == null)
             {
                 var itin = this.m_itinerariesStore.getAt(id - 1);
-                retVal = new otp.planner.Itinerary({xml:itin, from:this.m_from, to:this.m_to, id:id})
+                retVal = new otp.planner.Itinerary({map:this.planner.map, xml:itin, from:this.m_from, to:this.m_to, id:id})
                 if(retVal != null && retVal.isValid())
                     this.m_itineraryCache[id] = retVal;
             }

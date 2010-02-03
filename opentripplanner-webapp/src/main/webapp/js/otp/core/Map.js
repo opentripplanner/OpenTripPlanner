@@ -50,7 +50,6 @@ otp.core.MapStatic = {
     // config for google's projection
     srsName           : "EPSG:900913",
     units             : "meters",
-    //maxResolution     : 156543.03396025,
     maxResolution     : 156543.03396025,
     maxExtent         : new OpenLayers.Bounds(-2.003750834E7,-2.003750834E7, 2.003750834E7,2.003750834E7),
     center            : {x:-13655812, y:5704158},
@@ -83,8 +82,8 @@ otp.core.MapStatic = {
      * dataProjection
      */
     displayProjection : new OpenLayers.Projection("EPSG:4326"),
-    dataProjection : new OpenLayers.Projection("EPSG:4326"),
-    
+    dataProjection    : new OpenLayers.Projection("EPSG:4326"),
+
     /** 
      * Creates a new Map -- called by default when a new map is created
      * 
@@ -110,9 +109,7 @@ otp.core.MapStatic = {
         }
 
         otp.core.MapSingleton = this;
-        
         this.clear();
-
         console.log("exit Map constructor");
     },
 
@@ -209,8 +206,7 @@ otp.core.MapStatic = {
             return;
         }
         this.updateSize();
-        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection,
-                this.map.getProjectionObject()));
+        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
     },
 
     /**

@@ -15,7 +15,6 @@
 otp.namespace("otp.util");
 
 /**
- * Utility routines for Analytics
  */
 otp.util.Constants = {
 
@@ -23,5 +22,5 @@ otp.util.Constants = {
     TP_COOKIE_VALUE  : "otp_cookie_value",
 
 
-    CLASS_NAME       : "otp.utl.Constants"
+    CLASS_NAME       : "otp.util.Constants"
 };

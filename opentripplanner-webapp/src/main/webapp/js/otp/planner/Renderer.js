@@ -82,21 +82,27 @@ otp.planner.Renderer = {
                     isBaseLayer: false,
                     isFixed: false,
                     visibility: true,
-                    projection: otp.core.MapStatic.dataProjection
+                    projection: this.map.dataProjection
             };
             this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
 
-        	var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
-        	styleMap.addUniqueValueRules("default", "type", otp.util.OpenLayersUtils.getMarkerStyleLookup());
-        	
-        	var markerLayerOptions = {
-        	        isBaseLayer: false,
-        	        rendererOptions: {yOrdering: true},
-                    projection: otp.core.MapStatic.dataProjection,
-        	        styleMap: styleMap
-        	};
+            var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
+            var style;
+            if(this.rteMapPngs)
+                style = otp.util.OpenLayersUtils.getRouteNumberMarkerStyle();
+             else
+                style = otp.util.OpenLayersUtils.getRouteModeMarkerStyle();
+
+            styleMap.addUniqueValueRules("default", "type", style);
+
+            var markerLayerOptions = {
+                    isBaseLayer: false,
+                    rendererOptions: {yOrdering: true},
+                    projection: this.map.dataProjection,
+                    styleMap:   styleMap
+            };
             this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', markerLayerOptions);
             this.map.getMap().addLayer(this.m_markerLayer);
             this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clicability of other map layers
