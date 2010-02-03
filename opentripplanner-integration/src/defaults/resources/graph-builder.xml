@@ -37,11 +37,11 @@
                 <property name="permissionConverter">
                     <bean class="org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter">
                         <property name="attributeName" value="DIRECTION" />
-                        <property name="defaultPermission" value="PEDESTRIAN_AND_BICYCLE_ONLY" />
+                        <property name="defaultPermission" value="PEDESTRIAN_AND_BICYCLE" />
                         <property name="permissions">
                             <map>
-                                <entry key="1" value="ALL,PEDESTRIAN_ONLY" />
-                                <entry key="2" value="PEDESTRIAN_ONLY,ALL" />
+                                <entry key="1" value="ALL,PEDESTRIAN" />
+                                <entry key="2" value="PEDESTRIAN,ALL" />
                                 <entry key="3" value="ALL,ALL" />
                             </map>
                         </property>

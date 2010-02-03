@@ -84,11 +84,11 @@ public class TestRequest extends TestCase {
         schema.setNameAttribute("FULL_NAME");
 
         CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
-                "DIRECTION", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
+                "DIRECTION", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
         perms.addPermission("2", StreetTraversalPermission.ALL,
-                StreetTraversalPermission.PEDESTRIAN_ONLY);
-        perms.addPermission("3", StreetTraversalPermission.PEDESTRIAN_ONLY,
+                StreetTraversalPermission.PEDESTRIAN);
+        perms.addPermission("3", StreetTraversalPermission.PEDESTRIAN,
                 StreetTraversalPermission.ALL);
         perms.addPermission("1", StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
 

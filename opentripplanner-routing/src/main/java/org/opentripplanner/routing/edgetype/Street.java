@@ -42,6 +42,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public StreetTraversalPermission permission;
 
+    public boolean wheelchairAccessible;
+
     /**
      * Streets with bike lanes are safer -- about twice as safe as streets without.
      * This is how long the street would have to be without bike lanes, to kill as many
@@ -54,6 +56,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         super(start, end);
         this.length = length;
         this.permission = StreetTraversalPermission.ALL;
+        this.wheelchairAccessible = true;
     }
 
     public Street(Vertex start, Vertex end, String id, String name, double length) {
@@ -62,6 +65,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.name = name;
         this.length = length;
         this.permission = StreetTraversalPermission.ALL;
+        this.wheelchairAccessible = true;
     }
 
     public Street(Vertex start, Vertex end, String id, String name, double length, StreetTraversalPermission permission) {
@@ -70,6 +74,17 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.name = name;
         this.length = length;
         this.permission = permission;
+        this.wheelchairAccessible = true;
+    }
+
+
+    public Street(Vertex start, Vertex end, String id, String name, double length, StreetTraversalPermission permission, boolean wheelchairAccessible) {
+        super(start, end);
+        this.id = id;
+        this.name = name;
+        this.length = length;
+        this.permission = permission;
+        this.wheelchairAccessible = true;
     }
 
     public Street(Vertex start, Vertex end, String id, String name, double length, double bicycleSafetyEffectiveLength, StreetTraversalPermission permission) {
@@ -79,6 +94,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.length = length;
         this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
         this.permission = permission;
+        this.wheelchairAccessible = true;
     }
 
     public void setGeometry(LineString g) {
@@ -131,19 +147,19 @@ public class Street extends AbstractEdge implements WalkableEdge {
     }
 
     private boolean canTraverse(TraverseOptions wo) {
-        switch (permission) {
-        case BICYCLE_ONLY:
-            return wo.modes.getBicycle();
-        case PEDESTRIAN_AND_BICYCLE_ONLY:
-            return wo.modes.getBicycle() || wo.modes.getWalk();
-        case PEDESTRIAN_ONLY:
-            return wo.modes.getWalk();
-        case ALL:
-        case CROSSHATCHED:
-            /* everything is allowed */
-            break;
-        }
-        return true;
+        if(!wheelchairAccessible && wo.wheelchairAccessible)
+            return false;
+
+        if(wo.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN))
+            return true;
+
+        if(wo.modes.getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE))
+            return true;
+
+        if(wo.modes.getCar() && permission.allows(StreetTraversalPermission.CAR))
+            return true;
+
+        return false;
     }
 
     public String toString() {
@@ -200,6 +216,14 @@ public class Street extends AbstractEdge implements WalkableEdge {
     public double getBicycleSafetyEffectiveLength() {
         return bicycleSafetyEffectiveLength;
     }
+
+	public void setWheelchairAccessible(boolean wheelchairAccessible) {
+		this.wheelchairAccessible = wheelchairAccessible;
+	}
+
+	public boolean getWheelchairAccessible() {
+		return wheelchairAccessible;
+	}
 
     public double getLength() {
         return length;

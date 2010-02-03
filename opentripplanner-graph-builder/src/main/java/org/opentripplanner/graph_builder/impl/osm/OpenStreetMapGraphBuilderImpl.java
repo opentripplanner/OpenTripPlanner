@@ -16,6 +16,7 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence.Float;
+import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
@@ -54,12 +56,41 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
+    private Map<String, KeyValuePermission> _tagPermissions = new LinkedHashMap<String, KeyValuePermission>();
+
+    private class KeyValuePermission {
+        public String key;
+        public String value;
+        public StreetTraversalPermission permission;
+
+        public KeyValuePermission(String key, String value, StreetTraversalPermission permission) {
+            this.key        = key;
+            this.value      = value;
+            this.permission = permission;
+        }
+    };
+
     public void setProvider(OpenStreetMapProvider provider) {
         _providers.add(provider);
     }
 
     public void setProviders(List<OpenStreetMapProvider> providers) {
         _providers.addAll(providers);
+    }
+
+    public void setDefaultAccessPermissions(LinkedHashMap<String, StreetTraversalPermission> mappy) {
+        for(String tag : mappy.keySet()) {
+            int ch_eq = tag.indexOf("=");
+
+            if(ch_eq < 0){
+                _tagPermissions.put(tag, new KeyValuePermission(null, null, mappy.get(tag)));
+            } else {
+                String key   = tag.substring(0, ch_eq),
+                       value = tag.substring(ch_eq + 1);
+
+                _tagPermissions.put(tag, new KeyValuePermission(key, value, mappy.get(tag)));
+            }
+        }
     }
 
     @Override
@@ -115,7 +146,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
 
-                StreetTraversalPermission permissions = getPermissionsForWay(way);
+                StreetTraversalPermission permissions = getPermissionsForEntity(way);
+                if(permissions == StreetTraversalPermission.NONE)
+                    continue;
+
                 List<Integer> nodes = way.getNodeRefs();
                 for (int i = 0; i < nodes.size() - 1; i++) {
                     Integer startNode = nodes.get(i);
@@ -298,6 +332,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             Street street = new Street(from, to, id, name, d, permissions);
 
+            /* TODO: This should probably generalized somehow? */
+            if( "no".equals(way.getTags().get("wheelchair")) ||
+               ("steps".equals(way.getTags().get("highway")) && !"yes".equals(way.getTags().get("wheelchair")))) {
+                street.setWheelchairAccessible(false);
+            }
+
             Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate() };
             Float sequence = new PackedCoordinateSequence.Float(coordinates, 2);
             LineString lineString = _geometryFactory.createLineString(sequence);
@@ -307,21 +347,86 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return street;
         }
 
-        private StreetTraversalPermission getPermissionsForWay(OSMWay way) {
+        private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity) {
+            Map<String, String> tags = entity.getTags();
+            String all_tags = "";
+            StreetTraversalPermission def    = null;
+            StreetTraversalPermission access = null;
 
-            // TODO : Better mapping between OSM tags and travel permissions
-
-            Map<String, String> tags = way.getTags();
-            String value = tags.get("highway");
-
-            if (value == null || value.equals("motorway") || value.equals("motorway_link"))
-                return StreetTraversalPermission.CAR_ONLY;
-
-            if ("platform".equals(way.getTags().get("railway"))) {
-                return StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY;
+            for(String key : tags.keySet()) {
+                String tag = key + "=" + tags.get(key);
+                if(all_tags.equals("")) {
+                    all_tags += tag;
+                } else {
+                    all_tags += "; " + tag;
+                }
             }
 
-            return StreetTraversalPermission.ALL;
+            for(KeyValuePermission kvp : _tagPermissions.values()) {
+                if(tags.containsKey(kvp.key) && kvp.value.equals(tags.get(kvp.key))) {
+                    def = kvp.permission;
+                    break;
+                }
+            }
+
+            if(def == null) {
+                if(_tagPermissions.containsKey("__default__")) {
+                    def = _tagPermissions.get("__default__").permission;
+                    _log.debug("Used default permissions: " + all_tags);
+                } else {
+                    _log.warn("No default permissions for osm tags...");
+                    def = StreetTraversalPermission.ALL;
+                }
+            }
+
+            /* Only access=*, motorcar=*, bicycle=*, and foot=* is examined,
+             * since those are the only modes supported by OTP
+             * (wheelchairs are not of concern here)
+             *
+             * Only *=no, and *=private are checked for, all other values are
+             * presumed to be permissive (=> This may not be perfect, but is
+             * closer to reality, since most people don't follow the rules
+             * perfectly ;-)
+             */
+            if(tags.containsKey("access")) {
+                if("no".equals( tags.get("access") )) {
+                    access = StreetTraversalPermission.NONE;
+                } else {
+                    access = StreetTraversalPermission.ALL;
+                }
+            } else if (tags.containsKey("motorcar") || tags.containsKey("bicycle") || tags.containsKey("foot")) {
+                access = def;
+            }
+
+            if (tags.containsKey("motorcar")) {
+                if("no".equals(tags.get("motorcar")) || "private".equals(tags.get("motorcar"))) {
+                    access = access.remove(StreetTraversalPermission.CAR);
+                } else {
+                    access = access.add(StreetTraversalPermission.CAR);
+                }
+            }
+
+            if (tags.containsKey("bicycle")) {
+                if("no".equals(tags.get("bicycle")) || "private".equals(tags.get("bicycle"))) {
+                    access = access.remove(StreetTraversalPermission.BICYCLE);
+                } else {
+                    access = access.add(StreetTraversalPermission.BICYCLE);
+                }
+            }
+
+            if (tags.containsKey("foot")) {
+                if("no".equals(tags.get("foot")) || "private".equals(tags.get("foot"))) {
+                    access = access.remove(StreetTraversalPermission.PEDESTRIAN);
+                } else {
+                    access = access.add(StreetTraversalPermission.PEDESTRIAN);
+                }
+            }
+
+
+            if(access == null)
+                return def;
+
+            return access;
         }
     }
 }

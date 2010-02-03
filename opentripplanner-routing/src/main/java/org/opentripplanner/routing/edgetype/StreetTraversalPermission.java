@@ -13,11 +13,54 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Map;
+import java.util.HashMap;
+import java.util.EnumSet;
+
 public enum StreetTraversalPermission {
-    ALL,
-    PEDESTRIAN_ONLY,
-    BICYCLE_ONLY,
-    CROSSHATCHED, //this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
-    PEDESTRIAN_AND_BICYCLE_ONLY,
-    CAR_ONLY
+    NONE(0),
+
+    PEDESTRIAN(1),
+    BICYCLE(2),
+    PEDESTRIAN_AND_BICYCLE(3),
+    CAR(4),
+    PEDESTRIAN_AND_CAR(5),
+    BICYCLE_AND_CAR(6),
+    ALL(7),
+    CROSSHATCHED(15); //this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
+
+    private static final Map<Integer,StreetTraversalPermission> lookup = new HashMap<Integer,StreetTraversalPermission>();
+
+    static {
+        for(StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class))
+            lookup.put(s.getCode(), s);
+    }
+
+    private int code;
+
+    private StreetTraversalPermission(int code) {
+        this.code = code;
+    }
+
+    public int getCode() { return code; }
+
+    public static StreetTraversalPermission get(int code) {
+        return lookup.get(code);
+    }
+
+    public StreetTraversalPermission add(StreetTraversalPermission perm) {
+        return get(this.getCode() | perm.getCode());
+    }
+
+    public StreetTraversalPermission remove(StreetTraversalPermission perm) {
+        return (this.getCode() & perm.getCode()) != 0 ?  get(this.getCode() ^ perm.getCode()) : this;
+    }
+
+    public StreetTraversalPermission modify(boolean permissive, StreetTraversalPermission perm) {
+        return permissive ? add(perm) : remove(perm);
+    }
+
+    public boolean allows(StreetTraversalPermission perm) {
+        return (this.getCode() & perm.getCode()) != 0;
+    }
 }

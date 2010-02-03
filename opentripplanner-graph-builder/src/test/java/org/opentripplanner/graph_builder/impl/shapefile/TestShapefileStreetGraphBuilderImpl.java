@@ -63,11 +63,11 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         schema.setNameAttribute("Street");
 
         CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
-                "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE_ONLY);
+                "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
         perms.addPermission("W", StreetTraversalPermission.ALL,
-                StreetTraversalPermission.PEDESTRIAN_ONLY);
-        perms.addPermission("A", StreetTraversalPermission.PEDESTRIAN_ONLY,
+                StreetTraversalPermission.PEDESTRIAN);
+        perms.addPermission("A", StreetTraversalPermission.PEDESTRIAN,
                 StreetTraversalPermission.ALL);
         perms.addPermission("T", StreetTraversalPermission.ALL, StreetTraversalPermission.ALL);
 
