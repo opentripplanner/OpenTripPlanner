@@ -408,7 +408,8 @@ otp.planner.Itinerary = {
             var walk = this.m_fromStore.getAt(endIndex);
             var walkP = walk.get('geometry');
             mode = walk.get('mode');
-            if(mode == 'WALK')
+            // Don't draw another walk marker if the first leg is a walk and there's only one leg
+            if(mode == 'WALK' && endIndex > 0)
             {
                 endIndex--;
                 otp.util.OpenLayersUtils.makeMarker(walkP.x, walkP.y, 'walkMarker', this.m_markers);
