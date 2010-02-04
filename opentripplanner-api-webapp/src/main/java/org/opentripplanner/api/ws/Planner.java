@@ -213,8 +213,17 @@ public class Planner {
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
         SPTVertex tripEndVertex = vertices.lastElement();
-        Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), request.getFrom());
-        Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), request.getTo());
+        String startName = tripStartVertex.getName();
+        String endName = tripEndVertex.getName();
+        // Use vertex labels if they don't have names
+        if (startName == null) {
+            startName = tripStartVertex.getLabel();
+        }
+        if (endName == null) {
+            endName = tripEndVertex.getLabel();
+        }
+        Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
+        Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
