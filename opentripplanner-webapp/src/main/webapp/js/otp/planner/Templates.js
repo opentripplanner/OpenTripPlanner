@@ -116,11 +116,11 @@ otp.planner.Templates = {
     
     
     TP_START : new Ext.XTemplate(
-          '<h4><a href="#">Start at</a> {from}</h4>'
+          '<h4><a href="#">Start at</a> {name}</h4>'
     ).compile(), 
 
     TP_END : new Ext.XTemplate(
-          '<h4><a href="#">End at</a> {to}</h4>'
+          '<h4><a href="#">End at</a> {name}</h4>'
     ).compile(), 
 
     CLASS_NAME: "otp.planner.Templates"
