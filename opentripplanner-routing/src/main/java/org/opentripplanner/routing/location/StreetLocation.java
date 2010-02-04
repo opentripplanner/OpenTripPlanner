@@ -21,7 +21,6 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
