@@ -18,6 +18,8 @@ import java.io.ObjectOutputStream;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -129,9 +131,35 @@ public class Intersection implements Vertex {
         out.defaultWriteObject();
     }
 
+    /**
+     * Try to compute a more user-friendly name for this intersection than just the label. We do
+     * this on the fly because this method is never called for most intersections and we want to
+     * avoid the memory overhead of storing an extra string for every intersection unnecessarily.
+     * 
+     * TODO: Figure out a better way of doing this. The code below is horrendously ugly and it runs
+     * in O(n^2) (though n = number of streets incident to this intersection, and the typical case
+     * running time is much less than n^2).
+     */
     @Override
     public String getName() {
-        return label;
+       String firstIncidentStreet = null;
+       for (Edge e : outgoing) {
+           if (e instanceof Street) {
+               firstIncidentStreet = e.getName();
+           } else if (e instanceof Turn) {
+               if (((Turn)e).turnAngle != 0) {
+                   for (Edge e2 : e.getToVertex().getIncoming()) {
+                       if (e2 instanceof Street) {
+                           if (e2.getName() != firstIncidentStreet) {
+                               return firstIncidentStreet + " & " + e2.getName();
+                           }
+                       }
+                   }
+               }
+           }
+       }
+       // Can't come up with a better name, fall back to label.
+       return label;
     }
 
     @Override
