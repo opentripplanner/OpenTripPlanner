@@ -54,7 +54,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
-    private static final double MAX_SNAP_TO_INTERSECTION_DISTANCE = 0.00005;
+    private static final double MAX_SNAP_DISTANCE = 0.00005;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -118,7 +118,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         bestStop = v;
                     }
                 }
-                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                if (bestDistance <= MAX_SNAP_DISTANCE) {
                     return bestStop;
                 }
             }
@@ -156,9 +156,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 Coordinate start = bestStreet.getFromVertex().getCoordinate();
                 Coordinate end = bestStreet.getToVertex().getCoordinate();
                 Coordinate nearestPoint = location.getCoordinate(g);
-                if (nearestPoint.distance(start) < MAX_SNAP_TO_INTERSECTION_DISTANCE) {
+                if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
                     return bestStreet.getFromVertex();
-                } else if (nearestPoint.distance(end) < MAX_SNAP_TO_INTERSECTION_DISTANCE) {
+                } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
                     return bestStreet.getToVertex();
                 }
                 return StreetLocation.createStreetLocation(bestStreet.getName(), parallel, location);
