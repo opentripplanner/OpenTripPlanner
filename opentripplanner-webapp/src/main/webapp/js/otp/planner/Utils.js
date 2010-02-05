@@ -77,7 +77,7 @@ otp.planner.Utils = {
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
-                  {name: 'distance',         mapping: 'distance', convert: millisToMinutes},
+                  {name: 'distance',         mapping: 'distance', convert: metersToMiles},
                   {name: 'direction',        mapping: 'direction'},
                   {name: 'key',              mapping: 'key'},
                   {name: 'alerts',           mapping: 'route', convert: function(n, p)
