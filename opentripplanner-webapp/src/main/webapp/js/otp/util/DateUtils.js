@@ -83,7 +83,7 @@ otp.util.DateUtils = {
         return retVal;
     },
 
-
+    
     /** default to now + 365 days */ 
     addDays : function(days, date)
     {
@@ -95,7 +95,33 @@ otp.util.DateUtils = {
         return new Date(date.getTime()+(1000*60*60*24*days));
     },
     
-    DATE_FORMAT_STRING : "D, M jS g:mA",
+    /** Make a Date object from an ISO 8601 date string (ignoring time zone) */
+    isoDateStringToDate : function(str) {
+        if (!str)
+            return null;
+        var tokens = str.split(/[\-\+T:]/);
+        var date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3],
+                tokens[4], tokens[5], 0);
+        return date;
+    },
+
+    prettyDateTime : function(date) {
+        if (typeof date == "string") {
+            date = this.isoDateStringToDate(date);
+        }
+        return date.format(this.DATE_TIME_FORMAT_STRING);
+    },
+    
+    prettyTime : function(date) {
+        if (typeof date == "string") {
+            date = this.isoDateStringToDate(date);
+        }
+        return date.format(this.TIME_FORMAT_STRING);
+    },
+    
+    DATE_TIME_FORMAT_STRING : "D, M jS g:mA",
+    
+    TIME_FORMAT_STRING : "g:mA",
 
     CLASS_NAME : "otp.util.DateUtils"
 };

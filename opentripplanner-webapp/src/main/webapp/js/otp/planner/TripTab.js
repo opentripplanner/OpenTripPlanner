@@ -104,9 +104,7 @@ otp.planner.TripTab = {
         {
             var id    = this.m_tripNodePrefix + (i + 1);
             var itin  = store.getAt(i);
-            itin.set('id', (i+1)); // for template -- eg: the numerical hyperlink listing itineary option
-            itin.set('startTimeDisplay', new Date(itin.data.startTime).format(otp.util.DateUtils.DATE_FORMAT_STRING));
-            itin.set('endTimeDisplay', new Date(itin.data.endTime).format(otp.util.DateUtils.DATE_FORMAT_STRING));
+            itin.set('id', (i+1)); // for template -- eg: the numerical hyperlink listing itinerary option
             var text = otp.planner.Templates.TP_ITINERARY.applyTemplate(itin.data);
             z[i] = otp.util.ExtUtils.makeTreeNode(id, text, this.ITIN_NODE_CSS, this.ITIN_ICON_CSS, true, this.itineraryClick, this);
         }

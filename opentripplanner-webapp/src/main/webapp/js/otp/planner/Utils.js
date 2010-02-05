@@ -28,13 +28,17 @@ function metersToMiles (n, p) {
 	return miles.toFixed(2);
 }
 
-/** Make a Date object from an ISO 8601 date string (ignoring time zone)*/
-function isoDateStringToDate (str) {
-	if (!str) return null;
-	var tokens = str.split(/[\-\+T:]/);
-	var date = new Date(tokens[0], tokens[1] - 1, tokens[2],
-			        tokens[3], tokens[4], tokens[5], 0);
-	return date;
+// TODO: make sure otp.util.DateUtils is available so we don't have to wrap these functions
+function isoDateStringToDate(dateStr) {
+    return otp.util.DateUtils.isoDateStringToDate(dateStr);
+}
+
+function prettyDateTime(date) {
+    return otp.util.DateUtils.prettyDateTime(date);
+}
+
+function prettyTime(date) {
+    return otp.util.DateUtils.prettyTime(date);
 }
 
 otp.planner.Utils = {
@@ -61,6 +65,8 @@ otp.planner.Utils = {
                   {name: 'duration',     mapping: 'duration', convert: millisToMinutes},
                   {name: 'startTime',    mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',      mapping: 'endTime', convert: isoDateStringToDate},
+                  {name: 'startTimeDisplay', mapping: 'startTime', convert: prettyDateTime},
+                  {name: 'endTimeDisplay', mapping: 'endTime', convert: prettyDateTime},
                   {name: 'numTransfers', mapping: 'transfers'},
                   {name: 'numLegs',      mapping: 'legs', convert : function (n, p) { return p.length; }},
                   {name: 'walkTime',     mapping: 'walkTime', convert: millisToMinutes},
@@ -76,6 +82,7 @@ otp.planner.Utils = {
                   {name: 'order',            mapping: '@order'},
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
+                  {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
                   {name: 'distance',         mapping: 'distance', convert: metersToMiles},
                   {name: 'direction',        mapping: 'direction'},
