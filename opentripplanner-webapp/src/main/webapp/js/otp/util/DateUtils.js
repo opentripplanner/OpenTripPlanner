@@ -94,6 +94,8 @@ otp.util.DateUtils = {
 
         return new Date(date.getTime()+(1000*60*60*24*days));
     },
+    
+    DATE_FORMAT_STRING : "D, M jS g:mA",
 
     CLASS_NAME : "otp.util.DateUtils"
 };

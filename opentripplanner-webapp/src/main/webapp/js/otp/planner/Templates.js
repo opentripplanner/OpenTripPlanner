@@ -24,7 +24,7 @@ otp.planner.Templates = {
     TODO_FARE_ZONE : "2.30 - SEE BELOW - TODO PUT FARE ZONE IN XML",
 
     TP_ITINERARY : new Ext.XTemplate(
-          '<p><a href="#">{id}</a>: {startTime} - {endTime} <tpl if="numTransfers"><h10 class="transfers">({numTransfers} transfer<tpl if="numTransfers != 1">s</tpl>, {duration} minute<tpl if="duration != 1.0">s</tpl>)</h10></tpl></p>'
+          '<p><a href="#">{id}</a>: {startTimeDisplay} - {endTimeDisplay} <tpl if="numTransfers"><h10 class="transfers">({numTransfers} transfer<tpl if="numTransfers != 1">s</tpl>, {duration} minute<tpl if="duration != 1.0">s</tpl>)</h10></tpl></p>'
     ).compile(),
 
     /**
@@ -59,7 +59,7 @@ otp.planner.Templates = {
     '<div id="trip-details">',
     '<h3>Trip Details:</h3>',
     '<table cellpadding="3" cellspacing="0" border="0">',
-        '<tr><td>Travel</td><td>{date} @ {startTime}</td></tr>',
+        '<tr><td>Travel</td><td>{startTimeDisplay}</td></tr>',
         '<tr><td>Valid</td><td>{[new Date().format("F jS, Y @ g:ia")]}</td></tr>',
         '<tr><td>Time</td><td>{transitTime} minute<tpl if="transitTime != 1">s</tpl>',
             '<tpl if="waitingTime &gt; 0"> (plus {waitingTime} minute<tpl if="waitingTime != 1.0">s</tpl> transfer)</tpl>',
