@@ -24,7 +24,7 @@ otp.planner.Templates = {
     TODO_FARE_ZONE : "2.30 - SEE BELOW - TODO PUT FARE ZONE IN XML",
 
     TP_ITINERARY : new Ext.XTemplate(
-          '<p><a href="#">{id}</a>: {startTimeDisplay} - {endTimeDisplay} <tpl if="numTransfers"><h10 class="transfers">({numTransfers} transfer<tpl if="numTransfers != 1">s</tpl>, {duration} minute<tpl if="duration != 1.0">s</tpl>)</h10></tpl></p>'
+          '<p><a href="#">{id}</a>: {startTimeDisplay} - {endTimeDisplay} <tpl if="numTransfers"><br /><span class="transfers">({numTransfers} transfer<tpl if="numTransfers != 1">s</tpl>, {duration} minute<tpl if="duration != 1.0">s</tpl>)</span></tpl></p>'
     ).compile(),
 
     /**
@@ -88,7 +88,7 @@ otp.planner.Templates = {
         + '</tpl>',
     
     TP_LEG_MODE : '<h4><a href="#">{mode}</a> {routeName}</h4>',
-    TP_LEG_CONTINUES : '<h4><a href="#">Continues as</a> {routeName} <h10 class="transfers">(stay on board)</h10></h4>',
+    TP_LEG_CONTINUES : '<h4><a href="#">Continues as</a> {routeName} <span class="transfers">(stay on board)</span></h4>',
 
     m_transitLeg  : null,
     getTransitLeg : function()
