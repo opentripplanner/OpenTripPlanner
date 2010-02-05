@@ -128,4 +128,9 @@ public class StreetLocation extends GenericVertex {
         }
         return reified;
     }
+    
+    @Override
+    public String getName() {
+        return super.getName() == null ? label : super.getName();
+    }
 }
