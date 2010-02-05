@@ -500,7 +500,7 @@ otp.planner.Itinerary = {
     {
         var fmTxt = otp.planner.Templates.TP_START.applyTemplate(from.data);
         var toTxt = otp.planner.Templates.TP_END.applyTemplate(to.data);
-        itin.data.startTimeDisplay = new Date(itin.data.startTime).format(otp.util.DateUtils.DATE_FORMAT_STRING);
+        itin.set('startTimeDisplay', new Date(itin.data.startTime).format(otp.util.DateUtils.DATE_FORMAT_STRING));
         var tpTxt = otp.planner.Templates.TP_TRIPDETAILS.applyTemplate(itin.data);
 
         var fmId  = this.id + '-' + otp.planner.Utils.FROM_ID;
