@@ -49,6 +49,7 @@ public class StreetLocation extends GenericVertex {
      * controlled by the location parameter, which represents a distance 
      * along the edge between 0 (the from vertex) and 1 (the to vertex).
      *   
+     * @param label
      * @param name
      * @param streets A List of nearby streets (which are presumed to be coincident/parallel edges).
      *                i.e. a list of edges which represent a physical real-world street.
@@ -56,23 +57,23 @@ public class StreetLocation extends GenericVertex {
      *
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String name, List<Street> streets, LinearLocation location) {
+    public static StreetLocation createStreetLocation(String label, String name, List<Street> streets, LinearLocation location) {
 
         Geometry g = streets.get(0).getGeometry();
         Coordinate nearestPoint = location.getCoordinate(g);
 
-        return new StreetLocation(name, streets, location, nearestPoint.x, nearestPoint.y);
+        return new StreetLocation(label, name, streets, location, nearestPoint.x, nearestPoint.y);
     }
 
-    public static StreetLocation createStreetLocation(String name, Street street, LinearLocation location) {
+    public static StreetLocation createStreetLocation(String label, String name, Street street, LinearLocation location) {
         List<Street> streets = new LinkedList<Street>();
         streets.add(street);
-        return createStreetLocation(name, streets, location);
+        return createStreetLocation(label, name, streets, location);
     }
 
-    private StreetLocation(String name, List<Street> streets, LinearLocation location, double x,
+    private StreetLocation(String label, String name, List<Street> streets, LinearLocation location, double x,
             double y) {
-        super(name, x, y);
+        super(label, x, y, name);
         this.streets = streets;
         this.location = location;
 

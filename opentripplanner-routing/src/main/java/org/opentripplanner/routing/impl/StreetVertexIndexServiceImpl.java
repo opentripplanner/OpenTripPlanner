@@ -161,7 +161,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
                     return bestStreet.getToVertex();
                 }
-                return StreetLocation.createStreetLocation(bestStreet.getName(), parallel, location);
+                return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, location);
             }
         }
         return null;
