@@ -83,6 +83,7 @@ otp.planner.Utils = {
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
+                  {name: 'endTimeDisplayShort', mapping: 'endTime', convert: prettyTime},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
                   {name: 'distance',         mapping: 'distance', convert: metersToMiles},
                   {name: 'direction',        mapping: 'direction'},
