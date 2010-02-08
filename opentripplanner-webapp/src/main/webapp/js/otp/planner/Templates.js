@@ -74,12 +74,12 @@ otp.planner.Templates = {
     ).compile(),
 
     TP_LEG_BASE_STR : ''
-        + '<tpl if="fromStopId != null"><p><b>{startTimeDisplayShort}</b> Depart {fromName}'
+        + '<tpl if="fromStopId != null && fromStopId.length &gt; 0"><p><b>{startTimeDisplayShort}</b> Depart {fromName}'
         + '<tpl if="headsign != null && headsign.length &gt; 0"> ({headsign})</tpl>'
         + '<br/>Stop ID {fromStopId}</p>'
         + '</tpl>'
         + '<tpl if="duration != null"><div class="duration">{duration} minute<tpl if="duration != 1.0">s</tpl></div></tpl>'
-        + '<tpl if="toStopId &gt; 0"><p><b>{endTime}</b> Arrive {toName}<br/>Stop ID {toStopId}</p></tpl>'
+        + '<tpl if="toStopId != null && toStopId.length &gt; 0"><p><b>{endTime}</b> Arrive {toName}<br/>Stop ID {toStopId}</p></tpl>'
         + '<tpl if="alerts != null && alerts.length &gt; 0">'
         + '<tpl for="alerts">'
         +   '<p><br/><img src="images/ui/alert.gif" align="absmiddle"/> '
@@ -110,7 +110,7 @@ otp.planner.Templates = {
 
     TP_WALK_LEG : new Ext.XTemplate(
           '<h4><a href="#">Walk</a> {[otp.util.StringFormattingUtils.getDirection(values.direction)]} to {toName}</h4>',
-          '<tpl if="toStopId &gt; 0"><p>Stop ID {toStopId}</p></tpl>',
+          '<tpl if="toStopId != null && toStopId.length &gt; 0"><p>Stop ID {toStopId}</p></tpl>',
           '<p class="transfers">About {duration} minute<tpl if="duration != 1.0">s</tpl> - {distance} miles</p>'
     ).compile(),
     
