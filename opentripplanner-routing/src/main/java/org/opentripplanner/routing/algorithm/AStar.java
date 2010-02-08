@@ -157,6 +157,9 @@ public class AStar {
     public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
+        if (!options.back) {
+            throw new RuntimeException("Reverse paths must set options.back");
+        }
         if (origin == null || target == null) {
             return null;
         }
@@ -165,8 +168,8 @@ public class AStar {
         Vertex tmp = origin;
         origin = target;
         target = tmp;
-        
-        /* generate extra edges for StreetLocations */ 
+
+        /* generate extra edges for StreetLocations */
         Map<Vertex, Edge> extraEdges;
         if (target instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, Edge>();
@@ -192,17 +195,18 @@ public class AStar {
         while (!pq.empty()) { // Until the priority queue is empty:
             spt_u = (SPTVertex) pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
-            if (spt_u.mirror == target)
+            Vertex tov = spt_u.mirror;
+            if (tov == target)
                 break;
 
-            Iterable<Edge> incoming = spt_u.mirror.getIncoming();
+            Iterable<Edge> incoming = tov.getIncoming();
 
-            if (extraEdges.containsKey(spt_u.mirror)) {
+            if (extraEdges.containsKey(tov)) {
                 List<Edge> newIncoming = new ArrayList<Edge>();
-                for (Edge edge : spt_u.mirror.getIncoming()) {
+                for (Edge edge : tov.getIncoming()) {
                     newIncoming.add(edge);
                 }
-                newIncoming.add(extraEdges.get(spt_u.mirror));
+                newIncoming.add(extraEdges.get(tov));
                 incoming = newIncoming;
             }
 
@@ -223,29 +227,11 @@ public class AStar {
                 Vertex fromv = edge.getFromVertex();
                 distance = fromv.distance(target) / MAX_SPEED;
                 double new_w = spt_u.weightSum + wr.weight;
-                double old_w;
 
-                spt_v = spt.getVertex(fromv);
-                // if this is the first time edge.tov has been visited
-                if (spt_v == null) {
-                    old_w = Integer.MAX_VALUE;
-                    spt_v = spt.addVertex(fromv, wr.state, new_w, options);
-                } else {
-                    old_w = spt_v.weightSum + distance;
-                }
-
-                // If the new way of getting there is better,
-                if (new_w + distance < old_w) {
-                    // Set the State of v in the SPT to the current winner
-                    spt_v.state = wr.state;
-                    spt_v.weightSum = new_w;
-                    if (old_w == Integer.MAX_VALUE) {
-                        pq.insert(spt_v, new_w + distance);
-                    } else {
-                        pq.insert_or_dec_key(spt_v, new_w + distance);
-                    }
-
+                spt_v = spt.addVertex(fromv, wr.state, new_w, options);
+                if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
+                    pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }
         }
@@ -286,7 +272,8 @@ public class AStar {
         while (!pq.empty()) { // Until the priority queue is empty:
             spt_u = (SPTVertex) pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
-            if (spt_u.mirror == target)
+            Vertex fromv = spt_u.mirror;
+            if (fromv == target)
                 break;
 
             Iterable<Edge> outgoing = spt_u.mirror.getOutgoing();
@@ -311,34 +298,18 @@ public class AStar {
 
                 if (wr.weight < 0) {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
-                }
-
+                }/* else if (wr.weight == 0) {
+                    throw new ZeroWeightException();
+                }*/
                 Vertex tov = edge.getToVertex();
+
                 distance = tov.distance(target) / MAX_SPEED;
                 double new_w = spt_u.weightSum + wr.weight;
-                double old_w;
 
-                spt_v = spt.getVertex(tov);
-                // if this is the first time edge.tov has been visited
-                if (spt_v == null) {
-                    old_w = Double.MAX_VALUE;
-                    spt_v = spt.addVertex(tov, wr.state, new_w, options);
-                } else {
-                    old_w = spt_v.weightSum + distance;
-                }
-
-                // If the new way of getting there is better,
-                if (new_w + distance < old_w) {
-                    // Set the State of v in the SPT to the current winner
-                    spt_v.state = wr.state;
-                    spt_v.weightSum = new_w;
-                    if (old_w == Integer.MAX_VALUE) {
-                        pq.insert(spt_v, new_w + distance);
-                    } else {
-                        pq.insert_or_dec_key(spt_v, new_w + distance);
-                    }
-
+                spt_v = spt.addVertex(tov, wr.state, new_w, options);
+                if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
+                    pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }
         }

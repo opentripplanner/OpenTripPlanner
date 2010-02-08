@@ -67,7 +67,8 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
             return null;
         }
         State s1 = s0.clone();
-        return new TraverseResult(0, s1);
+        s1.incrementTimeInSeconds(1);
+        return new TraverseResult(1, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -75,7 +76,8 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
             return null;
         }
         State s1 = s0.clone();
-        return new TraverseResult(0, s1);
+        s1.incrementTimeInSeconds(-1);
+        return new TraverseResult(1, s1);
     }
 
 }

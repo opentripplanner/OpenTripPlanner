@@ -24,7 +24,7 @@ import java.io.ObjectOutputStream;
 import java.util.Vector;
 import java.util.zip.ZipFile;
 
-import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -99,7 +99,7 @@ class Main {
             System.out.print((i + 1) + "\t" + pair[0] + "\t" + pair[1]);
 
             long t0 = System.currentTimeMillis();
-            ShortestPathTree spt = Dijkstra.getShortestPathTree(gg, pair[0], pair[1], new State(),
+            ShortestPathTree spt = AStar.getShortestPathTree(gg, pair[0], pair[1], new State(),
                     new TraverseOptions());
             @SuppressWarnings("unused")
             GraphPath gp = spt.getPath(gg.getVertex(pair[1]));

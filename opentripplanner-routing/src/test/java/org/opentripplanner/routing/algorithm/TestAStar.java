@@ -22,7 +22,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -44,11 +43,13 @@ public class TestAStar extends TestCase {
         GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
         hl.load();
 
+        ShortestPathTree spt;
+        GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
-        ShortestPathTree spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
+        spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", new State(startTime), options);
 
-        GraphPath path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
+        path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
 
         long endTime = new GregorianCalendar(2009, 8, 7, 13, 29).getTimeInMillis();
 
@@ -73,7 +74,7 @@ public class TestAStar extends TestCase {
 
     }
 
-    public void testCompareSpeed() throws Exception {
+    public void testPortland() throws Exception {
 
         Graph graph;
 
@@ -90,34 +91,33 @@ public class TestAStar extends TestCase {
         long startClock, endClock;
         ShortestPathTree spt = null;
 
-        /* time Dijkstra */
-        startClock = System.nanoTime();
-        for (int i = 0; i < 20; ++i) {
-            spt = Dijkstra.getShortestPathTree(graph, "TriMet_6876", airport.getLabel(), new State(
-                    startTime.getTimeInMillis()), wo);
+        final int n_trials = 100;
+        String random[] = new String[n_trials];
+        for (int i = 0; i < n_trials ; ++i) {
+            String label;
+            while (true) {
+                int rand_id = (int)(Math.random() * 10000);
+                label = "TriMet_" + rand_id;
+                if (graph.getVertex(label) != null) {
+                    break;
+                }
+            }
+            random[i] = label;
         }
-        endClock = System.nanoTime();
-        long dijkstraTime = endClock - startClock;
-
-        GraphPath path = spt.getPath(airport);
-        assertNotNull(path);
 
         /* time A* */
         startClock = System.nanoTime();
-        for (int i = 0; i < 20; ++i) {
-            spt = AStar.getShortestPathTree(graph, "TriMet_6876", airport.getLabel(), new State(
+        for (int i = 0; i < n_trials ; ++i) {
+            spt = AStar.getShortestPathTree(graph, random[i], airport.getLabel(), new State(
                     startTime.getTimeInMillis()), wo);
         }
 
         endClock = System.nanoTime();
         long aStarTime = endClock - startClock;
 
-        path = spt.getPath(airport);
+        GraphPath path = spt.getPath(airport);
         assertNotNull(path);
-
-        System.out.println("A* took" + aStarTime / 1000000000.0);
-
-        assertTrue(dijkstraTime >= aStarTime);
+        assertTrue(aStarTime / n_trials / 1000000000.0 <= 0.1);
 
     }
 }

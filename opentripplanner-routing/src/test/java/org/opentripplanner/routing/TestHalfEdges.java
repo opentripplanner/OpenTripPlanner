@@ -132,8 +132,10 @@ public class TestHalfEdges extends TestCase {
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
+        TraverseOptions options = new TraverseOptions();
+        options.back = true;
         ShortestPathTree spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
-                .getTimeInMillis()), new TraverseOptions());
+                .getTimeInMillis()), options);
 
         GraphPath path = spt.getPath(start);
         assertNotNull(path);

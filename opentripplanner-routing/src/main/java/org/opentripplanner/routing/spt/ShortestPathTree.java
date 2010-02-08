@@ -13,48 +13,137 @@
 
 package org.opentripplanner.routing.spt;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.DrawHandler;
-import org.opentripplanner.routing.edgetype.Drawable;
 
 public class ShortestPathTree {
     private static final long serialVersionUID = -3899613853043676031L;
 
-    HashMap<Vertex, SPTVertex> vertices;
+    HashMap<Vertex, Collection<SPTVertex>> vertexSets;
 
     public ShortestPathTree() {
-        vertices = new HashMap<Vertex, SPTVertex>();
+        vertexSets = new HashMap<Vertex, Collection<SPTVertex>>();
     }
 
-    public SPTVertex addVertex(Vertex vv, State ss, double weightSum, TraverseOptions options) {
-        SPTVertex ret = new SPTVertex(vv, ss, weightSum, options);
-        this.vertices.put(vv, ret);
+    /**
+     * Add a vertex to the shortest path tree. If the vertex is already in the tree, this adds
+     * another way to get to that vertex, if that new way is not strictly dominated in both time and
+     * weight by an existing way.
+     *
+     * @param vertex
+     *            The graph vertex
+     * @param state
+     *            The state on arrival
+     * @param weightSum
+     *            The cost to get here
+     * @param options
+     *            The traversal options
+     * @return
+     */
+    public SPTVertex addVertex(Vertex vertex, State state, double weightSum, TraverseOptions options) {
+
+        Collection<SPTVertex> vertices = getVertices(vertex);
+        if (vertices == null) {
+            vertices = new ArrayList<SPTVertex>();
+            vertexSets.put(vertex, vertices);
+            SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
+            vertices.add(ret);
+            return ret;
+        }
+
+        long time = state.getTime();
+
+        double worstWeight = 0;
+        Iterator<SPTVertex> it = vertices.iterator();
+
+        if (options.back) {
+            long worstTime = Long.MAX_VALUE;
+            while (it.hasNext()) {
+                SPTVertex v = it.next();
+                double old_w = v.weightSum;
+                long old_t = v.state.getTime();
+
+                if (old_w <= weightSum && old_t >= time) {
+                    /* an existing vertex strictly dominates the new vertex */
+                    return null;
+                }
+
+                if (old_w > weightSum && old_t < time) {
+                    /* the new vertex strictly dominates an existing vertex */
+                    it.remove();
+                } else {
+                    if (old_w > worstWeight) {
+                        worstWeight = old_w;
+                    }
+                    if (old_t < worstTime) {
+                        worstTime = old_t;
+                    }
+                }
+            }
+
+            if (worstTime != Long.MAX_VALUE && time <= worstTime && weightSum >= worstWeight) {
+                return null;
+            }
+
+        } else {
+            long worstTime = -1;
+            while (it.hasNext()) {
+                SPTVertex v = it.next();
+                double old_w = v.weightSum;
+                long old_t = v.state.getTime();
+
+                if (old_w <= weightSum && old_t <= time) {
+                    /* an existing vertex strictly dominates the new vertex */
+                    return null;
+                }
+
+                if (old_w > weightSum && old_t > time) {
+                    /* the new vertex strictly dominates an existing vertex */
+                    it.remove();
+                } else {
+                    if (old_w > worstWeight) {
+                        worstWeight = old_w;
+                    }
+                    if (old_t > worstTime) {
+                        worstTime = old_t;
+                    }
+                }
+            }
+
+            if (worstTime != -1 && time >= worstTime && weightSum >= worstWeight) {
+                return null;
+            }
+        }
+        SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
+        vertices.add(ret);
         return ret;
-    }
-
-    public Collection<SPTVertex> getVertices() {
-        return this.vertices.values();
-    }
-
-    public SPTVertex getVertex(Vertex vv) {
-        return (SPTVertex) this.vertices.get(vv);
     }
 
     public GraphPath getPath(Vertex dest) {
         return getPath(dest, true);
     }
-    
+
     public GraphPath getPath(Vertex dest, boolean optimize) {
-        SPTVertex end = this.getVertex(dest);
-        if (end == null) {
+        SPTVertex end = null;
+        Collection<SPTVertex> set = getVertices(dest);
+        if (set == null) {
             return null;
         }
+        for (SPTVertex v : set) {
+            if (end == null || v.weightSum < end.weightSum) {
+                end = v;
+            }
+        }
 
+        if (set.size() == 0) {
+            System.out.println("empty set");
+        }
         GraphPath ret = new GraphPath();
         while (true) {
             ret.vertices.add(0, end);
@@ -71,16 +160,16 @@ public class ShortestPathTree {
     }
 
     public String toString() {
-        return "SPT " + this.vertices.size();
+        return "SPT " + this.vertexSets.size();
     }
 
-    public void draw(DrawHandler drawer) throws Exception {
-        for (SPTVertex vv : this.getVertices()) {
-            for (SPTEdge ee : vv.outgoing) {
-                if (ee.payload instanceof Drawable) {
-                    drawer.handle((Drawable) ee.payload);
-                }
-            }
-        }
+    public Collection<SPTVertex> getVertices(Vertex v) {
+        return vertexSets.get(v);
     }
+
+    public void removeVertex(SPTVertex vertex) {
+        Collection<SPTVertex> set = this.vertexSets.get(vertex.mirror);
+        set.remove(vertex);
+    }
+
 }

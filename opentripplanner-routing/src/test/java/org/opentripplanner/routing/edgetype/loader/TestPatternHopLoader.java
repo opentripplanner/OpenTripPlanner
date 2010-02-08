@@ -23,7 +23,6 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Intersection;
@@ -130,7 +129,7 @@ public class TestPatternHopLoader extends TestCase {
         GraphPath path;
 
         // A to B
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_b);
@@ -138,7 +137,7 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(4, path.vertices.size());
 
         // A to C
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_c);
@@ -146,19 +145,23 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(6, path.vertices.size());
 
         // A to D
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertEquals(9, path.vertices.size());
+        assertTrue(path.vertices.size() <= 9);
+        long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
 
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertEquals(10, path.vertices.size());
+        assertTrue(path.vertices.size() <= 10);
+        endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
     }
 
     /**
@@ -174,7 +177,7 @@ public class TestPatternHopLoader extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        spt = Dijkstra.getShortestPathTree(graph, stop_f.getLabel(), stop_h.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_f.getLabel(), stop_h.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 18, 5, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_h);
@@ -194,7 +197,7 @@ public class TestPatternHopLoader extends TestCase {
         GraphPath path;
 
         // Friday evening
-        spt = Dijkstra.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 18, 23, 20, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_h);
@@ -204,7 +207,7 @@ public class TestPatternHopLoader extends TestCase {
         // Saturday morning
         long startTime = new GregorianCalendar(2009, 8, 19, 0, 5, 0).getTimeInMillis();
 
-        spt = Dijkstra.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
                 startTime), options);
 
         path = spt.getPath(stop_h);
@@ -236,8 +239,8 @@ public class TestPatternHopLoader extends TestCase {
         Vertex stop_a = graph.getVertex("agency_A");
         hop = getHopOut(stop_a);
         geometry = hop.getGeometry();
-        assertTrue(geometry.getLength() > 0.999);
-        assertTrue(geometry.getLength() < 1.001);
+        assertTrue(geometry.getLength() > 0.009999);
+        assertTrue(geometry.getLength() < 0.010001);
 
     }
 
@@ -294,7 +297,7 @@ public class TestPatternHopLoader extends TestCase {
         long startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 0).getTimeInMillis();
         TraverseOptions options = new TraverseOptions(context);
 
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, stop_i.getLabel(), stop_k
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_i.getLabel(), stop_k
                 .getLabel(), new State(startTime), options);
         GraphPath path = spt.getPath(stop_k);
         int num_alights = 0;
@@ -320,14 +323,14 @@ public class TestPatternHopLoader extends TestCase {
         TraverseOptions options = new TraverseOptions(context);
         options.modes = new TraverseModeSet("TRAINISH");
 
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
 
         //a to b is bus only
         assertNull(spt.getPath(stop_b));
         
         options.modes = new TraverseModeSet("TRAINISH,BUSISH");
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
 
         assertNotNull(spt.getPath(stop_b));
@@ -337,7 +340,7 @@ public class TestPatternHopLoader extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_c = graph.getVertex("agency_C");
         TraverseOptions options = new TraverseOptions(context);
-        ShortestPathTree spt = Dijkstra.getShortestPathTree(graph, stop_d.getLabel(), stop_c.getLabel(), new State(
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(), stop_c.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 1, 10, 0, 0).getTimeInMillis()), options);
 
         GraphPath path = spt.getPath(stop_c);
@@ -378,8 +381,25 @@ public class TestPatternHopLoader extends TestCase {
                 .getTimeInMillis()), options);
         
         time.add(Calendar.HOUR, 1);
+        time.add(Calendar.SECOND, 1); //for the StreetTransitLink
         path = spt.getPath(near_d);
         assertNotNull(path);
         assertEquals(time.getTimeInMillis(), path.vertices.lastElement().state.getTime());
+    }
+
+    public void testRunForTrain() {
+
+        Vertex destination = graph.getVertex("agency_T");
+        TraverseOptions wo = new TraverseOptions();
+        wo.setGtfsContext(context);
+        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q", destination.getLabel(),
+                new State(startTime.getTimeInMillis()), wo);
+        GraphPath path = spt.getPath(destination);
+
+        long endTime = path.vertices.lastElement().state.getTime();
+        Calendar c = new GregorianCalendar();
+        c.setTimeInMillis(endTime);
+        assertTrue((endTime - startTime.getTimeInMillis()) / 1000 < 7200);
     }
 }

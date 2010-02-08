@@ -67,12 +67,12 @@ public class TestGraphPath extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        spt = Dijkstra.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
-        assertEquals(10, path.vertices.size());
+        assertTrue(path.vertices.size() <= 10);
 
         long bestStart = new GregorianCalendar(2009, 8, 7, 0, 20, 0).getTimeInMillis();
         assertNotSame(bestStart, path.vertices.firstElement().state.getTime());

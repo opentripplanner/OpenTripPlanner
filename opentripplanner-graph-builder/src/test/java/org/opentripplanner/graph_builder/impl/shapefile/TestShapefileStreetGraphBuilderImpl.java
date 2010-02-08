@@ -95,7 +95,6 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         }
         assertNotNull(start);
         assertNotNull(end);
-
         TraverseOptions wo = new TraverseOptions();
         ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, new State(0), wo);
         assertNotNull(spt);

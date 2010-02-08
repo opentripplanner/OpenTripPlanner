@@ -549,6 +549,9 @@ public class GTFSPatternHopFactory {
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
+            if (fromStop == toStop) {
+                continue;
+            }
             TransitStop fromStation = (TransitStop) graph.getVertex(id(fromStop.getId()));
             TransitStop toStation = (TransitStop) graph.getVertex(id(toStop.getId()));
             double distance = fromStation.distance(toStation);

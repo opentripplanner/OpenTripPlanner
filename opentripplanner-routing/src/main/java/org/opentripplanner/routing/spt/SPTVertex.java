@@ -71,4 +71,8 @@ public class SPTVertex extends GenericVertex {
     public String getStopId() {
         return this.mirror.getStopId();
     }
+
+    public boolean equals(SPTVertex v) {
+        return v.mirror == mirror && v.incoming == incoming;
+    }
 }
