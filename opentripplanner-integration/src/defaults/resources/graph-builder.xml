@@ -54,6 +54,7 @@
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
 
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
+        <property name="alwaysRebuild" value="false" />
         <property name="graphBundle" ref="graphBundle" />
         <property name="graphBuilders">
             <list>

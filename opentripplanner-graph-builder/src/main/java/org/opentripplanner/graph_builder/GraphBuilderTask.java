@@ -36,7 +36,7 @@ public class GraphBuilderTask {
 
     private GraphBundle _graphBundle;
     
-    private boolean _alwaysRebuild = false;
+    private boolean _alwaysRebuild = true;
 
     @Autowired
     public void setGraph(Graph graph) {
