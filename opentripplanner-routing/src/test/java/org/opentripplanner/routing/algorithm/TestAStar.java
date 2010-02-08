@@ -117,7 +117,8 @@ public class TestAStar extends TestCase {
 
         GraphPath path = spt.getPath(airport);
         assertNotNull(path);
-        assertTrue(aStarTime / n_trials / 1000000000.0 <= 0.1);
+        double time = aStarTime / n_trials / 1000000000.0;
+        assertTrue("Actual time " + time + "s greater than 200 ms", time <= 0.2);
 
     }
 }
