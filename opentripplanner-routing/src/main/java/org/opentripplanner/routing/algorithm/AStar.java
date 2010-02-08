@@ -199,7 +199,7 @@ public class AStar {
 
             if (extraEdges.containsKey(spt_u.mirror)) {
                 List<Edge> newIncoming = new ArrayList<Edge>();
-                for (Edge edge : spt_u.mirror.getOutgoing()) {
+                for (Edge edge : spt_u.mirror.getIncoming()) {
                     newIncoming.add(edge);
                 }
                 newIncoming.add(extraEdges.get(spt_u.mirror));
