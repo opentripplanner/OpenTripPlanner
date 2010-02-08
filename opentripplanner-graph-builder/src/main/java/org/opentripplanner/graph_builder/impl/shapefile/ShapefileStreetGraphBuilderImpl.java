@@ -155,14 +155,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     edgesByLocation.put(startCoordinate, startEdges);
                 }
                 startEdges.add(street);
-                startEdges.add(backStreet);
 
                 ArrayList<Edge> endEdges = edgesByLocation.get(endCoordinate);
                 if (endEdges == null) {
                     endEdges = new ArrayList<Edge>();
                     edgesByLocation.put(endCoordinate, endEdges);
                 }
-                endEdges.add(street);
                 endEdges.add(backStreet);
 
                 P2<StreetTraversalPermission> pair = permissionConverter.convert(feature);
