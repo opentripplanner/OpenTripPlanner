@@ -36,8 +36,6 @@ public class GenericVertex implements Vertex {
 
     private String stopId = null;
 
-    public Class<?> type;
-
     private double y;
 
     private double x;
@@ -140,10 +138,6 @@ public class GenericVertex implements Vertex {
         return label;
     }
 
-    public void setType(Class<?> type) {
-        this.type = type;
-    }
-    
     private void writeObject(ObjectOutputStream out) throws IOException {
         incoming.trimToSize();
         outgoing.trimToSize();
