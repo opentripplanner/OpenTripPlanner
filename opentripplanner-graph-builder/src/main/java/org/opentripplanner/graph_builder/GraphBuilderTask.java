@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +22,27 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.impl.GraphSerializationLibrary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class GraphBuilderTask {
+    
+    private static Logger _log = LoggerFactory.getLogger(GraphBuilderTask.class); 
 
     private Graph _graph;
 
     private List<GraphBuilder> _graphBuilders = new ArrayList<GraphBuilder>();
 
     private GraphBundle _graphBundle;
+    
+    private boolean _alwaysRebuild = false;
 
     @Autowired
     public void setGraph(Graph graph) {
         _graph = graph;
     }
-
+    
     public void addGraphBuilder(GraphBuilder loader) {
         _graphBuilders.add(loader);
     }
@@ -47,10 +54,23 @@ public class GraphBuilderTask {
     public void setGraphBundle(GraphBundle graphBundle) {
         _graphBundle = graphBundle;
     }
+    
+    public void setAlwaysRebuild(boolean alwaysRebuild) {
+        _alwaysRebuild = alwaysRebuild;
+    }
 
     public void run() throws IOException {
+        
+        File graphPath = _graphBundle.getGraphPath();
+        
+        if( graphPath.exists() && ! _alwaysRebuild) {
+            _log.info("graph already exists and alwaysRebuild=false => skipping graph build");
+            return;
+        }
+        
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(_graph);
-        GraphSerializationLibrary.writeGraph(_graph, _graphBundle.getGraphPath());
+        
+        GraphSerializationLibrary.writeGraph(_graph, graphPath);
     }
 }
