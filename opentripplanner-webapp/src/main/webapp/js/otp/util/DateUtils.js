@@ -119,9 +119,9 @@ otp.util.DateUtils = {
         return date.format(this.TIME_FORMAT_STRING);
     },
     
-    DATE_TIME_FORMAT_STRING : "D, M jS g:mA",
+    DATE_TIME_FORMAT_STRING : "D, M jS g:iA",
     
-    TIME_FORMAT_STRING : "g:mA",
+    TIME_FORMAT_STRING : "g:iA",
 
     CLASS_NAME : "otp.util.DateUtils"
 };
