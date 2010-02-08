@@ -174,9 +174,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public String toString() {
         if (this.name != null) {
-            return "Street(" + this.id + ", " + this.name + ", " + this.length + ")";
+            return "Street(" + this.id + ", " + this.name + ", " + this.length + ", " + this.permission + ")";
         } else {
-            return "Street(" + this.length + ")";
+            return "Street(" + this.length + ", " + this.permission + ")";
         }
     }
 
