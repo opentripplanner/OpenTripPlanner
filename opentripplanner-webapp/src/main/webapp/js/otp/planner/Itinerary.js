@@ -142,6 +142,7 @@ otp.planner.Itinerary = {
             vLayer.addFeatures(this.m_vectors);
             mLayer.addFeatures(this.m_markers);
             this.m_extent = mLayer.getDataExtent();
+            this.m_extent.extend(vLayer.getDataExtent());
         }
         catch(e)
         {
