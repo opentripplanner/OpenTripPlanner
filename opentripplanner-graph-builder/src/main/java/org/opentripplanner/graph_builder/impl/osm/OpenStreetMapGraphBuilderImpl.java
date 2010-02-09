@@ -91,6 +91,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 _tagPermissions.put(tag, new KeyValuePermission(key, value, mappy.get(tag)));
             }
         }
+        if (!_tagPermissions.containsKey("__default__")) {
+            _log.warn("No default permissions for osm tags...");
+        }
     }
 
     @Override
@@ -173,7 +176,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                         ArrayList<Edge> edges = edgesByLocation.get(start.getCoordinate());
                         if (edges == null) {
-                            edges = new ArrayList<Edge>();
+                            edges = new ArrayList<Edge>(4);
                             edgesByLocation.put(start.getCoordinate(), edges);
                         }
                         edges.add(street);
@@ -408,18 +411,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity) {
             Map<String, String> tags = entity.getTags();
-            String all_tags = "";
             StreetTraversalPermission def    = null;
-            StreetTraversalPermission access = null;
+            StreetTraversalPermission permission = null;
 
-            for(String key : tags.keySet()) {
-                String tag = key + "=" + tags.get(key);
-                if(all_tags.equals("")) {
-                    all_tags += tag;
-                } else {
-                    all_tags += "; " + tag;
-                }
-            }
+            String access = tags.get("access");
+            String motorcar = tags.get("motorcar");
+            String bicycle = tags.get("bicycle");
+            String foot = tags.get("foot");
+            String all_tags = access != null ? "access=" + access : "; ";
+            all_tags += motorcar != null ? "motorcar=" + motorcar : "; ";
+            all_tags += bicycle != null ? "bicycle=" + bicycle : "; ";
+            all_tags += foot != null ? "foot=" + foot : "; ";
 
             for(KeyValuePermission kvp : _tagPermissions.values()) {
                 if(tags.containsKey(kvp.key) && kvp.value.equals(tags.get(kvp.key))) {
@@ -433,7 +435,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     def = _tagPermissions.get("__default__").permission;
                     _log.debug("Used default permissions: " + all_tags);
                 } else {
-                    _log.warn("No default permissions for osm tags...");
                     def = StreetTraversalPermission.ALL;
                 }
             }
@@ -447,45 +448,45 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * closer to reality, since most people don't follow the rules
              * perfectly ;-)
              */
-            if(tags.containsKey("access")) {
-                if("no".equals( tags.get("access") )) {
-                    access = StreetTraversalPermission.NONE;
+            if(access != null) {
+                if("no".equals( access )) {
+                    permission = StreetTraversalPermission.NONE;
                 } else {
-                    access = StreetTraversalPermission.ALL;
+                    permission = StreetTraversalPermission.ALL;
                 }
-            } else if (tags.containsKey("motorcar") || tags.containsKey("bicycle") || tags.containsKey("foot")) {
-                access = def;
+            } else if (motorcar != null || bicycle != null || foot != null) {
+                permission = def;
             }
 
-            if (tags.containsKey("motorcar")) {
-                if("no".equals(tags.get("motorcar")) || "private".equals(tags.get("motorcar"))) {
-                    access = access.remove(StreetTraversalPermission.CAR);
+            if (motorcar != null) {
+                if("no".equals(motorcar) || "private".equals(motorcar)) {
+                    permission = permission.remove(StreetTraversalPermission.CAR);
                 } else {
-                    access = access.add(StreetTraversalPermission.CAR);
+                    permission = permission.add(StreetTraversalPermission.CAR);
                 }
             }
 
             if (tags.containsKey("bicycle")) {
-                if("no".equals(tags.get("bicycle")) || "private".equals(tags.get("bicycle"))) {
-                    access = access.remove(StreetTraversalPermission.BICYCLE);
+                if("no".equals(bicycle) || "private".equals(bicycle)) {
+                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
                 } else {
-                    access = access.add(StreetTraversalPermission.BICYCLE);
+                    permission = permission.add(StreetTraversalPermission.BICYCLE);
                 }
             }
 
-            if (tags.containsKey("foot")) {
-                if("no".equals(tags.get("foot")) || "private".equals(tags.get("foot"))) {
-                    access = access.remove(StreetTraversalPermission.PEDESTRIAN);
+            if (foot != null) {
+                if("no".equals(foot) || "private".equals(foot)) {
+                    permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                 } else {
-                    access = access.add(StreetTraversalPermission.PEDESTRIAN);
+                    permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
                 }
             }
 
 
-            if(access == null)
+            if(permission == null)
                 return def;
 
-            return access;
+            return permission;
         }
     }
 }
