@@ -30,6 +30,7 @@ import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.core.Edge;
@@ -37,7 +38,6 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.core.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -176,20 +176,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            for (ArrayList<Edge> edges : edgesByLocation.values()) {
-                for (Edge in : edges) {
-                    Vertex tov = in.getToVertex();
-                    Coordinate c = tov.getCoordinate();
-                    ArrayList<Edge> outEdges = edgesByLocation.get(c);
-                    if (outEdges != null) {
-                        for (Edge out : outEdges) {
-                            if (tov != out.getFromVertex() && out instanceof Street && out.getFromVertex().getCoordinate().equals(c)) {
-                                graph.addEdge(new Turn(in, out));
-                            }
-                        }
-                    }
-                }
-            }
+            StreetUtils.createTurnEdges(graph, edgesByLocation);
 
             features.close(it2);
         } catch (Exception ex) {
