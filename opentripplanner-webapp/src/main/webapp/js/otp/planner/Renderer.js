@@ -23,10 +23,9 @@ otp.namespace("otp.planner");
   */
 otp.planner.Renderer = {
 
-    map           : null,
-    locale        : null,
-    rteMapPngs    : false,  // false == use generic /image/map/trip/mode/<mode>.png icons
-                            // true  == use rte # /image/map/trip/rte/<number>.png icons 
+    map                     : null,
+    locale                  : null,
+    useGenericRouteIcons    : true,
 
     m_markerLayer : null,
     m_vectorLayer : null,
@@ -90,10 +89,10 @@ otp.planner.Renderer = {
 
             var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
             var style;
-            if(this.rteMapPngs)
-                style = otp.util.OpenLayersUtils.getRouteNumberMarkerStyle();
-             else
+            if(this.useGenericRouteIcons)
                 style = otp.util.OpenLayersUtils.getRouteModeMarkerStyle();
+            else
+                style = otp.util.OpenLayersUtils.getRouteNumberMarkerStyle();
 
             styleMap.addUniqueValueRules("default", "type", style);
 

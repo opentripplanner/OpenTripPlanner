@@ -428,19 +428,23 @@ otp.util.OpenLayersUtils = {
      *            y The vertical coordinate of the marker.
      * @param {String}
      *            route The route (e.g., 110 or M6) this marker is for.
+     * @param {String}
+     *            mode The mode (e.g., subway
      * @param {Object}
      *            mArray An array to add the new marker to. Optional.
      */
-    makeRouteMarker : function(x, y, route, mArray)
+    makeRouteMarker : function(x, y, route, mode, mArray)
     {
-        // TODO: This should default to a mode-appropriate marker icon
-        // (right now this is just a filler so we don't have broken img links)
         if (route == null || route === "") {
             route = "default-route";
+        }
+        if (mode == null || mode === "") {
+            mode = 'default-mode';
         }
         var routeMarker = null;
         routeMarker = this.makeMarker(x, y, 'routeMarker', mArray);
         routeMarker.attributes.route = route;
+        routeMarker.attributes.mode = mode.toLocaleLowerCase();
             
         return routeMarker;
     },

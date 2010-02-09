@@ -21,9 +21,10 @@ otp.namespace("otp.application");
 otp.application.Controller = {
 
     // config
-    extent     : null,
-    url        : null,
-    rteMapPngs : null,
+    extent               : null,
+    url                  : null,
+    useGenericRouteIcons : true, // true == use generic /image/map/trip/mode/<mode>.png icons
+                                 // false  == use rte # (or name) /image/map/trip/rte/<number>.png icons 
 
     // creation
     map        : null,
@@ -45,7 +46,7 @@ otp.application.Controller = {
 
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
-        this.planner = new otp.planner.Planner({rteMapPngs:this.rteMapPngs, url:this.url, map:this.map, poi:this.poi}); 
+        this.planner = new otp.planner.Planner({useGenericRouteIcons:this.useGenericRouteIcons, url:this.url, map:this.map, poi:this.poi}); 
         this.cm      = new otp.planner.ContextMenu({map:this.map, forms:this.planner.getForms()});
         this.ui.accordion.add(this.planner.getPanel());
         this.ui.doLayout();

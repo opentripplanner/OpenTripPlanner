@@ -32,9 +32,9 @@ otp.planner.Planner = {
     controller    : null,
 
     // configuration
-    url           : null,
-    poi           : null,
-    rteMapPngs    : false,  // needed here...sent down to Renderer constructor
+    url                     : null,
+    poi                     : null,
+    useGenericRouteIcons    : true,  // needed here...sent down to Renderer constructor
 
     // new tab (itineraries tabs) management
     m_tabs        : null,

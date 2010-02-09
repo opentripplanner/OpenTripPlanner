@@ -431,6 +431,7 @@ otp.planner.Itinerary = {
                 var to    = this.m_toStore.getAt(i);
                 var thru  = from.get('order');
                 var route = from.get('routeID');
+                var mode  = from.get('mode');
 
                 var fromP = from.get('geometry');
                 var toP = to.get('geometry');
@@ -443,7 +444,7 @@ otp.planner.Itinerary = {
                 if(thru == null || thru != 'thru-route')
                 {
                     otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'diskMarker', this.m_markers);
-                    otp.util.OpenLayersUtils.makeRouteMarker(fromP.x, fromP.y, route, this.m_markers);
+                    otp.util.OpenLayersUtils.makeRouteMarker(fromP.x, fromP.y, route, mode, this.m_markers);
                 }
 
                 // put a disk at the end of this route segment
