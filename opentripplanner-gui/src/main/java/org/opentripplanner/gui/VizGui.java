@@ -56,6 +56,8 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * Exit on window close.
  * 
@@ -394,6 +396,30 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(zoomToNodeButton);
         
+        JButton zoomToLocationButton = new JButton("Zoom to location");
+        zoomToLocationButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+              String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
+              if( result == null || result.length() == 0)
+                return;
+              String[] tokens = result.split("[\\s,]+");
+              double lat = Double.parseDouble(tokens[0]);
+              double lon = Double.parseDouble(tokens[1]);
+              Coordinate c = new Coordinate(lon,lat);
+              showGraph.zoomToLocation(c);
+            }
+        });
+        buttonPanel.add(zoomToLocationButton);
+        
+        JButton zoomOutButton = new JButton("Zoom out");
+        zoomOutButton.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            showGraph.zoomOut();
+          }
+        });
+        buttonPanel.add(zoomOutButton);
+        
         JButton routeButton = new JButton("Route");
         routeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -462,8 +488,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(traceButton);
-        
-        
+                
         /* right panel holds trip pattern and stop metadata */
         JTabbedPane rightPanel = new JTabbedPane();
 

@@ -122,7 +122,7 @@ public class ShowGraph extends PApplet {
             @Override
             public void mouseMoved(MouseEvent e) {
                 super.mouseMoved(e);
-                Point p = e.getLocationOnScreen();
+                Point p = e.getPoint();
                 mouseModelX = toModelX(p.x);
                 mouseModelY = toModelY(p.y);
             }
@@ -149,12 +149,23 @@ public class ShowGraph extends PApplet {
     public void zoomToDefault() {
         modelBounds = new Envelope(modelOuterBounds);
     }
+
+    public void zoomToLocation(Coordinate c) {
+      Envelope e = new Envelope();
+      e.expandToInclude(c);
+      e.expandBy(0.002);
+      modelBounds = e;
+    }
     
     public void zoomToVertex(Vertex v) {
     	Envelope e = new Envelope();
     	e.expandToInclude(v.getCoordinate());
     	e.expandBy(0.002);
     	modelBounds = e;
+    }
+    
+    public void zoomOut() {
+      modelBounds.expandBy(modelBounds.getWidth(), modelBounds.getHeight());
     }
     
     @SuppressWarnings("unchecked")
