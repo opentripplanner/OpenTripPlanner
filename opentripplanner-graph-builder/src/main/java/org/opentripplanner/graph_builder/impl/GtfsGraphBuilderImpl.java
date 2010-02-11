@@ -38,8 +38,7 @@ import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
-import org.onebusaway.gtfs.services.GtfsMutableDao;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
@@ -48,8 +47,8 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,11 +72,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private GtfsBundles _gtfsBundles;
 
-    private GtfsRelationalDaoImpl _defaultDao = new GtfsRelationalDaoImpl();
-
-    private GtfsRelationalDao _dao = _defaultDao;
-
-    private GtfsMutableDao _store = _defaultDao;
+    private GtfsMutableRelationalDao _dao = new GtfsRelationalDaoImpl();
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
 
@@ -87,12 +82,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         _gtfsBundles = gtfsBundles;
     }
 
-    public void setGtfsRelationalDao(GtfsRelationalDao dao) {
+    public void setDao(GtfsMutableRelationalDao dao) {
         _dao = dao;
-    }
-
-    public void setGtfsEntityStore(GtfsMutableDao store) {
-        _store = store;
     }
 
     public void setEntityReplacementStrategy(EntityReplacementStrategy strategy) {
@@ -260,7 +251,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         @Override
         public void open() {
-            _store.open();
+            _dao.open();
         }
 
         @Override
@@ -268,7 +259,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             Serializable replacement = _entityReplacementStrategy.getReplacementEntityId(type, id);
             if (replacement != null)
                 id = replacement;
-            return _store.getEntityForId(type, id);
+            return _dao.getEntityForId(type, id);
         }
 
         @Override
@@ -283,17 +274,17 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                     return;
             }
 
-            _store.saveEntity(entity);
+            _dao.saveEntity(entity);
         }
 
         @Override
         public void flush() {
-            _store.flush();
+            _dao.flush();
         }
 
         @Override
         public void close() {
-            _store.close();
+            _dao.close();
         }
 
         @Override
