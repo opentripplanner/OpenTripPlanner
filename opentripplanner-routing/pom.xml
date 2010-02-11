@@ -99,16 +99,6 @@
             </snapshots>
             <url>http://download.osgeo.org/</url>
         </repository>
-        <repository>
-            <id>releases.developer.onebusaway.org</id>
-            <url>http://developer.onebusaway.org/maven/repository/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
     </repositories>
     
     <build>
