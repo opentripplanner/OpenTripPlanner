@@ -105,8 +105,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
             
-            double bestDistance = Double.MAX_VALUE;
+            
             if (includeTransitStops) {
+                double bestDistance = Double.MAX_VALUE;
                 List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
 
                 Vertex bestStop = null;
@@ -131,6 +132,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
              * a pedestrian should be able to go in any direction. */
 
+            double bestDistance = Double.MAX_VALUE;
             nearby = edgeTree.query(envelope);
             for (Street e: nearby) {
                 Geometry g = e.getGeometry();
