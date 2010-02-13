@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Vector;
-
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -97,16 +95,6 @@ public final class DummyReferenceVertex implements Vertex {
 
     @Override
     public double getY() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setIncoming(Vector<Edge> incoming) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setOutgoing(Vector<Edge> outgoing) {
         throw new UnsupportedOperationException();
     }
 }

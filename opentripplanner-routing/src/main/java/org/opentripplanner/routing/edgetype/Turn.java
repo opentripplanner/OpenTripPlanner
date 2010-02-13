@@ -13,10 +13,9 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -30,15 +29,9 @@ public class Turn extends AbstractEdge {
 
     public int turnAngle;
 
-    public Turn(Edge in, Edge out) {
-        super(in.getToVertex(), out.getFromVertex());
-
-        double angleDiff = Math.abs(DirectionUtils.getInstance().getLastAngle(in.getGeometry())
-                - DirectionUtils.getInstance().getFirstAngle(out.getGeometry()));
-        turnAngle = (int) (180 * angleDiff / Math.PI);
-        if (turnAngle > 180) {
-            turnAngle = 360 - turnAngle;
-        }
+    public Turn(IntersectionVertex in, IntersectionVertex out) {
+        super(in, out);
+        turnAngle = Math.abs(180 - Math.abs(in.angle - out.angle));
     }
 
     @Override

@@ -20,6 +20,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -34,7 +35,6 @@ import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -87,13 +87,14 @@ public class TestGraphPath extends TestCase {
         
         
         // add some street data to the graph
-        Vertex v1 = new Intersection("fake_intersection", -74, 41.000001); // near stop K
-        Vertex v2 = new Intersection("fake_intersection2", -73.000002, 41.000001); // near L
+        Vertex v1 = new GenericStreetIntersectionVertex("fake_intersection", -74, 41.000001); // near stop K
+        Vertex v2 = new GenericStreetIntersectionVertex("fake_intersection2", -73.000002, 41.000001); // near stop L
+
         graph.addVertex(v1);
         graph.addVertex(v2);
         Street street = new Street(v1, v2, "fake_street", "fake_street", 10);
         GeometryFactory gf = new GeometryFactory();
-        street.setGeometry(gf.createLineString(new Coordinate[] { new Coordinate(-74, 41), new Coordinate(-73.000002, 41.000001)}));
+        street.setGeometry(gf.createLineString(new Coordinate[] { new Coordinate(-74, 41.000001), new Coordinate(-73.000002, 41.000001)}));
         
         graph.addEdge(street);
         

@@ -22,6 +22,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
@@ -33,7 +34,6 @@ import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.Intersection;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -130,10 +130,10 @@ public class TestStreet extends TestCase {
 
         Graph graph = new Graph();
         // a 1 degree x 1 degree square, right edge missing
-        Vertex tl = graph.addVertex(new Intersection("tl", -74, 41));
-        Vertex tr = graph.addVertex(new Intersection("tr", -73, 41));
-        Vertex bl = graph.addVertex(new Intersection("bl", -74, 40));
-        Vertex br = graph.addVertex(new Intersection("br", -73, 40));
+        Vertex tl = graph.addVertex(new GenericStreetIntersectionVertex("tl", -74, 41));
+        Vertex tr = graph.addVertex(new GenericStreetIntersectionVertex("tr", -73, 41));
+        Vertex bl = graph.addVertex(new GenericStreetIntersectionVertex("bl", -74, 40));
+        Vertex br = graph.addVertex(new GenericStreetIntersectionVertex("br", -73, 40));
 
         Street top = new Street(tl, tr, 20000);
         top.setGeometry(createGeometry(tl, tr));

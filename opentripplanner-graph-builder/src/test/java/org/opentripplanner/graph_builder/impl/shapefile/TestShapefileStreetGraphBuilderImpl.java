@@ -59,7 +59,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         ShapefileFeatureSourceFactoryImpl factory = new ShapefileFeatureSourceFactoryImpl(file);
 
         ShapefileStreetSchema schema = new ShapefileStreetSchema();
-        schema.setIdAttribute("StreetCode");
+        schema.setIdAttribute("SegmentID");
         schema.setNameAttribute("Street");
 
         CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
@@ -79,7 +79,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
         loader.buildGraph(gg);
 
-        assertEquals(237064, gg.getVertices().size());
+        assertEquals(201520, gg.getVertices().size());
 
         //find start and end vertices
         Vertex start = null;

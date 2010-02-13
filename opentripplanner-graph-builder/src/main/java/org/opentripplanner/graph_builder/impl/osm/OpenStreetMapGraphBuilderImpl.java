@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence.Float;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
@@ -33,9 +34,9 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -139,9 +140,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             pruneFloatingIslands();
 
-            HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
+            HashMap<Coordinate, Intersection> intersectionsByLocation = new HashMap<Coordinate, Intersection>();
 
             int wayIndex = 0;
+
+            //figure out which nodes that are actually intersections
+            Set<Integer> possibleIntersectionNodes = new HashSet<Integer>();
+            Set<Integer> intersectionNodes = new HashSet<Integer>();
+            for (OSMWay way : _ways.values()) {
+                List<Integer> nodes = way.getNodeRefs();
+                for (int node : nodes) {
+                    if (possibleIntersectionNodes.contains(node)) {
+                        intersectionNodes.add(node);
+                    } else {
+                        possibleIntersectionNodes.add(node);
+                    }
+                }
+            }
 
             for (OSMWay way : _ways.values()) {
 
@@ -154,44 +169,85 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     continue;
 
                 List<Integer> nodes = way.getNodeRefs();
-                for (int i = 0; i < nodes.size() - 1; i++) {
-                    Integer startNode = nodes.get(i);
-                    String vFromId = getVertexIdForNodeId(startNode) + "_" + i + "_" + way.getId();
-                    Integer endNode = nodes.get(i + 1);
-                    String vToId = getVertexIdForNodeId(endNode) + "_" + i + "_" + way.getId();
 
-                    OSMNode osmStartNode = _nodes.get(startNode);
+                Intersection startIntersection = null, endIntersection = null;
+
+                ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
+                GeometryFactory geometryFactory = new GeometryFactory();
+
+                Integer startNode = null;
+                OSMNode osmStartNode = null;
+                for (int i = 0; i < nodes.size() - 1; i++) {
+                    Integer endNode = nodes.get(i + 1);
+                    if (osmStartNode == null) {
+                        startNode = nodes.get(i);
+                        osmStartNode = _nodes.get(startNode);
+                    }
                     OSMNode osmEndNode = _nodes.get(endNode);
 
                     if (osmStartNode == null || osmEndNode == null)
                         continue;
 
-                    Vertex from = addVertex(graph, vFromId, osmStartNode);
-                    Vertex to = addVertex(graph, vToId, osmEndNode);
+                    LineString geometry;
 
-                    ArrayList<Street> streets = getEdgesForStreet(from, to, way, permissions);
-                    for(Street street : streets) {
-                        graph.addEdge(street);
-                        Vertex start = street.getFromVertex();
-
-                        ArrayList<Edge> edges = edgesByLocation.get(start.getCoordinate());
-                        if (edges == null) {
-                            edges = new ArrayList<Edge>(4);
-                            edgesByLocation.put(start.getCoordinate(), edges);
-                        }
-                        edges.add(street);
+                    /* skip vertices that are not intersections, except that we use them for geometry */
+                    if (segmentCoordinates.size() == 0) {
+                        segmentCoordinates.add(getCoordinate(osmStartNode));
                     }
+
+                    if (intersectionNodes.contains(endNode) || i == nodes.size() - 2) {
+                        segmentCoordinates.add(getCoordinate(osmEndNode));
+                        geometry = geometryFactory.createLineString(segmentCoordinates.toArray(new Coordinate[0]));
+                        segmentCoordinates.clear();
+                    } else {
+                        segmentCoordinates.add(getCoordinate(osmEndNode));
+                        continue;
+                    }
+
+                    /* generate intersections */
+                    if (startIntersection == null) {
+                        startIntersection = intersectionsByLocation.get(getCoordinate(osmStartNode));
+                        if (startIntersection == null) {
+                            startIntersection = new Intersection(getVertexIdForNodeId(startNode), osmStartNode.getLon(), osmStartNode.getLat());
+                            intersectionsByLocation.put(startIntersection.getCoordinate(), startIntersection);
+                        }
+                    } else {
+                        startIntersection = endIntersection;
+                    }
+
+                    endIntersection = intersectionsByLocation.get(getCoordinate(osmEndNode));
+                    if (endIntersection == null) {
+                        endIntersection = new Intersection(getVertexIdForNodeId(endNode), osmEndNode.getLon(), osmEndNode.getLat());
+                        intersectionsByLocation.put(endIntersection.getCoordinate(), endIntersection);
+                    }
+
+                    IntersectionVertex from = new IntersectionVertex(startIntersection, geometry, true);
+                    graph.addVertex(from);
+                    IntersectionVertex to = new IntersectionVertex(endIntersection, geometry, false);
+                    graph.addVertex(to);
+
+                    P2<Street> streets = getEdgesForStreet(from, to, way, permissions, geometry);
+                    Street street = streets.getFirst();
+                    if (street != null) {
+                        to.inStreet = street;
+                        from.outStreet = street;
+                    }
+                    Street backStreet = streets.getSecond();
+                    if (backStreet != null) {
+                        to.outStreet = backStreet;
+                        from.inStreet = backStreet;
+                    }
+
+                    startNode = endNode;
+                    osmStartNode = _nodes.get(startNode);
                 }
             }
 
-            StreetUtils.createTurnEdges(graph, edgesByLocation);
-
+            StreetUtils.unify(graph, intersectionsByLocation.values());
         }
 
-        private Vertex addVertex(Graph graph, String vertexId, OSMNode node) {
-            Intersection newVertex = new Intersection(vertexId, node.getLon(), node.getLat());
-            graph.addVertex(newVertex);
-            return newVertex;
+        private Coordinate getCoordinate(OSMNode osmNode) {
+            return new Coordinate(osmNode.getLon(), osmNode.getLat());
         }
 
         private void pruneFloatingIslands() {
@@ -283,15 +339,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /* Attempt at handling oneway streets, cycleways, and whatnot. See
          * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios,
          * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. */
-        private ArrayList<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
-                StreetTraversalPermission permissions) {
-            ArrayList<Street> streets = new ArrayList<Street>();
+        private P2<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
+                StreetTraversalPermission permissions, LineString geometry) {
             double d = from.distance(to);
 
             Map<String, String> tags = way.getTags();
 
             if(permissions == StreetTraversalPermission.NONE)
-                return streets;
+                return new P2<Street>(null, null);;
+
+            Street street = null, backStreet = null;
 
             /* Three basic cases, 1) bidirectonal for everyone, 2) unidirctional for cars only,
              * 3) biderectional for pedestrians only. */
@@ -299,20 +356,25 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     ("no".equals(tags.get("oneway:bicycle"))
                      || "opposite_lane".equals(tags.get("cycleway"))
                      || "opposite".equals(tags.get("cycleway")))) { // 2.
-                streets.add(getEdgeForStreet(from, to, way, d, permissions));
+                street = getEdgeForStreet(from, to, way, d, permissions);
                 if(permissions.remove(StreetTraversalPermission.CAR) != StreetTraversalPermission.NONE)
-                    streets.add(getEdgeForStreet(to, from, way, d, permissions.remove(StreetTraversalPermission.CAR)));
+                    backStreet = getEdgeForStreet(to, from, way, d, permissions.remove(StreetTraversalPermission.CAR));
             } else if ("yes".equals(tags.get("oneway")) || "roundabout".equals(tags.get("junction"))) { // 3
-                streets.add(getEdgeForStreet(from, to, way, d, permissions));
+                street = getEdgeForStreet(from, to, way, d, permissions);
                 if(permissions.allows(StreetTraversalPermission.PEDESTRIAN))
-                    streets.add(getEdgeForStreet(to, from, way, d, StreetTraversalPermission.PEDESTRIAN));
+                    backStreet = getEdgeForStreet(to, from, way, d, StreetTraversalPermission.PEDESTRIAN);
             } else { // 1.
-                streets.add(getEdgeForStreet(from, to, way, d, permissions));
-                streets.add(getEdgeForStreet(to, from, way, d, permissions));
+               street = getEdgeForStreet(from, to, way, d, permissions);
+               backStreet = getEdgeForStreet(to, from, way, d, permissions);
             }
 
-
-            return streets;
+            if (street != null) {
+                street.setGeometry(geometry);
+            }
+            if (backStreet != null) {
+                backStreet.setGeometry(geometry.reverse());
+            }
+            return new P2<Street>(street, backStreet);
         }
 
         private Street getEdgeForStreet(Vertex from, Vertex to, OSMWay way, double d,

@@ -13,8 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.TreeSet;
 
@@ -33,9 +33,8 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.core.Intersection;
@@ -95,9 +94,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = _schema
                     .getPermissionConverter();
 
-            HashMap<Coordinate, ArrayList<Edge>> edgesByLocation = new HashMap<Coordinate, ArrayList<Edge>>();
+            HashMap<Coordinate, Intersection> intersectionsByLocation = new HashMap<Coordinate, Intersection>();
 
             SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
+
+            //keep track of features that are duplicated so we don't have duplicate streets
+            HashSet<Object> seen = new HashSet<Object>();
 
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
@@ -107,6 +109,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 Object o = streetIdConverter.convert(feature);
                 String id = "" + o;
+                if (o != null && seen.contains(id)) {
+                    continue;
+                }
+                seen.add(id);
                 String name = streetNameConverter.convert(feature);
                 Coordinate[] coordinates = geom.getCoordinates();
 
@@ -129,39 +135,40 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
 
-                String uid = "_" + Math.random();
+                Intersection startIntersection = intersectionsByLocation.get(startCoordinate);
+                if (startIntersection == null) {
+                    startIntersection = new Intersection(startIntersectionName, startCoordinate.x,
+                            startCoordinate.y);
+                    intersectionsByLocation.put(startCoordinate, startIntersection);
+                }
 
-                Vertex startCorner = new Intersection(startIntersectionName + uid, startCoordinate.x,
-                        startCoordinate.y);
-                startCorner = graph.addVertex(startCorner);
+                Intersection endIntersection = intersectionsByLocation.get(endCoordinate);
+                if (endIntersection == null) {
+                    endIntersection = new Intersection(endIntersectionName, endCoordinate.x,
+                            endCoordinate.y);
+                    intersectionsByLocation.put(endCoordinate, endIntersection);
+                }
 
-                Vertex endCorner = new Intersection(endIntersectionName + uid, endCoordinate.x,
-                        endCoordinate.y);
-                endCorner = graph.addVertex(endCorner);
-
+                IntersectionVertex startCorner = new IntersectionVertex(startIntersection, geom, false);
+                while (graph.addVertex(startCorner) != startCorner) {
+                    startCorner.angle = (startCorner.angle + 1) % 360;
+                }
+                IntersectionVertex endCorner = new IntersectionVertex(endIntersection, geom, true);
+                while (graph.addVertex(endCorner) != endCorner) {
+                    endCorner.angle = (endCorner.angle + 1) % 360;
+                }
                 double length = JTS.orthodromicDistance(coordinates[0],
                         coordinates[coordinates.length - 1], worldCRS);
 
                 Street street = new Street(startCorner, endCorner, id, name, length);
                 street.setGeometry(geom);
-                graph.addEdge(street);
+                startCorner.outStreet = street;
+                endCorner.inStreet = street;
+
                 Street backStreet = new Street(endCorner, startCorner, id, name, length);
                 backStreet.setGeometry(geom.reverse());
-                graph.addEdge(backStreet);
-
-                ArrayList<Edge> startEdges = edgesByLocation.get(startCoordinate);
-                if (startEdges == null) {
-                    startEdges = new ArrayList<Edge>();
-                    edgesByLocation.put(startCoordinate, startEdges);
-                }
-                startEdges.add(street);
-
-                ArrayList<Edge> endEdges = edgesByLocation.get(endCoordinate);
-                if (endEdges == null) {
-                    endEdges = new ArrayList<Edge>();
-                    edgesByLocation.put(endCoordinate, endEdges);
-                }
-                endEdges.add(backStreet);
+                startCorner.inStreet = backStreet;
+                endCorner.outStreet = backStreet;
 
                 P2<StreetTraversalPermission> pair = permissionConverter.convert(feature);
 
@@ -176,7 +183,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            StreetUtils.createTurnEdges(graph, edgesByLocation);
+            StreetUtils.unify(graph, intersectionsByLocation.values());
 
             features.close(it2);
         } catch (Exception ex) {

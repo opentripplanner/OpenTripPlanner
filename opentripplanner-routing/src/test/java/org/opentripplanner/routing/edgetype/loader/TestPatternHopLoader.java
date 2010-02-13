@@ -24,8 +24,8 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -67,14 +67,14 @@ public class TestPatternHopLoader extends TestCase {
         Vertex stop_c = graph.getVertex("agency_C");
         Vertex stop_d = graph.getVertex("agency_D");
 
-        Vertex near_a = graph.addVertex(new Intersection("near_a", stop_a.getX() + 0.00001, stop_a.getY() + 0.00001));
-        Vertex near_b = graph.addVertex(new Intersection("near_b", stop_b.getX() + 0.00001, stop_b.getY() + 0.00001));
-        Vertex near_c = graph.addVertex(new Intersection("near_c", stop_c.getX() + 0.00001, stop_c.getY() + 0.00001));
-        Vertex near_d = graph.addVertex(new Intersection("near_d", stop_d.getX() + 0.00001, stop_d.getY() + 0.00001));
+        Vertex near_a = graph.addVertex(new GenericStreetIntersectionVertex("near_a", stop_a.getX() + 0.00001, stop_a.getY() + 0.00001));
+        Vertex near_b = graph.addVertex(new GenericStreetIntersectionVertex("near_b", stop_b.getX() + 0.00001, stop_b.getY() + 0.00001));
+        Vertex near_c = graph.addVertex(new GenericStreetIntersectionVertex("near_c", stop_c.getX() + 0.00001, stop_c.getY() + 0.00001));
+        Vertex near_d = graph.addVertex(new GenericStreetIntersectionVertex("near_d", stop_d.getX() + 0.00001, stop_d.getY() + 0.00001));
 
         Vertex[] nearPoints = {near_a, near_b, near_c, near_d};
 
-        Vertex nowhere = graph.addVertex(new Intersection("nowhere", 0, 0));
+        Vertex nowhere = graph.addVertex(new GenericStreetIntersectionVertex("nowhere", 0, 0));
 
         GeometryFactory gf = new GeometryFactory();
 

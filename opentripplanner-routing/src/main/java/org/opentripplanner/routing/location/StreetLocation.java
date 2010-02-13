@@ -13,12 +13,16 @@
 
 package org.opentripplanner.routing.location;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.LinkedList;
+import java.util.Vector;
 
+import org.opentripplanner.routing.core.DeadEnd;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -38,11 +42,6 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 public class StreetLocation extends GenericVertex {
     
     private static final long serialVersionUID = 1L;
-
-    public List<Street> streets;
-
-    public LinearLocation location; /* a number from 0 to 1 representing how far along the street the
-                               location is; 0 means the start vertex and 1 means the end vertex */
 
     /**
      * Creates a StreetLocation on the given street.  How far along is
@@ -71,12 +70,15 @@ public class StreetLocation extends GenericVertex {
         return createStreetLocation(label, name, streets, location);
     }
 
+    public List<Street> streets;
+
+    public LinearLocation location;
+
     private StreetLocation(String label, String name, List<Street> streets, LinearLocation location, double x,
             double y) {
         super(label, x, y, name);
-        this.streets = streets;
         this.location = location;
-
+        this.streets = streets;
         for( Street street : streets ) {
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
@@ -109,25 +111,75 @@ public class StreetLocation extends GenericVertex {
         return factory.createLineString(coords);
     }
 
-    public Vertex reify(Graph graph) {
-        String name = getName();
-        GenericVertex reified = new GenericVertex(getLabel(), getX(), getY(), name);
-        graph.addVertex(reified);
+    public void reify(Graph graph) {
+        /* first, figure out where the endpoints are  */
+        Vertex v1 = null, v2 = null;
+        for (Edge og : getOutgoing()) {
+            if (v1 == null) {
+                v1 = og.getToVertex();
+            } else {
+                v2 = og.getToVertex();
+            }
+        }
+        for (Edge ic : getIncoming()) {
+            if (v1 == null) {
+                v1 = ic.getFromVertex();
+            } else {
+                v2 = ic.getFromVertex();
+            }
+        }
+        /* now, reconfigure vertices to remove the street that this vertex splits
+         * and add the streets that replace it.
+         */
         for (Edge e : getIncoming()) {
             Street s = (Street) e;
-            Vertex fromv = e.getFromVertex();
-            Street street = new Street(fromv, reified, name, name, s.getLength(), s.getBicycleSafetyEffectiveLength(), s.getTraversalPermission(), s.getWheelchairAccessible());
-            street.setGeometry(s.getGeometry());
-            graph.addEdge(street);
+            Vertex intersection = s.getFromVertex();
+            if (intersection instanceof IntersectionVertex) {
+                ((IntersectionVertex) intersection).outStreet = s;
+            } else if (intersection instanceof DeadEnd) {
+                ((DeadEnd) intersection).outStreet = s;
+            } else {
+                /* remove the street from the outgoing edges of the from vertex */
+                GenericVertex v = (GenericVertex) intersection;
+                Vector<Edge> outgoing = v.getOutgoing();
+                Iterator<Edge> it = outgoing.iterator();
+                Vertex otherEnd = intersection == v1 ? v2 : v1;
+                while(it.hasNext()) {
+                    Edge e2 = it.next();
+                    if (e2.getToVertex() == otherEnd) {
+                        it.remove();
+                        break;
+                    }
+                }
+                outgoing.add(e);
+                v.setIncoming(outgoing);
+            }
         }
         for (Edge e : getOutgoing()) {
             Street s = (Street) e;
-            Vertex tov = e.getToVertex();
-            Street street = new Street(reified, tov, name, name, s.getLength(), s.getBicycleSafetyEffectiveLength(), s.getTraversalPermission(), s.getWheelchairAccessible());
-            street.setGeometry(s.getGeometry());
-            graph.addEdge(street);
+            Vertex intersection = s.getFromVertex();
+            if (intersection instanceof IntersectionVertex) {
+                ((IntersectionVertex) intersection).inStreet = s;
+            } else if (intersection instanceof DeadEnd) {
+                ((DeadEnd) intersection).inStreet = s;
+            } else {
+                GenericVertex v = (GenericVertex) intersection;
+                Vector<Edge> incoming = v.getIncoming();
+                Iterator<Edge> it = incoming.iterator();
+                Vertex otherEnd = intersection == v1 ? v2 : v1;
+                while(it.hasNext()) {
+                    Edge e2 = it.next();
+                    if (e2.getFromVertex() == otherEnd) {
+                        it.remove();
+                        break;
+                    }
+                }
+                incoming.add(e);
+                v.setIncoming(incoming);
+            }
         }
-        return reified;
+        graph.addVertex(this);
+        this.location = null;
     }
     
     @Override

@@ -18,6 +18,7 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -29,7 +30,6 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -65,10 +65,10 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 0.1 degree x 0.1 degree square
-        Vertex tl = graph.addVertex(new Intersection("tl", -74.1, 40.1));
-        Vertex tr = graph.addVertex(new Intersection("tr", -74.0, 40.1));
-        Vertex bl = graph.addVertex(new Intersection("bl", -74.1, 40.0));
-        Vertex br = graph.addVertex(new Intersection("br", -74.0, 40.0));
+        Vertex tl = graph.addVertex(new GenericStreetIntersectionVertex("tl", -74.1, 40.1));
+        Vertex tr = graph.addVertex(new GenericStreetIntersectionVertex("tr", -74.0, 40.1));
+        Vertex bl = graph.addVertex(new GenericStreetIntersectionVertex("bl", -74.1, 40.0));
+        Vertex br = graph.addVertex(new GenericStreetIntersectionVertex("br", -74.0, 40.0));
 
         graph.addVertex(new TransitStop("transitVertex", -74.05, 40.1, "transitVertex", "fleem station", null));
 

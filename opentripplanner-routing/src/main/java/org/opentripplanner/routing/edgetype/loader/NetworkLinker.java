@@ -15,9 +15,12 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
 
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OneStreetVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -59,7 +62,21 @@ public class NetworkLinker {
 
                 if (nearestIntersection != null) {
                     if (nearestIntersection instanceof StreetLocation) {
-                        nearestIntersection = ((StreetLocation) nearestIntersection).reify(graph);
+                        ((StreetLocation) nearestIntersection).reify(graph);
+                    } else if (nearestIntersection instanceof OneStreetVertex) {
+                        //this kind of vertex can only have one Street edge in each direction
+                        //so we need to create a spare vertex to connect the STL to.
+
+                        OneStreetVertex osvertex = ((OneStreetVertex) nearestIntersection);
+                        GenericVertex newV = new GenericVertex(nearestIntersection.getLabel() + " approach", nearestIntersection.getX(), nearestIntersection.getY());
+                        Street approach = new Street(nearestIntersection, newV, 0);
+                        Street approachBack = new Street(newV, nearestIntersection, 0);
+                        osvertex.inStreet.setToVertex(newV);
+                        osvertex.outStreet.setFromVertex(newV);
+                        osvertex.inStreet = approach;
+                        osvertex.outStreet = approachBack;
+                        nearestIntersection = newV;
+                        graph.addVertex(newV);
                     }
                     TransitStop ts = (TransitStop) v;
                     boolean wheelchairAccessible = ts.hasWheelchairEntrance();

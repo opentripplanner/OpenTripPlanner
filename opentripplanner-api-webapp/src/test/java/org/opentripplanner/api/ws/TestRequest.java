@@ -107,9 +107,9 @@ public class TestRequest extends TestCase {
         holder.pathService = pathService;
     }
     
-    private Vertex getVertexByPrefix(String prefix) {
+    private Vertex getVertexByCrossStreets(String s1, String s2) {
         for (Vertex v : graph.getVertices()) {
-            if (v.getLabel().startsWith(prefix)) {
+            if (v.getName().contains(s1) && v.getName().contains(s2)) {
                 return v;
             }
         }
@@ -118,8 +118,8 @@ public class TestRequest extends TestCase {
 
     public void testPlanner() throws Exception {
         
-        Vertex v1 = getVertexByPrefix("NE 43RD AVE at NE FLANDERS ST");
-        Vertex v2 = getVertexByPrefix("NE 43RD AVE at NE ROYAL CT");
+        Vertex v1 = getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST");
+        Vertex v2 = getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT");
         assertNotNull(v1);
         assertNotNull(v2);
         
@@ -159,10 +159,10 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
-        Vertex v1 = getVertexByPrefix("NW 10TH AVE at W BURNSIDE ST");
-        Vertex v2 = getVertexByPrefix("NE 21ST AVE at NE MASON ST");
-        Vertex v3 = getVertexByPrefix("SE 82ND AVE at SE ASH ST");
-        Vertex v4 = getVertexByPrefix("SE 92ND AVE at SE FLAVEL ST");
+        Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST");
+        Vertex v2 = getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST");
+        Vertex v3 = getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST");
+        Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST");
         Vertex[] vertices = {v1, v2, v3, v4};
         assertNotNull(v1);
         assertNotNull(v2);

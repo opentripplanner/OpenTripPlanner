@@ -10,7 +10,7 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
@@ -83,7 +83,7 @@ public class ShowGraph extends PApplet {
             modelBounds.expandToInclude(env);
             if (v instanceof TransitStop) {
                 vertexIndex.insert(env, v);
-            } else if(v instanceof Intersection) {
+            } else if(v instanceof IntersectionVertex) {
                 vertexIndex.insert(env, v);
             } else {
                 //a street-transit link, or a journey vertex.  no need for them in the ui.

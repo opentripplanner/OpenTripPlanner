@@ -21,11 +21,11 @@ import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.StreetIntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -69,10 +69,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         transitStopTree = new STRtree();
         HashSet<Street> edges = new HashSet<Street>();
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof Intersection) {
+            if (v instanceof StreetIntersectionVertex) {
                 for (Edge e: v.getOutgoing()) {
                     if (e instanceof Street){
                         edges.add((Street) e);
+                        if (e == null || e.getToVertex() == null) {
+                            System.out.println("here");
+                        }
                         Envelope env = new Envelope(v.getCoordinate(), e.getToVertex().getCoordinate());
                         edgeTree.insert(env, e);
                     }
@@ -89,7 +92,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Vertex getClosestVertex(final Coordinate c) {
         return getClosestVertex(c, true);
     }
-    
+
     @SuppressWarnings("unchecked")
     public Vertex getClosestVertex(final Coordinate c, boolean includeTransitStops) {
 

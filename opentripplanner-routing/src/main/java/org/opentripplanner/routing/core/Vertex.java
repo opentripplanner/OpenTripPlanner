@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -44,11 +43,7 @@ public interface Vertex extends Serializable {
 
     public double getY();
 
-    public void setOutgoing(Vector<Edge> outgoing);
-
     public Iterable<Edge> getOutgoing();
-
-    public void setIncoming(Vector<Edge> incoming);
 
     public Iterable<Edge> getIncoming();
 
