@@ -27,6 +27,7 @@ otp.planner.Itinerary = {
     // config
     map            : null,
     locale         : otp.locale.English,
+    showStopIds    : true,
 
     // raw data
     xml            : null,
@@ -515,6 +516,7 @@ otp.planner.Itinerary = {
         for(var i = 0; i < store.getCount(); i++)
         {
             var leg = store.getAt(i);
+            leg.data.showStopIds = this.showStopIds;
             var text;
             var hasKids = true;
             var iconCLS = 'bus-icon';
