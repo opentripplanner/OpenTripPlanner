@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
@@ -37,6 +38,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
     String name;
 
     LineString geometry;
+
+    PackedCoordinateSequence elevationProfile;
 
     public double length;
 
@@ -111,6 +114,10 @@ public class Street extends AbstractEdge implements WalkableEdge {
         geometry = g;
     }
 
+    public void setElevationProfile(PackedCoordinateSequence elev) {
+        elevationProfile = elev;
+    }
+    
     public TraverseResult traverse(State s0, TraverseOptions wo) {
         if (!canTraverse(wo)) {
             return null;
@@ -206,6 +213,10 @@ public class Street extends AbstractEdge implements WalkableEdge {
         return geometry;
     }
 
+    public PackedCoordinateSequence getElevationProfile() {
+        return elevationProfile;
+    }
+    
     public TraverseMode getMode() {
         // this is actually WALK or BICYCLE depending on the TraverseOptions
         return TraverseMode.WALK;
