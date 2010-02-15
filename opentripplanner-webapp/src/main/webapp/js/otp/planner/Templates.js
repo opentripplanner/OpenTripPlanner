@@ -64,7 +64,7 @@ otp.planner.Templates = {
         '<tr><td>Time</td><td>{transitTime} minute<tpl if="transitTime != 1">s</tpl>',
             '<tpl if="waitingTime &gt; 0"> (plus {waitingTime} minute<tpl if="waitingTime != 1.0">s</tpl> transfer)</tpl>',
          '</td></tr>',
-        '<tpl if="walkDistance &gt; 0.0"><tr><td>Walk</td><td>{walkDistance} mile<tpl if="walkDistance != 1.0">s</tpl></td></tr></tpl>',
+        '<tpl if="walkDistance"><tr><td>Walk</td><td>{walkDistance}</td></tr></tpl>',
         '<tr><td>Fares</td><td>',
             '<tpl if="regularFare &gt; 0.00">Adult <tpl if="regularFare == 2.30">All Zone</tpl> (${regularFare})<br/>Honored Citizen (${honoredFare})<br/>Youth/Student (${youthFare})</tpl>',
             '<tpl if="regularFare == \'\'">This trip is within Fareless Square, so no fare is required.</tpl>',
@@ -111,7 +111,10 @@ otp.planner.Templates = {
     TP_WALK_LEG : new Ext.XTemplate(
           '<h4><a href="#">Walk</a> {[otp.util.StringFormattingUtils.getDirection(values.direction)]} to {toName}</h4>',
           '<tpl if="toStopId != null && toStopId.length &gt; 0"><p>Stop ID {toStopId}</p></tpl>',
-          '<p class="transfers">About {duration} minute<tpl if="duration != 1.0">s</tpl> - {distance} miles</p>'
+          '<p class="transfers">About {duration} minute<tpl if="duration != 1.0">s</tpl> - {distance}</p>',
+          '<ol class="steps"><tpl for="formattedSteps">',
+              '{.}',
+          '</tpl></ol>'
     ).compile(),
     
     

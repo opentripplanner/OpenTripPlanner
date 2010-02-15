@@ -25,7 +25,11 @@ function millisToMinutes (n, p) {
 
 function metersToMiles (n, p) {
 	var miles = n / 1609.344;
-	return miles.toFixed(2);
+	return miles.toFixed(1);
+}
+
+function metersToFeet(meters) {
+    return parseInt(meters * 3.2808);
 }
 
 // TODO: make sure otp.util.DateUtils is available so we don't have to wrap these functions
@@ -39,6 +43,10 @@ function prettyDateTime(date) {
 
 function prettyTime(date) {
     return otp.util.DateUtils.prettyTime(date);
+}
+
+function prettyDistance(distance) {
+    return otp.planner.Utils.prettyDistance(distance);
 }
 
 otp.planner.Utils = {
@@ -70,7 +78,7 @@ otp.planner.Utils = {
                   {name: 'numTransfers', mapping: 'transfers'},
                   {name: 'numLegs',      mapping: 'legs', convert : function (n, p) { return p.length; }},
                   {name: 'walkTime',     mapping: 'walkTime', convert: millisToMinutes},
-                  {name: 'walkDistance', mapping: 'walkDistance', convert: metersToMiles},
+                  {name: 'walkDistance', mapping: 'walkDistance', convert: prettyDistance},
                   {name: 'transitTime',  mapping: 'transitTime', convert: millisToMinutes},
                   {name: 'waitingTime',  mapping: 'waitingTime', convert: millisToMinutes}
     ]),
@@ -85,7 +93,7 @@ otp.planner.Utils = {
                   {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
                   {name: 'endTimeDisplayShort', mapping: 'endTime', convert: prettyTime},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
-                  {name: 'distance',         mapping: 'distance', convert: metersToMiles},
+                  {name: 'distance',         mapping: 'distance', convert: prettyDistance},
                   {name: 'direction',        mapping: 'direction'},
                   {name: 'key',              mapping: 'key'},
                   {name: 'alerts',           mapping: 'route', convert: function(n, p)
@@ -114,7 +122,11 @@ otp.planner.Utils = {
                   {name: 'toDescription',    mapping: 'to/description'},
                   {name: 'toStopId',         mapping: 'to/stopId'},
                   {name: 'toCity',           mapping: 'to/@areaValue'},
-                  {name: 'legGeometry',         mapping: 'legGeometry/points',
+                  {name: 'steps',            mapping: 'steps', 
+                                             convert: function(val, rec) {
+                                                return otp.planner.Utils.makeWalkSteps(val, rec);
+                                             } },
+                  {name: 'legGeometry',      mapping: 'legGeometry/points',
                 	                         convert: function(n,p) {
                 	  							return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
                 	 					     } }
@@ -130,6 +142,35 @@ otp.planner.Utils = {
         return Ext.DomQuery.select(nodeName, xml);
     },
 
+    /**
+     * parse the <steps></steps> element into a JavaScript
+     */
+    makeWalkSteps : function(val, rec)
+    {
+        var nodes = Ext.DomQuery.select('steps/walkSteps', rec);
+        var steps = [];
+        for (var i = 0; i < nodes.length; i++)
+        {
+            var node = nodes[i];
+            var step = {};
+            // TODO: Parse these more efficiently?
+            step.distance = Ext.DomQuery.selectNumber('distance', node);
+            step.streetName = Ext.DomQuery.selectValue('streetName', node);
+            if (!step.streetName)
+            {
+                step.streetName = "unnamed street";
+            }
+            step.absoluteDirection = Ext.DomQuery.selectValue('absoluteDirection', node);
+            step.relativeDirection = Ext.DomQuery.selectValue('relativeDirection', node);
+            step.stayOn = (Ext.DomQuery.selectValue('stayOn', node).toLowerCase() === 'true');
+            step.becomes = (Ext.DomQuery.selectValue('becomes', node).toLowerCase() === 'true');
+            step.lon = Ext.DomQuery.selectNumber('lon', node);
+            step.lat = Ext.DomQuery.selectNumber('lat', node);
+            steps.push(step);
+        }
+        return steps;
+    },
+    
     /** */
     makeItinerariesTree : function(id, clickCallback, scope)
     {
@@ -212,6 +253,36 @@ otp.planner.Utils = {
         });
     },
 
+    /**
+     * Takes a distance in meters and returns a pretty string representation, including the units. For example:
+     * 
+     * 582.2 --> "0.36 mi"
+     * 20.62 --> "68 ft"
+     * 
+     * @param {number} meters The distance in meters
+     * 
+     * @returns {string} A formatted string, with units. If the input is null undefined, an empty string will be returned.
+     * 
+     * TODO: Make this method depend upon an app-wide config option specifying the system of units to use.
+     */
+    prettyDistance : function(meters)
+    {
+        if (meters == null || typeof meters == 'undefined')
+        {
+            return "";
+        }
+        var miles = metersToMiles(meters);
+        // Display distances < 0.1 miles in feet
+        if (miles < 0.1)
+        {
+            return metersToFeet(meters) + " ft";
+        }
+        else
+        {
+            return miles + " mi";
+        }
+    },
+    
     CLASS_NAME: "otp.planner.Utils"
 };
 }

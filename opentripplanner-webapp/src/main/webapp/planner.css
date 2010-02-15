@@ -166,6 +166,19 @@ button.home {
     padding:8px;
 }
 
+#tripplanner-panel .itiny ol.steps {
+    padding-left: 2em !important;
+    font-size: 0.9em;
+ }
+ 
+ #tripplanner-panel .itiny ol.steps li {
+     list-style-type: decimal !important;
+ }
+ 
+ #tripplanner-panel .itiny ol.steps li strong {
+    font-weight: bold;
+ }
+ 
 /*
 .x-form-field   {font-size: 90%;}
 .x-form-item label  {font-size: 90%;}

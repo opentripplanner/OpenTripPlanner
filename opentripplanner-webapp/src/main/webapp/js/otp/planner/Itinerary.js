@@ -26,6 +26,7 @@ otp.namespace("otp.planner");
 otp.planner.Itinerary = {
     // config
     map            : null,
+    locale         : otp.locale.English,
 
     // raw data
     xml            : null,
@@ -521,9 +522,57 @@ otp.planner.Itinerary = {
             var mode  = leg.get('mode').toLowerCase();
             if(mode == 'walk') 
             {
-                text = otp.planner.Templates.TP_WALK_LEG.applyTemplate(leg.data);
                 hasKids = false;
                 iconCLS = 'walk-icon';
+                if (!leg.data.formattedSteps)
+                {
+                    leg.data.formattedSteps = [];
+                    var steps = leg.data.steps;
+                    var stepText = "";
+                    var noStepsYet = true;
+                    // TODO: Finish localizing, and move the rest of the markup into templates.
+                    for (var j = 0; j < steps.length; j++)
+                    {
+                        step = steps[j];
+                        if (step.streetName == "street transit link")
+                        {
+                            // TODO: Include explicit instruction about entering/exiting transit station or stop?
+                            continue;
+                        }
+                        stepText = "<li>";
+                        var relativeDirection = step.relativeDirection;
+                        if (relativeDirection == null || noStepsYet == true)
+                        {
+                            stepText += 'Walk <strong>' + step.absoluteDirection.toLowerCase() + '</strong> on <strong>' + step.streetName + '</strong>';
+                            noStepsYet = false;
+                        }
+                        else 
+                        {
+                            relativeDirection = relativeDirection.toLowerCase();
+                            var directionText = this.locale.directions[relativeDirection];
+                            directionText = directionText.substr(0,1).toUpperCase() + directionText.substr(1);
+                            if (relativeDirection == "continue")
+                            {
+                                stepText += directionText + ' on <strong>' + steps[j].streetName + '</strong>';
+                            }
+                            else if (step.stayOn == true)
+                            {
+                                stepText += directionText + ' to continue on <strong>' + step.streetName + '</strong>';
+                            }
+                            else if (step.becomes == true)
+                            {
+                                stepText += directionText + ' as <strong>' + steps[j-1].streetName + '</strong> becomes <strong>' + step.streetName + '</strong>';
+                            }
+                            else
+                            {
+                                stepText += directionText + ' at <strong>' + step.streetName + '</strong>';
+                            }
+                        }
+                        stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+                        leg.data.formattedSteps.push(stepText);
+                    }
+                }
+                text = otp.planner.Templates.TP_WALK_LEG.applyTemplate(leg.data);
             }
             else
             {
@@ -546,6 +595,6 @@ otp.planner.Itinerary = {
     },
 
     CLASS_NAME: "otp.planner.Itinerary"
-}
+};
 
 otp.planner.Itinerary = new otp.Class(otp.planner.Itinerary);

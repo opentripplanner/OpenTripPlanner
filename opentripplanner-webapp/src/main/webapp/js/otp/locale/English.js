@@ -80,15 +80,22 @@ otp.locale.English = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast: "south east",
-        southWest: "south west",
-        northEast: "north east",
-        northWest: "north west",
-        north:     "north",
-        west:      "west",
-        south:     "south",
-        east:      "east",
-        bound:     "bound"
+        southEast:      "south east",
+        southWest:      "south west",
+        northEast:      "north east",
+        northWest:      "north west",
+        north:          "north",
+        west:           "west",
+        south:          "south",
+        east:           "east",
+        bound:          "bound",
+        left:           "left",
+        right:          "right",
+        slightly_left:  "slight left",
+        slightly_right: "slight right",
+        hard_left:      "hard left",
+        hard_right:     "hard right",
+        'continue':     "continue"
     },
 
     tripPlanner :
@@ -130,7 +137,7 @@ otp.locale.English = {
         [
           ['TRANSFERS', 'Fewest Transfers'],
           ['SAFE', 'Safest Trip'],
-          ['QUICK', 'Quickest Trip'] 
+          ['QUICK', 'Quickest Trip']
         ],
     
         arriveDepart: 

@@ -78,15 +78,22 @@ otp.locale.Spanish = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast: "sureste",
-        southWest: "sudoeste",
-        northEast: "nordeste",
-        northWest: "noroeste",
-        north:     "norte",
-        west:      "oeste",
-        south:     "sur",
-        east:      "este",
-        bound:     "límite"
+        southEast:      "sureste",
+        southWest:      "sudoeste",
+        northEast:      "nordeste",
+        northWest:      "noroeste",
+        north:          "norte",
+        west:           "oeste",
+        south:          "sur",
+        east:           "este",
+        bound:          "límite",
+        left:           "left",
+        right:          "right",
+        slightly_left:  "slight left",
+        slightly_right: "slight right",
+        hard_left:      "hard left",
+        hard_right:     "hard right",
+        'continue':     "continue"
     },
 
     tripPlanner :
