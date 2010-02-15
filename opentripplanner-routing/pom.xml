@@ -14,25 +14,10 @@
     </parent>
 
     <properties>
-        <geotools.version>2.5.7</geotools.version>
+        
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-main</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-shapefile</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-epsg-hsql</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -53,8 +38,6 @@
             <artifactId>onebusaway-gtfs</artifactId>
             <version>1.0.6</version>
         </dependency>
-        
-        <!-- Spring IoC Framework -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -65,7 +48,6 @@
             <artifactId>spring-aop</artifactId>
             <version>2.5.6</version>
         </dependency>
-        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -78,6 +60,8 @@
             <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
+        
+        <!-- Spring IoC Framework -->
     </dependencies>
 
     <repositories>
@@ -85,11 +69,6 @@
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net repository</name>
             <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>osgeo</id>
-            <name>Open Source Geospatial Foundation Repository</name>
-            <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
         <repository>
             <id>osgeo-snapshots</id>
