@@ -2,8 +2,6 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class DeadEnd extends OneStreetVertex implements Vertex, StreetIntersectionVertex {
@@ -17,18 +15,20 @@ public class DeadEnd extends OneStreetVertex implements Vertex, StreetIntersecti
         y = v.getY();
         inStreet = v.inStreet;
         outStreet = v.outStreet;
-        inStreet.setToVertex(this);
-        outStreet.setFromVertex(this);
+        if(inStreet != null)
+            inStreet.setToVertex(this);
+        if(outStreet != null)
+            outStreet.setFromVertex(this);
     }
 
     @Override
     public void addIncoming(Edge ee) {
-       throw new NotImplementedException();
+       throw new UnsupportedOperationException("Incoming and outgoing edges are only inStreet and outStreet");
     }
 
     @Override
     public void addOutgoing(Edge ee) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Incoming and outgoing edges are only inStreet and outStreet");
     }
 
     @Override

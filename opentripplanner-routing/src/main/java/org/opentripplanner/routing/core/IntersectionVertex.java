@@ -20,8 +20,6 @@ import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -29,7 +27,7 @@ public class IntersectionVertex extends OneStreetVertex implements Vertex, Stree
 
     private static final long serialVersionUID = 364261663335739528L;
 
-    public final Intersection intersection;
+    public Intersection intersection;
 
     public int angle;
 
@@ -73,11 +71,11 @@ public class IntersectionVertex extends OneStreetVertex implements Vertex, Stree
     }
 
     public void addIncoming(Edge ee) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Incoming and outgoing edges are only inStreet and outStreet, or those from intersection");
     }
 
     public void addOutgoing(Edge ee) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("Incoming and outgoing edges are only inStreet and outStreet, or those from intersection");
     }
 
     public String toString() {

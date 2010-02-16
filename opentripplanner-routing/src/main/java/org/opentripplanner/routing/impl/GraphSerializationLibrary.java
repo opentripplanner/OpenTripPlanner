@@ -26,6 +26,8 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.Intersection;
+import org.opentripplanner.routing.core.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,11 @@ public class GraphSerializationLibrary {
         Graph graph = (Graph) in.readObject();
         _log.info("Initializing graph...");
         for (Vertex vertex : graph.getVertices()) {
+            visitVertex(vertex, graph);
+        }
+
+        for (Vertex vertex : graph.getVertices()) {
+            visitVertex(vertex, graph);
             for (Edge edge : vertex.getIncoming())
                 visitEdge(edge, graph);
             for (Edge edge : vertex.getOutgoing())
@@ -58,6 +65,13 @@ public class GraphSerializationLibrary {
         }
         _log.info("Graph read");
         return graph;
+    }
+
+    private static void visitVertex(Vertex vertex, Graph graph) {
+        if(vertex instanceof IntersectionVertex) {
+            Intersection ix = ((IntersectionVertex) vertex).intersection;
+            ix.replaceDummyVertices(graph);
+        }
     }
 
     private static void visitEdge(Edge edge, Graph graph) {

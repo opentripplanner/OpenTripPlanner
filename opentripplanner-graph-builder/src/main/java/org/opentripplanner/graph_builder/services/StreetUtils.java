@@ -8,6 +8,7 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Intersection;
 import org.opentripplanner.routing.core.IntersectionVertex;
+import org.opentripplanner.routing.core.Vertex;
 
 public class StreetUtils {
 
@@ -16,23 +17,24 @@ public class StreetUtils {
         for (Intersection intersection: intersections) {
             if (intersection.getDegree() == 1) {
                 //a dead end can be represented more simply as a special case.
-                IntersectionVertex v = intersection.vertices.get(0);
+                IntersectionVertex v = (IntersectionVertex) intersection.vertices.get(0);
                 DeadEnd d = new DeadEnd(v);
                 graph.addVertex(d);
                 graph.removeVertex(v);
             } else if (intersection.getDegree() == 2) {
                 //this is an "intersection" of only two streets, and so can be simplified down
                 //to a single vertex.
-                IntersectionVertex v1 = intersection.vertices.get(0);
+                IntersectionVertex v1 = (IntersectionVertex) intersection.vertices.get(0);
                 GenericVertex generic = new GenericStreetIntersectionVertex(v1.getLabel(), v1.getX(), v1.getY(), v1.getName());
-                for (IntersectionVertex v : intersection.vertices) {
-                    if (v.inStreet != null) {
-                        generic.addIncoming(v.inStreet);
-                        v.inStreet.setToVertex(generic);
+                for (Vertex v : intersection.vertices) {
+                    IntersectionVertex iv = (IntersectionVertex) v;
+                    if (iv.inStreet != null) {
+                        generic.addIncoming(iv.inStreet);
+                        iv.inStreet.setToVertex(generic);
                     }
-                    if (v.outStreet != null) {
-                        generic.addOutgoing(v.outStreet);
-                        v.outStreet.setFromVertex(generic);
+                    if (iv.outStreet != null) {
+                        generic.addOutgoing(iv.outStreet);
+                        iv.outStreet.setFromVertex(generic);
                     }
                     graph.removeVertex(v);
                 }

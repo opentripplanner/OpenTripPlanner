@@ -6,7 +6,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.Turn;
+import org.opentripplanner.routing.impl.DummyReferenceVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -18,7 +20,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class Intersection implements Serializable {
     private static final long serialVersionUID = -6202870304501372173L;
 
-    public ArrayList<IntersectionVertex> vertices;
+    public ArrayList<Vertex> vertices;
 
     public double y;
 
@@ -30,15 +32,27 @@ public class Intersection implements Serializable {
         this.label = label;
         this.x = x;
         this.y = y;
-        vertices = new ArrayList<IntersectionVertex>();
+        vertices = new ArrayList<Vertex>();
     }
 
     public int getDegree() {
         return vertices.size();
     }
 
+    public void replaceDummyVertices(Graph graph) {
+        for(int i = 0; i < vertices.size(); i++) {
+            if(vertices.get(i) instanceof DummyReferenceVertex) {
+                vertices.set(i, (IntersectionVertex) graph.getVertex(vertices.get(i).getLabel()));
+                ((IntersectionVertex)vertices.get(i)).intersection = this;
+            }
+        }
+    }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
-        vertices.trimToSize();
+        for(int i = 0; i < vertices.size(); i++) {
+            if(!(vertices.get(i) instanceof DummyReferenceVertex))
+                vertices.set(i, new DummyReferenceVertex(vertices.get(i).getLabel()));
+        }
         out.defaultWriteObject();
     }
 
@@ -60,7 +74,7 @@ public class Intersection implements Serializable {
         Vector<Edge> outgoing = new Vector<Edge>();
         for (int i = 0; i < vertices.size(); ++i) {
             if (i != fromIndex && canTurn(fromIndex, i)) {
-                outgoing.add(new Turn(fromVertex, vertices.get(i)));
+                outgoing.add(new Turn(fromVertex, (IntersectionVertex) vertices.get(i)));
             }
         }
         return outgoing;
@@ -71,7 +85,7 @@ public class Intersection implements Serializable {
         Vector<Edge> incoming = new Vector<Edge>();
         for (int i = 0; i < vertices.size(); ++i) {
             if (i != toIndex && canTurn(i, toIndex)) {
-                incoming.add(new Turn(vertices.get(i), toVertex));
+                incoming.add(new Turn((IntersectionVertex) vertices.get(i), toVertex));
             }
         }
         return incoming;

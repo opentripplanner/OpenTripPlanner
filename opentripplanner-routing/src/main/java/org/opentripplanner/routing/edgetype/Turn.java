@@ -72,5 +72,4 @@ public class Turn extends AbstractEdge {
         s1.incrementTimeInSeconds(-turnAngle / 20);
         return new TraverseResult(turnAngle / 20.0, s1);
     }
-
 }
