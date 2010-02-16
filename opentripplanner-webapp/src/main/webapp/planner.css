@@ -293,17 +293,17 @@ li.x-tree-node{margin:0px;padding:0px;}
 .itinys-icon {display: none; visibility: collapse;}
 .start-icon {background-image:url(images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
 .end-icon {background-image:url(images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
-.busish-icon,.bus-icon {background-image:url(images/ui/trip/mode/bus.gif) !important;float:left;width:16px!important;height:17px!important;}
-.subway-icon,.trainish-icon,.transit-icon,.ltrail-icon {background-image:url(images/ui/trip/mode/rail.gif) !important;float:left;}
-.commuter-icon,.rail-icon,.commrail-icon {background-image:url(images/ui/trip/mode/cr.gif) !important;float:left;}
-.funicular-icon,.gondola-icon {background-image:url(images/ui/trip/mode/tram.gif) !important;float:left;}
-.tram-icon, .cable_car-icon,.trolley-icon,.streetcar-icon {background-image:url(images/ui/trip/mode/streetcar.gif) !important;float:left;}
-.walk-icon {background-image:url(images/ui/trip/mode/walk.gif) !important;float:left;}
-.bike-icon,.bicycle-icon {background-image:url(images/ui/trip/mode/bike.gif) !important;float:left;}
-.cable_car-icon {background-image:url(images/ui/trip/mode/streetcar.gif) !important;float:left;}
-.subway-icon{background-image:url(images/ui/trip/mode/rail.gif) !important;float:left;}
-.plane-icon{background-image:url(images/ui/trip/mode/plane.gif) !important;float:left;}
-.x-tree-elbow-minus, .x-tree-elbow-plus	{float: left;}
+.busish-icon,.bus-icon {background-image:url(images/ui/trip/mode/bus.png) !important;float:left;width:21px!important;height:21px!important;}
+.subway-icon,.transit-icon {background-image:url(images/ui/trip/mode/subway.png) !important;float:left;width:21px!important;height:21px!important;}
+.ltrail-icon, .light_trail-icon {background-image:url(images/ui/trip/mode/lite_rail.png) !important;float:left;width:21px!important;height:21px!important;}
+.commuter-icon,.rail-icon,.commrail-icon,.trainish-icon {background-image:url(images/ui/trip/mode/rail.png) !important;float:left;width:21px!important;height:21px!important;}
+.funicular-icon,.gondola-icon {background-image:url(images/ui/trip/mode/gondola.png) !important;float:left;width:21px!important;height:21px!important;}
+.tram-icon,.streetcar-icon {background-image:url(images/ui/trip/mode/tram.png) !important;float:left;width:21px!important;height:21px!important;}
+.cable_car-icon,.trolley-icon,{background-image:url(images/ui/trip/mode/trolly.png) !important;float:left;width:21px!important;height:21px!important;}
+.walk-icon {background-image:url(images/ui/trip/mode/walk.png) !important;float:left;width:21px!important;height:21px!important;}
+.bike-icon,.bicycle-icon {background-image:url(images/ui/trip/mode/bike.png) !important;float:left;width:21px!important;height:21px!important;}
+.plane-icon{background-image:url(images/ui/trip/mode/plane.png) !important;float:left;width:21px!important;height:21px!important;}
+.x-tree-elbow-minus, .x-tree-elbow-plus{float: left;}
 
 .x-tree-no-lines .x-tree-elbow-minus {
   vertical-align: top;

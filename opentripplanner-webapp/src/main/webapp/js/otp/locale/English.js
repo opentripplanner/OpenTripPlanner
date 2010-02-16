@@ -163,7 +163,7 @@ otp.locale.English = {
             ['7604',  '30 miles'],
             ['7605',  '40 miles'],
             ['7606',  '50 miles'],
-            ['7607',  '100 miles'],
+            ['7607',  '100 miles']
         ],
     
         mode : 

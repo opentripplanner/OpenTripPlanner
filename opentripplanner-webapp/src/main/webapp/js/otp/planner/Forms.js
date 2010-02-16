@@ -777,12 +777,13 @@ otp.planner.StaticForms = {
     makeOptionForms : function()
     {
         console.log("enter Forms.makeOptionsForms()");
-        
-        this.m_maxWalkDistanceStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
+
+        this.m_maxWalkDistanceStore  = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
         this.m_wheelchairStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.wheelchair);
 
+        console.log("new makeOptionsForms() optimize");
         this.m_optimizeForm = new Ext.form.ComboBox({
             id:             'trip-optimize-form',
             name:           'optimize',
@@ -803,6 +804,7 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
+        console.log("new makeOptionsForms() walk");
         this.m_maxWalkDistanceForm = new Ext.form.ComboBox({
             id:             'trip-walking-form',
             name:           'maxWalkDistance',
@@ -823,6 +825,7 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
+        console.log("new makeOptionsForms() mode");
         this.m_modeForm  = new Ext.form.ComboBox({
             id:             'trip-mode-form',
             name:           'mode',
@@ -843,7 +846,7 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-
+        console.log("new makeOptionsForms() wheelchair");
         this.m_wheelchairForm = new Ext.form.ComboBox({
             id:             'trip-wheelchair-form',
             name:           'wheelchair',
@@ -863,7 +866,6 @@ otp.planner.StaticForms = {
             forceSelection: true,
             selectOnFocus:  true
         });
-
 
         console.log("exit Forms.makeOptionsForms()");
 

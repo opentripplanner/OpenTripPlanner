@@ -535,6 +535,7 @@ otp.util.ExtUtils = {
      */
     makeStaticPullDownStore: function( data )
     {
+        console.log("Utils.makeStaticPullDownStore " + data);
         return new Ext.data.SimpleStore({
             fields: otp.util.OPT_ARRAY,
             data:   data 
@@ -593,27 +594,37 @@ otp.util.ExtUtils = {
      */
     makePointRecord : function(typeID) 
     {
-        if(typeID == null || typeID == '')
-            typeID = '';
-        else
-            typeID = typeID + '/';
-        
-        var POINT_RECORD = new Ext.data.Record.create([
-          {name: 'id',          mapping: '@id'},
-          {name: 'mode',        mapping: '@mode'},
-          {name: 'order',       mapping: '@order'},
-          {name: 'routeID',     mapping: 'route'},
-          {name: 'lat',         mapping: typeID + 'pos/lat'},
-          {name: 'lon',         mapping: typeID + 'pos/lon'},
-          {name: 'name',        mapping: typeID + 'name'},
-          {name: 'stopId',      mapping: typeID + 'stopId'}, 
-          {name: 'areaKey',     mapping: typeID + '@areaKey'},
-          {name: 'areaValue',   mapping: typeID + '@areaValue'},
-          {name: 'geometry',    mapping: typeID + 'geometry', convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); } },
-        ]);
-        
-        return POINT_RECORD;
-    },    
+        var retVal = null;
+        try
+        {
+            if(typeID == null || typeID == '')
+                typeID = '';
+            else
+                typeID = typeID + '/';
+
+            retVal = new Ext.data.Record.create([
+              {name: 'id',          mapping: '@id'},
+              {name: 'mode',        mapping: '@mode'},
+              {name: 'order',       mapping: '@order'},
+              {name: 'routeID',     mapping: 'route'},
+              {name: 'lat',         mapping: typeID + 'pos/lat'},
+              {name: 'lon',         mapping: typeID + 'pos/lon'},
+              {name: 'name',        mapping: typeID + 'name'},
+              {name: 'stopId',      mapping: typeID + 'stopId'}, 
+              {name: 'areaKey',     mapping: typeID + '@areaKey'},
+              {name: 'areaValue',   mapping: typeID + '@areaValue'},
+              {name: 'geometry',    mapping: typeID + 'geometry', 
+                                    convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); }
+              }
+            ]);
+        }
+        catch(e)
+        {
+            console.log("EXCEPTION: ExtUtils.makePointRecord() " + e);
+        }
+
+        return retVal;
+    },
 
     /**
      * makes a point store based on  
@@ -651,7 +662,7 @@ otp.util.ExtUtils = {
      */ 
     loadPointRecord : function(nodeID, xmlDoc) 
     {
-        var retVal = null; 
+        var retVal = null;
         try
         {
             var store = this.makePointStore(nodeID, '');
@@ -661,10 +672,10 @@ otp.util.ExtUtils = {
         }
         catch(e)
         {
+            retVal = this.makePointRecord(nodeID);  // TODO NICK: the param here was 'typeID'...changed to nodeID so it wouldn't throw exception
             console.log("EXCEPTION: ExtUtils.loadPointRecord " + e);
-            retVal = this.makePointRecord(typeID);
         }
-        
+
         return retVal;
     },
 

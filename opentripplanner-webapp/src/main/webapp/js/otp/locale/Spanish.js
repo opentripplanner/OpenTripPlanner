@@ -46,7 +46,6 @@ otp.locale.Spanish = {
         loading    : "Cargando",
         searching  : "Buscando...",
         qEmptyText : "Dirección, intersección,  punto de inteés o Identificador de Parada..."
-        	
     },
 
     buttons: 
@@ -140,7 +139,7 @@ otp.locale.Spanish = {
         arriveDepart: 
         [
           ['false', 'Salida'], 
-          ['true', 'Llegada']
+          ['true',  'Llegada']
         ],
     
         maxWalkDistance : 

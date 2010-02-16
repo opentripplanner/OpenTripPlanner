@@ -20,12 +20,12 @@ otp.namespace("otp.planner");
 try
 {
 function millisToMinutes (n, p) {
-	return parseInt(n / 60000);
+    return parseInt(n / 60000);
 }
 
 function metersToMiles (n, p) {
-	var miles = n / 1609.344;
-	return miles.toFixed(1);
+    var miles = n / 1609.344;
+    return miles.toFixed(1);
 }
 
 function metersToFeet(meters) {
@@ -127,9 +127,10 @@ otp.planner.Utils = {
                                                 return otp.planner.Utils.makeWalkSteps(val, rec);
                                              } },
                   {name: 'legGeometry',      mapping: 'legGeometry/points',
-                	                         convert: function(n,p) {
-                	  							return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
-                	 					     } }
+                                             convert: function(n,p) {
+                                                return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
+                                             } 
+                  }
     ]),
     /**
      * utility to select a dom element
