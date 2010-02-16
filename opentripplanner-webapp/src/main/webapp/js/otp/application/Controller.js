@@ -25,6 +25,8 @@ otp.application.Controller = {
     url                  : null,
     useGenericRouteIcons : true, // true == use generic /image/map/trip/mode/<mode>.png icons
                                  // false  == use rte # (or name) /image/map/trip/rte/<number>.png icons 
+    plannerContextMenu   : true,
+    mapContextMenu       : false,
 
     // creation
     map        : null,
@@ -41,13 +43,17 @@ otp.application.Controller = {
         otp.configure(this, config);
 
         this.params  = new otp.utils.ParseUrlParams();
-        this.map  = new otp.core.Map({defaultExtent:this.extent, attribution:otp.util.ExtUtils.MAP_ATTRIBUTION}); 
+        this.map  = new otp.core.Map({
+                defaultExtent  : this.extent, 
+                cm             : this.cm, 
+                attribution    : otp.util.ExtUtils.MAP_ATTRIBUTION
+        }); 
         this.ui   = new otp.core.UI({map:this.map});
 
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
         this.planner = new otp.planner.Planner({useGenericRouteIcons:this.useGenericRouteIcons, url:this.url, map:this.map, poi:this.poi}); 
-        this.cm      = new otp.planner.ContextMenu({map:this.map, forms:this.planner.getForms()});
+        this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
         this.ui.doLayout();
 
@@ -78,6 +84,21 @@ otp.application.Controller = {
         {
             console.log("ParseUrlParams highlight " + e)
         }
+    },
+
+   /**
+    * create a right-click context menu
+    */
+    makeContextMenu : function()
+    {
+        var  cmConfig = {};
+        if(this.plannerContextMenu)
+            cmConfig.forms = this.planner.getForms();
+        if(this.mapContextMenu)
+            cmConfig.map = this.map;
+
+        this.cm = new otp.planner.ContextMenu(cmConfig);
+        this.cm.map = this.map;  // NOTE: must add the map back to the cm (in case map no mapping params)
     },
 
     CLASS_NAME : "otp.application.Controller"

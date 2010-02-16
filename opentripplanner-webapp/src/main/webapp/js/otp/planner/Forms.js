@@ -582,7 +582,8 @@ otp.planner.StaticForms = {
                 var ll = this.contextMenu.getMapCoordinate();
                 this.setFrom(ll.lat+ "," + ll.lon, ll.lat, ll.lon);
             }
-        },
+        }
+        ,
         {
             text    : this.locale.contextMenu.toHere,
             iconCls : 'cToHere',

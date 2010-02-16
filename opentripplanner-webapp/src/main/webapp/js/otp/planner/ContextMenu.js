@@ -69,14 +69,23 @@ otp.planner.ContextMenu = {
  
         // OK, we don't have any CM elements, so let's try to get some from the other objects
         this.elements = new Array();
+        var fcm = false;
         if(this.forms)
         {
             this.elements.push(this.forms.getContextMenu(this));
-            this.elements.push('-');
+            fcm = true;
         }
         if(this.map)
         {
-            this.elements.push(this.map.getContextMenu(this));
+            var mcm = this.map.getContextMenu(this);
+            if(mcm != null && mcm.length > 0)
+            {
+                // add a separator between formCM and mapCM
+                if(fcm)
+                    this.elements.push('-');
+
+                this.elements.push(mcm);
+            }
         }
 
         return this.elements;

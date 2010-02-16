@@ -7,7 +7,7 @@
     <meta name="description" content="multi modal trip planner tripplanner bike tranist map"/>
     <meta name="keywords"    content="multi modal trip planner tripplanner bike tranist map" />
     <meta content="tripplanner v0.3 - January 2010"/>
-    <!-- yes debug -->
+    <!-- yes debug --
         <script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>
     <!-- end debug -->
 
@@ -72,8 +72,10 @@
         var pdx  = new OpenLayers.Bounds(-122.661,45.5222,-122.662,45.5224); 
         new otp.application.Controller({
             extent     : pdx,
-            url        : '/js/otp/planner/test/test.xml',
-            rteMapPngs : true
+            //mapContextMenu: true,
+            //plannerContextMenu: false,
+            rteMapPngs : true,
+            url        : '/js/otp/planner/test/test.xml'
         });
     });
     </script>

@@ -74,6 +74,7 @@ otp.core.MapStatic = {
     handleRightClicks : false,
     permaLinkEnabled  : false,
     historyEnabled    : true,
+    rightClickZoom    : true,
     controls          : [],
 
     /*
@@ -121,17 +122,18 @@ otp.core.MapStatic = {
             this.contextMenu = cm;
         }
 
-
-        var retVal = [
-            {
+        var retVal = []
+        if(this.rightClickZoom)
+        {
+            retVal.push({
                 text    : this.locale.contextMenu.centerHere,
                 iconCls : 'cCenterMap',
                 scope   : this,
                 handler : function () {
                     this.contextMenu.centerMapFromContextMenuXY();
                 }
-            },
-            {
+            });
+            retVal.push({
                 text    : this.locale.contextMenu.zoomInHere,
                 iconCls : 'cZoomIn',
                 scope   : this,
@@ -139,9 +141,8 @@ otp.core.MapStatic = {
                     this.contextMenu.centerMapFromContextMenuXY();
                     this.map.zoomIn();
                 }
-            }
-            ,
-            {
+            });
+            retVal.push({
                 text    : this.locale.contextMenu.zoomOutHere,
                 iconCls : 'cZoomOut',
                 scope   : this,
@@ -149,11 +150,12 @@ otp.core.MapStatic = {
                     this.contextMenu.centerMapFromContextMenuXY();
                     this.map.zoomOut();
                 }
-            }
-        ];
+            });
+        }
 
-        // nav history
-        if(this.controls && this.controls.hist) 
+        // nav history 
+        // TODO: where does this.controls.hist get set?  OL?
+        if(this.historyEnabled && this.controls && this.controls.hist)
         {
             retVal.push(
             {
