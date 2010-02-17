@@ -28,15 +28,15 @@ import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
  * 
  */
 
-public class GeotiffGridGoverageFactoryImpl implements NEDGridCoverageFactory {
+public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private File path;
 
-    public GeotiffGridGoverageFactoryImpl() {
+    public GeotiffGridCoverageFactoryImpl() {
 
     }
 
-    public GeotiffGridGoverageFactoryImpl(File path) {
+    public GeotiffGridCoverageFactoryImpl(File path) {
         this.path = path;
     }
 
