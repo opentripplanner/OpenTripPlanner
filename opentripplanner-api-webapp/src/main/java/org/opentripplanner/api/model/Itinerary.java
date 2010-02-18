@@ -18,6 +18,8 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.opentripplanner.routing.core.Fare;
+
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */

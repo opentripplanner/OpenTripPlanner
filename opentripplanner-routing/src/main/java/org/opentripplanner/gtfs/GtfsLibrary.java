@@ -18,17 +18,22 @@ import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.FareRule;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
 
+import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.HashMap;
 
 public class GtfsLibrary {
 
@@ -134,6 +139,8 @@ public class GtfsLibrary {
 
         private CalendarService _calendar;
 
+        private HashMap<AgencyAndId, FareContext> fareContexts = null;
+        
         public GtfsContextImpl(GtfsRelationalDao dao, CalendarService calendar) {
             _dao = dao;
             _calendar = calendar;
@@ -149,7 +156,41 @@ public class GtfsLibrary {
             return _calendar;
         }
 
+        @Override
+        public HashMap<AgencyAndId, FareContext> getFareContexts() {
+            if (fareContexts == null) {
+                fareContexts = new HashMap<AgencyAndId, FareContext>();
+                Collection<FareRule> rules = getDao().getAllFareRules();
+                for (FareRule rule: rules) {
+                    FareAttribute fare = rule.getFare();
+                    AgencyAndId id = fare.getId();
+                    FareContext fareContext = fareContexts.get(id);
+                    if (fareContext == null) {
+                        fareContext = new FareContext();
+                        fareContexts.put(id, fareContext);
+                    }
+                    String contains = rule.getContainsId();
+                    if (contains != null) {
+                        fareContext.addContains(contains);
+                    }
+                    String origin = rule.getOriginId();
+                    String destination = rule.getDestinationId();
+                    if (origin != null || destination != null) {
+                        fareContext.addOriginDestination(origin, destination);
+                    }
+                    Route route = rule.getRoute();
+                    if (route != null) {
+                        AgencyAndId routeId = route.getId();
+                        fareContext.addRoute(routeId);
+                    }
+                }
+            }
+            return fareContexts;
+        }
+
+        @Override
+        public FareAttribute getFareAttribute(AgencyAndId fareId) {
+            return getDao().getFareAttributeForId(fareId);
+        }
     }
-
-
 }

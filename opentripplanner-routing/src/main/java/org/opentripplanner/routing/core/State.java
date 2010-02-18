@@ -13,30 +13,96 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.ArrayList;
+import java.util.Currency;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.routing.core.Fare.FareType;
 
 public class State {
 
     private long _time;
-    private int curPattern = -1;
+    private int pattern = -1;
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
 
+    private List<String> zonesVisited;
+    
+    private List<AgencyAndId> routesVisited;
+    
     public State() {
         this(System.currentTimeMillis());
     }
 
     public State(long time) {
         _time = time;
+        zonesVisited = new ArrayList<String>();
     }    
 
     public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
+        this(time,pattern,tripId,walkDistance, new ArrayList<String>(), new ArrayList<AgencyAndId>());
+        zonesVisited = new ArrayList<String>();
+        routesVisited = new ArrayList<AgencyAndId>();
+    }
+
+    public State(long time, int pattern, AgencyAndId tripId, double walkDistance,
+            List<String> zonesVisited, List<AgencyAndId> routesVisited) {
         _time = time;
-        curPattern = pattern;
+        this.pattern = pattern;
         this.tripId = tripId;
         this.walkDistance = walkDistance;
+        this.zonesVisited = zonesVisited;
+        this.routesVisited = routesVisited;
+    }
+
+    public void addZone(String zone) {
+        if (zonesVisited.size() > 0 && zonesVisited.get(zonesVisited.size() - 1) == zone) {
+            return;
+        }
+        //copy on write
+        zonesVisited = new ArrayList<String>(zonesVisited);
+        zonesVisited.add(zone);
+    }
+    
+    public void addRoute(AgencyAndId route) {
+        if (routesVisited.size() > 0 && routesVisited.get(routesVisited.size() - 1) == route) {
+            return;
+        }
+        //copy on write
+        routesVisited = new ArrayList<AgencyAndId>(routesVisited);
+        routesVisited.add(route);
+    }
+    
+    public List<String> getZonesVisited() {
+        return zonesVisited;
+    }
+
+    public Fare getCost(GtfsContext context) {
+        HashMap<AgencyAndId, FareContext> contexts = context.getFareContexts();
+        float bestFare = Float.MAX_VALUE; 
+        Currency currency = null;
+        for (AgencyAndId fareId : contexts.keySet()) {
+            FareContext fareContext = contexts.get(fareId);
+            if (fareContext.matches(zonesVisited, routesVisited)) {
+                FareAttribute attribute = context.getFareAttribute(fareId);
+                float newFare = attribute.getPrice();
+                if (newFare < bestFare) {
+                    bestFare = newFare;
+                    currency = Currency.getInstance(attribute.getCurrencyType());
+                }
+            }
+        }
+        if (bestFare == Float.MAX_VALUE) {
+            return null;
+        }
+        Fare fare = new Fare();
+        fare.addFare(FareType.regular, currency, (int) (bestFare * Math.pow(10, currency.getDefaultFractionDigits())));
+        return fare;
     }
 
     public long getTime() {
@@ -48,20 +114,21 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time, curPattern, tripId, walkDistance);
+        State ret = new State(_time, pattern, tripId, walkDistance, zonesVisited, routesVisited);
         return ret;
     }
 
     public String toString() {
-        return "<State " + new Date(_time) + "," + curPattern + ">";
+        return "<State " + new Date(_time) + "," + pattern + ">";
     }
 
     public void setPattern(int curPattern) {
-        this.curPattern = curPattern;
+        this.pattern = curPattern;
     }
 
     public int getPattern() {
-        return curPattern;
+        return pattern;
     }
+
 
 }

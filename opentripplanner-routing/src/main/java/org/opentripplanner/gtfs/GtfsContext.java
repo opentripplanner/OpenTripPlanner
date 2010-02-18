@@ -13,11 +13,21 @@
 
 package org.opentripplanner.gtfs;
 
+import java.util.HashMap;
+
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+
+import org.opentripplanner.routing.core.FareContext;
 
 public interface GtfsContext {
     public GtfsRelationalDao getDao();
 
     public CalendarService getCalendarService();
+    
+    public HashMap<AgencyAndId, FareContext> getFareContexts();
+
+    public FareAttribute getFareAttribute(AgencyAndId fareId);
 }

@@ -147,9 +147,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
         double time = length / wo.speed;
         double weight;
         if (wo.modes.contains(TraverseMode.BICYCLE) && wo.optimizeFor.equals(OptimizeType.SAFE)) {
-            if (bicycleSafetyEffectiveLength < length * 0.99) {
-                System.out.println ("a shorter path on : " + getName() + ": " + bicycleSafetyEffectiveLength + " / " + length);
-            }
             weight = bicycleSafetyEffectiveLength / wo.speed;
         } else {
             weight = time;

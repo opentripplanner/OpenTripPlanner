@@ -51,7 +51,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
     public String getDirection() {
         return pattern.exemplar.getTripHeadsign();
     }
-
+    
     public double getDistance() {
         return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
     }
@@ -68,6 +68,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(runningTime);
+        state1.addZone(getEndStop().getZoneId());
         return new TraverseResult(runningTime, state1);
     }
 
