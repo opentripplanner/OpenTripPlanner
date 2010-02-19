@@ -107,8 +107,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
-            
-            
+
+            // TODO: it kinda sucks to have multiple return statements ... maybe refactor to have a single return at end of method
             if (includeTransitStops) {
                 double bestDistance = Double.MAX_VALUE;
                 List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
@@ -137,36 +137,47 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
             double bestDistance = Double.MAX_VALUE;
             nearby = edgeTree.query(envelope);
-            for (Street e: nearby) {
-                Geometry g = e.getGeometry();
-                double distance = g.distance(p);
-                if (distance < bestDistance) {
-                    bestDistance = distance;
+            // FP - added condition and Double / null due to NPE problems
+            if (nearby != null)
+            {
+                for (Street e: nearby) 
+                {
+                    if (e == null) continue;
+                    Geometry g = e.getGeometry();
+                    if(g != null) {
+                        double distance = g.distance(p);
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                        }
+                    }
                 }
-            }
-            List<Street> parallel = new LinkedList<Street>();
-            for (Street e: nearby) {
-                Geometry g = e.getGeometry();
-                double distance = g.distance(p);
-                if (distance == bestDistance) {
-                    parallel.add(e);
+                List<Street> parallel = new LinkedList<Street>();
+                for (Street e: nearby) {
+                    if (e == null) continue;
+                    Geometry g = e.getGeometry();
+                    if(g != null) {
+                        double distance = g.distance(p);
+                        if (distance == bestDistance) {
+                            parallel.add(e);
+                        }
+                    }
                 }
-            }
-            if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                Street bestStreet = parallel.get(0);
-                Geometry g = bestStreet.getGeometry();
-                LocationIndexedLine l = new LocationIndexedLine(g);
-                LinearLocation location = l.project(c);
+                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                    Street bestStreet = parallel.get(0);
+                    Geometry g = bestStreet.getGeometry();
+                    LocationIndexedLine l = new LocationIndexedLine(g);
+                    LinearLocation location = l.project(c);
 
-                Coordinate start = bestStreet.getFromVertex().getCoordinate();
-                Coordinate end = bestStreet.getToVertex().getCoordinate();
-                Coordinate nearestPoint = location.getCoordinate(g);
-                if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
-                    return bestStreet.getFromVertex();
-                } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
-                    return bestStreet.getToVertex();
+                    Coordinate start = bestStreet.getFromVertex().getCoordinate();
+                    Coordinate end = bestStreet.getToVertex().getCoordinate();
+                    Coordinate nearestPoint = location.getCoordinate(g);
+                    if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
+                        return bestStreet.getFromVertex();
+                    } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
+                        return bestStreet.getToVertex();
+                    }
+                    return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, location);
                 }
-                return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, location);
             }
         }
         return null;
