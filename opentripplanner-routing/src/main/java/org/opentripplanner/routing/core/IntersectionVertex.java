@@ -23,7 +23,7 @@ import org.opentripplanner.routing.impl.DistanceLibrary;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
-public class IntersectionVertex extends OneStreetVertex implements Vertex, StreetIntersectionVertex {
+public class IntersectionVertex extends OneStreetVertex implements StreetIntersectionVertex {
 
     private static final long serialVersionUID = 364261663335739528L;
 

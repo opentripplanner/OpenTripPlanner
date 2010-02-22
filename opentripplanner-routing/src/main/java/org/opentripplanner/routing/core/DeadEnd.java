@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class DeadEnd extends OneStreetVertex implements Vertex, StreetIntersectionVertex {
+public class DeadEnd extends OneStreetVertex implements StreetIntersectionVertex {
 
     private static final long serialVersionUID = 8659709448092487563L;
 

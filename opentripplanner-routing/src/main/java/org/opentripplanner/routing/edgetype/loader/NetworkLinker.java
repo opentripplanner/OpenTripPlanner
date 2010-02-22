@@ -71,9 +71,9 @@ public class NetworkLinker {
                         //so we need to create a spare vertex to connect the STL to.
 
                         OneStreetVertex osvertex = ((OneStreetVertex) nearestIntersection);
-                        GenericVertex newV = new GenericVertex(nearestIntersection.getLabel() + " approach", nearestIntersection.getX(), nearestIntersection.getY());
-                        Street approach = new Street(nearestIntersection, newV, 0);
-                        Street approachBack = new Street(newV, nearestIntersection, 0);
+                        GenericVertex newV = new GenericVertex(osvertex.getLabel() + " approach", osvertex.getX(), osvertex.getY());
+                        Street approach = new Street(osvertex, newV, 0);
+                        Street approachBack = new Street(newV, osvertex, 0);
                         osvertex.inStreet.setToVertex(newV);
                         osvertex.outStreet.setFromVertex(newV);
                         newV.addIncoming(osvertex.inStreet);
