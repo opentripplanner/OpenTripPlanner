@@ -73,8 +73,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 for (Edge e: v.getOutgoing()) {
                     if (e instanceof Street){
                         edges.add((Street) e);
-                        if (e == null || e.getToVertex() == null) {
-                            System.out.println("here");
+                        if (e.getGeometry() == null) {
+                            continue;
                         }
                         Envelope env = new Envelope(v.getCoordinate(), e.getToVertex().getCoordinate());
                         edgeTree.insert(env, e);
