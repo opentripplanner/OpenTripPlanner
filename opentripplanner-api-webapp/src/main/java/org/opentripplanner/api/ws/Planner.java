@@ -393,6 +393,10 @@ public class Planner {
                 // Turns do not exist outside of routing
                 continue;
             }
+            Geometry geom = edge.getGeometry();
+            if (geom == null) {
+                continue;
+            }
             String streetName = edge.getName();
             if (step == null) {
                 // first step
@@ -401,21 +405,21 @@ public class Planner {
                 step.streetName = streetName;
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
             } else if (step.streetName != streetName && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
                 step = new WalkStep();
                 steps.add(step);
                 step.streetName = streetName;
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle);
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
                 step.becomes = !multipleOptionsBefore(edge);
             } else {
                 /* generate turn-to-stay-on directions, where needed */
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(edge.getGeometry());
+                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
                 if (direction != RelativeDirection.CONTINUE) {
                     // figure out if there was another way we could have turned
@@ -434,7 +438,7 @@ public class Planner {
 
             step.distance += edge.getDistance();
 
-            lastAngle = DirectionUtils.getInstance().getLastAngle(edge.getGeometry());
+            lastAngle = DirectionUtils.getInstance().getLastAngle(geom);
         }
         return steps;
     }

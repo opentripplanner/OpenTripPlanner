@@ -118,6 +118,7 @@ public class PatternAlight extends PatternEdge {
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
+        state1.justTransferred = true;
         return new TraverseResult(-wait + BOARD_COST, state1);
     }
 

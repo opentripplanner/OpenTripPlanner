@@ -32,7 +32,7 @@ public class GraphPath {
     }
 
     public void optimize() {
-        State state = vertices.lastElement().state;
+        State state = vertices.lastElement().state.clone();
         State state0 = vertices.firstElement().state;
         if (state0.getTime() >= state.getTime()) {
             // reversed paths are already optimized, because preferences are asymmetric -- people

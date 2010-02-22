@@ -39,6 +39,7 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
     }
 
     private static final long serialVersionUID = -3311099256178798981L;
+    private static final double STL_TRAVERSE_COST = 1;
 
     public String getDirection() {
         return null;
@@ -68,7 +69,8 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(1);
-        return new TraverseResult(1, s1);
+        s1.justTransferred = true;
+        return new TraverseResult(STL_TRAVERSE_COST, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -77,7 +79,8 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-1);
-        return new TraverseResult(1, s1);
+        s1.justTransferred = true;
+        return new TraverseResult(STL_TRAVERSE_COST, s1);
     }
 
 }
