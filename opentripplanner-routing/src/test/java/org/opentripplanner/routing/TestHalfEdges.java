@@ -108,8 +108,8 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, new LinearLocation(0, 0.4));
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, new LinearLocation(0, 0.8));
+        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, (new LinearLocation(0, 0.4)).getCoordinate(leftUp.getGeometry()));
+        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, (new LinearLocation(0, 0.8)).getCoordinate(leftUp.getGeometry()));
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
@@ -127,8 +127,8 @@ public class TestHalfEdges extends TestCase {
     }
 
     public void testHalfEdgesBack() {
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, new LinearLocation(0, 0.4));
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, new LinearLocation(0, 0.8));
+        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, (new LinearLocation(0, 0.4)).getCoordinate(leftUp.getGeometry()));
+        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, (new LinearLocation(0, 0.8)).getCoordinate(rightUp.getGeometry()));
 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 

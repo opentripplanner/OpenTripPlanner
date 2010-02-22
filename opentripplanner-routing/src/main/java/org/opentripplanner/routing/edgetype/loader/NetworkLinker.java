@@ -45,7 +45,7 @@ public class NetworkLinker {
 
         _log.debug("constructing index...");
         StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(graph);
-        index.setup();
+        index.setup_modifiable();
         
         _log.debug("creating linkages...");
         int i = 0;
@@ -62,7 +62,10 @@ public class NetworkLinker {
 
                 if (nearestIntersection != null) {
                     if (nearestIntersection instanceof StreetLocation) {
-                        ((StreetLocation) nearestIntersection).reify(graph);
+                        if(((StreetLocation) nearestIntersection).streets != null) {
+                            ((StreetLocation) nearestIntersection).reify(graph);
+                            index.reified((StreetLocation) nearestIntersection);
+                        }
                     } else if (nearestIntersection instanceof OneStreetVertex) {
                         //this kind of vertex can only have one Street edge in each direction
                         //so we need to create a spare vertex to connect the STL to.
@@ -73,8 +76,10 @@ public class NetworkLinker {
                         Street approachBack = new Street(newV, nearestIntersection, 0);
                         osvertex.inStreet.setToVertex(newV);
                         osvertex.outStreet.setFromVertex(newV);
-                        osvertex.inStreet = approach;
-                        osvertex.outStreet = approachBack;
+                        newV.addIncoming(osvertex.inStreet);
+                        newV.addOutgoing(osvertex.outStreet);
+                        osvertex.inStreet = approachBack;
+                        osvertex.outStreet = approach;
                         nearestIntersection = newV;
                         graph.addVertex(newV);
                     }

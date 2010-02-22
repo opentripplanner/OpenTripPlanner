@@ -33,6 +33,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
  * Represents a location on a street, somewhere between the two corners.
@@ -52,32 +53,26 @@ public class StreetLocation extends GenericVertex {
      * @param name
      * @param streets A List of nearby streets (which are presumed to be coincident/parallel edges).
      *                i.e. a list of edges which represent a physical real-world street.
-     * @param location
+     * @param nearestPoint
      *
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String label, String name, List<Street> streets, LinearLocation location) {
-
-        Geometry g = streets.get(0).getGeometry();
-        Coordinate nearestPoint = location.getCoordinate(g);
-
-        return new StreetLocation(label, name, streets, location, nearestPoint.x, nearestPoint.y);
+    public static StreetLocation createStreetLocation(String label, String name, List<Street> streets, Coordinate nearestPoint) {
+        return new StreetLocation(label, name, streets, nearestPoint);
     }
 
-    public static StreetLocation createStreetLocation(String label, String name, Street street, LinearLocation location) {
+    public static StreetLocation createStreetLocation(String label, String name, Street street, Coordinate nearestPoint) {
         List<Street> streets = new LinkedList<Street>();
         streets.add(street);
-        return createStreetLocation(label, name, streets, location);
+        return createStreetLocation(label, name, streets, nearestPoint);
     }
 
     public List<Street> streets;
+	public LinearLocation location;
 
-    public LinearLocation location;
+    private StreetLocation(String label, String name, List<Street> streets, Coordinate nearestPoint) {
+        super(label, nearestPoint.x, nearestPoint.y, name);
 
-    private StreetLocation(String label, String name, List<Street> streets, LinearLocation location, double x,
-            double y) {
-        super(label, x, y, name);
-        this.location = location;
         this.streets = streets;
         for( Street street : streets ) {
             Vertex fromv = street.getFromVertex();
@@ -85,55 +80,63 @@ public class StreetLocation extends GenericVertex {
             Coordinate startCoord = fromv.getCoordinate();
             Coordinate endCoord = tov.getCoordinate();
 
+            LocationIndexedLine line = new LocationIndexedLine(street.getGeometry());
+            LinearLocation l = line.indexOf(nearestPoint);
+			if(location == null) location = l;
+
+            LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
+            LineString ending    = (LineString) line.extractLine(l, line.getEndIndex());
+
             String streetName = street.getName();
 
-            double weight1 = DistanceLibrary.distance(y, x, startCoord.y, startCoord.x);
+            double weight1 = DistanceLibrary.distance(nearestPoint, startCoord);
             double bicycleWeight1 = weight1 * street.bicycleSafetyEffectiveLength / street.length;
 
-            double weight2 = DistanceLibrary.distance(y, x, endCoord.y, endCoord.x);
+            double weight2 = DistanceLibrary.distance(nearestPoint, endCoord);
             double bicycleWeight2 = weight2 * street.bicycleSafetyEffectiveLength / street.length;
 
             Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, street.getTraversalPermission(), street.getWheelchairAccessible());
-            e1.setGeometry(toLineString(fromv.getCoordinate(), this.getCoordinate()));
+            e1.setGeometry(beginning);
             addIncoming(e1);
 
 
             Street e2 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, street.getTraversalPermission(), street.getWheelchairAccessible());
-            e2.setGeometry(toLineString(this.getCoordinate(), tov.getCoordinate()));
+            e2.setGeometry(ending);
             addOutgoing(e2);
         }
     }
 
-    private LineString toLineString(Coordinate start, Coordinate end) {
-        Coordinate[] coords = { start, end };
-        GeometryFactory factory = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING),
-                4326);
-        return factory.createLineString(coords);
-    }
-
     public void reify(Graph graph) {
+        if(streets == null)
+            return;
+
         /* first, figure out where the endpoints are  */
         Vertex v1 = null, v2 = null;
-        for (Edge og : getOutgoing()) {
-            if (v1 == null) {
-                v1 = og.getToVertex();
-            } else {
-                v2 = og.getToVertex();
+        for (Street e : streets) {
+            if (v1 == null && v2 != e.getToVertex()) {
+                v1 = e.getToVertex();
+            } else if( v1 == null && v2 != e.getFromVertex()) {
+                v1 = e.getFromVertex();
+            }
+            if( v2 == null && v1 != e.getToVertex()) {
+                v2 = e.getToVertex();
+            } else if( v2 == null && v1 != e.getFromVertex()) {
+                v2 = e.getFromVertex();
             }
         }
-        for (Edge ic : getIncoming()) {
-            if (v1 == null) {
-                v1 = ic.getFromVertex();
-            } else {
-                v2 = ic.getFromVertex();
-            }
-        }
+
         /* now, reconfigure vertices to remove the street that this vertex splits
          * and add the streets that replace it.
          */
         for (Edge e : getIncoming()) {
+            if(!(e instanceof Street))
+                continue;
+
             Street s = (Street) e;
             Vertex intersection = s.getFromVertex();
+            if(intersection != v1 && intersection != v2)
+                continue;
+
             if (intersection instanceof IntersectionVertex) {
                 ((IntersectionVertex) intersection).outStreet = s;
             } else if (intersection instanceof DeadEnd) {
@@ -148,7 +151,6 @@ public class StreetLocation extends GenericVertex {
                     Edge e2 = it.next();
                     if (e2.getToVertex() == otherEnd) {
                         it.remove();
-                        break;
                     }
                 }
                 outgoing.add(e);
@@ -156,8 +158,14 @@ public class StreetLocation extends GenericVertex {
             }
         }
         for (Edge e : getOutgoing()) {
+            if(!(e instanceof Street))
+                continue;
+
             Street s = (Street) e;
-            Vertex intersection = s.getFromVertex();
+            Vertex intersection = s.getToVertex();
+            if(intersection != v1 && intersection != v2)
+                continue;
+
             if (intersection instanceof IntersectionVertex) {
                 ((IntersectionVertex) intersection).inStreet = s;
             } else if (intersection instanceof DeadEnd) {
@@ -171,15 +179,14 @@ public class StreetLocation extends GenericVertex {
                     Edge e2 = it.next();
                     if (e2.getFromVertex() == otherEnd) {
                         it.remove();
-                        break;
                     }
                 }
                 incoming.add(e);
-                v.setIncoming(incoming);
+                v.setOutgoing(incoming);
             }
         }
         graph.addVertex(this);
-        this.location = null;
+        location = null;
     }
     
     @Override

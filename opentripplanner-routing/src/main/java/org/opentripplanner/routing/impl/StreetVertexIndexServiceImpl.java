@@ -35,7 +35,9 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
+import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -49,12 +51,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private Graph graph;
 
-    private STRtree edgeTree;
+    private SpatialIndex edgeTree;
     private STRtree transitStopTree;
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
     private static final double MAX_SNAP_DISTANCE = 0.00005;
+
+    private static final double DISTANCE_ERROR = 0.000005;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -64,8 +68,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @PostConstruct
+    public void setup_modifiable() {
+        edgeTree = new Quadtree();
+        postSetup();
+    }
+
+    @PostConstruct
     public void setup() {
         edgeTree = new STRtree();
+        postSetup();
+        ((STRtree) edgeTree).build();
+    }
+
+    @PostConstruct
+    public void postSetup() {
         transitStopTree = new STRtree();
         HashSet<Street> edges = new HashSet<Street>();
         for (Vertex v : graph.getVertices()) {
@@ -76,7 +92,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         if (e.getGeometry() == null) {
                             continue;
                         }
-                        Envelope env = new Envelope(v.getCoordinate(), e.getToVertex().getCoordinate());
+                        Envelope env = e.getGeometry().getEnvelopeInternal();
                         edgeTree.insert(env, e);
                     }
                 }
@@ -85,7 +101,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 transitStopTree.insert(env, v);
             }
         }
-        edgeTree.build();
         transitStopTree.build();
     }
 
@@ -152,18 +167,24 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     }
                 }
                 List<Street> parallel = new LinkedList<Street>();
+                Street bestStreet = null;
                 for (Street e: nearby) {
                     if (e == null) continue;
                     Geometry g = e.getGeometry();
                     if(g != null) {
                         double distance = g.distance(p);
-                        if (distance == bestDistance) {
+                        if (distance <= bestDistance + DISTANCE_ERROR && (bestStreet == null
+                                || ((bestStreet.getFromVertex() == e.getFromVertex() && bestStreet.getToVertex() == e.getToVertex() )
+                                || (bestStreet.getToVertex() == e.getFromVertex() && bestStreet.getFromVertex() == e.getToVertex() )))) {
+                            if(bestStreet == null)
+                                bestStreet = e;
+
                             parallel.add(e);
                         }
                     }
                 }
                 if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                    Street bestStreet = parallel.get(0);
+                    bestStreet = parallel.get(0);
                     Geometry g = bestStreet.getGeometry();
                     LocationIndexedLine l = new LocationIndexedLine(g);
                     LinearLocation location = l.project(c);
@@ -176,7 +197,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
                         return bestStreet.getToVertex();
                     }
-                    return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, location);
+                    return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, nearestPoint);
                 }
             }
         }
@@ -190,5 +211,21 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     public Graph getGraph() {
         return graph;
+    }
+
+    public void reified(StreetLocation vertex) {
+        if(vertex.streets == null) return;
+
+        for(Street e : vertex.streets) {
+            edgeTree.remove(e.getGeometry().getEnvelopeInternal(), e);
+        }
+        for(Edge e : vertex.getIncoming()) {
+            if(e instanceof Street)
+                edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
+        }
+        for(Edge e : vertex.getOutgoing()) {
+            if(e instanceof Street)
+                edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
+        }
     }
 }

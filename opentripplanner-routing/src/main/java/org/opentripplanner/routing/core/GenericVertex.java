@@ -44,6 +44,10 @@ public class GenericVertex implements Vertex {
 
     static final double METERS_PER_DEGREE_AT_EQUATOR = 111319.9;
 
+    public GenericVertex(String label, Coordinate coord, String name) {
+		this(label, coord.x, coord.y, name);
+	}
+
     public GenericVertex(String label, double x, double y) {
         this.label = label;
         this.x = x;

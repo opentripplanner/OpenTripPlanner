@@ -55,6 +55,10 @@ public class DistanceLibrary {
     
     public static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
 
+    public static final double distance(Coordinate from, Coordinate to) {
+        return distance(from.y, from.x, to.y, to.x);
+    }
+
     public static final double distance(double lat1, double lon1, double lat2, double lon2) {
         return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_KM * 1000);
     }
