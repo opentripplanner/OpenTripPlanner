@@ -30,8 +30,6 @@ public class TraverseOptions {
 
     public TraverseModeSet modes;
 
-    public double transferPenalty = 600;
-
     public Calendar calendar;
 
     private CalendarService calendarService;
