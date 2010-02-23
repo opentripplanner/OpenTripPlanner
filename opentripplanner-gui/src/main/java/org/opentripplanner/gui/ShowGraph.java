@@ -10,9 +10,11 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OneStreetVertex;
 import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 
@@ -46,8 +48,6 @@ public class ShowGraph extends PApplet {
 
     Envelope modelBounds = new Envelope();
 
-    Envelope screenBounds;
-
     VertexSelectionListener selector;
 
     private ArrayList<VertexSelectionListener> selectors;
@@ -72,9 +72,8 @@ public class ShowGraph extends PApplet {
     }
     
     public void setup() {
-        screenBounds = new Envelope(0, 700, 0, 700);
         background(0);
-        size(700, 700, P2D);
+        size(getSize().width, getSize().height, P2D);
 
         vertexIndex = new STRtree();
         edgeIndex = new STRtree();
@@ -83,17 +82,21 @@ public class ShowGraph extends PApplet {
             modelBounds.expandToInclude(env);
             if (v instanceof TransitStop) {
                 vertexIndex.insert(env, v);
-            } else if(v instanceof IntersectionVertex) {
+            } else if(v instanceof OneStreetVertex) {
+                vertexIndex.insert(env, v);
+            } else if(v instanceof StreetLocation) {
                 vertexIndex.insert(env, v);
             } else {
                 //a street-transit link, or a journey vertex.  no need for them in the ui.
             }
             
             for (Edge e : v.getOutgoing()) {
-            	if (e instanceof Street || e instanceof StreetTransitLink) {
-            		env = new Envelope(e.getFromVertex().getCoordinate());
-            		edgeIndex.insert(env, e);
-            	}
+                if (e instanceof Street || e instanceof StreetTransitLink) {
+                    if(e.getGeometry() == null)
+                        continue;
+                    env = e.getGeometry().getEnvelopeInternal();
+                    edgeIndex.insert(env, e);
+                }
             }
         }
         modelBounds.expandBy(0.02);
@@ -151,17 +154,17 @@ public class ShowGraph extends PApplet {
     }
 
     public void zoomToLocation(Coordinate c) {
-      Envelope e = new Envelope();
-      e.expandToInclude(c);
-      e.expandBy(0.002);
-      modelBounds = e;
+        Envelope e = new Envelope();
+        e.expandToInclude(c);
+        e.expandBy(0.002);
+        modelBounds = e;
     }
     
     public void zoomToVertex(Vertex v) {
-    	Envelope e = new Envelope();
-    	e.expandToInclude(v.getCoordinate());
-    	e.expandBy(0.002);
-    	modelBounds = e;
+        Envelope e = new Envelope();
+        e.expandToInclude(v.getCoordinate());
+        e.expandBy(0.002);
+        modelBounds = e;
     }
     
     public void zoomOut() {
@@ -171,51 +174,56 @@ public class ShowGraph extends PApplet {
     @SuppressWarnings("unchecked")
     public void draw() {
         fill(0);
-        rect(0, 0, (int)screenBounds.getMaxX(), (int) screenBounds.getMaxY());
+        rect(0, 0, getSize().width, getSize().height);
         List<Vertex> vertices = (List<Vertex>) vertexIndex.query(modelBounds);
         
+        List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
+        for (Edge e : edges) {
+            if(e == highlightedEdge)
+                continue;
+
+            if (e instanceof StreetTransitLink) {
+                stroke(75, 150, 255);
+            } else {
+                stroke(30, 255, 255);
+            }
+
+            Coordinate[] coords = e.getGeometry().getCoordinates();
+            for(int i = 1; i < coords.length; i++) {
+                line((float) toScreenX(coords[i-1].x), (float) toScreenY(coords[i-1].y), (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+            }
+        }
+        if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
+            stroke (255, 70, 70);
+
+            Coordinate[] coords = highlightedEdge.getGeometry().getCoordinates();
+            for(int i = 1; i < coords.length; i++) {
+                line((float) toScreenX(coords[i-1].x), (float) toScreenY(coords[i-1].y), (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+            }
+        }
+
         for (Vertex v : vertices) {
+            if(v == highlightedVertex)
+                continue;
+
             double x = v.getX();
             double y = v.getY();
             x = toScreenX(x);
             y = toScreenY(y);
             if (v instanceof TransitStop) {
+                fill(0);
                 stroke(255, 30, 255);
                 ellipse(x, y, 5.0, 5.0);
             } else if (highlightedVertices.contains(v)) {
                 stroke(0, 255, 0);
+                fill(0, 255, 0);
                 ellipse(x, y, 3.0, 3.0);
             } else {
                 stroke(255);
+                fill(255, 0, 0);
                 ellipse(x, y, 3.0, 3.0);
             }
-            
         }
-
-        List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
-        for (Edge e : edges) {
-        	double x1 = toScreenX(e.getFromVertex().getX());
-        	double y1 = toScreenY(e.getFromVertex().getY());
-        	double x2 = toScreenX(e.getToVertex().getX());
-        	double y2 = toScreenY(e.getToVertex().getY());
-        	
-        	if (e instanceof StreetTransitLink) {
-        		stroke(75, 150, 255);
-        	} else {
-        		stroke(30, 255, 255);
-        	}
-
-        	line((float)x1, (float)y1, (float)x2, (float)y2);
-        }
-        if (highlightedEdge != null) {
-            double x1 = toScreenX(highlightedEdge.getFromVertex().getX());
-            double y1 = toScreenY(highlightedEdge.getFromVertex().getY());
-            double x2 = toScreenX(highlightedEdge.getToVertex().getX());
-            double y2 = toScreenY(highlightedEdge.getToVertex().getY());
-            stroke (255, 70, 70);
-            line((float)x1, (float)y1, (float)x2, (float)y2);
-        }
-
         if (highlightedVertex != null) {
             stroke(255, 255, 30);
             fill(255, 255, 30);
@@ -227,13 +235,11 @@ public class ShowGraph extends PApplet {
     }
 
     private double toScreenY(double y) {
-        return map(y, modelBounds.getMinY(), modelBounds.getMaxY(), screenBounds.getMaxY(),
-                screenBounds.getMinY());
+        return map(y, modelBounds.getMinY(), modelBounds.getMaxY(), getSize().height, 0);
     }
 
     private double toScreenX(double x) {
-        return map(x, modelBounds.getMinX(), modelBounds.getMaxX(), screenBounds.getMinX(),
-                screenBounds.getMaxX());
+        return map(x, modelBounds.getMinX(), modelBounds.getMaxX(), 0, getSize().width);
     }
 
     @SuppressWarnings("unchecked")
@@ -298,13 +304,11 @@ public class ShowGraph extends PApplet {
     }
     
     private double toModelY(double y) {
-        return map(y, screenBounds.getMinY(), screenBounds.getMaxY(), modelBounds.getMaxY(),
-                modelBounds.getMinY());
+        return map(y, 0, getSize().height, modelBounds.getMaxY(), modelBounds.getMinY());
     }
 
     private double toModelX(double x) {
-        return map(x, screenBounds.getMinX(), screenBounds.getMaxX(), modelBounds.getMinX(),
-                modelBounds.getMaxX());
+        return map(x, 0, getSize().width, modelBounds.getMinX(), modelBounds.getMaxX());
     }
 
     /**
