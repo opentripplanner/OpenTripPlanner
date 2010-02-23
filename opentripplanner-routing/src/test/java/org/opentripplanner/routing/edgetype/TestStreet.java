@@ -44,6 +44,13 @@ public class TestStreet extends TestCase {
 
     private static GeometryFactory _geomFactory = new GeometryFactory();
 
+
+    public void testStreetSpeed() {
+        assertTrue(Math.abs(Street.slopeSpeedCoefficient(0,0) - 1) < 0.01);
+        assertTrue(Math.abs(Street.slopeSpeedCoefficient(0.35, 0) - 0.0624) < 0.02);
+        assertTrue(Math.abs(Street.slopeSpeedCoefficient(0, 5000) - 1.17) < 0.03);
+    }
+
     public void testStreetWalk() {
         Graph gg = new Graph();
 
