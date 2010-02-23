@@ -78,6 +78,8 @@ public class NetworkLinker {
                         osvertex.outStreet.setFromVertex(newV);
                         newV.addIncoming(osvertex.inStreet);
                         newV.addOutgoing(osvertex.outStreet);
+                        newV.addIncoming(approach);
+                        newV.addOutgoing(approachBack);
                         osvertex.inStreet = approachBack;
                         osvertex.outStreet = approach;
                         nearestIntersection = newV;

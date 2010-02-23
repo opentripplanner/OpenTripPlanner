@@ -67,7 +67,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         this.graph = graph;
     }
 
-    @PostConstruct
     public void setup_modifiable() {
         edgeTree = new Quadtree();
         postSetup();
@@ -80,8 +79,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         ((STRtree) edgeTree).build();
     }
 
-    @PostConstruct
-    public void postSetup() {
+    private void postSetup() {
         transitStopTree = new STRtree();
         HashSet<Street> edges = new HashSet<Street>();
         for (Vertex v : graph.getVertices()) {
