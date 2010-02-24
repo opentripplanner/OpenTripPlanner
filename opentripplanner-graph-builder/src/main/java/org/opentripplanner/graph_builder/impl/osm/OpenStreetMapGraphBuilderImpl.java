@@ -408,10 +408,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             String motorcar = tags.get("motorcar");
             String bicycle = tags.get("bicycle");
             String foot = tags.get("foot");
-            String all_tags = access != null ? "access=" + access : "; ";
-            all_tags += motorcar != null ? "motorcar=" + motorcar : "; ";
-            all_tags += bicycle != null ? "bicycle=" + bicycle : "; ";
-            all_tags += foot != null ? "foot=" + foot : "; ";
 
             for(KeyValuePermission kvp : _tagPermissions.values()) {
                 if(tags.containsKey(kvp.key) && kvp.value.equals(tags.get(kvp.key))) {
@@ -422,8 +418,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if(def == null) {
                 if(_tagPermissions.containsKey("__default__")) {
-                    def = _tagPermissions.get("__default__").permission;
+                    String all_tags = null;
+                    for(String key : tags.keySet()) {
+                        String tag = key + "=" + tags.get(key);
+                        if(all_tags == null) {
+                            all_tags = tag;
+                        } else {
+                            all_tags += "; " + tag;
+                        }
+                    }
                     _log.debug("Used default permissions: " + all_tags);
+                    def = _tagPermissions.get("__default__").permission;
                 } else {
                     def = StreetTraversalPermission.ALL;
                 }
@@ -439,7 +444,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * perfectly ;-)
              */
             if(access != null) {
-                if("no".equals( access )) {
+                if("no".equals( access ) || "private".equals( access)) {
                     permission = StreetTraversalPermission.NONE;
                 } else {
                     permission = StreetTraversalPermission.ALL;
@@ -456,7 +461,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            if (tags.containsKey("bicycle")) {
+            if (bicycle != null) {
                 if("no".equals(bicycle) || "private".equals(bicycle)) {
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
                 } else {
