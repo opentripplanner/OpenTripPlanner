@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.LinkedList;
 import java.util.Vector;
 
-import org.opentripplanner.routing.core.DeadEnd;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.IntersectionVertex;
+import org.opentripplanner.routing.core.OneStreetVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -65,7 +64,7 @@ public class StreetLocation extends GenericVertex {
     }
 
     public List<Street> streets;
-	public LinearLocation location;
+    public LinearLocation location;
 
     private StreetLocation(String label, String name, List<Street> streets, Coordinate nearestPoint) {
         super(label, nearestPoint.x, nearestPoint.y, name);
@@ -79,7 +78,7 @@ public class StreetLocation extends GenericVertex {
 
             LocationIndexedLine line = new LocationIndexedLine(street.getGeometry());
             LinearLocation l = line.indexOf(nearestPoint);
-			if(location == null) location = l;
+            if(location == null) location = l;
 
             LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
             LineString ending    = (LineString) line.extractLine(l, line.getEndIndex());
@@ -134,24 +133,40 @@ public class StreetLocation extends GenericVertex {
             if(intersection != v1 && intersection != v2)
                 continue;
 
-            if (intersection instanceof IntersectionVertex) {
-                ((IntersectionVertex) intersection).outStreet = s;
-            } else if (intersection instanceof DeadEnd) {
-                ((DeadEnd) intersection).outStreet = s;
+            if (intersection instanceof OneStreetVertex) {
+                ((OneStreetVertex) intersection).outStreet = s;
             } else {
-                /* remove the street from the outgoing edges of the from vertex */
+                /* From a given vertex, both the incoming and outgoing edges which
+                 * were split need to be removed, otherwise "dangling" edges are left
+                 * on some vertices. (<streets> contains the split edges)
+                 * The 'new' replacement edge also needs to be added as an outgoing
+                 * edge to the intersection.
+                 */
                 GenericVertex v = (GenericVertex) intersection;
+
                 Vector<Edge> outgoing = v.getOutgoing();
-                Iterator<Edge> it = outgoing.iterator();
-                Vertex otherEnd = intersection == v1 ? v2 : v1;
-                while(it.hasNext()) {
-                    Edge e2 = it.next();
-                    if (e2.getToVertex() == otherEnd) {
-                        it.remove();
+                Iterator<Edge> it_outgoing = outgoing.iterator();
+                while(it_outgoing.hasNext()) {
+                    Edge e2 = it_outgoing.next();
+                    if (streets.contains(e2)) {
+                        it_outgoing.remove();
                     }
                 }
-                outgoing.add(e);
-                v.setIncoming(outgoing);
+
+                Vector<Edge> incoming = v.getIncoming();
+                Iterator<Edge> it_incoming = incoming.iterator();
+                while(it_incoming.hasNext()) {
+                    Edge e2 = it_incoming.next();
+                    if (streets.contains(e2)) {
+                        it_incoming.remove();
+                    }
+                }
+
+                if(!outgoing.contains(e))
+                    outgoing.add(e);
+
+                v.setIncoming(incoming);
+                v.setOutgoing(outgoing);
             }
         }
         for (Edge e : getOutgoing()) {
@@ -163,23 +178,34 @@ public class StreetLocation extends GenericVertex {
             if(intersection != v1 && intersection != v2)
                 continue;
 
-            if (intersection instanceof IntersectionVertex) {
-                ((IntersectionVertex) intersection).inStreet = s;
-            } else if (intersection instanceof DeadEnd) {
-                ((DeadEnd) intersection).inStreet = s;
+            if (intersection instanceof OneStreetVertex) {
+                ((OneStreetVertex) intersection).inStreet = s;
             } else {
                 GenericVertex v = (GenericVertex) intersection;
-                Vector<Edge> incoming = v.getIncoming();
-                Iterator<Edge> it = incoming.iterator();
-                Vertex otherEnd = intersection == v1 ? v2 : v1;
-                while(it.hasNext()) {
-                    Edge e2 = it.next();
-                    if (e2.getFromVertex() == otherEnd) {
-                        it.remove();
+
+                Vector<Edge> outgoing = v.getOutgoing();
+                Iterator<Edge> it_outgoing = outgoing.iterator();
+                while(it_outgoing.hasNext()) {
+                    Edge e2 = it_outgoing.next();
+                    if (streets.contains(e2)) {
+                        it_outgoing.remove();
                     }
                 }
-                incoming.add(e);
-                v.setOutgoing(incoming);
+
+                Vector<Edge> incoming = v.getIncoming();
+                Iterator<Edge> it_incoming = incoming.iterator();
+                while(it_incoming.hasNext()) {
+                    Edge e2 = it_incoming.next();
+                    if (streets.contains(e2)) {
+                        it_incoming.remove();
+                    }
+                }
+
+                if(!incoming.contains(e))
+                    incoming.add(e);
+
+                v.setIncoming(incoming);
+                v.setOutgoing(outgoing);
             }
         }
         graph.addVertex(this);

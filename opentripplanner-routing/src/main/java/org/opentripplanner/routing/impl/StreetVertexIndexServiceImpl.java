@@ -81,20 +81,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private void postSetup() {
         transitStopTree = new STRtree();
-        HashSet<Street> edges = new HashSet<Street>();
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof StreetIntersectionVertex) {
-                for (Edge e: v.getOutgoing()) {
-                    if (e instanceof Street){
-                        edges.add((Street) e);
-                        if (e.getGeometry() == null) {
-                            continue;
-                        }
-                        Envelope env = e.getGeometry().getEnvelopeInternal();
-                        edgeTree.insert(env, e);
+            for (Edge e: v.getOutgoing()) {
+                if (e instanceof Street){
+                    if (e.getGeometry() == null) {
+                        continue;
                     }
-                }
-            } else if (v instanceof TransitStop) {
+                    Envelope env = e.getGeometry().getEnvelopeInternal();
+                    edgeTree.insert(env, e);
+                 }
+            }
+            if (v instanceof TransitStop) {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
@@ -153,6 +150,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             // FP - added condition and Double / null due to NPE problems
             if (nearby != null)
             {
+                Street bestStreet = null;
                 for (Street e: nearby) 
                 {
                     if (e == null) continue;
@@ -160,29 +158,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     if(g != null) {
                         double distance = g.distance(p);
                         if (distance < bestDistance) {
+                            bestStreet = e;
                             bestDistance = distance;
                         }
                     }
                 }
-                List<Street> parallel = new LinkedList<Street>();
-                Street bestStreet = null;
-                for (Street e: nearby) {
-                    if (e == null) continue;
-                    Geometry g = e.getGeometry();
-                    if(g != null) {
-                        double distance = g.distance(p);
-                        if (distance <= bestDistance + DISTANCE_ERROR && (bestStreet == null
-                                || ((bestStreet.getFromVertex() == e.getFromVertex() && bestStreet.getToVertex() == e.getToVertex() )
-                                || (bestStreet.getToVertex() == e.getFromVertex() && bestStreet.getFromVertex() == e.getToVertex() )))) {
-                            if(bestStreet == null)
-                                bestStreet = e;
-
-                            parallel.add(e);
-                        }
-                    }
-                }
                 if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                    bestStreet = parallel.get(0);
                     Geometry g = bestStreet.getGeometry();
                     LocationIndexedLine l = new LocationIndexedLine(g);
                     LinearLocation location = l.project(c);
@@ -194,6 +175,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         return bestStreet.getFromVertex();
                     } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
                         return bestStreet.getToVertex();
+                    }
+
+                    List<Street> parallel = new LinkedList<Street>();
+                    for (Street e: nearby) {
+                        if (e == null) continue;
+                        Geometry eg = e.getGeometry();
+                        if(eg != null) {
+                            double distance = eg.distance(p);
+                            if (distance <= bestDistance + DISTANCE_ERROR && (
+                                    (bestStreet.getFromVertex() == e.getFromVertex() && bestStreet.getToVertex() == e.getToVertex() )
+                                    || (bestStreet.getToVertex() == e.getFromVertex() && bestStreet.getFromVertex() == e.getToVertex() ))) {
+                                parallel.add(e);
+                            }
+                        }
                     }
                     return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, nearestPoint);
                 }
