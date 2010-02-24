@@ -174,7 +174,7 @@ public class ShowGraph extends PApplet {
     @SuppressWarnings("unchecked")
     public void draw() {
         fill(0);
-        rect(0, 0, getSize().width, getSize().height);
+        rect(0, 0, getSize().width - 1, getSize().height - 1);
         List<Vertex> vertices = (List<Vertex>) vertexIndex.query(modelBounds);
         
         List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
