@@ -396,12 +396,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setWheelchairAccessible(false);
             }
 
-            Coordinate[] coordinates = { from.getCoordinate(), to.getCoordinate() };
-            Float sequence = new PackedCoordinateSequence.Float(coordinates, 2);
-            LineString lineString = _geometryFactory.createLineString(sequence);
-
-            street.setGeometry(lineString);
-
             return street;
         }
 
