@@ -53,6 +53,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Turn;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +87,8 @@ public class Planner {
      * 
      * @param fromPlace
      *            The start location -- either latitude, longitude pair in degrees or a Vertex
-     *            label. For example, <code>40.714476,-74.005966</code> or <code>mtanyctsubway_A27_S</code>.
+     *            label. For example, <code>40.714476,-74.005966</code> or
+     *            <code>mtanyctsubway_A27_S</code>.
      * 
      * @param toPlace
      *            The end location (see fromPlace for format).
@@ -145,6 +147,12 @@ public class Planner {
             @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max)
             throws JSONException {
 
+        // TODO: add Lang / Locale parameter, and thus get localized content  (Messages & more...)
+
+        // TODO: test inputs, and prepare an error if we can't use said input.
+        // TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords / vertext ids to planner (or error back to user)
+        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing.  Abstrct that out so it's used here too...
+
         /* create request */
         Request request = new Request();
         request.setFrom(fromPlace);
@@ -160,12 +168,30 @@ public class Planner {
             request.setArriveBy(true);
 
         request.setOptimize(optimize);
-
         request.setModes(modes);
 
         /* use request to generate trip */
+        Response response = new Response(request);
+        try {
+            TripPlan plan = generatePlan(request);
+            response.setPlan(plan);
+        } catch (VertexNotFoundException e) {
+            PlannerError error = new PlannerError(Message.OUTSIDE_BOUNDS);
+            error.setMissing(e.getMissing());
+            response.setError(error);
+        } catch (PathNotFoundException e) {
+            PlannerError error = new PlannerError(Message.PATH_NOT_FOUND);
+            response.setError(error);
+        } catch (Exception e) {
+            PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
+            response.setError(error);
+        }
 
-        return generatePlan(request);
+        // TODO: TRANSIT TRIP ERRORS
+        //If no paths are returned, and the trip is transit, look at the date & time parameters, to see if that was cause for an issue (eg: schedule calendar might be outside of service dates; service times; etc...)
+        //If planed trip is just walking, and a transit trip is requested, and the walk itself is greater than the max walk requested, look at date & time parameters)
+
+        return response;
     }
 
     /**
@@ -175,7 +201,7 @@ public class Planner {
      * @return
      */
 
-    private Response generatePlan(Request request) {
+    private TripPlan generatePlan(Request request) {
         TraverseModeSet modeSet = request.getModeSet();
         assert (modeSet.isValid());
         TraverseOptions options = new TraverseOptions(modeSet);
@@ -189,8 +215,8 @@ public class Planner {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
                         options);
                 if (paths == null) {
-                    paths = pathservice.plan(request.getFrom(), request.getTo(), request
-                            .getDateTime(), options);
+                    paths = pathservice.plan(request.getFrom(), request.getTo(), 
+                            request.getDateTime(), options);
                 }
             } else {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), intermediates, request
@@ -199,18 +225,13 @@ public class Planner {
         } catch (VertexNotFoundException e) {
             LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
                     + request.getTo(), e);
-            Response response = new Response(request, null);
-
-            response.error = new PlannerError(e.getMissing());
-            return response;
+            throw e;
         }
         if (paths == null || paths.size() == 0) {
             LOGGER
                     .log(Level.INFO, "Path not found: " + request.getFrom() + " : "
                             + request.getTo());
-            Response response = new Response(request, null);
-            response.error = new PlannerError();
-            return response;
+            throw new PathNotFoundException();
         }
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
@@ -366,10 +387,8 @@ public class Planner {
             if (itinerary.transfers == -1) {
                 itinerary.transfers = 0;
             }
-
         }
-        Response response = new Response(request, plan);
-        return response;
+        return plan;
     }
 
     /**
@@ -407,7 +426,8 @@ public class Planner {
                 step.lat = edge.getFromVertex().getY();
                 double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
-            } else if (step.streetName != streetName && (step.streetName != null && !step.streetName.equals(streetName))) {
+            } else if (step.streetName != streetName
+                    && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
                 step = new WalkStep();
                 steps.add(step);

@@ -40,7 +40,7 @@ public class Request implements RequestInf {
     private String to;
     /**
      * An unordered list of intermediate locations to be visited (see the from field for format).
-     * Presently unused.
+     * TODO Presently unused.
      */
     private List<String> intermediatePlaces;
     /**

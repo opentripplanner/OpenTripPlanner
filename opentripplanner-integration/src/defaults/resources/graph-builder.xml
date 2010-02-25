@@ -32,7 +32,7 @@
         </property>
         <property name="schema">
             <bean class="org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema">
-                <property name="idAttribute" value="FULL_NAME" />
+                <property name="idAttribute" value="LOCALID" />
                 <property name="nameAttribute" value="FULL_NAME" />
                 <property name="permissionConverter">
                     <bean class="org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter">

@@ -27,25 +27,56 @@ import org.opentripplanner.api.model.error.PlannerError;
 @XmlRootElement
 public class Response {
 
+    private HashMap<String, String> requestParameters;
+    private TripPlan plan;
+    private PlannerError error = null;
+
+    public Response() {
+    }
+
+    public Response(Request req) {
+        this.requestParameters = req.getParameters();
+    }
+
+    public Response(Request req, TripPlan plan) {
+        this(req);
+        this.plan = plan;
+    }
+
+    // note order the getters below is semi-important, in that that's the order printed by jersey in the return
+    // e.g., from a human readable standpoint, it's tradition to have request params, followed by plan, followed by errors
+
     /**
      * A dictionary of the parameters provided in the request that triggered this response.
      */
-    public HashMap<String, String> requestParameters;
+    public HashMap<String, String> getRequestParameters() {
+        return requestParameters;
+    }
+
+    public void setRequestParameters(HashMap<String, String> requestParameters) {
+        this.requestParameters = requestParameters;
+    }
+
     /**
      * The actual trip plan.
      */
-    public TripPlan plan;
+    public TripPlan getPlan() {
+        return plan;
+    }
+
+    public void setPlan(TripPlan plan) {
+        this.plan = plan;
+    }
+
     /**
      * The error (if any) that this response raised.
      */
     @XmlElement(required=false)
-    public PlannerError error = null;
-    
-    public Response() {
+    public PlannerError getError() {
+        return error;
     }
 
-    public Response(Request req, TripPlan plan) {
-        requestParameters = req.getParameters();
-        this.plan = plan;
+    public void setError(PlannerError error) {
+        this.error = error;
     }
 }

@@ -137,7 +137,7 @@ public class TestRequest extends TestCase {
                 new TraverseModeSet("WALK"),
                 1);
         
-        Itinerary itinerary = response.plan.itinerary.get(0);
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.leg.get(0);
         List<WalkStep> steps = leg.walkSteps;
         assertEquals(3, steps.size());
