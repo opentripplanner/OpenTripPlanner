@@ -266,6 +266,10 @@ img.x-tree-node-icon, img.x-tree-ec-icon {margin:0px 7px 0px 0px !important;}
     margin-bottom:5px;
 }
 
+a.x-tree-node-anchor:link, a.x-tree-node-anchor:visited {
+    font-weight: normal;
+}
+
 .itiny {
     font-size   : 12px;
     border-color: #DDDDDD #FFFFFF #EEFFAA;
