@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.services.ned;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.opengis.coverage.Coverage;
 
 /**
  * Factory interface specifying the ability to generate GeoTools {@link GridCoverage2D} objects 
@@ -24,5 +25,5 @@ import org.geotools.coverage.grid.GridCoverage2D;
  */
 
 public interface NEDGridCoverageFactory {
-    public GridCoverage2D getGridCoverage();
+    public Coverage getGridCoverage();
 }

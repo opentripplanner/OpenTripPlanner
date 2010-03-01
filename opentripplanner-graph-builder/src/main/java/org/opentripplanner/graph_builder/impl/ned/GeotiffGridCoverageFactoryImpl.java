@@ -30,7 +30,8 @@ import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 
 public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
-    private File path;
+    private File path = null;
+    private GridCoverage2D coverage;
 
     public GeotiffGridCoverageFactoryImpl() {
 
@@ -48,14 +49,15 @@ public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
     public GridCoverage2D getGridCoverage() {
         GeoTiffFormat format = new GeoTiffFormat();
         GeoTiffReader reader = null;
-        GridCoverage2D coverage = null;
 
         try {
+            if (path == null) {
+                throw new RuntimeException("Path not set");
+            }
             reader = (GeoTiffReader) format.getReader(path);
             coverage = (GridCoverage2D) reader.read(null);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            throw new RuntimeException("Error getting coverage automatically. ", e);
         }
 
         return coverage;

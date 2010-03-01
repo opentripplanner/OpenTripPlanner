@@ -17,9 +17,9 @@ import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
+import org.opengis.coverage.Coverage;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -48,13 +48,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
     private NEDGridCoverageFactory gridCoverageFactory;
 
-    private GridCoverage2D coverage;
+    private Coverage coverage;
 
     /**
-     * The sampling frequency in meters. Defaults to 30m, the approximate resolution of 1 arc-second
+     * The sampling frequency in meters. Defaults to 10m, the approximate resolution of 1/3 arc-second
      * NED data.
      */
-    private double sampleFreqM = 30;
+    private double sampleFreqM = 10;
 
     /** The coordinate reference system for the input graph, defaults to WGS84 */
     private String graphCRS = "EPSG:4326";
@@ -63,7 +63,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     private MathTransform mt;
 
     /** the average latitude of the graph vertices; used for distance calculations */
-    private double avgLat;
+    private double averageLatitude;
 
     public void setGridCoverageFactory(NEDGridCoverageFactory factory) {
         gridCoverageFactory = factory;
@@ -99,7 +99,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             total += vv.getY();
             count++;
         }
-        avgLat = total / count;
+        averageLatitude = total / count;
 
         count = 0;
         for (Vertex vv : graph.getVertices()) {
@@ -124,7 +124,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         double currentD = 0, totalD = 0;
 
         double eq = 2 * 6378137 * Math.PI;
-        double oneDegLon = eq * Math.cos(Math.toRadians(avgLat)) / 360;
+        double oneDegLon = eq * Math.cos(Math.toRadians(averageLatitude)) / 360;
         double sampleFreqD = sampleFreqM / oneDegLon;
 
         DirectPosition2D srcDP = new DirectPosition2D(coords[0].x, coords[0].y), destDP = new DirectPosition2D();
@@ -195,7 +195,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     private double getElevation(double x, double y) {
         double values[] = new double[1];
         try {
-            coverage.evaluate(new Point2D.Double(x, y), values);
+            coverage.evaluate(new DirectPosition2D(x, y), values);
         } catch (Exception ex) {
             // TODO: Better handling of failed elevation queries
             return 0;
