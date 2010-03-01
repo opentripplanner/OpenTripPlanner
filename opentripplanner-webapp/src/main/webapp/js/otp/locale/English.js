@@ -132,6 +132,25 @@ otp.locale.English = {
             geoFromMsg   : "Please select the 'From' location for your trip: ",
             geoToMsg     : "Please select the 'To' location for your trip: "
         },
+        
+        // default messages from server if a message was not returned
+        msgcodes:
+        {
+        	200: "Plan OK",
+        	500: "Server error",
+        	400: "Trip out of bounds",
+        	404: "Path not found",
+        	406: "No transit times",
+        	408: "Request timed out",
+        	413: "Invalid parameter",
+        	440: "From geocode not found",
+        	450: "To geocode not found",
+        	460: "Geocode from and to not found",
+        	409: "Too close",
+        	340: "Geocode from ambiguous",
+        	350: "Geocode to ambiguous",
+        	360: "Geocode from and to ambiguous"
+        },
 
         options: 
         [

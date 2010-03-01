@@ -288,6 +288,12 @@ otp.planner.Planner = {
                 this.m_tabPanel.add(newTab);
                 this.m_tabPanel.setActiveTab(newTab);
             }
+            else if (!newTab)
+            {
+                // this path is taken when there are no itineraries found in the server response
+                // the tab does not get created in this case
+                return false;
+            }
         } 
         catch(e) 
         {
@@ -296,6 +302,7 @@ otp.planner.Planner = {
         }
         
         console.log("exit Planner.newTripPlan");
+        return true;
     },
 
     /**

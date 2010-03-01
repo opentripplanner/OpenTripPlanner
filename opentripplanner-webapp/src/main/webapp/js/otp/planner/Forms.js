@@ -164,11 +164,15 @@ otp.planner.StaticForms = {
     submitSuccess : function(form, action)
     {
         console.log('enter Forms.submitSuccess');
-        this.planner.newTripPlan(action.response.responseXML, this.getFormData());
+        var result = this.planner.newTripPlan(action.response.responseXML, this.getFormData());
+        if (!result)
+        {
+            this.tripRequestError(action.response.responseXML);
+            return;
+        }
         if(this.poi) this.poi.clearTrip();
         otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUCCESS);
         console.log('exit Forms.submitSuccess');
-
     },
 
     /** */
@@ -189,7 +193,7 @@ otp.planner.StaticForms = {
         var options  = null;
         var fromGrid = null;
         var toGrid   = null;
-
+        
         // load xml to see what errors we have
         try
         {
@@ -284,19 +288,30 @@ otp.planner.StaticForms = {
             }
             else
             {
-                var err  = Ext.DomQuery.selectNode('error',    xml);
-                message  = Ext.DomQuery.selectValue('message', err);
-                code     = Ext.DomQuery.selectValue('@id',     err);
+                var err  = Ext.DomQuery.selectNode('error', xml);
+                message  = Ext.DomQuery.selectValue('msg', err);
+                code     = Ext.DomQuery.selectValue('id', err);
+                if (!message && code)
+                {
+                	try
+                	{
+                	    code = parseInt(code);
+                	}
+                	catch (e)
+                	{
+                		code = 500;
+                	}
+                	message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
+                }
                 otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_ERROR + "/" + code);
             }
         } 
         catch(e) 
         {
-            // TODO - localize
             if(message == null || message == '')
                 message = this.locale.tripPlanner.error.deadMsg;
         }
-
+        
         if(message != null && message.length > 0)
         {
             // show the error
