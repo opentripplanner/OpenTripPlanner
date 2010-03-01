@@ -134,7 +134,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         Coordinate[] coordinates = elevationProfile.toCoordinateArray();
         slopeSpeedEffectiveLength = 0;
         slopeCostEffectiveLength = 0;
-        for (int i = 0; i < coordinates.length; ++i) {
+        for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
             double slope = rise / run;

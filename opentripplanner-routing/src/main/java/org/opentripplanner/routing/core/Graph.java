@@ -22,6 +22,7 @@ import org.opentripplanner.routing.edgetype.DrawHandler;
 import org.opentripplanner.routing.edgetype.Drawable;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
@@ -137,4 +138,11 @@ public class Graph implements Serializable {
         vertices.remove(vertex.getLabel());
     }
 
+    public Envelope getExtent() {
+        Envelope env = new Envelope();
+        for (Vertex v: this.getVertices()) {
+            env.expandToInclude(v.getCoordinate());
+        }
+        return env;
+    }
 }
