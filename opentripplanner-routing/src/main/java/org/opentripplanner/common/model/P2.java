@@ -24,4 +24,8 @@ public class P2<E> extends T2<E, E> {
     public P2(E first, E second) {
         super(first, second);
     }
+    
+    public String toString() {
+        return "P2(" + getFirst() + ", " + getSecond() + ")";
+    }
 }
