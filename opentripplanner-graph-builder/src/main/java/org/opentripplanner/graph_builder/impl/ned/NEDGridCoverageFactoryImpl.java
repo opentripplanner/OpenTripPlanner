@@ -22,6 +22,9 @@ import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.routing.core.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 
+/**
+ * Automatically downloads and caches NED to cover every vertex of a graph.
+ */
 public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private Graph graph;
@@ -30,11 +33,19 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private File cacheDirectory;
 
+    /**
+     * Set the graph that will be used to determine the extent of the NED.
+     * @param graph
+     */
     @Autowired
     public void setGraph(Graph graph) {
         this.graph = graph;
     }
 
+    /**
+     * Set the directory where NED will be cached.
+     * @param cacheDirectory
+     */
     public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
