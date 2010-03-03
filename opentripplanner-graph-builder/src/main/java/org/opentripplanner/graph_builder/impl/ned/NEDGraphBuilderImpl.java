@@ -18,10 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.CRS;
 import org.opengis.coverage.Coverage;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
@@ -56,12 +53,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      */
     private double sampleFreqM = 10;
 
-    /** The coordinate reference system for the input graph, defaults to WGS84 */
-    private String graphCRS = "EPSG:4326";
-
-    /** For transforming between the graph CRS and the NED CRS (EPSG:4269). */
-    private MathTransform mt;
-
     /** the average latitude of the graph vertices; used for distance calculations */
     private double averageLatitude;
 
@@ -69,27 +60,12 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         gridCoverageFactory = factory;
     }
 
-    public void setGraphCRS(String graphCRS) {
-        this.graphCRS = graphCRS;
-    }
-    
     public void setSampleFrequency(double freq) {
         sampleFreqM = freq;
     }
 
     @Override
     public void buildGraph(Graph graph) {
-
-        CoordinateReferenceSystem sourceCRS;
-        try {
-            sourceCRS = CRS.decode(graphCRS);
-            CoordinateReferenceSystem destCRS = CRS.decode("EPSG:4269"); // the standard NED
-            // projection
-            mt = CRS.findMathTransform(sourceCRS, destCRS);
-        } catch (Exception ex) {
-            throw new IllegalStateException("error creating MathTransform for NED graph builder",
-                    ex);
-        }
 
         coverage = gridCoverageFactory.getGridCoverage();
 
@@ -127,14 +103,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         double oneDegLon = eq * Math.cos(Math.toRadians(averageLatitude)) / 360;
         double sampleFreqD = sampleFreqM / oneDegLon;
 
-        DirectPosition2D srcDP = new DirectPosition2D(coords[0].x, coords[0].y), destDP = new DirectPosition2D();
+        DirectPosition2D position = new DirectPosition2D(coords[0].x, coords[0].y);
 
         List<Coordinate> coordList = new LinkedList<Coordinate>();
         try {
 
             // add the initial sample (x=0)
-            mt.transform(srcDP, destDP);
-            coordList.add(new Coordinate(0, getElevation(destDP.x, destDP.y)));
+            coordList.add(new Coordinate(0, getElevation(position.x, position.y)));
 
             // main sample loop
             int freqCount = 0;
@@ -146,36 +121,33 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 currentD += segLenD;
                 totalD += segLenD;
                 int iterCount = 0;
+                double distIntoSegD = sampleFreqD - lastD;
+                double dx = coords[i + 1].x - coords[i].x;
+                double dy = coords[i + 1].y - coords[i].y;
                 while (currentD > sampleFreqD) {
                     freqCount++;
                     iterCount++;
-                    double distIntoSegD = sampleFreqD - lastD;
-                    double dx = coords[i + 1].x - coords[i].x;
-                    double dy = coords[i + 1].y - coords[i].y;
                     double t = (distIntoSegD + iterCount * sampleFreqD) / segLenD;
-                    srcDP = new DirectPosition2D(coords[0].x + t * dx, coords[0].y + t * dy);
-                    mt.transform(srcDP, destDP);
-                    coordList.add(new Coordinate(sampleFreqM * freqCount, getElevation(destDP.x,
-                            destDP.y)));
+                    position = new DirectPosition2D(coords[i].x + t * dx, coords[i].y + t * dy);
+                    coordList.add(new Coordinate(sampleFreqM * freqCount, getElevation(position.x,
+                            position.y)));
                     currentD -= sampleFreqD;
                 }
             }
 
             // end sample (x=length)
             if (totalD % sampleFreqD != 0) {
-                srcDP = new DirectPosition2D(coords[coords.length - 1].x,
+                position = new DirectPosition2D(coords[coords.length - 1].x,
                         coords[coords.length - 1].y);
-                mt.transform(srcDP, destDP);
                 double totalM = totalD * oneDegLon;
-                coordList.add(new Coordinate(totalM, getElevation(destDP.x, destDP.y)));
+                coordList.add(new Coordinate(totalM, getElevation(position.x, position.y)));
             }
 
             Coordinate coordArr[] = new Coordinate[coordList.size()];
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(coordList
                     .toArray(coordArr));
 
-            /*System.out.println("profile:");
-            for (Coordinate c : elevPCS.toCoordinateArray()) System.out.println(" "+c.toString());*/
+//            for (Coordinate c : elevPCS.toCoordinateArray()) System.out.println(" "+c.toString());
 
             st.setElevationProfile(elevPCS);
 
@@ -190,16 +162,11 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * 
      * @param x the query latitude (NAD83)
      * @param y the query longitude (NAD83)
-     * @return elevation in meters; 0 if query fails (need better approach; 0 is valid elevation)
+     * @return elevation in meters
      */
     private double getElevation(double x, double y) {
         double values[] = new double[1];
-        try {
-            coverage.evaluate(new DirectPosition2D(x, y), values);
-        } catch (Exception ex) {
-            // TODO: Better handling of failed elevation queries
-            return 0;
-        }
+        coverage.evaluate(new DirectPosition2D(x, y), values);
         return values[0];
     }
 

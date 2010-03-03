@@ -20,12 +20,16 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 public class Street extends AbstractEdge implements WalkableEdge {
+
+    private static Logger log = LoggerFactory.getLogger(Street.class);
 
     private static final long serialVersionUID = -3215764532108343102L;
 
@@ -129,7 +133,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public void setElevationProfile(PackedCoordinateSequence elev) {
         elevationProfile = elev;
-
         //compute the cost of the elevation changes
         Coordinate[] coordinates = elevationProfile.toCoordinateArray();
         slopeSpeedEffectiveLength = 0;
@@ -138,6 +141,10 @@ public class Street extends AbstractEdge implements WalkableEdge {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
             double slope = rise / run;
+            if (slope > 0.35 || slope < -0.35) {
+                slope = 0; //Baldwin St in Dunedin, NZ, is the steepest street on earth, and has a grade of 35%.  So, this must be a data error.
+                log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data.");
+            }
             slopeCostEffectiveLength += run * (1 + slope * slope * 10); //any slope is bad
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
         }

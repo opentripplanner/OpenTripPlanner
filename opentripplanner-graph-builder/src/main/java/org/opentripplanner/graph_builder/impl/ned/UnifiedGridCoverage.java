@@ -19,11 +19,10 @@ import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
-import org.opengis.coverage.GeometryValuePair;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.util.Record;
+
 
 public class UnifiedGridCoverage extends AbstractCoverage {
 
@@ -47,10 +46,15 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     public double[] evaluate(DirectPosition point, double[] values)
             throws PointOutsideCoverageException, CannotEvaluateException {
         for (Coverage region : regions) {
-            GeometryValuePair gv = region.find(point);
-            Record value = gv.getValue();
-            System.out.println(value);
+            double[] result;
+            try {
+                result = region.evaluate(point, values);
+            } catch (PointOutsideCoverageException e) {
+                continue;
+            }
+            return result;
         }
+        /* not found */
 
         return values;
     }
