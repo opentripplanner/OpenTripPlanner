@@ -330,7 +330,7 @@ public class NEDDownloader {
         try {
             String key = getKey(url);
             _log.debug("Starting download " + key);
-            File path = getPathToNEDTile(key);
+            File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
                     "http://extract.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
                             + token);
