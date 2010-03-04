@@ -4,14 +4,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-webapp</artifactId>
-    <version>0.2</version>
+    <version>0.3-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>opentripplanner-webapp</name>
 
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
-        <version>0.2</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
 
     <dependencies>
