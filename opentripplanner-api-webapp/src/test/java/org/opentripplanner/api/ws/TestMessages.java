@@ -6,7 +6,7 @@ import junit.framework.TestCase;
 
 public class TestMessages extends TestCase {
 
-    public void testRelativeDirection() {
+    public void testLanguages() {
 
         String e = Message.GEOCODE_FROM_AMBIGUOUS.get();
         String f = Message.GEOCODE_FROM_AMBIGUOUS.get(Locale.CANADA_FRENCH);
