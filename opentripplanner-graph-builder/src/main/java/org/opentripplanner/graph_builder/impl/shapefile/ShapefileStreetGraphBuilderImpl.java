@@ -13,9 +13,11 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.TreeSet;
 
 import org.geotools.data.DefaultQuery;
@@ -101,10 +103,15 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             //keep track of features that are duplicated so we don't have duplicate streets
             HashSet<Object> seen = new HashSet<Object>();
 
+            List<SimpleFeature> featureList = new ArrayList<SimpleFeature>();
             Iterator<SimpleFeature> it2 = features.iterator();
             while (it2.hasNext()) {
+                featureList.add(it2.next());
+            }
+            features.close(it2);
 
-                SimpleFeature feature = it2.next();
+            for (SimpleFeature feature : featureList) {
+                //SimpleFeature feature = it2.next();
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
                 Object o = streetIdConverter.convert(feature);
@@ -178,8 +185,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 P2<Double> effectiveLength;
                 if (safetyConverter != null) {
                     effectiveLength = safetyConverter.convert(feature);
-                    street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
-                    backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                    if (effectiveLength != null) {
+                        street.setBicycleSafetyEffectiveLength(effectiveLength.getFirst() * length);
+                        backStreet.setBicycleSafetyEffectiveLength(effectiveLength.getSecond() * length);
+                    }
                 }
             }
 
