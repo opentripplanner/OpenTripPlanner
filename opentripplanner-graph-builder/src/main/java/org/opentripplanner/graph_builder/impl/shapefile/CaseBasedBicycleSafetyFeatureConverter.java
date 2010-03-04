@@ -7,16 +7,17 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
-public class CaseBasedBicycleSafetyFeatureConverter implements
-        SimpleFeatureConverter<P2<Double>> {
+/**
+ * This converter handles bike lanes/paths/routes.
+ */
+public class CaseBasedBicycleSafetyFeatureConverter implements SimpleFeatureConverter<P2<Double>> {
 
     private String safetyAttributeName;
     private String directionAttributeName;
 
     private Map<String, Double> safetyFeatures = new HashMap<String, Double>();
     private Map<String, Integer> directions = new HashMap<String, Integer>();
-
-    public static final P2<Double> oneone = new P2<Double> (1.0, 1.0);
+    public static final P2<Double> oneone = new P2<Double>(1.0, 1.0);
 
     @Override
     public P2<Double> convert(SimpleFeature feature) {
@@ -29,10 +30,11 @@ public class CaseBasedBicycleSafetyFeatureConverter implements
         int directionFeature = directions.get(directionKey);
 
         return new P2<Double>((directionFeature & 0x1) == 0 ? 1.0 : safetyFeature,
-                              (directionFeature & 0x2) == 0 ? 1.0 : safetyFeature);
+                (directionFeature & 0x2) == 0 ? 1.0 : safetyFeature);
     }
 
-    public CaseBasedBicycleSafetyFeatureConverter(String safetyAttributeName, String directionAttributeName) {
+    public CaseBasedBicycleSafetyFeatureConverter(String safetyAttributeName,
+            String directionAttributeName) {
         this.safetyAttributeName = safetyAttributeName;
         this.directionAttributeName = directionAttributeName;
     }
@@ -62,6 +64,12 @@ public class CaseBasedBicycleSafetyFeatureConverter implements
         safetyFeatures.put(attributeValue, safety);
     }
 
+    /**
+     * Maps the direction value to a number representing the direction that the bike safety feature
+     * goes. The number is 1 for a safety feature that goes with the road geometry, 2 for a safety
+     * feature that goes against it, and 3 for a safety feature that goes both ways.
+     * @param directionValues
+     */
     public void setDirection(Map<String, String> directionValues) {
         for (Map.Entry<String, String> entry : directionValues.entrySet()) {
             String attributeValue = entry.getKey();
