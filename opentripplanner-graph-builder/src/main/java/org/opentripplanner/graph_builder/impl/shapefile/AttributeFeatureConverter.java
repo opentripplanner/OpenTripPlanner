@@ -31,6 +31,10 @@ public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
     public void setAttributeName(String attributeName){
         _attributeName = attributeName;
     }
+    
+    public String getAttributeName() {
+        return _attributeName;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
