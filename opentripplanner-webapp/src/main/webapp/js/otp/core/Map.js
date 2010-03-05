@@ -32,9 +32,14 @@ otp.core.MapStatic = {
 
     // config for 4326
     mapDiv            : "map",
+    /*
     url               : "http://maps.opengeo.org/transitech/gwc/service/wms",
+    layerNames        : ['tplanner'],
+    /*/
+    url               : "http://maps.opengeo.org/geowebcache/service/wms",
+    layerNames        : ['openstreetmap'],
+    /**/
     srsName           : "EPSG:4326",
-    layerNames        : ['tplanner'], 
     numZoomLevels     : 17,
     format            : 'png',
     units             : null,
