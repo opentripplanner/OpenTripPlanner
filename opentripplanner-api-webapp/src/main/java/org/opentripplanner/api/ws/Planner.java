@@ -41,6 +41,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -52,6 +53,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -183,6 +185,7 @@ public class Planner {
             PlannerError error = new PlannerError(Message.PATH_NOT_FOUND);
             response.setError(error);
         } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "exception planning trip: ", e);
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }
@@ -275,6 +278,7 @@ public class Planner {
             int startWalk = -1;
             int i = -1;
             SPTEdge lastEdge = null;
+            double lastElevation = Double.MAX_VALUE;
             for (SPTEdge edge : path.edges) {
                 i++;
                 Edge graphEdge = edge.payload;
@@ -358,6 +362,24 @@ public class Planner {
                 if (edgeMode == TraverseMode.WALK) {
                     itinerary.walkTime += edgeTime;
                     itinerary.walkDistance += graphEdge.getDistance();
+                    if (graphEdge instanceof Street) {
+                        PackedCoordinateSequence profile = ((Street)graphEdge).getElevationProfile();
+                        if (profile != null) {
+                            for (Coordinate coordinate : profile.toCoordinateArray()) {
+                                if (lastElevation == Double.MAX_VALUE) {
+                                    lastElevation = coordinate.y;
+                                    continue;
+                                }
+                                double elevationChange = lastElevation - coordinate.y;
+                                if (elevationChange > 0) {
+                                    itinerary.elevationGained += elevationChange;
+                                } else {
+                                    itinerary.elevationLost -= elevationChange;
+                                }
+                                lastElevation = coordinate.y;
+                            }
+                        }
+                    }
                 }
 
                 if (edgeMode.isTransit()) {
