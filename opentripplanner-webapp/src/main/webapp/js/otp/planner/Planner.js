@@ -79,7 +79,8 @@ otp.planner.Planner = {
             iconCls:    'planner-panel',
             autoShow:   true,
             border:     false,
-            items:      [this.m_tabPanel]
+            items:      [this.m_tabPanel],
+            listeners:  {'expand': {fn: this.panelExpanded, scope: this}}
         });
 
         // step 3: create the render and form (and add the form to the tab panel
@@ -345,6 +346,15 @@ otp.planner.Planner = {
         this.m_tabPanel.doLayout();
     },
 
+    /*
+     * called when this particular panel has been given focus
+     */
+    panelExpanded: function()
+    {
+        var activeTab = this.m_tabPanel.getActiveTab();
+        this.tabChange(this.m_tabPanel, activeTab);
+    },
+    
     CLASS_NAME: "otp.planner.Planner"
 }
 

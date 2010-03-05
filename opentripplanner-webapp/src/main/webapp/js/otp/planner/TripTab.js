@@ -100,13 +100,15 @@ otp.planner.TripTab = {
 
         // step C: create itinerary nodes from the store (to be placed into trees ... see below)
         var z = new Array();
+        var treeNodeDefaults = {cls: this.ITIN_NODE_CSS, iconCls: this.ITIN_ICON_CSS, leaf: true};
         for(var i = 0; i < store.getCount(); i++) 
         {
             var id    = this.m_tripNodePrefix + (i + 1);
             var itin  = store.getAt(i);
             itin.set('id', (i+1)); // for template -- eg: the numerical hyperlink listing itinerary option
             var text = otp.planner.Templates.TP_ITINERARY.applyTemplate(itin.data);
-            z[i] = otp.util.ExtUtils.makeTreeNode(id, text, this.ITIN_NODE_CSS, this.ITIN_ICON_CSS, true, this.itineraryClick, this);
+            var treeNodeConfig = Ext.apply({}, {id: id, text: text}, treeNodeDefaults);
+            z[i] = otp.util.ExtUtils.makeTreeNode(treeNodeConfig, this.itineraryClick, this);
         }
 
         // make sure there are nodes (itineraries) to add to the tree

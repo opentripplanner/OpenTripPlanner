@@ -65,11 +65,6 @@ otp.planner.Templates = {
             '<tpl if="waitingTime &gt; 0"> (plus {waitingTime} minute<tpl if="waitingTime != 1.0">s</tpl> transfer)</tpl>',
          '</td></tr>',
         '<tpl if="walkDistance"><tr><td>Walk</td><td>{walkDistance}</td></tr></tpl>',
-        '<tr><td>Fares</td><td>',
-            '<tpl if="regularFare &gt; 0.00">Adult <tpl if="regularFare == 2.30">All Zone</tpl> (${regularFare})<br/>Honored Citizen (${honoredFare})<br/>Youth/Student (${youthFare})</tpl>',
-            '<tpl if="regularFare == \'\'">This trip is within Fareless Square, so no fare is required.</tpl>',
-            '<tpl if="tramFare &gt; 0"><br/><I>+ Tram Fare</I> (${tramFare} round-trip)</tpl>',
-        '</td></tr>',
     '</table></div>'
     ).compile(),
 

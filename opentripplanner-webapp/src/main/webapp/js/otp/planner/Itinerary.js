@@ -27,7 +27,7 @@ otp.planner.Itinerary = {
     // config
     map            : null,
     locale         : otp.locale.English,
-    showStopIds    : true,
+    showStopIds    : false,
 
     // raw data
     xml            : null,
@@ -128,7 +128,7 @@ otp.planner.Itinerary = {
                     }
                 }
             }
-
+            
             if(this.map.dataProjection != mLayer.map.getProjection())
             {
                 for ( var i = 0; i < this.m_markers.length; ++i) {
@@ -142,6 +142,7 @@ otp.planner.Itinerary = {
             }
             
             vLayer.addFeatures(this.m_vectors);
+            
             mLayer.addFeatures(this.m_markers);
             this.m_extent = mLayer.getDataExtent();
             this.m_extent.extend(vLayer.getDataExtent());
@@ -376,7 +377,11 @@ otp.planner.Itinerary = {
         console.log("exit Itinerary.makeWalkLines");
     },
 
-
+    createAndAddMarker: function(x, y, options)
+    {
+        var marker = otp.util.OpenLayersUtils.makeMarker(x, y, options);
+        this.m_markers.push(marker);
+    },
 
    /**
     * Gets a new Marker Layer for drawing the trip plan's features upon
@@ -398,13 +403,13 @@ otp.planner.Itinerary = {
                 // if the first leg isn't a walk, then assume it's a transit leg
                 // so paint the route icon (eg: fromStore.getAt(0))
                 startIndex = 0;
-                otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'fromMarker', this.m_markers);
+                this.createAndAddMarker(fromP.x, fromP.y, {type: 'fromMarker', mode: mode});
             }
             else
             {
                 // first leg is a walk leg, so mark this point with the from icon that has the walking guy, and move on to next leg in store...
                 startIndex = 1;
-                otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'fromWalkMarker', this.m_markers);
+                this.createAndAddMarker(fromP.x, fromP.y, {type: 'fromWalkMarker', mode: mode});
             }
 
             // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
@@ -415,7 +420,7 @@ otp.planner.Itinerary = {
             if(mode == 'WALK' && endIndex > 0)
             {
                 endIndex--;
-                otp.util.OpenLayersUtils.makeMarker(walkP.x, walkP.y, 'walkMarker', this.m_markers);
+                this.createAndAddMarker(walkP.x, walkP.y, {type: 'walkMarker', mode: mode});
             }
 
             // save the list of routes for this itinerary the first time around
@@ -434,7 +439,7 @@ otp.planner.Itinerary = {
                 var thru  = from.get('order');
                 var route = from.get('routeID');
                 var mode  = from.get('mode');
-
+                
                 var fromP = from.get('geometry');
                 var toP = to.get('geometry');
 
@@ -445,18 +450,27 @@ otp.planner.Itinerary = {
                 // only show the route bubble if we're drawing the beginning of the block (eg not a thru route transfer / stay on bus)
                 if(thru == null || thru != 'thru-route')
                 {
-                    otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, 'diskMarker', this.m_markers);
-                    otp.util.OpenLayersUtils.makeRouteMarker(fromP.x, fromP.y, route, mode, this.m_markers);
+                    this.createAndAddMarker(fromP.x, fromP.y, {type: 'diskMarker', mode: mode});
+                    // TODO: How should street transit links be rendered?
+                    if (route == "street transit link")
+                    {
+                        this.createAndAddMarker(fromP.x, fromP.y, {type: 'walkMarker', mode: mode});
+                    }
+                    else
+                    {
+                        var agencyId = from.get('agencyId');
+                        this.createAndAddMarker(fromP.x, fromP.y, {type: 'routeMarker', mode: mode, route: route, agencyId: agencyId});
+                    }
                 }
 
                 // put a disk at the end of this route segment
-                otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'diskMarker', this.m_markers);
+                this.createAndAddMarker(toP.x, toP.y, {type: 'diskMarker'});
             }
 
             // do the TO (end) marker 
             var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
             var toP = to.get('geometry');
-            otp.util.OpenLayersUtils.makeMarker(toP.x, toP.y, 'toMarker', this.m_markers);
+            this.createAndAddMarker(toP.x, toP.y, {type: 'toMarker'});
         }
         catch(e)
         {
@@ -511,7 +525,8 @@ otp.planner.Itinerary = {
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
 
         var retVal = new Array();
-        retVal.push(otp.util.ExtUtils.makeTreeNode(fmId, fmTxt, 'itiny',      'start-icon', true,  clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true},
+                                                   clickCallback, scope));
 
         for(var i = 0; i < store.getCount(); i++)
         {
@@ -519,13 +534,16 @@ otp.planner.Itinerary = {
             leg.data.showStopIds = this.showStopIds;
             var text;
             var hasKids = true;
-            var iconCLS = 'bus-icon';
+            // XXX we need to use the path to the icon instead of the class
+            // this is to prevent having to manually generate custom css styles for each route
+            var icon = 'images/ui/trip/mode/bus.png';
             var sched = null;
-            var mode  = leg.get('mode').toLowerCase();
+            var modeOrigCase = leg.get('mode');
+            var mode = modeOrigCase.toLowerCase();
             if(mode == 'walk') 
             {
                 hasKids = false;
-                iconCLS = 'walk-icon';
+                icon = 'images/ui/trip/mode/walk.png';
                 if (!leg.data.formattedSteps)
                 {
                     leg.data.formattedSteps = [];
@@ -578,6 +596,7 @@ otp.planner.Itinerary = {
             }
             else
             {
+                var routeName = leg.get('routeName');
                 var order = leg.get('order');
                 if (order == 'thru-route') {
                     text = otp.planner.Templates.getInterlineLeg().applyTemplate(leg.data);
@@ -586,12 +605,16 @@ otp.planner.Itinerary = {
                 {
                     text  = otp.planner.Templates.getTransitLeg().applyTemplate(leg.data);
                 }
-                iconCLS = mode + '-icon';
+                var agencyId = leg.get('agencyId');
+                // XXX need to move configuration to somewhere more appropriate
+                icon = otp.util.OpenLayersUtils.useCustomIconsForAgencies.indexOf(agencyId) !== -1
+                       ? 'custom/' + agencyId + '/' + modeOrigCase + '/' + routeName + '.png'
+                       : 'images/ui/trip/mode/' + mode + '.png';
             }
-            retVal.push(otp.util.ExtUtils.makeTreeNode(this.id + this.LEG_ID + i, text, 'itiny', iconCLS, hasKids, clickCallback, scope));
+            retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }
-        retVal.push(otp.util.ExtUtils.makeTreeNode(toId, toTxt, 'itiny', 'end-icon', true, clickCallback, scope));
-        retVal.push(otp.util.ExtUtils.makeTreeNode(tpId, tpTxt, 'trip-details-shell', 'no-icon', true, clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
 
         return retVal;
     },

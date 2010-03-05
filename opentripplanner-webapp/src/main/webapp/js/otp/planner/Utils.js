@@ -86,6 +86,7 @@ otp.planner.Utils = {
     LEG_RECORD : new Ext.data.Record.create([
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
+                  {name: 'agencyId',         mapping: '@agencyId'},
                   {name: 'headsign',         mapping: '@headsign'},
                   {name: 'order',            mapping: '@order'},
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
@@ -176,9 +177,16 @@ otp.planner.Utils = {
     makeItinerariesTree : function(id, clickCallback, scope)
     {
         var thisID = this.ITINERARIES_TREE + id;
+        var root = otp.util.ExtUtils.makeTreeNode({
+                id: 'root-' + thisID,
+                text: '<B>' + id + '</B>',
+                cls: this.ITIN_CLS,
+                iconCls: this.ITIN_CLS,
+                leaf: false
+        }, clickCallback, scope);
         var retVal = new Ext.tree.TreePanel({
             //title: 'trip options',
-            root       : otp.util.ExtUtils.makeTreeNode('root-' + thisID, '<B>' + id + '</B>',  this.ITIN_CLS, this.ITIN_CLS, false, clickCallback, scope),
+            root       : root,
             id         : thisID,
             lines      : false,
             collapsible: false,
@@ -194,8 +202,15 @@ otp.planner.Utils = {
     makeTripDetailsTree : function(id, clickCallback, scope)
     {
         var thisID = this.TRIPDETAILS_TREE + id;
+        var root = otp.util.ExtUtils.makeTreeNode({
+                id: 'root-' + thisID,
+                text: '<B>' + id + '</B>',
+                cls: this.DETAIL_CLS,
+                iconCls: this.DETAIL_CLS,
+                leaf: false
+        }, clickCallback, scope);
         var retVal = new Ext.tree.TreePanel({
-            root       : otp.util.ExtUtils.makeTreeNode('root-' + thisID, '<B>' + id + '</B>', this.DETAIL_CLS, this.DETAIL_CLS, false, clickCallback, scope),
+            root       : root,
             id         : thisID,
             lines      : false,
             //autoScroll:true,

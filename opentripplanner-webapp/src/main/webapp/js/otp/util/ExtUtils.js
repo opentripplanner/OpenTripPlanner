@@ -431,22 +431,13 @@ otp.util.ExtUtils = {
      * @param {Function} clickCallback
      * @param {Object}   scope (for callback)
      */
-    makeTreeNode : function(id, text, nodeCLS, iconCLS, isLeaf, clickCallback, scope, dis)
+    makeTreeNode : function(treeNodeConfig, /*id, text, nodeCLS, iconCLS, isLeaf, */clickCallback, scope)
     {
-        var retVal = new Ext.tree.TreeNode({
-            id:          id,
-            text:        text,
-            cls:         nodeCLS,
-            iconCls:     iconCLS,
-            leaf:        isLeaf,
-            margins:     '0 0 0 0',
-            cmargins:    '0 2 0 0',
-            expanded:    true,
-            collapsible: true
-        });
-        this.setClickCallback(retVal, clickCallback, scope);
-
-        return retVal;
+        var configDefaults = {margins: '0 0 0 0', cmargins: '0 2 0 0', expanded: true, collapsible: true};
+        var config = Ext.apply({}, treeNodeConfig, configDefaults);
+        var treeNode = new Ext.tree.TreeNode(config);
+        this.setClickCallback(treeNode, clickCallback, scope);
+        return treeNode;
     },
 
     /** */
@@ -606,7 +597,7 @@ otp.util.ExtUtils = {
               {name: 'id',          mapping: '@id'},
               {name: 'mode',        mapping: '@mode'},
               {name: 'order',       mapping: '@order'},
-              {name: 'routeID',     mapping: 'route'},
+              {name: 'routeID',     mapping: '@route'},
               {name: 'lat',         mapping: typeID + 'pos/lat'},
               {name: 'lon',         mapping: typeID + 'pos/lon'},
               {name: 'name',        mapping: typeID + 'name'},
@@ -614,8 +605,16 @@ otp.util.ExtUtils = {
               {name: 'areaKey',     mapping: typeID + '@areaKey'},
               {name: 'areaValue',   mapping: typeID + '@areaValue'},
               {name: 'geometry',    mapping: typeID + 'geometry', 
-                                    convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); }
-              }
+                                    convert: function(n,p) { return otp.util.OpenLayersUtils.geo_json_converter(n,p); }},
+              {name: 'agencyId',    convert: function(val, rec) {
+                                                 var node = rec;
+                                                 if (node.nodeName !== 'leg') {
+                                                     node = rec.parentNode;
+                                                 }
+                                                 return node.nodeName === 'leg'
+                                                        ? node.getAttribute('agencyId')
+                                                        : null;
+                                             }}
             ]);
         }
         catch(e)

@@ -97,6 +97,14 @@ otp.locale.English = {
         hard_right:     "hard right",
         'continue':     "continue"
     },
+    
+    systemmap :
+    {
+        labels :
+        {
+            panelTitle : "System Map"
+        }
+    },
 
     tripPlanner :
     {

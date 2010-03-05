@@ -1,169 +1,216 @@
-/*
- * Open Trip Planner CSS 
- */
+div.olMap {
+background: #81bee7 !important;
+}
 
-/************* OpenLayers Stuff *******************/
-div.olMapViewport { 
-    z-index: 0; 
+div.olMapViewport {
+z-index: 0;
 }
 
 div.olControlScale {
-    right: 3px;
-    bottom: 3em;
-    display: block;
-    position: absolute;
-    font-size: smaller;
+right: 3px;
+bottom: 3em;
+display: block;
+position: absolute;
+font-size: smaller;
 }
+
 div.olControlScaleLine {
-   left: 10px;
-   bottom: 25px;
-   font-size: x-small;
+left: 10px;
+bottom: 25px;
+font-size: x-small;
 }
+
 div.olControlScaleLineBottom {
-   border: solid 2px black;
-   border-bottom: none;
-   margin-top:-2px;
-   text-align: center;
+border: solid 2px #000;
+border-bottom: none;
+margin-top: -2px;
+text-align: center;
 }
+
 div.olControlScaleLineTop {
-   border: solid 2px black;
-   border-top: none;
-   text-align: center;
+border: solid 2px #000;
+border-top: none;
+text-align: center;
 }
+
 div.olControlPermalink {
-  bottom:1.5em;
-  display:block;
-  font-size:65%;
-  position:absolute;
-  right:3px;
+bottom: 1.5em;
+display: block;
+font-size: 65%;
+position: absolute;
+right: 3px;
 }
+
 div.olControlAttribution {
-  bottom:0.0em;
-  display:block;
-  font-size:65%;
-  position:absolute;
-  right:3px;
+bottom: 0;
+display: block;
+font-size: 65%;
+position: absolute;
+right: 3px;
 }
+
+div.olControlAttribution a {
+color: #393939;
+padding: 3px;
+}
+
+div.olControlAttribution a:hover,
+div.olControlAttribution a:active {
+color: #ff8b38;
+background: #4c4c4c;
+text-decoration: none;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+border-radius: 3px;
+}
+
 div.olControlMousePosition {
-  left: 10px;
-  bottom:0.0em;
-  display:block;
-  font-family:Arial;
-  position:absolute;
-  font-size:x-small;
+left: 10px;
+bottom: 0;
+display: block;
+font-family: Arial;
+position: absolute;
+font-size: x-small;
 }
 
-
-/******************* Ext Stuff ****************/
-
-/* buttons */
 .clear-button {
-    background-image:url(images/ui/buttons/clear.gif)  !important;
+background-image: url(images/ui/buttons/clear.gif)!important;
 }
+
 .print-button {
-    background-image:url(images/ui/buttons/print.gif)  !important;
+background-image: url(images/ui/buttons/print.gif)!important;
 }
+
 .feedback-button {
-    background-image:url(images/ui/buttons/feedback.gif)  !important;
+background-image: url(images/ui/buttons/feedback.gif)!important;
 }
+
 .fullScreen-button {
-    background-image:url(images/ui/buttons/fullscreen.gif)  !important;
+background-image: url(images/ui/buttons/fullscreen.gif)!important;
 }
+
 .measure-button {
-    background-image:url(images/ui/buttons/measure.gif)  !important;
+background-image: url(images/ui/buttons/measure.gif)!important;
 }
+
 .reverse-button {
-   background-image: url(images/ui/buttons/reverse.png) !important;
+background-image: url(images/ui/buttons/reverse.png)!important;
 }
+
 .edit-button {
-   background-image: url(images/ui/buttons/edit.png) !important;
+background-image: url(images/ui/buttons/edit.png)!important;
 }
 
 button.home {
-   background-image: url(images/ui/buttons/logoSmall.gif);
-   background-repeat: no-repeat;
+background-image: url(images/ui/buttons/logoSmall.gif);
+background-repeat: no-repeat;
 }
 
-/* context menu */ 
 .cFromHere {
-    background: transparent url(images/ui/buttons/from_here.png) no-repeat scroll 0%;
-}
-.cToHere {
-    background: transparent url(images/ui/buttons/to_here.png) no-repeat scroll 0%;
-}
-.cCenterMap {
-    background: transparent url(images/ui/buttons/center.png) no-repeat scroll 0%;
-}
-.cZoomIn {
-    background: transparent url(images/ui/buttons/zoom_in.png) no-repeat scroll 0%;
-}
-.cZoomOut {
-    background: transparent url(images/ui/buttons/zoom_out.png) no-repeat scroll 0%;
-}
-.cPrevious {
-    background: transparent url(images/ui/buttons/previous.png) no-repeat scroll 0%;
-}
-.cNext {
-    background: transparent url(images/ui/buttons/next.png) no-repeat scroll 0%;
+background: transparent url(images/ui/buttons/from_here.png) no-repeat scroll 0;
 }
 
+.cToHere {
+background: transparent url(images/ui/buttons/to_here.png) no-repeat scroll 0;
+}
+
+.cCenterMap {
+background: transparent url(images/ui/buttons/center.png) no-repeat scroll 0;
+}
+
+.cZoomIn {
+background: transparent url(images/ui/buttons/zoom_in.png) no-repeat scroll 0;
+}
+
+.cZoomOut {
+background: transparent url(images/ui/buttons/zoom_out.png) no-repeat scroll 0;
+}
+
+.cPrevious {
+background: transparent url(images/ui/buttons/previous.png) no-repeat scroll 0;
+}
+
+.cNext {
+background: transparent url(images/ui/buttons/next.png) no-repeat scroll 0;
+}
 
 .planner-panel {
-    background-image:url(images/ui/buttons/tripplaner.gif) !important;
+background-image: url(images/ui/buttons/tripplanner.png)!important;
+width:28px;
+}
+
+.systemmap-panel {
+width:28px;
+height:16px;
+background-image: url(images/ui/buttons/systemmap.png)!important;
 }
 
 #trip-details {
-    border: 1px solid #BFBFBF;
-    background-color: #F2F2F2;
-    padding: 10px 0 10px 10px;
-    cursor:text;
+border: 1px solid #4c4c4c;
+background-color: #f9f9f9;
+cursor: text;
+padding: 10px 0 10px 10px;
 }
+
 #trip-details table td {
-        font: 80%/120% Arial, Helvetica, sans-serif;
-        vertical-align: top;
-        padding: 0px 8px 2px 0px;
-    }
+font: 80%/120% "Helvetica Neue", Arial, Helvetica, sans-serif;
+vertical-align: top;
+padding: 0 8px 2px 0;
+}
+
 .trip-details-shell {
-    padding: 0px 15px 20px;
-    background-color:#FFFFFF;
-    cursor:text;
+background-color: #FFF;
+cursor: text;
+padding: 0 15px 20px;
 }
+
 .no-icon {
-    line-height: 0;
-    background-image:none !important;
-    padding:0px!important;
-    border:0!important;
+line-height: 0;
+background-image: none!important;
+border: 0!important;
+padding: 0!important;
 }
 
-#tp-accordion .x-panel-body, #tp-accordion .x-panel-btns {
-  background-color:#F0F0F0;
-  border-color:#D0D0D0;
+#tp-accordion .x-panel-body {
+background-color: #e6e6e6;
+border-color: #D0D0D0;
 }
 
-#tp-accordion .x-form-item, #tp-accordion .x-form-field {
-      font-size:   9pt;
-      font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+#tp-accordion .x-panel-btns {
+background-color: #4c4c4c;
+border-color: #D0D0D0;
+}
+
+#tp-accordion .x-form-item {
+font-size: 9pt;
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+#tp-accordion .x-form-field {
+font-size: 9pt;
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 #tripplanner-panel .x-tree-node-leaf {
-    background-color:#FFFFFF;
-}
-#tripplanner-panel .x-tree-node-over {
-    background-color:#F0F0D0;
-}
-#tripplanner-panel .x-tree-selected {
-    background-color:#E0E0E0;
+background-color: #e6e6e6;
 }
 
+#tripplanner-panel .x-tree-node-over {
+background-color: #f0f0f0;
+}
+
+#tripplanner-panel .x-tree-selected {
+background-color: #fff;
+}
 
 #tripplanner-panel span .x-tab-strip-text {
-  text-align:center;
+text-align: center;
 }
 
 #tripplanner-panel .x-form fieldset {
-    border:0 none transparent;
-    margin-bottom:5px;
-    padding:8px;
+border: 0 none transparent;
+margin-bottom: 5px;
+padding: 8px;
 }
 
 #tripplanner-panel .itiny ol.steps {
@@ -187,83 +234,195 @@ button.home {
 
 /* FRANK ADDED schedules.css OVERRIDE */
 .duration {
-    background-image:url(images/ui/trip/tdots.gif) !important;
-    background-repeat: no-repeat;
-    background-position:left center;
-    color:#888888;
-    text-indent:40px;
-    font-size: 80%;
+background-image: url(images/ui/trip/tdots.gif)!important;
+background-repeat: no-repeat;
+background-position: left center;
+color: #888;
+text-indent: 40px;
+font-size: 80%;
 }
 
 .transfers {
-    color:#888888;
-    font-size: 80%;
+color: #888;
+font-size: 80%;
 }
 
-a:link, a:visited { 
-	font-weight: bold; 
-	text-decoration: none; 
-	color: #3B5A95;
-	}
+a:link {
+font-weight: 700;
+text-decoration: none;
+color: #ff8b38;
+}
 
-a:hover, a:active { 
-	text-decoration: underline; 
-	color: #FF3300;
-	}
+a:visited {
+font-weight: 700;
+text-decoration: none;
+color: #ff8b38;
+}
+
+a:hover {
+text-decoration: underline;
+color: #ff6a00;
+}
+
+a:active {
+text-decoration: underline;
+color: #ff6a00;
+}
 
 #footer_liq {
-    margin: 0px auto;
-    padding-bottom:0px;
-    padding-top:0px;
+padding-bottom: 0;
+padding-top: 0;
+margin: 0 auto;
 }
 
-/* override of Ext's default CSS stuff */
-
-/* Tree Node*/
-.x-tree {background:#FFF !important;}
-
-.x-tree-root-node, .x-tree-node, .x-tree-node img, .x-tree-node a span 
-	{white-space:normal!important; margin: 0!important; padding: 0!important;}
-
-.x-tree-node .x-tree-node-over{background-color:#EBEEF4;}
-
-.x-tree-node .x-tree-selected{background-color:#FFF7BF;}
-
-img.x-tree-node-icon, img.x-tree-ec-icon {margin:0px 7px 0px 0px !important;}
-
-.x-tree-node-indent {display:none; visibility:collapse;}
-
-.x-tree-node-expanded  .x-tree-node-icon, 
-.x-tree-node-collapsed .x-tree-node-icon {height:1px; width:1px;}
-
-.x-tree-node .x-tree-selected a span{
-	color:       black;	
-    font-weight: normal;
+.x-tree {
+background: #FFF!important;
 }
 
-.x-tree-node div.itinys-node{
-    background:#eee url(images/ui/bg.gif) repeat-x;
-    margin-top:1px;
-    border-top:1px solid #ddd;
-    border-bottom:1px solid #ccc;
-    padding-top:2px;
-    padding-bottom:1px;
+.x-tree-root-node {
+white-space: normal!important;
+margin: 0!important;
+padding: 0!important;
 }
 
-.x-tree-icon, .x-tree-elbow-line, .x-tree-elbow, .x-tree-elbow-end {
-   background-repeat:no-repeat;
-   border:0pt none;
-   height:20px;
-   margin:1pt;
-   padding:0pt;
-   vertical-align:middle;
-   width:2px;
+.x-tree-node {
+white-space: normal!important;
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+margin: 0!important;
+padding: 0!important;
 }
 
-.x-tree-node-el h4, .x-tree-node-leaf h4, .x-unselectable h4, .itiny h4, .x-tree-selectedh4, .x-tree-node-over h4 {
-    vertical-align:middle;
-    margin-top:2px;
-    margin-bottom:5px;
+.x-tree-node img {
+white-space: normal!important;
+margin: 0!important;
+padding: 0!important;
+}
+
+.x-tree-node a span {
+white-space: normal!important;
+margin: 0!important;
+padding: 0!important;
+}
+
+.x-tree-node .x-tree-node-over {
+background-color: #EBEEF4;
+}
+
+.x-tree-node .x-tree-selected {
+background-color: #FFF7BF;
+}
+
+img.x-tree-node-icon {
+margin: 0 7px 0 0 !important;
+}
+
+img.x-tree-ec-icon {
+margin: 0 7px 0 0 !important;
+}
+
+.x-tree-node-indent {
+display: none;
+visibility: collapse;
+}
+
+.x-tree-node-expanded .x-tree-node-icon {
+height: 1px;
+width: 1px;
+}
+
+.x-tree-node-collapsed .x-tree-node-icon {
+height: 1px;
+width: 1px;
+}
+
+.x-tree-node .x-tree-selected a span {
+color: #000;
+font-weight: 400;
+}
+
+.x-tree-node div.itinys-node {
+background: #eee url(images/ui/bg.gif) repeat-x;
+margin-top: 1px;
+border-top: 1px solid #ddd;
+border-bottom: 1px solid #ccc;
+padding-top: 2px;
+padding-bottom: 1px;
+}
+
+.x-tree-icon {
+background-repeat: no-repeat;
+border: 0 none;
+height: 20px;
+vertical-align: middle;
+width: 2px;
+margin: 1pt;
+padding: 0;
+}
+
+.x-tree-elbow-line {
+background-repeat: no-repeat;
+border: 0 none;
+height: 20px;
+vertical-align: middle;
+width: 2px;
+margin: 1pt;
+padding: 0;
+}
+
+.x-tree-elbow {
+background-repeat: no-repeat;
+border: 0 none;
+height: 20px;
+vertical-align: middle;
+width: 2px;
+margin: 1pt;
+padding: 0;
+}
+
+.x-tree-elbow-end {
+background-repeat: no-repeat;
+border: 0 none;
+height: 20px;
+vertical-align: middle;
+width: 2px;
+margin: 1pt;
+padding: 0;
+}
+
+.x-tree-node-el h4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
+}
+
+.x-tree-node-leaf h4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
+}
+
+.x-unselectable h4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
+}
+
+.itiny h4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
+}
+
+.x-tree-selectedh4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
+}
+
+.x-tree-node-over h4 {
+vertical-align: middle;
+margin-top: 2px;
+margin-bottom: 5px;
 }
 
 a.x-tree-node-anchor:link, a.x-tree-node-anchor:visited {
@@ -271,29 +430,53 @@ a.x-tree-node-anchor:link, a.x-tree-node-anchor:visited {
 }
 
 .itiny {
-    font-size   : 12px;
-    border-color: #DDDDDD #FFFFFF #EEFFAA;
-    margin: 0px;
-    padding-left: 7px;
-    padding-top:  3px;
-    min-height:   24px!important;
-    border-style:solid;
-    border-bottom:1px solid #aaa;
-    border-width:1px;
-    vertical-align:middle;
+font-size: 12px;
+padding-left: 7px;
+padding-top: 3px;
+min-height: 24px!important;
+border-bottom: 1px solid #808080;
+vertical-align: middle;
+margin: 0;
 }
 
-/*.itiny-node  {padding: 7px;}*/
-.itiny .x-tree-ec-icon {display:none;}
+.itiny .x-tree-ec-icon {
+display: none;
+}
 
-.new-tab {background-image:url(images/ui/trip/triangle.png) !important;}
-.load-icon {background-image:url(images/ui/trip/triangle.png) !important;}
+.itiny-inline-icon {
+float: left;
+width: 21px !important;
+height: 21px !important;
+}
 
-li.x-tree-node{margin:0px;padding:0px;}
+.popup-route-icon {
+float: left;
+height: 18px;
+width: 18px;
+margin: 0 5 0 0;
+}
 
-.start-icon, .end-icon, .bus-icon, .streetcar-icon, .ltrail-icon, .commrail-icon, .tram-icon, .walk-icon
-{padding:0px!important;border:0!important;}
+.new-tab {
+background-image: url(images/ui/trip/triangle.png)!important;
+}
 
+.load-icon {
+background-image: url(images/ui/trip/triangle.png)!important;
+}
+
+li.x-tree-node {
+margin: 0;
+padding: 0;
+}
+
+.start-icon {
+border: 0!important;
+background-image: url(images/ui/trip/start.png)!important;
+float: left;
+width: 21px!important;
+height: 21px!important;
+padding: 0!important;
+}
 .itinys-icon {display: none; visibility: collapse;}
 .start-icon {background-image:url(images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
 .end-icon {background-image:url(images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
@@ -309,165 +492,405 @@ li.x-tree-node{margin:0px;padding:0px;}
 .plane-icon{background-image:url(images/ui/trip/mode/plane.png) !important;float:left;width:21px!important;height:21px!important;}
 .x-tree-elbow-minus, .x-tree-elbow-plus{float: left;}
 
+li.departure {
+clear: both;
+margin: 0 0 5px;
+}
+
+.end-icon {
+border: 0!important;
+background-image: url(images/ui/trip/end.png)!important;
+float: left;
+width: 21px!important;
+height: 21px!important;
+padding: 0!important;
+}
+
+.bus-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/bus.gif)!important;
+float: left;
+width: 16px!important;
+height: 17px!important;
+padding: 0!important;
+}
+
+.streetcar-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/streetcar.gif)!important;
+float: left;
+padding: 0!important;
+}
+
+.ltrail-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/rail.gif)!important;
+float: left;
+padding: 0!important;
+}
+
+.commrail-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/cr.gif)!important;
+float: left;
+padding: 0!important;
+}
+
+.tram-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/tram.gif)!important;
+float: left;
+padding: 0!important;
+}
+
+.walk-icon {
+border: 0!important;
+background-image: url(images/ui/trip/mode/walk.png)!important;
+float: left;
+padding: 0!important;
+}
+
+.itinys-icon {
+display: none;
+visibility: collapse;
+}
+
+.x-tree-elbow-minus {
+float: left;
+}
+
+.x-tree-elbow-plus {
+float: left;
+}
+
 .x-tree-no-lines .x-tree-elbow-minus {
-  vertical-align: top;
-  background-position:1pt 50%;
-  background-image:url(images/ui/buttons/zip-minus.gif);
+vertical-align: top;
+background-position: 1pt 50%;
+background-image: url(images/ui/buttons/zip-minus.gif);
 }
+
 .x-tree-no-lines .x-tree-elbow-plus {
-  vertical-align: top;
-  background-position:1pt 50%;
-  background-image:url(images/ui/buttons/zip-plus.gif);
+vertical-align: top;
+background-position: 1pt 50%;
+background-image: url(images/ui/buttons/zip-plus.gif);
 }
 
-
-
-/**** Structure ****/
 .ext-el-mask {
-    background:#EBEEF4;
+background: #EBEEF4;
 }
+
 .x-grid3-td-title b {
-    display:block;
-    color:#333;
+display: block;
+color: #333;
 }
+
 .x-grid3-td-title b i {
-    font-weight:normal;
-    font-style: normal;
-    color:#000;
+font-weight: 400;
+font-style: normal;
+color: #000;
 }
+
 .x-grid3-td-title .topic {
-    padding-left:20px;
-    background:transparent url(images/ui/bg.gif) no-repeat 0 2px;
+padding-left: 20px;
+background: transparent url(images/ui/bg.gif) no-repeat 0 2px;
 }
+
 .x-grid3-td-title .x-grid3-cell-inner {
-    white-space:normal;
+white-space: normal;
 }
+
 .x-grid3-td-title a {
-    color: #3B5A95;
-    text-decoration:none;
+color: #3B5A95;
+text-decoration: none;
 }
+
 .x-grid3-td-title a:hover {
-    text-decoration:underline;
+text-decoration: underline;
 }
+
 .details .x-btn-text {
-    background-image: url(images/ui/bg.gif);
+background-image: url(images/ui/bg.gif);
 }
 
-.x-grid3-row-body p {
-    /*margin:5px 20px 10px 25px !important;
-    color:#000;*/
-}
 .x-border-layout-ct {
-    background:transparent;
+background: #fff;
 }
-body.x-border-layout-ct {
-    background:#EBEEF4 url(images/ui/bg.gif) repeat-x left top !important;
-}
+
 .x-layout-split {
-    background-color:transparent !important;
+background-color: transparent!important;
 }
+
 .forum-ct a span {
-    font-weight:normal;
-    color:#222;
+font-weight: 400;
+color: #222;
 }
-#topic-grid .x-panel-tbar .x-toolbar {
-   /* border-top:0 none; */
-}
+
 #main-tabs .x-tab-panel-body {
-    background:transparent;
-    border:0 none;
+background: transparent;
+border: 0 none;
 }
 
-
-/* Preview classes */
 .preview .x-panel-body {
-    background  : #fff;
-    color       : #222;
-    font-family : Verdana, Arial, Helvetica, sans-serif;
+background: #fff;
+color: #222;
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
-.preview .x-panel-body p {
-    margin:0px 0;
-}
-.preview .x-panel-body ul {
-    margin-left:0px;
-}
-.preview .x-panel-body ul li {
-    display:list-item;
-    list-style-image:none !important;
-    list-style-position:outside !important;
-    list-style-type:none !important;
-    margin-left:0px;   
-}
-.preview .x-panel-body pre, #preview .x-panel-body code {
-    background:#f1f1f1;
-    display:block;
-}
-.preview .x-panel-body h4.post-author {
-    font-weight:normal;
-    color:#555;
-}
-.preview .x-panel-body span.post-date {
-    font-weight:normal;
-    color:#555;
-    float:right;
-}
-.preview .x-panel-body div.post-data {
-    background:#FFFFFF;
-    padding:5px;
-    border-bottom:1px solid #EBEEF4;
-}
-.preview .x-panel-body div.post-body {
-    padding:10px;
-}
-/*.single-preview .x-toolbar, #right-preview .preview .x-toolbar {
-    border-top:0 none;
-}*/
-.reading-menu .x-menu-item-checked {
-   border:1px dotted #a3bae9 !important;
-    background:#DFE8F6;
-	padding:0;
-}
-.x-tab-panel-header {
-    border-bottom-width:0 !important;
-}
-#suggested {
-    border-top:0 none;
-}
-#suggested a {
-    text-decoration:none;
-    color: #3B5A95;
-    display:block;
-    padding:3px;
-    float:right;
-    margin-right:4px;
-}
-#suggested a:hover {
-    text-decoration:underline;
-    color:#FF3300;
-}
-.x-combo-list-item {
-    zoom:1;
 
-    padding:3px 10px 3px 10px;
-    border:1px solid #fff;
-    border-bottom:1px solid #eeeeee;
-    white-space:normal;
-    color:#555;
+.preview .x-panel-body p {
+margin: 0;
 }
+
+.preview .x-panel-body ul {
+margin-left: 0;
+}
+
+.preview .x-panel-body ul li {
+display: list-item;
+list-style-image: none!important;
+list-style-position: outside!important;
+list-style-type: none!important;
+margin-left: 0;
+}
+
+.preview .x-panel-body pre {
+background: #f1f1f1;
+display: block;
+}
+
+#preview .x-panel-body code {
+background: #f1f1f1;
+display: block;
+}
+
+.preview .x-panel-body h4.post-author {
+font-weight: 400;
+color: #555;
+}
+
+.preview .x-panel-body span.post-date {
+font-weight: 400;
+color: #555;
+float: right;
+}
+
+.preview .x-panel-body div.post-data {
+background: #FFF;
+border-bottom: 1px solid #EBEEF4;
+padding: 5px;
+}
+
+.preview .x-panel-body div.post-body {
+padding: 10px;
+}
+
+.reading-menu .x-menu-item-checked {
+border: 1px dotted #a3bae9!important;
+background: #DFE8F6;
+padding: 0;
+}
+
+.x-tab-panel-header {
+border-width: 0!important;
+}
+
+#suggested {
+border-top: 0 none;
+}
+
+#suggested a {
+text-decoration: none;
+color: #3B5A95;
+display: block;
+float: right;
+margin-right: 4px;
+padding: 3px;
+}
+
+#suggested a:hover {
+text-decoration: underline;
+color: #F30;
+}
+
+.x-combo-list-item {
+zoom: 1;
+border: 1px solid #fff;
+border-bottom: 1px solid #eee;
+white-space: normal;
+color: #555;
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+padding: 3px 10px;
+}
+
 .x-combo-list-item strong {
-    color:#777;
-    font-style: normal;
-    float:left;
+color: #777;
+font-style: normal;
+float: left;
 }
+
 .x-combo-list-item em {
-    color:#222;
-    font-style: normal;
-    float:left;
-    width:325px;
+color: #222;
+font-style: normal;
+float: left;
+width: 325px;
 }
+
 .x-node-ctx {
-    background:#eee !important;
-    border:1px solid #ccc !important;
+background: #eee!important;
+border: 1px solid #ccc!important;
 }
-/* Font Overrides */
-.x-window-dlg .ext-mb-textarea, .x-combo-list-small .x-combo-list-item, .x-combo-list-item, .x-combo-list-hd, #x-debug-browser .x-tree .x-tree-node a span, .x-box-mc, .x-menu-list-item, .x-tip .x-tip-body, .x-tip .x-tip-header-text, .x-date-mp-btns button, .x-date-mp td, .x-date-inner th, .x-date-middle, .x-date-left, .x-date-right, .x-tree-node, .x-dd-drag-ghost, .x-grid-empty, .x-grid-group-hd div, .x-grid3-topbar, .x-grid3-bottombar, .x-grid3-hd-row td, .x-grid3-row td, .x-grid3-summary-row td, .x-toolbar td,.x-toolbar span, .x-toolbar input, .x-toolbar div, .x-toolbar select, .x-toolbar label, .x-btn button, .x-btn, .x-fieldset legend, .ext-safari .x-small-editor .x-form-field, .x-small-editor .x-form-field, .x-form-invalid-msg, .x-form-item, .x-form-grow-sizer, .x-form-field, .x-tab-strip span.x-tab-strip-text, .ext-el-mask-msg div{font-family: Verdana, Arial, Helvetica, sans-serif;}
+
+.x-window-dlg .ext-mb-textarea {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-combo-list-small .x-combo-list-item {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-combo-list-hd {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+#x-debug-browser .x-tree .x-tree-node a span {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-box-mc {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-menu-list-item {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-tip .x-tip-body {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-tip .x-tip-header-text {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-mp-btns button {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-mp td {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-inner th {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-middle {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-left {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-date-right {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-dd-drag-ghost {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid-empty {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid-group-hd div {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid3-topbar {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid3-bottombar {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid3-hd-row td {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid3-row td {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-grid3-summary-row td {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar td {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar span {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar input {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar div {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar select {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-toolbar label {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-btn button {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-btn {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-fieldset legend {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.ext-safari .x-small-editor .x-form-field {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-small-editor .x-form-field {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-form-invalid-msg {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-form-item {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-form-grow-sizer {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-form-field {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.x-tab-strip span.x-tab-strip-text {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}
+
+.ext-el-mask-msg div {
+font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+}

@@ -28,6 +28,8 @@ otp.core.ComboBox = {
     name         : 'cb.name',
     label        : 'Form',
     display      : 'display',
+    emptyText    : '...',
+		cls					 : '',
 
     /**
      * constructor of sorts
@@ -56,7 +58,7 @@ otp.core.ComboBox = {
             fieldLabel:    this.label,
             displayField:  this.display,
             tpl:           this.m_template,
-            emptyText:     '...',
+            emptyText:     this.emptyText,
             valueNotFoundText: '',
             store:         this.m_store,
             mode:          'local',
@@ -67,7 +69,9 @@ otp.core.ComboBox = {
             resizable:     true,
             maxHeight :    150,
             lazyRender:    false,
-            selectOnFocus: true
+            selectOnFocus: true,
+						hideLabel: true,
+						cls: this.cls
         });
     },
 

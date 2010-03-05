@@ -23,7 +23,7 @@ otp.application.Controller = {
     // config
     extent               : null,
     url                  : null,
-    useGenericRouteIcons : true, // true == use generic /image/map/trip/mode/<mode>.png icons
+    useGenericRouteIcons : false, // true == use generic /image/map/trip/mode/<mode>.png icons
                                  // false  == use rte # (or name) /image/map/trip/rte/<number>.png icons 
     plannerContextMenu   : true,
     mapContextMenu       : false,
@@ -35,6 +35,9 @@ otp.application.Controller = {
     cm         : null,
     planner    : null,
     params     : null,
+    
+    // whether to add the systemmap to the accordion
+    hasSystemMap : false,
 
     /** */
     initialize : function(config)
@@ -49,12 +52,22 @@ otp.application.Controller = {
                 attribution    : otp.util.ExtUtils.MAP_ATTRIBUTION
         }); 
         this.ui   = new otp.core.UI({map:this.map});
-
+        
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
         this.planner = new otp.planner.Planner({useGenericRouteIcons:this.useGenericRouteIcons, url:this.url, map:this.map, poi:this.poi}); 
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
+
+        if (this.hasSystemMap)
+        {
+        	// XXX how to set the url? this.url seems to be null?
+        	this.sm      = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/departures'});
+        	this.ui.accordion.add(this.sm.getPanel());
+        	// we want the system map to be the default panel now
+        	this.ui.accordion.layout.setActiveItem(1);
+        }
+        
         this.ui.doLayout();
 
         this.load();

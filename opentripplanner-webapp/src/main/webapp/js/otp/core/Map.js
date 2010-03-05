@@ -32,13 +32,18 @@ otp.core.MapStatic = {
 
     // config for 4326
     mapDiv            : "map",
-    url               : "http://maps.opengeo.org/geowebcache/service/wms",
+    url               : "http://maps.opengeo.org/transitech/gwc/service/wms",
     srsName           : "EPSG:4326",
-    layerNames        : ['openstreetmap'], 
-    numZoomLevels     : 19,
+    layerNames        : ['tplanner'], 
+    numZoomLevels     : 17,
+    format            : 'png',
     units             : null,
     maxResolution     : null,
     maxExtent         : null,
+    
+    // list of functions that will be called before/after all features on the map are removed
+    beforeAllFeaturesRemoved: [],
+    allFeaturesRemoved: [],
 
 /*
     // config for 4326
@@ -194,6 +199,8 @@ otp.core.MapStatic = {
     {
     	if (this.defaultExtent == "automatic")
         {
+            //this.defaultExtent = 
+            /*
             // If we're set to automatically get the default extent from the
             // server and we don't have it yet, request it and set a timeout to
             // come back to call this function again soon.
@@ -206,9 +213,11 @@ otp.core.MapStatic = {
             var newTimeout = timeout+timeout;
             setTimeout(function() {self.clear(newTimeout);}, newTimeout);
             return;
+            */
         }
         this.updateSize();
-        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+        this.map.setCenter(new OpenLayers.LonLat(-73.913099432279, 40.765190880891), 12);
+        //this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
     },
 
     /**
@@ -288,7 +297,31 @@ otp.core.MapStatic = {
             console.log("exception Map.zoomToExtent" + e)
         }
     },
-    
+
+    /**
+     * Remove all features from non base layers on the map
+     */
+    removeAllFeatures : function()
+    {
+        // mini events system
+        // if this expands some more, we should have a more proper event system
+        // with an interface in front of it to add/remove events
+        Ext.each(this.beforeAllFeaturesRemoved, function(fn) {
+            fn.call(this);
+        }, this);
+        for (var i = 0; i < this.map.layers.length; i++)
+        {
+            var layer = this.map.layers[i];
+            if (!layer.isBaseLayer)
+            {
+                layer.removeFeatures(layer.features);
+            }
+        }
+        Ext.each(this.allFeaturesRemoved, function(fn) {
+            fn.call(this);
+        }, this);
+    },
+
     CLASS_NAME : "otp.core.Map"
 };
 

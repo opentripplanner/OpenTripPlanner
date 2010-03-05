@@ -634,7 +634,7 @@ otp.planner.StaticForms = {
             items:       optForms
         });
 
-        this.m_submitButton = new Ext.Toolbar.Button({
+        this.m_submitButton = new Ext.Button({
             text:    this.locale.tripPlanner.labels.planTrip,
             id:      'trip-submit',
             scope:   this,
@@ -653,9 +653,9 @@ otp.planner.StaticForms = {
                             optFP,
                             new Ext.form.Hidden({name: 'toCoord',   value: ''}),
                             new Ext.form.Hidden({name: 'fromCoord', value: ''}),
-            				new Ext.form.Hidden({name: 'intermediatePlaces', value: ''})
+            								new Ext.form.Hidden({name: 'intermediatePlaces', value: ''}),
+														this.m_submitButton
                          ],
-            buttons:     [this.m_submitButton],
 
             // configure how to read the XML Data
             reader:      this.m_xmlRespRecord,
@@ -688,14 +688,15 @@ otp.planner.StaticForms = {
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        this.m_fromForm = new otp.core.ComboBox({layout: 'anchor', id: 'from.id', name: 'fromPlace', label: this.locale.tripPlanner.labels.from});
-        this.m_toForm   = new otp.core.ComboBox({layout: 'anchor', id: 'to.id',   name: 'toPlace',   label: this.locale.tripPlanner.labels.to});
+        this.m_fromForm = new otp.core.ComboBox({layout: 'anchor', id: 'from.id', name: 'fromPlace', emptyText: this.locale.tripPlanner.labels.from, label: '', cls: 'nudgeRight'});
+        this.m_toForm   = new otp.core.ComboBox({layout: 'anchor', id: 'to.id',   name: 'toPlace', emptyText: this.locale.tripPlanner.labels.to, label: '', cls: 'nudgeRight'});
         var rev  = new Ext.Button({
             tooltip:   this.locale.buttons.reverseMiniTip,
             iconCls:   "reverse-button",
             hideLabel: true,
             scope:     this,
             tabIndex:  -1,
+						cls: 			 'tallLeft', 
             handler : function(obj)
             {
                 this.m_fromForm.reverse(this.m_toForm);
@@ -781,9 +782,13 @@ otp.planner.StaticForms = {
             ]
         };
 
+
+				var tempToFromText = new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>");
+
         console.log("exit Forms.makeFromToForms()");
 
-        return [this.m_fromForm.getComboBox(), rev, this.m_toForm.getComboBox(), timePanel]; 
+        //return [this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel];
+				return [tempToFromText, this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel]; 
     },
 
 

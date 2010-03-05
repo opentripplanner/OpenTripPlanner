@@ -60,13 +60,7 @@ otp.planner.Renderer = {
     {
         console.log("enter planner.Renderer.clear");
 
-        if (this.m_vectorLayer && this.m_itinerary) {
-            this.m_vectorLayer.removeFeatures(this.m_itinerary.getVectors());
-        }
-
-        if (this.m_markerLayer && this.m_itinerary) {
-            this.m_markerLayer.removeFeatures(this.m_itinerary.getMarkers());
-        }
+        this.map.removeAllFeatures();
 
         console.log("exit planner.Renderer.clear");
     },
@@ -86,25 +80,21 @@ otp.planner.Renderer = {
             this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
-
-            var styleMap = new OpenLayers.StyleMap({graphicOpacity: 0.92});
-            var style;
-            if(this.useGenericRouteIcons)
-                style = otp.util.OpenLayersUtils.getRouteModeMarkerStyle();
-            else
-                style = otp.util.OpenLayersUtils.getRouteNumberMarkerStyle();
-
-            styleMap.addUniqueValueRules("default", "type", style);
-
+                                    
+            var style = otp.util.OpenLayersUtils.getMarkerStyle();
+            var styleMap = new OpenLayers.StyleMap(style);
+            var uniqueValueRules = otp.util.OpenLayersUtils.getMarkerUniqueValueRules();
+            styleMap.addUniqueValueRules("default", "type", uniqueValueRules);
+            
             var markerLayerOptions = {
                     isBaseLayer: false,
                     rendererOptions: {yOrdering: true},
                     projection: this.map.dataProjection,
-                    styleMap:   styleMap
+                    styleMap: styleMap
             };
             this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', markerLayerOptions);
             this.map.getMap().addLayer(this.m_markerLayer);
-            this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clicability of other map layers
+            this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clickability of other map layers
         }
 
         // draw graphic plan on the map

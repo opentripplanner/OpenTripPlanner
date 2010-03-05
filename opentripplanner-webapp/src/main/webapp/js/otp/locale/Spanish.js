@@ -95,6 +95,14 @@ otp.locale.Spanish = {
         'continue':     "continue"
     },
 
+    systemmap :
+    {
+        labels :
+        {
+            panelTitle : "System Map"
+        }
+    },
+
     tripPlanner :
     {
         labels : 

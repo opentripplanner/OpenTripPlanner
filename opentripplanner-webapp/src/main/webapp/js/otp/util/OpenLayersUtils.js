@@ -329,125 +329,89 @@ otp.util.OpenLayersUtils = {
 
     RTE_ICON_SIZE   : new OpenLayers.Size(105, 34),
     RTE_ICON_OFFSET : new OpenLayers.Pixel(0, -34),  
-
-    FROM_WALK_ICON  : 'images/map/trip/start-walk.png',
-    FROM_ICON       : 'images/map/trip/start.png',
-    TO_ICON         : 'images/map/trip/end.png',
-    DISK_ICON       : 'images/map/trip/xferdisk.png',
-    WALK_ICON       : 'images/map/trip/mode/walk.png',
-    ROUTE_DIR       : 'images/map/trip/rte/',
-    MODE_DIR        : 'images/map/trip/mode/',
-
-    ST_END_SIZE     : new OpenLayers.Size(20, 34),
-    ST_END_OFFSET   : new OpenLayers.Pixel(-10, -34),
+    ST_END_SIZE     : new OpenLayers.Size(21, 39),
+    ST_END_OFFSET   : new OpenLayers.Pixel(-10, -39),
     DISK_SIZE       : new OpenLayers.Size(10, 10),
     DISK_OFFSET     : new OpenLayers.Pixel(-5, -5),
+    
+//    useCustomIconsForAgencies : ['MTA NYCT'],
+    useCustomIconsForAgencies: [],
 
-    /**
-     * Returns a lookup to be used by OpenLayers to determine how to render the various
-     * features (e.g., route and walking markers) on the map.
-     */
-    getRouteNumberMarkerStyle :  function()
-    {
-        var retVal = this.getBaseMarkerStyle();
+    markerGraphicMapping  : {
+        walkMarker: 'images/map/trip/mode/walk.png',
+        fromWalkMarker: 'images/map/trip/start-walk.png',
+        toMarker: 'images/map/trip/end.png',
+        fromMarker: 'images/map/trip/start.png',
+        diskMarker: 'images/map/trip/xferdisk.png',
+        routeMarker: function(feature) {
+            // XXX move configuration somewhere more appropriate
+            var attrs = feature.attributes;
+            return this.useCustomIconsForAgencies.indexOf(attrs.agencyId) !== -1
+                   ? 'custom/' + attrs.agencyId + '/' + attrs.mode + '/' + attrs.route + '-marker.png'
+                   : 'images/map/trip/mode/' + attrs.mode.toLowerCase() + '.png';
+        }
+    },
 
-        retVal.routeMarker = {
-                // icon is determined by the value of feature.attributes.route
-                externalGraphic: this.ROUTE_DIR + "${route}.png",
-                graphicWidth:   this.RTE_ICON_SIZE.w,
-                graphicHeight:  this.RTE_ICON_SIZE.h,
-                graphicXOffset: this.RTE_ICON_OFFSET.x,
-                graphicYOffset: this.RTE_ICON_OFFSET.y
+    getMarkerStyle: function() {
+        var template = {
+            externalGraphic: "${getExternalGraphic}",
+            graphicOpacity: 0.92
         };
-
-        return retVal; 
+        var graphicMapping = this.markerGraphicMapping;
+        var olutils = this;
+        var context = {
+            getExternalGraphic: function(feature) {
+                var externalGraphic = graphicMapping[feature.attributes.type];
+                return typeof externalGraphic === 'function'
+                       ? externalGraphic.call(olutils, feature)
+                       : externalGraphic;
+            }
+        };        
+        var style = new OpenLayers.Style(template, {context: context});
+        return style;
     },
 
-    getRouteModeMarkerStyle :  function()
-    {
-        var retVal = this.getBaseMarkerStyle();
-        retVal.routeMarker = {
-                // icon is determined by the value of feature.attributes.route
-                externalGraphic: this.MODE_DIR + "${mode}.png",
-                graphicWidth:   this.RTE_ICON_SIZE.w,
-                graphicHeight:  this.RTE_ICON_SIZE.h,
-                graphicXOffset: this.RTE_ICON_OFFSET.x,
-                graphicYOffset: this.RTE_ICON_OFFSET.y
-            };
-
-        return retVal; 
-    },
-
-    getBaseMarkerStyle : function()
-    {
+    getMarkerUniqueValueRules: function() {
         return {
-            'walkMarker': {
-                externalGraphic: this.WALK_ICON,
+            walkMarker: {
                 graphicWidth: this.RTE_ICON_SIZE.w,
                 graphicHeight: this.RTE_ICON_SIZE.h,
                 graphicXOffset: this.RTE_ICON_OFFSET.x,
                 graphicYOffset: this.RTE_ICON_OFFSET.y
             },
-            'fromWalkMarker': {
-                externalGraphic: this.FROM_WALK_ICON,
+            fromWalkMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
                 graphicHeight: this.ST_END_SIZE.h,
                 graphicXOffset: this.ST_END_OFFSET.x,
                 graphicYOffset: this.ST_END_OFFSET.y
             },
-            'toMarker': {
-                externalGraphic: this.TO_ICON,
+            toMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
                 graphicHeight: this.ST_END_SIZE.h,
                 graphicXOffset: this.ST_END_OFFSET.x,
                 graphicYOffset: this.ST_END_OFFSET.y
             },
-            'fromMarker': {
-                externalGraphic: this.FROM_ICON,
+            fromMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
                 graphicHeight: this.ST_END_SIZE.h,
                 graphicXOffset: this.ST_END_OFFSET.x,
                 graphicYOffset: this.ST_END_OFFSET.y
             },
-            'diskMarker': {
-                externalGraphic: this.DISK_ICON,
+            diskMarker: {
                 graphicWidth: this.DISK_SIZE.w,
                 graphicHeight: this.DISK_SIZE.h,
                 graphicXOffset: this.DISK_OFFSET.x,
                 graphicYOffset: this.DISK_OFFSET.y
+            },
+            routeMarker: {
+                graphicWidth:   this.RTE_ICON_SIZE.w,
+                graphicHeight:  this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET.x,
+                graphicYOffset: this.RTE_ICON_OFFSET.y
             }
         };
     },
 
-    /**
-     * Create a new route marker.
-     * 
-     * @param {Number}
-     *            x The horizontal coordinate of the marker.
-     * @param {Number}
-     *            y The vertical coordinate of the marker.
-     * @param {String}
-     *            route The route (e.g., 110 or M6) this marker is for.
-     * @param {String}
-     *            mode The mode (e.g., subway
-     * @param {Object}
-     *            mArray An array to add the new marker to. Optional.
-     */
-    makeRouteMarker : function(x, y, route, mode, mArray)
-    {
-        if (route == null || route === "") {
-            route = "default-route";
-        }
-        if (mode == null || mode === "") {
-            mode = 'default-mode';
-        }
-        var routeMarker = null;
-        routeMarker = this.makeMarker(x, y, 'routeMarker', mArray);
-        routeMarker.attributes.route = route;
-        routeMarker.attributes.mode = mode.toLocaleLowerCase();
-            
-        return routeMarker;
-    },
 
     /**
      * Create a new marker.
@@ -456,22 +420,16 @@ otp.util.OpenLayersUtils = {
      *            x The horizontal coordinate of the marker.
      * @param {Number}
      *            y The vertical coordinate of the marker.
-     * @param {String}
-     *            type The type of the marker. This determines how it will be
-     *            displayed on the map, including what icon to use.
      * @param {Object}
-     *            mArray An array to add the new marker to. Optional.
+     *            attributes that will be set on the new marker feature
      */
-    makeMarker : function(x, y, type, mArray)
+    makeMarker : function(x, y, attributes)
     {
         var point = new OpenLayers.Geometry.Point(x, y);
         var marker = new OpenLayers.Feature.Vector(point);
-        marker.attributes.type = type;
         
-        if (mArray) {
-            mArray.push(marker);
-        }
-        
+        Ext.apply(marker.attributes, attributes);
+
         return marker;
     },
 
@@ -661,7 +619,7 @@ otp.util.OpenLayersUtils = {
     },
     
     encoded_polyline_converter: function(n,p) {
-
+        
         var lat = 0;
         var lon = 0;
 
