@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.services.shapefile;
+package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,6 +8,8 @@ import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
 /**
  * This is a simple feature converter that gets features from a secondary feature source. This is
