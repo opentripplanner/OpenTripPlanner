@@ -175,7 +175,7 @@
         </plugins>
     </build>
 
-    <!-- If we are running in hudson use cobertura. -->
+    <!-- If we are running in hudson -->
     <profiles>
         <profile>
             <id>hudson</id>
@@ -184,14 +184,6 @@
                     <name>BUILD_NUMBER</name>
                 </property>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>cobertura-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
 
             <distributionManagement>
                 <site>
@@ -208,7 +200,7 @@
                         <artifactId>maven-enunciate-plugin</artifactId>
                         <version>1.17</version>
                         <configuration>
-                            <configFile>enunciate.xml</configFile> 
+                            <configFile>../opentripplanner-api-webapp/enunciate.xml</configFile> 
                         </configuration>
                     </plugin>
                 </plugins>
