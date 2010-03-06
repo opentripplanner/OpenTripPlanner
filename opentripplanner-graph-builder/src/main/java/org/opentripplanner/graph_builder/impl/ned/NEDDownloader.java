@@ -135,7 +135,7 @@ public class NEDDownloader {
             OMElement payload = getValidateOMElement();
             Options options = new Options();
             EndpointReference targetEPR = new EndpointReference(
-                    "http://extract.cr.usgs.gov/requestValidationService/services/RequestValidationService");
+                    "http://igskmncnwb010.cr.usgs.gov/requestValidationService/services/RequestValidationService");
             options.setTo(targetEPR);
             options.setAction("processAOI");
 
@@ -167,6 +167,7 @@ public class NEDDownloader {
             for (OMElement urlElement : nodes) {
                 String urlString = urlElement.getText().trim();
                 _log.debug("Adding NED URL:" + urlString);
+                urlString = urlString.replaceFirst("http://extract.", "http://igskmncnwb010.");
                 URL url = new URL(urlString);
                 urls.add(url);
             }
@@ -332,7 +333,7 @@ public class NEDDownloader {
             _log.debug("Starting download " + key);
             File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
-                    "http://extract.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
+                    "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
                             + token);
             URLConnection connection = downloadUrl.openConnection();
             HttpURLConnection httpconnection = (HttpURLConnection) connection;
@@ -358,7 +359,7 @@ public class NEDDownloader {
         }
         try {
             URL cleanupURL = new URL(
-                    "http://extract.cr.usgs.gov/axis2/services/DownloadService/setDownloadComplete?downloadID="
+                    "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/setDownloadComplete?downloadID="
                             + token);
             cleanupURL.openStream().close();
         } catch (Exception e) {
@@ -384,7 +385,7 @@ public class NEDDownloader {
 
     private boolean downloadReady(String token) {
         try {
-            String url = "http://extract.cr.usgs.gov/axis2/services/DownloadService/getDownloadStatus?downloadID="
+            String url = "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getDownloadStatus?downloadID="
                     + token;
             OMElement doc = getXMLFromURL(new URL(url), true);
             if (doc == null) {
