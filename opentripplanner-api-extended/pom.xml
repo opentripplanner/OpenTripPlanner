@@ -176,6 +176,7 @@
     </build>
 
     <!-- If we are running in hudson -->
+    <!--
     <profiles>
         <profile>
             <id>hudson</id>
@@ -207,6 +208,6 @@
             </reporting>
         </profile>
     </profiles>
-
+    -->
 
 </project>
