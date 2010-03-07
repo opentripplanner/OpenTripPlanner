@@ -16,7 +16,10 @@ package org.opentripplanner.graph_builder.impl.ned;
 import java.io.File;
 import java.util.List;
 
+import javax.media.jai.InterpolationBilinear;
+
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.routing.core.Graph;
@@ -59,7 +62,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
             for (File path : paths) {
                 GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl();
                 factory.setPath(path);
-                GridCoverage2D regionCoverage = factory.getGridCoverage();
+                GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(), new InterpolationBilinear());
                 if (coverage == null) {
                     coverage = new UnifiedGridCoverage("unified", regionCoverage);
                 } else {
