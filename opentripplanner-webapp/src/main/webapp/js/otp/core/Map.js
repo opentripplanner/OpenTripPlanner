@@ -204,8 +204,6 @@ otp.core.MapStatic = {
     {
     	if (this.defaultExtent == "automatic")
         {
-            //this.defaultExtent = 
-            /*
             // If we're set to automatically get the default extent from the
             // server and we don't have it yet, request it and set a timeout to
             // come back to call this function again soon.
@@ -218,11 +216,9 @@ otp.core.MapStatic = {
             var newTimeout = timeout+timeout;
             setTimeout(function() {self.clear(newTimeout);}, newTimeout);
             return;
-            */
         }
         this.updateSize();
-        this.map.setCenter(new OpenLayers.LonLat(-73.913099432279, 40.765190880891), 12);
-        //this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
     },
 
     /**
