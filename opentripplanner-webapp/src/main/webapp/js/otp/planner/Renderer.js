@@ -25,7 +25,6 @@ otp.planner.Renderer = {
 
     map                     : null,
     locale                  : null,
-    useGenericRouteIcons    : true,
 
     m_markerLayer : null,
     m_vectorLayer : null,

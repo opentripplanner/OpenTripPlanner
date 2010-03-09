@@ -181,13 +181,9 @@ otp.systemmap.Systemmap = {
 
         var self = this;
         this.systemPanel.getSelectionModel().on('rowselect', function(sm, rowIdx, r) {
-            var mode = r.data.mode,
-                agencyId = r.data.agencyId,
-                routeName = r.data.line.toUpperCase();
-            // XXX move configuration somewhere more appropriate
-            var routeImage = otp.util.OpenLayersUtils.useCustomIconsForAgencies.indexOf(agencyId) !== -1
-                             ? routeImage = 'custom/' + agencyId + '/' + mode + '/' + routeName + '-big.png'
-                             : 'images/map/trip/mode/' + mode.toLowerCase() + '.png';
+            var route = r.get('line');
+            var imagePathOptions = Ext.apply({}, r.data, {imageType: 'big', route: route});
+            var routeImage = otp.util.imagePathManager.imagePath(imagePathOptions);
             detailTpl.overwrite(detailPanel.body, Ext.apply({}, r.data, {routeImage: routeImage}));
             
             if (!self.xmlLoaded)
@@ -365,14 +361,9 @@ otp.systemmap.Systemmap = {
                                           {
                                               var departureRecord = self.departureStore.getAt(i),
                                                   routeId = departureRecord.get('routeId'),
-                                                  routeRecord = self.routeStore.getById(routeId),
-                                                  mode = routeRecord.get('mode'),
-                                                  agencyId = routeRecord.get('agencyId'),
-                                                  routeName = routeRecord.get('line').toUpperCase();
-                                              // XXX move configuration somewhere more appropriate
-                                              var routeImage = otp.util.OpenLayersUtils.useCustomIconsForAgencies.indexOf(agencyId) !== -1
-                                                               ? routeImage = 'custom/' + agencyId + '/' + mode + '/' + routeName + '.png'
-                                                               : 'images/map/trip/mode/' + mode.toLowerCase() + '.png';
+                                                  routeRecord = self.routeStore.getById(routeId);
+                                              var imagePathOptions = Ext.apply({}, {route: routeRecord.get('line')}, routeRecord.data);
+                                              var routeImage = otp.util.imagePathManager.imagePath(imagePathOptions);
                                               var departureMarkup = popupDepartureTpl.apply(Ext.apply({}, {routeImage: routeImage}, departureRecord.data));
                                               departuresMarkup += departureMarkup;
                                           }

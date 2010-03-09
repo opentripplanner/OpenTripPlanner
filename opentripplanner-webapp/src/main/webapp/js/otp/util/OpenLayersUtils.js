@@ -344,11 +344,8 @@ otp.util.OpenLayersUtils = {
         fromMarker: 'images/map/trip/start.png',
         diskMarker: 'images/map/trip/xferdisk.png',
         routeMarker: function(feature) {
-            // XXX move configuration somewhere more appropriate
-            var attrs = feature.attributes;
-            return this.useCustomIconsForAgencies.indexOf(attrs.agencyId) !== -1
-                   ? 'custom/' + attrs.agencyId + '/' + attrs.mode + '/' + attrs.route + '-marker.png'
-                   : 'images/map/trip/mode/' + attrs.mode.toLowerCase() + '.png';
+            var imagePathOptions = Ext.apply({}, {imageType: 'marker'}, feature.attributes);
+            return otp.util.imagePathManager.imagePath(imagePathOptions);
         }
     },
 

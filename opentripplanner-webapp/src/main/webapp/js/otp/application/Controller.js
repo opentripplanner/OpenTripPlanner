@@ -23,8 +23,13 @@ otp.application.Controller = {
     // config
     extent               : null,
     url                  : null,
-    useGenericRouteIcons : false, // true == use generic /image/map/trip/mode/<mode>.png icons
-                                 // false  == use rte # (or name) /image/map/trip/rte/<number>.png icons 
+
+    // custom icons will be used for these agency ids
+    useCustomIconsForAgencies: [],
+
+    // whether to add the systemmap to the accordion
+    hasSystemMap : false,
+
     plannerContextMenu   : true,
     mapContextMenu       : false,
 
@@ -36,9 +41,6 @@ otp.application.Controller = {
     planner    : null,
     params     : null,
     
-    // whether to add the systemmap to the accordion
-    hasSystemMap : false,
-
     /** */
     initialize : function(config)
     {
@@ -52,10 +54,13 @@ otp.application.Controller = {
                 attribution    : otp.util.ExtUtils.MAP_ATTRIBUTION
         }); 
         this.ui   = new otp.core.UI({map:this.map});
+
+        // initialize utilities
+        otp.util.imagePathManager.addCustomAgencies(this.useCustomIconsForAgencies);
         
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
-        this.planner = new otp.planner.Planner({useGenericRouteIcons:this.useGenericRouteIcons, url:this.url, map:this.map, poi:this.poi}); 
+        this.planner = new otp.planner.Planner({url:this.url, map:this.map, poi:this.poi});
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 

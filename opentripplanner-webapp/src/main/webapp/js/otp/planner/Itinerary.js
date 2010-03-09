@@ -538,8 +538,7 @@ otp.planner.Itinerary = {
             // this is to prevent having to manually generate custom css styles for each route
             var icon = 'images/ui/trip/mode/bus.png';
             var sched = null;
-            var modeOrigCase = leg.get('mode');
-            var mode = modeOrigCase.toLowerCase();
+            var mode = leg.get('mode').toLowerCase();
             if(mode == 'walk') 
             {
                 hasKids = false;
@@ -606,10 +605,7 @@ otp.planner.Itinerary = {
                     text  = otp.planner.Templates.getTransitLeg().applyTemplate(leg.data);
                 }
                 var agencyId = leg.get('agencyId');
-                // XXX need to move configuration to somewhere more appropriate
-                icon = otp.util.OpenLayersUtils.useCustomIconsForAgencies.indexOf(agencyId) !== -1
-                       ? 'custom/' + agencyId + '/' + modeOrigCase + '/' + routeName + '.png'
-                       : 'images/ui/trip/mode/' + mode + '.png';
+                icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
             }
             retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }

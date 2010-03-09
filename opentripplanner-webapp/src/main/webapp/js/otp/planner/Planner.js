@@ -34,7 +34,6 @@ otp.planner.Planner = {
     // configuration
     url                     : null,
     poi                     : null,
-    useGenericRouteIcons    : true,  // needed here...sent down to Renderer constructor
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
