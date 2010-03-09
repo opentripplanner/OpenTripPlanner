@@ -64,8 +64,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     private double slopeCostEffectiveLength;
 
-    private static int bogus;
-
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
         this.length = length;
@@ -150,8 +148,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
             double slope = rise / run;
             if (slope > 0.35 || slope < -0.35) {
                 slope = 0; //Baldwin St in Dunedin, NZ, is the steepest street on earth, and has a grade of 35%.  So, this must be a data error.
-                bogus += 1;                
-                log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data: " + bogus);
+                log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data");
             }
             slopeCostEffectiveLength += run * (1 + slope * slope * 10); //any slope is bad
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
