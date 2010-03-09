@@ -349,7 +349,7 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
 
             var mode = from.get('mode');
-            if(mode == 'WALK') 
+            if(mode == 'WALK' || mode == 'TRANSFER') 
             {
                 try
                 {
@@ -452,7 +452,7 @@ otp.planner.Itinerary = {
                 {
                     this.createAndAddMarker(fromP.x, fromP.y, {type: 'diskMarker', mode: mode});
                     // TODO: How should street transit links be rendered?
-                    if (route == "street transit link")
+                    if (route == "street transit link" || mode == "TRANSFER")
                     {
                         this.createAndAddMarker(fromP.x, fromP.y, {type: 'walkMarker', mode: mode});
                     }
