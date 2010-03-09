@@ -100,6 +100,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
 
+            SimpleFeatureConverter<Boolean> slopeOverrideCoverter = _schema.getSlopeOverrideConverter();
+
             //keep track of features that are duplicated so we don't have duplicate streets
             HashSet<Object> seen = new HashSet<Object>();
 
@@ -176,6 +178,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 backStreet.setGeometry(geom.reverse());
                 startCorner.inStreet = backStreet;
                 endCorner.outStreet = backStreet;
+
+                boolean slopeOverride = slopeOverrideCoverter.convert(feature);
+                street.setSlopeOverride(slopeOverride);
+                backStreet.setSlopeOverride(slopeOverride);
 
                 P2<StreetTraversalPermission> pair = permissionConverter.convert(feature);
 
