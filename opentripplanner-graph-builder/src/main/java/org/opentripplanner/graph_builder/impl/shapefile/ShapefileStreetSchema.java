@@ -27,6 +27,8 @@ public class ShapefileStreetSchema {
 
     private SimpleFeatureConverter<P2<Double>> bicycleSafetyConverter = null;
 
+    private SimpleFeatureConverter<Boolean> slopeOverrideConverter = new CaseBasedBooleanConverter();
+
     public SimpleFeatureConverter<String> getIdConverter() {
         return idConverter;
     }
@@ -66,5 +68,13 @@ public class ShapefileStreetSchema {
 
     public SimpleFeatureConverter<P2<Double>> getBicycleSafetyConverter() {
         return bicycleSafetyConverter;
+    }
+
+    public SimpleFeatureConverter<Boolean> getSlopeOverrideConverter() {
+        return slopeOverrideConverter ;
+    }
+
+    public void setSlopeOverrideConverter(SimpleFeatureConverter<Boolean> slopeOverrideConverter) {
+        this.slopeOverrideConverter = slopeOverrideConverter;
     }
 }

@@ -49,6 +49,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
     public StreetTraversalPermission permission;
 
     public boolean wheelchairAccessible;
+    
+    private boolean slopeOverride;
 
     /**
      * Streets with bike lanes are safer -- about twice as safe as streets without.
@@ -61,6 +63,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
     private double slopeSpeedEffectiveLength;
 
     private double slopeCostEffectiveLength;
+
+    private static int bogus;
 
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
@@ -132,6 +136,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
     }
 
     public void setElevationProfile(PackedCoordinateSequence elev) {
+        if (slopeOverride) {
+            elev = new PackedCoordinateSequence.Float(new Coordinate[] {new Coordinate(0f, 0f)}, 2);
+        }
         elevationProfile = elev;
         //compute the cost of the elevation changes
         Coordinate[] coordinates = elevationProfile.toCoordinateArray();
@@ -143,7 +150,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
             double slope = rise / run;
             if (slope > 0.35 || slope < -0.35) {
                 slope = 0; //Baldwin St in Dunedin, NZ, is the steepest street on earth, and has a grade of 35%.  So, this must be a data error.
-                log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data.");
+                bogus += 1;                
+                log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data: " + bogus);
             }
             slopeCostEffectiveLength += run * (1 + slope * slope * 10); //any slope is bad
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
@@ -419,6 +427,22 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public double getLength() {
         return length;
+    }
+
+    /**
+     * Override slope calculation to always return 0.  This is useful when the street is a 
+     * flat bridge over sloping terrain
+     * @param slopeOverride the slopeOverride to set
+     */
+    public void setSlopeOverride(boolean slopeOverride) {
+        this.slopeOverride = slopeOverride;
+    }
+
+    /**
+     * @see{setSlopeOVerride}
+     */
+    public boolean getSlopeOverride() {
+        return slopeOverride;
     }
 
 }
