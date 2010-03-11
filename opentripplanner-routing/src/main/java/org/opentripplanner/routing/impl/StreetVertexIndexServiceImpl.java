@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,7 +20,6 @@ import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.StreetIntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;

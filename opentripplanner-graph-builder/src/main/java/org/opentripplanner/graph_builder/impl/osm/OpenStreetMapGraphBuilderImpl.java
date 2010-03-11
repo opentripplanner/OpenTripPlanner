@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence.Float;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
@@ -50,8 +48,6 @@ import com.vividsolutions.jts.geom.LineString;
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
-
-    private static final GeometryFactory _geometryFactory = new GeometryFactory();
 
     private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
 

@@ -1,12 +1,18 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.extended.ws;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.naming.Context;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -14,21 +20,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.api.extended.ws.model.TransitServerDepartures;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoute;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoutes;
-import org.opentripplanner.api.extended.ws.model.TransitServerStop;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
