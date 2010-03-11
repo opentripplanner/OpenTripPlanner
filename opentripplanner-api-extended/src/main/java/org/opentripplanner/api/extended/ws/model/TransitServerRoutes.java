@@ -24,9 +24,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.extended.fork.EncodedPolylineBean;
-import org.opentripplanner.api.extended.fork.PolylineEncoder;
 import org.opentripplanner.api.extended.ws.TransitServerGtfs;
+import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 @XmlRootElement(name="routes")
 public class TransitServerRoutes {

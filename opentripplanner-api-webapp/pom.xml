@@ -137,6 +137,13 @@
         <version>2.5.6</version>
       </dependency>
 
+      <dependency>
+      	<groupId>org.opentripplanner</groupId>
+      	<artifactId>opentripplanner-utils</artifactId>
+      	<version>0.3-SNAPSHOT</version>
+      	<type>jar</type>
+      	<scope>compile</scope>
+      </dependency>
     </dependencies>
 
     <build>

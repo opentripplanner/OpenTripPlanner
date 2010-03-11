@@ -19,6 +19,8 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.opentripplanner.util.model.EncodedPolylineBean;
+
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).

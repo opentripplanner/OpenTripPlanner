@@ -14,11 +14,10 @@
 package org.opentripplanner.api.extended.ws.model;
 
 import java.util.List;
-
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.extended.fork.EncodedPolylineBean;
 import org.opentripplanner.api.extended.ws.TransitServerGtfs;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 
 public class TransitServerRoute {
     private String shortname;
