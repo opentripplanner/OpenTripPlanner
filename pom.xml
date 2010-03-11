@@ -17,6 +17,7 @@
       <module>opentripplanner-routing</module>
       <module>opentripplanner-webapp</module>
       <module>opentripplanner-api-extended</module>
+      <module>opentripplanner-utils</module>
   </modules>
 
   <build>
