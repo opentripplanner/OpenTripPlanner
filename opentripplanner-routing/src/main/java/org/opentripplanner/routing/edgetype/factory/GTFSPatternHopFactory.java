@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -221,6 +222,15 @@ public class GTFSPatternHopFactory {
          */
 
         HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart = new HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>>();
+        HashMap<Trip, List<Frequency>> tripFrequencies = new HashMap<Trip, List<Frequency>>();
+        for(Frequency freq : _dao.getAllFrequencies()) {
+            List<Frequency> freqs= tripFrequencies.get(freq.getTrip());
+            if(freqs == null) {
+                freqs = new ArrayList<Frequency>();
+                tripFrequencies.put(freq.getTrip(), freqs);
+            }
+            freqs.add(freq);
+        }
 
         for (Trip trip : trips) {
 
@@ -228,9 +238,9 @@ public class GTFSPatternHopFactory {
                 _log.debug("trips=" + index + "/" + trips.size());
             index++;
 
-            List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+            List<StopTime> originalStopTimes = _dao.getStopTimesForTrip(trip);
 
-            if (stopTimes.size() < 2) {
+            if (originalStopTimes.size() < 2) {
                 _log
                         .warn("Trip "
                                 + trip
@@ -238,69 +248,104 @@ public class GTFSPatternHopFactory {
                 continue;
             }
 
+            List<List<StopTime>> allStopTimes = new ArrayList<List<StopTime>>();
+            List<Frequency>      frequencies  = tripFrequencies.get(trip);
+
             StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
             String blockId = trip.getBlockId();
-            boolean simple = false;
 
-            if (tripPattern == null) {
-                tripPattern = makeTripPattern(graph, trip, stopTimes);
-
-                patterns.put(stopPattern, tripPattern);
-                if (blockId != null && !blockId.equals("")) {
-                    addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
-                            blockId);
-                }
+            /*
+             * Trip frequencies are handled by creating new StopTimes for each departure in
+             * a frequency. Since only the departure/arrival times change, the tripPattern
+             * may be reused.
+             *
+             * FIXME: Instead of duplicating StopTimes, create a new set of edgetypes
+             * FIXME: to represent frequency-based trips.
+             */
+            if(frequencies == null) {
+                allStopTimes.add(originalStopTimes);
             } else {
-                int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
-                        .getDepartureTime());
-                if (insertionPoint < 0) {
-                    // There's already a departure at this time on this trip pattern. This means
-                    // that either (a) this will have all the same stop times as that one, and thus
-                    // will be a duplicate of it, or (b) it will have different stops, and thus
-                    // break the assumption that trips are non-overlapping.
-                    _log.warn("duplicate first departure time for trip " + trip.getId()
-                            + ".  This will be handled correctly but inefficiently.");
+                for(Frequency freq : frequencies) {
+                    for(int i = freq.getStartTime(); i < freq.getEndTime(); i += freq.getHeadwaySecs()) {
+                        int diff = i - originalStopTimes.get(0).getArrivalTime();
+                        List<StopTime> newStopTimes = new ArrayList<StopTime>();
 
-                    simple = true;
-                    createSimpleHops(graph, trip, stopTimes);
-
-                } else {
-
-                    // try to insert this trip at this location
-
-                    StopTime st1 = null;
-                    int i;
-                    for (i = 0; i < stopTimes.size() - 1; i++) {
-                        StopTime st0 = stopTimes.get(i);
-                        st1 = stopTimes.get(i + 1);
-                        int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-                        int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-                        try {
-                            tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                    runningTime, st1.getArrivalTime(), dwellTime,
-                                    trip);
-                        } catch (TripOvertakingException e) {
-                            _log
-                                    .warn("trip "
-                                            + trip.getId()
-                                            + " overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
-                            // back out trips and revert to the simple method
-                            for (i = i - 1; i >= 0; --i) {
-                                tripPattern.removeHop(i, insertionPoint);
-                            }
-                            createSimpleHops(graph, trip, stopTimes);
-                            simple = true;
-                            break;
+                        for(StopTime st : originalStopTimes) {
+                            StopTime modified = cloneStopTime(st);
+                            if(st.isArrivalTimeSet())
+                                modified.setArrivalTime(st.getArrivalTime() + diff);
+                            if(st.isDepartureTimeSet())
+                                modified.setDepartureTime(st.getDepartureTime() + diff);
+                            newStopTimes.add(modified);
                         }
+                        allStopTimes.add(newStopTimes);
                     }
                 }
-                if (!simple) {
+            }
+
+            for(List<StopTime> stopTimes : allStopTimes) {
+                boolean simple = false;
+
+                if (tripPattern == null) {
+                    tripPattern = makeTripPattern(graph, trip, stopTimes);
+
+                    patterns.put(stopPattern, tripPattern);
                     if (blockId != null && !blockId.equals("")) {
                         addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
                                 blockId);
                     }
-                    tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+                } else {
+                    int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
+                            .getDepartureTime());
+                    if (insertionPoint < 0) {
+                        // There's already a departure at this time on this trip pattern. This means
+                        // that either (a) this will have all the same stop times as that one, and thus
+                        // will be a duplicate of it, or (b) it will have different stops, and thus
+                        // break the assumption that trips are non-overlapping.
+                        _log.warn("duplicate first departure time for trip " + trip.getId()
+                                + ".  This will be handled correctly but inefficiently.");
+
+                        simple = true;
+                        createSimpleHops(graph, trip, stopTimes);
+
+                    } else {
+
+                        // try to insert this trip at this location
+
+                        StopTime st1 = null;
+                        int i;
+                        for (i = 0; i < stopTimes.size() - 1; i++) {
+                            StopTime st0 = stopTimes.get(i);
+                            st1 = stopTimes.get(i + 1);
+                            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
+                            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+                            try {
+                                tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
+                                        runningTime, st1.getArrivalTime(), dwellTime,
+                                        trip);
+                            } catch (TripOvertakingException e) {
+                                _log
+                                        .warn("trip "
+                                                + trip.getId()
+                                                + " overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
+                                // back out trips and revert to the simple method
+                                for (i = i - 1; i >= 0; --i) {
+                                    tripPattern.removeHop(i, insertionPoint);
+                                }
+                                createSimpleHops(graph, trip, stopTimes);
+                                simple = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!simple) {
+                        if (blockId != null && !blockId.equals("")) {
+                            addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
+                                    blockId);
+                        }
+                        tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+                    }
                 }
             }
         }
@@ -748,5 +793,26 @@ public class GTFSPatternHopFactory {
         double indexPart = (distance - distances[index - 1])
                 / (distances[index] - prevDistance);
         return new LinearLocation(index - 1, indexPart);
+    }
+
+    private StopTime cloneStopTime(StopTime original) {
+        StopTime anew = new StopTime();
+        anew.setTrip(original.getTrip());
+        anew.setStopSequence(original.getStopSequence());
+        anew.setStopHeadsign(original.getStopHeadsign());
+        anew.setStop(original.getStop());
+        anew.setRouteShortName(original.getRouteShortName());
+        anew.setPickupType(original.getPickupType());
+        anew.setId(original.getId());
+        anew.setDropOffType(original.getDropOffType());
+
+        if(original.isShapeDistTraveledSet())
+            anew.setShapeDistTraveled(original.getShapeDistTraveled());
+        if(original.isArrivalTimeSet())
+            anew.setArrivalTime(original.getArrivalTime());
+        if(original.isDepartureTimeSet())
+            anew.setDepartureTime(original.getDepartureTime());
+
+        return anew;
     }
 }
