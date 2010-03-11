@@ -239,7 +239,7 @@ public class GTFSPatternHopFactory {
             index++;
 
             List<StopTime> originalStopTimes = _dao.getStopTimesForTrip(trip);
-
+            interpolateStopTimes(originalStopTimes);
             if (originalStopTimes.size() < 2) {
                 _log
                         .warn("Trip "
@@ -479,14 +479,82 @@ public class GTFSPatternHopFactory {
         stopTrips.add(new EncodedTrip(trip, 0, tripPattern));
     }
 
+    private void interpolateStopTimes(List<StopTime> stopTimes) {
+        int lastStop = stopTimes.size() - 1;
+        int numInterpStops = -1;
+        int departureTime = -1, prevDepartureTime = -1;
+        int interpStep = 0;
+
+        int i;
+        StopTime st1 = null;
+        for (i = 0; i < lastStop; i++) {
+//            System.out.println("i = " + i);
+            StopTime st0 = stopTimes.get(i);
+            st1 = stopTimes.get(i + 1);
+
+            prevDepartureTime = departureTime;
+            departureTime = st0.getDepartureTime();
+
+            /* Interpolate, if necessary, the times of non-timepoint stops */
+
+            /* trivial cases */
+            if (!st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) {
+                st0.setDepartureTime(st0.getArrivalTime());
+            }
+            if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
+                st1.setDepartureTime(st1.getArrivalTime());
+            }
+            /* genuine interpolation needed */
+            if (!(st0.isDepartureTimeSet() && st0.isArrivalTimeSet())) {
+                // figure out how many such stops there are in a row.
+                int j;
+                StopTime st = null;
+                for (j = i + 1; j < lastStop + 1; ++j) {
+                    st = stopTimes.get(j);
+                    if (st.isDepartureTimeSet() || st.isArrivalTimeSet()) {
+                        break;
+                    }
+                }
+                if (j == lastStop + 1) {
+                    throw new RuntimeException(
+                            "Could not interpolate arrival/departure time on stop " + i
+                            + " (missing final stop time) on trip " + st0.getTrip());
+                }
+                numInterpStops = j - i;
+                int arrivalTime;
+                if (st.isArrivalTimeSet()) {
+                    arrivalTime = st.getArrivalTime();
+                } else {
+                    arrivalTime = st.getDepartureTime();
+                }
+                interpStep = (arrivalTime - prevDepartureTime) / (numInterpStops + 1);
+                if (interpStep < 0) {
+                    throw new RuntimeException(
+                            "trip goes backwards for some reason");
+                }
+                for (j = i; j < i + numInterpStops; ++j) {
+                    //System.out.println("interpolating " + j + " between " + prevDepartureTime + " and " + arrivalTime);
+                    departureTime = prevDepartureTime + interpStep * (j - i + 1);
+                    st = stopTimes.get(j);
+                    if (st.isArrivalTimeSet()) {
+                        departureTime = st.getArrivalTime();
+                    } else {
+                        st.setArrivalTime(departureTime);
+                    }
+                    if (!st.isDepartureTimeSet()) {
+                        st.setDepartureTime(departureTime);
+                    }
+                }
+                i = j - 1;
+            }
+        }
+    }
+
     private TripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
         TripPattern tripPattern = new TripPattern(trip, stopTimes);
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
-        int departureTime = -1, prevDepartureTime = -1;
-        int numInterpStops = -1, firstInterpStop = -1;
-        int interpStep = 0;
 
         int i;
         StopTime st1 = null;
@@ -521,45 +589,11 @@ public class GTFSPatternHopFactory {
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourneyArrive));
 
-            prevDepartureTime = departureTime;
-            departureTime = st0.getDepartureTime();
             int arrivalTime = st1.getArrivalTime();
 
-            /* Interpolate, if necessary, the times of non-timepoint stops */
-            if (!(st0.isDepartureTimeSet() && st1.isArrivalTimeSet())) {
+            int departureTime = st0.getDepartureTime();
 
-                if (numInterpStops == -1) {
-                    // figure out how many such stops there are in a row.
-                    int j;
-                    for (j = i + 1; j < lastStop + 1; ++j) {
-                        StopTime st = stopTimes.get(j);
-                        if (st.isDepartureTimeSet()) {
-                            break;
-                        }
-                    }
-                    if (j == lastStop + 1) {
-                        throw new RuntimeException(
-                                "Could not interpolate arrival/departure time on stop " + i
-                                        + " on trip " + trip);
-                    }
-                    StopTime st = stopTimes.get(j);
-                    numInterpStops = j - i - 1;
-                    firstInterpStop = i + 1;
-                    interpStep = (st.getArrivalTime() - departureTime) / (numInterpStops + 2);
-                }
-                if (i >= firstInterpStop) {
-                    departureTime = prevDepartureTime + interpStep * (i + 1 - firstInterpStop);
-                }
-                if (i < firstInterpStop + numInterpStops - 1) {
-                    arrivalTime = departureTime + interpStep;
-                }
-                if (i == firstInterpStop + numInterpStops - 1) {
-                    // done interpolating
-                    numInterpStops = -1;
-                }
-            }
-
-            int runningTime = arrivalTime - departureTime;
+            int runningTime = arrivalTime - departureTime ;
 
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
                     trip);
