@@ -402,4 +402,42 @@ public class TestPatternHopLoader extends TestCase {
         c.setTimeInMillis(endTime);
         assertTrue((endTime - startTime.getTimeInMillis()) / 1000 < 7200);
     }
+
+	public void testFrequencies() {
+        Vertex stop_u = graph.getVertex("agency_U");
+        Vertex stop_v = graph.getVertex("agency_V");
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        TraverseOptions options = new TraverseOptions(context);
+        options.modes = new TraverseModeSet("TRANSIT");
+
+        // U to V - original stop times - shouldn't be used
+        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        path = spt.getPath(stop_v);
+        assertNotNull(path);
+        assertEquals(4, path.vertices.size());
+        long endTime = new GregorianCalendar(2009, 8, 7, 6, 40, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+
+        // U to V - first frequency
+        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 7, 7, 0, 0).getTimeInMillis()), options);
+        path = spt.getPath(stop_v);
+        assertNotNull(path);
+        assertEquals(4, path.vertices.size());
+        endTime = new GregorianCalendar(2009, 8, 7, 7, 40, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+
+        // U to V - second frequency
+        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 7, 14, 0, 0).getTimeInMillis()), options);
+        path = spt.getPath(stop_v);
+        assertNotNull(path);
+        assertEquals(4, path.vertices.size());
+        endTime = new GregorianCalendar(2009, 8, 7, 14, 40, 0).getTimeInMillis();
+        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+	}
 }
