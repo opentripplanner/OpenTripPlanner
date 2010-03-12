@@ -47,12 +47,14 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -289,6 +291,11 @@ public class Planner {
                 lastEdge = edge;
 
                 TraverseMode edgeMode = graphEdge.getMode();
+                // special case for bicycling on Street edges, where mode cannot be deduced from
+                // edge type
+                if (graphEdge instanceof Street && modeSet.contains(TraverseMode.BICYCLE)) {
+                    edgeMode = TraverseMode.BICYCLE;
+                }
                 double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
 
                 if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
@@ -359,7 +366,7 @@ public class Planner {
                     continue;
                 }
 
-                if (edgeMode == TraverseMode.WALK) {
+                if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
                     itinerary.walkTime += edgeTime;
                     itinerary.walkDistance += graphEdge.getDistance();
                     if (graphEdge instanceof Street) {
