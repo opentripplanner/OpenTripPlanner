@@ -534,15 +534,14 @@ otp.planner.Itinerary = {
             leg.data.showStopIds = this.showStopIds;
             var text;
             var hasKids = true;
-            // XXX we need to use the path to the icon instead of the class
-            // this is to prevent having to manually generate custom css styles for each route
-            var icon = 'images/ui/trip/mode/bus.png';
             var sched = null;
             var mode = leg.get('mode').toLowerCase();
-            if(mode == 'walk') 
+            var routeName = leg.get('routeName');
+            var agencyId = leg.get('agencyId');
+            if(mode == 'walk' || mode == 'bike') 
             {
+                var verb = mode === 'bike' ? 'Bike' : 'Walk';
                 hasKids = false;
-                icon = 'images/ui/trip/mode/walk.png';
                 if (!leg.data.formattedSteps)
                 {
                     leg.data.formattedSteps = [];
@@ -562,7 +561,7 @@ otp.planner.Itinerary = {
                         var relativeDirection = step.relativeDirection;
                         if (relativeDirection == null || noStepsYet == true)
                         {
-                            stepText += 'Walk <strong>' + step.absoluteDirection.toLowerCase() + '</strong> on <strong>' + step.streetName + '</strong>';
+                            stepText += verb + ' <strong>' + step.absoluteDirection.toLowerCase() + '</strong> on <strong>' + step.streetName + '</strong>';
                             noStepsYet = false;
                         }
                         else 
@@ -591,11 +590,11 @@ otp.planner.Itinerary = {
                         leg.data.formattedSteps.push(stepText);
                     }
                 }
-                text = otp.planner.Templates.TP_WALK_LEG.applyTemplate(leg.data);
+                var template = mode == 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
+                text = otp.planner.Templates[template].applyTemplate(leg.data);
             }
             else
             {
-                var routeName = leg.get('routeName');
                 var order = leg.get('order');
                 if (order == 'thru-route') {
                     text = otp.planner.Templates.getInterlineLeg().applyTemplate(leg.data);
@@ -604,9 +603,8 @@ otp.planner.Itinerary = {
                 {
                     text  = otp.planner.Templates.getTransitLeg().applyTemplate(leg.data);
                 }
-                var agencyId = leg.get('agencyId');
-                icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
             }
+            icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
             retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
