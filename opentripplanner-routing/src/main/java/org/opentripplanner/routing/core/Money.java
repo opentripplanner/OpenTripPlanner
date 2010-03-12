@@ -25,12 +25,12 @@ public class Money implements Comparable<Money> {
     /**
      * The currency of the money.
      */
-    Currency currency;
+    private Currency currency;
     /**
      * The actual currency value in decimal fixed-point, with the default number of fraction digits
      * from currency after the decimal point.
      */
-    int cents; 
+    private int cents; 
 
     public Money() {}
     
@@ -56,5 +56,21 @@ public class Money implements Comparable<Money> {
             throw new RuntimeException("Can't compare " + m.currency + " to " + currency);
         }
         return cents - m.cents;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCents(int cents) {
+        this.cents = cents;
+    }
+
+    public int getCents() {
+        return cents;
     }
 }
