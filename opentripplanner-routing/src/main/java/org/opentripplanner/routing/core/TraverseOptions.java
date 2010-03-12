@@ -44,7 +44,7 @@ public class TraverseOptions {
 
     public double maxWalkDistance = Double.MAX_VALUE;
 
-    private HashMap<AgencyAndId, FareContext> fareContexts;
+    private HashMap<AgencyAndId, FareRuleSet> fareContexts;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -65,7 +65,7 @@ public class TraverseOptions {
 
     public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
-        fareContexts = context.getFareContexts();
+        fareContexts = context.getFareRules();
     }
 
     public void setCalendarService(CalendarServiceImpl calendarService) {
@@ -92,7 +92,7 @@ public class TraverseOptions {
     /**
      * @return the fareContexts
      */
-    public HashMap<AgencyAndId, FareContext> getFareContexts() {
+    public HashMap<AgencyAndId, FareRuleSet> getFareContexts() {
         return fareContexts;
     }
 

@@ -10,6 +10,10 @@ public class WrappedCurrency {
         value = null;
     }
 
+    public WrappedCurrency(Currency value) {
+        this.value = value;
+    }
+    
     public WrappedCurrency(String name) {
         value = Currency.getInstance(name);
     }
@@ -29,13 +33,16 @@ public class WrappedCurrency {
     public String getSymbol(Locale l) {
         return value.getSymbol(l);
     }
-    
-    public WrappedCurrency(Currency value) {
-        this.value = value;
-    }
-    
+
     public String toString() {
         return value.toString();
     }
     
+    public boolean equals(Object o) {
+        if (o instanceof Currency) {
+            return value.equals(o);
+        }
+        WrappedCurrency c = (WrappedCurrency) o;
+        return value.equals(c.value);
+    }
 }

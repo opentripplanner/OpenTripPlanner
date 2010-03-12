@@ -25,6 +25,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
@@ -35,6 +36,8 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.FareContext;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TransitStop;
@@ -165,8 +168,18 @@ public class GTFSPatternHopFactory {
 
     private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
+    private FareContext fareContext;
+
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
+       
+        HashMap<AgencyAndId, FareRuleSet> fareRules = context.getFareRules();
+        HashMap<AgencyAndId, FareAttribute> fareAttributes = new HashMap<AgencyAndId, FareAttribute>(); 
+        for (AgencyAndId fareId: fareRules.keySet()) {
+            FareAttribute attribute = context.getFareAttribute(fareId);
+            fareAttributes.put(fareId, attribute);
+        }
+        fareContext = new FareContext(fareRules, fareAttributes);        
     }
 
     public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
@@ -585,7 +598,7 @@ public class GTFSPatternHopFactory {
 
             PatternHop hop = new PatternHop(startJourneyDepart, endJourneyArrive, s0, s1, i,
                     tripPattern);
-
+            hop.setFareContext(fareContext);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourneyArrive));
 
@@ -683,6 +696,7 @@ public class GTFSPatternHopFactory {
             Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);
             graph.addEdge(dwell);
             Hop hop = new Hop(startJourneyDepart, endJourney, st0, st1);
+            hop.setFareContext(fareContext);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourney));
             hops.add(hop);

@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.logging.Logger;
 
@@ -38,7 +37,7 @@ public class Fare {
         fare = new HashMap<FareType, Money>();
     }
 
-    public void addFare(FareType fareType, Currency currency, int cents) {
+    public void addFare(FareType fareType, WrappedCurrency currency, int cents) {
         fare.put(fareType, new Money(currency, cents));
     }
     

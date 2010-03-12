@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -55,7 +56,7 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
     private AgencyAndId _serviceId;
 
     private int elapsed;
-
+    
     public AgencyAndId getServiceId() {
         return _serviceId;
     }
@@ -79,12 +80,14 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(elapsed);
+        state1.addZone(getEndStop().getZoneId(), fareContext);
         return new TraverseResult(elapsed, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-elapsed);
+        state1.addZone(getStartStop().getZoneId(), fareContext);
         return new TraverseResult(elapsed, state1);
     }
 
@@ -99,6 +102,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
     ArrayList<DrawablePoint> geometryCache = null;
 
     private Geometry geometry = null;
+
+    private FareContext fareContext;
 
     public ArrayList<DrawablePoint> getDrawableGeometry() {
         if (geometryCache != null) {
@@ -164,5 +169,9 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
 
     public Trip getTrip() {
         return start.getTrip();
+    }
+
+    public void setFareContext(FareContext context) {
+        fareContext = context;
     }
 }

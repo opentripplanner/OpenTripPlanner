@@ -13,14 +13,11 @@
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.opentripplanner.routing.core.Fare;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -268,8 +265,7 @@ public class Planner {
             itinerary.startTime = new Date(startState.getTime());
             itinerary.endTime = new Date(endState.getTime());
             itinerary.duration = endState.getTime() - startState.getTime();
-            itinerary.fare = new Fare();
-            itinerary.fare.addFare(Fare.FareType.regular, Currency.getInstance("USD"), 225);
+            itinerary.fare = endState.getCost();
             itinerary.transfers = -1;
 
             Leg leg = null;

@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -40,6 +41,8 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
 
     private Geometry geometry = null;
 
+    private FareContext context = null;
+    
     public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
         super(startJourney, endJourney, tripPattern);
@@ -68,7 +71,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(runningTime);
-        state1.addZone(getEndStop().getZoneId());
+        state1.addZone(getEndStop().getZoneId(), context);
         return new TraverseResult(runningTime, state1);
     }
 
@@ -76,6 +79,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(-runningTime);
+        state1.addZone(getStartStop().getZoneId(), context);
         return new TraverseResult(runningTime, state1);
     }
 
@@ -106,5 +110,13 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
 
     public String toString() {
         return "PatternHop(" + super.toString() + ")";
+    }
+
+    public void setFareContext(FareContext context) {
+        this.context = context;
+    }
+
+    public FareContext getContext() {
+        return context;
     }
 }

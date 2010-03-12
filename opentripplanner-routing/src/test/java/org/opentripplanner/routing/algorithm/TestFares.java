@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
-import java.util.Currency;
 import java.util.GregorianCalendar;
 
 import org.opentripplanner.ConstantsForTests;
@@ -12,6 +11,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -37,7 +37,7 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
 
-        Fare cost = path.vertices.lastElement().state.getCost(context);
-        assertEquals(cost.getFare(FareType.regular), new Money(Currency.getInstance("USD"), 425));
+        Fare cost = path.vertices.lastElement().state.getCost();
+        assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
 }

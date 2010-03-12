@@ -20,14 +20,14 @@ import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 
-import org.opentripplanner.routing.core.FareContext;
+import org.opentripplanner.routing.core.FareRuleSet;
 
 public interface GtfsContext {
     public GtfsRelationalDao getDao();
 
     public CalendarService getCalendarService();
     
-    public HashMap<AgencyAndId, FareContext> getFareContexts();
+    public HashMap<AgencyAndId, FareRuleSet> getFareRules();
 
     public FareAttribute getFareAttribute(AgencyAndId fareId);
 }
