@@ -41,4 +41,22 @@ public class Fare {
     public void addFare(FareType fareType, Currency currency, int cents) {
         fare.put(fareType, new Money(currency, cents));
     }
+    
+    public Money getFare(FareType type) {
+        return fare.get(type);
+    }
+    
+    public String toString() {
+        StringBuffer buffer = new StringBuffer("Fare(");
+        for (FareType type : fare.keySet()) {
+            Money cost = fare.get(type);
+            buffer.append("[");
+            buffer.append(type.toString());
+            buffer.append(":");
+            buffer.append(cost.toString());
+            buffer.append("], ");
+        }
+        buffer.append(")");
+        return buffer.toString();
+    }
 }

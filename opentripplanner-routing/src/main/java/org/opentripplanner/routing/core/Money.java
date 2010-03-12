@@ -13,13 +13,14 @@
 
 package org.opentripplanner.routing.core;
 
+import java.text.NumberFormat;
 import java.util.Currency;
 
 /**
- * <strong>Fare support has not yet been implemented.</strong>
+ * <strong>Fare support is very, very preliminary.</strong>
  *
  */
-public class Money {
+public class Money implements Comparable<Money> {
 
     /**
      * The currency of the money.
@@ -38,5 +39,22 @@ public class Money {
         this.cents = cents;
     }
     
-
+    public String toString() {
+        NumberFormat nf = NumberFormat.getCurrencyInstance();
+        nf.setCurrency(currency);
+        String c = nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
+        return "Money(" + c + ")";
+    }
+    
+    public boolean equals(Object other) {
+        Money m = (Money) other;
+        return m.currency.equals(currency) && m.cents == cents;
+    }
+    
+    public int compareTo(Money m) {
+        if (m.currency != currency) {
+            throw new RuntimeException("Can't compare " + m.currency + " to " + currency);
+        }
+        return cents - m.cents;
+    }
 }

@@ -44,6 +44,7 @@ public class State {
     public State(long time) {
         _time = time;
         zonesVisited = new ArrayList<String>();
+        routesVisited = new ArrayList<AgencyAndId>();
     }    
 
     public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
@@ -85,11 +86,11 @@ public class State {
     }
 
     public Fare getCost(GtfsContext context) {
-        HashMap<AgencyAndId, FareContext> contexts = context.getFareContexts();
+        HashMap<AgencyAndId, FareContext> fareContexts = context.getFareContexts();
         float bestFare = Float.MAX_VALUE; 
         Currency currency = null;
-        for (AgencyAndId fareId : contexts.keySet()) {
-            FareContext fareContext = contexts.get(fareId);
+        for (AgencyAndId fareId : fareContexts.keySet()) {
+            FareContext fareContext = fareContexts.get(fareId);
             if (fareContext.matches(zonesVisited, routesVisited)) {
                 FareAttribute attribute = context.getFareAttribute(fareId);
                 float newFare = attribute.getPrice();
