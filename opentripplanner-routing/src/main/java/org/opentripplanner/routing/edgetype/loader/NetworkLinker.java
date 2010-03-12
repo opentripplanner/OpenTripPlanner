@@ -69,19 +69,27 @@ public class NetworkLinker {
                     } else if (nearestIntersection instanceof OneStreetVertex) {
                         //this kind of vertex can only have one Street edge in each direction
                         //so we need to create a spare vertex to connect the STL to.
-
                         OneStreetVertex osvertex = ((OneStreetVertex) nearestIntersection);
                         GenericVertex newV = new GenericVertex(osvertex.getLabel() + " approach", osvertex.getX(), osvertex.getY());
+
                         Street approach = new Street(osvertex, newV, 0);
                         Street approachBack = new Street(newV, osvertex, 0);
-                        osvertex.inStreet.setToVertex(newV);
-                        osvertex.outStreet.setFromVertex(newV);
-                        newV.addIncoming(osvertex.inStreet);
-                        newV.addOutgoing(osvertex.outStreet);
+
+                        if(osvertex.inStreet != null) {
+                            osvertex.inStreet.setToVertex(newV);
+                            newV.addIncoming(osvertex.inStreet);
+                        }
+                        if(osvertex.outStreet != null) {
+                            osvertex.outStreet.setFromVertex(newV);
+                            newV.addOutgoing(osvertex.outStreet);
+                        }
+
                         newV.addIncoming(approach);
                         newV.addOutgoing(approachBack);
+
                         osvertex.inStreet = approachBack;
                         osvertex.outStreet = approach;
+
                         nearestIntersection = newV;
                         graph.addVertex(newV);
                     }
