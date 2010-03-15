@@ -40,4 +40,26 @@ public class TestFares extends TestCase {
         Fare cost = path.vertices.lastElement().state.getCost();
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
+    public void testPortland() throws Exception {
+
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
+        TraverseOptions options = new TraverseOptions();
+        options.setGtfsContext(context);
+
+        Graph gg = new Graph();
+        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
+        hl.load();
+        ShortestPathTree spt;
+        GraphPath path = null;
+        long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();
+        
+        //from zone 3 to zone 2
+        spt = AStar.getShortestPathTree(gg, "TriMet_10579",
+                "TriMet_8346", new State(startTime), options);
+
+        path = spt.getPath(gg.getVertex("TriMet_8346"));
+        assertNotNull(path);
+        Fare cost = path.vertices.lastElement().state.getCost();
+        assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 200));
+    }
 }

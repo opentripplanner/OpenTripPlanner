@@ -48,24 +48,28 @@ public class FareRuleSet implements Serializable {
     }
 
     public boolean matches(List<String> zonesVisited, List<AgencyAndId> routesVisited) {
-        //check for matching origin/destination
-        P2<String> od = new P2<String>(zonesVisited.get(0), zonesVisited.get(zonesVisited.size() - 1));
-        if (!originDestinations.contains(od)) {
-            P2<String> od2 = new P2<String>(od.getFirst(), null);
-            if (!originDestinations.contains(od2)) {
-                od2 = new P2<String>(null, od.getFirst());
+        //check for matching origin/destination, if this ruleset has any origin/destination restrictions
+        if (originDestinations.size() > 0) {
+            P2<String> od = new P2<String>(zonesVisited.get(0), zonesVisited.get(zonesVisited.size() - 1));
+            if (!originDestinations.contains(od)) {
+                P2<String> od2 = new P2<String>(od.getFirst(), null);
                 if (!originDestinations.contains(od2)) {
+                    od2 = new P2<String>(null, od.getFirst());
+                    if (!originDestinations.contains(od2)) {
+                        return false;
+                    }
+                }
+            }
+        }
+        
+        //check for matching contains, if this ruleset has any containment restrictions
+        if (contains.size() > 0) {
+            for (String contained : contains) {
+                if (!zonesVisited.contains(contained)) {
                     return false;
                 }
             }
         }
-        //check for matching contains
-        for (String contained : contains) {
-            if (!zonesVisited.contains(contained)) {
-                return false;
-            }
-        }
-        
         //check for matching routes
         for (AgencyAndId route : routesVisited) {
             if (!routes.contains(route)) {

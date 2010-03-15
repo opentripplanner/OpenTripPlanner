@@ -64,7 +64,7 @@ public class State {
     }
 
     public void addZone(String zone, FareContext context) {
-        if (zonesVisited.size() > 0 && zonesVisited.get(zonesVisited.size() - 1) == zone) {
+        if (zonesVisited.size() > 0 && zonesVisited.get(zonesVisited.size() - 1).equals(zone)) {
             return;
         }
         //copy on write
@@ -74,7 +74,7 @@ public class State {
     }
     
     public void addRoute(AgencyAndId route, FareContext fareContext) {
-        if (routesVisited.size() > 0 && routesVisited.get(routesVisited.size() - 1) == route) {
+        if (routesVisited.size() > 0 && routesVisited.get(routesVisited.size() - 1).equals(route)) {
             return;
         }
         //copy on write
@@ -97,6 +97,7 @@ public class State {
         Currency currency = null;
         HashMap<AgencyAndId, FareRuleSet> fareRules = fareContext.getFareRules();
         HashMap<AgencyAndId, FareAttribute> fareAttributes = fareContext.getFareAttributes();
+        System.out.println(zonesVisited);
         for (AgencyAndId fareId : fareRules.keySet()) {
             FareRuleSet ruleSet = fareRules.get(fareId);
             if (ruleSet.matches(zonesVisited, routesVisited)) {
