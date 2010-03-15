@@ -64,6 +64,9 @@ public class State {
     }
 
     public void addZone(String zone, FareContext context) {
+        if (zone == null) {
+            return;
+        }
         if (zonesVisited.size() > 0 && zonesVisited.get(zonesVisited.size() - 1).equals(zone)) {
             return;
         }
