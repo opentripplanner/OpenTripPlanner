@@ -44,14 +44,12 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.Turn;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -295,6 +293,7 @@ public class Planner {
                 double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
 
                 if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
+                    //change of mode
                     if (edgeMode != mode
                             || (!mode.isOnStreetNonTransit() && graphEdge.getName() != name)) {
                         name = graphEdge.getName();
@@ -325,9 +324,9 @@ public class Planner {
                             leg.headsign = trip.getTripHeadsign();
                             leg.agencyId = trip.getId().getAgencyId();
                         }
-                        mode = graphEdge.getMode();
+                        mode = edgeMode;
                         leg.mode = mode.toString();
-                        if (mode == TraverseMode.WALK) {
+                        if (mode == TraverseMode.WALK || mode == TraverseMode.BICYCLE) {
                             startWalk = i;
                         } else {
                             startWalk = -1;

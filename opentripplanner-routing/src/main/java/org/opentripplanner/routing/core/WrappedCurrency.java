@@ -4,7 +4,7 @@ import java.util.Currency;
 import java.util.Locale;
 
 public class WrappedCurrency {
-    public Currency value;
+    private Currency value;
     
     public WrappedCurrency() {
         value = null;
@@ -44,5 +44,9 @@ public class WrappedCurrency {
         }
         WrappedCurrency c = (WrappedCurrency) o;
         return value.equals(c.value);
+    }
+    
+    public Currency getCurrency() {
+        return value;
     }
 }
