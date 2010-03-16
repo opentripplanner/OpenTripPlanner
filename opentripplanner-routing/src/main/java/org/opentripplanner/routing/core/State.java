@@ -100,7 +100,6 @@ public class State {
         Currency currency = null;
         HashMap<AgencyAndId, FareRuleSet> fareRules = fareContext.getFareRules();
         HashMap<AgencyAndId, FareAttribute> fareAttributes = fareContext.getFareAttributes();
-        System.out.println(zonesVisited);
         for (AgencyAndId fareId : fareRules.keySet()) {
             FareRuleSet ruleSet = fareRules.get(fareId);
             if (ruleSet.matches(zonesVisited, routesVisited)) {
