@@ -349,7 +349,7 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
 
             var mode = from.get('mode');
-            if(mode == 'WALK' || mode == 'TRANSFER') 
+            if(mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER') 
             {
                 try
                 {
@@ -398,9 +398,9 @@ otp.planner.Itinerary = {
             var from = this.m_fromStore.getAt(startIndex);
             var fromP = from.get('geometry');
             var mode = from.get('mode');
-            if(mode != 'WALK') 
+            if(mode !== 'WALK' && mode !== 'BICYCLE') 
             {
-                // if the first leg isn't a walk, then assume it's a transit leg
+                // if the first leg isn't a walk or bike, then assume it's a transit leg or bike leg
                 // so paint the route icon (eg: fromStore.getAt(0))
                 startIndex = 0;
                 this.createAndAddMarker(fromP.x, fromP.y, {type: 'fromMarker', mode: mode});
@@ -409,18 +409,32 @@ otp.planner.Itinerary = {
             {
                 // first leg is a walk leg, so mark this point with the from icon that has the walking guy, and move on to next leg in store...
                 startIndex = 1;
-                this.createAndAddMarker(fromP.x, fromP.y, {type: 'fromWalkMarker', mode: mode});
+                var markerType;
+                if (mode === 'WALK')
+                {
+                    markerType = 'fromWalkMarker';
+                }
+                else if (mode === 'BICYCLE')
+                {
+                    markerType = 'fromBicycleMarker';
+                }
+                else
+                {
+                    markerType = 'fromMarker';
+                }
+                this.createAndAddMarker(fromP.x, fromP.y, {type: markerType, mode: mode});
             }
 
             // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
             var walk = this.m_fromStore.getAt(endIndex);
             var walkP = walk.get('geometry');
             mode = walk.get('mode');
-            // Don't draw another walk marker if the first leg is a walk and there's only one leg
-            if(mode == 'WALK' && endIndex > 0)
+            // Don't draw another walk marker if the first leg is a walk or bike and there's only one leg
+            if((mode === 'WALK' || mode === 'BICYCLE') && endIndex > 0)
             {
                 endIndex--;
-                this.createAndAddMarker(walkP.x, walkP.y, {type: 'walkMarker', mode: mode});
+                var markerType = (mode === 'BICYCLE') ? 'bicycleMarker' : 'walkMarker';
+                this.createAndAddMarker(walkP.x, walkP.y, {type: markerType, mode: mode});
             }
 
             // save the list of routes for this itinerary the first time around
@@ -538,9 +552,9 @@ otp.planner.Itinerary = {
             var mode = leg.get('mode').toLowerCase();
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
-            if(mode == 'walk' || mode == 'bike') 
+            if(mode === 'walk' || mode === 'bicycle') 
             {
-                var verb = mode === 'bike' ? 'Bike' : 'Walk';
+                var verb = (mode === 'bicycle') ? 'Bike' : 'Walk';
                 hasKids = false;
                 if (!leg.data.formattedSteps)
                 {

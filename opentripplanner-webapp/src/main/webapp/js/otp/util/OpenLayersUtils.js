@@ -339,7 +339,9 @@ otp.util.OpenLayersUtils = {
 
     markerGraphicMapping  : {
         walkMarker: 'images/map/trip/mode/walk.png',
+        bicycleMarker: 'images/map/trip/mode/bicycle.png',
         fromWalkMarker: 'images/map/trip/start-walk.png',
+        fromBicycleMarker: 'images/map/trip/start-bicycle.png',
         toMarker: 'images/map/trip/end.png',
         fromMarker: 'images/map/trip/start.png',
         diskMarker: 'images/map/trip/xferdisk.png',
@@ -377,6 +379,12 @@ otp.util.OpenLayersUtils = {
                 graphicYOffset: this.RTE_ICON_OFFSET.y
             },
             fromWalkMarker: {
+                graphicWidth: this.ST_END_SIZE.w,
+                graphicHeight: this.ST_END_SIZE.h,
+                graphicXOffset: this.ST_END_OFFSET.x,
+                graphicYOffset: this.ST_END_OFFSET.y
+            },
+            fromBicycleMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
                 graphicHeight: this.ST_END_SIZE.h,
                 graphicXOffset: this.ST_END_OFFSET.x,
@@ -423,10 +431,8 @@ otp.util.OpenLayersUtils = {
     makeMarker : function(x, y, attributes)
     {
         var point = new OpenLayers.Geometry.Point(x, y);
-        var marker = new OpenLayers.Feature.Vector(point);
+        var marker = new OpenLayers.Feature.Vector(point, attributes);
         
-        Ext.apply(marker.attributes, attributes);
-
         return marker;
     },
 
