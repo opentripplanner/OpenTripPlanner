@@ -171,5 +171,6 @@
   </dependencyManagement>
   <properties>
   	<geotools.version>2.5.7</geotools.version>
-	</properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 </project>
