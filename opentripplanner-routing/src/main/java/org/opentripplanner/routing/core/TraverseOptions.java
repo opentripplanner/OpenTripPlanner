@@ -14,13 +14,13 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -34,7 +34,7 @@ public class TraverseOptions {
 
     private CalendarService calendarService;
 
-    private Map<AgencyAndId, Set<Date>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<Date>>();
+    private Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
 
     public boolean back = false;
 
@@ -76,8 +76,8 @@ public class TraverseOptions {
         return calendarService;
     }
 
-    public boolean serviceOn(AgencyAndId serviceId, Date serviceDate) {
-        Set<Date> dates = serviceDatesByServiceId.get(serviceId);
+    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
+        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
         if (dates == null) {
             dates = calendarService.getServiceDatesForServiceId(serviceId);
             serviceDatesByServiceId.put(serviceId, dates);

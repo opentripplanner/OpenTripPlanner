@@ -39,7 +39,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
@@ -102,10 +102,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
             factory.setGtfsDao(_dao);
-            CalendarServiceData data = factory.createServiceCalendarData();
+            CalendarServiceData data = factory.createData();
 
             CalendarServiceImpl service = new CalendarServiceImpl();
-            service.setServiceCalendarData(data);
+            service.setData(data);
 
             GtfsContext context = GtfsLibrary.createContext(_dao, service);
 
@@ -113,8 +113,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             for (Stop stop : _dao.getAllStops()) {
 
                 String id = GtfsLibrary.convertIdToString(stop.getId());
-                graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(), stop.getId().getId(),
-                        stop));
+                graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(),
+                        stop.getId().getId(), stop));
             }
 
             GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
@@ -186,7 +186,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 if (entityClass.equals(Agency.class))
                     agencies.addAll(reader.getAgencies());
 
-                store.flush();
+                try {
+                    store.flush();
+                } catch (Exception e) {
+                    System.out.println("Error flushing");
+                }
             }
         }
 
@@ -197,6 +201,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         File path = gtfsBundle.getPath();
         if (path != null)
+
             return path;
 
         URL url = gtfsBundle.getUrl();
@@ -311,11 +316,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         public void handleEntity(Object bean) {
             int count = incrementCount(bean.getClass());
             if (count % 1000 == 0)
-                if( _log.isDebugEnabled() ) {
+                if (_log.isDebugEnabled()) {
                     String name = bean.getClass().getName();
                     int index = name.lastIndexOf('.');
-                    if( index != -1)
-                        name = name.substring(index+1);
+                    if (index != -1)
+                        name = name.substring(index + 1);
                     _log.debug("loading " + name + ": " + count);
                 }
         }

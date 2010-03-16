@@ -25,7 +25,7 @@ public class Money implements Comparable<Money> {
     /**
      * The currency of the money.
      */
-    private WrappedCurrency currency;
+    private WrappedCurrency currency = null;
     /**
      * The actual currency value in decimal fixed-point, with the default number of fraction digits
      * from currency after the decimal point.
@@ -41,7 +41,11 @@ public class Money implements Comparable<Money> {
     
     public String toString() {
         NumberFormat nf = NumberFormat.getCurrencyInstance();
-        nf.setCurrency(currency.value);
+        Currency cur = currency.getCurrency();
+        if (cur == null) {
+            return "Money()";
+        }
+        nf.setCurrency(cur);
         String c = nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
         return "Money(" + c + ")";
     }

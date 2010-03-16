@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -80,9 +81,9 @@ public class PatternAlight extends PatternEdge {
             return null;
         }
         long currentTime = state0.getTime();
-        Date serviceDate = getServiceDate(currentTime, options.calendar);
-        Date serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
-        int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
+        ServiceDate serviceDate = getServiceDate(currentTime, options.calendar);
+        ServiceDate serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
+        int secondsSinceMidnight = (int) ((currentTime - serviceDate.getAsDate().getTime()) / 1000);
 
         int wait = 1;
         int patternIndex = -1;
@@ -131,13 +132,13 @@ public class PatternAlight extends PatternEdge {
         return new TraverseResult(1, s1);
     }
 
-    private Date getServiceDate(long currentTime, Calendar c) {
+    private ServiceDate getServiceDate(long currentTime, Calendar c) {
         c.setTimeInMillis(currentTime);
         c.set(Calendar.HOUR_OF_DAY, 0);
         c.set(Calendar.MINUTE, 0);
         c.set(Calendar.SECOND, 0);
         c.set(Calendar.MILLISECOND, 0);
-        return c.getTime();
+        return new ServiceDate(c.getTime());
     }
     
     public int getStopIndex() {

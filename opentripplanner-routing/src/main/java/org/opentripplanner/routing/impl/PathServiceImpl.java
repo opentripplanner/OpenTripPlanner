@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -59,7 +59,7 @@ public class PathServiceImpl implements PathService {
         if (_graph.hasService(CalendarServiceData.class)) {
             CalendarServiceData data = _graph.getService(CalendarServiceData.class);
             CalendarServiceImpl calendarService = new CalendarServiceImpl();
-            calendarService.setServiceCalendarData(data);
+            calendarService.setData(data);
             _calendarService = calendarService;
         }
     }

@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -226,7 +227,8 @@ public class TransitServerGtfs {
     }
     
     public Set<AgencyAndId> getServiceIdsOnDate(Date date) {
-        return gtfsContext.getCalendarService().getServiceIdsOnDate(date);
+    	ServiceDate serviceDate = new ServiceDate(date);
+        return gtfsContext.getCalendarService().getServiceIdsOnDate(serviceDate);
     }
 
 }

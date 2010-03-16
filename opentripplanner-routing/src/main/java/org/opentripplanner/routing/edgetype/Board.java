@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -86,7 +87,7 @@ public class Board extends AbstractEdge {
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
 
         CalendarService service = wo.getCalendarService();
-        Set<Date> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
+        Set<ServiceDate> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
         if (!serviceDates.contains(serviceDate))
             return null;
 

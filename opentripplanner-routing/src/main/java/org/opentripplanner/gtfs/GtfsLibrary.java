@@ -24,7 +24,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.onebusaway.gtfs.services.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -74,10 +74,10 @@ public class GtfsLibrary {
 
         CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
         factory.setGtfsDao(dao);
-        CalendarServiceData data = factory.createServiceCalendarData();
+        CalendarServiceData data = factory.createData();
 
         CalendarServiceImpl service = new CalendarServiceImpl();
-        service.setServiceCalendarData(data);
+        service.setData(data);
         return service;
     }
 

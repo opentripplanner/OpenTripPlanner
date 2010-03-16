@@ -37,7 +37,7 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs-hibernate</artifactId>
-            <version>1.0.6</version>
+            <version>1.1.0</version>
         </dependency>
         
         <dependency>
@@ -120,6 +120,12 @@
             <groupId>org.apache.woden</groupId>
             <artifactId>woden-impl-dom</artifactId>
             <version>1.0M8</version>
+        </dependency>
+        <dependency>
+        	<groupId>postgresql</groupId>
+        	<artifactId>postgresql</artifactId>
+        	<version>8.3-603.jdbc4</version>
+        	<optional>false</optional>
         </dependency>
     </dependencies>
 
