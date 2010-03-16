@@ -17,48 +17,41 @@ otp.namespace("otp.util");
 /**
  * strings that routing engine uses to define modes
  */
-otp.util.Modes = {
-
-    WALK        : 'WALK', 
-    TRAM        : 'TRAM', 
-    SUBWAY      : 'SUBWAY',
-    RAIL        : 'RAIL', 
-    BUS         : 'BUS', 
-    CABLE_CAR   : 'CABLE_CAR', 
-    GONDOLA     : 'GONDOLA', 
-    FERRY       : 'FERRY',
-    FUNICULAR   : 'FUNICULAR',
-    TRANSIT     : 'TRANSIT',
-    TRAINISH    : 'TRAINISH', 
-    BUSISH      : 'BUSISH',
-
-    transitModes : null,
-
-    /** IMPORTANT: always call init prior to using any other methods (or value arrays) */
-    init : function()
-    {
-        if(this.transitModes == null)
-            this.transitModes = [this.TRAM, this.SUBWAY, this.BUS, this.RAIL, this.GONDOLA, this.FERRY, this.CABLE_CAR, this.FUNICULAR, this.BUSISH, this.TRANSIT, this.TRAINISH];
-
-    },
-
-    isTransit : function(mode)
-    {
-        this.init();
-
-        var retVal = false;
-        for(var i = 0; i < this.transitModes.length; i++)
+otp.util.Modes = (function() {
+    
+    var modes = {
+            WALK        : 'WALK',
+            BICYCLE     : 'BICYCLE',
+            TRAM        : 'TRAM', 
+            SUBWAY      : 'SUBWAY',
+            RAIL        : 'RAIL', 
+            BUS         : 'BUS', 
+            CABLE_CAR   : 'CABLE_CAR', 
+            GONDOLA     : 'GONDOLA', 
+            FERRY       : 'FERRY',
+            FUNICULAR   : 'FUNICULAR',
+            TRANSIT     : 'TRANSIT',
+            TRAINISH    : 'TRAINISH', 
+            BUSISH      : 'BUSISH'
+    };
+    
+    var transitModes = [modes.TRAM, modes.SUBWAY, modes.BUS, modes.RAIL, modes.GONDOLA, modes.FERRY, modes.CABLE_CAR, modes.FUNICULAR, modes.BUSISH, modes.TRANSIT, modes.TRAINISH];
+    
+    return {
+        isTransit : function(mode)
         {
-            var m = this.transitModes[i];
-            if(mode == m || mode.toUpperCase() == m)
+            var retVal = false;
+            for(var i = 0; i < transitModes.length; i++)
             {
-                retVal = true;
-                break;
+                var m = transitModes[i];
+                if(mode == m || mode.toUpperCase() == m)
+                {
+                    retVal = true;
+                    break;
+                }
             }
+
+            return retVal;
         }
-
-        return retVal;
-    },
-
-    CLASS_NAME       : "otp.util.Modes"
-};
+    };
+})();
