@@ -141,9 +141,6 @@ public class ShortestPathTree {
             }
         }
 
-        if (set.size() == 0) {
-            System.out.println("empty set");
-        }
         GraphPath ret = new GraphPath();
         while (true) {
             ret.vertices.add(0, end);
