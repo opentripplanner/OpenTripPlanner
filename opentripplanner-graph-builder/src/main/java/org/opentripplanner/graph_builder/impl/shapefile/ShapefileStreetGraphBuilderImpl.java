@@ -40,6 +40,8 @@ import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.core.Intersection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -50,6 +52,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
 
 
 public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
+    private static Logger log = LoggerFactory.getLogger(ShapefileStreetGraphBuilderImpl.class);
 
     private FeatureSourceFactory _featureSourceFactory;
 
@@ -138,7 +141,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                         intersectionNameToId, startCoordinate);
 
                 if (startIntersectionName == "null") {
-                    System.out.println(name);
+                    log.warn("No intersection name for " + name);
                 }
 
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
