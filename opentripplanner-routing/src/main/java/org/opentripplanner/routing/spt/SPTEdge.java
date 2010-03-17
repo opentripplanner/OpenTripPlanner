@@ -116,4 +116,8 @@ public class SPTEdge implements Edge {
     public Vertex getToVertex() {
         return tov;
     }
+    
+    public String toString() {
+        return "SPTEdge(" + payload.toString() + ")";
+    }
 }
