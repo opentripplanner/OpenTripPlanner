@@ -503,20 +503,26 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         buttonPanel.add(traceButton);
                 
         /* right panel holds trip pattern and stop metadata */
-        JTabbedPane rightPanel = new JTabbedPane();
-
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
         pane.add(rightPanel, BorderLayout.LINE_END);
+        
+        JTabbedPane rightPanelTabs = new JTabbedPane();
+        rightPanel.add(rightPanelTabs, BorderLayout.CENTER);
+        serviceIdLabel = new JLabel("[service id]");
+        rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
+        
         departurePattern = new JList();
         departurePattern.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
-        rightPanel.addTab("trip pattern", dpScrollPane);
+        rightPanelTabs.addTab("trip pattern", dpScrollPane);
 
         JList metadataList = new JList();
         metadataModel = new DefaultListModel();
         metadataList.setModel(metadataModel);
         metadataList.setPrototypeCellValue("bicycleSafetyEffectiveLength : 10.42468803");
         JScrollPane mdScrollPane = new JScrollPane(metadataList);
-        rightPanel.addTab("metadata", mdScrollPane);
+        rightPanelTabs.addTab("metadata", mdScrollPane);
 
         pathservice = new PathServiceImpl();
         pathservice.setGraph(graph);
