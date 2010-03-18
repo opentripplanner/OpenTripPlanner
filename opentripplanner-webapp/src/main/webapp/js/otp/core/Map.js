@@ -120,7 +120,12 @@ otp.core.MapStatic = {
         }
 
         otp.core.MapSingleton = this;
-        this.clear();
+        // TODO clean this up
+        // this is a hack to get around the default extent not being set correctly when it's specified as a bounds object
+        // instead of automatic
+        // see ticket #63
+        var self = this;
+        setTimeout(function() { self.clear(); }, 100);
         console.log("exit Map constructor");
     },
 
