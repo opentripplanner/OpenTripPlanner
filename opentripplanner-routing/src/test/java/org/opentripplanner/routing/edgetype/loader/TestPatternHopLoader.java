@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -403,7 +404,7 @@ public class TestPatternHopLoader extends TestCase {
         assertTrue((endTime - startTime.getTimeInMillis()) / 1000 < 7200);
     }
 
-	public void testFrequencies() {
+    public void testFrequencies() {
         Vertex stop_u = graph.getVertex("agency_U");
         Vertex stop_v = graph.getVertex("agency_V");
 
@@ -439,5 +440,32 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(4, path.vertices.size());
         endTime = new GregorianCalendar(2009, 8, 7, 14, 40, 0).getTimeInMillis();
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
-	}
+    }
+    
+    public void testFewestTransfers() {
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+        TraverseOptions options = new TraverseOptions(context);
+        options.optimizeFor = OptimizeType.QUICK;
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+
+        //when optimizing for speed, take the fast two-bus path
+        GraphPath path = spt.getPath(stop_d);
+        assertNotNull(path);
+        State endState = path.vertices.lastElement().state;
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 20, 0).getTimeInMillis(), endState.getTime());
+        
+        //when optimizing for fewest transfers, take the slow one-bus path
+        options.optimizeFor = OptimizeType.TRANSFERS;
+        spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(), new State(
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_d);
+        assertNotNull(path);
+        endState = path.vertices.lastElement().state;
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 50, 0).getTimeInMillis(), endState.getTime());
+
+    }
+
 }

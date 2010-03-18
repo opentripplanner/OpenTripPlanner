@@ -14,10 +14,10 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -74,31 +74,31 @@ public class PatternBoard extends PatternEdge {
         return "leave street network for transit network";
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        if (!wo.modes.get(modeMask)) {
+    public TraverseResult traverse(State state0, TraverseOptions options) {
+        if (!options.modes.get(modeMask)) {
             return null;
         }
         long currentTime = state0.getTime();
-        ServiceDate serviceDate = getServiceDate(currentTime, wo.calendar);
-        ServiceDate serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, wo.calendar);
+        ServiceDate serviceDate = getServiceDate(currentTime, options.calendar);
+        ServiceDate serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
         int secondsSinceMidnight = (int) ((currentTime - serviceDate.getAsDate().getTime()) / 1000);
 
         int wait = -1;
         int patternIndex = -1;
         AgencyAndId service = pattern.exemplar.getServiceId();
-        if (wo.serviceOn(service, serviceDate)) {
+        if (options.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight, wo.wheelchairAccessible, true);
+            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, true);
             if (patternIndex >= 0) {
                 wait = pattern.getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
         }
-        if (wo.serviceOn(service, serviceDateYesterday)) {
+        if (options.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
             int yesterdayPatternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight
-                    + SEC_IN_DAY, wo.wheelchairAccessible, true);
+                    + SEC_IN_DAY, options.wheelchairAccessible, true);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getDepartureTime(stopIndex, yesterdayPatternIndex)
                         - secondsSinceMidnight - SEC_IN_DAY;
@@ -117,7 +117,13 @@ public class PatternBoard extends PatternEdge {
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
-        return new TraverseResult(wait + BOARD_COST, state1);
+        long transfer_penalty = 0;
+        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
+            //this is not the first boarding, therefore we must have "transferred" -- whether
+            //via a formal transfer or by walking.
+            transfer_penalty = options.optimize_transfer_penalty;
+        }
+        return new TraverseResult(wait + BOARD_COST + transfer_penalty, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {

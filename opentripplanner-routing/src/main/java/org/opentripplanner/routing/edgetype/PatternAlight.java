@@ -14,10 +14,10 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -120,7 +120,13 @@ public class PatternAlight extends PatternEdge {
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
         state1.justTransferred = true;
-        return new TraverseResult(-wait + BOARD_COST, state1);
+        long transfer_penalty = 0;
+        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
+            //this is not the first boarding, therefore we must have "transferred" -- whether
+            //via a formal transfer or by walking.
+            transfer_penalty = options.optimize_transfer_penalty;
+        }
+        return new TraverseResult(-wait + BOARD_COST + transfer_penalty, state1);
     }
 
     public TraverseResult traverse(State state0, TraverseOptions options) {

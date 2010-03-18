@@ -501,7 +501,6 @@ public class GTFSPatternHopFactory {
         int i;
         StopTime st1 = null;
         for (i = 0; i < lastStop; i++) {
-//            System.out.println("i = " + i);
             StopTime st0 = stopTimes.get(i);
             st1 = stopTimes.get(i + 1);
 

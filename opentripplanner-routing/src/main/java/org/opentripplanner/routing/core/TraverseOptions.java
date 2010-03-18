@@ -45,7 +45,9 @@ public class TraverseOptions {
     public double maxWalkDistance = Double.MAX_VALUE;
 
     private HashMap<AgencyAndId, FareRuleSet> fareContexts;
-    
+
+    public long optimize_transfer_penalty = 1800; //by default, only transfer if it saves half an hour
+
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
