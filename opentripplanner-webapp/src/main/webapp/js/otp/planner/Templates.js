@@ -61,9 +61,7 @@ otp.planner.Templates = {
     '<table cellpadding="3" cellspacing="0" border="0">',
         '<tr><td>Travel</td><td>{startTimeDisplay}</td></tr>',
         '<tr><td>Valid</td><td>{[new Date().format("F jS, Y @ g:ia")]}</td></tr>',
-        '<tr><td>Time</td><td>{transitTime} minute<tpl if="transitTime != 1">s</tpl>',
-            '<tpl if="waitingTime &gt; 0"> (plus {waitingTime} minute<tpl if="waitingTime != 1.0">s</tpl> transfer)</tpl>',
-         '</td></tr>',
+        '<tr><td>Time</td><td>{duration} minute<tpl if="duration != 1">s</tpl></td></tr>',
         '<tpl if="walkDistance"><tr><td>Walk</td><td>{walkDistance}</td></tr></tpl>',
     '</table></div>'
     ).compile(),
