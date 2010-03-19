@@ -54,43 +54,22 @@ otp.util.OpenLayersUtils = {
      * static function to make the OpenLayers map object
      *   example: makeMap();
      */
-    makeMap : function(controls, epsg, div, numZoomLevels, units,  maxExtent, maxResolution, displayProjection)
+    makeMap : function(div, options)
     {
-        var map = null;
-
-        var options = {
-            displayProjection: displayProjection,
-            projection: new OpenLayers.Projection(epsg),
-            controls: controls
-        };
-
-        if(units != null)
-            options.units = units;
-        if(maxExtent != null)
-            options.maxExtent = maxExtent;
-        if(maxResolution != null)
-            options.maxResolution = maxResolution;
-        if(numZoomLevels && numZoomLevels > 0)
-            options.numZoomLevels = numZoomLevels;
-
-        map = new OpenLayers.Map(div, options);
-
-        return map;
+        return new OpenLayers.Map(div, options);
     },
 
     /** */
-    makeMapBaseLayer : function(map, urls, layer, tileBuffer, transitionEffect, attribution)
+    makeMapBaseLayer : function(map, defaultOptions)
     {
-        var layer = new OpenLayers.Layer.WMS("Map", urls, {
-                layers : layer,
-                format : 'image/png'
-            }, {
-                buffer : tileBuffer,
-                isBaseLayer : true,
-                transitionEffect : transitionEffect,
-                attribution : attribution,
-                size : new OpenLayers.Size(512, 512)
-            }
+    	var options = Ext.apply({}, defaultOptions, {
+    		isBaseLayer : true,
+    	});
+        var layer = new OpenLayers.Layer.WMS("Map", options.url, {
+                layers : options.layers,
+                format : options.format
+            },
+            options
         );
         map.addLayer(layer);
 

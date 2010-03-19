@@ -21,17 +21,7 @@ otp.namespace("otp.application");
 otp.application.Controller = {
 
     // config
-    extent               : null,
-    url                  : null,
-
-    // custom icons will be used for these agency ids
-    useCustomIconsForAgencies: [],
-
-    // whether to add the systemmap to the accordion
-    hasSystemMap : false,
-
-    plannerContextMenu   : true,
-    mapContextMenu       : false,
+    url        : null,
 
     // creation
     map        : null,
@@ -45,18 +35,23 @@ otp.application.Controller = {
     initialize : function(config)
     {
         console.log("enter application.Controller constructor");
-        otp.configure(this, config);
+        //otp.configure(this, config);
+        this.config = config;
+        
+        Ext.apply(this.config.map, {
+        	cm               : this.cm, 
+            attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
+            options: {
+        	     controls: []
+        	}
+        });
 
         this.params  = new otp.utils.ParseUrlParams();
-        this.map  = new otp.core.Map({
-                defaultExtent  : this.extent, 
-                cm             : this.cm, 
-                attribution    : otp.util.ExtUtils.MAP_ATTRIBUTION
-        }); 
+        this.map  = new otp.core.Map(this.config.map);
         this.ui   = new otp.core.UI({map:this.map});
 
         // initialize utilities
-        otp.util.imagePathManager.addCustomAgencies(this.useCustomIconsForAgencies);
+        otp.util.imagePathManager.addCustomAgencies(this.config.useCustomIconsForAgencies);
         
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
@@ -64,13 +59,16 @@ otp.application.Controller = {
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 
-        if (this.hasSystemMap)
+        if (this.config.systemMap.enabled)
         {
         	// XXX how to set the url? this.url seems to be null?
-        	this.sm      = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/departures'});
+        	this.sm = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/departures'});
         	this.ui.accordion.add(this.sm.getPanel());
-        	// we want the system map to be the default panel now
-        	this.ui.accordion.layout.setActiveItem(1);
+        	if (this.config.systemMap.showByDefault)
+        	{
+        		// we want the system map to be the default panel now
+        		this.ui.accordion.layout.setActiveItem(1);
+        	}
         }
         
         this.ui.doLayout();
@@ -110,9 +108,9 @@ otp.application.Controller = {
     makeContextMenu : function()
     {
         var  cmConfig = {};
-        if(this.plannerContextMenu)
+        if(this.config.plannerContextMenu)
             cmConfig.forms = this.planner.getForms();
-        if(this.mapContextMenu)
+        if(this.config.mapContextMenu)
             cmConfig.map = this.map;
 
         this.cm = new otp.planner.ContextMenu(cmConfig);

@@ -58,6 +58,7 @@
     <script src="js/otp/planner/poi/Style.js"></script>
     <script src="js/otp/systemmap/Systemmap.js"></script>
     <script src="js/otp/application/Controller.js"></script>
+    <script src="js/otp/config.js"></script>
 </head>
 <style>
 </style>
@@ -70,9 +71,7 @@
     Ext.onReady(function()
     {
         otp.util.AnalyticsUtils.initGoogleAnalytics();
-        new otp.application.Controller({
-            rteMapPngs : true
-        });
+        new otp.application.Controller(otp.config);
     });
     </script>
 </body>

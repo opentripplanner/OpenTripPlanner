@@ -30,40 +30,15 @@ otp.core.MapStatic = {
     map               : null,
     baseLayer         : null,
 
-    // config for 4326
     mapDiv            : "map",
-    /*
-    url               : "http://maps.opengeo.org/transitech/gwc/service/wms",
-    layerNames        : ['tplanner'],
-    /*/
-    url               : "http://maps.opengeo.org/geowebcache/service/wms",
-    layerNames        : ['openstreetmap'],
-    /**/
-    srsName           : "EPSG:4326",
-    numZoomLevels     : 17,
-    format            : 'png',
-    units             : null,
-    maxResolution     : null,
-    maxExtent         : null,
     
     // list of functions that will be called before/after all features on the map are removed
     beforeAllFeaturesRemoved: [],
     allFeaturesRemoved: [],
 
-/*
-    // config for 4326
-    maxResolution     : 0.703125,
-    maxExtent         : new OpenLayers.Bounds(-180.0,-90.0,180.0,90.0),
-    units             : "meters", // note meters & feed cause line to be NaN
-    numZoomLevels     : 19,
-
-    // config for google's projection
-    srsName           : "EPSG:900913",
-    units             : "meters",
-    maxResolution     : 156543.03396025,
-    maxExtent         : new OpenLayers.Bounds(-2.003750834E7,-2.003750834E7, 2.003750834E7,2.003750834E7),
-    center            : {x:-13655812, y:5704158},
-*/
+    // Options passed into the OpenLayers.Map constructor
+    options          : null,
+    baseLayerOptions : null,
 
     /**
      * An OpenLayers.Bounds object that defines the default extent used when
@@ -73,11 +48,10 @@ otp.core.MapStatic = {
      * the extent of the data being routed on from the server.
      * 
      */
-    defaultExtent : "automatic",
+    defaultExtent : null,
     
     /** use attribution if you want the same attribute on both tile sets */
     attribution       : null,
-    transitionEffect  :'resize',
 
     /** OL Controls on/off switches */
     zoomWheelEnabled  : true,
@@ -85,7 +59,6 @@ otp.core.MapStatic = {
     permaLinkEnabled  : false,
     historyEnabled    : true,
     rightClickZoom    : true,
-    controls          : [],
 
     /*
      * Projections - neither should need changing. displayProjection is only
@@ -107,19 +80,19 @@ otp.core.MapStatic = {
     {
         console.log("enter Map constructor");
         otp.configure(this, config);
-
-        this.map       = otp.util.OpenLayersUtils.makeMap(this.controls, this.srsName, this.mapDiv, this.numZoomLevels, this.units, this.maxExtent, this.maxResolution, this.displayProjection);
-        this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.url, this.layerNames, this.tileBuffer, this.transitionEffect, this.attribution);
+        
+        this.map = otp.util.OpenLayersUtils.makeMap(this.mapDiv, this.options);
+        this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
         this.map.setBaseLayer(this.baseLayer, true);
 
-        // if we have an empty array of controls, then add the defaults
-        // if this.controls == null, then don't create controls (default skinny nav control will appear)
-        if(this.controls != null && this.controls.length == 0)
-        {
-            this.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
-        }
-
         otp.core.MapSingleton = this;
+        
+        // if we have an empty array of controls, then add the defaults
+        if (this.options.controls != null && this.options.controls.length == 0)
+        {
+        	this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
+        }
+        
         // TODO clean this up
         // this is a hack to get around the default extent not being set correctly when it's specified as a bounds object
         // instead of automatic
