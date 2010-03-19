@@ -13,7 +13,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -27,8 +27,8 @@ public class TestFares extends TestCase {
         options.setGtfsContext(context);
 
         Graph gg = new Graph();
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
-        hl.load();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(gg);
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
@@ -47,8 +47,8 @@ public class TestFares extends TestCase {
         options.setGtfsContext(context);
 
         Graph gg = new Graph();
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
-        hl.load();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(gg);
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();

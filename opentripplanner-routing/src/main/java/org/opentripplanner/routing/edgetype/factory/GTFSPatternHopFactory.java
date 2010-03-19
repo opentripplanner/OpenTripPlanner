@@ -179,7 +179,7 @@ public class GTFSPatternHopFactory {
             FareAttribute attribute = context.getFareAttribute(fareId);
             fareAttributes.put(fareId, attribute);
         }
-        fareContext = new FareContext(fareRules, fareAttributes);        
+        fareContext = new FareContext(fareRules, fareAttributes);
     }
 
     public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
@@ -203,6 +203,15 @@ public class GTFSPatternHopFactory {
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      */
     public void run(Graph graph) {
+
+        // Load stops
+        for (Stop stop : _dao.getAllStops()) {
+            graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
+                    stop.getLat(), stop.getName(), stop.getId().getId(), stop));
+        }
+
+        // Load hops
+        _log.debug("Loading hops");
 
         clearCachedData();
 

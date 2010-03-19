@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -40,8 +40,8 @@ public class TestAStar extends TestCase {
         options.setGtfsContext(context);
 
         Graph gg = new Graph();
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(gg, context);
-        hl.load();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(gg);
 
         ShortestPathTree spt;
         GraphPath path = null;

@@ -30,11 +30,12 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
 
-public class TestHopLoader extends TestCase {
+public class TestHopFactory extends TestCase {
 
     private Graph graph;
 
@@ -45,8 +46,8 @@ public class TestHopLoader extends TestCase {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(graph, context);
-        hl.load();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(graph);
 
     }
 

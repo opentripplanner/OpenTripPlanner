@@ -30,7 +30,7 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.Transfer;
-import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -51,8 +51,8 @@ public class TestGraphPath extends TestCase {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(graph, context);
-        hl.load();
+        GTFSPatternHopFactory hl = new GTFSPatternHopFactory(context);
+        hl.run(graph);
 
     }
 

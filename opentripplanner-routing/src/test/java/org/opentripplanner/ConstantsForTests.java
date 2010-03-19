@@ -18,7 +18,7 @@ import java.io.File;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 
 public class ConstantsForTests {
@@ -71,8 +71,8 @@ public class ConstantsForTests {
         try {
             portlandContext = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
             portlandGraph = new Graph();
-            GTFSPatternHopLoader hl = new GTFSPatternHopLoader(portlandGraph, portlandContext);
-            hl.load();
+            GTFSPatternHopFactory factory = new GTFSPatternHopFactory(portlandContext);
+            factory.run(portlandGraph);
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

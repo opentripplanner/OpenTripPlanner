@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.TestAStar;
 import org.opentripplanner.routing.algorithm.TestGraphPath;
 import org.opentripplanner.routing.core.TestGraph;
 import org.opentripplanner.routing.edgetype.TestStreet;
-import org.opentripplanner.routing.edgetype.loader.TestPatternHopLoader;
+import org.opentripplanner.routing.edgetype.loader.TestPatternHopFactory;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;
@@ -31,7 +31,7 @@ public class AllTests {
         suite.addTestSuite(TestAStar.class);
         suite.addTestSuite(TestGraph.class);
         suite.addTestSuite(TestGraphPath.class);
-        suite.addTestSuite(TestPatternHopLoader.class);
+        suite.addTestSuite(TestPatternHopFactory.class);
         suite.addTestSuite(TestHalfEdges.class);
         suite.addTestSuite(TestStreet.class);
         // $JUnit-END$

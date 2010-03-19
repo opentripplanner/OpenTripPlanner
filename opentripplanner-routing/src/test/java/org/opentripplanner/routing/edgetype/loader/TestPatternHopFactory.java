@@ -39,7 +39,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.Transfer;
-import org.opentripplanner.routing.edgetype.loader.GTFSPatternHopLoader;
+import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class TestPatternHopLoader extends TestCase {
+public class TestPatternHopFactory extends TestCase {
 
     private Graph graph;
 
@@ -60,8 +60,8 @@ public class TestPatternHopLoader extends TestCase {
         context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
 
-        GTFSPatternHopLoader hl = new GTFSPatternHopLoader(graph, context);
-        hl.load();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(graph);
 
         Vertex stop_a = graph.getVertex("agency_A");
         Vertex stop_b = graph.getVertex("agency_B");
@@ -467,5 +467,4 @@ public class TestPatternHopLoader extends TestCase {
         assertEquals(new GregorianCalendar(2009, 8, 1, 16, 50, 0).getTimeInMillis(), endState.getTime());
 
     }
-
 }
