@@ -14,11 +14,17 @@
 package org.opentripplanner.api.extended.ws.model;
 
 import java.util.List;
+
+import javax.xml.bind.annotation.XmlRootElement;
+
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.extended.ws.TransitServerGtfs;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+@XmlRootElement(name="route")
 public class TransitServerRoute {
     private String shortname;
     private String longname;
@@ -79,6 +85,49 @@ public class TransitServerRoute {
         this.setShortName(route.getShortName());
         this.setLongName(route.getLongName());
         this.setStops(new TransitServerStops(stops));
+        this.setAgencyId(routeId);
+        List <ShapePoint> shapePoints = transitServerGtfs.getShapePointsForRoute(routeId);
+        int n = shapePoints.size();
+        double[] lat = new double[n];
+        double[] lon = new double[n];
+        int i = 0;
+        for (ShapePoint sp : shapePoints) {
+            lat[i] = sp.getLat();
+            lon[i] = sp.getLon();
+            i++;
+        }
+        EncodedPolylineBean geometry = PolylineEncoder.createEncodings(lat, lon);
+        
+        this.geometry = geometry;
+        switch (route.getType()) {
+        case 0:
+            this.setMode("TRAM");
+            break;
+        case 1:
+            this.setMode("SUBWAY");
+            break;
+        case 2:
+            this.setMode("RAIL");
+            break;
+        case 3:
+            this.setMode("BUS");
+            break;
+        case 4:
+            this.setMode("FERRY");
+            break;
+        case 5:
+            this.setMode("CABLE_CAR");
+            break;
+        case 6:
+            this.setMode("GONDOLA");
+            break;
+        case 7:
+            this.setMode("FUNICULAR");
+            break;
+        default:
+            throw new IllegalArgumentException("unknown gtfs route type " + route.getType());
+        }
+        
     }
 
     public void setShortName(String shortName) {

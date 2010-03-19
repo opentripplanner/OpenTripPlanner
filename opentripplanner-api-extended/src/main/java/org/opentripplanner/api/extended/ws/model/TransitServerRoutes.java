@@ -28,7 +28,7 @@ import org.opentripplanner.api.extended.ws.TransitServerGtfs;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-@XmlRootElement(name="routes")
+	@XmlRootElement(name="routes")
 public class TransitServerRoutes {
 
     @XmlElement(name="route")

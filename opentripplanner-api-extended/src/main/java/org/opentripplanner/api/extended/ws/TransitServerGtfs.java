@@ -73,6 +73,8 @@ public class TransitServerGtfs {
     
     private void loadRepresentativeShapeIds() {
         String[] ids = new String[] {
+        		"TriMet 10W1010", "TriMet 10W1020",
+        		"TriMet 10W1040", "TriMet 10W1050",  
                 "MTA NYCT A20100125W_048000_1..S03R",
                 "MTA NYCT A20100125W_048050_2..S01R",
                 "MTA NYCT A20100125W_048350_3..S01R",

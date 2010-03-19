@@ -67,7 +67,7 @@ public class TransitDataServer {
     @GET
     @Path("routes/{route_id}")
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public TransitServerRoute getRoute(@PathParam("route") String routeId) throws JSONException {
+    public TransitServerRoute getRoute(@PathParam("route_id") String routeId) throws JSONException {
         return new TransitServerRoute(transitServerGtfs, routeId);
     }
 }
