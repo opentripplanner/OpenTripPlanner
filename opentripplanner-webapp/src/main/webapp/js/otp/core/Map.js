@@ -78,7 +78,6 @@ otp.core.MapStatic = {
      */
     initialize : function(config)
     {
-        console.log("enter Map constructor");
         otp.configure(this, config);
         
         this.map = otp.util.OpenLayersUtils.makeMap(this.mapDiv, this.options);
@@ -99,7 +98,6 @@ otp.core.MapStatic = {
         // see ticket #63
         var self = this;
         setTimeout(function() { self.clear(); }, 100);
-        console.log("exit Map constructor");
     },
 
     /** */

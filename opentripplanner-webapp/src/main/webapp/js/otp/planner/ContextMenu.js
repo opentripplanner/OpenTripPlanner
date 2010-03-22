@@ -26,7 +26,6 @@ otp.planner.ContextMenu = {
     /** */
     constructor: function(config)
     {
-        console.log("enter ui.ContextMenu constructor");
         otp.configure(this, config);
 
         try
@@ -56,8 +55,6 @@ otp.planner.ContextMenu = {
         {
             console.log("otp.planner.ContextMenu: consturctor error " + e);
         }
-
-        console.log("exit ui.ContextMenu constructor");
     },
 
     /** */

@@ -41,7 +41,6 @@ otp.systemmap.Systemmap = {
 
     initialize : function(config)
     {
-        console.log("enter systemmap.Systemmap constructor");
         this.systemmap = this;
         otp.configure(this, config);
         var self = this;
@@ -224,9 +223,7 @@ otp.systemmap.Systemmap = {
             listeners:  {'expand': {fn: this.panelExpanded, scope: this}}
         });
         
-        this.fetchData();
-                
-        console.log("exit systemmap.Systemmap constructor");
+        this.fetchData();                
     },
 
     getPanel : function()
@@ -251,7 +248,6 @@ otp.systemmap.Systemmap = {
             url = this.url;
         }
         var self = this;
-        console.log('Systemmap fetching data: ' + url);
         OpenLayers.Request.GET({
             url : url,
             headers: {Accept: 'application/xml'},
@@ -559,7 +555,6 @@ otp.systemmap.Systemmap = {
  
     onDataLoaded: function(data)
     {
-        console.log("Systemmap data loaded");
         this.data = data;
         this.routeStore.loadData(data);
         this.stopStore.loadData(data);

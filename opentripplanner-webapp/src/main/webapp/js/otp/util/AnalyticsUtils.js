@@ -50,7 +50,6 @@ otp.util.AnalyticsUtils = {
     /** */
    importGoogleAnalytics : function(domain, id)
    {
-       console.log("enter AnalyticsUtils.importGoogleAnalytics");
         try
         {
             document.write(unescape("%3Cscript src='" + this.gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -59,14 +58,11 @@ otp.util.AnalyticsUtils = {
         {
             console.log("GA EXCEPTION: AnalyticsUtils.importGoogleAnalytics threw exception " + e);
         }
-
-        console.log("exit AnalyticsUtils.importGoogleAnalytics");
    },
 
    /** */
    initGoogleAnalytics : function(domain, id)
    {
-       console.log("enter AnalyticsUtils.initGoogleAnalytics");
         try
         {
             if(domain == null) domain = this.defaultDomain;
@@ -80,7 +76,6 @@ otp.util.AnalyticsUtils = {
         {
             console.log("GA EXCEPTION: AnalyticsUtils.initGoogleAnalytics threw exception " + e);
         }
-        console.log("exit initGoogleAnalytics");
    },
 
     /** */

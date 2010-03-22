@@ -58,7 +58,6 @@ otp.planner.Itinerary = {
     /** */
     initialize : function(config)
     {
-        console.log("enter planner.Itinerary constructor");
         otp.configure(this, config);
 
         this.m_vectors    = new Array();
@@ -69,13 +68,11 @@ otp.planner.Itinerary = {
         this.m_toStore    = otp.planner.Utils.makeToStore();
         
         this.load();
-        console.log("exit planner.Itinerary constructor");
     },
 
     /** */
     load : function()
     {
-        console.log("enter Itinerary.load");
         this.m_legStore.loadData(this.xml.node);
         this.m_fromStore.loadData(this.xml.node);
         this.m_toStore.loadData(this.xml.node);
@@ -92,7 +89,6 @@ otp.planner.Itinerary = {
         // get start & end time
         this.makeStartEndTime();
 
-        console.log("exit Itinerary.load");
         return this.m_valid;
     },
 
@@ -103,7 +99,6 @@ otp.planner.Itinerary = {
      */
     draw : function(vLayer, mLayer)
     {
-        console.log("enter Itinerary.draw");
         try
         {
             if(this.m_vectors.length < 1)
@@ -151,8 +146,6 @@ otp.planner.Itinerary = {
         {
             console.log("exception Itinerary.draw " + e);
         }
-
-        console.log("exit Itinerary.draw ");
     },
 
     /** */
@@ -247,7 +240,6 @@ otp.planner.Itinerary = {
      */
     getParams : function()
     {
-        console.log("enter Itinerary.getParams");
         var retVal = {};
 
         try
@@ -260,7 +252,6 @@ otp.planner.Itinerary = {
             console.log("exception Itinerary.getParams " + e);
         }
 
-        console.log("exit Itinerary.getParams");
         return retVal;
     },
 
@@ -270,8 +261,6 @@ otp.planner.Itinerary = {
      */
     makeStartEndTime : function()
     {
-        console.log("enter Itinerary.makeStartEndTime");
-
         try
         {
            this.m_startTime = this.xml.data.startTime;
@@ -281,8 +270,6 @@ otp.planner.Itinerary = {
         {
             console.log("exception Itinerary.makeStartEndTime " + e);
         }
-
-        console.log("exit Itinerary.makeStartEndTime");
     },
 
 
@@ -291,8 +278,6 @@ otp.planner.Itinerary = {
      */
     makeRouteLines : function(vLayer)
     {
-        console.log("enter Itinerary.makeRouteLines");
-
         var vectors  = new Array();
         
         var endIndex = this.m_fromStore.getCount() - 1;
@@ -327,8 +312,6 @@ otp.planner.Itinerary = {
             if(vLayer)
                 vLayer.addFeatures(vectors);
         }
-
-        console.log("exit Itinerary.makeRouteLines");
     },
 
 
@@ -338,8 +321,6 @@ otp.planner.Itinerary = {
      */
     makeWalkLines : function(vLayer)
     {
-        console.log("enter Itinerary.makeWalkLines");
-
         var vectors  = new Array();
         
         var endIndex = this.m_fromStore.getCount() - 1;
@@ -373,8 +354,6 @@ otp.planner.Itinerary = {
             if(vLayer)
                 vLayer.addFeatures(vectors);
         }
-
-        console.log("exit Itinerary.makeWalkLines");
     },
 
     createAndAddMarker: function(x, y, options)
@@ -388,7 +367,6 @@ otp.planner.Itinerary = {
     */
     makeMarkers : function()
     {
-        console.log("enter Itinerary.makeMarkers");
         try
         {
             var startIndex = 0;
@@ -490,7 +468,6 @@ otp.planner.Itinerary = {
         {
             console.log("exit Itinerary.makeMarkers" + e);
         }
-        console.log("exit Itinerary.makeMarkers");
     },
         
 //

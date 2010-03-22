@@ -526,7 +526,6 @@ otp.util.ExtUtils = {
      */
     makeStaticPullDownStore: function( data )
     {
-        console.log("Utils.makeStaticPullDownStore " + data);
         return new Ext.data.SimpleStore({
             fields: otp.util.OPT_ARRAY,
             data:   data 

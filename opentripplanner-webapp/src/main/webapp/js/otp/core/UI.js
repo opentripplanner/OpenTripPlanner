@@ -48,7 +48,6 @@ otp.core.UI = {
      */
     initialize : function(config)
     {
-        console.log("enter ui.UI constructor");
         otp.configure(this, config);
 
         this.viewport = new Ext.Viewport({
@@ -61,8 +60,6 @@ otp.core.UI = {
         // NOTE: do this here, vs within _getSubPanels()
         if(this.south == null) this.south = this.innerSouth;
         if(this.east  == null) this.east  = this.innerEast;
-
-        console.log("exit ui.UI constructor");
     },
 
 
@@ -176,7 +173,6 @@ otp.core.UI = {
     /** */
     doLayout : function()
     {
-        console.log("UI doLayout");
         try
         {
 /*

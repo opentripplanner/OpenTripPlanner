@@ -74,7 +74,6 @@ otp.core.Measure = {
     initialize : function(config)
     {
         // step 1: configure the objec
-        console.log("enter measure.Measure constructor");
         otp.configure(this, config);
 
         // step 2: create the control
@@ -124,8 +123,6 @@ otp.core.Measure = {
         catch(e)
         {
         }
-
-        console.log("exit measure.Measure constructor");
     },
 
     /** OL callback on mousemovement */
@@ -288,8 +285,6 @@ otp.core.Measure = {
         catch(e)
         {
         }
-
-        console.log("exit measure.Measure constructor");
     },
 
     CLASS_NAME : "otp.core.Measure"

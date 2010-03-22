@@ -34,7 +34,6 @@ otp.application.Controller = {
     /** */
     initialize : function(config)
     {
-        console.log("enter application.Controller constructor");
         //otp.configure(this, config);
         this.config = config;
         
@@ -75,7 +74,6 @@ otp.application.Controller = {
 
         this.load();
 
-        console.log("exit application.Controller constructor");
     },
 
    /**

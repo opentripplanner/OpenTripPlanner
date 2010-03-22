@@ -36,7 +36,6 @@ otp.core.ComboBox = {
      */
     initialize : function(config)
     {
-        console.log("enter Text constructor");
         otp.configure(this, config);
 
         this.m_store = new Ext.data.SimpleStore({

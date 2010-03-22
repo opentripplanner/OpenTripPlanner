@@ -48,7 +48,6 @@ otp.planner.Planner = {
     /** */
     initialize : function(config)
     {
-        console.log("enter planner.Planner constructor");
         this.planner = this;
         otp.configure(this, config);
 
@@ -95,8 +94,6 @@ otp.planner.Planner = {
         m = this.map.getMap();
         m.events.register('click', m, function (e) {
         });
-
-        console.log("exit planner.Planner constructor");
     },
 
     /** enlarge the main view panel of this object */ 
@@ -266,8 +263,6 @@ otp.planner.Planner = {
      */
     newTripPlan : function(xml, request)
     {
-        console.log("enter Planner.newTripPlan");
-
 /** seems to be fixed in Extjs 3.0 ... at least on the Mac
 
         if(Ext.isOpera)
@@ -301,7 +296,6 @@ otp.planner.Planner = {
             console.log("exception Planner.newTripPlan: exception " + e);
         }
         
-        console.log("exit Planner.newTripPlan");
         return true;
     },
 
@@ -310,7 +304,6 @@ otp.planner.Planner = {
      */
     tabChange : function(tabPanel, activeTab) 
     {
-        console.log("enter Planner.tabChange");
         try
         {
             this.m_renderer.clear();
@@ -330,7 +323,6 @@ otp.planner.Planner = {
         {
             console.log("exception Planner.tabChange " + e);
         }
-        console.log("exit Planner.tabChange");
     },
 
     /**

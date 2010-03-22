@@ -36,38 +36,29 @@ otp.planner.Renderer = {
     /** */
     initialize : function(config)
     {
-        console.log("enter planner.Renderer constructor");
         otp.configure(this, config);
-        console.log("exit planner.Renderer constructor");
     },
 
     /** */
     draw : function(itin, tree)
     {
-        console.log("enter planner.Renderer.draw");
         if(itin != null)
         {
             this.m_itinerary = itin;
             this.m_tree      = tree;
             this.drawItineraryOntoMap();
         }
-        console.log("exit planner.Renderer.draw");
     },
 
     /** */
     clear : function()
     {
-        console.log("enter planner.Renderer.clear");
-
         this.map.removeAllFeatures();
-
-        console.log("exit planner.Renderer.clear");
     },
 
     /** */
     drawItineraryOntoMap : function()
     {
-        console.log("enter Renderer.drawItineraryOntoMap");
         if(this.m_vectorLayer == null)
         {
             var vectorLayerOptions = {
@@ -105,22 +96,16 @@ otp.planner.Renderer = {
         otp.util.ExtUtils.clearTreeNodes(this.m_tree);
         var n = this.m_itinerary.getTreeNodes(this.legClick, this);
         this.m_tree.root.appendChild(n);
-
-        console.log("exit Renderer.drawItineraryOntoMap");
     },
 
      /** */
     drawItineraryIntoPrinter : function()
     {
-        console.log("enter planner.Renderer.drawItinerayIntoPrinter");
-        console.log("exit planner.Renderer.drawItinerayIntoPrinter");
     },
 
     /** */
     drawItineraryIntoEmail : function()
     {
-        console.log("enter planner.Renderer.drawItinerayIntoEmail");
-        console.log("exit planner.Renderer.drawItinerayIntoEmail");
     },
 
     /**
@@ -128,8 +113,6 @@ otp.planner.Renderer = {
      */
     legClick : function(node, event)
     {
-        console.log("enter Renderer.legClick");
-
         if(node.id.indexOf(otp.planner.Utils.TRIP_ID) >= 0)
         {
             this.map.zoomToExtent(this.m_markerLayer.getDataExtent());
@@ -152,8 +135,6 @@ otp.planner.Renderer = {
             coord = coord.get('geometry');
             this.map.zoom(coord.x, coord.y);
         }
-
-        console.log("exit Renderer.legClick");
     },
 
     CLASS_NAME: "otp.planner.Renderer"

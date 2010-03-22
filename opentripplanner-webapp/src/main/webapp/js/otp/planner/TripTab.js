@@ -63,7 +63,6 @@ otp.planner.TripTab = {
     /** */
     initialize : function(config)
     {
-        console.log("enter planner.TripTab constructor");
         otp.configure(this, config);
 
         // step 1: save off raw data
@@ -76,16 +75,12 @@ otp.planner.TripTab = {
         if(this.load())
         {
         }
-
-        console.log("exit planner.TripTab constructor");
     },
 
 
     /** */
     load : function()
     {
-        console.log("enter TripTab.load");
-
         // step A: load the stores
         var store = this.m_itinerariesStore;
         store.loadData(this.m_itinerariesXML);
@@ -160,15 +155,12 @@ otp.planner.TripTab = {
             // tree.selectPath(path);
         }
 
-        console.log("exit TripTab.load");
         return this.isValid();
     },
 
     /** */
     printCB : function(b, e)
     {
-        console.log("enter TripTab.print");
-
         console.log("TripTab.print: close request object");
         var req    = otp.clone(this.request);
         req.url    = this.printUrl;
@@ -186,27 +178,20 @@ otp.planner.TripTab = {
         otp.planner.PrintTripWin.focus();
 
         otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_PRINT);
-
-        console.log("exit TripTab.print");
     },
 
     /** */
     editCB : function(b, e)
     {
-        console.log("enter TripTab.edit");
         this.planner.clearForms();
         this.planner.populateFormTab(this.request);
 
         otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_EDIT);
-
-        console.log("exit TripTab.edit");
     },
 
     /** */
     reverseCB : function(b, e)
     {
-        console.log("enter TripTab.reverse");
-
         this.planner.clearForms();
 
         var rev = otp.clone(this.request);
@@ -235,18 +220,14 @@ otp.planner.TripTab = {
         this.planner.populateFormTab(rev);
 
         otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_REVERSE);
-
-        console.log("exit TripTab.reverse");
     },
 
     /** */
     draw : function()
     {
-        console.log("enter TripTab.draw");
         this.renderer.clear();
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
-        console.log("exit TripTab.draw");
     },
 
     /**
@@ -254,12 +235,10 @@ otp.planner.TripTab = {
      */
     itineraryClick : function(node, event)
     {
-        console.log("enter TripTab.itineraryClick");
         try
         {
             // node id == 'tp-X-Y', where Y (eg: 1,2,...) is the index into the Ext store
             var tripNum = node.id.substring(node.id.lastIndexOf('-') + 1);
-            console.log("TripTab.itineraryClick: activate itinerary number " + tripNum);
 
             this.activateItinerary(tripNum);
             this.draw();
@@ -268,7 +247,6 @@ otp.planner.TripTab = {
         {
             console.log("exception TripTab.itineraryClick " + e);
         }
-        console.log("exit TripTab.itineraryClick");
     },
 
     /**

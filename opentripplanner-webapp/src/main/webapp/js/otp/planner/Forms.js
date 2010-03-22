@@ -69,8 +69,6 @@ otp.planner.StaticForms = {
      */
     initialize : function(config)
     {
-        console.log("enter Forms() constructor");
-
         // step 1: bit of init (before configure override happens)
         otp.configure(this, config);
 
@@ -87,8 +85,6 @@ otp.planner.StaticForms = {
 
         // step 3: set the singleton & statis stuff to this 
         otp.planner.StaticForms = this;
-
-        console.log("exit Forms() constructor");
     },
 
     /**
@@ -104,7 +100,6 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
-        console.log("enter planner.Forms.submit()");
         try
         {
             // hide stuff that might be open
@@ -126,8 +121,6 @@ otp.planner.StaticForms = {
         {
             console.log('exception Forms.submit exception ' + e)
         }
-
-        console.log("exit planner.Forms.submit()");
     },
 
     /**
@@ -135,8 +128,6 @@ otp.planner.StaticForms = {
      */
     preSubmit : function(form, action)
     {
-        console.log("enter planner.Forms.preSubmit()");
-
         // step 1: save off the state of the from & to text forms (eg: remember input into these fields)
         this.m_fromForm.persist();
         this.m_toForm.persist();
@@ -156,14 +147,11 @@ otp.planner.StaticForms = {
             toCoord:   toCoordVal,
             toPlace:   toPlaceVal
         });
-
-        console.log("exit planner.Forms.preSubmit()");
     },
 
     /** */
     submitSuccess : function(form, action)
     {
-        console.log('enter Forms.submitSuccess');
         var result = this.planner.newTripPlan(action.response.responseXML, this.getFormData());
         if (!result)
         {
@@ -172,16 +160,13 @@ otp.planner.StaticForms = {
         }
         if(this.poi) this.poi.clearTrip();
         otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUCCESS);
-        console.log('exit Forms.submitSuccess');
     },
 
     /** */
     submitFailure : function(form, action)
     {
-        console.log('enter Forms.submitFailure');
         this.m_submitButton.focus();
         this.tripRequestError(action.response.responseXML);
-        console.log('exit Forms.submitFailure');
     },
 
 
@@ -618,8 +603,6 @@ otp.planner.StaticForms = {
      */
     makeMainPanel : function()
     {
-        console.log("enter Forms.makeMainPanel()");
-
         var fromToForms = this.makeFromToForms();
         var fromToFP = new Ext.form.FieldSet({
             labelWidth:  40,
@@ -642,7 +625,6 @@ otp.planner.StaticForms = {
             handler: this.submit
         });
 
-        console.log("make the m_panel FormPanel");
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,
             id:          'form-tab',
@@ -665,24 +647,19 @@ otp.planner.StaticForms = {
         };
         this.m_panel = new Ext.FormPanel(conf);
 
-        console.log("set callbacks on the m_panel FormPanel");
         this.m_panel.on({
                 scope:           this,
                 beforeaction:    this.preSubmit,
                 actionfailed:    this.submitFailure,
                 actioncomplete:  this.submitSuccess
         });
-
-        console.log("exit Forms.makeMainPanel()");
     },
 
     /**
      * from & to form creation
      */
     makeFromToForms : function()
-    {
-        console.log("enter Forms.makeFromToForms()");
-        
+    {        
         // step 1: these give the from & to forms 'memory' -- all submitted strings are saved off in the cookie for latter use
         Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
         Ext.state.Manager.getProvider();
@@ -785,8 +762,6 @@ otp.planner.StaticForms = {
 
 				var tempToFromText = new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>");
 
-        console.log("exit Forms.makeFromToForms()");
-
         //return [this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel];
 				return [tempToFromText, this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel]; 
     },
@@ -797,14 +772,11 @@ otp.planner.StaticForms = {
      */
     makeOptionForms : function()
     {
-        console.log("enter Forms.makeOptionsForms()");
-
         this.m_maxWalkDistanceStore  = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
         this.m_wheelchairStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.wheelchair);
 
-        console.log("new makeOptionsForms() optimize");
         this.m_optimizeForm = new Ext.form.ComboBox({
             id:             'trip-optimize-form',
             name:           'optimize',
@@ -825,7 +797,6 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        console.log("new makeOptionsForms() walk");
         this.m_maxWalkDistanceForm = new Ext.form.ComboBox({
             id:             'trip-walking-form',
             name:           'maxWalkDistance',
@@ -846,7 +817,6 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        console.log("new makeOptionsForms() mode");
         this.m_modeForm  = new Ext.form.ComboBox({
             id:             'trip-mode-form',
             name:           'mode',
@@ -867,7 +837,6 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        console.log("new makeOptionsForms() wheelchair");
         this.m_wheelchairForm = new Ext.form.ComboBox({
             id:             'trip-wheelchair-form',
             name:           'wheelchair',
@@ -887,8 +856,6 @@ otp.planner.StaticForms = {
             forceSelection: true,
             selectOnFocus:  true
         });
-
-        console.log("exit Forms.makeOptionsForms()");
 
         return [this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_modeForm, this.m_wheelchairForm];
     },

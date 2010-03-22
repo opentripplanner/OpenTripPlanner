@@ -39,8 +39,6 @@ otp.planner.poi.Control = {
 
     initialize: function(config)
     {
-        console.log("enter poi.Control");
-
         // step 1: configure 
         this.styleMap = otp.util.OpenLayersUtils.makeDefaultPointFeatureStyle();
         otp.configure(this, config);
@@ -61,8 +59,6 @@ otp.planner.poi.Control = {
         });
 
         this.drag.onComplete = this.onComplete;
-
-        console.log("exit poi.Control");
     },
 
     /** */
