@@ -273,7 +273,6 @@ otp.planner.Planner = {
 
         try 
         {
-            console.log("Planner.newTripPlan: create new trip tab");
             var trip = new otp.planner.TripTab({planner:this, xml:xml, id:++this.m_tabCount, renderer:this.m_renderer, locale:this.locale, request:request}); 
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
