@@ -41,7 +41,7 @@ try
 } 
 catch (e) 
 {
-    console.log("no worries if this exception is thrown...just means that OpenLayers is not included in your html file (eg: maybe this is not an OL project)")
+    console.log("no worries if this exception is thrown...just means that OpenLayers is not included in your html file (eg: maybe this is not an OL project)");
 }
 /**
   * Web Map / TripPlanner
@@ -63,7 +63,7 @@ otp.util.OpenLayersUtils = {
     makeMapBaseLayer : function(map, defaultOptions)
     {
     	var options = Ext.apply({}, defaultOptions, {
-    		isBaseLayer : true,
+    		isBaseLayer : true
     	});
         var layer = new OpenLayers.Layer.WMS("Map", options.url, {
                 layers : options.layers,

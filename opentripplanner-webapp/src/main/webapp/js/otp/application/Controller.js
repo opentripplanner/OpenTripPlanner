@@ -96,7 +96,7 @@ otp.application.Controller = {
         }
         catch(e)
         {
-            console.log("ParseUrlParams highlight " + e)
+            console.log("ParseUrlParams highlight " + e);
         }
     },
 

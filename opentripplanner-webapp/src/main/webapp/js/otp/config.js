@@ -17,7 +17,7 @@ otp.config = {
 	    // These options are passed directly to the OpenLayers.Map constructor.
         'options': {
 			projection: "EPSG:4326",
-			numZoomLevels: 17,
+			numZoomLevels: 17
 		},
         
 		// Base tile information 

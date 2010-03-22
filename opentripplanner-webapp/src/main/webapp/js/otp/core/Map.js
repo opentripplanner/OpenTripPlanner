@@ -163,7 +163,7 @@ otp.core.MapStatic = {
             this.contextMenu = cm;
         }
 
-        var retVal = []
+        var retVal = [];
         if(this.rightClickZoom)
         {
             retVal.push({
@@ -313,7 +313,7 @@ otp.core.MapStatic = {
         }
         catch(e)
         {
-            console.log("exception Map.zoomToExtent" + e)
+            console.log("exception Map.zoomToExtent" + e);
         }
     },
 
