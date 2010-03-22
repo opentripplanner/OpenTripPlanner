@@ -64,6 +64,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     private double slopeCostEffectiveLength;
 
+    private double maxSlope = 0;
+
     public Street(Vertex start, Vertex end, double length) {
         super(start, end);
         this.length = length;
@@ -149,6 +151,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
             if (slope > 0.35 || slope < -0.35) {
                 slope = 0; //Baldwin St in Dunedin, NZ, is the steepest street on earth, and has a grade of 35%.  So, this must be a data error.
                 log.warn("Warning: street " + this + " steeper than Baldwin Street.  This is an error in the algorithm or the data");
+            }
+            if (maxSlope < Math.abs(slope)) {
+                maxSlope  = Math.abs(slope);
             }
             slopeCostEffectiveLength += run * (1 + slope * slope * 10); //any slope is bad
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
@@ -273,10 +278,25 @@ public class Street extends AbstractEdge implements WalkableEdge {
         if (!canTraverse(wo)) {
             return null;
         }
+        
         State s1 = s0.clone();
         double time = this.length / wo.speed;
-        double weight = 0;
-        if (wo.modes.contains(TraverseMode.BICYCLE))
+        double weight = computeWeight(s0, wo, time);
+        s1.walkDistance += length;
+        // it takes time to walk/bike along a street, so update state accordingly
+        s1.incrementTimeInSeconds((int) time);
+        return new TraverseResult(weight, s1);
+    }
+
+    private double computeWeight(State s0, TraverseOptions wo, double time) {
+        double weight;
+        if (wo.wheelchairAccessible) {
+            //in fact, a wheelchair user will probably be going slower
+            //than a cyclist, having less wind resistance, but will have 
+            //a stronger preference for less work.  Maybe it
+            //evens out?
+            weight = slopeSpeedEffectiveLength / wo.speed; 
+        } else if (wo.modes.contains(TraverseMode.BICYCLE))
             switch (wo.optimizeFor) {
             case SAFE:
                 weight = bicycleSafetyEffectiveLength / wo.speed;
@@ -296,10 +316,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
             weight *= 100;
         }
-        s1.walkDistance += length;
-        // it takes time to walk/bike along a street, so update state accordingly
-        s1.incrementTimeInSeconds((int) time);
-        return new TraverseResult(weight, s1);
+        return weight;
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -309,26 +326,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         State s1 = s0.clone();
         double time = length / wo.speed;
         double weight;
-        if (wo.modes.contains(TraverseMode.BICYCLE))
-            switch (wo.optimizeFor) {
-            case SAFE:
-                weight = bicycleSafetyEffectiveLength / wo.speed;
-            break;
-            case FLAT:
-                weight = slopeCostEffectiveLength;
-                break;
-            case QUICK:
-                weight = slopeSpeedEffectiveLength / wo.speed;
-                break;
-            default:
-                //TODO: greenways
-                weight = length / wo.speed;
-        } else {
-            weight = time;
-        }
-        if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
-            weight *= 100;
-        }
+        weight = computeWeight(s0, wo, time);
         s1.walkDistance += this.length;
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
@@ -336,8 +334,14 @@ public class Street extends AbstractEdge implements WalkableEdge {
     }
 
     private boolean canTraverse(TraverseOptions wo) {
-        if(!wheelchairAccessible && wo.wheelchairAccessible)
-            return false;
+        if (wo.wheelchairAccessible) {
+            if(!wheelchairAccessible) {
+                return false;
+            }
+            if (maxSlope > wo.maxSlope) {
+                return false;
+            }
+        }
 
         if(wo.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN))
             return true;

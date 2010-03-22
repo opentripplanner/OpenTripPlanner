@@ -48,6 +48,8 @@ public class TraverseOptions {
 
     public long optimize_transfer_penalty = 1800; //by default, only transfer if it saves half an hour
 
+    public double maxSlope = 0.0833333333333; //ADA max wheelchair ramp slope is a good default.
+
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
