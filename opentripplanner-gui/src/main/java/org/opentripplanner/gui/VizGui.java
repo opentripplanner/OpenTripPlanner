@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javassist.Modifier;
@@ -138,8 +139,13 @@ class TripPatternListModel extends AbstractListModel {
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
     	for (Integer dt : pattern.getDepartureTimes(stopIndex)) {
             Calendar c = new GregorianCalendar();
-            c.setTimeInMillis((dt + 5 * 3600) * 1000);
-            departureTimes.add(DateFormat.getTimeInstance().format(c.getTime()));
+            c.setTimeInMillis(dt * 1000);
+            Date date = c.getTime();
+            //adjust the time for the system's timezone.  This is kind of a hack.
+            int tzAdjust = TimeZone.getDefault().getOffset(date.getTime());
+            c.setTimeInMillis(dt * 1000 - tzAdjust);
+            date = c.getTime();
+            departureTimes.add(DateFormat.getTimeInstance().format(date));
         }
     }
 
