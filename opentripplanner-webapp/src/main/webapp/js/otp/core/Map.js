@@ -150,7 +150,9 @@ otp.core.MapStatic = {
     },
 
     zoomToDefaultExtent : function() {
-        this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+        if (this.defaultExtent && this.defaultExtent !== 'automatic') {
+            this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+        }
     },
 
     /** */
