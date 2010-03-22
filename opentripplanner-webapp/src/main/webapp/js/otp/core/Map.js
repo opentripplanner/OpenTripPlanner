@@ -92,12 +92,65 @@ otp.core.MapStatic = {
         	this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
         }
         
-        // TODO clean this up
-        // this is a hack to get around the default extent not being set correctly when it's specified as a bounds object
-        // instead of automatic
-        // see ticket #63
+
         var self = this;
-        setTimeout(function() { self.clear(); }, 100);
+
+        if (this.defaultExtent === 'automatic') {
+            // ask the server for the extent
+
+            // these two variables get enclosed over
+            // the map gets zoomed when they are both true so that proper zoom levels
+            // get calculated
+            // without these checks, we were getting issues where the map would be zoomed
+            // all the way out when the default extent was specified
+            var layerLoaded = false;
+            var extentRetrieved = false;
+
+            OpenLayers.Request.GET({
+                    // TODO: store the base /ws URL someplace else
+                    url: '/opentripplanner-api-webapp/ws/metadata',
+                    // TODO: switch other ajax requests from XML to JSON?
+                    headers: {Accept: 'application/json'},
+                    success : function(xhr) 
+                    {
+                          var metadata = Ext.util.JSON.decode(xhr.responseText);
+                          self.defaultExtent = new OpenLayers.Bounds(
+                                  metadata.minLongitude,
+                                  metadata.minLatitude,
+                                  metadata.maxLongitude,
+                                  metadata.maxLatitude
+                          );
+                          extentRetrieved = true;
+                          if (layerLoaded) {
+                              self.zoomToDefaultExtent();
+                          }
+                    },
+                    failure: function(xhr)
+                    {
+                        console.log('failure retrieving default extent');
+                    }
+            });
+
+            var zoomOnFirstLoad = function() {
+                layerLoaded = true;
+                if (extentRetrieved) {
+                    self.zoomToDefaultExtent();
+                }
+                self.map.baseLayer.events.un({loadend: zoomOnFirstLoad});
+            };
+            self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
+        } else {
+            var zoomOnFirstLoad = function() {
+                self.zoomToDefaultExtent();
+                self.map.baseLayer.events.un({loadend: zoomOnFirstLoad});
+            };
+            self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
+        }
+
+    },
+
+    zoomToDefaultExtent : function() {
+        this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
     },
 
     /** */
@@ -176,25 +229,12 @@ otp.core.MapStatic = {
     },
 
     /** */
-    clear : function(timeout)
+    clear : function()
     {
-    	if (this.defaultExtent == "automatic")
-        {
-            // If we're set to automatically get the default extent from the
-            // server and we don't have it yet, request it and set a timeout to
-            // come back to call this function again soon.
-    	    this.getDefaultExtentFromServer();
-            var self = this;
-            if (!timeout)
-            {
-                timeout = 100;
-            }
-            var newTimeout = timeout+timeout;
-            setTimeout(function() {self.clear(newTimeout);}, newTimeout);
-            return;
+        if (this.defaultExtent && this.defaultExtent !== 'automatic') {
+            this.updateSize();
+            self.map.zoomToDefaultExtent();
         }
-        this.updateSize();
-        this.map.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
     },
 
     /**
