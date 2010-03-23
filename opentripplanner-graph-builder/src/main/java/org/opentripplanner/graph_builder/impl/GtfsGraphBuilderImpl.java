@@ -209,7 +209,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         if (url != null) {
 
             File tmpDir = getTemporaryDirectory();
-            File gtfsFile = new File(tmpDir, "gtfs_file.zip");
+            String fileName = gtfsBundle.getDefaultAgencyId() + "_gtfs.zip";
+            File gtfsFile = new File(tmpDir, fileName);
 
             if (gtfsFile.exists()) {
                 _log.info("using already downloaded gtfs file: path=" + gtfsFile);
