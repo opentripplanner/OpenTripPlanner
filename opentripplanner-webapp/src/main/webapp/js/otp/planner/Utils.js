@@ -186,7 +186,7 @@ otp.planner.Utils = {
 	 * 
 	 */
     getFare : function(rec, fareType) {
-    	nodes = Ext.DomQuery.select('fare/entry', rec);
+    	var nodes = Ext.DomQuery.select('fare/entry', rec);
     	var fare = null;
     	for (var i = 0; i < nodes.length; i++) {
     		if (Ext.DomQuery.selectValue('key', rec) === fareType) {
