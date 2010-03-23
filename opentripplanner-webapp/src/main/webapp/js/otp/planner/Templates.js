@@ -59,6 +59,7 @@ otp.planner.Templates = {
     '<div id="trip-details">',
     '<h3>Trip Details:</h3>',
     '<table cellpadding="3" cellspacing="0" border="0">',
+    	'<tpl if="regularFare != null"><tr><td>Fare</td><td>{regularFare}</td></tr></tpl>',
         '<tr><td>Travel</td><td>{startTimeDisplay}</td></tr>',
         '<tr><td>Valid</td><td>{[new Date().format("F jS, Y @ g:ia")]}</td></tr>',
         '<tr><td>Time</td><td>{duration} minute<tpl if="duration != 1">s</tpl></td></tr>',

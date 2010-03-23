@@ -66,10 +66,9 @@ otp.planner.Utils = {
                   'id',
                   'description',
                   {name: 'viaRoute',     mapping: '@viaRoute'},
-                  {name: 'regularFare',  mapping: 'fare/regular'},
-                  {name: 'honoredFare',  mapping: 'fare/special[@id=honored]'},
-                  {name: 'youthFare',    mapping: 'fare/special[@id=youth]'},
-                  {name: 'tramFare',     mapping: 'fare/special[@id=tram]'},
+                  {name: 'regularFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'regular'); }},
+                  {name: 'seniorFare',   mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'senior'); }},
+                  {name: 'studentFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'student'); }},
                   {name: 'duration',     mapping: 'duration', convert: millisToMinutes},
                   {name: 'startTime',    mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',      mapping: 'endTime', convert: isoDateStringToDate},
@@ -171,6 +170,32 @@ otp.planner.Utils = {
             steps.push(step);
         }
         return steps;
+    },
+    
+    /**
+	 * parse the <fare> tag in the response document, extracting the data
+	 * associated with fareType.
+	 * 
+	 * @param {Object}
+	 *            rec XML object to parse
+	 * @param {String}
+	 *            fareType type of fare to parse
+	 * 
+	 * @returns {String} formatted string representation of the fare (e.g.,
+	 *          $2.25) or null if fare can't be parsed.
+	 * 
+	 */
+    getFare : function(rec, fareType) {
+    	nodes = Ext.DomQuery.select('fare/entry', rec);
+    	var fare = null;
+    	for (var i = 0; i < nodes.length; i++) {
+    		if (Ext.DomQuery.selectValue('key', rec) === fareType) {
+    			var cents = parseInt(Ext.DomQuery.selectValue('value/cents', rec));
+    			//TODO Use currency in value/currency once available
+    			fare = Ext.util.Format.usMoney(cents/100);
+    		}
+    	}
+    	return fare;
     },
     
     /** */
