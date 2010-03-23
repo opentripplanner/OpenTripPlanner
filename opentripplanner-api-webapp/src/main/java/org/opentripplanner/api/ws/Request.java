@@ -75,6 +75,11 @@ public class Request implements RequestInf {
      */
     private Integer numItineraries = 3;
 
+    /**
+     * The maximum slope of streets for wheelchair trips.
+     */
+    private double maxSlope = -1;
+    
     /** 
      * The complete list of parameters.
      */
@@ -308,5 +313,19 @@ public class Request implements RequestInf {
      */
     public List<String> getIntermediatePlaces() {
         return intermediatePlaces;
+    }
+
+    /**
+     * @return the maximum street slope for wheelchair trips
+     */
+    public double getMaxSlope() {
+        return maxSlope;
+    }
+    
+    /**
+     * @param maxSlope the maximum street slope for wheelchair trpis
+     */
+    public void setMaxSlope(double maxSlope) {
+        this.maxSlope = maxSlope;
     }
 }

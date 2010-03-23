@@ -208,15 +208,23 @@ public class Planner {
         options.optimizeFor = request.getOptimize();
         options.back = request.isArriveBy();
         options.wheelchairAccessible = request.getWheelchair();
+        if (request.getMaxSlope() > 0) { 
+            options.maxSlope = request.getMaxSlope();
+        }
         List<GraphPath> paths = null;
+        boolean tooSloped = false;
         try {
             List<String> intermediates = request.getIntermediatePlaces();
             if (intermediates.size() == 0) {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
                         options);
-                if (paths == null) {
+                if (paths == null && request.getWheelchair()) {
+                    //There are no paths that meet the user's slope restrictions.
+                    //Try again without slope restrictions (and warn user).
+                    options.maxSlope = Double.MAX_VALUE; 
                     paths = pathservice.plan(request.getFrom(), request.getTo(), 
                             request.getDateTime(), options);
+                    tooSloped = true;
                 }
             } else {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), intermediates, request
@@ -265,7 +273,8 @@ public class Planner {
             itinerary.duration = endState.getTime() - startState.getTime();
             itinerary.fare = endState.getCost();
             itinerary.transfers = -1;
-
+            itinerary.tooSloped = tooSloped;
+            
             Leg leg = null;
             TraverseMode mode = null;
             Geometry geometry = null;

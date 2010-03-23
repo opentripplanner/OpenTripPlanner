@@ -87,6 +87,12 @@ public class Itinerary {
     @XmlElementWrapper(name = "legs")
     public List<Leg> leg = new ArrayList<Leg>();
 
+    /**
+     * This itinerary has a greater slope than the user requested (but there are no possible 
+     * itineraries with a good slope). 
+     */
+    public boolean tooSloped = false;
+
     public void addLeg(Leg leg) {
         this.leg.add(leg);
     }
