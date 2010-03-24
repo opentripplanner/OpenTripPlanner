@@ -36,6 +36,11 @@ otp.config = {
     
     // Context menu with trip planning options (e.g., "Start trip here")
     plannerContextMenu : true,
+    
+    // Metrics system
+    //metricsSystem : 'international', // => meters, km
+    metricsSystem : 'english', // => feet, miles
+    
     // Context menu with general map features (e.g., "Center map here")
     mapContextMenu : false
     
