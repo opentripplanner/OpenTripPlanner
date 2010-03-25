@@ -48,7 +48,7 @@ public class ShortestPathTree {
      */
     public SPTVertex addVertex(Vertex vertex, State state, double weightSum, TraverseOptions options) {
 
-        Collection<SPTVertex> vertices = getVertices(vertex);
+        Collection<SPTVertex> vertices = vertexSets.get(vertex);
         if (vertices == null) {
             vertices = new ArrayList<SPTVertex>();
             vertexSets.put(vertex, vertices);
@@ -59,11 +59,9 @@ public class ShortestPathTree {
 
         long time = state.getTime();
 
-        double worstWeight = 0;
         Iterator<SPTVertex> it = vertices.iterator();
 
         if (options.back) {
-            long worstTime = Long.MAX_VALUE;
             while (it.hasNext()) {
                 SPTVertex v = it.next();
                 double old_w = v.weightSum;
@@ -77,22 +75,10 @@ public class ShortestPathTree {
                 if (old_w > weightSum && old_t < time) {
                     /* the new vertex strictly dominates an existing vertex */
                     it.remove();
-                } else {
-                    if (old_w > worstWeight) {
-                        worstWeight = old_w;
-                    }
-                    if (old_t < worstTime) {
-                        worstTime = old_t;
-                    }
                 }
             }
 
-            if (worstTime != Long.MAX_VALUE && time <= worstTime && weightSum >= worstWeight) {
-                return null;
-            }
-
         } else {
-            long worstTime = -1;
             while (it.hasNext()) {
                 SPTVertex v = it.next();
                 double old_w = v.weightSum;
@@ -106,18 +92,7 @@ public class ShortestPathTree {
                 if (old_w > weightSum && old_t > time) {
                     /* the new vertex strictly dominates an existing vertex */
                     it.remove();
-                } else {
-                    if (old_w > worstWeight) {
-                        worstWeight = old_w;
-                    }
-                    if (old_t > worstTime) {
-                        worstTime = old_t;
-                    }
-                }
-            }
-
-            if (worstTime != -1 && time >= worstTime && weightSum >= worstWeight) {
-                return null;
+                } 
             }
         }
         SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
@@ -131,7 +106,7 @@ public class ShortestPathTree {
 
     public GraphPath getPath(Vertex dest, boolean optimize) {
         SPTVertex end = null;
-        Collection<SPTVertex> set = getVertices(dest);
+        Collection<SPTVertex> set = vertexSets.get(dest);
         if (set == null) {
             return null;
         }
@@ -158,10 +133,6 @@ public class ShortestPathTree {
 
     public String toString() {
         return "SPT " + this.vertexSets.size();
-    }
-
-    public Collection<SPTVertex> getVertices(Vertex v) {
-        return vertexSets.get(v);
     }
 
     public void removeVertex(SPTVertex vertex) {
