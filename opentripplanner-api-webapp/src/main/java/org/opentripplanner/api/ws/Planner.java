@@ -437,7 +437,7 @@ public class Planner {
 
         WalkStep step = null;
 
-        double lastAngle = 0;
+        double lastAngle = 0, distance = 0;
 
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
@@ -459,6 +459,8 @@ public class Planner {
                 step.lat = edge.getFromVertex().getY();
                 double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
+                step.elevation = encodeElevationProfile(edge, 0);
+                distance = edge.getDistance();
             } else if (step.streetName != streetName
                     && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
@@ -470,11 +472,23 @@ public class Planner {
                 step.lon = edge.getFromVertex().getX();
                 step.lat = edge.getFromVertex().getY();
                 step.becomes = !multipleOptionsBefore(edge);
+                step.elevation = encodeElevationProfile(edge, 0);
+                distance = edge.getDistance();
             } else {
                 /* generate turn-to-stay-on directions, where needed */
                 double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
-                if (direction != RelativeDirection.CONTINUE) {
+                
+                if (direction == RelativeDirection.CONTINUE) {
+                    // append elevation info
+                    if(step.elevation != null) {
+                        if(step.elevation.length() > 0) step.elevation += ",";
+                        step.elevation += encodeElevationProfile(edge, distance);
+                    }
+                    distance += edge.getDistance();
+                }
+                else {
+                //if (direction != RelativeDirection.CONTINUE) {
                     // figure out if there was another way we could have turned
                     boolean optionsBefore = multipleOptionsBefore(edge);
                     if (optionsBefore) {
@@ -485,8 +499,11 @@ public class Planner {
                         step.stayOn = true;
                         step.lon = edge.getFromVertex().getX();
                         step.lat = edge.getFromVertex().getY();
+                        step.elevation = encodeElevationProfile(edge, 0);
+                        distance = edge.getDistance();
                     }
                 }
+                
             }
 
             step.distance += edge.getDistance();
@@ -496,6 +513,22 @@ public class Planner {
         return steps;
     }
 
+    private String encodeElevationProfile(Edge edge, double offset) {
+        if(!(edge instanceof Street)) {
+            return "";
+        }
+        if(((Street) edge).getElevationProfile() == null) {
+            return "";
+        }
+        String str = "";
+        Coordinate[] coordArr = ((Street) edge).getElevationProfile().toCoordinateArray();
+        for(int i=0; i<coordArr.length; i++) {
+            str+= Math.round(coordArr[i].x+offset) + "," + Math.round(coordArr[i].y*10.0)/10.0 + 
+                  (i < coordArr.length-1 ? "," : "");
+        }
+        return str;
+    }
+    
     private boolean multipleOptionsBefore(Edge edge) {
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();

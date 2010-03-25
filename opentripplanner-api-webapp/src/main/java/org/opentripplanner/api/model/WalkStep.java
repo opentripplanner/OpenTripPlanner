@@ -85,6 +85,11 @@ public class WalkStep {
      */
     public double lat;
 
+    /**
+     * The elevation profile as a comma-separated list of x,y values
+     */
+    public String elevation;
+    
     public void setDirections(double lastAngle, double thisAngle) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle);
         setAbsoluteDirection(thisAngle);

@@ -167,6 +167,7 @@ otp.planner.Utils = {
             step.becomes = (Ext.DomQuery.selectValue('becomes', node).toLowerCase() === 'true');
             step.lon = Ext.DomQuery.selectNumber('lon', node);
             step.lat = Ext.DomQuery.selectNumber('lat', node);
+            step.elevation = Ext.DomQuery.selectValue('elevation', node); 
             steps.push(step);
         }
         return steps;

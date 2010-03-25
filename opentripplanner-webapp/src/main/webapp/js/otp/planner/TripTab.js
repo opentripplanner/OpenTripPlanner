@@ -26,17 +26,19 @@ otp.planner.PrintTripWin = null;
 otp.planner.TripTab = {
 
     // config
-    map        : null,
-    locale     : otp.locale.English,
+    map          : null,
+    ui           : null,
+    locale       : otp.locale.English,
 
-    planner    : null,
-    renderer   : null,
-    xml        : null,
-    request    : null,
+    planner      : null,
+    renderer     : null,
+    topoRenderer : null,
+    xml          : null,
+    request      : null,
 
-    id         : 0,
+    id           : 0,
 
-    m_utils    : otp.planner.Utils,
+    m_utils      : otp.planner.Utils,
 
     // constants
     XML_ITINERARIES_NODE : 'itineraries',
@@ -227,6 +229,22 @@ otp.planner.TripTab = {
     {
         this.renderer.clear();
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+        
+        if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
+        {
+            this.ui.innerSouth.getEl().setHeight(180);
+            this.ui.innerSouth.show();
+            this.ui.viewport.doLayout();
+            this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+        }
+        else {
+            if(this.ui.innerSouth.isVisible()) 
+            {
+                this.ui.innerSouth.hide();
+                this.ui.viewport.doLayout();
+            }
+        }
+        
         this.planner.controller.activate(this.CLASS_NAME);
     },
 

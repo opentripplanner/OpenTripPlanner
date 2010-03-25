@@ -54,7 +54,7 @@ otp.application.Controller = {
         
         ////////// trip planner ///////////
         this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
-        this.planner = new otp.planner.Planner({url:this.url, map:this.map, poi:this.poi});
+        this.planner = new otp.planner.Planner({url:this.url, map:this.map, poi:this.poi, ui:this.ui});
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 

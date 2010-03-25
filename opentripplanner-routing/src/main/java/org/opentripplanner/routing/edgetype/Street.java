@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -392,6 +395,32 @@ public class Street extends AbstractEdge implements WalkableEdge {
     public PackedCoordinateSequence getElevationProfile() {
         return elevationProfile;
     }
+    
+    /**
+     * Returns a subset of the elevation profile given a range. The x-values of the returned
+     * coordinates are adjusted accordingly when the start value is greater than 0. 
+     *  
+     * @param start
+     * @param end
+     * @return a PackedCoordinateSequence
+     */
+    public PackedCoordinateSequence getElevationProfile(double start, double end) {
+        if(elevationProfile == null) return null;
+        List<Coordinate> coordList = new LinkedList<Coordinate>();
+        
+        if(start < 0) start = 0;
+        if(end > length) end = length;
+        
+        for(Coordinate coord : elevationProfile.toCoordinateArray()) {
+            if(coord.x >= start && coord.x <= end) {
+                coordList.add(new Coordinate(coord.x-start, coord.y));
+            }
+        }
+        
+        Coordinate coordArr[] = new Coordinate[coordList.size()];
+        return new PackedCoordinateSequence.Double(coordList.toArray(coordArr));
+    }
+    
     
     public TraverseMode getMode() {
         // this is actually WALK or BICYCLE depending on the TraverseOptions

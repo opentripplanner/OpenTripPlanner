@@ -30,6 +30,7 @@ otp.planner.Planner = {
     map           : null,
     planner       : null,
     controller    : null,
+    ui            : null,
 
     // configuration
     url                     : null,
@@ -44,6 +45,7 @@ otp.planner.Planner = {
     m_tabCount    : 0,
     m_forms       : null,
     m_renderer    : null,
+    m_topoRenderer : null,
 
     /** */
     initialize : function(config)
@@ -83,6 +85,7 @@ otp.planner.Planner = {
 
         // step 3: create the render and form (and add the form to the tab panel
         this.m_renderer = new otp.planner.Renderer(this);
+        this.m_topoRenderer = new otp.planner.TopoRenderer({panel:this.ui.innerSouth});
         this.m_forms    = new otp.planner.Forms(this);
         this.addFormPanel(this.m_forms.getPanel());
 
@@ -273,7 +276,7 @@ otp.planner.Planner = {
 
         try 
         {
-            var trip = new otp.planner.TripTab({planner:this, xml:xml, id:++this.m_tabCount, renderer:this.m_renderer, locale:this.locale, request:request}); 
+            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
             {
@@ -316,6 +319,13 @@ otp.planner.Planner = {
             {
                 this.m_activeTabID = 0;
                 this.controller.deactivate(this.CLASS_NAME);
+                
+                // hide the topo map
+                if(this.ui.innerSouth.isVisible()) 
+                {
+                    this.ui.innerSouth.hide();
+                    this.ui.viewport.doLayout();
+                }
             }
         }
         catch(e)
