@@ -64,16 +64,22 @@ public class FareRuleSet implements Serializable {
         
         //check for matching contains, if this ruleset has any containment restrictions
         if (contains.size() > 0) {
+            if (zonesVisited.size() != contains.size()) {
+                return false;
+            }
             for (String contained : contains) {
                 if (!zonesVisited.contains(contained)) {
                     return false;
                 }
             }
         }
+        
         //check for matching routes
-        for (AgencyAndId route : routesVisited) {
-            if (!routes.contains(route)) {
-                return false;
+        if (routes.size() != 0) {
+            for (AgencyAndId route : routesVisited) {
+                if (!routes.contains(route)) {
+                    return false;
+                }
             }
         }
         
