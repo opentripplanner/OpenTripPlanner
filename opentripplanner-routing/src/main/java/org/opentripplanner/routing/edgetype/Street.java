@@ -139,6 +139,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
     }
 
     public void setElevationProfile(PackedCoordinateSequence elev) {
+        if (elev == null) {
+            return;
+        }
         if (slopeOverride) {
             elev = new PackedCoordinateSequence.Float(new Coordinate[] {new Coordinate(0f, 0f)}, 2);
         }
