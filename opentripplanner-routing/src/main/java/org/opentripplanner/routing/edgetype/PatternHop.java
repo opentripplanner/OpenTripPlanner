@@ -42,7 +42,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
     private Geometry geometry = null;
 
     private FareContext context = null;
-    
+
     public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
         super(startJourney, endJourney, tripPattern);
@@ -54,7 +54,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
     public String getDirection() {
         return pattern.exemplar.getTripHeadsign();
     }
-    
+
     public double getDistance() {
         return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
     }
@@ -71,7 +71,8 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(runningTime);
-        state1.addZone(getEndStop().getZoneId(), context);
+        state1.setZoneAndRoute(getEndStop().getZoneId(), pattern.exemplar.getRoute().getId(),
+                context);
         return new TraverseResult(runningTime, state1);
     }
 
@@ -79,7 +80,8 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
         state1.incrementTimeInSeconds(-runningTime);
-        state1.addZone(getStartStop().getZoneId(), context);
+        state1.setZoneAndRoute(getStartStop().getZoneId(), pattern.exemplar.getRoute().getId(),
+                context);
         return new TraverseResult(runningTime, state1);
     }
 

@@ -47,10 +47,11 @@ public class FareRuleSet implements Serializable {
         routes.add(route);
     }
 
-    public boolean matches(List<String> zonesVisited, List<AgencyAndId> routesVisited) {
+    public boolean matches(String startZone, String endZone, Set<String> zonesVisited,
+            Set<AgencyAndId> routesVisited) {
         //check for matching origin/destination, if this ruleset has any origin/destination restrictions
         if (originDestinations.size() > 0) {
-            P2<String> od = new P2<String>(zonesVisited.get(0), zonesVisited.get(zonesVisited.size() - 1));
+            P2<String> od = new P2<String>(startZone, endZone);
             if (!originDestinations.contains(od)) {
                 P2<String> od2 = new P2<String>(od.getFirst(), null);
                 if (!originDestinations.contains(od2)) {
@@ -61,28 +62,21 @@ public class FareRuleSet implements Serializable {
                 }
             }
         }
-        
+
         //check for matching contains, if this ruleset has any containment restrictions
         if (contains.size() > 0) {
-            if (zonesVisited.size() != contains.size()) {
+            if (!zonesVisited.equals(contains)) {
                 return false;
             }
-            for (String contained : contains) {
-                if (!zonesVisited.contains(contained)) {
-                    return false;
-                }
-            }
         }
-        
+
         //check for matching routes
         if (routes.size() != 0) {
-            for (AgencyAndId route : routesVisited) {
-                if (!routes.contains(route)) {
-                    return false;
-                }
+            if (!routes.containsAll(routesVisited)) {
+                return false;
             }
         }
-        
+
         return true;
     }
 }

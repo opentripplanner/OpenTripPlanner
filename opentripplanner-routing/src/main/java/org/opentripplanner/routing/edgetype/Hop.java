@@ -80,14 +80,14 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(elapsed);
-        state1.addZone(getEndStop().getZoneId(), fareContext);
+        state1.setZoneAndRoute(getEndStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
         return new TraverseResult(elapsed, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-elapsed);
-        state1.addZone(getStartStop().getZoneId(), fareContext);
+        state1.setZoneAndRoute(getStartStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
         return new TraverseResult(elapsed, state1);
     }
 

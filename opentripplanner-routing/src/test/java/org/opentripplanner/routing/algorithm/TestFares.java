@@ -15,6 +15,7 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import junit.framework.TestCase;
@@ -37,9 +38,10 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
 
-        Fare cost = path.vertices.lastElement().state.getCost();
+        Fare cost = path.getCost();
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
+
     public void testPortland() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
@@ -52,14 +54,35 @@ public class TestFares extends TestCase {
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();
-        
-        //from zone 3 to zone 2
-        spt = AStar.getShortestPathTree(gg, "TriMet_10579",
-                "TriMet_8346", new State(startTime), options);
+
+        // from zone 3 to zone 2
+        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8346", new State(startTime),
+                options);
 
         path = spt.getPath(gg.getVertex("TriMet_8346"));
         assertNotNull(path);
-        Fare cost = path.vertices.lastElement().state.getCost();
+        Fare cost = path.getCost();
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 200));
+
+        // complex trip
+
+        startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
+        spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", new State(startTime),
+                options);
+
+        path = spt.getPath(gg.getVertex("TriMet_4231"));
+        assertNotNull(path);
+        for (SPTVertex v : path.vertices) {
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTimeInMillis(v.state.getTime());
+            System.out.println(v + " : " + calendar.getTime());
+        }
+        cost = path.getCost();
+        /*
+         * this is commented out because portland's fares are, I think, broken in the gtfs. see
+         * thread on gtfs-changes.
+         */
+        // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
+
     }
 }
