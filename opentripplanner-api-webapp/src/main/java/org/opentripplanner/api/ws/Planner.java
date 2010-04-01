@@ -271,7 +271,7 @@ public class Planner {
             itinerary.startTime = new Date(startState.getTime());
             itinerary.endTime = new Date(endState.getTime());
             itinerary.duration = endState.getTime() - startState.getTime();
-            itinerary.fare = endState.getCost();
+            itinerary.fare = path.getCost();
             itinerary.transfers = -1;
             itinerary.tooSloped = tooSloped;
             
