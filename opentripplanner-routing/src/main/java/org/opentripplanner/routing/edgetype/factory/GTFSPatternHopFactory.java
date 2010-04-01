@@ -772,17 +772,17 @@ public class GTFSPatternHopFactory {
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
 
-        LineString geometry = _geometriesByShapeSegmentKey.get(key);
+        Geometry geometry = _geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
 
-            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
+            geometry = locationIndexedLine.extractLine(startIndex, endIndex);
 
             // Pack the resulting line string
             CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
                     .getCoordinates(), 2);
             geometry = _factory.createLineString(sequence);
 
-            _geometriesByShapeSegmentKey.put(key, geometry);
+            _geometriesByShapeSegmentKey.put(key, (LineString) geometry);
         }
 
         return geometry;
