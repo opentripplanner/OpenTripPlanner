@@ -24,4 +24,6 @@ public interface PathService {
 
     public List<GraphPath> plan(String from, String to, List<String> intermediates, Date dateTime,
             TraverseOptions options);
+
+    public boolean isAccessible(String place, double maxSlope);
 }

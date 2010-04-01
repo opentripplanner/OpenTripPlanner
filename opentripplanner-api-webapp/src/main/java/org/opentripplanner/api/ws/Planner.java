@@ -181,6 +181,9 @@ public class Planner {
         } catch (PathNotFoundException e) {
             PlannerError error = new PlannerError(Message.PATH_NOT_FOUND);
             response.setError(error);
+        } catch (LocationNotAccessible e) {
+            PlannerError error = new PlannerError(Message.LOCATION_NOT_ACCESSIBLE);
+            response.setError(error);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "exception planning trip: ", e);
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
@@ -210,6 +213,13 @@ public class Planner {
         options.wheelchairAccessible = request.getWheelchair();
         if (request.getMaxSlope() > 0) { 
             options.maxSlope = request.getMaxSlope();
+        }
+        if (request.getWheelchair()) {
+            //check if the start and end locations are accessible
+            if (!pathservice.isAccessible(request.getFrom(), options.maxSlope) || !pathservice.isAccessible(request.getTo(), options.maxSlope)) {
+                throw new LocationNotAccessible();
+            }
+            
         }
         List<GraphPath> paths = null;
         boolean tooSloped = false;

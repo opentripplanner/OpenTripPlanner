@@ -22,11 +22,17 @@ import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OneStreetVertex;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -156,6 +162,37 @@ public class PathServiceImpl implements PathService {
         }
 
         return _graph.getVertex(place);
+    }
+
+    @Override
+    public boolean isAccessible(String place, double maxSlope) {
+        Vertex vertex = getVertexForPlace(place);
+        if (vertex instanceof TransitStop) {
+            TransitStop ts = (TransitStop) vertex;
+            return ts.hasWheelchairEntrance();
+        } else if (vertex instanceof GenericStreetIntersectionVertex) {
+            for (Edge e : vertex.getIncoming()) {
+                if (e instanceof Street) {
+                    Street s = (Street) e;
+                    if (s.getWheelchairAccessible(maxSlope)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        } else if (vertex instanceof StreetLocation) {
+            StreetLocation sl = (StreetLocation) vertex;
+            for (Street street : sl.streets) {
+                if (street.getWheelchairAccessible(maxSlope)) {
+                    return true;
+                }
+            }
+            return false;
+        } else if (vertex instanceof OneStreetVertex) {
+            OneStreetVertex osv = (OneStreetVertex) vertex;
+            return osv.outStreet.getWheelchairAccessible(maxSlope);
+        }
+        return true;
     }
 
 }
