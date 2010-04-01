@@ -47,6 +47,7 @@ public class TransitServerGtfs {
     private Map<String, String> routeIdsToShapePointIds = new HashMap<String, String>();
     private Map<String, List<ShapePoint>> shapeIdsToShapePoints = new HashMap<String, List<ShapePoint>>();
     private Map<String, HashSet<String>> latLonToStopIds = new HashMap<String, HashSet<String>>();
+    private Map<String, Set> stopIdsToRouteIds = new HashMap<String, Set>();
     
     // XXX the list of trip ids that have shapes that are representative of a particular route
     // this was hand generated for new york city
@@ -168,6 +169,13 @@ public class TransitServerGtfs {
             List<Stop> stopsForRoute = routeIdsToStops.get(routeId);
             stopsForRoute.add(stop);
             routeIdsToRoutes.put(routeId, route);
+            Set<String> routeIdsForStopId = stopIdsToRouteIds.get(stopId);
+            if (routeIdsForStopId == null) {
+                routeIdsForStopId = new HashSet<String>();
+                stopIdsToRouteIds.put(stopId, routeIdsForStopId);
+            }
+            routeIdsForStopId.add(routeId);
+            
         }
         
         // associate shape points with shape ids
@@ -219,6 +227,10 @@ public class TransitServerGtfs {
         }
     }
     
+    public Map<String, HashSet<String>> getLatLonsToStopIds() {
+        return latLonToStopIds;
+    }
+
     public List<StopTime> getStopTimesForStopId(String stopId) {
         if (stopIdsToStopTimes.containsKey(stopId)) {
             return stopIdsToStopTimes.get(stopId);
@@ -231,6 +243,15 @@ public class TransitServerGtfs {
     public Set<AgencyAndId> getServiceIdsOnDate(Date date) {
     	ServiceDate serviceDate = new ServiceDate(date);
         return gtfsContext.getCalendarService().getServiceIdsOnDate(serviceDate);
+    }
+    
+    public Set<String> getRouteIdsForStopId(String stopId) {
+        if (stopIdsToRouteIds.containsKey(stopId)) {
+            return stopIdsToRouteIds.get(stopId);
+        } else {
+            System.out.println("No route ids found for stop id: " + stopId);
+            return new HashSet<String>();
+        }
     }
 
 }

@@ -23,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.extended.ws.model.TransitServerDepartures;
+import org.opentripplanner.api.extended.ws.model.TransitServerDetailedStop;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoute;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoutes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,7 @@ public class TransitDataServer {
     public TransitServerDepartures getDepartures(@QueryParam("lat") String lat,
                                                  @QueryParam("lon") String lon,
                                                  @DefaultValue("3") @QueryParam("n") int n) throws JSONException {
-        String latlon = lat + "," + lon;
+        String latlon = buildLatLon(lat, lon);
         return new TransitServerDepartures(latlon, n, transitServerGtfs);
     }
     
@@ -69,5 +70,22 @@ public class TransitDataServer {
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public TransitServerRoute getRoute(@PathParam("route_id") String routeId) throws JSONException {
         return new TransitServerRoute(transitServerGtfs, routeId);
+    }
+    
+    @GET
+    @Path("stop")
+    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public TransitServerDetailedStop getDetailedStop(@QueryParam("lat") String lat,
+                                                     @QueryParam("lon") String lon,
+                                                     @DefaultValue("3") @QueryParam("n") int n) throws JSONException {
+        String latlon = buildLatLon(lat, lon);
+        return new TransitServerDetailedStop(transitServerGtfs, latlon, n);
+    }
+    
+    private String buildLatLon(String lat, String lon) {
+        if (lat == null || lon == null) {
+            throw new NullPointerException("Got null for a lat/lon value: " + lat + " - " + lon);
+        }
+        return lat + "," + lon;
     }
 }

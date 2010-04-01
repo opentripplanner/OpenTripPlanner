@@ -153,8 +153,8 @@ otp.systemmap.Systemmap = {
             storeId: 'departureStore',
             reader: departureXmlReader
         });
-
-        this.systemPanel = new Ext.grid.GridPanel({      
+        
+        this.systemPanel = new Ext.grid.GridPanel({
             id: 'system-panel',
             store: this.routeStore,
             columns: [
@@ -332,7 +332,7 @@ otp.systemmap.Systemmap = {
             map.addLayer(this.systemMapLayerRoutes);
             map.addLayer(this.systemMapLayerStops);
 
-            var popupTplMarkup = '<h2>Departures</h2><ul>{departures}</ul>';
+            var popupTplMarkup = '<h3>Upcoming departures</h3><ul class="departures">{departures}</ul>';
             var popupTpl = new Ext.Template(popupTplMarkup);
             var popupDepartureMarkup = '<li class="departure"><img src="{routeImage}" class="popup-route-icon" /> <strong>{headsign}</strong> - {dateFormatted}</li>';
             var popupDepartureTpl = new Ext.Template(popupDepartureMarkup);
@@ -346,56 +346,70 @@ otp.systemmap.Systemmap = {
                         url: self.popupUrl,
                         params: {lat: lat, lon: lon, n: 5},
                         headers: {Accept: 'application/xml'},
-                        success : function(xhr) 
-                                  {
-                                      var html = '';
-                                      if (xhr.responseXML != null)
-                                      {
-                                          self.departureStore.loadData(xhr.responseXML);
-                                          var departuresMarkup = '';
-                                          for (var i = 0; i < self.departureStore.getCount(); i++)
-                                          {
-                                              var departureRecord = self.departureStore.getAt(i),
-                                                  routeId = departureRecord.get('routeId'),
-                                                  routeRecord = self.routeStore.getById(routeId);
-                                              var imagePathOptions = Ext.apply({}, {route: routeRecord.get('line')}, routeRecord.data);
-                                              var routeImage = otp.util.imagePathManager.imagePath(imagePathOptions);
-                                              var departureMarkup = popupDepartureTpl.apply(Ext.apply({}, {routeImage: routeImage}, departureRecord.data));
-                                              departuresMarkup += departureMarkup;
-                                          }
-                                          html = popupTpl.apply({departures: departuresMarkup});
-                                      }
-                                      else
-                                      {
-                                          html = '<p>No departures found</p>';
-                                      }
-                                      var popup = new OpenLayers.Popup(
-                                              feature.attributes.id,
-                                              feature.geometry.getBounds().getCenterLonLat(),
-                                              new OpenLayers.Size(200, 200),
-                                              html,
-                                              true,
-                                              function() { selectControlStops.unselect(feature); }
-                                      );
-                                      feature.popup = popup;
-                                      map.addPopup(popup);
-                                  },
-                        failure : function(xhr)
-                                  {
-                                      console.log("SystemMap popup fetch data error:");
-                                      console.log(xhr);
-                                  }
+                        success : function(xhr) {
+                            var html = '';
+                            if (xhr.responseXML != null) {
+                                var stopNode = xhr.responseXML.firstChild;
+                                if (stopNode.nodeName === 'stop') {
+                                    var stopName = Ext.DomQuery.select('name', stopNode)[0];
+                                    html += '<h2>' + stopName.firstChild.nodeValue + '</h2>';
+                                    html += '<ul class="routelist">';
+                                    var routeIdNodes = Ext.DomQuery.select('routeIds routeId', stopNode);
+                                    // use a mapping to eliminate duplicates
+                                    var routeIconSet = {};
+                                    Ext.each(routeIdNodes, function(routeIdNode) {
+                                            var routeId = routeIdNode.firstChild.nodeValue;
+                                            var routeRecord = self.routeStore.getById(routeId);
+                                            var routeName = routeRecord.get('line');
+                                            var iconOptions = Ext.apply({}, routeRecord.data, {route: routeName});
+                                            var iconPath = otp.util.imagePathManager.imagePath(iconOptions);
+                                            routeIconSet[iconPath] = null;
+                                        });
+                                    for (var iconPath in routeIconSet) {
+                                        html += '<li><img src="' + iconPath + '" /></li>';
+                                    }
+                                    html += '</ul>';
+                                    var departuresMarkup = '';
+                                    self.departureStore.loadData(xhr.responseXML);
+                                    for (var i = 0; (i < self.departureStore.getCount() && i < 3); i++) {
+                                        var departureRecord = self.departureStore.getAt(i),
+                                            routeId = departureRecord.get('routeId'),
+                                            routeRecord = self.routeStore.getById(routeId);
+                                        var imagePathOptions = Ext.apply({}, {route: routeRecord.get('line')}, routeRecord.data);
+                                        var routeImage = otp.util.imagePathManager.imagePath(imagePathOptions);
+                                        var departureMarkup = popupDepartureTpl.apply(Ext.apply({}, {routeImage: routeImage}, departureRecord.data));
+                                        departuresMarkup += departureMarkup;
+                                    }
+                                    html += popupTpl.apply({departures: departuresMarkup});
+                                } else {
+                                    html += '<p>No stop data found</p>';
+                                }
+                            } else {
+                                html = '<p>No departures found</p>';
+                            }
+                            var popup = new OpenLayers.Popup(
+                                                             feature.attributes.id,
+                                                             feature.geometry.getBounds().getCenterLonLat(),
+                                                             new OpenLayers.Size(200, 200),
+                                                             html,
+                                                             true,
+                                                             function() { selectControlStops.unselect(feature); }
+                                                             );
+                            feature.popup = popup;
+                            map.addPopup(popup);
+                            },
+                        failure : function(xhr) {
+                                console.log("SystemMap popup fetch data error:");
+                                console.log(xhr);
+                        }
                     });
                 },
                 onUnselect: function(feature) {
-                    map.removePopup(feature.popup);
-                    feature.popup.destroy();
-                    feature.popup = null;   
-                }
-            });
-            map.addControl(selectControlStops);
-            selectControlStops.activate();
-            
+                        map.removePopup(feature.popup);
+                        feature.popup.destroy();
+                        feature.popup = null;   
+                    }
+            });            
             var selectControlRoutes = new OpenLayers.Control.SelectFeature(this.systemMapLayerRoutes, {
                 onSelect: function(feature) {                
                     for (var i = 0; i < self.systemMapLayerRoutes.features.length; i++)
@@ -458,10 +472,7 @@ otp.systemmap.Systemmap = {
                         }
                     }
                 }
-            });
-            map.addControl(selectControlRoutes);
-            selectControlRoutes.activate();
-            
+            });            
             this.selectControlRoutes = selectControlRoutes;
             
             // add a listener when the map removes all features so that we can remove all selected features
@@ -472,27 +483,115 @@ otp.systemmap.Systemmap = {
             self.map.beforeAllFeaturesRemoved.push(beforeAllFeaturesRemoved);
 
             // having a hover control active with a click control 
-//            var hoverControlRoutes = new OpenLayers.Control.SelectFeature(this.systemMapLayerRoutes, {
-//                hover: true,
-//                overFeature: function(feature) {
-//                    self.systemMapLayerRoutes.drawFeature(feature, 'select');
-//                },
-//                outFeature: function(feature) {
-//                    var intent = 'default';
-//                    for (var i = 0; i < self.systemMapLayerRoutes.selectedFeatures.length; i++)
-//                    {
-//                        var f = self.systemMapLayerRoutes.selectedFeatures[i];
-//                        if (f === feature)
-//                        {
-//                            intent = 'select';
-//                            break;
-//                        }
-//                    }
-//                    self.systemMapLayerRoutes.drawFeature(feature, intent);
-//                }
-//            });
-//            map.addControl(hoverControlRoutes);
-//            hoverControlRoutes.activate();
+            var hoverControlStops = new OpenLayers.Control.SelectFeature(this.systemMapLayerStops, {
+                hover: true,
+                overFeature: function(feature) {
+                    if (feature.hoverPopup) {
+                        // we've hovered back on while a timeout was set
+                        // we should clear the timeout and do nothing else
+                        clearTimeout(feature.hoverTimeoutId);
+                        feature.hoverTimeoutId = null;
+                    }
+                    else {
+                        // display the popup on the screen
+                        var stopRecord = self.stopStore.getById(feature.attributes.id);
+                        var lat = stopRecord.get('lat');
+                        var lon = stopRecord.get('lon');
+                        OpenLayers.Request.GET({
+                                url: self.popupUrl,
+                                params: {lat: lat, lon: lon, n: 5},
+                                headers: {Accept: 'application/xml'},
+                                success : function(xhr) {
+                                    var html = '';
+                                    if (xhr.responseXML != null) {
+                                        var stopNode = xhr.responseXML.firstChild;
+                                        if (stopNode.nodeName === 'stop') {
+                                            var stopName = Ext.DomQuery.select('name', stopNode)[0];
+                                            html += '<h2>' + stopName.firstChild.nodeValue + '</h2>';
+                                            html += '<ul class="routelist">';
+                                            var routeIdNodes = Ext.DomQuery.select('routeIds routeId', stopNode);
+                                            // use a mapping to eliminate duplicates
+                                            var routeIconSet = {};
+                                            Ext.each(routeIdNodes, function(routeIdNode) {
+                                                    var routeId = routeIdNode.firstChild.nodeValue;
+                                                    var routeRecord = self.routeStore.getById(routeId);
+                                                    var routeName = routeRecord.get('line');
+                                                    var iconOptions = Ext.apply({}, routeRecord.data, {route: routeName});
+                                                    var iconPath = otp.util.imagePathManager.imagePath(iconOptions);
+                                                    routeIconSet[iconPath] = null;
+                                            });
+                                            for (var iconPath in routeIconSet) {
+                                                html += '<li><img src="' + iconPath + '" /></li>';
+                                            }
+                                            html += '</ul>';
+                                        } else {
+                                            html += '<p>No stop data found</p>';
+                                        }
+                                    } else {
+                                        html = '<p>No stop data found</p>';
+                                    }
+                                    var popup = new OpenLayers.Popup(
+                                                                     feature.attributes.id,
+                                                                     feature.geometry.getBounds().getCenterLonLat(),
+                                                                     new OpenLayers.Size(200, 200),
+                                                                     html,
+                                                                     true,
+                                                                     function() { selectControlStops.unselect(feature); }
+                                                                     );
+                                    popup.displayClass = 'olHoverPopup';
+                                    popup.div.className = popup.displayClass;
+                                    feature.hoverPopup = popup;
+                                    feature.hoverTimeoutId = null;
+                                    map.addPopup(popup);
+                                    if (feature.shouldHoverOutOnPopup) {
+                                        // the user hovered off the popup before the async request came through
+                                        // this means that we should trigger the timer to destroy the popup now
+                                        // we do this by calling the hover out event function manually
+                                        hoverControlStops.outFeature(feature);
+                                        feature.shouldHoverOutOnPopup = false;
+                                    }
+                                },
+                                failure : function(xhr) {
+                                    console.log("SystemMap hover popup fetch data error:");
+                                    console.log(xhr);
+                                }
+                            });
+                        }
+                },
+                outFeature: function(feature) {
+                    if (feature.hoverPopup && !feature.hoverTimeoutId) {
+                        var timeoutId = setTimeout(function() {
+                                if (feature.hoverPopup && feature.hoverTimeoutId) {
+                                    map.removePopup(feature.hoverPopup);
+                                    feature.hoverPopup.destroy();
+                                } else {
+                                    // this shouldn't happen
+                                    console.log("Warning: supposed to destroy popup, but it looks like that already happened");
+                                    while (map.popups.length > 0) {
+                                        map.removePopup(map.popups[0]);
+                                    }
+                                    console.log("Removed all popups to eliminate phantoms");
+                                }
+                                feature.hoverPopup = null;
+                                feature.timeoutId = null;
+                            }, 500);
+                        feature.hoverTimeoutId = timeoutId;
+                    } else {
+                        // the async request hasn't completed yet but the user hovered off the stop
+                        // this variable signals the handler above that it should start the timeout handler
+                        // when the response comes in
+                        feature.shouldHoverOutOnPopup = true;
+                    }
+                }
+            });
+            
+            // add all controls to map
+            map.addControl(hoverControlStops);
+            hoverControlStops.activate();
+            map.addControl(selectControlStops);
+            selectControlStops.activate();
+            map.addControl(selectControlRoutes);
+            selectControlRoutes.activate();
         }
         // load the map features from the xml
         for (var i = 0; i < this.routeStore.getCount(); i++)

@@ -1535,7 +1535,9 @@ bottom: 0;
 }
 
 .olPopup,
-.olPopup > div {
+.olPopup > div,
+.olHoverPopup,
+.olHoverPopup > div {
 background-color: transparent!important;
 overflow: visible!important;
 }
@@ -1544,31 +1546,84 @@ overflow: visible!important;
 font-size: 12px;
 background: url(../images/transit-extend/popup-bg.png) 0 0 no-repeat; /* will replace with image */
 position: relative;
-padding: 5px 5px 5px 20px!important;
+padding: 0 0 0 13px!important;
 top: -20px;
 left: 5px;
-height: 140px!important;
+height: 150px!important;
 overflow: auto;
+width: 212px!important;
 }
 
 .olPopupContent h2 {
-font-size: 14px;
+font-size: 10px;
 text-transform: uppercase;
-margin: 0 0 7px;
+margin: 5px 5px 2px;
+color: #fff;
+}
+
+.olPopupContent h3 {
+font-size: 10px;
+padding: 3px 5px 3px;
+margin: 0;
+background: #fff;
+width: 196px;
+}
+
+.olPopupContent ul.departures {
+padding: 0 5px;
+margin: 0;
+width: 197px;
+}
+
+.olPopupContent ul.routelist {
+margin: 0;
+padding: 0 0 5px 5px;
+}
+
+.olPopupContent ul.routelist li {
+display: inline;
+margin: 0;
 }
 
 .olPopupCloseBox {
 top: -15px!important;
-right: 25px!important;
+right: 6px!important;
 background: url(../images/transit-extend/close.gif) 50% 50% no-repeat !important;
 }
 
 .mapHelp {
 font-size: 14px;
 margin: 0 0 6px;
-background: #f2f2f2 url(../images/transit-extend/info.png) 6px 50% no-repeat !important;
+background: url(../images/transit-extend/info.png) 6px 50% no-repeat !important;
 padding: 6px 6px 6px 33px;
 border: 1px solid #f0a250;
+}
+
+.olHoverPopup .olPopupContent {
+background: url(../images/transit-extend/hover-popup-bg.png) 0 0 no-repeat;
+height: 30px!important;
+width: 157px!important;
+padding: 5px 5px 5px 13px!important;
+top: -13px;
+overflow: hidden;
+}
+
+.olHoverPopup .olPopupContent h2 {
+font-size: 9px;
+font-weight: normal;
+text-transform: capitalize;
+margin: 0 0 2px;
+color: #fff;
+overflow: hidden;
+white-space: nowrap;
+}
+
+.olHoverPopup ul.routelist {
+padding: 0;
+}
+
+.olHoverPopup .olPopupCloseBox {
+display: none;
 }
 
 #x-form-el-from\.id,

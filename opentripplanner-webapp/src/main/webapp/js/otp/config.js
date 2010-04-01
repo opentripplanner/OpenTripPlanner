@@ -28,6 +28,10 @@ otp.config = {
             transitionEffect: 'resize'
         }
     },
+
+    // if specified, uri path to a custom logo
+    // otherwise use the default "images/ui/logoSmall.png"
+    'logo': null,
     
     // List of agency IDs (as specified in GTFS) for which custom icons should be used.
     // Icons should be placed in the custom directory (e.g., custom/nyct)

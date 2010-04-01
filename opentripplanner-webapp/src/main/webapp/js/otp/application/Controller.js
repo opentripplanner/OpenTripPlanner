@@ -49,6 +49,15 @@ otp.application.Controller = {
         this.map  = new otp.core.Map(this.config.map);
         this.ui   = new otp.core.UI({map:this.map});
 
+        // create logo image, using a custom logo if specified
+        var customLogo = this.config.logo;
+        var logoPath = (typeof customLogo === 'string') ? customLogo : 'images/ui/logoSmall.png';
+        var logoAnchorWrapper = Ext.get('logo').query('a')[0];
+        Ext.DomHelper.append(logoAnchorWrapper, {tag: 'img',
+                                                 alt: "OpenTripPlanner home",
+                                                 src: logoPath
+                                                 });
+
         // initialize utilities
         otp.util.imagePathManager.addCustomAgencies(this.config.useCustomIconsForAgencies);
         
@@ -61,7 +70,7 @@ otp.application.Controller = {
         if (this.config.systemMap.enabled)
         {
         	// XXX how to set the url? this.url seems to be null?
-        	this.sm = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/departures'});
+        	this.sm = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/stop'});
         	this.ui.accordion.add(this.sm.getPanel());
         	if (this.config.systemMap.showByDefault)
         	{
