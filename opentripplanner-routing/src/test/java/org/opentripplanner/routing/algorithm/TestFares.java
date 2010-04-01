@@ -15,7 +15,6 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import junit.framework.TestCase;
@@ -64,6 +63,19 @@ public class TestFares extends TestCase {
         Fare cost = path.getCost();
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 200));
 
+        System.out.println("long trip");
+        // long trip
+
+        startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
+        spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", new State(startTime),
+                options);
+
+        path = spt.getPath(gg.getVertex("TriMet_1252"));
+        assertNotNull(path);
+        cost = path.getCost();
+        
+        //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
+        
         // complex trip
 
         startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
@@ -72,11 +84,6 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("TriMet_4231"));
         assertNotNull(path);
-        for (SPTVertex v : path.vertices) {
-            GregorianCalendar calendar = new GregorianCalendar();
-            calendar.setTimeInMillis(v.state.getTime());
-            System.out.println(v + " : " + calendar.getTime());
-        }
         cost = path.getCost();
         /*
          * this is commented out because portland's fares are, I think, broken in the gtfs. see

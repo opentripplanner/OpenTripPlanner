@@ -43,6 +43,8 @@ class Ride {
     String startZone;
 
     String endZone;
+    
+    long startTime;
 
     public Ride() {
         zones = new HashSet<String>();
@@ -50,22 +52,31 @@ class Ride {
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Ride(from ");
-        builder.append(startZone);
-        builder.append(" to ");
-        builder.append(endZone);
+        builder.append("Ride");
+        if (startZone != null) {
+            builder.append("(from ");
+            builder.append(startZone);
+        }
+        if (endZone != null) {
+            builder.append(" to ");
+            builder.append(endZone);
+        }
         builder.append(" on ");
         builder.append(route);
-        builder.append(" through ");
-        boolean first = true;
-        for (String zone : zones) {
-            if (first) {
-                first = false;
-            } else {
-                builder.append(",");
+        if (zones.size() > 0) {
+            builder.append(" through ");
+            boolean first = true;
+            for (String zone : zones) {
+                if (first) {
+                    first = false;
+                } else {
+                    builder.append(",");
+                }
+                builder.append(zone);
             }
-            builder.append(zone);
         }
+        builder.append(" at ");
+        builder.append(startTime);
         builder.append(")");
         return builder.toString();
     }
@@ -113,7 +124,7 @@ public class GraphPath {
         HashMap<AgencyAndId, FareRuleSet> fareRules = fareContext.getFareRules();
         HashMap<AgencyAndId, FareAttribute> fareAttributes = fareContext.getFareAttributes();
 
-        // rides
+        // create rides
         List<Ride> rides = new ArrayList<Ride>();
         Ride newRide = null;
         for (SPTVertex vertex : vertices) {
@@ -127,6 +138,7 @@ public class GraphPath {
                     rides.add(newRide);
                     newRide.startZone = zone;
                     newRide.route = route;
+                    newRide.startTime = vertex.state.getTime();
                 }
                 newRide.zones.add(zone);
                 newRide.endZone = zone;
@@ -140,10 +152,9 @@ public class GraphPath {
         String startZone = null;
         int transfersUsed = -1;
         float totalFare = 0, currentFare = -1;
-
+        long startTime = rides.get(0).startTime;
         for (int i = 0; i < rides.size(); ++i) {
             Ride ride = rides.get(i);
-            System.out.println("considering ride : " + ride);
             if (startZone == null) {
                 startZone = ride.startZone;
             }
@@ -152,12 +163,19 @@ public class GraphPath {
             zones.addAll(ride.zones);
             transfersUsed += 1;
 
+            long tripTime = ride.startTime - startTime;
+            
             // find the best fare that matches this set of rides
             for (AgencyAndId fareId : fareRules.keySet()) {
                 FareRuleSet ruleSet = fareRules.get(fareId);
                 if (ruleSet.matches(startZone, ride.endZone, zones, routes)) {
                     FareAttribute attribute = fareAttributes.get(fareId);
                     if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
+                        continue;
+                    }
+                    //assume transfers are evaluated at boarding time,
+                    //as trimet does
+                    if (attribute.isTransferDurationSet() && tripTime > attribute.getTransferDuration() * 1000) {
                         continue;
                     }
                     float newFare = attribute.getPrice();
@@ -177,12 +195,13 @@ public class GraphPath {
                 // there's no fare, but we can fall back to the previous fare, and retry starting
                 // here
                 totalFare += currentFare;
-                currentFare = 0;
+                currentFare = -1;
                 transfersUsed = -1;
                 --i;
                 zones = new HashSet<String>();
                 startZone = ride.startZone;
                 routes = new HashSet<AgencyAndId>();
+                startTime = ride.startTime;
             } else {
                 currentFare = bestFare;
             }
@@ -191,7 +210,7 @@ public class GraphPath {
         totalFare += currentFare;
 
         Fare fare = new Fare();
-        fare.addFare(FareType.regular, new WrappedCurrency(currency), (int) (totalFare * Math.pow(
+        fare.addFare(FareType.regular, new WrappedCurrency(currency), (int) Math.round(totalFare * Math.pow(
                 10, currency.getDefaultFractionDigits())));
         return fare;
     }

@@ -61,6 +61,9 @@ public class State {
         fareContext = context;
     }
     
+    /**
+     * @return the time in milliseconds since the epoch.
+     */
     public long getTime() {
         return _time;
     }
