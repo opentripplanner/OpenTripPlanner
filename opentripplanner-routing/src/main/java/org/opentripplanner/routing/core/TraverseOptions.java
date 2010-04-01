@@ -60,6 +60,9 @@ public class TraverseOptions {
     public TraverseOptions(TraverseModeSet modes) {
         this();
         this.modes = modes;
+        if (modes.getBicycle()) {
+            speed = 6; //6 m/s, ~13.5 mph, a random bicycling speed.
+        }
     }
 
     public TraverseOptions(GtfsContext context) {
