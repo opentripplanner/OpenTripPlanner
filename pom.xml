@@ -65,7 +65,7 @@
             <version>2.6.1</version>
             <configuration>
                 <links>
-                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.0.6/</link>
+                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.1.2/</link>
                 </links>
             </configuration>
           </plugin>
