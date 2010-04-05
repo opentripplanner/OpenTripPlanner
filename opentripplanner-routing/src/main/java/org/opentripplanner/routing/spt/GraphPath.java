@@ -146,7 +146,6 @@ public class GraphPath {
         }
 
         // There are no rides, so there's no fare.
-        // TODO: Is this the proper way/place to check for this? Is it masking anything?
         if (rides.size() == 0) {
             return null;
         }
