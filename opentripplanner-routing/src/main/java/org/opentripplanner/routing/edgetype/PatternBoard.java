@@ -51,13 +51,10 @@ public class PatternBoard extends PatternEdge {
 
     private FareContext fareContext;
 
-    private String zone;
-
-    public PatternBoard(Vertex startStation, Vertex startJourney, TripPattern pattern, int stopIndex, String zone, FareContext context, TraverseMode mode) {
+    public PatternBoard(Vertex startStation, Vertex startJourney, TripPattern pattern, int stopIndex, FareContext context, TraverseMode mode) {
         super(startStation, startJourney, pattern);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
-        this.zone = zone;
         fareContext = context;
     }
 
@@ -124,7 +121,7 @@ public class PatternBoard extends PatternEdge {
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
-        state1.setZoneAndRoute(zone, pattern.exemplar.getRoute().getId(), fareContext);
+        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.exemplar.getRoute().getId(), fareContext);
         long transfer_penalty = 0;
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether

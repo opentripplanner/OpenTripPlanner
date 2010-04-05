@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -45,6 +47,8 @@ public final class TripPattern implements Serializable {
     private ArrayList<Integer>[] arrivalTimes;
 
     private ArrayList<Integer>[] dwellTimes;
+    
+    private String[] zones;
 
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
     public static final int FLAG_PICKUP = 2;
@@ -65,6 +69,7 @@ public final class TripPattern implements Serializable {
         arrivalTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         perTripFlags = new ArrayList<Integer>();
         perStopFlags = new int[hops + 1];
+        zones = new String[hops + 1];
         trips = new ArrayList<Trip>();
         int i;
         for (i = 0; i < hops; ++i) {
@@ -76,6 +81,7 @@ public final class TripPattern implements Serializable {
 
         i = 0;
         for (StopTime stopTime : stopTimes) {
+            zones[i] = stopTimes.get(i).getStop().getZoneId();
             if (stopTime.getStop().getWheelchairBoarding() != 0) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
@@ -293,5 +299,14 @@ public final class TripPattern implements Serializable {
 
     public boolean canBoard(int stopIndex) {
         return (perStopFlags[stopIndex] & FLAG_PICKUP) != 0;
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        perTripFlags.trimToSize();
+        out.defaultWriteObject();
+    }
+
+    public String getZone(int stopIndex) {
+        return zones[stopIndex];
     }
 }

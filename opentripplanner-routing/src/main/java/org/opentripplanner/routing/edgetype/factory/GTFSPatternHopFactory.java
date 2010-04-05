@@ -624,9 +624,9 @@ public class GTFSPatternHopFactory {
             Vertex endStation = graph.getVertex(id(s1.getId()));
 
             PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart, tripPattern,
-                    i, s0.getZoneId(), fareContext, mode);
+                    i, fareContext, mode);
             graph.addEdge(boarding);
-            graph.addEdge(new PatternAlight(endJourneyArrive, endStation, s1.getZoneId(), fareContext, tripPattern, i, mode));
+            graph.addEdge(new PatternAlight(endJourneyArrive, endStation, fareContext, tripPattern, i, mode));
         }
 
         tripPattern.setTripFlags(0, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
