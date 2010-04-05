@@ -55,7 +55,7 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
     @Override
     public T convert(SimpleFeature feature) {
         ensureCached();
-        String mainKeyValue = feature.getAttribute(this.mainKey).toString();
+        String mainKeyValue = toHashableString(feature.getAttribute(this.mainKey));
         SimpleFeature joinedFeature = cache.get(mainKeyValue);
 
         if (joinedFeature == null) {
@@ -79,7 +79,7 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
             Iterator<SimpleFeature> it = features.iterator();
             while (it.hasNext()) {
                 SimpleFeature feature = it.next();
-                String joinedKeyValue = feature.getAttribute(joinedKey).toString();
+                String joinedKeyValue = toHashableString(feature.getAttribute(joinedKey));
                 cache.put(joinedKeyValue, feature);
             }
             features.close(it);
@@ -89,6 +89,21 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
         }
     }
 
+    /**
+     * Convert a feature value to a String for hashing. We use this instead of simply calling
+     * toString to avoid issues when the column types for these features are slightly different. See
+     * http://opentripplanner.org/ticket/226
+     * 
+     * @param keyValue
+     * @return a string to use as the hash key
+     */
+    private String toHashableString(Object keyValue) {
+        if (keyValue instanceof Number) {
+            keyValue = ((Number)keyValue).doubleValue();
+        }
+        return keyValue.toString();
+    }
+    
     public void setConverter(SimpleFeatureConverter<T> converter) {
         this.converter = converter;
     }

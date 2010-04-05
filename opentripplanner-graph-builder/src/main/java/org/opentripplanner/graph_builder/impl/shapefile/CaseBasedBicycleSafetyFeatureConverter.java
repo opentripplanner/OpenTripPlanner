@@ -39,8 +39,12 @@ public class CaseBasedBicycleSafetyFeatureConverter implements SimpleFeatureConv
         if (safetyFeature == null)
             return oneone;
 
-        String directionKey = feature.getAttribute(directionAttributeName).toString();
-        int directionFeature = directions.get(directionKey);
+        String directionKey = (String) feature.getAttribute(directionAttributeName);
+        int directionFeature = 3; // Default to applying the safety feature in both directions
+                                  // (useful if the dataset doesn't include direction information)
+        if (directionKey != null) {
+            directionFeature = directions.get(directionKey.toString());
+        }
 
         return new P2<Double>((directionFeature & 0x1) == 0 ? 1.0 : safetyFeature,
                 (directionFeature & 0x2) == 0 ? 1.0 : safetyFeature);
