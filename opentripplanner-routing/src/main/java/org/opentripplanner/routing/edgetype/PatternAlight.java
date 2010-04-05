@@ -17,7 +17,6 @@ import java.util.Calendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -48,15 +47,12 @@ public class PatternAlight extends PatternEdge {
     private int stopIndex;
 
     private int modeMask;
-
-    private FareContext fareContext;
     
-    public PatternAlight(Vertex startStation, Vertex startJourney, FareContext context, TripPattern pattern,
+    public PatternAlight(Vertex startStation, Vertex startJourney, TripPattern pattern,
             int stopIndex, TraverseMode mode) {
         super(startStation, startJourney, pattern);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
-        fareContext = context;
     }
 
     public String getDirection() {
@@ -124,7 +120,7 @@ public class PatternAlight extends PatternEdge {
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
         state1.justTransferred = true;
-        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.exemplar.getRoute().getId(), fareContext);
+        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.exemplar.getRoute().getId(), pattern.fareContext);
         long transfer_penalty = 0;
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether

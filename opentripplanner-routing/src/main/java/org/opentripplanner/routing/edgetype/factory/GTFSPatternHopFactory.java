@@ -310,7 +310,7 @@ public class GTFSPatternHopFactory {
                 boolean simple = false;
 
                 if (tripPattern == null) {
-                    tripPattern = makeTripPattern(graph, trip, stopTimes);
+                    tripPattern = makeTripPattern(graph, trip, stopTimes, fareContext);
 
                     patterns.put(stopPattern, tripPattern);
                     if (blockId != null && !blockId.equals("")) {
@@ -571,8 +571,8 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private TripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        TripPattern tripPattern = new TripPattern(trip, stopTimes);
+    private TripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes, FareContext fareContext) {
+        TripPattern tripPattern = new TripPattern(trip, stopTimes, fareContext);
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
@@ -624,9 +624,9 @@ public class GTFSPatternHopFactory {
             Vertex endStation = graph.getVertex(id(s1.getId()));
 
             PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart, tripPattern,
-                    i, fareContext, mode);
+                    i, mode);
             graph.addEdge(boarding);
-            graph.addEdge(new PatternAlight(endJourneyArrive, endStation, fareContext, tripPattern, i, mode));
+            graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
         }
 
         tripPattern.setTripFlags(0, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);

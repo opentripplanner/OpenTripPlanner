@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
 public final class TripPattern implements Serializable {
@@ -59,9 +60,12 @@ public final class TripPattern implements Serializable {
 
     private ArrayList<Trip> trips;
 
+    public FareContext fareContext;
+
     @SuppressWarnings("unchecked")
-    public TripPattern(Trip exemplar, List<StopTime> stopTimes) {
+    public TripPattern(Trip exemplar, List<StopTime> stopTimes, FareContext fareContext) {
         this.exemplar = exemplar;
+        this.fareContext = fareContext;
         int hops = stopTimes.size() - 1;
         departureTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         runningTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
