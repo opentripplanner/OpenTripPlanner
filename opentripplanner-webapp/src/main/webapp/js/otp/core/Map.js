@@ -333,7 +333,9 @@ otp.core.MapStatic = {
             var layer = this.map.layers[i];
             if (!layer.isBaseLayer)
             {
-                layer.removeFeatures(layer.features);
+                if (typeof layer.removeFeatures === 'function') {
+                    layer.removeFeatures(layer.features);
+                }
             }
         }
         Ext.each(this.allFeaturesRemoved, function(fn) {

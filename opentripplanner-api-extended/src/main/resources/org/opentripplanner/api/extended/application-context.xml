@@ -25,6 +25,7 @@
                 <constructor-arg><value>/home/rob/data/otp/mta/theonetrain.zip</value></constructor-arg>    	            	      
     	    </bean>
     	</property>
+    	<property name="geoserverBaseUri" value="http://openlayers.example.com/geoserver/wms" />
     </bean>
     
 </beans>

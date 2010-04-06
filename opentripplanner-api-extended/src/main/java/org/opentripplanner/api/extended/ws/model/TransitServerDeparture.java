@@ -15,10 +15,14 @@ package org.opentripplanner.api.extended.ws.model;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import org.onebusaway.gtfs.model.Route;
 
 public class TransitServerDeparture implements Comparable<TransitServerDeparture> {
-    private String routeId;
+    @XmlElement(name="route")
+    private TransitServerDetailedRoute route;
+    
     private String headsign;
     private Date date;
 
@@ -26,19 +30,11 @@ public class TransitServerDeparture implements Comparable<TransitServerDeparture
     }
     
     public TransitServerDeparture(Route route, String headsign, Date date) {
-        String routeId = route.getId().toString();
-        this.setRouteId(routeId);
+        this.route = new TransitServerDetailedRoute(route);
         this.setHeadsign(headsign);
         this.setDate(date);
     }
 
-    public void setRouteId(String routeId) {
-        this.routeId = routeId;
-    }
-
-    public String getRouteId() {
-        return routeId;
-    }
 
     public void setHeadsign(String headsign) {
         this.headsign = headsign;

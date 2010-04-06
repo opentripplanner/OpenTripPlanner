@@ -1,28 +1,35 @@
 otp.config = {
-		
+  
     'systemMap': {
-		// If true, the system map accordion tab will be added to the web app.
-		enabled: false,
-		// If true, the system map view will be shown by default instead of the trip planner.
-		// No effect if the system map is not enabled.
-		showByDefault: true
-	},
+        // If true, a system map will be used in the display
+        enabled: false,
+
+        // uris and layer names
+        // these match up with geoserver
+        layerUrlRoutes: 'http://routelayer.example.com/wms',
+        layerUrlStops: 'http://stoplayer.example.com/wms',
+        layerNamesRoute: 'routeLayerName',
+        layerNamesStop: 'stopLayerName',
+        
+        // this is the uri to the extended api that proxies to geoserver
+        controlStopsUrl: '/opentripplanner-api-extended/ws/wms',
+    },
     
     'map': {
-		// The default extent to zoom the map to when the web app loads.
-		// This can either be an OpenLayers.Bounds object or the string "automatic"
-		// If set to "automatic", the client will ask the server for the default extent.
-	    'defaultExtent': "automatic",
-	    
-	    // These options are passed directly to the OpenLayers.Map constructor.
+        // The default extent to zoom the map to when the web app loads.
+        // This can either be an OpenLayers.Bounds object or the string "automatic"
+        // If set to "automatic", the client will ask the server for the default extent.
+        'defaultExtent': "automatic",
+     
+        // These options are passed directly to the OpenLayers.Map constructor.
         'options': {
-			projection: "EPSG:4326",
-			numZoomLevels: 17
-		},
+            projection: "EPSG:4326",
+            numZoomLevels: 17
+        },
         
-		// Base tile information 
+        // Base tile information 
         'baseLayerOptions': {
-			url: 'http://maps.opengeo.org/geowebcache/service/wms',
+            url: 'http://maps.opengeo.org/geowebcache/service/wms',
             layers: ['openstreetmap'],
             format: 'image/png',
             transitionEffect: 'resize'
@@ -47,5 +54,5 @@ otp.config = {
     
     // Context menu with general map features (e.g., "Center map here")
     mapContextMenu : false
-    
+
 };

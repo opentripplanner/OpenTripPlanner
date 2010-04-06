@@ -55,6 +55,7 @@ public class TransitServerGtfs {
     
     private File gtfsFile;
     private GtfsContext gtfsContext;
+    private String geoserverBaseUri;
 
     public void setGtfsFile(File gtfsFile) {
         this.gtfsFile = gtfsFile;
@@ -70,6 +71,14 @@ public class TransitServerGtfs {
 
     public GtfsContext getGtfsContext() {
         return gtfsContext;
+    }
+    
+    public String getGeoserverBaseUri() {
+        return this.geoserverBaseUri;
+    }
+    
+    public void setGeoserverBaseUri(String geoserverBaseUri) {
+        this.geoserverBaseUri = geoserverBaseUri;
     }
     
     private void loadRepresentativeShapeIds() {
@@ -113,6 +122,9 @@ public class TransitServerGtfs {
     public void initialize() throws IOException {
         if (gtfsFile == null) {
             throw new IllegalStateException("Gtfs file is not set");
+        }
+        if (geoserverBaseUri == null) {
+            throw new IllegalStateException("Geoserver base uri not set");
         }
         System.out.println("Reading gtfs file: " + gtfsFile.getPath());
         this.setGtfsContext(GtfsLibrary.readGtfs(gtfsFile));

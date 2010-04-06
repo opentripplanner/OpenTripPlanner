@@ -67,16 +67,8 @@ otp.application.Controller = {
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 
-        if (this.config.systemMap.enabled)
-        {
-        	// XXX how to set the url? this.url seems to be null?
-        	this.sm = new otp.systemmap.Systemmap({map: this.map, url: '/opentripplanner-api-extended/ws/routes', popupUrl: '/opentripplanner-api-extended/ws/stop'});
-        	this.ui.accordion.add(this.sm.getPanel());
-        	if (this.config.systemMap.showByDefault)
-        	{
-        		// we want the system map to be the default panel now
-        		this.ui.accordion.layout.setActiveItem(1);
-        	}
+        if (this.config.systemMap.enabled) {
+            this.sm = new otp.systemmap.Systemmap(Ext.apply({}, {map: this.map}, config.systemMap));
         }
         
         this.ui.doLayout();
