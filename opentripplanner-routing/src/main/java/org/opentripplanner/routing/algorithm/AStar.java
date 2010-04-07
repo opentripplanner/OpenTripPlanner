@@ -295,20 +295,19 @@ public class AStar {
                 if (wr == null) {
                     continue;
                 }
-
+                
                 if (wr.weight < 0) {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
-                }/* else if (wr.weight == 0) {
-                    throw new ZeroWeightException();
-                }*/
+                }
+                
                 Vertex tov = edge.getToVertex();
 
-                distance = tov.distance(target) / MAX_SPEED;
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
+                    distance = tov.distance(target) / MAX_SPEED;                    
                     pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }
