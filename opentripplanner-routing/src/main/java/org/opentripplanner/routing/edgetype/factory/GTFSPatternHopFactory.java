@@ -36,6 +36,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.GenericVertex;
@@ -44,12 +45,14 @@ import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -113,9 +116,9 @@ class EncodedTrip implements Comparable<EncodedTrip> {
 
     int patternIndex;
 
-    TripPattern pattern;
+    BasicTripPattern pattern;
 
-    public EncodedTrip(Trip trip, int i, TripPattern pattern) {
+    public EncodedTrip(Trip trip, int i, BasicTripPattern pattern) {
         this.trip = trip;
         this.patternIndex = i;
         this.pattern = pattern;
@@ -223,7 +226,7 @@ public class GTFSPatternHopFactory {
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
 
-        HashMap<StopPattern, TripPattern> patterns = new HashMap<StopPattern, TripPattern>();
+        HashMap<StopPattern, BasicTripPattern> patterns = new HashMap<StopPattern, BasicTripPattern>();
 
         int index = 0;
 
@@ -274,7 +277,7 @@ public class GTFSPatternHopFactory {
             List<Frequency>      frequencies  = tripFrequencies.get(trip);
 
             StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
-            TripPattern tripPattern = patterns.get(stopPattern);
+            BasicTripPattern tripPattern = patterns.get(stopPattern);
             String blockId = trip.getBlockId();
 
             /*
@@ -448,20 +451,35 @@ public class GTFSPatternHopFactory {
 
         loadTransfers(graph);
         deleteUselessDwells(graph);
-
+        shrinkPatterns(graph);
         clearCachedData();
-
     }
-
+    /**
+     * Replace BasicTripPatterns with ArrayTripPatterns.
+     */
+    private void shrinkPatterns(Graph graph) {
+        for (Vertex v : graph.getVertices()) {
+            for (Edge e: v.getOutgoing()) {
+                if (e instanceof PatternEdge) {
+                    PatternEdge pe = (PatternEdge) e;
+                    TripPattern pattern = pe.getPattern();
+                    if (pattern instanceof BasicTripPattern) {
+                        pe.setPattern(((BasicTripPattern) pattern).convertToArrayTripPattern());
+                    }
+                }
+            }
+        }
+    }
+    
     /**
      * Delete dwell edges that take no time, and merge their start and end vertices.
      * For trip patterns that have no trips with dwells, remove the dwell data, and merge the arrival
      * and departure times.
      */
     private void deleteUselessDwells(Graph graph) {
-        HashSet<TripPattern> possiblySimplePatterns = new HashSet<TripPattern>();
+        HashSet<BasicTripPattern> possiblySimplePatterns = new HashSet<BasicTripPattern>();
         for (PatternDwell dwell : potentiallyUselessDwells) {
-            TripPattern pattern = dwell.getPattern();
+            BasicTripPattern pattern = (BasicTripPattern) dwell.getPattern();
             boolean useless = true;
             for (int i = 0; i < pattern.getNumDwells(); ++i) {
                 if (pattern.getDwellTime(dwell.getStopIndex(), i) != 0) {
@@ -479,14 +497,14 @@ public class GTFSPatternHopFactory {
             v.mergeFrom(graph, (GenericVertex) dwell.getToVertex());
             possiblySimplePatterns.add(pattern);
         }
-        for (TripPattern pattern: possiblySimplePatterns) {
+        for (BasicTripPattern pattern: possiblySimplePatterns) {
             pattern.simplify();
         }
     }
 
     private void addTripToInterliningMap(
             HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart, Trip trip,
-            List<StopTime> stopTimes, TripPattern tripPattern, String blockId) {
+            List<StopTime> stopTimes, BasicTripPattern tripPattern, String blockId) {
         HashMap<Stop, TreeSet<EncodedTrip>> blockStops = tripsByBlockAndStart.get(blockId);
         if (blockStops == null) {
             blockStops = new HashMap<Stop, TreeSet<EncodedTrip>>();
@@ -571,8 +589,8 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private TripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes, FareContext fareContext) {
-        TripPattern tripPattern = new TripPattern(trip, stopTimes, fareContext);
+    private BasicTripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes, FareContext fareContext) {
+        BasicTripPattern tripPattern = new BasicTripPattern(trip, stopTimes, fareContext);
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
@@ -792,7 +810,7 @@ public class GTFSPatternHopFactory {
 
         LineString geometry = _geometriesByShapeId.get(shapeId);
 
-        if (geometry != null)
+        if (geometry != null) 
             return geometry;
 
         List<ShapePoint> points = _dao.getShapePointsForShapeId(shapeId);

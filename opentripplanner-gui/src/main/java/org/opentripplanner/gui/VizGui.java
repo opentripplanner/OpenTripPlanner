@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -137,7 +138,10 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
-    	for (Integer dt : pattern.getDepartureTimes(stopIndex)) {
+    	Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
+    	while (departureTimeIterator.hasNext()) {
+    	    int dt = departureTimeIterator.next();
+
             Calendar c = new GregorianCalendar();
             c.setTimeInMillis(dt * 1000);
             Date date = c.getTime();
@@ -364,7 +368,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 ListModel model = new TripPatternListModel(pattern, stopIndex);
                 departurePattern.setModel(model);
 
-                Trip trip = pattern.exemplar;
+                Trip trip = pattern.getExemplar();
                 serviceIdLabel.setText(trip.getServiceId().toString());
             }
         };

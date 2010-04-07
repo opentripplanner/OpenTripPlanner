@@ -78,9 +78,9 @@ public class SPTEdge implements Edge {
         }
 
         if (payload instanceof PatternEdge) {
-            int patternIndex = fromv.state.getPattern();
+            int patternIndex = fromv.state.getTrip();
             if (patternIndex == -1) {
-                patternIndex = tov.state.getPattern();
+                patternIndex = tov.state.getTrip();
             }
 
             TripPattern pattern = ((PatternEdge)payload).getPattern();

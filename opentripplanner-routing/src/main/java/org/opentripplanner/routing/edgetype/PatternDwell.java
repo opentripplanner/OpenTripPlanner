@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -23,7 +22,7 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternDwell extends AbstractEdge {
+public class PatternDwell extends PatternEdge {
 
     /**
      *  Models waiting in a station on a vehicle.  The vehicle may not change 
@@ -32,17 +31,16 @@ public class PatternDwell extends AbstractEdge {
     
     private static final long serialVersionUID = 1L;
 
-    private TripPattern pattern;
     private int stopIndex;
     
     public PatternDwell(Vertex startJourney, Vertex endJourney, int stopIndex, TripPattern tripPattern) {
-        super(startJourney, endJourney);
+        super(startJourney, endJourney, tripPattern);
         this.stopIndex = stopIndex;
         this.pattern = tripPattern;
     }
 
     public String getDirection() {
-        return pattern.exemplar.getTripHeadsign();
+        return pattern.getExemplar().getTripHeadsign();
     }
 
     public double getDistance() {
@@ -50,23 +48,23 @@ public class PatternDwell extends AbstractEdge {
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.exemplar.getRoute());
+        return GtfsLibrary.getTraverseMode(pattern.getExemplar().getRoute());
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.exemplar.getRoute());
+        return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
-        int dwellTime = pattern.getDwellTime(stopIndex, state0.getPattern());
+        int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(dwellTime);
         return new TraverseResult(dwellTime, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
-        int dwellTime = pattern.getDwellTime(stopIndex, state0.getPattern());
+        int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(-dwellTime);
         return new TraverseResult(dwellTime, state1);
     }

@@ -85,22 +85,22 @@ public class PatternBoard extends PatternEdge {
 
         int wait = -1;
         int patternIndex = -1;
-        AgencyAndId service = pattern.exemplar.getServiceId();
+        AgencyAndId service = getPattern().getExemplar().getServiceId();
         if (options.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, true);
+            patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, true);
             if (patternIndex >= 0) {
-                wait = pattern.getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
+                wait = getPattern().getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
         }
         if (options.serviceOn(service, serviceDateYesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
-            int yesterdayPatternIndex = pattern.getNextPattern(stopIndex, secondsSinceMidnight
+            int yesterdayPatternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight
                     + SEC_IN_DAY, options.wheelchairAccessible, true);
             if (yesterdayPatternIndex >= 0) {
-                int waitYesterday = pattern.getDepartureTime(stopIndex, yesterdayPatternIndex)
+                int waitYesterday = getPattern().getDepartureTime(stopIndex, yesterdayPatternIndex)
                         - secondsSinceMidnight - SEC_IN_DAY;
                 if (wait < 0 || waitYesterday < wait) {
                     // choose the better time
@@ -116,10 +116,10 @@ public class PatternBoard extends PatternEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
-        state1.tripId = pattern.getTrip(patternIndex).getId();
-        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.exemplar.getRoute().getId(), pattern.fareContext);
+        state1.tripId = getPattern().getTrip(patternIndex).getId();
+        state1.setZoneAndRoute(getPattern().getZone(stopIndex), getPattern().getExemplar().getRoute().getId(), getPattern().getFareContext());
         long transfer_penalty = 0;
-        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
+        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
             transfer_penalty = options.optimize_transfer_penalty;
@@ -128,7 +128,7 @@ public class PatternBoard extends PatternEdge {
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-	if (!pattern.canBoard(stopIndex)) {
+	if (!getPattern().canBoard(stopIndex)) {
             return null;
         }
         State s1 = state0.clone();

@@ -52,7 +52,7 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
     }
 
     public String getDirection() {
-        return pattern.exemplar.getTripHeadsign();
+        return pattern.getExemplar().getTripHeadsign();
     }
 
     public double getDistance() {
@@ -60,27 +60,27 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.exemplar.getRoute());
+        return GtfsLibrary.getTraverseMode(pattern.getExemplar().getRoute());
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.exemplar.getRoute());
+        return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
-        int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
+        int runningTime = pattern.getRunningTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(runningTime);
-        state1.setZoneAndRoute(getEndStop().getZoneId(), pattern.exemplar.getRoute().getId(),
+        state1.setZoneAndRoute(getEndStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
                 context);
         return new TraverseResult(runningTime, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
-        int runningTime = pattern.getRunningTime(stopIndex, state0.getPattern());
+        int runningTime = pattern.getRunningTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(-runningTime);
-        state1.setZoneAndRoute(getStartStop().getZoneId(), pattern.exemplar.getRoute().getId(),
+        state1.setZoneAndRoute(getStartStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
                 context);
         return new TraverseResult(runningTime, state1);
     }

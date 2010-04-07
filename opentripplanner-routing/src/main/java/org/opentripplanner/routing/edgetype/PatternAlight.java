@@ -87,10 +87,10 @@ public class PatternAlight extends PatternEdge {
 
         int wait = 1;
         int patternIndex = -1;
-        AgencyAndId service = pattern.exemplar.getServiceId();
+        AgencyAndId service = pattern.getExemplar().getServiceId();
         if (options.serviceOn(service, serviceDate)) {
             // try to get the departure time on today's schedule
-            patternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, false);
+            patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, false);
             if (patternIndex >= 0) {
                 wait = pattern.getArrivalTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
@@ -99,7 +99,7 @@ public class PatternAlight extends PatternEdge {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
-            int yesterdayPatternIndex = pattern.getPreviousPattern(stopIndex, secondsSinceMidnight
+            int yesterdayPatternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight
                     + SEC_IN_DAY, options.wheelchairAccessible, false);
             if (yesterdayPatternIndex >= 0) {
                 int waitYesterday = pattern.getArrivalTime(stopIndex, yesterdayPatternIndex)
@@ -120,9 +120,9 @@ public class PatternAlight extends PatternEdge {
         state1.incrementTimeInSeconds(wait);
         state1.tripId = pattern.getTrip(patternIndex).getId();
         state1.justTransferred = true;
-        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.exemplar.getRoute().getId(), pattern.fareContext);
+        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.getExemplar().getRoute().getId(), pattern.getFareContext());
         long transfer_penalty = 0;
-        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getPattern() != -1) {
+        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
             transfer_penalty = options.optimize_transfer_penalty;

@@ -20,7 +20,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 public class State {
 
     private long _time;
-    private int pattern = -1;
+    private int trip = -1;
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
 
@@ -44,10 +44,10 @@ public class State {
         this(time, pattern, tripId, walkDistance, null, null, null);
     }
 
-    public State(long time, int pattern, AgencyAndId tripId, double walkDistance,
+    public State(long time, int trip, AgencyAndId tripId, double walkDistance,
             AgencyAndId route, String zone, FareContext fareContext) {
         _time = time;
-        this.pattern = pattern;
+        this.trip = trip;
         this.tripId = tripId;
         this.walkDistance = walkDistance;
         this.route = route;
@@ -73,19 +73,19 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time, pattern, tripId, walkDistance, route, zone, fareContext);
+        State ret = new State(_time, trip, tripId, walkDistance, route, zone, fareContext);
         return ret;
     }
 
     public String toString() {
-        return "<State " + new Date(_time) + "," + pattern + ">";
+        return "<State " + new Date(_time) + "," + trip + ">";
     }
 
     public void setPattern(int curPattern) {
-        this.pattern = curPattern;
+        this.trip = curPattern;
     }
 
-    public int getPattern() {
-        return pattern;
+    public int getTrip() {
+        return trip;
     }
 }

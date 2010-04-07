@@ -29,4 +29,8 @@ public abstract class PatternEdge extends AbstractEdge {
     public TripPattern getPattern() {
         return pattern;
     }
+
+    public void setPattern(TripPattern pattern) {
+        this.pattern = pattern;
+    }
 }
