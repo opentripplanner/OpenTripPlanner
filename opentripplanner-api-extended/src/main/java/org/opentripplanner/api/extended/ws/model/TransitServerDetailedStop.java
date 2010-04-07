@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.onebusaway.gtfs.model.Route;
@@ -15,11 +14,7 @@ import org.opentripplanner.api.extended.ws.TransitServerGtfs;
 public class TransitServerDetailedStop {
     
     private String name;
-    
-//    @XmlElement(name="routeIds")
-//    private TransitServerRouteIds routeIds;
-    
-    @XmlElement(name="routes")
+
     private TransitServerDetailedRoutes routes;
     
     private TransitServerDepartures departures;
@@ -39,14 +34,13 @@ public class TransitServerDetailedStop {
         String stopId = stop.getId().toString();
         this.setName(stop.getName());
         Set<String> routeIdsForStopId = transitServerGtfs.getRouteIdsForStopId(stopId);
-//        this.routeIds = new TransitServerRouteIds(routeIdsForStopId);
         this.setDepartures(new TransitServerDepartures(latlon, nDepartures, transitServerGtfs));
         List<Route> routes = new ArrayList<Route>();
         for (String routeId : routeIdsForStopId) {
             Route route = transitServerGtfs.getRoute(routeId);
             routes.add(route);
         }
-        this.routes = new TransitServerDetailedRoutes(routes);
+        this.setRoutes(new TransitServerDetailedRoutes(routes));
     }
     
     public void setName(String name) {
@@ -63,6 +57,14 @@ public class TransitServerDetailedStop {
 
     public TransitServerDepartures getDepartures() {
         return departures;
+    }
+
+    public void setRoutes(TransitServerDetailedRoutes routes) {
+        this.routes = routes;
+    }
+
+    public TransitServerDetailedRoutes getRoutes() {
+        return routes;
     }
 
 }

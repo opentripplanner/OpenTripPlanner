@@ -7,18 +7,23 @@ import org.onebusaway.gtfs.model.Route;
 
 public class TransitServerDetailedRoute {
     
+    @SuppressWarnings("unused")
     @XmlElement(name="mode")
     private String mode;
     
+    @SuppressWarnings("unused")
     @XmlElement(name="shortName")
     private String shortName;
     
+    @SuppressWarnings("unused")
     @XmlElement(name="longName")
     private String longName;
     
+    @SuppressWarnings("unused")
     @XmlElement(name="agencyId")
     private String agencyId;
     
+    @SuppressWarnings("unused")
     @XmlElement(name="routeId")
     private String routeId;
     
