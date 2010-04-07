@@ -171,7 +171,7 @@ public class GTFSPatternHopFactory {
 
     private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
-    private FareContext fareContext;
+    private FareContext fareContext = null;
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -182,7 +182,9 @@ public class GTFSPatternHopFactory {
             FareAttribute attribute = context.getFareAttribute(fareId);
             fareAttributes.put(fareId, attribute);
         }
-        fareContext = new FareContext(fareRules, fareAttributes);
+        if (fareRules.size () > 0 && fareAttributes.size() > 0) { 
+            fareContext = new FareContext(fareRules, fareAttributes);
+        }
     }
 
     public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
