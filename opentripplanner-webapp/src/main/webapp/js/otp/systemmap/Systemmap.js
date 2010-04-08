@@ -77,12 +77,31 @@ otp.systemmap.Systemmap = {
 
             map.addLayers([this.layerRoutes, this.layerStops]);
 
-            // XXX should make this configurable, if we want this at all?
+            // FIXME should make this configurable, if we want this at all?
             var layerSwitcherControl = new OpenLayers.Control.LayerSwitcher();
             map.addControl(layerSwitcherControl);
             layerSwitcherControl.activate();
 
             this.loadPopupBehavior();
+
+            // FIXME this is a hack to get around the wms layers shadowing the trip vector layers
+            // when a trip is planned
+            // the trip layers are already on top of of the system map layers
+            // so it's unclear to me why this doesn't already work
+            // but calling raiseLayer seems to force the issue
+            var raiseTripLayers = function() {
+                var layersToRaise = [];
+                Ext.each(map.layers, function(layer) {
+                        if (layer.name.indexOf('trip') !== -1) {
+                            layersToRaise.push(layer);
+                        }
+                    });
+                Ext.each(layersToRaise, function(layer) {
+                        map.raiseLayer(layer, 1);
+                    });
+            };
+            this.layerRoutes.events.on({loadend: raiseTripLayers});
+            this.layerStops.events.on({loadend: raiseTripLayers});
         }
     },
 
