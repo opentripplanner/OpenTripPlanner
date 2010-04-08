@@ -42,22 +42,6 @@ otp.systemmap.Systemmap = {
     {
         this.systemmap = this;
         otp.configure(this, config);
-
-        this.m_mainPanel = new Ext.Panel({
-            id:         'sm-accordion',
-            title:      this.locale.systemmap.labels.panelTitle,
-            iconCls:    'systemmap-panel',
-            autoShow:   true,
-            border:     false,
-            layout:     'vBox',
-            layoutConfig: {
-                align: 'stretch',
-                pack: 'start'
-            },
-            items:      [],
-            listeners:  {'expand': {fn: this.panelExpanded, scope: this}}
-        });
-
         this.loadSystemMap();
     },
 
