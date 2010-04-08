@@ -99,53 +99,43 @@ otp.planner.Itinerary = {
      */
     draw : function(vLayer, mLayer)
     {
-        try
-        {
-            if(this.m_vectors.length < 1)
-            {
-                this.makeRouteLines();
-                this.makeWalkLines();
-            }
-            
-            if( this.m_markers.length < 1) {
-                this.makeMarkers();
-            }
-            
-            // Reproject layer data for display if necessary
-            if(this.map.dataProjection != vLayer.map.getProjection())
-            {
-                for ( var i = 0; i < this.m_vectors.length; ++i) {
-                    if (!this.m_vectors[i].geometry._otp_reprojected) {
-                        this.m_vectors[i].geometry._otp_reprojected = true;
-                        this.m_vectors[i].geometry.transform(
-                                this.map.dataProjection,
-                                vLayer.map.getProjectionObject());
-                    }
+        if (this.m_vectors.length < 1) {
+            this.makeRouteLines();
+            this.makeWalkLines();
+        }
+
+        if (this.m_markers.length < 1) {
+            this.makeMarkers();
+        }
+
+        // Reproject layer data for display if necessary
+        if (this.map.dataProjection != vLayer.map.getProjection()) {
+            for (var i = 0; i < this.m_vectors.length; ++i) {
+                if (!this.m_vectors[i].geometry._otp_reprojected) {
+                    this.m_vectors[i].geometry._otp_reprojected = true;
+                    this.m_vectors[i].geometry.transform(
+                            this.map.dataProjection, vLayer.map
+                                    .getProjectionObject());
                 }
             }
-            
-            if(this.map.dataProjection != mLayer.map.getProjection())
-            {
-                for ( var i = 0; i < this.m_markers.length; ++i) {
-                    if (!this.m_markers[i].geometry._otp_reprojected) {
-                        this.m_markers[i].geometry._otp_reprojected = true;
-                        this.m_markers[i].geometry.transform(
-                                this.map.dataProjection,
-                                mLayer.map.getProjectionObject());
-                    }
+        }
+
+        if (this.map.dataProjection != mLayer.map.getProjection()) {
+            for (var i = 0; i < this.m_markers.length; ++i) {
+                if (!this.m_markers[i].geometry._otp_reprojected) {
+                    this.m_markers[i].geometry._otp_reprojected = true;
+                    this.m_markers[i].geometry.transform(
+                            this.map.dataProjection, mLayer.map
+                                    .getProjectionObject());
                 }
             }
-            
-            vLayer.addFeatures(this.m_vectors);
-            
-            mLayer.addFeatures(this.m_markers);
-            this.m_extent = mLayer.getDataExtent();
-            this.m_extent.extend(vLayer.getDataExtent());
         }
-        catch(e)
-        {
-            console.log("exception Itinerary.draw " + e);
-        }
+
+        vLayer.addFeatures(this.m_vectors);
+
+        mLayer.addFeatures(this.m_markers);
+        this.m_extent = mLayer.getDataExtent();
+        this.m_extent.extend(vLayer.getDataExtent());
     },
 
     /** */
@@ -175,26 +165,19 @@ otp.planner.Itinerary = {
     getVectors : function()
     {
         var retVal = null;
-        try
-        {
-            if(this.m_vectors.length < 1)
-            {
-                this.makeRouteLines();
-                this.makeWalkLines();
-            }
-            retVal = this.m_vectors;
+
+        if (this.m_vectors.length < 1) {
+            this.makeRouteLines();
+            this.makeWalkLines();
         }
-        catch(e)
-        {
-            console.log("exit Itinerary.getVectors " + e);
-        }
-        
+        retVal = this.m_vectors;
+
         return retVal;
     },
 
 
     /**
-     *  pushes a new vector into the line array 
+     * pushes a new vector into the line array
      */
     pushVector : function(vector)
     {
@@ -242,15 +225,8 @@ otp.planner.Itinerary = {
     {
         var retVal = {};
 
-        try
-        {
-           this.m_startTime = this.xml.data.startTime;
-           this.m_endTime   = this.xml.data.endTime;
-        }
-        catch(e)
-        {
-            console.log("exception Itinerary.getParams " + e);
-        }
+        this.m_startTime = this.xml.data.startTime;
+        this.m_endTime = this.xml.data.endTime;
 
         return retVal;
     },
@@ -261,98 +237,70 @@ otp.planner.Itinerary = {
      */
     makeStartEndTime : function()
     {
-        try
-        {
-           this.m_startTime = this.xml.data.startTime;
-           this.m_endTime   = this.xml.data.endTime;
-        }
-        catch(e)
-        {
-            console.log("exception Itinerary.makeStartEndTime " + e);
-        }
+        this.m_startTime = this.xml.data.startTime;
+        this.m_endTime = this.xml.data.endTime;
     },
 
 
     /**
      * 
      */
-    makeRouteLines : function(vLayer)
-    {
-        var vectors  = new Array();
-        
+    makeRouteLines : function(vLayer) {
+        var vectors = new Array();
+
         var endIndex = this.m_fromStore.getCount() - 1;
-        for(var i = 0; i <= endIndex; i++) 
-        {
+        for ( var i = 0; i <= endIndex; i++) {
             var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
             var mode = from.get('mode');
 
-            if(otp.util.Modes.isTransit(mode))
-            {
-                try
-                {
-                    var geoJson = leg.get('legGeometry');
-                    var geoLine = new OpenLayers.Feature.Vector(geoJson,
-                            null,
-                            otp.util.OpenLayersUtils.RED_STYLE
-                    );
-                    var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
-                    vectors.push(geoLine);
-                }
-                catch(e)
-                {
-                    console.log("exception Itinerary.makeRouteLines " + e);
-                }
+            if (otp.util.Modes.isTransit(mode)) {
+                var geoJson = leg.get('legGeometry');
+                var geoLine = new OpenLayers.Feature.Vector(geoJson, null,
+                        otp.util.OpenLayersUtils.RED_STYLE);
+                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from,
+                        this.m_toStore.getAt(i));
+                vectors.push(geoLine);
             }
         }
-      
-        if(vectors.length > 0)
-        {
+
+        if (vectors.length > 0) {
             this.concatVectors(vectors);
-            if(vLayer)
+            if (vLayer) {
                 vLayer.addFeatures(vectors);
+            }
         }
     },
 
 
     /**
-     * makes lines between from / to / transfers
-     * NOTE: should only be called when creating a new itinerary (not every time that itinerary is drawn)
+     * makes lines between from / to / transfers NOTE: should only be called
+     * when creating a new itinerary (not every time that itinerary is drawn)
      */
-    makeWalkLines : function(vLayer)
-    {
-        var vectors  = new Array();
-        
+    makeWalkLines : function(vLayer) {
+        var vectors = new Array();
+
         var endIndex = this.m_fromStore.getCount() - 1;
-        for(var i = 0; i <= endIndex; i++) 
-        {
+        for ( var i = 0; i <= endIndex; i++) {
             var from = this.m_fromStore.getAt(i);
             var leg = this.m_legStore.getAt(i);
 
             var mode = from.get('mode');
-            if(mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER') 
-            {
-                try
-                {
-                    var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'),
-                            null,
-                            otp.util.OpenLayersUtils.BLACK_STYLE
-                    );
-                    var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
-                    vectors.push(geoLine);
-                }
-                catch(e)
-                {
-                    console.log("exception Itinerary.makeWalkLines " + e);
-                }
+            if (mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER') {
+                var geoLine = new OpenLayers.Feature.Vector(leg
+                        .get('legGeometry'), null,
+                        otp.util.OpenLayersUtils.BLACK_STYLE);
+                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from,
+                        this.m_toStore.getAt(i));
+                vectors.push(geoLine);
             }
         }
-      
-        if(vectors.length > 0)
-        {
+
+        if (vectors.length > 0) {
             this.concatVectors(vectors);
-            if(vLayer)
+            if (vLayer) {
                 vLayer.addFeatures(vectors);
+            }
         }
     },
 
@@ -365,109 +313,117 @@ otp.planner.Itinerary = {
    /**
     * Gets a new Marker Layer for drawing the trip plan's features upon
     */
-    makeMarkers : function()
-    {
-        try
-        {
-            var startIndex = 0;
-            var endIndex   = this.m_fromStore.getCount() - 1; 
+    makeMarkers : function() {
+        var startIndex = 0;
+        var endIndex = this.m_fromStore.getCount() - 1;
 
-            // do the FROM marker 
-            var from = this.m_fromStore.getAt(startIndex);
-            var fromP = from.get('geometry');
+        // do the FROM marker
+        var from = this.m_fromStore.getAt(startIndex);
+        var fromP = from.get('geometry');
+        var mode = from.get('mode');
+        if (mode !== 'WALK' && mode !== 'BICYCLE') {
+            // if the first leg isn't a walk or bike, then assume it's a transit
+            // leg or bike leg
+            // so paint the route icon (eg: fromStore.getAt(0))
+            startIndex = 0;
+            this.createAndAddMarker(fromP.x, fromP.y, {
+                type : 'fromMarker',
+                mode : mode
+            });
+        } else {
+            // first leg is a walk leg, so mark this point with the from icon
+            // that has the walking guy, and move on to next leg in store...
+            startIndex = 1;
+            var markerType;
+            if (mode === 'WALK') {
+                markerType = 'fromWalkMarker';
+            } else if (mode === 'BICYCLE') {
+                markerType = 'fromBicycleMarker';
+            } else {
+                markerType = 'fromMarker';
+            }
+            this.createAndAddMarker(fromP.x, fromP.y, {
+                type : markerType,
+                mode : mode
+            });
+        }
+
+        // if the last leg is a walk, then paint it now & don't print a route
+        // icon (eg: endIndex--)
+        var walk = this.m_fromStore.getAt(endIndex);
+        var walkP = walk.get('geometry');
+        mode = walk.get('mode');
+        // Don't draw another walk marker if the first leg is a walk or bike and
+        // there's only one leg
+        if ((mode === 'WALK' || mode === 'BICYCLE') && endIndex > 0) {
+            endIndex--;
+            var markerType = (mode === 'BICYCLE') ? 'bicycleMarker'
+                    : 'walkMarker';
+            this.createAndAddMarker(walkP.x, walkP.y, {
+                type : markerType,
+                mode : mode
+            });
+        }
+
+        // save the list of routes for this itinerary the first time around
+        var doRoutes = false;
+        if (this.m_routes == null) {
+            this.m_routes = new Array();
+            doRoutes = true;
+        }
+
+        // draw the itinerary
+        for ( var i = startIndex; i <= endIndex; i++) {
+            var from = this.m_fromStore.getAt(i);
+            var to = this.m_toStore.getAt(i);
+            var thru = from.get('order');
+            var route = from.get('routeID');
             var mode = from.get('mode');
-            if(mode !== 'WALK' && mode !== 'BICYCLE') 
-            {
-                // if the first leg isn't a walk or bike, then assume it's a transit leg or bike leg
-                // so paint the route icon (eg: fromStore.getAt(0))
-                startIndex = 0;
-                this.createAndAddMarker(fromP.x, fromP.y, {type: 'fromMarker', mode: mode});
-            }
-            else
-            {
-                // first leg is a walk leg, so mark this point with the from icon that has the walking guy, and move on to next leg in store...
-                startIndex = 1;
-                var markerType;
-                if (mode === 'WALK')
-                {
-                    markerType = 'fromWalkMarker';
-                }
-                else if (mode === 'BICYCLE')
-                {
-                    markerType = 'fromBicycleMarker';
-                }
-                else
-                {
-                    markerType = 'fromMarker';
-                }
-                this.createAndAddMarker(fromP.x, fromP.y, {type: markerType, mode: mode});
-            }
 
-            // if the last leg is a walk, then paint it now & don't print a route icon (eg: endIndex--)
-            var walk = this.m_fromStore.getAt(endIndex);
-            var walkP = walk.get('geometry');
-            mode = walk.get('mode');
-            // Don't draw another walk marker if the first leg is a walk or bike and there's only one leg
-            if((mode === 'WALK' || mode === 'BICYCLE') && endIndex > 0)
-            {
-                endIndex--;
-                var markerType = (mode === 'BICYCLE') ? 'bicycleMarker' : 'walkMarker';
-                this.createAndAddMarker(walkP.x, walkP.y, {type: markerType, mode: mode});
-            }
-
-            // save the list of routes for this itinerary the first time around
-            var doRoutes = false;
-            if(this.m_routes == null)
-            {
-                this.m_routes = new Array();
-                doRoutes = true;
-            }
-
-            // draw the itinerary 
-            for(var i = startIndex; i <= endIndex; i++) 
-            {
-                var from  = this.m_fromStore.getAt(i);
-                var to    = this.m_toStore.getAt(i);
-                var thru  = from.get('order');
-                var route = from.get('routeID');
-                var mode  = from.get('mode');
-                
-                var fromP = from.get('geometry');
-                var toP = to.get('geometry');
-
-                // save the route number off (eg: used to show vehicles on the map for these routes, etc...)
-                if(doRoutes && route != null && route.length > 0)
-                   this.m_routes.push(route);
-
-                // only show the route bubble if we're drawing the beginning of the block (eg not a thru route transfer / stay on bus)
-                if(thru == null || thru != 'thru-route')
-                {
-                    this.createAndAddMarker(fromP.x, fromP.y, {type: 'diskMarker', mode: mode});
-                    // TODO: How should street transit links be rendered?
-                    if (route == "street transit link" || mode == "TRANSFER")
-                    {
-                        this.createAndAddMarker(fromP.x, fromP.y, {type: 'walkMarker', mode: mode});
-                    }
-                    else
-                    {
-                        var agencyId = from.get('agencyId');
-                        this.createAndAddMarker(fromP.x, fromP.y, {type: 'routeMarker', mode: mode, route: route, agencyId: agencyId});
-                    }
-                }
-
-                // put a disk at the end of this route segment
-                this.createAndAddMarker(toP.x, toP.y, {type: 'diskMarker'});
-            }
-
-            // do the TO (end) marker 
-            var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
+            var fromP = from.get('geometry');
             var toP = to.get('geometry');
-            this.createAndAddMarker(toP.x, toP.y, {type: 'toMarker'});
+
+            // save the route number off (eg: used to show vehicles on the map
+            // for these routes, etc...)
+            if (doRoutes && route != null && route.length > 0)
+                this.m_routes.push(route);
+
+            // only show the route bubble if we're drawing the beginning of the
+            // block (eg not a thru route transfer / stay on bus)
+            if (thru == null || thru != 'thru-route') {
+                this.createAndAddMarker(fromP.x, fromP.y, {
+                    type : 'diskMarker',
+                    mode : mode
+                });
+                // TODO: How should street transit links be rendered?
+                if (route == "street transit link" || mode == "TRANSFER") {
+                    this.createAndAddMarker(fromP.x, fromP.y, {
+                        type : 'walkMarker',
+                        mode : mode
+                    });
+                } else {
+                    var agencyId = from.get('agencyId');
+                    this.createAndAddMarker(fromP.x, fromP.y, {
+                        type : 'routeMarker',
+                        mode : mode,
+                        route : route,
+                        agencyId : agencyId
+                    });
+                }
+            }
+
+            // put a disk at the end of this route segment
+            this.createAndAddMarker(toP.x, toP.y, {
+                type : 'diskMarker'
+            });
         }
-        catch(e)
-        {
-            console.log("exit Itinerary.makeMarkers" + e);
-        }
+
+        // do the TO (end) marker
+        var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
+        var toP = to.get('geometry');
+        this.createAndAddMarker(toP.x, toP.y, {
+            type : 'toMarker'
+        });
     },
         
 //
@@ -476,18 +432,10 @@ otp.planner.Itinerary = {
     LEG_ID : '-leg-',
 
     /** */
-    getLegStartPoint : function(id)
-    {
-        try
-        {
-            var nid = id.substring(id.lastIndexOf(this.LEG_ID) + this.LEG_ID.length);
-            var retVal = this.m_fromStore.getAt(nid);
-            return retVal;
-        }
-        catch(e)
-        {
-            console.log("exit Itinerary.getLegStartPoint " + e);
-        }
+    getLegStartPoint : function(id) {
+        var nid = id.substring(id.lastIndexOf(this.LEG_ID) + this.LEG_ID.length);
+        var retVal = this.m_fromStore.getAt(nid);
+        return retVal;
     },
 
     /** */

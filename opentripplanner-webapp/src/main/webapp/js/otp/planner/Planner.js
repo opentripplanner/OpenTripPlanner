@@ -91,8 +91,8 @@ otp.planner.Planner = {
 
         // step 4: override the Form's submit method to something we own here in planner
         var thisObj = this;
-        this.m_forms.submitSuccess = function(){ thisObj.formSuccessCB() };
-        this.m_forms.submitFailure = function(){ thisObj.formFailureCB() };
+        this.m_forms.submitSuccess = function(){ thisObj.formSuccessCB(); };
+        this.m_forms.submitFailure = function(){ thisObj.formFailureCB(); };
 
         m = this.map.getMap();
         m.events.register('click', m, function (e) {
@@ -128,16 +128,8 @@ otp.planner.Planner = {
     },
 
     /** */
-    clearForms : function()
-    {
-        try
-        {
-            this.m_forms.clear();
-        }
-        catch(e)
-        {
-            console.log("exception Planner.clearForms " + e);
-        }
+    clearForms : function() {
+        this.m_forms.clear();
     },
 
     /** */
@@ -162,18 +154,10 @@ otp.planner.Planner = {
     },
 
     /** */
-    clear : function()
-    {
-        try
-        {
-            this.showFormTab();
-            this.m_forms.clear();
-            this.m_renderer.clear();
-        }
-        catch(e)
-        {
-            console.log("exception Planner.clear " + e);
-        }
+    clear : function() {
+        this.showFormTab();
+        this.m_forms.clear();
+        this.m_renderer.clear();
     },
 
     /** */
@@ -191,54 +175,42 @@ otp.planner.Planner = {
     },
 
     /** */
-    getTripInfo : function(mapURL, txtURL)
-    {
-        var retVal = {url:"", txt:"", txtUrl:"", valid:false};
-        try
-        {
-            if(mapURL == null)
-                mapURL = "http://plan.opentripplanner.org";
-
-            if(txtURL == null)
-                txtURL = "http://text.opentripplanner.org";
-
-            var info      = this.getForms().getFormData(mapURL);
-            retVal.txt    = otp.planner.Templates.tripFeedbackDetails.applyTemplate(info);
-            retVal.url    = otp.planner.Templates.tripPrintTemplate.applyTemplate(info);
-            info.url      = txtURL;
-            retVal.txtUrl = otp.planner.Templates.txtPlannerURL.applyTemplate(info);
-            retVal.valid  = (
-                            ((info.from      != null && info.from.length      > 0) ||
-                             (info.fromPlace != null && info.fromPlace.length > 0) ) 
-                            &&
-                            ((info.to        != null && info.to.length        > 0) ||
-                             (info.toPlace   != null && info.toPlace.length   > 0))
-            );
+    getTripInfo : function(mapURL, txtURL) {
+        var retVal = {
+            url : "",
+            txt : "",
+            txtUrl : "",
+            valid : false
+        };
+        if (mapURL == null) {
+            mapURL = "http://plan.opentripplanner.org";
         }
-        catch(e)
-        {
-            console.log("exception Planner.getTripInfo " + e);
+
+        if (txtURL == null) {
+            txtURL = "http://text.opentripplanner.org";
         }
+
+        var info = this.getForms().getFormData(mapURL);
+        retVal.txt = otp.planner.Templates.tripFeedbackDetails
+                .applyTemplate(info);
+        retVal.url = otp.planner.Templates.tripPrintTemplate
+                .applyTemplate(info);
+        info.url = txtURL;
+        retVal.txtUrl = otp.planner.Templates.txtPlannerURL.applyTemplate(info);
+        retVal.valid = (
+                ((info.from != null && info.from.length > 0) || (info.fromPlace != null && info.fromPlace.length > 0)) 
+                && ((info.to != null && info.to.length > 0) || (info.toPlace != null && info.toPlace.length > 0)));
 
         return retVal;
     },
 
     /** */
-    getActiveItinerary : function()
-    {
+    getActiveItinerary : function() {
         var retVal = null;
 
-        try
-        {
-            var tt = this.m_tabs[this.m_activeTabID];
-            if(tt)
-            {
-                retVal = tt.getActiveItinerary();
-            }
-        }
-        catch(e)
-        {
-            console.log("exception Planner.getActiveItinerary " + e);
+        var tt = this.m_tabs[this.m_activeTabID];
+        if (tt) {
+            retVal = tt.getActiveItinerary();
         }
 
         return retVal;
@@ -306,31 +278,20 @@ otp.planner.Planner = {
      */
     tabChange : function(tabPanel, activeTab) 
     {
-        try
-        {
-            this.m_renderer.clear();
-            var newTab = this.m_tabs[activeTab.id];
-            if(newTab != null)
-            {
-                this.m_activeTabID = activeTab.id;
-                newTab.draw();
-            }
-            else
-            {
-                this.m_activeTabID = 0;
-                this.controller.deactivate(this.CLASS_NAME);
+        this.m_renderer.clear();
+        var newTab = this.m_tabs[activeTab.id];
+        if (newTab != null) {
+            this.m_activeTabID = activeTab.id;
+            newTab.draw();
+        } else {
+            this.m_activeTabID = 0;
+            this.controller.deactivate(this.CLASS_NAME);
                 
-                // hide the topo map
-                if(this.ui.innerSouth.isVisible()) 
-                {
-                    this.ui.innerSouth.hide();
-                    this.ui.viewport.doLayout();
-                }
+            // hide the topo map
+            if (this.ui.innerSouth.isVisible()) {
+                this.ui.innerSouth.hide();
+                this.ui.viewport.doLayout();
             }
-        }
-        catch(e)
-        {
-            console.log("exception Planner.tabChange " + e);
         }
     },
 
@@ -356,6 +317,6 @@ otp.planner.Planner = {
     },
     
     CLASS_NAME: "otp.planner.Planner"
-}
+};
 
 otp.planner.Planner = new otp.Class(otp.planner.Planner);

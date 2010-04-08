@@ -251,20 +251,13 @@ otp.planner.TripTab = {
     /**
      * callback function that will populate the itineraries tree  
      */
-    itineraryClick : function(node, event)
-    {
-        try
-        {
-            // node id == 'tp-X-Y', where Y (eg: 1,2,...) is the index into the Ext store
-            var tripNum = node.id.substring(node.id.lastIndexOf('-') + 1);
+    itineraryClick : function(node, event) {
+        // node id == 'tp-X-Y', where Y (eg: 1,2,...) is the index into the Ext
+        // store
+        var tripNum = node.id.substring(node.id.lastIndexOf('-') + 1);
 
-            this.activateItinerary(tripNum);
-            this.draw();
-        }
-        catch(e)
-        {
-            console.log("exception TripTab.itineraryClick " + e);
-        }
+        this.activateItinerary(tripNum);
+        this.draw();
     },
 
     /**
@@ -285,29 +278,28 @@ otp.planner.TripTab = {
      *
      * @param {Object} id
      */
-    getItinerary : function(id)
-    {
+    getItinerary : function(id) {
         var retVal = null;
-        try
-        {
-            if(id == null)
-                id = 1;
+        if (id == null) {
+            id = 1;
+        }
 
-            // try to get itinerary object from cache...if not there, create it
-            var retVal = this.m_itineraryCache[id];
-            if(retVal == null)
-            {
-                var itin = this.m_itinerariesStore.getAt(id - 1);
-                retVal = new otp.planner.Itinerary({map:this.planner.map, xml:itin, from:this.m_from, to:this.m_to, id:id})
-                if(retVal != null && retVal.isValid())
-                    this.m_itineraryCache[id] = retVal;
+        // try to get itinerary object from cache...if not there, create it
+        var retVal = this.m_itineraryCache[id];
+        if (retVal == null) {
+            var itin = this.m_itinerariesStore.getAt(id - 1);
+            retVal = new otp.planner.Itinerary( {
+                map : this.planner.map,
+                xml : itin,
+                from : this.m_from,
+                to : this.m_to,
+                id : id
+            });
+            if (retVal != null && retVal.isValid()) {
+                this.m_itineraryCache[id] = retVal;
             }
         }
-        catch(e)
-        {
-            console.log("exception TripTab.getItinerary (id = " + id + ") " + e);
-        }
-        
+
         return retVal;
     },
 
@@ -339,7 +331,7 @@ otp.planner.TripTab = {
     },
 
     CLASS_NAME: "otp.planner.TripTab"
-}
+};
 
 otp.planner.TripTab = new otp.Class(otp.planner.TripTab);
 

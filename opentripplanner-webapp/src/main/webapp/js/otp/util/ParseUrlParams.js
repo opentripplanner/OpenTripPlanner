@@ -40,7 +40,7 @@ otp.utils.ParseUrlParams = {
         }
         catch(e)
         {
-            console.log("ParseUrlParams constructor " + e)
+            console.log("ParseUrlParams constructor " + e);
         }
     },
 
@@ -50,7 +50,7 @@ otp.utils.ParseUrlParams = {
      */
     getParamValue : function(name, defVal)
     {
-        var retVal = defVal
+        var retVal = defVal;
         try
         {
             if(this.m_params[name])

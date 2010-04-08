@@ -82,28 +82,21 @@ otp.application.Controller = {
     */
     load : function()
     {
-        try
-        {
-            // do the POI and the openTool stuff (and if a POI exists, suspend the pan on the tool)
-//            var p = this.params.getPoi(this.poi, this.map);
+        // do the POI and the openTool stuff (and if a POI exists, suspend
+        // the pan on the tool)
+        // var p = this.params.getPoi(this.poi, this.map);
 
-            // trip planner forms
-            var forms  = this.planner.getForms();
-            forms.populate(this.params.m_params);
-            if(this.params.hasSubmit())
-            {
-                forms.submit();
-            }
-        }
-        catch(e)
-        {
-            console.log("ParseUrlParams highlight " + e);
+        // trip planner forms
+        var forms = this.planner.getForms();
+        forms.populate(this.params.m_params);
+        if (this.params.hasSubmit()) {
+            forms.submit();
         }
     },
 
    /**
-    * create a right-click context menu
-    */
+     * create a right-click context menu
+     */
     makeContextMenu : function()
     {
         var  cmConfig = {};

@@ -307,14 +307,7 @@ otp.core.MapStatic = {
     /** */
     zoomToExtent : function(extent)
     {
-        try
-        {
-            this.map.zoomToExtent(extent);
-        }
-        catch(e)
-        {
-            console.log("exception Map.zoomToExtent" + e);
-        }
+        this.map.zoomToExtent(extent);
     },
 
     /**

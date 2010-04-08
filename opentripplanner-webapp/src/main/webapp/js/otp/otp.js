@@ -333,7 +333,7 @@ otp._copyProp = function(property, destination, value)
         if(destination.CLASS_INHERITANCE == null)
              destination.CLASS_INHERITANCE = "";
         else
-            pre = ";"
+            pre = ";";
 
         destination.CLASS_INHERITANCE += pre + value;
     }

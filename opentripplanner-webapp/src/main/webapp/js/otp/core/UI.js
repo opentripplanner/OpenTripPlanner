@@ -173,22 +173,7 @@ otp.core.UI = {
     /** */
     doLayout : function()
     {
-        try
-        {
-/*
-NOT SURE THAT ALL THESE DO LAYOUTs are providing a benefit beyond what the viewport does...
-            if(this.south)                                       this.south.doLayout()
-            if(this.innerSouth && this.south != this.innerSouth) this.innerSouth.doLayout()
-            if(this.east)                                        this.east.doLayout()
-            if(this.innerEast && this.innerEast != this.east)    this.innerEast.doLayout();
-            if(this.west)                                        this.west.doLayout();
-            if(this.accordion && this.accordion != this.west)    this.accordion.doLayout();
-            if(this.map)                                         this.map.updateSize();
-*/
-            this.viewport.doLayout();
-        }
-        catch(e)
-        {}
+        this.viewport.doLayout();
     },
 
     /**

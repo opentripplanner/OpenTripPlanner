@@ -12,7 +12,7 @@ otp.config = {
         layerNamesStop: 'stopLayerName',
         
         // this is the uri to the extended api that proxies to geoserver
-        controlStopsUrl: '/opentripplanner-api-extended/ws/wms',
+        controlStopsUrl: '/opentripplanner-api-extended/ws/wms'
     },
     
     'map': {

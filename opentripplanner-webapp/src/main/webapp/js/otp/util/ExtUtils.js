@@ -274,7 +274,7 @@ otp.util.ExtUtils = {
         if(tip == null)
             tip = '<b>Clear</b><br/>Clears the map of all selections and feature detail windows.';
         if(handler == null)
-            handler = function(e, tE, P){ P.m_control.clear();}
+            handler = function(e, tE, P){ P.m_control.clear();};
             
         return { 
             id   : id,
@@ -333,7 +333,7 @@ otp.util.ExtUtils = {
     {
         // prevents repeated popup opening, thus swalling other events (like hyper-links w/in grid)
         if(props == null) 
-            props = {description:'', x:'', y:''}
+            props = {description:'', x:'', y:''};
 
         try
         {
@@ -647,7 +647,7 @@ otp.util.ExtUtils = {
         // if a store is passed in, then just empty it and return it
         if(store && store.removeAll)
         {
-            store.removeAll()
+            store.removeAll();
             return store;
         }
 
@@ -678,4 +678,4 @@ otp.util.ExtUtils = {
     },
 
     CLASS_NAME: "otp.util.ExtUtils"
-}
+};

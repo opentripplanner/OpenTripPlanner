@@ -100,31 +100,25 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
-        try
-        {
-            // hide stuff that might be open
-            this.collapseComboBoxes();
-            this.hideErrorDialogs();
+        // hide stuff that might be open
+        this.collapseComboBoxes();
+        this.hideErrorDialogs();
 
-            otp.util.ExtUtils.setTripPlannerCookie();
+        otp.util.ExtUtils.setTripPlannerCookie();
 
-            this.m_panel.form.submit({
-                    method:  'GET',
-                    url:     this.url,
-                    waitMsg: this.locale.tripPlanner.labels.submitMsg
-            });
+        this.m_panel.form.submit( {
+            method : 'GET',
+            url : this.url,
+            waitMsg : this.locale.tripPlanner.labels.submitMsg
+        });
 
-            // analytics 
-            otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUBMIT);
-        }
-        catch(e)
-        {
-            console.log('exception Forms.submit exception ' + e)
-        }
+        // analytics
+        otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUBMIT);
     },
 
     /**
-     * pre submit does some necessary bookkeeping for the form.  the real work happens in the (overridden) submit method
+     * pre submit does some necessary bookkeeping for the form. the real work
+     * happens in the (overridden) submit method
      */
     preSubmit : function(form, action)
     {
@@ -188,15 +182,14 @@ otp.planner.StaticForms = {
                     width:     .75,
                     sortable:   true,
                     dataIndex: 'description'
-                }
-                ,
+                },
                 {
                     header:    'City',
                     width:     .25,
                     sortable:true,
                     dataIndex: 'areaValue'
                 }
-            ]
+            ];
             
             // try to populate the from & to form stores (in case of ambiguous results of geocoding)
             var to = Ext.DomQuery.selectNode('toList', xml);
@@ -314,7 +307,7 @@ otp.planner.StaticForms = {
             setTimeout(function()
             {
                 try {
-                    Ext.MessageBox.hide()
+                    Ext.MessageBox.hide();
                 } catch(e) {}
             }, 5000);
         }
@@ -344,7 +337,7 @@ otp.planner.StaticForms = {
         }
         catch(e)
         {
-            console.log("Forms.collapseComboBox " + e)
+            console.log("Forms.collapseComboBox " + e);
         }
     },
 
@@ -352,21 +345,14 @@ otp.planner.StaticForms = {
     hideErrorDialogs : function()
     {
         // hide the default message box
-        try {Ext.MessageBox.hide()         } catch(e){}
-        try{this.m_geoErrorPopup.close();  } catch(e){}
+        try {Ext.MessageBox.hide();        } catch(e){}
+        try {this.m_geoErrorPopup.close();  } catch(e){}
     },
 
     /** wrapper (with try / catch) for planner focus() */
     focus : function()
     {
-        try
-        {
-            this.planner.focus();
-        }
-        catch(e)
-        {
-            console.log("exception Forms.forms " + e);
-        }
+        this.planner.focus();
     },
 
     /**

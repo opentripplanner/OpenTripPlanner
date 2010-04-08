@@ -24,37 +24,30 @@ otp.planner.ContextMenu = {
     renderTo : null,
 
     /** */
-    constructor: function(config)
-    {
+    constructor : function(config) {
         otp.configure(this, config);
 
-        try
-        {
-            if(this.renderTo == null)
-                 this.renderTo = Ext.get(otp.util.OpenLayersUtils.MAP_PANEL);
-
-            var opts = {
-                renderTo: this.renderTo,
-                items:    this.getElements()
-            };
-    
-            this.renderTo.on('contextmenu', function (event){ 
-                this.showAt(event.xy);
-                event.stopEvent();
-            }, this);
-            this.renderTo.on('click', function (event) {
-                this.hide();
-            }, this);
-            this.renderTo.on('blur', function (event) {
-                this.hide();
-            }, this);
-
-            Ext.menu.Menu.call(this, opts);
+        if (this.renderTo == null) {
+            this.renderTo = Ext.get(otp.util.OpenLayersUtils.MAP_PANEL);
         }
-        catch(e)
-        {
-            console.log("otp.planner.ContextMenu: consturctor error " + e);
-        }
+
+        var opts = {
+            renderTo : this.renderTo,
+            items : this.getElements()
+        };
+
+        this.renderTo.on('contextmenu', function(event) {
+            this.showAt(event.xy);
+            event.stopEvent();
+        }, this);
+        this.renderTo.on('click', function(event) {
+            this.hide();
+        }, this);
+        this.renderTo.on('blur', function(event) {
+            this.hide();
+        }, this);
+
+        Ext.menu.Menu.call(this, opts);
     },
 
     /** */
@@ -111,11 +104,4 @@ otp.planner.ContextMenu = {
     CLASS_NAME : "otp.planner.ContextMenu"
 };
 
-try
-{
-    otp.planner.ContextMenu = Ext.extend(Ext.menu.Menu, otp.planner.ContextMenu);
-}
-catch(e)
-{
-    console.log("otp.planner.ContextMenu: error creating this type...please ignore this error if you are not using Ext");
-}
+otp.planner.ContextMenu = Ext.extend(Ext.menu.Menu, otp.planner.ContextMenu);

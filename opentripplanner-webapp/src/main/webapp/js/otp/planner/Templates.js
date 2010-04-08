@@ -131,7 +131,7 @@ otp.planner.Templates = {
     ).compile(), 
 
     CLASS_NAME: "otp.planner.Templates"
-}
+};
 }
 catch(e)
 {

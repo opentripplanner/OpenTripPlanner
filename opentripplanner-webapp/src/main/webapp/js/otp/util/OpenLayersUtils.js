@@ -502,8 +502,7 @@ otp.util.OpenLayersUtils = {
         }
         catch(e)
         {
-            console.log('OpenLayersUtils.getLatLonOfPixel exception ' + e)
-           
+            console.log('OpenLayersUtils.getLatLonOfPixel exception ' + e);
         }
     },
 

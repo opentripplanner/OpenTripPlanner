@@ -115,14 +115,8 @@ otp.core.Measure = {
             this.makeExtToolTip();
 
         // step 4: add control to map
-        try
-        {
-            this.map.addControl(this.m_control);
-            this.m_control.displaySystem = this.units;
-        }
-        catch(e)
-        {
-        }
+        this.map.addControl(this.m_control);
+        this.m_control.displaySystem = this.units;
     },
 
     /** OL callback on mousemovement */
@@ -151,30 +145,18 @@ otp.core.Measure = {
     /** turn the measure control on */
     on : function()
     {
-        try
-        {
-            this.m_control.activate();
-            this.toggleOutput(true);
-            this.m_onOff = true;
-            otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.MEASURE);
-        }
-        catch(e)
-        {
-        }
+    	this.m_control.activate();
+    	this.toggleOutput(true);
+    	this.m_onOff = true;
+    	otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.MEASURE);
     },
 
     /** turn the measure control off */
     off : function()
     {
-        try
-        {
-            this.m_control.deactivate();
-            this.toggleOutput(false);
-            this.m_onOff = false;
-        }
-        catch(e)
-        {
-        }
+        this.m_control.deactivate();
+        this.toggleOutput(false);
+        this.m_onOff = false;
     },
 
 
@@ -196,41 +178,28 @@ otp.core.Measure = {
     /** UI: send measure result to output */
     write : function(msg)
     {
-        try
-        {
-            this.outputMethod.call(this.outputPanel, msg);
-            this.outputPanel.show();
-        }
-        catch(e)
-        {
-        }
+        this.outputMethod.call(this.outputPanel, msg);
+        this.outputPanel.show();
     },
 
     /** UI: hide / show for the output item */
     makeButton : function(tbar)
     {
         var retVal = {};
-        try 
-        {
-             // step 1: button config object
-            retVal = {
-                id:            'measure-button',
-                iconCls:       'measure-button',
-                text:          this.locale.buttons.measure,
-                tooltip:       this.locale.buttons.measureTip,
-                enableToggle:  true,
-                scope:         this,
-                handler:       this.toggle
-            }
+        // step 1: button config object
+        retVal = {
+        		id:            'measure-button',
+        		iconCls:       'measure-button',
+        		text:          this.locale.buttons.measure,
+        		tooltip:       this.locale.buttons.measureTip,
+        		enableToggle:  true,
+        		scope:         this,
+        		handler:       this.toggle
+        };
 
-            // step 2: add button to tbar
-            if(tbar != null)
-            {
-                tbar.addButton(retVal);
-            }
-        }
-        catch(e)
-        {
+        // step 2: add button to tbar
+        if (tbar != null) {
+        	tbar.addButton(retVal);
         }
         
         return retVal;
@@ -240,22 +209,13 @@ otp.core.Measure = {
     /** UI: hide / show for the output item */
     toggleOutput : function(bool)
     {
-        try 
-        {
-            if(bool == false)
-            {
-                this.outputPanel.hide();
-                this.outputPanel.disable();
-            }
-            else
-            {
-                this.outputPanel.enable();
-                this.clearOutput();
-                this.outputPanel.show();
-            }
-        }
-        catch(e)
-        {
+        if (bool == false) {
+            this.outputPanel.hide();
+            this.outputPanel.disable();
+        } else {
+            this.outputPanel.enable();
+            this.clearOutput();
+            this.outputPanel.show();
         }
     },
 
@@ -268,23 +228,17 @@ otp.core.Measure = {
     /** UI default output panel -- a tooltip that follows the mouse around */
     makeExtToolTip : function()
     {
-        try 
-        {
-            this.outputPanel = new Ext.ToolTip({
-                target:     this.outputParentDiv,
-                title:      this.locale.buttons.measureInfo,
-                width:      175,
-                dismissDelay: 0,
-                showDelay:    0,
-                disabled:   true,
-                hidden:     true,
-                trackMouse: true
-            });
-            this.outputMethod = this.outputPanel.setTitle;//.el.update;
-        }
-        catch(e)
-        {
-        }
+        this.outputPanel = new Ext.ToolTip( {
+            target : this.outputParentDiv,
+            title : this.locale.buttons.measureInfo,
+            width : 175,
+            dismissDelay : 0,
+            showDelay : 0,
+            disabled : true,
+            hidden : true,
+            trackMouse : true
+        });
+        this.outputMethod = this.outputPanel.setTitle;// .el.update;
     },
 
     CLASS_NAME : "otp.core.Measure"
