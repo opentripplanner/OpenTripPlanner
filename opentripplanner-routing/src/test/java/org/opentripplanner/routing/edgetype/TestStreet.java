@@ -73,7 +73,7 @@ public class TestStreet extends TestCase {
         TraverseResult wr = ee.traverse(s0, wo);
 
         assertNotNull(wr);
-        assertEquals(wr.weight, streetLength / wo.speed);
+        assertEquals(wr.weight, wo.walkReluctance * streetLength / wo.speed);
         // Has the time elapsed as expected?
         assertEquals(wr.state.getTime(), endTime.getTimeInMillis());
 
@@ -82,7 +82,7 @@ public class TestStreet extends TestCase {
         wr = ee.traverseBack(s0, wo);
 
         assertNotNull(wr);
-        assertEquals(wr.weight, streetLength / wo.speed);
+        assertEquals(wr.weight, wo.walkReluctance * streetLength / wo.speed);
         assertEquals(wr.state.getTime(), startTime.getTimeInMillis());
     }
 

@@ -345,6 +345,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
             weight *= 100;
         }
+        weight *= wo.walkReluctance;
         return weight;
     }
 
@@ -354,8 +355,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         }
         State s1 = s0.clone();
         double time = length / wo.speed;
-        double weight;
-        weight = computeWeight(s0, wo, time);
+        double weight = computeWeight(s0, wo, time);
         s1.walkDistance += this.length;
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
