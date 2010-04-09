@@ -14,47 +14,69 @@
 package org.opentripplanner.graph_builder.impl.ned;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Formatter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.apache.axiom.om.OMAbstractFactory;
-import org.apache.axiom.om.OMElement;
-import org.apache.axiom.om.OMFactory;
-import org.apache.axiom.om.OMNamespace;
-import org.apache.axiom.om.impl.builder.StAXOMBuilder;
-import org.apache.axiom.om.xpath.AXIOMXPath;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.client.Options;
-import org.apache.axis2.client.ServiceClient;
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
 
+import org.opentripplanner.graph_builder.impl.osm.OSMDownloader;
 import org.opentripplanner.routing.core.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 public class NEDDownloader {
 
-    private static Logger _log = LoggerFactory.getLogger(NEDDownloader.class);
+    private static Logger log = LoggerFactory.getLogger(NEDDownloader.class);
 
     private Graph graph;
 
     private File cacheDirectory;
+
+    static String dataset = "ND302XZ"; // 1/9 arcsecond data. TODO: fall back to
+
+    // ND302XZ (1/3 arcsecond) or NED02XZ (1 arcsecond) if necessary
+
+    private double _latYStep = 0.16;
+
+    private double _lonXStep = 0.16;
 
     @Autowired
     public void setGraph(Graph graph) {
@@ -87,89 +109,101 @@ public class NEDDownloader {
         return path;
     }
 
-    private OMElement getValidateOMElement() {
-        String dataset = "ND302XZ"; // 1/3 arcsecond data. TODO: should try ND902XZ (1/9th
-        // arcsecond) and fall back to NED02XZ (1 arcsecond) if
-        // necessary
+    private List<String> getValidateElements() {
         Envelope extent = graph.getExtent();
-        OMFactory fac = OMAbstractFactory.getOMFactory();
-        OMNamespace omNs = fac.createOMNamespace("http://edc/usgs/gov/", "");
-        OMElement method = fac.createOMElement("processAOI", omNs);
-        OMElement value = fac.createOMElement("requestInfoXml", omNs);
-        String xmlRequestString = "<REQUEST_SERVICE_INPUT>" + "<AOI_GEOMETRY>" + "<EXTENT>"
-                + "<TOP>"
-                + extent.getMaxY()
-                + "</TOP>"
-                + "<BOTTOM>"
-                + extent.getMinY()
-                + "</BOTTOM>"
-                + "<LEFT>"
-                + extent.getMinX()
-                + "</LEFT>"
-                + "<RIGHT>"
-                + extent.getMaxX()
-                + "</RIGHT>"
-                + "</EXTENT>"
-                + "<SPATIALREFERENCE_WKID/>"
-                + "</AOI_GEOMETRY>"
-                + "<LAYER_INFORMATION>"
-                + "     <LAYER_IDS>"
-                + dataset
-                + "</LAYER_IDS>"
-                + "</LAYER_INFORMATION>"
-                + "<CHUNK_SIZE>250"
-                + "</CHUNK_SIZE>"
-                + "<ORIGINATOR/>"
-                + "</REQUEST_SERVICE_INPUT>";
 
-        value.addChild(fac.createOMText(value, xmlRequestString));
+        List<String> elements = new ArrayList<String>();
 
-        method.addChild(value);
+        double minY = OSMDownloader.floor(extent.getMinY(), _latYStep);
+        double maxY = OSMDownloader.ceil(extent.getMaxY(), _latYStep);
+        double minX = OSMDownloader.floor(extent.getMinX(), _lonXStep);
+        double maxX = OSMDownloader.ceil(extent.getMaxX(), _lonXStep);
 
-        return method;
+        for (double y = minY; y < maxY; y += _latYStep) {
+            for (double x = minX; x < maxX; x += _lonXStep) {
+                Envelope region = new Envelope(x, x + _lonXStep, y, y + _latYStep);
+
+                String xmlRequestString = "<REQUEST_SERVICE_INPUT>" + "<AOI_GEOMETRY>" + "<EXTENT>"
+                        + "<TOP>"
+                        + region.getMaxY()
+                        + "</TOP>"
+                        + "<BOTTOM>"
+                        + region.getMinY()
+                        + "</BOTTOM>"
+                        + "<LEFT>"
+                        + region.getMinX()
+                        + "</LEFT>"
+                        + "<RIGHT>"
+                        + region.getMaxX()
+                        + "</RIGHT>"
+                        + "</EXTENT>"
+                        + "<SPATIALREFERENCE_WKID/>"
+                        + "</AOI_GEOMETRY>"
+                        + "<LAYER_INFORMATION>"
+                        + "     <LAYER_IDS>"
+                        + dataset
+                        + "</LAYER_IDS>"
+                        + "</LAYER_INFORMATION>"
+                        + "<CHUNK_SIZE>250"
+                        + "</CHUNK_SIZE>"
+                        + "<ORIGINATOR/>" + "</REQUEST_SERVICE_INPUT>";
+
+                elements.add(xmlRequestString);
+            }
+        }
+        return elements;
     }
 
-    @SuppressWarnings("unchecked")
     public List<URL> getDownloadURLs() {
+        List<URL> urls = new ArrayList<URL>();
+        List<String> payloads = getValidateElements();
+        log.debug("Getting urls from request validation service");
+        String RTendpointURL = "http://igskmncnwb010.cr.usgs.gov/requestValidationService/services/RequestValidationService";
+
         try {
-            OMElement payload = getValidateOMElement();
-            Options options = new Options();
-            EndpointReference targetEPR = new EndpointReference(
-                    "http://igskmncnwb010.cr.usgs.gov/requestValidationService/services/RequestValidationService");
-            options.setTo(targetEPR);
-            options.setAction("processAOI");
+            for (String payload : payloads) {
+                sleep(2000);
 
-            ServiceClient sender = new ServiceClient();
-            sender.setOptions(options);
+                Service RTservice = new Service();
+                Call RTcall = (Call) RTservice.createCall();
 
-            _log.debug("Getting urls from request validation service");
-            // the return document contains an XML document ...
-            OMElement result = sender.sendReceive(payload);
+                RTcall.setTargetEndpointAddress(new java.net.URL(RTendpointURL));
 
-            AXIOMXPath xpathExpression = new AXIOMXPath(result, "//ns1:processAOIReturn");
-            xpathExpression.addNamespace("ns1", "http://edc.usgs.gov");
-            OMElement holder = (OMElement) xpathExpression.selectSingleNode(result);
+                // Service method
+                RTcall.setOperationName(new QName("edc.usgs.gov", "processAOI"));
 
-            // ... that contains an XML document
-            String xml = holder.getText();
+                String response = (String) RTcall.invoke(new Object[] { payload });
 
-            // ... which seems to get prematurely decoded
-            xml = xml.replace("&", "&amp;");
-            XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(
-                    new StringReader(xml));
+                Document doc = stringToDoc(response);
+                XPathExpression expr = makeXPathExpression("//ns1:processAOIReturn/text()");
+                String xml = expr.evaluate(doc);
+                if (!xml.equals("")) {
+                    // case where response is wrapped
+                    doc = stringToDoc(xml);
+                }
+                // ... which seems to get prematurely decoded
+                // xml = xml.replace("&", "&amp;");
 
-            StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(xmlStreamReader);
-            xpathExpression = new AXIOMXPath(result, "//PIECE/DOWNLOAD_URL");
-            List<OMElement> nodes = xpathExpression.selectNodes(stAXOMBuilder.getDocumentElement());
+                expr = makeXPathExpression("//PIECE/DOWNLOAD_URL");
+                NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+                // and which finally contains a list of URLs that we can pass on to the next step.
 
-            // and which finally contains a list of URLs that we can pass on to the next step.
-            List<URL> urls = new ArrayList<URL>();
-            for (OMElement urlElement : nodes) {
-                String urlString = urlElement.getText().trim();
-                _log.debug("Adding NED URL:" + urlString);
-                urlString = urlString.replaceFirst("http://extract.", "http://igskmncnwb010.");
-                URL url = new URL(urlString);
-                urls.add(url);
+                // hopefully, this will be a list of one.
+                if (nodes.getLength() > 1) {
+                    log
+                            .debug("One of our NED tiles requires more than one tile from the server.  This is slightly inefficient, and sort of yucky.");
+                }
+                for (int i = 0; i < nodes.getLength(); ++i) {
+                    Node node = nodes.item(i);
+                    String urlString = node.getTextContent().trim();
+                    log.debug("Adding NED URL:" + urlString);
+                    // use one specific, less-broken server at usgs
+                    urlString = urlString.replaceFirst("http://extract.", "http://igskmncnwb010.");
+                    urlString = urlString.replaceAll(" ", "+"); // urls returned are broken
+                    // sometimes.
+                    URL url = new URL(urlString);
+                    urls.add(url);
+                }
             }
             return urls;
         } catch (Exception e) {
@@ -178,16 +212,32 @@ public class NEDDownloader {
 
     }
 
+    private XPathExpression makeXPathExpression(String xpathStr) throws XPathExpressionException {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        xpath.setNamespaceContext(new EDCNamespaceContext());
+        XPathExpression expr = xpath.compile(xpathStr);
+        return expr;
+    }
+
+    private static Document stringToDoc(String str) throws ParserConfigurationException,
+            SAXException, IOException {
+        DocumentBuilderFactory documentFactory = DocumentBuilderFactory.newInstance();
+        documentFactory.setNamespaceAware(true);
+        DocumentBuilder builder = documentFactory.newDocumentBuilder();
+        str = str.replaceAll("&", "&amp;");
+
+        Document doc = builder.parse(new ByteArrayInputStream(str.getBytes("UTF-8")));
+        return doc;
+    }
+
     private String initiateDownload(URL url) {
         try {
-            _log.debug("Trying to initiate download: " + url);
-            OMElement doc = getXMLFromURL(url);
-
-            AXIOMXPath xpathExpression = new AXIOMXPath(doc, "//ns:return");
-            xpathExpression.addNamespace("ns1", "http://edc/usgs/gov");
-            OMElement tokenElement = (OMElement) xpathExpression.selectSingleNode(doc);
-            String token = tokenElement.getText();
-            _log.debug("Initiated download; got token: " + token);
+            log.debug("Trying to initiate download: " + url);
+            Document doc = getXMLFromURL(url);
+            XPathExpression xPathExpression = makeXPathExpression("//ns:return/text()");
+            String token = xPathExpression.evaluate(doc);
+            log.debug("Initiated download; got token: " + token);
             return token;
         } catch (Exception e) {
             throw new RuntimeException(
@@ -196,47 +246,48 @@ public class NEDDownloader {
         }
     }
 
-    public static OMElement getXMLFromURL(URL url) {
+    public static Document getXMLFromURL(URL url) {
         return getXMLFromURL(url, false);
     }
 
-    public static OMElement getXMLFromURL(URL url, boolean htmlOK) {
+    public static Document getXMLFromURL(URL url, boolean htmlOK) {
         String contents = null;
-        try {
-            URLConnection connection = url.openConnection();
-            InputStream stream = connection.getInputStream();
+        while (true) {
+            try {
+                URLConnection connection = url.openConnection();
+                InputStream stream = connection.getInputStream();
 
-            InputStreamReader reader = new InputStreamReader(new BufferedInputStream(stream));
-            char[] buffer = new char[4096];
-            StringBuffer sb = new StringBuffer();
-            while (true) {
-                int bytesRead = reader.read(buffer);
-                if (bytesRead == -1) {
-                    break;
+                InputStreamReader reader = new InputStreamReader(new BufferedInputStream(stream));
+                char[] buffer = new char[4096];
+                StringBuffer sb = new StringBuffer();
+                while (true) {
+                    int bytesRead = reader.read(buffer);
+                    if (bytesRead == -1) {
+                        break;
+                    }
+                    sb.append(buffer, 0, bytesRead);
                 }
-                sb.append(buffer, 0, bytesRead);
-            }
-            contents = sb.toString();
-            HttpURLConnection httpconnection = (HttpURLConnection) connection;
-            httpconnection.disconnect();
-            if (contents.startsWith("<HTML>")) {
-                if (htmlOK) {
-                    return null;
+                contents = sb.toString();
+                HttpURLConnection httpconnection = (HttpURLConnection) connection;
+                httpconnection.disconnect();
+                if (contents.startsWith("<HTML>")) {
+                    if (htmlOK) {
+                        return null;
+                    }
+                    throw new RuntimeException(
+                            "Error getting data from USGS Download Server -- they sent us HTML when we wanted XML.  Here's the HTML they sent, for what it's worth: \n"
+                                    + contents);
                 }
+
+                return stringToDoc(contents);
+            } catch (IOException e) {
+                log.warn("IO error, retrying: " + e);
+                sleep(5000);
+            } catch (Exception e) {
                 throw new RuntimeException(
-                        "Error getting data from USGS Download Server -- they sent us HTML when we wanted XML.  Here's the HTML they sent, for what it's worth: \n"
-                                + contents);
+                        "Error getting data from USGS Download Server while checking download status: contents = \n"
+                                + contents, e);
             }
-            XMLStreamReader xmlStreamReader = XMLInputFactory.newInstance().createXMLStreamReader(
-                    new StringReader(contents));
-
-            StAXOMBuilder stAXOMBuilder = new StAXOMBuilder(xmlStreamReader);
-            OMElement doc = stAXOMBuilder.getDocumentElement();
-            return doc;
-        } catch (Exception e) {
-            throw new RuntimeException(
-                    "Error getting data from USGS Download Server while checking download status: contents = \n"
-                            + contents, e);
         }
     }
 
@@ -265,33 +316,94 @@ public class NEDDownloader {
     }
 
     public List<File> downloadNED() {
-        _log.debug("Downloading NED");
-        List<URL> urls = getDownloadURLs();
+        log.debug("Downloading NED");
+        List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
-        for (URL url : urls) {
+        Iterator<URL> it = urls.iterator();
+        URL url = it.next();
+        do {
             String key = getKey(url);
             File tile = getPathToNEDTile(key);
             if (tile.exists()) {
                 files.add(tile);
-                _log.debug(url + " already exists; not downloading");
-                continue;
+                log.debug(url + " already exists; not downloading");
+                if (it.hasNext()) {
+                    url = it.next();
+                    continue;
+                } else {
+                    break;
+                }
             }
-            sleep(10000);
-            String token = initiateDownload(url);
-            do {
-                _log.debug("Waiting to query");
-                sleep(30000);
-            } while (!downloadReady(token));
-            sleep(10000);
             try {
-                downloadFile(url, token);
-                files.add(unzipFile(url));
+                while (true) {
+                    sleep(10000);
+                    String token = initiateDownload(url);
+                    do {
+                        log.debug("Waiting to query");
+                        sleep(30000);
+                    } while (!downloadReady(token));
+                    sleep(10000);
+
+                    downloadFile(url, token);
+                    try {
+                        files.add(unzipFile(url));
+                    } catch (NotAZipFileException e) {
+                        // try again (my kingdom for goto)
+                        continue;
+                    }
+                    break;
+                }
+            } catch (NoDownloadIDException e) {
+                log.debug("Failed to download, retrying");
+                //have to retry
+                continue;
             } catch (Exception e) {
                 throw new RuntimeException(
                         "Error getting data from USGS Download Server while downloading", e);
             }
-        }
+            if (it.hasNext()) {
+                url = it.next();
+            } else {
+                break;
+            }
+        } while (true);
         return files;
+    }
+
+    private List<URL> getDownloadURLsCached() {
+        Envelope extent = graph.getExtent();
+        Formatter formatter = new Formatter();
+        String filename = formatter.format("%f,%f-%f,%f.urls", extent.getMinX(), extent.getMinY(), extent.getMaxX(),
+                extent.getMaxY()).toString();
+        try {
+            File file = new File(cacheDirectory, filename);
+            List<URL> urls;
+            if (!file.exists()) {
+                //get urls from validation server and write them to the cache
+                urls = getDownloadURLs();
+                FileOutputStream os = new FileOutputStream(file);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+                for (URL url : urls) {
+                    writer.write(url.toString());
+                    writer.write('\n');
+                }
+                return urls;
+            }
+            //read cached urls
+            FileInputStream is = new FileInputStream(file);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            urls = new ArrayList<URL>();
+            while (true) {
+                String line = reader.readLine();
+                if (line == null || line.length() == 0) {
+                    break;
+                }
+                urls.add(new URL(line));
+            }
+            return urls;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private File unzipFile(URL url) {
@@ -299,6 +411,16 @@ public class NEDDownloader {
         String key = getKey(url);
         File path = getPathToNEDArchive(key);
         try {
+            FileInputStream inputStream = new FileInputStream(path);
+            byte[] header = new byte[2];
+            inputStream.read(header, 0, 2);
+            inputStream.close();
+            if (header[0] != 'P' || header[1] != 'K') {
+                // not a zip file
+                log.warn("not a zip file.");
+                path.delete();
+                throw new NotAZipFileException();
+            }
             ZipFile zipFile = new ZipFile(path);
             for (Enumeration<? extends ZipEntry> e = zipFile.entries(); e.hasMoreElements();) {
                 ZipEntry entry = e.nextElement();
@@ -318,7 +440,8 @@ public class NEDDownloader {
                     return tile;
                 }
             }
-
+        } catch (NotAZipFileException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException("Error extracting geotiff from zip " + path, e);
         }
@@ -330,7 +453,7 @@ public class NEDDownloader {
     private void downloadFile(URL url, String token) {
         try {
             String key = getKey(url);
-            _log.debug("Starting download " + key);
+            log.debug("Starting download " + key);
             File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
                     "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
@@ -351,7 +474,7 @@ public class NEDDownloader {
             ostream.close();
             istream.close();
             httpconnection.disconnect();
-            _log.debug("Done download " + key);
+            log.debug("Done download " + key);
             NEDDownloader.sleep(10000);
         } catch (Exception e) {
             throw new RuntimeException(
@@ -363,7 +486,7 @@ public class NEDDownloader {
                             + token);
             cleanupURL.openStream().close();
         } catch (Exception e) {
-            _log.debug("Error getting data from USGS Download Server while cleaning up", e);
+            log.debug("Error getting data from USGS Download Server while cleaning up", e);
         }
     }
 
@@ -387,21 +510,22 @@ public class NEDDownloader {
         try {
             String url = "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getDownloadStatus?downloadID="
                     + token;
-            OMElement doc = getXMLFromURL(new URL(url), true);
+            Document doc = getXMLFromURL(new URL(url), true);
             if (doc == null) {
                 return false;
             }
-            AXIOMXPath xpathExpression = new AXIOMXPath(doc, "//ns:return");
-            xpathExpression.addNamespace("ns1", "http://edc/usgs/gov");
-            OMElement tokenElement = (OMElement) xpathExpression.selectSingleNode(doc);
-            String status = tokenElement.getText();
+            XPathExpression xPathExpression = makeXPathExpression("//ns2:return/text()");
+            String status = xPathExpression.evaluate(doc);
             int end = status.indexOf(",");
             if (end == -1) {
-                _log.warn("bogus status " + status + " for token " + token);
+                if (status.contains("downloadID not found")) {
+                    throw new NoDownloadIDException();
+                }
+                log.warn("bogus status " + status + " for token " + token);
                 return false;
             }
             int statusCode = Integer.parseInt(status.substring(0, end));
-            if (statusCode >= 400) {
+            if (statusCode >= 400 && statusCode < 500) {
                 return true;
             }
             return false;
@@ -411,4 +535,42 @@ public class NEDDownloader {
         }
 
     }
+}
+
+/**
+ * Some shit that apparently Java can't be arsed to provide for you.
+ * 
+ * @author novalis
+ * 
+ */
+class EDCNamespaceContext implements NamespaceContext {
+    public String getNamespaceURI(String prefix) {
+        if (prefix.equals("ns1")) {
+            return "http://edc.usgs.gov";
+        } else {
+            return "http://edc/usgs/gov/xsd";
+        }
+
+    }
+
+    public String getPrefix(String namespace) {
+        if (namespace.equals("http://edc.usgs.gov")) {
+            return "ns1";
+        } else {
+            return "ns";
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Iterator getPrefixes(String namespace) {
+        return null;
+    }
+}
+
+class NotAZipFileException extends RuntimeException {
+    private static final long serialVersionUID = -3724250760182397153L;
+}
+
+class NoDownloadIDException extends RuntimeException {
+    private static final long serialVersionUID = -4749381647025119431L;
 }

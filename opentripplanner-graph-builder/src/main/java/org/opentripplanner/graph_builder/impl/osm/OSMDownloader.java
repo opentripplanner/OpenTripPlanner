@@ -75,11 +75,11 @@ public class OSMDownloader {
         }
     }
 
-    private double floor(double value, double step) {
+    public static double floor(double value, double step) {
         return step * Math.floor(value / step);
     }
 
-    private double ceil(double value, double step) {
+    public static double ceil(double value, double step) {
         return step * Math.ceil(value / step);
     }
 

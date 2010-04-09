@@ -219,7 +219,11 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      */
     private double getElevation(double x, double y) {
         double values[] = new double[1];
-        coverage.evaluate(new DirectPosition2D(x, y), values);
+        try {
+            coverage.evaluate(new DirectPosition2D(x, y), values);
+        } catch (org.opengis.coverage.PointOutsideCoverageException e) {
+            //skip this for now
+        }
         return values[0];
     }
 
