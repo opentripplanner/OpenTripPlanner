@@ -57,7 +57,7 @@ public class TraverseOptions {
      * to the 6.  If this takes less than optimize_transfer_penalty seconds, then 
      * that's what we'll return.
      */
-    public long optimize_transfer_penalty = 1800; 
+    public long optimizeTransferPenalty = 1800; 
 
     public double maxSlope = 0.0833333333333; //ADA max wheelchair ramp slope is a good default.
 

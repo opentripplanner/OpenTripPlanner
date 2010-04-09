@@ -122,7 +122,7 @@ public class PatternBoard extends PatternEdge {
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
-            transfer_penalty = options.optimize_transfer_penalty;
+            transfer_penalty = options.optimizeTransferPenalty;
         }
         return new TraverseResult(wait + BOARD_COST + transfer_penalty, state1);
     }
