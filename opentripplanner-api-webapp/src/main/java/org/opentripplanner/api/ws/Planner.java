@@ -143,7 +143,8 @@ public class Planner {
             @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max)
+            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
+            @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content  (Messages & more...)
@@ -165,6 +166,8 @@ public class Planner {
             request.setWalk(maxWalkDistance);
         if (arriveBy != null && arriveBy)
             request.setArriveBy(true);
+        if (showIntermediateStops != null && showIntermediateStops)
+            request.setShowIntermediateStops(true);
 
         request.setOptimize(optimize);
         request.setModes(modes);
@@ -408,6 +411,18 @@ public class Planner {
                     mode = graphEdge.getMode();
                     leg.mode = mode.toString();
                     leg.route = graphEdge.getName();
+                    if (request.getShowIntermediateStops()) {
+                        /* add intermediate stop to current leg */
+                        if (leg.stop==null) {
+                            //first transit edge, just create the list (the initial stop is current "from" vertex)
+                            leg.stop = new ArrayList<Place>();
+                        } else {
+                            //any further transit edge, add "from" vertex to intermediate stops
+                            Place stop = new Place(edge.fromv.getX(), edge.fromv.getY(), edge.fromv.getName());
+                            stop.stopId = edge.fromv.getStopId();
+                            leg.stop.add(stop);
+                        }
+                    }
                 }
             }
 

@@ -148,7 +148,8 @@ public class TestRequest extends TestCase {
                 1.33,
                 OptimizeType.QUICK,
                 new TraverseModeSet("WALK"),
-                1);
+                1,
+                false);
         
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.leg.get(0);

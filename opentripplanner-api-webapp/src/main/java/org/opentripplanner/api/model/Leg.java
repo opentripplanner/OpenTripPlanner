@@ -85,6 +85,14 @@ public class Leg {
     public Place to = null;
 
     /**
+     * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
+     * For non-transit legs, null.
+     * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
+     */
+    @XmlElementWrapper(name = "intermediateStops")
+    public List<Place> stop;
+    
+    /**
      * The leg's geometry.
      */
     public EncodedPolylineBean legGeometry;

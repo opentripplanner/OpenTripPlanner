@@ -31,6 +31,7 @@ public interface RequestInf {
     public static String OPTIMIZE = "optimize";
     public static String MODE = "mode";
     public static String NUMBER_ITINERARIES = "numItineraries";
+    public static String SHOW_INTERMEDIATE_STOPS = "showIntermediateStops";
 
     public static String ARRIVE_BY = "arriveBy";
     public static String WALK_SPEED = "walkSpeed";
@@ -133,5 +134,16 @@ public interface RequestInf {
     public void setNumItineraries(Integer numItineraries);
 
     public void removeMode(TraverseMode car);
+
+    /** 
+     * @param showIntermediateStops
+     *          whether the planner should return intermediate stop lists for transit legs 
+     */
+    public void setShowIntermediateStops(boolean showIntermediateStops);
+
+    /** 
+     * @return whether the planner should return intermediate stop lists for transit legs 
+     */
+    public boolean getShowIntermediateStops();
 
 }

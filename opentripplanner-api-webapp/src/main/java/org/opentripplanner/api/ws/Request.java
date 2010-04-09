@@ -80,6 +80,11 @@ public class Request implements RequestInf {
      */
     private double maxSlope = -1;
     
+    /**
+     * Whether the planner should return intermediate stops lists for transit legs.
+     */
+    private boolean showIntermediateStops = false;
+    
     /** 
      * The complete list of parameters.
      */
@@ -327,5 +332,21 @@ public class Request implements RequestInf {
      */
     public void setMaxSlope(double maxSlope) {
         this.maxSlope = maxSlope;
+    }
+    
+    /** 
+     * @param showIntermediateStops
+     *          whether the planner should return intermediate stop lists for transit legs 
+     */
+    public void setShowIntermediateStops(boolean showIntermediateStops) {
+        this.showIntermediateStops = showIntermediateStops;
+        paramPush(SHOW_INTERMEDIATE_STOPS, showIntermediateStops);
+    }
+
+    /** 
+     * @return whether the planner should return intermediate stop lists for transit legs 
+     */
+    public boolean getShowIntermediateStops() {
+        return showIntermediateStops;
     }
 }
