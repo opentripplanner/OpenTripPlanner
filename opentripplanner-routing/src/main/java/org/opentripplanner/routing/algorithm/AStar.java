@@ -28,7 +28,9 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.FibHeap;
+import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /** 
@@ -163,7 +165,15 @@ public class AStar {
         if (origin == null || target == null) {
             return null;
         }
-
+        
+        // Return Tree
+        ShortestPathTree spt;
+        if (options.modes.getTransit()) { 
+            spt = new MultiShortestPathTree();
+        } else {
+            spt = new BasicShortestPathTree();
+        }
+        
         /* Run backwards from the target to the origin */
         Vertex tmp = origin;
         origin = target;
@@ -180,8 +190,6 @@ public class AStar {
         } else {
             extraEdges = new NullExtraEdges();
         }
-        // Return Tree
-        ShortestPathTree spt = new ShortestPathTree();
 
         double distance = origin.distance(target) / MAX_SPEED;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
@@ -245,6 +253,14 @@ public class AStar {
             return null;
         }
 
+        // Return Tree
+        ShortestPathTree spt;
+        if (options.modes.getTransit()) { 
+            spt = new MultiShortestPathTree();
+        } else {
+            spt = new BasicShortestPathTree();
+        }
+        
         /* generate extra edges for StreetLocations */
         Map<Vertex, Edge> extraEdges;
         if (target instanceof StreetLocation) {
@@ -256,9 +272,6 @@ public class AStar {
         } else {
             extraEdges = new NullExtraEdges();
         }
-
-        // Return Tree
-        ShortestPathTree spt = new ShortestPathTree();
 
         double distance = origin.distance(target) / MAX_SPEED;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);

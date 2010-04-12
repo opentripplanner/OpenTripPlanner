@@ -274,6 +274,7 @@ public class TraverseModeSet {
         }
     }
 
+    /** Returns true if any the trip may use some transit mode */
     public boolean getTransit() {
         return (modes & (MODE_TRANSIT)) != 0;
     }

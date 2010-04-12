@@ -26,6 +26,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.services.RoutingService;
+import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
@@ -73,7 +74,7 @@ class TSPPathFinder {
             Map<Vertex, HashMap<Vertex, GraphPath>> paths, HashSet<Vertex> vertices, State state, TraverseOptions options) {
         TSPPath shortestPath = findShortestPathInternal(toVertex, fromVertex, paths, vertices);
         
-        ShortestPathTree spt = new ShortestPathTree();
+        ShortestPathTree spt = new BasicShortestPathTree();
         GraphPath newPath = new GraphPath();
         Vertex lastVertex = fromVertex;
         GraphPath subPath;
