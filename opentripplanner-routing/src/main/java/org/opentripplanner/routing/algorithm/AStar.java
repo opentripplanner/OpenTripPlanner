@@ -23,6 +23,7 @@ import java.util.Set;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
@@ -106,8 +107,6 @@ class NullExtraEdges implements Map<Vertex, Edge> {
  */
 public class AStar {
 
-    static final double MAX_SPEED = 10.0;
-
     /**
      * Plots a path on graph from origin to target, departing at the time 
      * given in state and with the options options.
@@ -190,8 +189,9 @@ public class AStar {
         } else {
             extraEdges = new NullExtraEdges();
         }
-
-        double distance = origin.distance(target) / MAX_SPEED;
+        final double max_speed = getMaxSpeed(options);
+        
+        double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -233,7 +233,7 @@ public class AStar {
                 }
 
                 Vertex fromv = edge.getFromVertex();
-                distance = fromv.distance(target) / MAX_SPEED;
+                distance = fromv.distance(target) / max_speed;
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
@@ -272,8 +272,8 @@ public class AStar {
         } else {
             extraEdges = new NullExtraEdges();
         }
-
-        double distance = origin.distance(target) / MAX_SPEED;
+        final double max_speed = getMaxSpeed(options);
+        double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -320,12 +320,22 @@ public class AStar {
                 spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    distance = tov.distance(target) / MAX_SPEED;                    
+                    distance = tov.distance(target) / max_speed;                    
                     pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }
         }
         return spt;
+    }
+
+    private static double getMaxSpeed(TraverseOptions options) {
+        if (options.modes.contains(TraverseMode.TRANSIT)) {
+            //assume that the max average transit speed over a hop is 10 m/s, which is so far true for
+            //New York and Portland
+            return 10;
+        } else {
+            return options.speed;
+        }
     }
 
 }
