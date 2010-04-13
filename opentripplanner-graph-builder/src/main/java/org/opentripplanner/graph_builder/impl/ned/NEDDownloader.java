@@ -337,12 +337,21 @@ public class NEDDownloader {
             try {
                 while (true) {
                     sleep(10000);
-                    String token = initiateDownload(url);
-                    do {
-                        log.debug("Waiting to query");
-                        sleep(30000);
-                    } while (!downloadReady(token));
-                    sleep(10000);
+                    String token;
+                    while (true) {
+                        token = initiateDownload(url);
+                        int i = 0;
+                        do {
+                            log.debug("Waiting to query");
+                            sleep(30000);
+                        } while (!downloadReady(token) && i++ < 20);
+                        sleep(10000);
+                        if (i != 20) {
+                            break;
+                        }
+                        //we've waited ten minutes.  Let's just give up on this download and try again.
+                        log.debug("Giving up on slow download and retrying");
+                    }
 
                     downloadFile(url, token);
                     try {
@@ -355,7 +364,7 @@ public class NEDDownloader {
                 }
             } catch (NoDownloadIDException e) {
                 log.debug("Failed to download, retrying");
-                //have to retry
+                // have to retry
                 continue;
             } catch (Exception e) {
                 throw new RuntimeException(
@@ -373,23 +382,15 @@ public class NEDDownloader {
     private List<URL> getDownloadURLsCached() {
         Envelope extent = graph.getExtent();
         Formatter formatter = new Formatter();
-        String filename = formatter.format("%f,%f-%f,%f.urls", extent.getMinX(), extent.getMinY(), extent.getMaxX(),
-                extent.getMaxY()).toString();
+        String filename = formatter.format("%f,%f-%f,%f.urls", extent.getMinX(), extent.getMinY(),
+                extent.getMaxX(), extent.getMaxY()).toString();
         try {
             File file = new File(cacheDirectory, filename);
             List<URL> urls;
             if (!file.exists()) {
-                //get urls from validation server and write them to the cache
-                urls = getDownloadURLs();
-                FileOutputStream os = new FileOutputStream(file);
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
-                for (URL url : urls) {
-                    writer.write(url.toString());
-                    writer.write('\n');
-                }
-                return urls;
+                return getAndCacheUrls(file);
             }
-            //read cached urls
+            // read cached urls
             FileInputStream is = new FileInputStream(file);
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             urls = new ArrayList<URL>();
@@ -400,10 +401,26 @@ public class NEDDownloader {
                 }
                 urls.add(new URL(line));
             }
+            if (urls.size() == 0) {
+                return getAndCacheUrls(file);
+            }
             return urls;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<URL> getAndCacheUrls(File file) throws IOException {
+        // get urls from validation server and write them to the cache
+        List<URL> urls = getDownloadURLs();
+        FileOutputStream os = new FileOutputStream(file);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os));
+        for (URL url : urls) {
+            writer.write(url.toString());
+            writer.write('\n');
+        }
+        os.close();
+        return urls;
     }
 
     private File unzipFile(URL url) {
