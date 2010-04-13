@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 
 // NOTE - /ws/plan is the full path -- see web.xml
 
@@ -271,6 +272,8 @@ public class Planner {
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
+        GeometryFactory geometryFactory = new GeometryFactory();
+
         for (GraphPath path : paths) {
 
             Itinerary itinerary = new Itinerary();
@@ -290,7 +293,7 @@ public class Planner {
             
             Leg leg = null;
             TraverseMode mode = null;
-            Geometry geometry = null;
+            CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
             String name = null;
 
             int startWalk = -1;
@@ -329,10 +332,11 @@ public class Planner {
                             leg.to = new Place(endCoord.x, endCoord.y, fromv.getName());
                             leg.to.stopId = fromv.getStopId();
                             leg.endTime = new Date(edge.tov.state.getTime());
+                            Geometry geometry = geometryFactory.createLineString(coordinates);
                             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                             leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
                             leg = null;
-                            geometry = null;
+                            coordinates = new CoordinateArrayListSequence();
                         }
 
                         /* initialize new leg */
@@ -361,12 +365,9 @@ public class Planner {
                     }
                 }
                 Geometry edgeGeometry = graphEdge.getGeometry();
-                if (geometry == null) {
-                    geometry = edgeGeometry;
-                } else {
-                    if (edgeGeometry != null) {
-                        geometry = geometry.union(edgeGeometry);
-                    }
+                
+                if (edgeGeometry != null) {
+                    coordinates.extend(edgeGeometry.getCoordinates());
                 }
 
                 leg.distance += edge.getDistance();
@@ -435,6 +436,7 @@ public class Planner {
                 leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
                 leg.to.stopId = tov.getStopId();
                 leg.endTime = new Date(lastEdge.tov.state.getTime());
+                Geometry geometry = geometryFactory.createLineString(coordinates);
                 leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                 leg.duration = lastEdge.tov.state.getTime() - leg.startTime.getTime();
                 if (startWalk != -1) {
