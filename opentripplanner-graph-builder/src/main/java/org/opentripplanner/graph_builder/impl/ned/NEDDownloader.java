@@ -419,6 +419,8 @@ public class NEDDownloader {
             writer.write(url.toString());
             writer.write('\n');
         }
+        writer.flush();
+        writer.close();
         os.close();
         return urls;
     }
