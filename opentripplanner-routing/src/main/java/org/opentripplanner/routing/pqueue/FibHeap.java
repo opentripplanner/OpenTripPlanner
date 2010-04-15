@@ -198,7 +198,7 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
     }
 
     void decrease_node_key(FibNode x, double k) {
-        if (k < x.key) {
+        if (k <= x.key) {
             return;
         }
         assert k < x.key : "new key " + k + " is greater than current key " + x.key;
