@@ -31,6 +31,7 @@ public class State {
     public AgencyAndId route = null;
 
     public FareContext fareContext;
+    public boolean lastEdgeWasStreet = false;
 
     public State() {
         this(System.currentTimeMillis());

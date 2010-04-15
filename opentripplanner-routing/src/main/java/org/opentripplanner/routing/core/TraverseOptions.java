@@ -40,7 +40,7 @@ public class TraverseOptions {
 
     public boolean wheelchairAccessible = false;
 
-    public OptimizeType optimizeFor;
+    public OptimizeType optimizeFor = OptimizeType.QUICK;
 
     public double maxWalkDistance = Double.MAX_VALUE;
 

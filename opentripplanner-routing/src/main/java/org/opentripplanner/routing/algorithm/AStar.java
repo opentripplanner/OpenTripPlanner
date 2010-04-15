@@ -22,6 +22,7 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -219,8 +220,13 @@ public class AStar {
             }
 
             for (Edge edge : incoming) {
-
-                TraverseResult wr = edge.traverseBack(spt_u.state, options);
+                State state = spt_u.state;
+                if (edge.getToVertex() == target) {
+                    state = state.clone();
+                    state.lastEdgeWasStreet = false;
+                    state.justTransferred = spt_u.state.justTransferred;
+                }
+                TraverseResult wr = edge.traverseBack(state, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
@@ -300,9 +306,13 @@ public class AStar {
             }
 
             for (Edge edge : outgoing) {
-
-                TraverseResult wr = edge.traverse(spt_u.state, options);
-
+                State state = spt_u.state;
+                if (edge.getToVertex() == target) {
+                    state = state.clone();
+                    state.lastEdgeWasStreet = false;
+                    state.justTransferred = spt_u.state.justTransferred;
+                }
+                TraverseResult wr = edge.traverse(state, options);
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
                 if (wr == null) {
@@ -334,7 +344,13 @@ public class AStar {
             //New York and Portland
             return 10;
         } else {
-            return options.speed;
+            if (options.optimizeFor == OptimizeType.QUICK) {
+                return options.speed;
+            } else {
+                //assume that the best route is no more than 10 times better than
+                //the as-the-crow-flies flat base route.  
+                return options.speed * 10; 
+            }
         }
     }
 

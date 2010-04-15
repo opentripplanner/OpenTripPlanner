@@ -63,6 +63,7 @@ public class Turn extends AbstractEdge {
     public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(turnAngle / 20);
+        s1.lastEdgeWasStreet = s0.lastEdgeWasStreet;
         return new TraverseResult(turnAngle / 20.0, s1);
     }
 
@@ -70,6 +71,7 @@ public class Turn extends AbstractEdge {
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-turnAngle / 20);
+        s1.lastEdgeWasStreet = s0.lastEdgeWasStreet;
         return new TraverseResult(turnAngle / 20.0, s1);
     }
 }

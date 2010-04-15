@@ -22,9 +22,12 @@ import org.junit.Test;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class TestShapefileStreetGraphBuilderImpl extends TestCase {
@@ -84,19 +87,38 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         //find start and end vertices
         Vertex start = null;
         Vertex end = null;
+        Vertex carlton = null;
         for (Vertex v : gg.getVertices()) {
             if (v.getLabel().startsWith("PARK PL at VANDERBILT AV")) {
                 start = v;
-            } else {
-                if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST")) {
-                    end = v;
-                }
+            } else if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST")) {
+                end = v;
+            } else if (v.getLabel().startsWith("CARLTON AV at PARK PL")) {
+                carlton = v;
             }
         }
         assertNotNull(start);
         assertNotNull(end);
+        assertNotNull(carlton);
+        
         TraverseOptions wo = new TraverseOptions();
         ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, new State(0), wo);
         assertNotNull(spt);
+
+        //test that the option to walk bikes on the first or last segment works
+        
+        wo = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        
+        //Real live cyclists tell me that they would prefer to ride around the long way than to 
+        //walk their bikes the short way.  If we slow down the default biking speed, that will 
+        //force a change in preferences.
+        wo.speed = 2; 
+        
+        spt = AStar.getShortestPathTree(gg, start, carlton, new State(0), wo);
+        assertNotNull(spt);
+        
+        GraphPath path = spt.getPath(carlton);
+        assertTrue(path.edges.size() <= 3);
+        
     }
 }

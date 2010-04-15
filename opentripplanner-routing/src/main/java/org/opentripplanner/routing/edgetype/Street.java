@@ -19,6 +19,7 @@ import java.util.List;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StreetIntersectionVertex;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -304,7 +305,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
         if (!canTraverse(wo)) {
-            return null;
+            return tryWalkBike(s0, wo, getToVertex(), false);
         }
 
         State s1 = s0.clone();
@@ -313,6 +314,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
         s1.walkDistance += length;
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) time);
+        s1.lastEdgeWasStreet = true;
         return new TraverseResult(weight, s1);
     }
 
@@ -351,7 +353,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
         if (!canTraverse(wo)) {
-            return null;
+            return tryWalkBike(s0, wo, getFromVertex(), true);
         }
         State s1 = s0.clone();
         double time = length / wo.speed;
@@ -359,7 +361,31 @@ public class Street extends AbstractEdge implements WalkableEdge {
         s1.walkDistance += this.length;
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
+        s1.lastEdgeWasStreet = true;
         return new TraverseResult(weight, s1);
+    }
+
+    /** If the edge is one-way the wrong way for bikes, and it is the first or last
+     * street edge of a run of street edges, walk the bike backwards along the edge.   
+     * @return
+     */
+    private TraverseResult tryWalkBike(State s0, TraverseOptions options, Vertex endVertex, boolean back) {
+        if (s0.lastEdgeWasStreet && ! (endVertex instanceof StreetIntersectionVertex)) {
+            return null;
+        }
+        if (!options.modes.getBicycle()) {
+            return null;
+        }
+        if (!permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return null;
+        }
+        State s1 = s0.clone();
+        double time = length / 1.33; //3 mi/hr, average walking speed
+        s1.walkDistance += this.length;
+        
+        s1.incrementTimeInSeconds((int) time * (back ? -1 : 1));
+        s1.lastEdgeWasStreet = true;
+        return new TraverseResult(time, s1);
     }
 
     private boolean canTraverse(TraverseOptions wo) {
@@ -372,15 +398,18 @@ public class Street extends AbstractEdge implements WalkableEdge {
             }
         }
 
-        if (wo.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN))
+        if (wo.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
+        }
 
-        if (wo.modes.getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE))
+        if (wo.modes.getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) { 
+                return true;
+        }
+
+        if (wo.modes.getCar() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
-
-        if (wo.modes.getCar() && permission.allows(StreetTraversalPermission.CAR))
-            return true;
-
+        }
+        
         return false;
     }
 
