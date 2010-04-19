@@ -45,7 +45,7 @@ public class OpenStreetMapGraphBuilderTest extends TestCase {
         Vertex v2 = gg.getVertex("osm node 288969929 at 141");
         Vertex v3 = gg.getVertex("osm node 288969929 at 219");
         v1.getName();
-        assertTrue ("name of v1 must be like \"Kamiennogórska at Mariana Smoluchowskiego\"; was " + v1.getName(), v1.getName().contains("Kamiennogórska") && v1.getName().contains("Mariana Smoluchowskiego"));
+        assertTrue ("name of v1 must be like \"Kamiennog\u00F3rska at Mariana Smoluchowskiego\"; was " + v1.getName(), v1.getName().contains("Kamiennog\u00F3rska") && v1.getName().contains("Mariana Smoluchowskiego"));
 
         for (Edge e : v1.getOutgoing()) {
             if (e instanceof Turn) {
