@@ -27,6 +27,20 @@ otp.config = {
             numZoomLevels: 17
         },
         
+        // Instead of specifying just the base layer options, you can instead
+        // specify the full base layer object.
+        // The example below creates a new base layer that uses the default OSM
+        // tiles.
+        /*
+        baseLayer: new OpenLayers.Layer.OSM({
+        url: [
+              "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+              "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+              "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
+          ],
+        numZoomLevels: 18
+        }), */
+        
         // Base tile information 
         'baseLayerOptions': {
             url: 'http://maps.opengeo.org/geowebcache/service/wms',

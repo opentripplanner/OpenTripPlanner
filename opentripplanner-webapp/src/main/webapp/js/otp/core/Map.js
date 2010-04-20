@@ -81,7 +81,11 @@ otp.core.MapStatic = {
         otp.configure(this, config);
         
         this.map = otp.util.OpenLayersUtils.makeMap(this.mapDiv, this.options);
-        this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
+        if (this.baseLayer == null) {
+            this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
+        } else {
+            this.map.addLayer(this.baseLayer);
+        }
         this.map.setBaseLayer(this.baseLayer, true);
 
         otp.core.MapSingleton = this;
