@@ -510,19 +510,19 @@ otp.planner.Itinerary = {
                             directionText = directionText.substr(0,1).toUpperCase() + directionText.substr(1);
                             if (relativeDirection == "continue")
                             {
-                                stepText += directionText + ' on <strong>' + steps[j].streetName + '</strong>';
+                                stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
                             }
                             else if (step.stayOn == true)
                             {
-                                stepText += directionText + ' to continue on <strong>' + step.streetName + '</strong>';
+                                stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
                             }
                             else if (step.becomes == true)
                             {
-                                stepText += directionText + ' as <strong>' + steps[j-1].streetName + '</strong> becomes <strong>' + step.streetName + '</strong>';
+                                stepText += this.locale.directions['becomes'] + ' <strong>' + steps[j-1].streetName + '</strong> becomes <strong>' + step.streetName + '</strong>';
                             }
                             else
                             {
-                                stepText += directionText + ' at <strong>' + step.streetName + '</strong>';
+                                stepText += directionText + " " + this.locale.directions['at'] + ' <strong>' + step.streetName + '</strong>';
                             }
                         }
                         stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';

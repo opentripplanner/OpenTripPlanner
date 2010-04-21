@@ -95,7 +95,10 @@ otp.locale.English = {
         slightly_right: "slight right",
         hard_left:      "hard left",
         hard_right:     "hard right",
-        'continue':     "continue"
+        'continue':     "continue on",
+        to_continue:    "to continue on",
+        becomes:        "street name becomes",
+        at:             "at"
     },
     
     systemmap :

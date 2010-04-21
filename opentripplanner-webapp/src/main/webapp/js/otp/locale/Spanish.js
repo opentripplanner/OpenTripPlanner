@@ -21,20 +21,20 @@ otp.locale.Spanish = {
 
     contextMenu : 
     {
-        fromHere         : "Salir desde aquí",
-        toHere           : "Llegar hasta aquí",
+        fromHere         : "Salir desde aquï¿½",
+        toHere           : "Llegar hasta aquï¿½",
 
-        centerHere       : "Centrar mapa aquí",
+        centerHere       : "Centrar mapa aquï¿½",
         zoomInHere       : "Acercar",
         zoomOutHere      : "Alejar",
-        previous         : "Último encuadre",
+        previous         : "ï¿½ltimo encuadre",
         next             : "Siguiente encuadre"
     },
 
     service : 
     {
-        weekdays:  "días de la semana",
-        saturday:  "Sábado",
+        weekdays:  "dï¿½as de la semana",
+        saturday:  "Sï¿½bado",
         sunday:    "Domingo",
         schedule:  "Horario"
     },
@@ -45,14 +45,14 @@ otp.locale.Spanish = {
         date       : "Fecha",
         loading    : "Cargando",
         searching  : "Buscando...",
-        qEmptyText : "Dirección, intersección,  punto de inteés o Identificador de Parada..."
+        qEmptyText : "Direcciï¿½n, intersecciï¿½n,  punto de inteï¿½s o Identificador de Parada..."
     },
 
     buttons: 
     {
         reverse       : "Cambiar",
-        reverseTip    : "<b>Camibar orígen-destino</b><br/>Plan a return trip by reversing this trip's start and end points, and adjusting the time forward.",
-        reverseMiniTip: "Cambiar orígen-destino",
+        reverseTip    : "<b>Camibar orï¿½gen-destino</b><br/>Plan a return trip by reversing this trip's start and end points, and adjusting the time forward.",
+        reverseMiniTip: "Cambiar orï¿½gen-destino",
 
         clear         : "Inicializar",
         clearTip      : "<b>Inicializar</b><br/>Inicializar el mapa y los botones activos.",
@@ -70,7 +70,7 @@ otp.locale.Spanish = {
         clear        : "Borrar",
         ok           : "OK",
         cancel       : "Cancelar",
-        yes          : "Sí",
+        yes          : "Sï¿½",
         no           : "No"
     },
 
@@ -85,14 +85,17 @@ otp.locale.Spanish = {
         west:           "oeste",
         south:          "sur",
         east:           "este",
-        bound:          "límite",
+        bound:          "lï¿½mite",
         left:           "left",
         right:          "right",
         slightly_left:  "slight left",
         slightly_right: "slight right",
         hard_left:      "hard left",
         hard_right:     "hard right",
-        'continue':     "continue"
+        'continue':     "continue a",
+        to_continue:    "para continuer a",
+        becomes:        "nombre de calle cambia a",
+        at:             "a"
     },
 
     systemmap :
@@ -117,11 +120,11 @@ otp.locale.Spanish = {
             time          : "Hora",
             when          : "Tiempo",
             from          : "Desde",
-            fromHere      : "Desde aquí",
+            fromHere      : "Desde aquï¿½",
             to            : "Hasta",
-            toHere        : "Hasta aquí",
+            toHere        : "Hasta aquï¿½",
             minimize      : "Mostrar el",
-            maxWalkDistance: "Máxima distancia hasta la parada",
+            maxWalkDistance: "Mï¿½xima distancia hasta la parada",
             arriveDepart  : "Llegada/Salida a",
             mode          : "Modo de viaje",
             go            : "Empezar",
@@ -133,8 +136,8 @@ otp.locale.Spanish = {
         {
             title        : 'Trip Planner Error',
             deadMsg      : "Map Trip Planner is currently not responding. Please wait a few minutes to try again, or try the text trip planner (see link below).",
-            geoFromMsg   : "Por favor, seleccione la posición de salida de su Viaje: ",
-            geoToMsg     : "Por favor, seleccione la posición de llegada de su Viaje: "
+            geoFromMsg   : "Por favor, seleccione la posiciï¿½n de salida de su Viaje: ",
+            geoToMsg     : "Por favor, seleccione la posiciï¿½n de llegada de su Viaje: "
         },
         
         // default messages from server if a message was not returned
@@ -159,9 +162,9 @@ otp.locale.Spanish = {
 
         options: 
         [
-          ['TRANSFERS', 'Mínimo número de Transbordos'],
-          ['SAFE', 'Viaje más seguro'],
-          ['QUICK', 'Viaje más corto'] 
+          ['TRANSFERS', 'Mï¿½nimo nï¿½mero de Transbordos'],
+          ['SAFE', 'Viaje mï¿½s seguro'],
+          ['QUICK', 'Viaje mï¿½s corto'] 
         ],
     
         arriveDepart: 
@@ -181,11 +184,11 @@ otp.locale.Spanish = {
     
         mode : 
         [
-            ['TRANSIT,WALK', 'Tr‡nsito'],
+            ['TRANSIT,WALK', 'Trï¿½nsito'],
             ['BUSISH,TRAINISH,WALK', 'Bus y Tren'],
             ['BUSISH,WALK', 'Solo Bus'],
             ['TRAINISH,WALK', 'Solo Tren'],
-            ['WALK', 'Solo a pié'],
+            ['WALK', 'Solo a piï¿½'],
             ['BICYCLE', 'Bicicleta']
         ],
 
