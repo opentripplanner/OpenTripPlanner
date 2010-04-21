@@ -57,9 +57,8 @@ public class RouteDialog extends JDialog {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("clicked");
-                from = fromField.getText();
-                to = toField.getText();
+                from = fromField.getText().trim();
+                to = toField.getText().trim();
                 outer.setVisible(false);
             }
             
