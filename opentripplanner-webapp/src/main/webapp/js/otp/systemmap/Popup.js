@@ -42,11 +42,16 @@ otp.systemmap.Popup = {
     // set to the timeout id when the popup is triggered to be closed
     timeoutId: null,
 
+    // reference to the system map
+    sysmap: null,
+
     initialize: function(config) {
         otp.configure(this, config);
 
-        var routes = this.doc.routes.route;
-        var departures = this.doc.departures.departure;
+//         var routes = this.doc.routes.route;
+//         var departures = this.doc.departures.departure;
+        var routes = this.doc.routes;
+        var departures = this.doc.departures;
         if (!departures instanceof Array) {
             departures = [departures];
         }
@@ -116,12 +121,13 @@ otp.systemmap.Popup = {
         // XXX projection?
         //lonlat = lonlat.transform(new OpenLayers.Projection(), new OpenLayers.Projection());
         
+        var self = this;
         var popup = new OpenLayers.Popup(null,
                                          lonlat,
                                          new OpenLayers.Size(200, 200),
                                          html,
                                          true,
-                                         null //function() { selectControlStops.unselect(feature); }
+                                         function() { self.sysmap.popupClosed(); self.removePopup(); }
                                          );
         if (this.klass) {
             popup.displayClass = this.klass;
@@ -132,13 +138,17 @@ otp.systemmap.Popup = {
         this.popup = popup;
     },
 
+    removePopup: function() {
+        if (this.popup) {
+            this.map.removePopup(this.popup);
+            this.popup.destroy();
+            this.popup = null;
+        }
+    },
+
     triggerClose: function(timeout) {
         var self = this;
-        this.timeoutId = setTimeout(function() {
-                self.map.removePopup(self.popup);
-                self.popup.destroy();
-                self.popup = null;
-            }, timeout);
+        this.timeoutId = setTimeout(function() { self.removePopup(); }, timeout);
     },
 
     CLASS_NAME: 'otp.systemmap.Popup'
