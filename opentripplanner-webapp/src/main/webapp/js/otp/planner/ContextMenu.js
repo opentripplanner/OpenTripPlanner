@@ -33,11 +33,20 @@ otp.planner.ContextMenu = {
 
         var opts = {
             renderTo : this.renderTo,
-            items : this.getElements()
+            items : this.getElements(),
+            enableScrolling: false
         };
 
         this.renderTo.on('contextmenu', function(event) {
-            this.showAt(event.xy);
+            var x = event.xy[0];
+            var y = event.xy[1];
+                            
+            // Place the context menu above the cursor if placing it below the
+            // cursor would cause it to go out of view.
+            if (y + this.getHeight() > this.container.getHeight()) {
+                y = y - this.getHeight();
+            }
+            this.showAt([x, y]);
             event.stopEvent();
         }, this);
         this.renderTo.on('click', function(event) {
