@@ -43,8 +43,11 @@ otp.planner.ContextMenu = {
                             
             // Place the context menu above the cursor if placing it below the
             // cursor would cause it to go out of view.
-            if (y + this.getHeight() > this.container.getHeight()) {
+            if (y + this.getHeight() > this.container.getHeight() + this.container.getY()) {
                 y = y - this.getHeight();
+            }
+            if (x + this.getWidth() > this.container.getWidth() + this.container.getX()) {
+                x = x - this.getWidth();
             }
             this.showAt([x, y]);
             event.stopEvent();
