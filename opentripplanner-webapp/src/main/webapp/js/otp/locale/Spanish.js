@@ -88,14 +88,14 @@ otp.locale.Spanish = {
         bound:          "límite",
         left:           "izquierda",
         right:          "derecha",
-        slightly_left:  "poca izquierda",
-        slightly_right: "poca derecha",
-        hard_left:      "extrema izquierda",
-        hard_right:     "extrema derecha",
-        'continue':     "continue on", 
-        to_continue:    "to continue on", 
-        becomes:        "street name becomes", 
-        at:             "at" 
+        slightly_left:  "un poco izquierda",
+        slightly_right: "un poco derecha",
+        hard_left:      "muy izquierda",
+        hard_right:     "muy derecha",
+        'continue':     "sigue derecho", 
+        to_continue:    "para continuar en", 
+        becomes:        "se hace", 
+        at:             "en" 
     },
 
     systemmap :
