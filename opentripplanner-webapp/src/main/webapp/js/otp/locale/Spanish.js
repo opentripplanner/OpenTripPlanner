@@ -67,7 +67,7 @@ otp.locale.Spanish = {
         feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
 
         submit       : "Enviar",
-        clear        : "Borrar",
+        clearButton  : "Borrar",
         ok           : "OK",
         cancel       : "Cancelar",
         yes          : "Sí",
@@ -184,7 +184,7 @@ otp.locale.Spanish = {
     
         mode : 
         [
-            ['TRANSIT,WALK', 'Tr‡nsito'],
+            ['TRANSIT,WALK', 'Tránsito'],
             ['BUSISH,TRAINISH,WALK', 'Bus y Tren'],
             ['BUSISH,WALK', 'Solo Bus'],
             ['TRAINISH,WALK', 'Solo Tren'],

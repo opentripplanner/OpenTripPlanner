@@ -70,7 +70,7 @@ otp.locale.English = {
         feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
 
         submit       : "Submit",
-        clear        : "Clear",
+        clearButton  : "Clear",
         ok           : "OK",
         cancel       : "Cancel",
         yes          : "Yes",
