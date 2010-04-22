@@ -45,7 +45,7 @@ otp.locale.Spanish = {
         date       : "Fecha",
         loading    : "Cargando",
         searching  : "Buscando...",
-        qEmptyText : "Dirección, intersección,  punto de inteés o Identificador de Parada..."
+        qEmptyText : "Dirección, intersección,  punto de interés o Identificador de Parada..."
     },
 
     buttons: 
