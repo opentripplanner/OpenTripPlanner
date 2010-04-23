@@ -87,7 +87,7 @@ otp.planner.TopoRenderer = {
                 ctx.fill();
                 ctx.fillStyle = "rgb(47,79,79)"; 
                 ctx.font = "bold 8pt sans-serif";
-                ctx.fillText((minElev+d*100)+"'", 7, y-2);
+                this.fillText(ctx, (minElev+d*100)+"'", 7, y-2);
             }
             
             //render the graduated-blue background
@@ -131,9 +131,9 @@ otp.planner.TopoRenderer = {
          
                 ctx.fillStyle = "rgb(255,255,255)";
                 ctx.font = "bold 8pt sans-serif";
-                ctx.fillText(step.streetName, currentX+5, 10);
+                this.fillText(ctx, step.streetName, currentX+5, 10);
                 ctx.font = "8pt sans-serif";
-                ctx.fillText(prettyDistance(step.distance), currentX+5, 21);
+                this.fillText(ctx, prettyDistance(step.distance), currentX+5, 21);
                 
                 if(step.elevation != undefined) {
                     var elevArr = steps[i].elevation.split(",");
@@ -179,7 +179,19 @@ otp.planner.TopoRenderer = {
 
         }    
     },
-    
+
+    fillText : function (ctx, str, x, y) {
+        if (ctx.fillText == undefined) {
+            //for FF 3.0.
+            ctx.save();
+            ctx.moveTo(x, y);
+            ctx.mozDrawText(str);
+            ctx.restore();
+        } else {
+            ctx.fillText(ctx, str, x, y);
+        }
+    },
+
     CLASS_NAME: "otp.planner.TopoRenderer"
 };
 
