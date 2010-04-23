@@ -98,6 +98,15 @@ otp.locale.Spanish = {
         at:             "en" 
     },
 
+    time:
+    {
+        minute_abbrev:  "min",
+        minutes_abbrev: "mins",
+        second_abbrev: "sec",
+        seconds_abbrev: "secs",
+        months:         ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+    },
+
     systemmap :
     {
         labels :

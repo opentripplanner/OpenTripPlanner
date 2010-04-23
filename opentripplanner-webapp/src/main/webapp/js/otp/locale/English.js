@@ -97,8 +97,17 @@ otp.locale.English = {
         hard_right:     "hard right",
         'continue':     "continue on",
         to_continue:    "to continue on",
-        becomes:        "street name becomes",
+        becomes:        "becomes",
         at:             "at"
+    },
+
+    time:
+    {
+        minute_abbrev:  "min",
+        minutes_abbrev: "mins",
+        second_abbrev: "sec",
+        seconds_abbrev: "secs",
+        months:         ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
     
     systemmap :

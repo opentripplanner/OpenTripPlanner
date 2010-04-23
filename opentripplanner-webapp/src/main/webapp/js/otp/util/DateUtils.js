@@ -19,6 +19,8 @@ otp.namespace("otp.util");
  */
 otp.util.DateUtils = {
 
+    locale       : otp.locale.English,
+
     /** minutes / seconds */
     getMinutesAndSeconds : function(m, s, mStr, mmStr, sStr)
     {
@@ -26,9 +28,9 @@ otp.util.DateUtils = {
 
         if(mStr  == ":"){ mmStr = ":"; sStr="";}
         if(mStr  == "."){ mmStr = "."; sStr="";}
-        if(mStr  == null) mStr  = " min, ";
-        if(mmStr == null) mmStr = " mins, ";
-        if(sStr  == null) sStr  = " secs ";
+        if(mStr  == null) mStr  = " " + this.locale.time.minute_abbrev + ", ";
+        if(mmStr == null) mmStr = " " + this.locale.time.minutes_abbrev;
+        if(sStr  == null) sStr  = " " + this.locale.time.seconds_abbrev + " ";
 
         if(m && m > 0)
             retVal += m + (m == 1 ? mStr : mmStr);
@@ -42,7 +44,7 @@ otp.util.DateUtils = {
     getMonthAsInt : function(str, pad)
     {
         var retVal = str;
-        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var months = this.locale.time.months;
 
         for(var i = 0; i < months.length; i++)
         {
@@ -77,7 +79,7 @@ otp.util.DateUtils = {
         }
         catch(e)
         {
-            retVal = {"min":min, "sec":sec};
+            retVal = {"min":this.locale.minute_abbrev, "sec":second_abbrev};
         }
 
         return retVal;
