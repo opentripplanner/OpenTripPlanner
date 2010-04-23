@@ -228,7 +228,6 @@ otp.planner.TripTab = {
     draw : function()
     {
         this.renderer.clear();
-        this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         
         if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
         {
@@ -245,6 +244,7 @@ otp.planner.TripTab = {
             }
         }
         
+        this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
     },
 
