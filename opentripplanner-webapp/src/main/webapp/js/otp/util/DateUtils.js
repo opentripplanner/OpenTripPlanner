@@ -79,7 +79,7 @@ otp.util.DateUtils = {
         }
         catch(e)
         {
-            retVal = {"min":this.locale.minute_abbrev, "sec":second_abbrev};
+            retVal = {"min":this.locale.time.minute_abbrev, "sec":this.locale.time.second_abbrev};
         }
 
         return retVal;
