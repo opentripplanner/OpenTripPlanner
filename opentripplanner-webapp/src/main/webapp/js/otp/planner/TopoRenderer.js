@@ -188,7 +188,7 @@ otp.planner.TopoRenderer = {
             ctx.mozDrawText(str);
             ctx.restore();
         } else {
-            ctx.fillText(ctx, str, x, y);
+            ctx.fillText(str, x, y);
         }
     },
 
