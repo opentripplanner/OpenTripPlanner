@@ -674,7 +674,7 @@ public class GTFSPatternHopFactory {
             }
             TransitStop fromStation = (TransitStop) graph.getVertex(id(fromStop.getId()));
             TransitStop toStation = (TransitStop) graph.getVertex(id(toStop.getId()));
-            double distance = fromStation.distance(toStation);
+            double distance = fromStation.distance(toStation.getCoordinate());
             if (t.getTransferType() < 3) {
                 org.opentripplanner.routing.edgetype.Transfer edge;
                 if (t.getTransferType() == 2) { // transfer has minimum transfer time
