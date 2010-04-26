@@ -282,7 +282,7 @@ public class NEDDownloader {
                 return stringToDoc(contents);
             } catch (IOException e) {
                 log.warn("IO error, retrying: " + e);
-                sleep(5000);
+                sleep(3000);
             } catch (Exception e) {
                 throw new RuntimeException(
                         "Error getting data from USGS Download Server while checking download status: contents = \n"
@@ -336,7 +336,7 @@ public class NEDDownloader {
             }
             try {
                 while (true) {
-                    sleep(10000);
+                    sleep(3000);
                     String token;
                     while (true) {
                         token = initiateDownload(url);
@@ -345,7 +345,7 @@ public class NEDDownloader {
                             log.debug("Waiting to query");
                             sleep(30000);
                         } while (!downloadReady(token) && i++ < 20);
-                        sleep(10000);
+                        sleep(3000);
                         if (i != 20) {
                             break;
                         }
@@ -494,7 +494,7 @@ public class NEDDownloader {
             istream.close();
             httpconnection.disconnect();
             log.debug("Done download " + key);
-            NEDDownloader.sleep(10000);
+            NEDDownloader.sleep(3000);
         } catch (Exception e) {
             throw new RuntimeException(
                     "Error getting data from USGS Download Server while downloading", e);
