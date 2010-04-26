@@ -337,7 +337,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. */
         private P2<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
                 StreetTraversalPermission permissions, LineString geometry) {
-            double d = from.distance(to);
+            double d = from.distance(to.getCoordinate());
 
             Map<String, String> tags = way.getTags();
 

@@ -192,7 +192,7 @@ public class AStar {
         }
         final double max_speed = getMaxSpeed(options);
         
-        double distance = origin.distance(target) / max_speed;
+        double distance = origin.fastDistance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -221,7 +221,7 @@ public class AStar {
 
             for (Edge edge : incoming) {
                 State state = spt_u.state;
-                if (edge.getToVertex() == target) {
+                if (edge.getFromVertex() == target) {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
                     state.justTransferred = spt_u.state.justTransferred;
@@ -239,7 +239,7 @@ public class AStar {
                 }
 
                 Vertex fromv = edge.getFromVertex();
-                distance = fromv.distance(target) / max_speed;
+                distance = fromv.fastDistance(target) / max_speed;
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
@@ -279,7 +279,7 @@ public class AStar {
             extraEdges = new NullExtraEdges();
         }
         final double max_speed = getMaxSpeed(options);
-        double distance = origin.distance(target) / max_speed;
+        double distance = origin.fastDistance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -330,7 +330,7 @@ public class AStar {
                 spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    distance = tov.distance(target) / max_speed;                    
+                    distance = tov.fastDistance(target) / max_speed;                    
                     pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }

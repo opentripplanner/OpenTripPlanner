@@ -54,7 +54,7 @@ public final class DummyReferenceVertex implements Vertex {
     }
 
     @Override
-    public double distance(Vertex v) {
+    public double fastDistance(Vertex v) {
         throw new UnsupportedOperationException();
     }
 

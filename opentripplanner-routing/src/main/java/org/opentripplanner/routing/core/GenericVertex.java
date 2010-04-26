@@ -67,7 +67,7 @@ public class GenericVertex implements Vertex {
         this.stopId = stopId;
     }
 
-    public double distance(Vertex v) {
+    public double fastDistance(Vertex v) {
 
         double xd = v.getX() - getX();
         double yd = v.getY() - getY();

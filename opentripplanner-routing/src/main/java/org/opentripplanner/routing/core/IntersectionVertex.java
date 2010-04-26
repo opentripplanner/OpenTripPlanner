@@ -43,7 +43,7 @@ public class IntersectionVertex extends OneStreetVertex implements StreetInterse
         angle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
     }
 
-    public double distance(Vertex v) {
+    public double fastDistance(Vertex v) {
 
         double xd = v.getX() - getX();
         double yd = v.getY() - getY();

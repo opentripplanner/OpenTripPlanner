@@ -23,7 +23,8 @@ public interface Vertex extends Serializable {
 
     public String getStopId();
 
-    public double distance(Vertex v);
+    /** This is fast but totally inaccurate distance function used as a heuristic in A* */
+    public double fastDistance(Vertex v);
 
     public double distance(Coordinate c);
 

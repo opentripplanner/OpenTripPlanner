@@ -15,6 +15,8 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 
+import org.opentripplanner.routing.impl.DistanceLibrary;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class DeadEnd extends OneStreetVertex implements StreetIntersectionVertex {
@@ -45,7 +47,7 @@ public class DeadEnd extends OneStreetVertex implements StreetIntersectionVertex
     }
 
     @Override
-    public double distance(Vertex v) {
+    public double fastDistance(Vertex v) {
 
         double xd = v.getX() - x;
         double yd = v.getY() - y;
@@ -54,10 +56,7 @@ public class DeadEnd extends OneStreetVertex implements StreetIntersectionVertex
 
     @Override
     public double distance(Coordinate c) {
-
-        double xd = c.x - x;
-        double yd = c.y - y;
-        return Math.sqrt(xd * xd + yd * yd) * GenericVertex.METERS_PER_DEGREE_AT_EQUATOR * GenericVertex.COS_MAX_LAT;
+        return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
     }
 
     @Override
