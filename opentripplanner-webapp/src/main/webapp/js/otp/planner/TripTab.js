@@ -229,21 +229,25 @@ otp.planner.TripTab = {
     {
         this.renderer.clear();
         
-        if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
-        {
-            this.ui.innerSouth.getEl().setHeight(180);
-            this.ui.innerSouth.show();
-            this.ui.viewport.doLayout();
-            this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
-        }
-        else {
-            if(this.ui.innerSouth.isVisible()) 
+        /* draw topographic map */
+        console.log("HERE");
+        if (document.createElement('canvas').getContext) {
+            if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
             {
-                this.ui.innerSouth.hide();
+                this.ui.innerSouth.getEl().setHeight(180);
+                this.ui.innerSouth.show();
                 this.ui.viewport.doLayout();
+                this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+            }
+            else 
+            {
+                if(this.ui.innerSouth.isVisible()) 
+                {
+                    this.ui.innerSouth.hide();
+                    this.ui.viewport.doLayout();
+                }
             }
         }
-        
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
     },
