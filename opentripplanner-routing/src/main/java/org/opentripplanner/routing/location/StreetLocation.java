@@ -93,13 +93,12 @@ public class StreetLocation extends GenericVertex {
 
             Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, street.getTraversalPermission(), street.getWheelchairAccessible());
             e1.setGeometry(beginning);
-            e1.setElevationProfile(street.getElevationProfile(0, l.getSegmentFraction()*street.length));
+            e1.setElevationProfile(street.getElevationProfile(0, weight1));
             addIncoming(e1);
-
 
             Street e2 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, street.getTraversalPermission(), street.getWheelchairAccessible());
             e2.setGeometry(ending);
-            e2.setElevationProfile(street.getElevationProfile(l.getSegmentFraction()*street.length, street.length));
+            e2.setElevationProfile(street.getElevationProfile(weight1, street.length));
             addOutgoing(e2);
         }
     }

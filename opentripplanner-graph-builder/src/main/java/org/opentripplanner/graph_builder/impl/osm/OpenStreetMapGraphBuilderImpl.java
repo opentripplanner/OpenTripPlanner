@@ -38,6 +38,7 @@ import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,7 +338,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. */
         private P2<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
                 StreetTraversalPermission permissions, LineString geometry) {
-            double d = from.distance(to.getCoordinate());
+            // get geometry length, irritatingly.
+            Coordinate[] coordinates = geometry.getCoordinates();
+            double d = 0;
+            for (int i = 1; i < coordinates.length; ++i) {
+                d += DistanceLibrary.distance(coordinates[i-1], coordinates[i]);
+            }
 
             Map<String, String> tags = way.getTags();
 
