@@ -21,6 +21,7 @@ import javax.annotation.PostConstruct;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -90,6 +91,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                  }
             }
             if (v instanceof TransitStop) {
+                //only index transit stops that (a) are entrances, or (b) have no associated entrances
+                TransitStop ts = (TransitStop) v;
+                if (!ts.isEntrance()) {
+                    boolean hasEntrance = false;
+
+                    for (Edge e: v.getOutgoing()) {
+                        if (e instanceof PathwayEdge) {
+                            hasEntrance = true;
+                            break;
+                        }
+                    }
+                    if (hasEntrance) {
+                        //transit stop has entrances
+                        continue;
+                    }
+                }
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }

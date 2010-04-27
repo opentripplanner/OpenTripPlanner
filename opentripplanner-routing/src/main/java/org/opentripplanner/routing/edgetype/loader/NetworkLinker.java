@@ -15,11 +15,13 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OneStreetVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -58,6 +60,22 @@ public class NetworkLinker {
             i++;
             
             if (v instanceof TransitStop) {
+                //only connect transit stops that (a) are entrances, or (b) have no associated entrances
+                TransitStop ts = (TransitStop) v;
+                if (!ts.isEntrance()) {
+                    boolean hasEntrance = false;
+
+                    for (Edge e: v.getOutgoing()) {
+                        if (e instanceof PathwayEdge) {
+                            hasEntrance = true;
+                            break;
+                        }
+                    }
+                    if (hasEntrance) {
+                        //transit stop has entrances
+                        continue;
+                    }
+                }
                 Vertex nearestIntersection = index.getClosestVertex(v.getCoordinate(), false);
 
                 if (nearestIntersection != null) {
@@ -93,7 +111,6 @@ public class NetworkLinker {
                         nearestIntersection = newV;
                         graph.addVertex(newV);
                     }
-                    TransitStop ts = (TransitStop) v;
                     boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                     graph.addEdge(new StreetTransitLink(nearestIntersection, v, wheelchairAccessible));
                     graph.addEdge(new StreetTransitLink(v, nearestIntersection, wheelchairAccessible));

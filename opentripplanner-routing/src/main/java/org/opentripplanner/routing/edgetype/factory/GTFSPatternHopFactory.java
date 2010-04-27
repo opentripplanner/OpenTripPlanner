@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
@@ -49,6 +50,7 @@ import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -210,10 +212,8 @@ public class GTFSPatternHopFactory {
     public void run(Graph graph) {
 
         // Load stops
-        for (Stop stop : _dao.getAllStops()) {
-            graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
-                    stop.getLat(), stop.getName(), stop.getId().getId(), stop));
-        }
+        loadStops(graph);
+        loadPathways(graph);
 
         // Load hops
         _log.debug("Loading hops");
@@ -455,6 +455,27 @@ public class GTFSPatternHopFactory {
         deleteUselessDwells(graph);
         shrinkPatterns(graph);
         clearCachedData();
+      }
+
+    private void loadPathways(Graph graph) {
+        for (Pathway pathway : _dao.getAllPathways()) {
+            Vertex fromVertex = graph.getVertex(id(pathway.getFromStop().getId()));
+            Vertex toVertex = graph.getVertex(id(pathway.getToStop().getId()));
+            Edge path;
+            if (pathway.isWheelchairTraversalTimeSet()) {
+                path = new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
+            } else {
+                path = new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
+            }
+            graph.addEdge(path); 
+        }
+    }
+
+    private void loadStops(Graph graph) {
+        for (Stop stop : _dao.getAllStops()) {
+            graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
+                    stop.getLat(), stop.getName(), stop.getId().getId(), stop));
+        }
     }
     /**
      * Replace BasicTripPatterns with ArrayTripPatterns.

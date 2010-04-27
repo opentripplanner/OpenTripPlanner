@@ -101,7 +101,7 @@ public class TestPatternHopFactory extends TestCase {
         for (Edge e : stop_a.getOutgoing()) {
             assertTrue(e instanceof PatternBoard || e instanceof StreetTransitLink);
         }
-
+        
         Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
@@ -466,5 +466,22 @@ public class TestPatternHopFactory extends TestCase {
         endState = path.vertices.lastElement().state;
         assertEquals(new GregorianCalendar(2009, 8, 1, 16, 50, 0).getTimeInMillis(), endState.getTime());
 
+    }
+
+    public void testPathways() throws Exception {
+
+        Vertex entrance = graph.getVertex("agency_entrance_a");
+        assertNotNull(entrance);
+        Vertex stop = graph.getVertex("agency_A");
+        assertNotNull(stop);
+
+        TraverseOptions options = new TraverseOptions(context);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, entrance, stop, new State(
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+        
+        GraphPath path = spt.getPath(stop);
+        assertNotNull(path);
+        State endState = path.vertices.lastElement().state;
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 0, 34).getTimeInMillis(), endState.getTime());
     }
 }

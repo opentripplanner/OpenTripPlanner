@@ -17,16 +17,22 @@ import org.onebusaway.gtfs.model.Stop;
 
 public class TransitStop extends GenericVertex implements Vertex {
     private static final long serialVersionUID = 1L;
-    boolean wheelchairEntrance;
+    private boolean wheelchairEntrance;
+    private boolean isEntrance;
 
     public TransitStop(String id, double lon, double lat, String name, String stopId, Stop stop) {
         super(id, lon, lat, name, stopId);
         if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
         }
+        isEntrance = stop == null ? false : stop.getLocationType() == 2;
     }
 
     public boolean hasWheelchairEntrance() {
         return wheelchairEntrance;
+    }
+
+    public boolean isEntrance() {
+        return isEntrance;
     }
 }
