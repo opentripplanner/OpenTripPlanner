@@ -230,7 +230,6 @@ otp.planner.TripTab = {
         this.renderer.clear();
         
         /* draw topographic map */
-        console.log("HERE");
         if (document.createElement('canvas').getContext) {
             if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
             {
