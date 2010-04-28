@@ -31,7 +31,7 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Jersey</servlet-name>
-        <url-pattern>/ws/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>

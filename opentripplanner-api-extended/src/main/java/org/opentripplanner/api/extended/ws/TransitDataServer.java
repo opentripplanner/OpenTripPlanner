@@ -26,12 +26,9 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -39,12 +36,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.api.extended.ws.model.TransitServerDepartures;
-import org.opentripplanner.api.extended.ws.model.TransitServerDetailedStop;
-import org.opentripplanner.api.extended.ws.model.TransitServerRoute;
-import org.opentripplanner.api.extended.ws.model.TransitServerRoutes;
 import org.opentripplanner.api.extended.ws.model.WmsInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -66,45 +58,11 @@ public class TransitDataServer {
     @Produces("text/html")
     public String getIndex() {
         return "<html><body><h2>The system works</h2></body></html>";
-    }
-    
-    @GET
-    @Path("routes")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public TransitServerRoutes getRoutes() throws JSONException {
-        return new TransitServerRoutes(transitServerGtfs);
-    }
-    
-    @GET
-    @Path("departures")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public TransitServerDepartures getDepartures(@QueryParam("lat") String lat,
-                                                 @QueryParam("lon") String lon,
-                                                 @DefaultValue("3") @QueryParam("n") int n) throws JSONException {
-        String latlon = buildLatLon(lat, lon);
-        return new TransitServerDepartures(latlon, n, transitServerGtfs);
-    }
-    
-    @GET
-    @Path("routes/{route_id}")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public TransitServerRoute getRoute(@PathParam("route_id") String routeId) throws JSONException {
-        return new TransitServerRoute(transitServerGtfs, routeId);
-    }
+    }   
 
     @GET
-    @Path("stop")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public TransitServerDetailedStop getDetailedStop(@QueryParam("lat") String lat,
-                                                     @QueryParam("lon") String lon,
-                                                     @DefaultValue("3") @QueryParam("n") int n) throws JSONException {
-        String latlon = buildLatLon(lat, lon);
-        return new TransitServerDetailedStop(transitServerGtfs, latlon, n);
-    }
-    
-    @GET
     @Path("wms")
-    @Produces( { MediaType.APPLICATION_JSON/*, MediaType.APPLICATION_XML, MediaType.TEXT_XML*/ })
+    @Produces( { MediaType.APPLICATION_JSON })
     public WmsInfo getWmsInfo(@Context UriInfo ui) {
         try {
             String baseAddress = this.transitServerGtfs.getGeoserverBaseUri();
@@ -122,20 +80,6 @@ public class TransitDataServer {
                     }
                     uriBuilder.queryParam(key, val);
                 }
-//                    .queryParam("service", service)
-//                    .queryParam("version", version)
-//                    .queryParam("request", request)
-//                    .queryParam("layers", layers)
-//                    .queryParam("query_layers", query_layers)
-//                    .queryParam("styles", styles)
-//                    .queryParam("bbox", bbox)
-//                    .queryParam("srs", srs)
-//                    .queryParam("feature_count", feature_count)
-//                    .queryParam("x", x)
-//                    .queryParam("y", y)
-//                    .queryParam("height", height)
-//                    .queryParam("width", width)
-//                    .queryParam("info_format", info_format);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 throw new WebApplicationException(400);
@@ -177,34 +121,13 @@ public class TransitDataServer {
                     routeIdsWithAgencyId.add("MTA NYCT " + routeId);
                 }
                 return new WmsInfo(transitServerGtfs, routeIdsWithAgencyId);
-            } else {
-                return new WmsInfo();
-            }
-            
-//            // get the stop for the id
-//            Stop stop = this.transitServerGtfs.getGtfsContext().getDao().getStopForId(new AgencyAndId("MTA NYCT", stopId));
-//            if (stop == null) {
-//                throw new WebApplicationException(404);
-//            }
-//            String latlon = buildLatLon(stop.getLat(), stop.getLon());
-//            return new TransitServerDetailedStop(transitServerGtfs, latlon, 3);
+            }            
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        throw new WebApplicationException(404);
-    }
-    
-    private String buildLatLon(String lat, String lon) {
-        if (lat == null || lon == null) {
-            throw new NullPointerException("Got null for a lat/lon value: " + lat + " - " + lon);
-        }
-        return lat + "," + lon;
-    }
-
-    @SuppressWarnings("unused")
-    private String buildLatLon(double lat, double lon) {
-        return buildLatLon("" + lat, "" + lon);
-    }
+        // returns an empty response
+        return new WmsInfo();
+    }    
 }
