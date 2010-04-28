@@ -98,7 +98,7 @@ public class TransitServerGtfs {
                 "MTA NYCT B20100125W_048250_B..S45R",
                 "MTA NYCT B20100125A_048300_C..S04R",
                 "MTA NYCT B20100125W_048300_D..S14R",
-                "MTA NYCT 20100125W_049100_E..S56R",
+                "MTA NYCT B20100125W_049100_E..S56R",
                 "MTA NYCT B20100125U_048250_F..S69R",
                 "MTA NYCT B20100125U_048050_G..N12R",
                 "MTA NYCT B20100125W_048000_J..N12R",
