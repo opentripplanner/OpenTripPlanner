@@ -44,11 +44,8 @@ public class TransitServerGtfs {
     private Map<String, List<Stop>> routeIdsToStops = new HashMap<String, List<Stop>>();
     private Map<String, List<StopTime>> stopIdsToStopTimes = new HashMap<String, List<StopTime>>();
     private Map<String, Stop> stopIdsToStops = new HashMap<String, Stop>();
-    private Map<String, String> routeIdsToShapePointIds = new HashMap<String, String>();
-    private Map<String, List<ShapePoint>> shapeIdsToShapePoints = new HashMap<String, List<ShapePoint>>();
-    private Map<String, Set<String>> latLonToStopIds = new HashMap<String, Set<String>>();
     private Map<String, Set<String>> stopIdsToRouteIds = new HashMap<String, Set<String>>();
-    
+
     // XXX the list of trip ids that have shapes that are representative of a particular route
     // this was hand generated for new york city
     private Set<String> representativeTripIds;
@@ -154,12 +151,6 @@ public class TransitServerGtfs {
             String tripId = trip.getId().toString();
             
             String stopId = stop.getId().toString();
-            String latLon = stop.getLat() + ","  + stop.getLon();
-            if (!latLonToStopIds.containsKey(latLon)) {
-                latLonToStopIds.put(latLon, new HashSet<String>());
-            }
-            Set<String> stopIdsForLatLon = latLonToStopIds.get(latLon);
-            stopIdsForLatLon.add(stopId);
             
             if (!stopIdsToStopTimes.containsKey(stopId)) {
                 stopIdsToStopTimes.put(stopId, new ArrayList<StopTime>());
@@ -174,7 +165,6 @@ public class TransitServerGtfs {
             if (!representativeTripIds.contains(tripId)) {
                 continue;
             }
-            routeIdsToShapePointIds.put(routeId, shapeId);
             if (!routeIdsToStops.containsKey(routeId)) {
                 routeIdsToStops.put(routeId, new ArrayList<Stop>());
             }
@@ -189,16 +179,6 @@ public class TransitServerGtfs {
             routeIdsForStopId.add(routeId);
             
         }
-        
-        // associate shape points with shape ids
-        for (ShapePoint sp : dao.getAllShapePoints()) {
-            String shapeId = sp.getShapeId().toString();
-            if (!shapeIdsToShapePoints.containsKey(shapeId)) {
-                shapeIdsToShapePoints.put(shapeId, new ArrayList<ShapePoint>());
-            }
-            List<ShapePoint> shapePoints = shapeIdsToShapePoints.get(shapeId);
-            shapePoints.add(sp);
-        }
     }
 
     public List<Route> getRoutes() {
@@ -211,37 +191,9 @@ public class TransitServerGtfs {
         return routeIdsToStops.get(routeId);
     }
 
-    public List<ShapePoint> getShapePointsForRoute(String routeId) {
-        String shapeId = routeIdsToShapePointIds.get(routeId);
-        if (shapeIdsToShapePoints.containsKey(shapeId))
-            return shapeIdsToShapePoints.get(shapeId);
-        else {
-            return new ArrayList<ShapePoint>();
-        }
-    }
-
     public Route getRoute(String routeId) {
         return routeIdsToRoutes.get(routeId);
-    }
-    
-    public List<Stop> getStopsForLatLon(String latlon) {
-        if (latLonToStopIds.containsKey(latlon)) {
-            Set<String> stopIds = latLonToStopIds.get(latlon);
-            List<Stop> stops = new ArrayList<Stop>();
-            for (String stopId : stopIds) {
-                Stop stop = stopIdsToStops.get(stopId);
-                stops.add(stop);
-            }
-            return stops;
-        } else {
-            System.out.println("No stops found for lat lon: " + latlon);
-            return new ArrayList<Stop>();
-        }
-    }
-    
-    public Map<String, Set<String>> getLatLonsToStopIds() {
-        return latLonToStopIds;
-    }
+    }    
 
     public List<StopTime> getStopTimesForStopId(String stopId) {
         if (stopIdsToStopTimes.containsKey(stopId)) {
@@ -265,5 +217,4 @@ public class TransitServerGtfs {
             return new HashSet<String>();
         }
     }
-
 }
