@@ -20,6 +20,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -28,16 +33,19 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.extended.ws.model.TransitServerDepartures;
 import org.opentripplanner.api.extended.ws.model.TransitServerDetailedStop;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoute;
 import org.opentripplanner.api.extended.ws.model.TransitServerRoutes;
+import org.opentripplanner.api.extended.ws.model.WmsInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -97,40 +105,37 @@ public class TransitDataServer {
     @GET
     @Path("wms")
     @Produces( { MediaType.APPLICATION_JSON/*, MediaType.APPLICATION_XML, MediaType.TEXT_XML*/ })
-    public TransitServerDetailedStop getWmsInfo(@QueryParam("SERVICE") String service,
-                             @QueryParam("VERSION") String version,
-                             @QueryParam("REQUEST") String request,
-                             @QueryParam("LAYERS") String layers,
-                             @QueryParam("QUERY_LAYERS") String query_layers,
-                             @QueryParam("STYLES") String styles,
-                             @QueryParam("BBOX") String bbox,
-                             @QueryParam("SRS") String srs,
-                             @QueryParam("FEATURE_COUNT") String feature_count,
-                             @QueryParam("X") String x,
-                             @QueryParam("Y") String y,
-                             @QueryParam("HEIGHT") String height,
-                             @QueryParam("WIDTH") String width,
-                             @QueryParam("INFO_FORMAT") String info_format
-                             ) {
+    public WmsInfo getWmsInfo(@Context UriInfo ui) {
         try {
             String baseAddress = this.transitServerGtfs.getGeoserverBaseUri();
             UriBuilder uriBuilder = null;
             try {
-                uriBuilder = UriBuilder.fromUri(baseAddress)
-                    .queryParam("service", service)
-                    .queryParam("version", version)
-                    .queryParam("request", request)
-                    .queryParam("layers", layers)
-                    .queryParam("query_layers", query_layers)
-                    .queryParam("styles", styles)
-                    .queryParam("bbox", bbox)
-                    .queryParam("srs", srs)
-                    .queryParam("feature_count", feature_count)
-                    .queryParam("x", x)
-                    .queryParam("y", y)
-                    .queryParam("height", height)
-                    .queryParam("width", width)
-                    .queryParam("info_format", info_format);
+                uriBuilder = UriBuilder.fromUri(baseAddress);
+                MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
+                for (Entry<String, List<String>> entrySet : queryParams.entrySet()) {
+                    String key = entrySet.getKey();
+                    List<String> vals = entrySet.getValue();
+                    // we only expect the first anyway
+                    String val = vals.get(0);
+                    if (vals.size() > 1) {
+                        System.out.println("*** got more than one value for: " + key + " - using first: " + val);
+                    }
+                    uriBuilder.queryParam(key, val);
+                }
+//                    .queryParam("service", service)
+//                    .queryParam("version", version)
+//                    .queryParam("request", request)
+//                    .queryParam("layers", layers)
+//                    .queryParam("query_layers", query_layers)
+//                    .queryParam("styles", styles)
+//                    .queryParam("bbox", bbox)
+//                    .queryParam("srs", srs)
+//                    .queryParam("feature_count", feature_count)
+//                    .queryParam("x", x)
+//                    .queryParam("y", y)
+//                    .queryParam("height", height)
+//                    .queryParam("width", width)
+//                    .queryParam("info_format", info_format);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 throw new WebApplicationException(400);
@@ -140,21 +145,49 @@ public class TransitDataServer {
             URL url = new URL(urlString);
             URLConnection conn = url.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-            // read one line of the response
-            // which should be the actual stop id
-            String stopId = reader.readLine();
-            if (stopId == null) {
-                throw new WebApplicationException(404);
+
+            // parse the geoserver response for stops and routes
+            Pattern pattern = Pattern.compile("(stops|routes).(\\S+)");
+            String line = null;
+            List<String> stopIds = new ArrayList<String>();
+            List<String> routeIds = new ArrayList<String>();
+            while ((line = reader.readLine()) != null) {
+                Matcher m = pattern.matcher(line);
+                while (m.find()) {
+                    String matchType = m.group(1);
+                    if (matchType.equals("stops")) {
+                        stopIds.add(m.group(2));
+                    } else if (matchType.equals("routes")) {
+                        routeIds.add(m.group(2));
+                    }
+                }
             }
             reader.close();
 
-            // get the stop for the id
-            Stop stop = this.transitServerGtfs.getGtfsContext().getDao().getStopForId(new AgencyAndId("MTA NYCT", stopId));
-            if (stop == null) {
-                throw new WebApplicationException(404);
+            // if we have any stops, then that's the type of result we return
+            if (stopIds.size() > 0) {
+                // if we've found any stop ids then we we use the first one
+                String stopId = stopIds.get(0);
+                return new WmsInfo(transitServerGtfs, new AgencyAndId("MTA NYCT", stopId));
+            } else if (routeIds.size() > 0) {
+                // we have only route ids back
+                // first we have to convert the ids to have the agency and id on them too
+                List<String> routeIdsWithAgencyId = new ArrayList<String>();
+                for (String routeId : routeIds) {
+                    routeIdsWithAgencyId.add("MTA NYCT " + routeId);
+                }
+                return new WmsInfo(transitServerGtfs, routeIdsWithAgencyId);
+            } else {
+                return new WmsInfo();
             }
-            String latlon = buildLatLon(stop.getLat(), stop.getLon());
-            return new TransitServerDetailedStop(transitServerGtfs, latlon, 3);
+            
+//            // get the stop for the id
+//            Stop stop = this.transitServerGtfs.getGtfsContext().getDao().getStopForId(new AgencyAndId("MTA NYCT", stopId));
+//            if (stop == null) {
+//                throw new WebApplicationException(404);
+//            }
+//            String latlon = buildLatLon(stop.getLat(), stop.getLon());
+//            return new TransitServerDetailedStop(transitServerGtfs, latlon, 3);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -170,6 +203,7 @@ public class TransitDataServer {
         return lat + "," + lon;
     }
 
+    @SuppressWarnings("unused")
     private String buildLatLon(double lat, double lon) {
         return buildLatLon("" + lat, "" + lon);
     }

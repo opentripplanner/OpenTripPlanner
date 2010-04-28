@@ -135,7 +135,7 @@ otp.systemmap.Systemmap = {
                             } catch(err) {
                                 return;
                             }
-                            if (!doc.type || doc.type !== 'stop') {
+                            if (!doc || !doc.type || doc.type !== 'stop') {
                                 return;
                             }
                             doc = doc.stop;
@@ -177,11 +177,10 @@ otp.systemmap.Systemmap = {
                             } catch (err) {
                                 return;
                             }
-                            if (!doc.type || !(doc.type === 'stop' || doc.type === 'routes')) {
+                            if (!doc || !doc.type || !(doc.type === 'stop' || doc.type === 'routes')) {
                                 return;
                             }
                             if (doc.type === 'routes') {
-                                the_doc = doc;
 
                                 // highlight all stops on the routes
                                 var stopIds = [];

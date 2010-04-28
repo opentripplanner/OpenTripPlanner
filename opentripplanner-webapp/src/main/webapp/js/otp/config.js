@@ -8,13 +8,17 @@ otp.config = {
         // these match up with geoserver
         layerUrlRoutes: 'http://routelayer.example.com/wms',
         layerUrlStops: 'http://stoplayer.example.com/wms',
+        layerUrlRoutesHighlighted: 'http://routelayerhighlighted.example.com/wms',
+        layerUrlStopsHighlighted: 'http://stoplayerhighlighted.example.com/wms',
         layerNamesRoute: 'routeLayerName',
         layerNamesStop: 'stopLayerName',
+        layerNamesRouteHighlighted: 'routeLayerHighlightedName',
+        layerNamesStopHighlighted: 'stopLayerHighlightedName',
         
         // this is the uri to the extended api that proxies to geoserver
-        controlStopsUrl: '/opentripplanner-api-extended/ws/wms'
+        controlStopsUrl: '/opentripplanner-api-extended/wms'
     },
-    
+
     'map': {
         // The default extent to zoom the map to when the web app loads.
         // This can either be an OpenLayers.Bounds object or the string "automatic"
