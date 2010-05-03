@@ -219,5 +219,75 @@ otp.util.StringFormattingUtils = {
         return retVal;
     }, 
 
+    /**
+     * utility to convert z[][] to a[] (made up of z[][i] values)
+     */
+    arraysToStrings: function(arrays, indx, blankVal)
+    {
+        var retVal = [];
+        var i = 0;
+        if(indx != null && indx >= 0 && indx <=100)
+            i = indx;
+
+        for(var p in arrays)
+        {
+            var v = arrays[p][i];
+            if(v == "" && blankVal)
+                v = blankVal;
+
+            retVal[p] = v; 
+            //alert(p + ' : ' + retVal[p]);
+        }
+        
+        return retVal;
+    },
+
+    /** */
+    stripNonPrints : function(inStr)
+    {
+        // strip non printable 
+        return inStr.replace(/[^a-zA-Z0-9&@()*_\-\', ]/g,"");
+    },
+
+    /** stub to remove bad words (if open to public) */
+    stripCurseWords : function(inStr)
+    {
+        var retVal = inStr;
+        return retVal;
+    },
+
+    /** */
+    maxLen : function(inStr, maxSize)
+    {
+        if (!maxSize) maxSize = 100; 
+            
+        if (!inStr.length > maxSize) 
+            inStr = inStr.substr(0, maxSize);
+            
+        return inStr;
+    },
+
+
+    /** */
+    clean : function(inStr, defStr, maxSize)
+    {
+        var retVal = inStr;
+        try
+        {
+            if(!defStr)  defStr  = inStr;
+
+            inStr = trimet.utils.StringUtils.stripNonPrints(inStr);
+            inStr = trimet.utils.StringUtils.stripCurseWords(inStr);
+            inStr = trimet.utils.StringUtils.maxLen(inStr, maxSize);
+            retVal = inStr;
+        }
+        catch(ex)
+        {
+            retVal = defStr;
+        }
+        
+        return retVal;
+    },
+
     CLASS_NAME: "otp.util.StringFormattingUtils"
 };

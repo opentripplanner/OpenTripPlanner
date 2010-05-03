@@ -212,7 +212,8 @@ otp.locale.English = {
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle']
+            ['BICYCLE', 'Bicycle'],
+            ['TRANSIT,BICYCLE', 'Transit & Bicycle']
         ],
 
         wheelchair :

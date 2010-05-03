@@ -45,6 +45,39 @@ otp.util.ObjUtils = {
      },
 
     /** */
+    deleteFromArray : function (arr, val, all) 
+    {
+        var retVal = arr;
+        try
+        {
+            if(this.isArray(arr))
+            {
+                retVal = new Array();
+                var cullVal = true;
+                for(var i = 0; i < arr.length; i++)
+                {
+                    if(arr[i] == val && cullVal)
+                    {
+                        // if we're only culling the first, set our flag
+                        if(!all)
+                            cullVal = false;
+
+                        // move to next value without copying to output array
+                        continue;
+                    }
+                    // add this value (!= val) to return array 
+                    retVal.push(arr[i]);
+                } 
+            }
+        }
+        catch(e)
+        {}
+
+        return retVal;
+     },
+    
+
+    /** */
     getBottomArray : function(arr, maxDepth)
     {
         var retVal = null;

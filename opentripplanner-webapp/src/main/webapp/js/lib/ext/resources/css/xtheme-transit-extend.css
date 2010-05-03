@@ -1143,7 +1143,7 @@ background-position:-153px 0;
 .x-form-field-wrap .x-form-spinner-splitter {
 line-height:1px;
 font-size:1px;
-background:transparent url(/js/extjs/resources/spinner-split.gif) no-repeat 0 0;
+background:transparent url(../images/spinner-split.gif) no-repeat 0 0;
 position:absolute;
 cursor:n-resize;
 }
@@ -1498,14 +1498,11 @@ left: 285px !important; /* fragile - quick pass to position over the dropdown bu
 }
 
 .nudgeRight {
-
 }
 
-.tallLeft {
+.msgButton {
 position: relative;
-top: -40px;
 margin-bottom: -10px;
-left: 320px;
 }
 
 .tallLeft .x-btn-small .x-btn-text {
@@ -1623,11 +1620,5 @@ padding: 0;
 }
 
 .olHoverPopup .olPopupCloseBox {
-display: none;
-}
-
-#x-form-el-from\.id,
-#x-form-el-to\.id,
-.tallLeft {
 display: none;
 }

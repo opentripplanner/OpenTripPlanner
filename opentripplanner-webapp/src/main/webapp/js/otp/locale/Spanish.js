@@ -198,7 +198,8 @@ otp.locale.Spanish = {
             ['BUSISH,WALK', 'Solo Bus'],
             ['TRAINISH,WALK', 'Solo Tren'],
             ['WALK', 'Solo a pié'],
-            ['BICYCLE', 'Bicicleta']
+            ['BICYCLE', 'Bicicleta'],
+            ['TRANSIT,BICYCLE', 'Tránsito y Bicicleta']
         ],
 
         wheelchair :

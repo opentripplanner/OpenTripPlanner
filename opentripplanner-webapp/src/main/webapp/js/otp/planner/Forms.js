@@ -41,6 +41,8 @@ otp.planner.StaticForms = {
 
     m_fromForm       : null,
     m_toForm         : null,
+    fromToOverride   : null,  // over-ride me to get rid of From / To from with something else
+
     m_date           : null,
     m_time           : null,
     m_arriveByStore       : null,
@@ -131,14 +133,16 @@ otp.planner.StaticForms = {
         this.hideErrorDialogs();
 
         // step 3: fixe up some of the form values before sending onto the trip planner web service
-        var toPlaceVal   = this.m_toForm.getRawValue();
+        var toPlaceVal = this.m_toForm.getRawValue();
+        if(toPlaceVal == null || toPlaceVal.length < 1)
+            toPlaceVal = this.m_toCoord;
+
         var fromPlaceVal = this.m_fromForm.getRawValue();
-        var toCoordVal   = otp.util.ObjUtils.getCoordinate(this.m_toCoord);
-        var fromCoordVal = otp.util.ObjUtils.getCoordinate(this.m_fromCoord);
+        if(fromPlaceVal == null || fromPlaceVal.length < 1)
+            fromPlaceVal = this.m_fromCoord;
+
         form.setValues({
-            fromCoord: fromCoordVal,
             fromPlace: fromPlaceVal,
-            toCoord:   toCoordVal,
             toPlace:   toPlaceVal
         });
     },
@@ -271,15 +275,15 @@ otp.planner.StaticForms = {
                 code     = Ext.DomQuery.selectValue('id', err);
                 if (!message && code)
                 {
-                	try
-                	{
-                	    code = parseInt(code);
-                	}
-                	catch (e)
-                	{
-                		code = 500;
-                	}
-                	message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
+                    try
+                    {
+                        code = parseInt(code);
+                    }
+                    catch (e)
+                    {
+                        code = 500;
+                    }
+                    message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
                 }
                 otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_ERROR + "/" + code);
             }
@@ -362,7 +366,7 @@ otp.planner.StaticForms = {
     setFrom : function(fString, x, y, moveMap, noPoi)
     {
         this.focus();
-        this.m_fromForm.setRawValue(fString);
+        otp.util.ExtUtils.formSetRawValue(this.m_fromForm, fString);
         if(x && x > -181.1 && y && y > -181.1) 
         {
             this.m_fromCoord = x + ',' + y;
@@ -377,7 +381,7 @@ otp.planner.StaticForms = {
     setTo : function(tString, x, y, moveMap, noPoi)
     {
         this.focus();
-        this.m_toForm.setRawValue(tString);
+        otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString);
         if(x && x > -180.1 && y && y > -181.1) 
         {
             this.m_toCoord = x + ',' + y;
@@ -385,18 +389,18 @@ otp.planner.StaticForms = {
         }
     },
 
+    /** a simple helper class to set data in a form */
     setRawInput : function(p, f)
     {
         var retVal = false;
 
-        // since we're 
         if(p != null 
         && p !== true 
         && p != "true" 
         && p.match('Address, .*Stop ID') == null
         )
         {
-            f.setRawValue(p);
+            otp.util.ExtUtils.formSetRawValue(f, p);
             retVal = true;
         }
 
@@ -439,9 +443,35 @@ otp.planner.StaticForms = {
                 forms.m_date.setRawValue(params.on);
                 date = true;
             }
-            if(params.arriveBy)
-                forms.m_arriveByForm.setValue(params.arriveBy);
             
+            // arrive by parameter 
+            if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "A"))
+                forms.m_arrForm.setValue('A');
+            if(params.arr && (params.arr.indexOf("rive") > 0 || params.arr == "A"))
+                forms.m_arrForm.setValue('A');
+            if(params.Arr && (params.Arr.indexOf("rive") > 0 || params.Arr == "A"))
+                forms.m_arrForm.setValue('A');
+            if(params.arrParam && (params.arrParam.indexOf("part") > 0 || params.arrParam == "D"))
+                forms.m_arrForm.setValue('D');
+            if(params.arr && (params.arr.indexOf("part") > 0 || params.arr == "D"))
+                forms.m_arrForm.setValue('D');
+            if(params.Arr && (params.Arr.indexOf("part") > 0 || params.Arr == "D"))
+                forms.m_arrForm.setValue('D');
+            if(params.after)
+            {
+                time = params.after.replace(/\./g, "");
+                forms.m_time.setRawValue(time);
+                forms.m_arrForm.setValue('D');
+                time = true;
+            }
+            else if(params.by)
+            {
+                time = params.by.replace(/\./g, "");
+                forms.m_time.setRawValue(time);
+                forms.m_arrForm.setValue('A');
+                time = true;
+            }
+
             if(params.time)
             {
                 time = params.time.replace(/\./g, "");
@@ -458,8 +488,17 @@ otp.planner.StaticForms = {
                 forms.m_modeForm.setValue(params.mode);
             if(params.wheelchair)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
-            
+
             // stupid trip planner form processing...
+
+            // Hour=7&Minute=02&AmPm=pm
+            if(!time && params.Hour && params.Minute && params.AmPm)
+            {
+                time = params.Hour + ":" +  params.Minute + " " + params.AmPm.toLowerCase();
+                time = time.replace(/\./g, "");
+                forms.m_time.setRawValue(time);
+                time = true;
+            }
 
             // &month=Oct&day=7
             if(!date && params.month && params.day)
@@ -590,10 +629,19 @@ otp.planner.StaticForms = {
     makeMainPanel : function()
     {
         var fromToForms = this.makeFromToForms();
+        var dateTime    = this.makeDateTime();
+        var fromToArray = [fromToForms, dateTime];
+
+        // override will override the display of the from & to form
+        if(this.fromToOverride)
+        {
+            fromToArray = [this.fromToOverride, dateTime];
+        }
+
         var fromToFP = new Ext.form.FieldSet({
             labelWidth:  40,
             border:      false,
-            items:       fromToForms
+            items:       fromToArray
         });
 
         var optForms = this.makeOptionForms();
@@ -619,10 +667,10 @@ otp.planner.StaticForms = {
             keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
-                            new Ext.form.Hidden({name: 'toCoord',   value: ''}),
-                            new Ext.form.Hidden({name: 'fromCoord', value: ''}),
-            								new Ext.form.Hidden({name: 'intermediatePlaces', value: ''}),
-														this.m_submitButton
+                            new Ext.form.Hidden({name: 'toPlace',   value: ''}),
+                            new Ext.form.Hidden({name: 'fromPlace', value: ''}),
+                            new Ext.form.Hidden({name: 'intermediatePlaces', value: ''}),
+                            this.m_submitButton
                          ],
 
             // configure how to read the XML Data
@@ -641,25 +689,29 @@ otp.planner.StaticForms = {
         });
     },
 
+
     /**
      * from & to form creation
+     * NOTE: defining fromToOverride (needs to be at least a Template, of not another form) will 
+     *       override the display of the from & to defined here
      */
     makeFromToForms : function()
-    {        
+    {
         // step 1: these give the from & to forms 'memory' -- all submitted strings are saved off in the cookie for latter use
         Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        this.m_fromForm = new otp.core.ComboBox({layout: 'anchor', id: 'from.id', name: 'fromPlace', emptyText: this.locale.tripPlanner.labels.from, label: '', cls: 'nudgeRight'});
-        this.m_toForm   = new otp.core.ComboBox({layout: 'anchor', id: 'to.id',   name: 'toPlace', emptyText: this.locale.tripPlanner.labels.to, label: '', cls: 'nudgeRight'});
+        this.m_fromForm = new otp.core.ComboBox({layout: 'anchor', id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from, label: '', cls: 'nudgeRight'});
+        this.m_toForm   = new otp.core.ComboBox({layout: 'anchor', id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to, label: '',   cls: 'nudgeRight'});
         var rev  = new Ext.Button({
             tooltip:   this.locale.buttons.reverseMiniTip,
+            id:        "form.reverse.id",
             iconCls:   "reverse-button",
+            cls:      'formReverseButton', 
             hideLabel: true,
             scope:     this,
             tabIndex:  -1,
-						cls: 			 'tallLeft', 
             handler : function(obj)
             {
                 this.m_fromForm.reverse(this.m_toForm);
@@ -673,19 +725,54 @@ otp.planner.StaticForms = {
         this.m_toForm.getComboBox().on(  {scope: this, focus  : this.clearTo    });
         this.m_toForm.getComboBox().on(  {scope: this, select : this.selectTo   });
 
+        var inputPanel = {
+            xtype:    'panel',
+            border:    false,
+            layout:    'column',
+            items: [
+                {
+                    columnWidth: 0.90,
+                    layout: 'form',
+                    border: false,
+                    items: [
+                        this.m_fromForm.getComboBox(),
+                        this.m_toForm.getComboBox()
+                    ]
+                }
+                ,
+                {
+                    bodyStyle: 'padding-top:15px',
+                    columnWidth: 0.07,
+                    layout: 'anchor',
+                    border: false,
+                    items: [rev]
+                }
+            ]
+        };
+
+        return inputPanel;
+    },
+
+
+    /**
+     * from & to form creation
+     */
+    makeDateTime : function()
+    {
         this.m_date = new Ext.form.DateField({
             id:         'trip-date-form',
             fieldLabel: this.locale.tripPlanner.labels.date,
             name:       'date',
             format:     'm/d/Y',
             allowBlank: false,
+            msgTarget:  'qtip',
             anchor:     "95%",
             value:      new Date().format('m/d/Y')
         });
 
         this.m_arriveByStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
         this.m_arriveByForm  = new Ext.form.ComboBox({
-            id:             'trip-arrive-form',
+                id:             'trip-arrive-form',
                 name:           'arriveBy',
                 hiddenName:     'arriveBy',
                 fieldLabel:     this.locale.tripPlanner.labels.when,
@@ -709,6 +796,7 @@ otp.planner.StaticForms = {
                 fieldLabel : this.locale.tripPlanner.labels.when,
                 accelerate : true,
                 width      : 85,
+                msgTarget  : 'qtip',
                 value      : new Date().format('g:i a'),
                 strategy   : new Ext.ux.form.Spinner.TimeStrategy({format:'g:i a'}),
                 name       : 'time'
@@ -731,7 +819,6 @@ otp.planner.StaticForms = {
                     columnWidth: 0.33,
                     layout: 'anchor',
                     border: false,
-                    //labelWidth: 5,
                     items: [this.m_date]
                 }
                 ,
@@ -745,11 +832,7 @@ otp.planner.StaticForms = {
             ]
         };
 
-
-				var tempToFromText = new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>");
-
-        //return [this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel];
-				return [tempToFromText, this.m_fromForm.getComboBox(), this.m_toForm.getComboBox(), rev, timePanel]; 
+        return timePanel;
     },
 
 

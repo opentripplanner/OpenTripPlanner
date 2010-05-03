@@ -83,7 +83,7 @@ otp.planner.poi.Popup = {
     {
         if(text)
         {
-            //text = otp.utils.StringUtils.clean(text);
+            text = otp.util.StringFormattingUtils.clean(text);
             if(text && text.length > 0)
                 this.contentHTML = text;
         }

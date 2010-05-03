@@ -79,7 +79,7 @@ otp.core.MapStatic = {
     initialize : function(config)
     {
         otp.configure(this, config);
-        
+
         this.map = otp.util.OpenLayersUtils.makeMap(this.mapDiv, this.options);
         if (this.baseLayer == null) {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
@@ -89,7 +89,7 @@ otp.core.MapStatic = {
         this.map.setBaseLayer(this.baseLayer, true);
 
         otp.core.MapSingleton = this;
-        
+
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
@@ -288,7 +288,10 @@ otp.core.MapStatic = {
     /** */
     zoomIn : function()
     {
-        this.map.zoomIn();
+        // bug in OL 2.8 that does not allow zoomIn() to work without first doing a zoomout...so we do it the long way...
+        var zoom = this.map.getZoom();
+        zoom++;
+        this.map.zoomTo(zoom);
     },
 
     /** */

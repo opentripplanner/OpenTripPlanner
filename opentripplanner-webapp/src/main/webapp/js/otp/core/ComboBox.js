@@ -28,9 +28,12 @@ otp.core.ComboBox = {
     name         : 'cb.name',
     label        : 'Form',
     display      : 'display',
-    emptyText    : '...',
-		cls					 : '',
+    cls          : '',
 
+    anchor       : '95%',
+    msgTarget    : 'qtip',
+    emptyText    : '...',
+    maxHeight    : 150,
     /**
      * constructor of sorts
      */
@@ -53,24 +56,25 @@ otp.core.ComboBox = {
 
         this.m_form  = new Ext.form.ComboBox({
             id:            this.id,
+            cls:           this.cls,
             hiddenName:    this.name,
             fieldLabel:    this.label,
             displayField:  this.display,
+            msgTarget:     this.msgTarget,
             tpl:           this.m_template,
             emptyText:     this.emptyText,
             valueNotFoundText: '',
             store:         this.m_store,
             mode:          'local',
-            anchor:        '95%',
+            anchor:        this.anchor,
             triggerAction: 'all',
             allowBlank:    false,
             typeAhead:     false,
             resizable:     true,
-            maxHeight :    150,
+            maxHeight :    this.maxHeight,
             lazyRender:    false,
             selectOnFocus: true,
-						hideLabel: true,
-						cls: this.cls
+            hideLabel:     true
         });
     },
 

@@ -515,7 +515,43 @@ otp.util.OpenLayersUtils = {
       this.map.setCenter(lon_lat);
     },
 
-    
+    /** event handler for zomming into the layer upon feature load */
+    zoomToLoadedFeatures : function(map, layer)
+    {
+        try 
+        {
+            layer.events.on({
+                "loadend" : function(o, e)
+                {
+                    var dx = layer.getDataExtent();
+                    map.zoomToExtent(dx);
+                }
+            });
+        }
+        catch(e)
+        {
+            console.log("ERROR: " + e)
+        }
+    },
+
+    /**
+     * make a ZOOM IN / ZOOM OUT link that controls the map 
+     */
+    makeZoomLink: function(inText, outText)
+    {
+        if(inText == null   || inText.length < 1)
+            inText = 'Zoom in';
+        if(outText == null || outText.length < 1)
+            outText = 'Zoom out';
+
+        return '<ul class=”links”>' +
+             '<li>' +
+             '<a href="#zoomIn" onclick="otp.core.MapSingleton.zoomIn();"   title="' + inText + '">' + inText + '</a>  ' +
+             ' | ' +
+             '<a href="#zoomOut" onclick="otp.core.MapSingleton.zoomOut();" title="' + outText + '">' + outText + '</a>' +
+             '</li>' +
+             '</ul>';
+    },
 
     ///////////// MISC UTILS ///////////// MISC UTILS ///////////// MISC UTILS ///////////// MISC UTILS /////////////
 

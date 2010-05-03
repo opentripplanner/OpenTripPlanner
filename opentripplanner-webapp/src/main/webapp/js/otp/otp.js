@@ -261,8 +261,8 @@ otp.configure = function(destination, source, getAll) {
             var value = source[property];
             var exist = destination[property];
 
-            // copy the variable to the destination as long as it's not null, and the desination is not a function 
-            if(value != null && value.call == null && value.apply == null && (exist !== undefined || getAll == true))
+            // copy the variable to the destination as long as it's not null, and the source is either a simple  object or an Ext Template
+            if(value != null && typeof value !== 'function' && (exist !== undefined || getAll == true))
             {
                 destination[property] = value;
             }

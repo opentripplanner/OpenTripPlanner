@@ -20,9 +20,6 @@ otp.namespace("otp.application");
  */
 otp.application.Controller = {
 
-    // config
-    url        : null,
-
     // creation
     map        : null,
     ui         : null,
@@ -30,22 +27,23 @@ otp.application.Controller = {
     cm         : null,
     planner    : null,
     params     : null,
-    
+
     /** */
     initialize : function(config)
     {
-        //otp.configure(this, config);
         this.config = config;
-        
+        if(this.config == null || this.config.map == null)
+            this.config = otp.config;
+
         Ext.apply(this.config.map, {
-        	cm               : this.cm, 
+            cm               : this.cm, 
             attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
             options: {
-        	     controls: []
-        	}
+                 controls: []
+            }
         });
 
-        this.params  = new otp.utils.ParseUrlParams();
+        this.params  = new otp.util.ParseUrlParams();
         this.map  = new otp.core.Map(this.config.map);
         this.ui   = new otp.core.UI({map:this.map});
 
@@ -60,17 +58,23 @@ otp.application.Controller = {
 
         // initialize utilities
         otp.util.imagePathManager.addCustomAgencies(this.config.useCustomIconsForAgencies);
-        
+
         ////////// trip planner ///////////
-        this.poi     = new otp.planner.poi.Control({map:this.map.getMap()});
-        this.planner = new otp.planner.Planner({url:this.url, map:this.map, poi:this.poi, ui:this.ui});
+        this.poi  = new otp.planner.poi.Control({map:this.map.getMap()});
+        var  purl = this.params.getPlannerUrl(this.config.planner.url);
+        var  pconfig = this.config.planner;
+        pconfig.url = purl;
+        pconfig.map = this.map;
+        pconfig.poi = this.poi;
+        pconfig.ui  = this.ui;;
+        this.planner = new otp.planner.Planner(pconfig);
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 
         if (this.config.systemMap.enabled) {
             this.sm = new otp.systemmap.Systemmap(Ext.apply({}, {map: this.map}, config.systemMap));
         }
-        
+
         this.ui.doLayout();
 
         this.load();
@@ -82,9 +86,8 @@ otp.application.Controller = {
     */
     load : function()
     {
-        // do the POI and the openTool stuff (and if a POI exists, suspend
-        // the pan on the tool)
-        // var p = this.params.getPoi(this.poi, this.map);
+        // do the POI and the openTool stuff (and if a POI exists, suspend the pan on the tool)
+        var p = this.params.getPoi(this.poi, this.map);
 
         // trip planner forms
         var forms = this.planner.getForms();

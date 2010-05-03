@@ -19,6 +19,11 @@ otp.config = {
         controlStopsUrl: '/opentripplanner-api-extended/wms'
     },
 
+    'planner': {
+        'url'            : null,
+        'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
+    },
+
     'map': {
         // The default extent to zoom the map to when the web app loads.
         // This can either be an OpenLayers.Bounds object or the string "automatic"
@@ -57,19 +62,19 @@ otp.config = {
     // if specified, uri path to a custom logo
     // otherwise use the default "images/ui/logoSmall.png"
     'logo': null,
-    
+
     // List of agency IDs (as specified in GTFS) for which custom icons should be used.
     // Icons should be placed in the custom directory (e.g., custom/nyct)
     // Ex. ['nyct', 'mnr']
     'useCustomIconsForAgencies': [],
-    
-    // Context menu with trip planning options (e.g., "Start trip here")
-    plannerContextMenu : true,
-    
+
     // Metrics system
     //metricsSystem : 'international', // => meters, km
     metricsSystem : 'english', // => feet, miles
-    
+
+    // Context menu with trip planning options (e.g., "Start trip here")
+    plannerContextMenu : true,
+
     // Context menu with general map features (e.g., "Center map here")
     mapContextMenu : false
 

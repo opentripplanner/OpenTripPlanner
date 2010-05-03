@@ -103,6 +103,35 @@ otp.util.ExtUtils = {
     ABOUT_MAP_WINDOW   : null,
 
 
+    /** first five params are required...config param is optional to override things */
+    makeJsonStore : function(url, id, total, root, fields, config)
+    {
+        // json reader / store
+        var c = {
+            proxy: new Ext.data.HttpProxy({method: 'GET', url:url}),
+
+            // store config
+            autoDestroy     : true,
+            autoSave        : false,
+            autoLoad        : false,
+            restful         : false,  // false = load() request is a POST; true = request becomes a GET
+
+            // reader configs
+            idProperty      : id,
+            totalProperty   : total,
+            root            : root,
+            fields          : fields
+        };
+        trimet.extend(c, config);
+
+        var retVal = new Ext.data.JsonStore(c);
+        retVal.proxy.on("exception",
+            function(p, type, action){console.log("EXCEPTION: ExtUtils.makeJsonStore error type:", type, ", action:", action);}
+        );
+        return retVal;
+    },
+
+
     /** */
     setCookie : function(name, value, date, path, domain) 
     {
@@ -215,6 +244,21 @@ otp.util.ExtUtils = {
         if(height) c.height = height;
 
         return otp.util.ExtUtils.makePopupWithConfig(c, isShow, closeable, noCloseButton);
+    },
+
+
+    /**
+     * within an exception block because if the form is hidden, Ext throws an error
+     */
+    formSetRawValue : function(form, value)
+    {
+        try
+        {
+            form.setRawValue(value);
+        }
+        catch(e)
+        {
+        }
     },
 
     /** 

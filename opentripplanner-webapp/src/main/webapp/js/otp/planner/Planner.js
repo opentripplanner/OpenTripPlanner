@@ -35,6 +35,7 @@ otp.planner.Planner = {
     // configuration
     url                     : null,
     poi                     : null,
+    fromToOverride          : null,
 
     // new tab (itineraries tabs) management
     m_tabs        : null,

@@ -11,13 +11,13 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
-otp.namespace("otp.utils");
+otp.namespace("otp.util");
 
 /**
  * Parses the URL parameters, and if there's an X & Y, we put that point up (along with a popup)
  * @class
  */
-otp.utils.ParseUrlParams = {
+otp.util.ParseUrlParams = {
 
     staticControl : null,
     m_params      : null,
@@ -123,7 +123,7 @@ otp.utils.ParseUrlParams = {
             }
             else if(map)
             {
-                otp.utils.OpenLayersUtils.setCenter(map, h.x, h.y, h.z);
+                otp.util.OpenLayersUtils.setCenter(map, h.x, h.y, h.z);
             }
         }
         catch(e)
@@ -144,7 +144,7 @@ otp.utils.ParseUrlParams = {
     parseQueryStrToStrings: function(q)
     {
         var obj = this.parseQueryStrToArrays(q);
-        return otp.utils.StringUtils.arraysToStrings(obj);
+        return otp.util.StringFormattingUtils.arraysToStrings(obj);
     },
 
     /**
@@ -218,7 +218,28 @@ otp.utils.ParseUrlParams = {
         
         return retVal;
     },
-    CLASS_NAME: "otp.utils.ParseUrlParams"
+
+    /**
+     * Trip Planner URL can be sent in as a url parameter (good for dev/debugging the UI)
+     * GET PARAM: purl=/test/file/path.xml
+     */
+    getPlannerUrl : function(defVal)
+    {
+        var retVal = defVal;
+        try
+        {
+            var u = this.getParamValue('purl');
+            if(u != null)
+                retVal = u;
+        }
+        catch(exp)
+        {
+        }
+        
+        return retVal;
+    },
+
+    CLASS_NAME: "otp.util.ParseUrlParams"
 };
 
-otp.utils.ParseUrlParams = new otp.Class(otp.utils.ParseUrlParams);
+otp.util.ParseUrlParams = new otp.Class(otp.util.ParseUrlParams);
