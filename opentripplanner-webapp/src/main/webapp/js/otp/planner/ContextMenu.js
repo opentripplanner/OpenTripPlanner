@@ -22,6 +22,8 @@ otp.planner.ContextMenu = {
     forms    : null,
     elements : null,
     renderTo : null,
+    clickX   : null, // Store the pixel *on the map* the user clicked on
+    clickY   : null,
 
     /** */
     constructor : function(config) {
@@ -40,6 +42,8 @@ otp.planner.ContextMenu = {
         this.renderTo.on('contextmenu', function(event) {
             var x = event.xy[0];
             var y = event.xy[1];
+            this.clickX = x - this.container.getX();
+            this.clickY = y - this.container.getY();
                             
             // Place the context menu above the cursor if placing it below the
             // cursor would cause it to go out of view.
@@ -92,16 +96,16 @@ otp.planner.ContextMenu = {
 
         return this.elements;
     },
-
+    
 
     /**
      * get map coordinate lat/lon given the position of the context menu click 
      */
     getMapCoordinate : function ()
     {
-        var c  = otp.util.ExtUtils.getPixelXY(this.el, this.map.el);
-        var ll = otp.util.OpenLayersUtils.getLatLonOfPixel(this.map.getMap(), c.x, c.y);
-        return ll;
+        // Use actual click location rather than CM loc because the two aren't
+        // neceesarily the same (e.g., when click is near the window border)
+        return otp.util.OpenLayersUtils.getLatLonOfPixel(this.map.getMap(), this.clickX, this.clickY);
     },
 
     /**
@@ -109,8 +113,7 @@ otp.planner.ContextMenu = {
      */
     centerMapFromContextMenuXY : function () 
     {
-        var c = otp.util.ExtUtils.getPixelXY(this.el, this.map.el);
-        this.map.centerMapAtPixel(c.x, c.y);
+        this.map.centerMapAtPixel(this.clickX, this.clickY);
     },
 
     CLASS_NAME : "otp.planner.ContextMenu"
