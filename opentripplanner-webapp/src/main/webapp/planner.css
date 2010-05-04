@@ -889,3 +889,22 @@ font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 .ext-el-mask-msg div {
 font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
+
+/* CSS Overrides
+These rules fix the broken map widget in Safari and Chrome.
+See http://opentripplanner.org/ticket/257
+*/
+
+/**---------------------------------------------------------------
+*** Safari override fixes                                                     
+***---------------------------------------------------------------*/
+.ext-safari .x-date-picker {
+    width: 185px;
+}
+
+/**---------------------------------------------------------------
+*** Chrome override fixes                                                     
+***---------------------------------------------------------------*/
+.ext-chrome .x-date-picker {
+    width: 185px;
+}
