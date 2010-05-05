@@ -139,19 +139,21 @@ otp.core.UI = {
             this.innerCenter = this.center.getComponent(0);
             this.innerSouth  = this.center.getComponent(1);
             this.innerEast   = this.center.getComponent(2);
-            
-            
+
+
             this.west   = new Ext.Panel({
                 layout:       'accordion',
                 region:       'west',
                 id:           'west-panel',
-                split:        true,
-                width:        353,
+                header:       false,
+                width:        360,
                 minSize:      150,
                 maxSize:      450,
+                margins:      '30 0 1 1',
+                split:        true,
                 useSplitTips: true,
+                collapsible:  true,
                 collapseMode: 'mini',
-                margins:      '30 0 2 3',
                 collapsible:   true,
                 layoutConfig:{
                     animate:true,
