@@ -16,6 +16,8 @@ package org.opentripplanner.api.model;
 import java.util.Date;
 import java.util.List;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
@@ -52,7 +54,7 @@ public class Leg {
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.
      */
     @XmlAttribute
-    public String mode = "Walk";
+    public String mode = TraverseMode.WALK.toString();
 
     /**
      * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
@@ -102,4 +104,18 @@ public class Leg {
      */
     @XmlElementWrapper(name = "steps")
     public List<WalkStep> walkSteps;
+
+    /**
+     * bogus walk legs are those that have 0.0 distance, and just one instruction 
+     * @return boolean to indicate a bogus 
+     */
+    public boolean isBogusWalkLeg() {
+        boolean retVal = false;
+        if( TraverseMode.WALK.toString().equals(this.mode)         &&
+            (this.walkSteps == null || this.walkSteps.size() <= 1) && 
+            this.distance == 0) {
+            retVal = true;
+        }
+        return retVal;
+    }
 }

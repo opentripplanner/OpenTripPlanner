@@ -201,13 +201,14 @@ public class Planner {
         return response;
     }
 
+
     /**
      * Generates a TripPlan from a Request;
      * 
      * @param request
      * @return
+     * TODO this method if fugly... needs major refactoring to clarify the assembly rules and what is happening within the 240 lines of code
      */
-
     private TripPlan generatePlan(Request request) {
         TraverseModeSet modeSet = request.getModeSet();
         assert (modeSet.isValid());
@@ -335,11 +336,20 @@ public class Planner {
                             Geometry geometry = geometryFactory.createLineString(coordinates);
                             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                             leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
+
+                            // removes 0.0 length legs from itinerary
+                            if(leg.isBogusWalkLeg()) {
+                                itinerary.removeLeg(leg);
+                            }
                             leg = null;
                             coordinates = new CoordinateArrayListSequence();
                         }
 
                         /* initialize new leg */
+                        // removes 0.0 length legs from itinerary
+                        if(leg != null && leg.isBogusWalkLeg()) {
+                            itinerary.removeLeg(leg);
+                        }
                         leg = new Leg();
                         itinerary.addLeg(leg);
 
@@ -441,6 +451,11 @@ public class Planner {
                 leg.duration = lastEdge.tov.state.getTime() - leg.startTime.getTime();
                 if (startWalk != -1) {
                     leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
+                }
+
+                // removes 0.0 length legs from itinerary
+                if(leg.isBogusWalkLeg()) {
+                    itinerary.removeLeg(leg);
                 }
                 leg = null;
             }

@@ -93,7 +93,25 @@ public class Itinerary {
      */
     public boolean tooSloped = false;
 
+    /** 
+     * adds leg to array list
+     * @param leg
+     */
     public void addLeg(Leg leg) {
-        this.leg.add(leg);
+        if(leg != null)
+            this.leg.add(leg);
+    }
+
+    /** 
+     * finds the leg object in the array list (last entered if duplicates exist inthe list), and removes it 
+     * @param leg object to be removed
+     */
+    public void removeLeg(Leg leg) {
+        if(leg != null) {
+            int i = this.leg.lastIndexOf(leg);
+            if(i >= 0) {
+                this.leg.remove(leg);
+            }
+        }
     }
 }
