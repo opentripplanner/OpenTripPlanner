@@ -92,7 +92,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx2200m</argument>
+                                <argument>-Xmx700m</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
                                 <argument>org.opentripplanner.integration.graph_builder.GraphBuilderIntegrationMain</argument>
@@ -148,7 +148,7 @@
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>high</cargo.logging>
                                    <!-- -->
-                                    <cargo.jvmargs>-Xmx2000m</cargo.jvmargs>
+                                    <cargo.jvmargs>-Xmx700m</cargo.jvmargs>
                                      <!-- -->
                                     <!-- ->
                                     <cargo.jvmargs><![CDATA[-Xmx1500m -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n]]></cargo.jvmargs>

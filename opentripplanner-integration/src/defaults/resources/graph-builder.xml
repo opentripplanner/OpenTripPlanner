@@ -15,7 +15,7 @@
                     <list>
                         <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
                             <property name="url"
-                                value="http://developer.trimet.org/schedule/current.zip" />
+                                value="http://opentripplanner.org/raw-attachment/ticket/267/google_transit.zip" />
                         </bean>
                     </list>
                 </property>
