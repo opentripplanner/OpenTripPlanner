@@ -40,7 +40,7 @@ public class GraphSerializationLibrary {
         if (!graphPath.getParentFile().exists())
             graphPath.getParentFile().mkdirs();
 
-        _log.info("Writing graph...");
+        _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(graphPath)));
         out.writeObject(graph);
         out.close();
@@ -49,7 +49,7 @@ public class GraphSerializationLibrary {
 
     public static Graph readGraph(File graphPath) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream (new FileInputStream(graphPath)));
-        _log.info("Reading graph...");
+        _log.info("Reading graph " + graphPath.getAbsolutePath() + " ...");
         Graph graph = (Graph) in.readObject();
         _log.info("Initializing graph...");
         for (Vertex vertex : graph.getVertices()) {
