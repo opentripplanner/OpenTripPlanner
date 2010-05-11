@@ -74,10 +74,14 @@ public class CaseBasedTraversalPermissionConverter implements
 
     @Override
     public P2<StreetTraversalPermission> convert(SimpleFeature feature) {
-        String key = feature.getAttribute(_attributeName).toString();
-        P2<StreetTraversalPermission> permission = _permissions.get(key);
-        if (permission == null)
-            permission = _defaultPermission;
+        Object key = feature.getAttribute(_attributeName);
+        if (key == null) {
+            return _defaultPermission;
+        }
+        P2<StreetTraversalPermission> permission = _permissions.get(key.toString());
+        if (permission == null) {
+            return _defaultPermission;
+        }
         return permission;
     }
 }
