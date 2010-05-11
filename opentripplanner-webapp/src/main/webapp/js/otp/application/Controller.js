@@ -75,6 +75,11 @@ otp.application.Controller = {
             this.sm = new otp.systemmap.Systemmap(Ext.apply({}, {map: this.map}, config.systemMap));
         }
 
+        if (this.config.attributionPanel.enabled) {
+            this.attributionPanel = new otp.application.Attribution(this.config.attributionPanel);
+            this.ui.accordion.add(this.attributionPanel.getPanel());
+        }
+
         this.ui.doLayout();
 
         this.load();

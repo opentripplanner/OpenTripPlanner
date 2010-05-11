@@ -59,6 +59,15 @@ otp.config = {
         }
     },
 
+    // when enabled, adds another item to the accordion for attribution
+    'attributionPanel': {
+        enabled: true,
+        // this shows up as the title of the accordion item
+        panelTitle: 'License Attribution',
+        // the actual html that appears in the panel
+        attributionHtml: '<p class="disclaimer">Disclaimer goes here</p>'
+    },
+
     // if specified, uri path to a custom logo
     // otherwise use the default "images/ui/logoSmall.png"
     'logo': null,
