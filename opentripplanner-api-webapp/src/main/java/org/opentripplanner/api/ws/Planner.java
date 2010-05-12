@@ -95,7 +95,7 @@ public class Planner {
      * 
      * @param intermediatePlaces
      *            An unordered list of intermediate locations to be visited (see the fromPlace for
-     *            format). <strong>Presently unused.</strong>
+     *            format).
      * 
      * @param date
      *            The date that the trip should depart (or arrive, for requests where arriveBy is
