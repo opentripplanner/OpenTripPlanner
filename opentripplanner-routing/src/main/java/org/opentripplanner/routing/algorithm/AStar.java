@@ -243,7 +243,7 @@ public class AStar {
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
-                if (spt_v != null) {
+                if (spt_v != null && spt_v.weightSum == new_w) {
                     spt_v.setParent(spt_u, edge);
                     pq.insert_or_dec_key(spt_v, new_w + distance);
                 }

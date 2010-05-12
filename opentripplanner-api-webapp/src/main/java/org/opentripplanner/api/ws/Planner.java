@@ -161,14 +161,21 @@ public class Planner {
         request.setDateTime(date, time);
         request.setWheelchair(wheelchair);
 
-        if (max != null)
+        if (max != null) {
             request.setNumItineraries(max);
-        if (maxWalkDistance != null)
+        }
+        if (maxWalkDistance != null) {
             request.setWalk(maxWalkDistance);
-        if (arriveBy != null && arriveBy)
+        }
+        if (arriveBy != null && arriveBy) {
             request.setArriveBy(true);
-        if (showIntermediateStops != null && showIntermediateStops)
+        }
+        if (showIntermediateStops != null && showIntermediateStops) {
             request.setShowIntermediateStops(true);
+        }
+        if (intermediatePlaces != null && !intermediatePlaces.equals("")) {
+            request.setIntermediatePlaces(intermediatePlaces);
+        }
 
         request.setOptimize(optimize);
         request.setModes(modes);
