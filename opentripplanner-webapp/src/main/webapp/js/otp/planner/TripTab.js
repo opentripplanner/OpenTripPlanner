@@ -114,7 +114,6 @@ otp.planner.TripTab = {
             // step D++: add buttons to the tab 
             var r = new Ext.Toolbar.Button({
                 text:    this.locale.buttons.reverse,
-                id:      'trip-reverse',
                 iconCls: 'reverse-button',
                 tooltip: this.locale.buttons.reverseTip,
                 scope:   this,
@@ -123,7 +122,6 @@ otp.planner.TripTab = {
 
             var e = new Ext.Toolbar.Button({
                 text:    this.locale.buttons.edit,
-                id:      'trip-edit',
                 iconCls: 'edit-button',
                 tooltip: this.locale.buttons.editTip,
                 scope:   this,
@@ -132,7 +130,6 @@ otp.planner.TripTab = {
 
             var p = new Ext.Toolbar.Button({
                 text:    this.locale.buttons.print,
-                id:      'trip-print',
                 iconCls: 'print-button',
                 tooltip: this.locale.buttons.printTip,
                 scope:   this,
