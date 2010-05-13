@@ -390,7 +390,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (name == null) {
                 name = id;
             }
-            Street street = new Street(from, to, id, name, d, permissions);
+            Street street = new Street(from, to, name, d, permissions);
 
             /* TODO: This should probably generalized somehow? */
             if( "no".equals(way.getTags().get("wheelchair")) ||

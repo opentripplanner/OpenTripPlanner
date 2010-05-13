@@ -92,7 +92,7 @@ public class TestGraphPath extends TestCase {
 
         graph.addVertex(v1);
         graph.addVertex(v2);
-        Street street = new Street(v1, v2, "fake_street", "fake_street", 10);
+        Street street = new Street(v1, v2, "fake_street", 10);
         GeometryFactory gf = new GeometryFactory();
         street.setGeometry(gf.createLineString(new Coordinate[] { new Coordinate(-74, 41.000001), new Coordinate(-73.000002, 41.000001)}));
         

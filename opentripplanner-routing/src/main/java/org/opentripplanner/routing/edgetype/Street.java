@@ -40,8 +40,6 @@ public class Street extends AbstractEdge implements WalkableEdge {
     private static final String[] DIRECTIONS = { "north", "northeast", "east", "southeast",
             "south", "southwest", "west", "northwest" };
 
-    String id;
-
     String name;
 
     LineString geometry;
@@ -79,9 +77,8 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.wheelchairAccessible = true;
     }
 
-    public Street(Vertex start, Vertex end, String id, String name, double length) {
+    public Street(Vertex start, Vertex end, String name, double length) {
         super(start, end);
-        this.id = id;
         this.name = name;
         this.length = length;
         this.slopeSpeedEffectiveLength = length;
@@ -90,34 +87,30 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.wheelchairAccessible = true;
     }
 
-    public Street(Vertex start, Vertex end, String id, String name, double length,
+    public Street(Vertex start, Vertex end, String name, double length, StreetTraversalPermission permission) {
+        super(start, end);
+        this.name = name;
+        this.length = length;
+        this.slopeSpeedEffectiveLength = length;
+        this.bicycleSafetyEffectiveLength = length;
+        this.permission = permission;
+        this.wheelchairAccessible = true;
+    }
+
+    public Street(Vertex start, Vertex end, String name, double length, StreetTraversalPermission permission,
+            boolean wheelchairAccessible) {
+        super(start, end);
+        this.name = name;
+        this.length = length;
+        this.slopeSpeedEffectiveLength = length;
+        this.bicycleSafetyEffectiveLength = length;
+        this.permission = permission;
+        this.wheelchairAccessible = true;
+    }
+
+    public Street(Vertex start, Vertex end, String name, double length, double bicycleSafetyEffectiveLength,
             StreetTraversalPermission permission) {
         super(start, end);
-        this.id = id;
-        this.name = name;
-        this.length = length;
-        this.slopeSpeedEffectiveLength = length;
-        this.bicycleSafetyEffectiveLength = length;
-        this.permission = permission;
-        this.wheelchairAccessible = true;
-    }
-
-    public Street(Vertex start, Vertex end, String id, String name, double length,
-            StreetTraversalPermission permission, boolean wheelchairAccessible) {
-        super(start, end);
-        this.id = id;
-        this.name = name;
-        this.length = length;
-        this.slopeSpeedEffectiveLength = length;
-        this.bicycleSafetyEffectiveLength = length;
-        this.permission = permission;
-        this.wheelchairAccessible = true;
-    }
-
-    public Street(Vertex start, Vertex end, String id, String name, double length,
-            double bicycleSafetyEffectiveLength, StreetTraversalPermission permission) {
-        super(start, end);
-        this.id = id;
         this.name = name;
         this.length = length;
         this.slopeSpeedEffectiveLength = length;
@@ -126,11 +119,9 @@ public class Street extends AbstractEdge implements WalkableEdge {
         this.wheelchairAccessible = true;
     }
 
-    public Street(Vertex start, Vertex end, String id, String name, double length,
-            double bicycleSafetyEffectiveLength, StreetTraversalPermission permission,
-            boolean wheelchairAccessible) {
+    public Street(Vertex start, Vertex end, String name, double length, double bicycleSafetyEffectiveLength,
+            StreetTraversalPermission permission, boolean wheelchairAccessible) {
         super(start, end);
-        this.id = id;
         this.name = name;
         this.length = length;
         this.slopeSpeedEffectiveLength = length;
@@ -415,7 +406,7 @@ public class Street extends AbstractEdge implements WalkableEdge {
 
     public String toString() {
         if (this.name != null) {
-            return "Street(" + this.id + ", " + this.name + ", " + this.length + ", "
+            return "Street(" + this.name + ", " + this.length + ", "
                     + this.permission + ")";
         } else {
             return "Street(" + this.length + ", " + this.permission + ")";

@@ -172,12 +172,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 double length = JTS.orthodromicDistance(coordinates[0],
                         coordinates[coordinates.length - 1], worldCRS);
 
-                Street street = new Street(startCorner, endCorner, id, name, length);
+                Street street = new Street(startCorner, endCorner, name, length);
                 street.setGeometry(geom);
                 startCorner.outStreet = street;
                 endCorner.inStreet = street;
 
-                Street backStreet = new Street(endCorner, startCorner, id, name, length);
+                Street backStreet = new Street(endCorner, startCorner, name, length);
                 backStreet.setGeometry(geom.reverse());
                 startCorner.inStreet = backStreet;
                 endCorner.outStreet = backStreet;

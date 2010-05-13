@@ -91,12 +91,12 @@ public class StreetLocation extends GenericVertex {
             double weight2 = DistanceLibrary.distance(nearestPoint, endCoord);
             double bicycleWeight2 = weight2 * street.bicycleSafetyEffectiveLength / street.length;
 
-            Street e1 = new Street(fromv, this, streetName, streetName, weight1, bicycleWeight1, street.getTraversalPermission(), street.getWheelchairAccessible());
+            Street e1 = new Street(fromv, this, streetName, weight1, bicycleWeight1, street.getTraversalPermission(), street.getWheelchairAccessible());
             e1.setGeometry(beginning);
             e1.setElevationProfile(street.getElevationProfile(0, weight1));
             addIncoming(e1);
 
-            Street e2 = new Street(this, tov, streetName, streetName, weight2, bicycleWeight2, street.getTraversalPermission(), street.getWheelchairAccessible());
+            Street e2 = new Street(this, tov, streetName, weight2, bicycleWeight2, street.getTraversalPermission(), street.getWheelchairAccessible());
             e2.setGeometry(ending);
             e2.setElevationProfile(street.getElevationProfile(weight1, street.length));
             addOutgoing(e2);
