@@ -62,10 +62,13 @@ otp.locale.English = {
 
         fullScreen    : "Full Screen",
         fullScreenTip : "<b>Full Screen</b><br/>Show -or- hide tool panels",
-        
+
         print         : "Print",
         printTip      : "<b>Print</b><br/>Print friendly version of the trip plan (without map).",
-        
+
+        link          : "Link",
+        linkTip      : "<b>Link</b><br/>Show link url for this trip plan.",
+
         feedback      : "Feedback",
         feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
 

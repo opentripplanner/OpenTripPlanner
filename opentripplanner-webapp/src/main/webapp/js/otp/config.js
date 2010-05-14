@@ -21,6 +21,11 @@ otp.config = {
 
     'planner': {
         'url'            : null,
+        'linkTemplates'  : [
+            {name:'{trip} Link', url:'http://opentripplanner.org'},
+            {name:'Google Link', url:'http://maps.google.com'},
+            {name:'TriMet Link', url:'http://maps.trimet.org'}
+        ],
         'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
     },
 

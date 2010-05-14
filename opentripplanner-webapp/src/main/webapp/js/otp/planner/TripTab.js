@@ -26,19 +26,20 @@ otp.planner.PrintTripWin = null;
 otp.planner.TripTab = {
 
     // config
-    map          : null,
-    ui           : null,
-    locale       : otp.locale.English,
+    map           : null,
+    ui            : null,
+    locale        : otp.locale.English,
+    linkTemplates : null,
 
-    planner      : null,
-    renderer     : null,
-    topoRenderer : null,
-    xml          : null,
-    request      : null,
+    planner       : null,
+    renderer      : null,
+    topoRenderer  : null,
+    xml           : null,
+    request       : null,
 
-    id           : 0,
+    id            : 0,
 
-    m_utils      : otp.planner.Utils,
+    m_utils       : otp.planner.Utils,
 
     // constants
     XML_ITINERARIES_NODE : 'itineraries',
@@ -136,10 +137,18 @@ otp.planner.TripTab = {
                 handler: this.printCB
             });
 
+            var l = new Ext.Toolbar.Button({
+                text:    this.locale.buttons.link,
+                iconCls: 'link-button',
+                tooltip: this.locale.buttons.linkTip,
+                scope:   this,
+                handler: this.linkCB
+            });
+
             // step D: create UI panel & tree & add tree to Itineary renderer 
             this.m_itinerariesTree = this.m_utils.makeItinerariesTree(this.id, this.itineraryClick, this);
             this.m_tripDetailsTree = this.m_utils.makeTripDetailsTree(this.id, null, null);
-            this.m_panel           = this.m_utils.makeTripTab(this.id, this.m_title, this.m_itinerariesTree, this.m_tripDetailsTree, [r, e, p]);
+            this.m_panel           = this.m_utils.makeTripTab(this.id, this.m_title, this.m_itinerariesTree, this.m_tripDetailsTree, [r, e, p, l]);
 
             // step E: add itineraries to tree
             var tree = this.m_itinerariesTree;
@@ -155,6 +164,19 @@ otp.planner.TripTab = {
         }
 
         return this.isValid();
+    },
+
+    /** */
+    linkCB : function(b, e)
+    {
+        if(this.linkTemplates == null || this.linkTemplates.length <= 0) return;
+
+        console.log("TripTab.link: enter link to itinerary");
+        var html = '';
+        for(var i = 0; i < this.linkTemplates.length; i++) {
+            html += '<a target="#" href="' + this.linkTemplates[i].url + '">' + this.linkTemplates[i].name + '</a><br/>';
+        }
+        this.linkDialog = otp.util.ExtUtils.makePopup({'html':html}, this.locale.buttons.link, true, 300, 200, true, 100, 200);
     },
 
     /** */

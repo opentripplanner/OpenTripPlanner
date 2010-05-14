@@ -36,6 +36,7 @@ otp.planner.Planner = {
     url                     : null,
     poi                     : null,
     fromToOverride          : null,
+    linkTemplates           : null,
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -249,7 +250,7 @@ otp.planner.Planner = {
 
         try 
         {
-            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
+            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, linkTemplates:this.linkTemplates, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
             {

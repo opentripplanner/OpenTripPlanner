@@ -59,12 +59,15 @@ otp.locale.Spanish = {
 
         fullScreen    : "Pantalla completa",
         fullScreenTip : "<b>Pantalla completa</b><br/>Mostrar - ocultar paneles",
-        
+
         print         : "Imprimir",
         printTip      : "<b>Imprimir</b><br/>Imprimir este plan de viaje junto con las paradas.",
-        
+
+        link          : "Link",
+        linkTip      : "<b>(translate me) Link</b><br/>Show link url for this trip plan.",
+
         feedback      : "Feedback",
-        feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
+        feedbackTip   : "<b>(translate me) Feedback</b><br/>Send your thoughts or experiences with the map",
 
         submit       : "Enviar",
         clearButton  : "Borrar",

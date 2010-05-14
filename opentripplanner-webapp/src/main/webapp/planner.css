@@ -81,6 +81,10 @@ background-image: url(images/ui/buttons/clear.gif)!important;
 background-image: url(images/ui/buttons/print.gif)!important;
 }
 
+.link-button {
+background-image: url(images/ui/buttons/link.png)!important;
+}
+
 .feedback-button {
 background-image: url(images/ui/buttons/feedback.gif)!important;
 }
