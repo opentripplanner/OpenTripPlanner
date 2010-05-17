@@ -56,6 +56,9 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
     public T convert(SimpleFeature feature) {
         ensureCached();
         String mainKeyValue = toHashableString(feature.getAttribute(this.mainKey));
+        if (mainKeyValue == null) {
+            return null;
+        }
         SimpleFeature joinedFeature = cache.get(mainKeyValue);
 
         if (joinedFeature == null) {
@@ -80,7 +83,9 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
             while (it.hasNext()) {
                 SimpleFeature feature = it.next();
                 String joinedKeyValue = toHashableString(feature.getAttribute(joinedKey));
-                cache.put(joinedKeyValue, feature);
+                if (joinedKeyValue != null) {
+                    cache.put(joinedKeyValue, feature);
+                }
             }
             features.close(it);
 
@@ -98,6 +103,9 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
      * @return a string to use as the hash key
      */
     private String toHashableString(Object keyValue) {
+        if (keyValue == null) {
+            return null;
+        }
         if (keyValue instanceof Number) {
             keyValue = ((Number)keyValue).doubleValue();
         }
