@@ -25,12 +25,12 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * Calculates street traversal permissions based upon a fixed set of cases.
  * 
  * For example, given a shapefile that includes a DIRECTION column with data as follows:
- * <code>
+ * <pre>
  * | DIRECTION | NAME    | 
  * | ONE_WAY_F | Side St | 
  * | TWO_WAY   | Main St |
  * | ONE_WAY_B | Foo St. |
- * </code>
+ * </pre>
  * You could use a CaseBasedTraversalPermissionConverter to implement the following rules:
  *
  *      By default, all streets should be traversable by pedestrians and bicycles in both directions.
@@ -47,6 +47,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * 
  * These rules could be implemented by configuring the converter bean as follows:
  * <code>
+ * {@code
  * <bean class="org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter"> 
  *   <property name="attributeName"     value="DIRECTION" /> 
  *   <property name="defaultPermission" value="PEDESTRIAN_AND_BICYCLE" /> 
@@ -58,6 +59,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  *      </map> 
  *  </property> 
  * </bean>
+ * }
  * </code>
  * @see org.opentripplanner.routing.edgetype.StreetTraversalPermission
  * 
