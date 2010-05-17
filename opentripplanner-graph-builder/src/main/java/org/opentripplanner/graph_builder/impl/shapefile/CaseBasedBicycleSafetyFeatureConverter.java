@@ -21,7 +21,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
 /**
- * This converter handles bike lanes/paths/routes.
+ * Handles marking certain types of streets/bike lanes as more or less safe for bike trips.
  */
 public class CaseBasedBicycleSafetyFeatureConverter implements SimpleFeatureConverter<P2<Double>> {
 
@@ -59,10 +59,19 @@ public class CaseBasedBicycleSafetyFeatureConverter implements SimpleFeatureConv
     public CaseBasedBicycleSafetyFeatureConverter() {
     }
 
+    /**
+     * @param safetyAttributeName
+     *            The name of the attribute used when calculating the feature's safety.
+     */
     public void setSafetyAttributeName(String safetyAttributeName) {
         this.safetyAttributeName = safetyAttributeName;
     }
 
+    /**
+     * @param directionAttributeName
+     *            The name of the attribute used when calculating the direction of the
+     *            street/bikelane for which that the safety feature should apply.
+     */
     public void setDirectionAttributeName(String directionAttributeName) {
         this.directionAttributeName = directionAttributeName;
     }

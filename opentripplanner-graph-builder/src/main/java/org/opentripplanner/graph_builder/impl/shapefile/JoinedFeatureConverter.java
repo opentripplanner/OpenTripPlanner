@@ -73,8 +73,8 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
         }
     }
 
-    /** We have to cache all the features in the supplemenetal file, because
-     * if we try to load them on the fly, Geotools wigs out.
+    /** We have to cache all the features in the supplemental file, because
+     * if we try to load them on the fly, GeoTools wigs out.
      */
     private void ensureCached() {
         if (cache != null) {
@@ -123,10 +123,16 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
         this.converter = converter;
     }
 
+    /**
+     * The name of the attribute in the joined feature source to use as the join key.
+     */
     public void setJoinedKey(String joinedKey) {
         this.joinedKey = joinedKey;
     }
 
+    /**
+     * The name of the attribute in the main feature source to use as the join key.
+     */
     public void setMainKey(String mainKey) {
         this.mainKey = mainKey;
     }

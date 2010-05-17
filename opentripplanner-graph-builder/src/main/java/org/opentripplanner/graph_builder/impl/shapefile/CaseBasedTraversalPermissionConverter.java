@@ -58,8 +58,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  *           <entry key="TWO_WAY" value="ALL,ALL" /> 
  *      </map> 
  *  </property> 
- * </bean>
- * }
+ * </bean>}
  * </pre>
  * @see org.opentripplanner.routing.edgetype.StreetTraversalPermission
  * 
