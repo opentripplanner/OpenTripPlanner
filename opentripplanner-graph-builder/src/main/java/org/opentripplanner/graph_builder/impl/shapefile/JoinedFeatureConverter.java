@@ -23,12 +23,16 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This is a simple feature converter that gets features from a secondary feature source. This is
  * useful if you have (say) bike lane data in another file.
  */
 public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
+
+    private static Logger log = LoggerFactory.getLogger(ShapefileStreetGraphBuilderImpl.class);
 
     private SimpleFeatureConverter<T> converter;
 
@@ -57,6 +61,7 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
         ensureCached();
         String mainKeyValue = toHashableString(feature.getAttribute(this.mainKey));
         if (mainKeyValue == null) {
+            log.warn("Feature " + feature.getID() + " has null value for its mainKey (" + mainKey + ")");
             return null;
         }
         SimpleFeature joinedFeature = cache.get(mainKeyValue);
@@ -85,6 +90,8 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
                 String joinedKeyValue = toHashableString(feature.getAttribute(joinedKey));
                 if (joinedKeyValue != null) {
                     cache.put(joinedKeyValue, feature);
+                } else {
+                    log.warn("Feature " + feature.getID() + " has null value for its joinedKey (" + joinedKey + ")");
                 }
             }
             features.close(it);
