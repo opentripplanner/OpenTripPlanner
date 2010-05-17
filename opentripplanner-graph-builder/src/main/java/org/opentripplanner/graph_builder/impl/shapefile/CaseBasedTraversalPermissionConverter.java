@@ -33,20 +33,20 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * </pre>
  * You could use a CaseBasedTraversalPermissionConverter to implement the following rules:
  *
- *      By default, all streets should be traversable by pedestrians and bicycles in both directions.
+ *      <p>By default, all streets should be traversable by pedestrians and bicycles in both directions.</p>
  *      
- *      If a street's DIRECTION attribute is ONE_WAY_F, it should be traversable by cars and bikes in
- *      only the forward direction and traversable by pedestrians in both directions. 
+ *      <p>If a street's DIRECTION attribute is ONE_WAY_F, it should be traversable by cars and bikes in
+ *      only the forward direction and traversable by pedestrians in both directions.</p>
  * 
- *      If a street's DIRECTION attribute is ONE_WAY_B, it should be traversable by cars and bikes in
- *      only the backward direction and traversable by pedestrians in both directions. 
+ *      <p>If a street's DIRECTION attribute is ONE_WAY_B, it should be traversable by cars and bikes in
+ *      only the backward direction and traversable by pedestrians in both directions.</p>
  *      
- *      If a street's DIRECTION attribute is TWO_WAY, it should be traversable by everyone in both 
- *      directions.
+ *      <p>If a street's DIRECTION attribute is TWO_WAY, it should be traversable by everyone in both 
+ *      directions.</p>
  *      
  * 
  * These rules could be implemented by configuring the converter bean as follows:
- * <code>
+ * <pre>
  * {@code
  * <bean class="org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter"> 
  *   <property name="attributeName"     value="DIRECTION" /> 
@@ -60,7 +60,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  *  </property> 
  * </bean>
  * }
- * </code>
+ * </pre>
  * @see org.opentripplanner.routing.edgetype.StreetTraversalPermission
  * 
  */
