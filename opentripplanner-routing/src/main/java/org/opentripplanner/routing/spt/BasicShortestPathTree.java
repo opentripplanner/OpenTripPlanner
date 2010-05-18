@@ -26,6 +26,8 @@ public class BasicShortestPathTree implements ShortestPathTree {
                 ret.weightSum = weightSum;
                 ret.state = ss;
                 ret.options = options;
+            } else {
+                return null;
             }
         }
         return ret;
