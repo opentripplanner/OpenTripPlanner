@@ -166,12 +166,18 @@ otp.planner.TripTab = {
         return this.isValid();
     },
 
-    /** */
+    /** 
+     * will display a link (or set of links) to the trip planner for a given itinerary in a dialog
+     * 
+     * @param {Object} b
+     * @param {Object} e
+     */
     linkCB : function(b, e)
     {
         if(this.linkTemplates == null || this.linkTemplates.length <= 0) return;
 
-        console.log("TripTab.link: enter link to itinerary");
+        otp.planner.Templates.tripPrintTemplate.apply(req);
+
         var html = '';
         for(var i = 0; i < this.linkTemplates.length; i++) {
             html += '<a target="#" href="' + this.linkTemplates[i].url + '">' + this.linkTemplates[i].name + '</a><br/>';

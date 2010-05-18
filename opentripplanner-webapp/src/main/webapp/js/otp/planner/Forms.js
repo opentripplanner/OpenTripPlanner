@@ -41,12 +41,16 @@ otp.planner.StaticForms = {
 
     m_fromForm       : null,
     m_toForm         : null,
+    m_toPlace        : null,
+    m_fromPlace      : null,
+    m_intermediatePlaces : null,
+
     fromToOverride   : null,  // over-ride me to get rid of From / To from with something else
 
     m_date           : null,
     m_time           : null,
-    m_arriveByStore       : null,
-    m_arriveByForm        : null,
+    m_arriveByStore     : null,
+    m_arriveByForm      : null,
 
     m_maxWalkDistanceStore      : null,
     m_maxWalkDistanceForm       : null,
@@ -133,18 +137,32 @@ otp.planner.StaticForms = {
         this.hideErrorDialogs();
 
         // step 3: fixe up some of the form values before sending onto the trip planner web service
-        var toPlaceVal = this.m_toForm.getRawValue();
-        if(toPlaceVal == null || toPlaceVal.length < 1)
-            toPlaceVal = this.m_toCoord;
-
-        var fromPlaceVal = this.m_fromForm.getRawValue();
-        if(fromPlaceVal == null || fromPlaceVal.length < 1)
-            fromPlaceVal = this.m_fromCoord;
-
         form.setValues({
-            fromPlace: fromPlaceVal,
-            toPlace:   toPlaceVal
+            fromPlace: this.getFromValue(),
+            toPlace:   this.getToValue()
         });
+    },
+
+    /** */
+    getToValue : function()
+    {
+        var retVal = this.m_toForm.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_toPlace.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_toCoord;
+        return retVal;
+    },
+
+    /** */
+    getFromValue : function()
+    {
+        var retVal = this.m_fromForm.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_fromPlace.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_fromCoord;
+        return retVal;
     },
 
     /** */
@@ -416,13 +434,18 @@ otp.planner.StaticForms = {
             this.clearFrom();
             this.clearTo();
 
-            this.setRawInput(params.Orig, forms.m_fromForm);
-            this.setRawInput(params.Dest, forms.m_toForm);
-
-            this.setRawInput(params.from, forms.m_fromForm);
-            this.setRawInput(params.to,   forms.m_toForm);
+            this.setRawInput(params.Orig,      forms.m_fromForm);
+            this.setRawInput(params.Orig,      forms.m_fromPlace);
+            this.setRawInput(params.Dest,      forms.m_toForm);
+            this.setRawInput(params.Dest,      forms.m_toPlace);
+            this.setRawInput(params.from,      forms.m_fromForm);
+            this.setRawInput(params.from,      forms.m_fromPlace);
+            this.setRawInput(params.to,        forms.m_toForm);
+            this.setRawInput(params.to,        forms.m_toPlace);
             this.setRawInput(params.fromPlace, forms.m_fromForm);
+            this.setRawInput(params.fromPlace, forms.m_fromPlace);
             this.setRawInput(params.toPlace,   forms.m_toForm);
+            this.setRawInput(params.toPlace,   forms.m_toPlace);
 
             if(params.fromCoord && params.fromCoord.indexOf('0.0') != 0)
                 this.m_fromCoord = params.fromCoord;
@@ -443,32 +466,32 @@ otp.planner.StaticForms = {
                 forms.m_date.setRawValue(params.on);
                 date = true;
             }
-            
+
             // arrive by parameter 
             if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "A"))
-                forms.m_arrForm.setValue('A');
+                forms.m_arriveByForm.setValue('A');
             if(params.arr && (params.arr.indexOf("rive") > 0 || params.arr == "A"))
-                forms.m_arrForm.setValue('A');
+                forms.m_arriveByForm.setValue('A');
             if(params.Arr && (params.Arr.indexOf("rive") > 0 || params.Arr == "A"))
-                forms.m_arrForm.setValue('A');
+                forms.m_arriveByForm.setValue('A');
             if(params.arrParam && (params.arrParam.indexOf("part") > 0 || params.arrParam == "D"))
-                forms.m_arrForm.setValue('D');
+                forms.m_arriveByForm.setValue('D');
             if(params.arr && (params.arr.indexOf("part") > 0 || params.arr == "D"))
-                forms.m_arrForm.setValue('D');
+                forms.m_arriveByForm.setValue('D');
             if(params.Arr && (params.Arr.indexOf("part") > 0 || params.Arr == "D"))
-                forms.m_arrForm.setValue('D');
+                forms.m_arriveByForm.setValue('D');
             if(params.after)
             {
                 time = params.after.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('D');
+                forms.m_arriveByForm.setValue('D');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arrForm.setValue('A');
+                forms.m_arriveByForm.setValue('A');
                 time = true;
             }
 
@@ -538,10 +561,10 @@ otp.planner.StaticForms = {
         retVal.toCoord   = this.m_toCoord;
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = this.m_time.getRawValue();
-        retVal.arriveBy       = this.m_arriveByForm.getRawValue();
+        retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
-        retVal.maxWalkDistance      = this.m_maxWalkDistanceForm.getValue();
-        retVal.mode      = this.m_modeForm.getValue();
+        retVal.maxWalkDistance = this.m_maxWalkDistanceForm.getValue();
+        retVal.mode            = this.m_modeForm.getValue();
         retVal.wheelchair      = this.m_wheelchairForm.getValue();
         retVal.intermediate_places = ''; //TODO: intermediate stops
         try
@@ -659,6 +682,10 @@ otp.planner.StaticForms = {
             handler: this.submit
         });
 
+        this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
+        this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
+        this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
+
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,
             id:          'form-tab',
@@ -667,9 +694,9 @@ otp.planner.StaticForms = {
             keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
-                            new Ext.form.Hidden({name: 'toPlace',   value: ''}),
-                            new Ext.form.Hidden({name: 'fromPlace', value: ''}),
-                            new Ext.form.Hidden({name: 'intermediatePlaces', value: ''}),
+                            this.m_toPlace,
+                            this.m_fromPlace,
+                            this.m_intermediatePlaces,
                             this.m_submitButton
                          ],
 

@@ -19,6 +19,14 @@ otp.namespace("otp.planner");
   */
 try
 {
+otp.planner.ParamTemplate = 'fromPlace={[values.from.replace(/&/g,"@")]}'
+        + '&toPlace={[values.to.replace(/&/g,"@")]}'
+        + '<tpl if="fromCoord != null">&fromCoord={fromCoord}</tpl>'
+        + '<tpl if="toCoord   != null">&toCoord={toCoord}</tpl>'
+        + '&arr={arriveBy}&min={opt}&maxWalkDistance={maxWalkDistance}&mode={mode}&itinID={itinID}&submit'
+        + '&date={date}'
+        + '&time={time}';
+
 otp.planner.Templates = {
 
     TODO_FARE_ZONE : "2.30 - SEE BELOW - TODO PUT FARE ZONE IN XML",
@@ -35,24 +43,8 @@ otp.planner.Templates = {
         'Trip Details: {from} to {to} {arr} {time} on {date}, {opt} with a walk of {walk} via {mode}.'
     ).compile(),
 
-    txtPlannerURL : new Ext.XTemplate( 
-        '{url}?',
-        'from={[values.from.replace(/&/g,"@")]}',
-        '&to={[values.to.replace(/&/g,"@")]}',
-        '&min={opt}&walk_speed={walk_speed}&mode={mode}&id={id}',
-        '&on={date}',
-        '&{[values.arriveBy=="false" ? "after" : "by"]}={time}'
-    ).compile(),
-
     tripPrintTemplate : new Ext.XTemplate( 
-        '{url}?',
-        'fromPlace={[values.from.replace(/&/g,"@")]}',
-        '&toPlace={[values.to.replace(/&/g,"@")]}',
-        '<tpl if="fromCoord != null">&fromCoord={fromCoord}</tpl>',
-        '<tpl if="toCoord   != null">&toCoord={toCoord}</tpl>',
-        '&arr={arriveBy}&min={opt}&maxWalkDistance={maxWalkDistance}&mode={mode}&itinID={itinID}&submit',
-        '&date={date}',
-        '&time={time}'
+        '{url}?' + otp.planner.ParamTemplate
     ).compile(),
 
     TP_TRIPDETAILS : new Ext.XTemplate(
