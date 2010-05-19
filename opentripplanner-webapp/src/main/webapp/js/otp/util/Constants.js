@@ -20,6 +20,7 @@ otp.util.Constants = {
 
     TP_COOKIE_NAME   : "otp_cookie_name",
     TP_COOKIE_VALUE  : "otp_cookie_value",
+    BLANK_LAT_LON    : '0.0,0.0',
 
 
     CLASS_NAME       : "otp.util.Constants"

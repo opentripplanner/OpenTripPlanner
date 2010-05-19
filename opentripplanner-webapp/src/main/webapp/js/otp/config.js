@@ -22,9 +22,18 @@ otp.config = {
     'planner': {
         'url'            : null,
         'linkTemplates'  : [
-            {name:'{trip} Link', url:'http://opentripplanner.org'},
-            {name:'Google Link', url:'http://maps.google.com'},
-            {name:'TriMet Link', url:'http://maps.trimet.org'}
+            {name:'OTP (at TriMet)',  url:'http://maps5.trimet.org/otp?' + otp.planner.ParamTemplate},
+
+            {separator:true, name:'Transit Trips'},
+            {name:'TriMet',           url:'http://maps.trimet.org?arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
+            {name: 'Google Transit',  url:'http://www.google.com/maps?date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
+
+            {separator:true, name:'Bike Trips'},
+            {name: 'Google Bikes',    url:'http://www.google.com/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=b'},
+            {name: 'ByCycle',         url:'http://bycycle.org/regions/portlandor/routes/find?s=longitude%3D{fromLon}%20latitude%3D{fromLat}&e=longitude%3D{toLon},%20latitude%3D{toLat}&pref=default'},
+
+            {separator:true, name:'Walk Trips'},
+            {name: 'Google Walking',  url:'http://www.google.com/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
         'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
     },

@@ -19,10 +19,8 @@ otp.namespace("otp.planner");
   */
 try
 {
-otp.planner.ParamTemplate = 'fromPlace={[values.from.replace(/&/g,"@")]}'
-        + '&toPlace={[values.to.replace(/&/g,"@")]}'
-        + '<tpl if="fromCoord != null">&fromCoord={fromCoord}</tpl>'
-        + '<tpl if="toCoord   != null">&toCoord={toCoord}</tpl>'
+otp.planner.ParamTemplate = 'fromPlace={[values.fromPlace.replace(/&/g,"@")]}'
+        + '&toPlace={[values.toPlace.replace(/&/g,"@")]}'
         + '&arr={arriveBy}&min={opt}&maxWalkDistance={maxWalkDistance}&mode={mode}&itinID={itinID}&submit'
         + '&date={date}'
         + '&time={time}';
@@ -40,7 +38,7 @@ otp.planner.Templates = {
      */
     // TODO - localize
     tripFeedbackDetails : new Ext.XTemplate( 
-        'Trip Details: {from} to {to} {arr} {time} on {date}, {opt} with a walk of {walk} via {mode}.'
+        'Trip Details: {fromPlace} to {toPlace} {arr} {time} on {date}, {opt} with a walk of {walk} via {mode}.'
     ).compile(),
 
     tripPrintTemplate : new Ext.XTemplate( 

@@ -176,13 +176,25 @@ otp.planner.TripTab = {
     {
         if(this.linkTemplates == null || this.linkTemplates.length <= 0) return;
 
-        otp.planner.Templates.tripPrintTemplate.apply(req);
+        var win_y = 100;
+        var html = otp.planner.Templates.tripFeedbackDetails.apply(this.request) + "<br/>";
 
-        var html = '';
         for(var i = 0; i < this.linkTemplates.length; i++) {
-            html += '<a target="#" href="' + this.linkTemplates[i].url + '">' + this.linkTemplates[i].name + '</a><br/>';
+            win_y+=15;
+            if(this.linkTemplates[i].separator == true) {
+                html += '<br/>';
+                if(this.linkTemplates[i].name != null) {
+                    html += '<h2>' + this.linkTemplates[i].name + '</h2>';
+                    win_y+=20;
+                }
+                continue;
+            }
+            if(this.linkTemplates[i].template == null) {
+                this.linkTemplates[i].template = new Ext.XTemplate(this.linkTemplates[i].url).compile();
+            }
+            html += '<a target="#" href="' + this.linkTemplates[i].template.apply(this.request) + '">' + this.linkTemplates[i].name + '</a><br/>';
         }
-        this.linkDialog = otp.util.ExtUtils.makePopup({'html':html}, this.locale.buttons.link, true, 300, 200, true, 100, 200);
+        this.linkDialog = otp.util.ExtUtils.makePopup({'html':html}, this.locale.buttons.link, true, 300, win_y, true, 100, 200);
     },
 
     /** */
@@ -256,7 +268,7 @@ otp.planner.TripTab = {
         
         /* draw topographic map */
         if (document.createElement('canvas').getContext) {
-            if(this.request.mode == "WALK" || this.request.mode == "BICYCLE")
+            if(this.request.mode == "WALK" || this.request.mode.contains("BICYCLE"))
             {
                 this.ui.innerSouth.getEl().setHeight(180);
                 this.ui.innerSouth.show();

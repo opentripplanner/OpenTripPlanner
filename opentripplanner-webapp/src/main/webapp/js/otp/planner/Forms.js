@@ -64,8 +64,8 @@ otp.planner.StaticForms = {
     // buttons
     m_submitButton   : null,
 
-    m_fromCoord      : '0.0,0.0',
-    m_toCoord        : '0.0,0.0',
+    m_fromCoord      : otp.util.Constants.BLANK_LAT_LON,
+    m_toCoord        : otp.util.Constants.BLANK_LAT_LON,
 
     m_xmlRespRecord  : null, 
 
@@ -138,31 +138,9 @@ otp.planner.StaticForms = {
 
         // step 3: fixe up some of the form values before sending onto the trip planner web service
         form.setValues({
-            fromPlace: this.getFromValue(),
-            toPlace:   this.getToValue()
+            fromPlace: this.getFrom(),
+            toPlace:   this.getTo()
         });
-    },
-
-    /** */
-    getToValue : function()
-    {
-        var retVal = this.m_toForm.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_toPlace.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_toCoord;
-        return retVal;
-    },
-
-    /** */
-    getFromValue : function()
-    {
-        var retVal = this.m_fromForm.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_fromPlace.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_fromCoord;
-        return retVal;
     },
 
     /** */
@@ -377,9 +355,24 @@ otp.planner.StaticForms = {
         this.planner.focus();
     },
 
+
+    /** will look in text forms first, then hidden form variable, then coordinate for value */
+    /** TODO: from & to form values must be re-thought we only allow one value x,y -or- string value */ 
+    getFrom : function()
+    {
+        var retVal = this.m_fromForm.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_fromPlace.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_fromCoord;
+        return retVal;
+    },
+
+
     /**
      * set from form with either/both a string and X/Y
      * NOTE: x & y are reversed -- really are lat,lon
+     *
      */
     setFrom : function(fString, x, y, moveMap, noPoi)
     {
@@ -388,8 +381,21 @@ otp.planner.StaticForms = {
         if(x && x > -181.1 && y && y > -181.1) 
         {
             this.m_fromCoord = x + ',' + y;
+            this.setRawInput(this.m_fromCoord, this.m_fromForm);
+            this.setRawInput(this.m_fromCoord, this.m_fromPlace);
             if(this.poi && !noPoi) this.poi.setFrom(y, x, fString, moveMap);
         }
+    },
+
+    /** will look in text forms first, then hidden form variable, then coordinate for value */
+    getTo : function()
+    {
+        var retVal = this.m_toForm.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_toPlace.getRawValue();
+        if(retVal == null || retVal.length < 1)
+            retVal = this.m_toCoord;
+        return retVal;
     },
 
     /**
@@ -403,6 +409,8 @@ otp.planner.StaticForms = {
         if(x && x > -180.1 && y && y > -181.1) 
         {
             this.m_toCoord = x + ',' + y;
+            this.setRawInput(this.m_toCoord, this.m_toForm);
+            this.setRawInput(this.m_toCoord, this.m_toPlace);
             if(this.poi && !noPoi) this.poi.setTo(y, x, tString, moveMap);
         }
     },
@@ -553,12 +561,8 @@ otp.planner.StaticForms = {
         var retVal = {};
         retVal.url       = url;
         retVal.itinID    = "1";
-        retVal.from      = this.m_fromForm.getRawValue();
-        retVal.fromPlace = this.m_fromForm.getRawValue();
-        retVal.fromCoord = this.m_fromCoord;
-        retVal.to        = this.m_toForm.getRawValue();
-        retVal.toPlace   = this.m_toForm.getRawValue();
-        retVal.toCoord   = this.m_toCoord;
+        retVal.fromPlace = this.getFrom();
+        retVal.toPlace   = this.getTo();
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
@@ -567,9 +571,54 @@ otp.planner.StaticForms = {
         retVal.mode            = this.m_modeForm.getValue();
         retVal.wheelchair      = this.m_wheelchairForm.getValue();
         retVal.intermediate_places = ''; //TODO: intermediate stops
+
+        // break up the from coordinate into lat & lon
+        var coord = this.m_fromCoord;
+        if(coord == otp.util.Constants.BLANK_LAT_LON)
+            coord = retVal.fromPlace;
+        retVal.fromLat = this.getLat(coord);
+        retVal.fromLon = this.getLon(coord);
+
+        // break up the to coordinate into lat & lon
+        coord = this.m_toCoord;
+        if(coord == otp.util.Constants.BLANK_LAT_LON)
+            coord = retVal.toPlace;
+        retVal.toLat   = this.getLat(coord);
+        retVal.toLon   = this.getLon(coord);
+
         try
         {
             retVal.time = retVal.time.replace(/\./g, "");
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
+    /** returns the second value from a comma separated string eg: 0.0,0.returnMe*/
+    getLon : function(coord) {
+        var retVal = null;
+
+        try
+        {
+            retVal = coord.substring(coord.indexOf(',') + 1); 
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
+    /** returns the first value from a comma separated string eg: 0.returnMe,0.0 */
+    getLat : function(coord) {
+        var retVal = null;
+
+        try
+        {
+            retVal = coord.substring(0, coord.indexOf(',')); 
         }
         catch(e)
         {
@@ -583,7 +632,7 @@ otp.planner.StaticForms = {
      */
     clearFrom : function(formToo)
     {
-        this.m_fromCoord = '0.0,0.0'; 
+        this.m_fromCoord = otp.util.Constants.BLANK_LAT_LON; 
 
         if(formToo && formToo === true)
         {
@@ -595,7 +644,7 @@ otp.planner.StaticForms = {
      */
     clearTo : function(formToo)
     {
-        this.m_toCoord = '0.0,0.0'; 
+        this.m_toCoord = otp.util.Constants.BLANK_LAT_LON; 
 
         if(formToo && formToo === true)
         {
