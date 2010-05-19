@@ -267,7 +267,8 @@ otp.planner.TripTab = {
         this.renderer.clear();
         
         /* draw topographic map */
-        if (document.createElement('canvas').getContext) {
+        
+        if (otp.planner.Utils.supportsCanvas()) {
             if(this.request.mode == "WALK" || this.request.mode.contains("BICYCLE"))
             {
                 this.ui.innerSouth.getEl().setHeight(180);

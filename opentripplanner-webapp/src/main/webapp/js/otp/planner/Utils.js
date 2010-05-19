@@ -331,6 +331,18 @@ otp.planner.Utils = {
         }
     },
     
+    /*
+     * Determines whether or not the browser supports the HTML5 Canvas element.
+     * Includes check for ExplorerCanvas for IE support.
+     */
+    supportsCanvas : function() {
+        var c = document.createElement('canvas');
+        if (typeof G_vmlCanvasManager != "undefined") {
+            c = G_vmlCanvasManager.initElement(c);
+        }
+        return !!c.getContext;
+    },
+    
     CLASS_NAME: "otp.planner.Utils"
 };
 }

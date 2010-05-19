@@ -230,6 +230,9 @@ padding: 8px;
     font-weight: bold;
  }
  
+ .canvas-container {
+    overflow: auto;
+ }
 
 /* FRANK ADDED schedules.css OVERRIDE */
 .duration {

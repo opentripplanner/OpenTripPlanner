@@ -1,8 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html debug="true">
+<html>
 <head>
     <title>OpenTripPlanner Map</title>
-
 
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
     <meta name="description" content="The Open Trip Planner provides step-by-step directions for using multiple modes of travel, including transit, biking and walking. Find out more about this open source project at http://opentripplanner.org." />
@@ -16,6 +15,8 @@
     <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
     <link rel="stylesheet" type="text/css" href="planner.css" />
 
+    <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
+    
     <script src="js/lib/openlayers/OpenLayers.js"></script>
     <script src="js/lib/ext/adapter/ext/ext-base.js"></script>
 
@@ -26,7 +27,7 @@
     <script src="js/lib/ext/TabCloseMenu.js"></script>
 
     <script src="js/lib/geoext/GeoExt.js"></script>
-
+    
     <script src="js/otp/otp.js"></script>
     <script src="js/otp/util/Constants.js"></script>
     <script src="js/otp/util/Modes.js"></script>
@@ -61,8 +62,7 @@
     <script src="js/otp/application/Controller.js"></script>
     <script src="js/otp/config.js"></script>
 </head>
-<style>
-</style>
+
 <body>
     <div class="logo" id="logo"> 
         <a href="http://opentripplanner.org" title="OpenTripPlanner Home"></a>
@@ -76,5 +76,4 @@
     });
     </script>
 </body>
-</html>
 </html>
