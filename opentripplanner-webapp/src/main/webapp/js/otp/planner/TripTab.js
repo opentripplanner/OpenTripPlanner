@@ -273,24 +273,23 @@ otp.planner.TripTab = {
     },
 
     /** */
-    draw : function()
-    {
+    draw : function() {
         this.renderer.clear();
         
         /* draw topographic map */
         
         if (otp.planner.Utils.supportsCanvas()) {
-            if(this.request.mode == "WALK" || this.request.mode.contains("BICYCLE"))
-            {
-                this.ui.innerSouth.getEl().setHeight(180);
-                this.ui.innerSouth.show();
-                this.ui.viewport.doLayout();
-                this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
-            }
-            else 
-            {
-                if(this.ui.innerSouth.isVisible()) 
-                {
+            if (this.request.mode == "WALK" || this.request.mode.contains("BICYCLE")) {
+                var firstStep = this.m_activeItinerary.m_legStore.getAt(0).data.steps[0];
+                // Only show topo map if there's elevation data.
+                if (typeof firstStep.elevation == 'string' && firstStep.elevation != "") {
+                    this.ui.innerSouth.getEl().setHeight(180);
+                    this.ui.innerSouth.show();
+                    this.ui.viewport.doLayout();
+                    this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+                }
+            } else {
+                if (this.ui.innerSouth.isVisible()) {
                     this.ui.innerSouth.hide();
                     this.ui.viewport.doLayout();
                 }
