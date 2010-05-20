@@ -22,17 +22,18 @@ otp.config = {
     'planner': {
         'url'            : null,
         'linkTemplates'  : [
-            {name:'OTP (at TriMet)',  url:'http://maps5.trimet.org/otp?' + otp.planner.ParamTemplate},
+            {name:'Link to this trip (OTP)',  url:'index.html?' + otp.planner.ParamTemplate},
 
-            {separator:true, name:'Transit Trips'},
-            {name:'TriMet',           url:'http://maps.trimet.org?arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
-            {name: 'Google Transit',  url:'http://www.google.com/maps?date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
+            {separator:true, name:'This trip on other transit planners'},
+            {name: 'Google Transit',       url:'http://www.google.com/maps?<tpl if="arriveBy == \'Arrive\'">ttype=arr&</tpl>date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
+//            {name:'TriMet (Map Planner)',  url:'http://maps.trimet.org?<tpl if="opt == \'TRANSFERS\'">min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">walk=0.9999&</tpl>arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
+//            {name:'TriMet (Text Planner - time and date reset to current)', url:'http://trimet.org/go/cgi-bin/plantrip.cgi?<tpl if="arriveBy == \'Arrive\'">Arr=A&</tpl><tpl if="opt == \'TRANSFERS\'">Min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">Walk=0.9999&</tpl>date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},            
 
-            {separator:true, name:'Bike Trips'},
+            {separator:true, name:'On other bike trip planners'},
             {name: 'Google Bikes',    url:'http://www.google.com/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=b'},
-            {name: 'ByCycle',         url:'http://bycycle.org/regions/portlandor/routes/find?s=longitude%3D{fromLon}%20latitude%3D{fromLat}&e=longitude%3D{toLon},%20latitude%3D{toLat}&pref=default'},
+//            {name: 'ByCycle',         url:'http://bycycle.org/regions/portlandor/routes/find?s=longitude%3D{fromLon}%20latitude%3D{fromLat}&e=longitude%3D{toLon},%20latitude%3D{toLat}&pref=default'},
 
-            {separator:true, name:'Walk Trips'},
+            {separator:true, name:'On other walking direction planners'},
             {name: 'Google Walking',  url:'http://www.google.com/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
         'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")

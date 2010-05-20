@@ -33,14 +33,14 @@ otp.util.Modes =  {
     TRAINISH    : 'TRAINISH', 
     BUSISH      : 'BUSISH',
 
-    /** return transit */
-    transitModes : [this.TRAM, this.SUBWAY, this.BUS, this.RAIL, this.GONDOLA, this.FERRY, this.CABLE_CAR, this.FUNICULAR, this.BUSISH, this.TRANSIT, this.TRAINISH],
-    isTransit : function(mode) {
-        var retVal = false;
 
+    /** return transit */
+    isTransit : function(mode) {
+        var transitModes = [this.TRAM, this.SUBWAY, this.BUS, this.RAIL, this.GONDOLA, this.FERRY, this.CABLE_CAR, this.FUNICULAR, this.BUSISH, this.TRANSIT, this.TRAINISH];
+        var retVal   = false;
         if(mode != null) {
-            for(var i = 0; i < this.transitModes.length; i++) {
-                var m = this.transitModes[i];
+            for(var i = 0; i < transitModes.length; i++) {
+                var m = transitModes[i];
                 if(mode.toUpperCase().indexOf(m) >= 0 ) {
                     retVal = true;
                     break;
@@ -50,6 +50,7 @@ otp.util.Modes =  {
 
         return retVal;
     },
+
 
     CLASS_NAME : "otp.util.Modes"
 };

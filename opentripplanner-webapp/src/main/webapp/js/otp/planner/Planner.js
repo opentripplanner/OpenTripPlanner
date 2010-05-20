@@ -288,7 +288,7 @@ otp.planner.Planner = {
         } else {
             this.m_activeTabID = 0;
             this.controller.deactivate(this.CLASS_NAME);
-                
+
             // hide the topo map
             if (this.ui.innerSouth.isVisible()) {
                 this.ui.innerSouth.hide();
@@ -296,6 +296,7 @@ otp.planner.Planner = {
             }
         }
     },
+
 
     /**
      * adds a form panel to a new tab in the trip planner tab'd panel.

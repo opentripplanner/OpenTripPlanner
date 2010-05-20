@@ -175,8 +175,8 @@ otp.locale.Spanish = {
         options: 
         [
           ['TRANSFERS', 'Mínimo número de Transbordos'],
-          ['SAFE', 'Viaje más seguro'],
-          ['QUICK', 'Viaje más corto'] 
+          ['QUICK',     'Viaje más corto'],
+          ['SAFE',      'Viaje más seguro']
         ],
     
         arriveDepart: 

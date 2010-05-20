@@ -176,11 +176,16 @@ otp.planner.TripTab = {
     {
         if(this.linkTemplates == null || this.linkTemplates.length <= 0) return;
 
-        var win_y = 100;
+
+        // link dialog has a message about the trip and is at least 120 pixels in height
+        var win_y = 120;
         var html = otp.planner.Templates.tripFeedbackDetails.apply(this.request) + "<br/>";
 
+        // if there are link templates in the config, then process those templates and add their contents to the dialog (also increase the height of the window)
         for(var i = 0; i < this.linkTemplates.length; i++) {
             win_y+=15;
+
+            // a separator template will add a newline (and optional header string) to the html
             if(this.linkTemplates[i].separator == true) {
                 html += '<br/>';
                 if(this.linkTemplates[i].name != null) {
@@ -189,11 +194,17 @@ otp.planner.TripTab = {
                 }
                 continue;
             }
+
+            // create the Ext XTemplate on the first pass through this loop for all URLs 
             if(this.linkTemplates[i].template == null) {
                 this.linkTemplates[i].template = new Ext.XTemplate(this.linkTemplates[i].url).compile();
             }
+
+            // add a new url to the link dialog, processing the XTemplate for the URL 
             html += '<a target="#" href="' + this.linkTemplates[i].template.apply(this.request) + '">' + this.linkTemplates[i].name + '</a><br/>';
         }
+
+        // make and show the link dialog
         this.linkDialog = otp.util.ExtUtils.makePopup({'html':html}, this.locale.buttons.link, true, 300, win_y, true, 100, 200);
     },
 

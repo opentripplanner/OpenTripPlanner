@@ -476,30 +476,30 @@ otp.planner.StaticForms = {
             }
 
             // arrive by parameter 
-            if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "A"))
-                forms.m_arriveByForm.setValue('A');
-            if(params.arr && (params.arr.indexOf("rive") > 0 || params.arr == "A"))
-                forms.m_arriveByForm.setValue('A');
-            if(params.Arr && (params.Arr.indexOf("rive") > 0 || params.Arr == "A"))
-                forms.m_arriveByForm.setValue('A');
-            if(params.arrParam && (params.arrParam.indexOf("part") > 0 || params.arrParam == "D"))
-                forms.m_arriveByForm.setValue('D');
-            if(params.arr && (params.arr.indexOf("part") > 0 || params.arr == "D"))
-                forms.m_arriveByForm.setValue('D');
-            if(params.Arr && (params.Arr.indexOf("part") > 0 || params.Arr == "D"))
-                forms.m_arriveByForm.setValue('D');
+            if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "true"))
+                forms.m_arriveByForm.setValue('true');
+            if(params.arr && (params.arr.indexOf("rive") > 0 || params.arr == "true"))
+                forms.m_arriveByForm.setValue('true');
+            if(params.Arr && (params.Arr.indexOf("rive") > 0 || params.Arr == "true"))
+                forms.m_arriveByForm.setValue('true');
+            if(params.arrParam && (params.arrParam.indexOf("part") > 0 || params.arrParam == "false"))
+                forms.m_arriveByForm.setValue('false');
+            if(params.arr && (params.arr.indexOf("part") > 0 || params.arr == "false"))
+                forms.m_arriveByForm.setValue('false');
+            if(params.Arr && (params.Arr.indexOf("part") > 0 || params.Arr == "false"))
+                forms.m_arriveByForm.setValue('false');
             if(params.after)
             {
                 time = params.after.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arriveByForm.setValue('D');
+                forms.m_arriveByForm.setValue('false');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
                 forms.m_time.setRawValue(time);
-                forms.m_arriveByForm.setValue('A');
+                forms.m_arriveByForm.setValue('true');
                 time = true;
             }
 
@@ -567,7 +567,8 @@ otp.planner.StaticForms = {
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
-        retVal.maxWalkDistance = this.m_maxWalkDistanceForm.getValue();
+        var d = this.m_maxWalkDistanceForm.getValue();
+        retVal.maxWalkDistance = d * 1.0;
         retVal.mode            = this.m_modeForm.getValue();
         retVal.wheelchair      = this.m_wheelchairForm.getValue();
         retVal.intermediate_places = ''; //TODO: intermediate stops
