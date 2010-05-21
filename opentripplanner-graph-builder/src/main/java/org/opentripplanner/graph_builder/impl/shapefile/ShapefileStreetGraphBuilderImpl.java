@@ -178,7 +178,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 endCorner.inStreet = street;
 
                 Street backStreet = new Street(endCorner, startCorner, name, length);
-                backStreet.setGeometry(geom.reverse());
+                backStreet.setGeometry((LineString) geom.reverse());
                 startCorner.inStreet = backStreet;
                 endCorner.outStreet = backStreet;
 

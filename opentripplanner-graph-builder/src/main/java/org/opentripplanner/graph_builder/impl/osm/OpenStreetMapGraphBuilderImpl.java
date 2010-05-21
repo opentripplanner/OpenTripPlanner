@@ -374,7 +374,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setGeometry(geometry);
             }
             if (backStreet != null) {
-                backStreet.setGeometry(geometry.reverse());
+                backStreet.setGeometry((LineString) geometry.reverse());
             }
             return new P2<Street>(street, backStreet);
         }
