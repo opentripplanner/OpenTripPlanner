@@ -138,6 +138,6 @@ otp.planner.Renderer = {
     },
 
     CLASS_NAME: "otp.planner.Renderer"
-}
+};
 
 otp.planner.Renderer = new otp.Class(otp.planner.Renderer);
