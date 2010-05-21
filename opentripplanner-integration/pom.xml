@@ -92,7 +92,7 @@
                         <configuration>
                             <executable>java</executable>
                             <arguments>
-                                <argument>-Xmx700m</argument>
+                                <argument>-Xmx900m</argument>
                                 <argument>-classpath</argument>
                                 <classpath />
                                 <argument>org.opentripplanner.integration.graph_builder.GraphBuilderIntegrationMain</argument>
