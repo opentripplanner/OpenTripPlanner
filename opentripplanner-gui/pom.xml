@@ -13,10 +13,6 @@
         <version>0.4-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <geotools.version>2.5.7</geotools.version>
-    </properties>
-
     <repositories>
         <repository>
             <id>download.java.net</id>
