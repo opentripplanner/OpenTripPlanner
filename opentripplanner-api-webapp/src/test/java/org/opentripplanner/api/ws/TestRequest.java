@@ -139,7 +139,7 @@ public class TestRequest extends TestCase {
         Response response = planner.getItineraries(
                 v1.getLabel(),
                 v2.getLabel(),
-                new ArrayList<String>(),
+                null,
                 "2009-01-01", 
                 "11:11:11",
                 false,
