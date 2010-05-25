@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<groups xmlns="http://www.isdc.ro/wro"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.isdc.ro/wro wro.xsd">
+
+  <group name="otp-min">
+    <js>/js/otp/otp.js</js>
+    <js>/js/otp/util/Constants.js</js>
+    <js>/js/otp/util/Modes.js</js>
+    <js>/js/otp/locale/English.js</js>
+    <js>/js/otp/util/AnalyticsUtils.js</js>
+    <js>/js/otp/util/DateUtils.js</js>
+    <js>/js/otp/util/ObjUtils.js</js>
+    <js>/js/otp/util/StringFormattingUtils.js</js>
+    <js>/js/otp/util/OpenLayersUtils.js</js>
+    <js>/js/otp/util/ExtUtils.js</js>
+    <js>/js/otp/util/ImagePathManager.js</js>
+    <js>/js/otp/util/ParseUrlParams.js</js>
+    <js>/js/otp/planner/ContextMenu.js</js>
+    <js>/js/otp/core/ComboBox.js</js>
+    <js>/js/otp/core/Map.js</js>
+    <js>/js/otp/core/Measure.js</js>
+    <js>/js/otp/core/UI.js</js>
+    <js>/js/otp/planner/Utils.js</js>
+    <js>/js/otp/planner/Forms.js</js>
+    <js>/js/otp/planner/Itinerary.js</js>
+    <js>/js/otp/planner/Planner.js</js>
+    <js>/js/otp/planner/Renderer.js</js>
+    <js>/js/otp/planner/TopoRenderer.js</js>
+    <js>/js/otp/planner/Templates.js</js>
+    <js>/js/otp/planner/TripTab.js</js>
+    <js>/js/otp/planner/poi/Control.js</js>
+    <js>/js/otp/planner/poi/Popup.js</js>
+    <js>/js/otp/planner/poi/Style.js</js>
+    <js>/js/otp/systemmap/Systemmap.js</js>
+    <js>/js/otp/systemmap/Popup.js</js>
+    <js>/js/otp/application/Attribution.js</js>
+    <js>/js/otp/application/Controller.js</js>
+    <js>/js/otp/config.js</js>
+  </group>
+
+</groups>

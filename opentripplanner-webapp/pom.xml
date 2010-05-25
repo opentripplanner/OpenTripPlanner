@@ -20,6 +20,25 @@
 
     <build>
         <finalName>opentripplanner-webapp</finalName>
+        <plugins>
+            <plugin>
+                <groupId>ro.isdc.wro4j</groupId>
+                <artifactId>wro4j-maven-plugin</artifactId>
+                <version>1.2.6</version>
+                <executions>
+                    <execution>
+                            <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                  <targetGroups>otp-min</targetGroups>
+                  <destinationFolder>${basedir}/src/main/webapp/js/</destinationFolder>
+                  <contextFolder>${basedir}/src/main/webapp/</contextFolder>
+                </configuration>
+            </plugin>
+        </plugins>
     </build>
-
 </project>
