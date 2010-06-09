@@ -45,6 +45,10 @@ otp.systemmap.Popup = {
     // reference to the system map
     sysmap: null,
 
+    // popup id can be used to identify it
+    id: null,
+    
+
     initialize: function(config) {
         otp.configure(this, config);
 
@@ -127,7 +131,7 @@ otp.systemmap.Popup = {
                                          new OpenLayers.Size(200, 200),
                                          html,
                                          true,
-                                         function() { self.sysmap.popupClosed(); self.removePopup(); }
+                                         function() { self.sysmap.popupClosed(self.id); self.removePopup(); }
                                          );
         if (this.klass) {
             popup.displayClass = this.klass;

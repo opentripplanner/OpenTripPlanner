@@ -44,6 +44,14 @@ otp.systemmap.Systemmap = {
     controlStopsClick: null,
     controlStopsUrl: null,
 
+    // we'll need to keep track of the highlighted stops that we need to display as state
+    // so that a hover popup will only add to it instead of replacing it
+    lastClickedPopup: null,
+    lastHoveredPopup: null,
+
+    // need to keep track of the state of the currently selected stops
+    highlightedStops: [],
+
     initialize : function(config)
     {
         this.systemmap = this;
@@ -90,7 +98,8 @@ otp.systemmap.Systemmap = {
             var raiseTripLayers = function() {
                 var layersToRaise = [];
                 Ext.each(map.layers, function(layer) {
-                        if (layer.name.indexOf('trip') !== -1) {
+                        if (typeof layer.name === 'string' &&
+                            layer.name.indexOf('trip') !== -1) {
                             layersToRaise.push(layer);
                         }
                     });
@@ -104,6 +113,32 @@ otp.systemmap.Systemmap = {
     },
 
     /**
+     * return a comma separated list of currently active stops
+     * concatentated with the stop ids passed into the function
+     * note that this does not alter the highlightedStops array
+     * This is the format that's required to pass to geoserver
+     */
+    highlightedStopFeatureIds: function() {
+        var newids = Ext.flatten(arguments);
+        var allids = this.highlightedStops.concat(newids);
+        return allids.join(",");
+    },
+
+    /**
+     * display a highlighted layer with the appropriate features highlighted
+     * featureIdsAsString should be a comma separated string
+     */
+    displayHighlightedLayer: function(layer, featureIdsAsString) {
+        if (featureIdsAsString === "") {
+            delete layer.params['featureId'];
+            layer.setVisibility(false);
+        } else {
+            layer.mergeNewParams({featureId: featureIdsAsString});
+            layer.setVisibility(true);
+        }
+    },
+
+    /**
      * add the logic for the popups to the system map
      * safe to call multiple times
      */
@@ -112,34 +147,51 @@ otp.systemmap.Systemmap = {
         var self = this;
 
         if (!this.controlStopsHover) {
-            var lastHoveredPopup = null;
             this.controlStopsHover = new OpenLayers.Control.WMSGetFeatureInfo({
                     hover: true,
                     url: this.controlStopsUrl,
                     layerUrls: [this.layerUrlStops],
                     layers: [this.layerStops],
                     eventListeners: {
-                        beforegetfeatureinfo: function(event) {
-                            if (lastHoveredPopup) {
-                                lastHoveredPopup.triggerClose(500);
-                                lastHoveredPopup = null;
-                            }
-                            //delete self.layerStopsHighlighted.params['CQL_FILTER'];
-                            //self.layerStopsHighlighted.redraw();
-                            self.layerStopsHighlighted.setVisibility(false);
-                            //self.layerStops.setOpacity(1.0);
-                        },
                         getfeatureinfo: function(event) {
+                            var nostops = false;
                             try {
                                 var doc = Ext.util.JSON.decode(event.text);
                             } catch(err) {
-                                return;
+                                nostops = true;
                             }
                             if (!doc || !doc.type || doc.type !== 'stop') {
+                                nostops = true;
+                            }
+                            if (nostops) {
+                                self.displayHighlightedLayer(self.layerStopsHighlighted, self.highlightedStopFeatureIds());
+                                if (self.lastHoveredPopup) {
+                                    self.lastHoveredPopup.triggerClose(500);
+                                    self.lastHoveredPopup = null;
+                                }
                                 return;
                             }
+
                             doc = doc.stop;
+                            var stopId = 'stops.' + doc.stopId;
+
+                            // if we're hovering over the same stop, we don't need to do anything
+                            if (self.lastHoveredPopup && self.lastHoveredPopup.id === stopId) {
+                                return;
+                            } else if (self.lastHoveredPopup) {
+                                // but we need to clean up the old popup if it's a different one
+                                self.lastHoveredPopup.triggerClose(500);
+                                self.lastHoveredPopup = null;
+                            }
+
+                            // if a click popup exists for the same stop, we don't want to show a hover popup
+                            if (self.lastClickedPopup && self.lastClickedPopup.id === stopId) {
+                                self.displayHighlightedLayer(self.layerStopsHighlighted, self.highlightedStopFeatureIds());
+                                return;
+                            }
+
                             var popup = new otp.systemmap.Popup({map: map,
+                                                                 id: stopId,
                                                                  doc: doc,
                                                                  klass: 'olHoverPopup',
                                                                  displayDepartures: false,
@@ -148,12 +200,9 @@ otp.systemmap.Systemmap = {
                                 });
                             // keep a reference to the last popup displayed
                             // which will get closed when the next hover is triggered
-                            lastHoveredPopup = popup;
+                            self.lastHoveredPopup = popup;
 
-                            var stopId = doc.stopId;
-                            self.layerStopsHighlighted.mergeNewParams({featureId: stopId});
-                            self.layerStopsHighlighted.setVisibility(true);
-                            //self.layerStops.setOpacity(0.3);
+                            self.displayHighlightedLayer(self.layerStopsHighlighted, self.highlightedStopFeatureIds(stopId));
                         }
                     }
             });
@@ -165,6 +214,10 @@ otp.systemmap.Systemmap = {
                     layers: [this.layerRoutes, this.layerStops],
                     eventListeners: {
                         beforegetfeatureinfo: function(event) {
+                            if (self.lastClickedPopup) {
+                                self.lastClickedPopup.triggerClose(500);
+                                self.lastClickedPopup = null;
+                            }
                             self.layerStopsHighlighted.setVisibility(false);
                             self.layerRoutesHighlighted.setVisibility(false);
 
@@ -172,12 +225,17 @@ otp.systemmap.Systemmap = {
                             self.layerRoutes.setOpacity(1.0);
                         },
                         getfeatureinfo: function(event) {
+                            var nodata = false;
                             try {
                                 var doc = Ext.util.JSON.decode(event.text);
                             } catch (err) {
-                                return;
+                                nodata = true;
                             }
                             if (!doc || !doc.type || !(doc.type === 'stop' || doc.type === 'routes')) {
+                                nodata = true;
+                            }
+                            if (nodata) {
+                                self.highlightedStops = [];
                                 return;
                             }
                             if (doc.type === 'routes') {
@@ -187,10 +245,11 @@ otp.systemmap.Systemmap = {
                                 Ext.each(doc.stopids, function(stopId) {
                                     stopIds.push("stops." + stopId);
                                 });
-                                stopIds = stopIds.join(",");
-                                the_stopids = stopIds;
-                                self.layerStopsHighlighted.mergeNewParams({featureId: stopIds});
-                                self.layerStopsHighlighted.setVisibility(true);
+
+                                // here we'll lose the previously selected stops, ok?
+                                self.highlightedStops = stopIds;
+                                
+                                self.displayHighlightedLayer(self.layerStopsHighlighted, self.highlightedStopFeatureIds());
 
                                 // highlight all routes
                                 var routeIds = [];
@@ -198,20 +257,31 @@ otp.systemmap.Systemmap = {
                                         routeIds.push("routes." + route.routeId);
                                     });
                                 routeIds = routeIds.join(",");
-                                self.layerRoutesHighlighted.mergeNewParams({featureId: routeIds});
-                                self.layerRoutesHighlighted.setVisibility(true);
+                                self.displayHighlightedLayer(self.layerRoutesHighlighted, routeIds);
                                 
                             } else {
                                 doc = doc.stop;
+                                var stopId = "stops." + doc.stopId;
                                 var popup = new otp.systemmap.Popup({map: map,
+                                                                     id: stopId,
                                                                      doc: doc,
                                                                      displayDepartures: true,
                                                                      xy: event.xy,
                                                                      sysmap: self
                                     });
-                                var stopId = "stops." + doc.stopId;
-                                self.layerStopsHighlighted.mergeNewParams({featureId: stopId});
-                                self.layerStopsHighlighted.setVisibility(true);
+                                self.lastClickedPopup = popup;
+
+                                // if we have a hover popup for the same stop, close that one immediately
+                                if (self.lastHoveredPopup && self.lastHoveredPopup.id === stopId) {
+                                    self.lastHoveredPopup.removePopup();
+                                    self.lastHoveredPopup = null;
+                                }
+                                
+
+                                // we lose previously selected stopids here
+                                self.highlightedStops = [stopId];
+
+                                self.displayHighlightedLayer(self.layerStopsHighlighted, self.highlightedStopFeatureIds());
     
                                 // highlight all routes serviced by this stop
                                 var routes = doc.routes;
@@ -220,13 +290,12 @@ otp.systemmap.Systemmap = {
                                         routeIds.push("routes." + route.routeId);
                                     });
                                 var featureId = routeIds.join(",");
-                                self.layerRoutesHighlighted.mergeNewParams({featureId: featureId});
-                                self.layerRoutesHighlighted.setVisibility(true);
+                                self.displayHighlightedLayer(self.layerRoutesHighlighted, featureId);
                             }
 
                             // and dim the map
-                            self.layerRoutes.setOpacity(0.4);
-                            self.layerStops.setOpacity(0.4);
+                            self.layerRoutes.setOpacity(0.1);
+                            self.layerStops.setOpacity(0.1);
                         }
                     }
                 });
@@ -238,10 +307,12 @@ otp.systemmap.Systemmap = {
         }
     },
 
-    popupClosed: function() {
+    popupClosed: function(popupId) {
         this.layerStops.setOpacity(1.0);
         this.layerRoutes.setOpacity(1.0);
         this.layerRoutesHighlighted.setVisibility(false);
+        this.layerStopsHighlighted.setVisibility(false);
+        this.highlightedStops.remove(popupId);
     },
  
     CLASS_NAME: "otp.systemmap.Systemmap"
