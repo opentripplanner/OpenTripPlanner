@@ -531,8 +531,9 @@ public class Planner {
                 if (direction == RelativeDirection.CONTINUE) {
                     // append elevation info
                     if(step.elevation != null) {
-                        if(step.elevation.length() > 0) step.elevation += ",";
-                        step.elevation += encodeElevationProfile(edge, distance);
+                        String s = encodeElevationProfile(edge, distance);
+                        if ((step.elevation.length() > 0) && !s.equals("")) step.elevation += ",";
+                        step.elevation += s;
                     }
                     distance += edge.getDistance();
                 }
