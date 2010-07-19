@@ -223,6 +223,7 @@ public class Planner {
         options.optimizeFor = request.getOptimize();
         options.back = request.isArriveBy();
         options.wheelchairAccessible = request.getWheelchair();
+        options.maxWalkDistance = request.getWalk();
         if (request.getMaxSlope() > 0) { 
             options.maxSlope = request.getMaxSlope();
         }

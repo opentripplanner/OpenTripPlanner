@@ -45,7 +45,7 @@ public class Request implements RequestInf {
     /**
      * The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile.
      */
-    private Double maxWalkDistance = 804.0; // half a mile in meters
+    private Double maxWalkDistance = Double.MAX_VALUE;
     /**
      * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
      */
