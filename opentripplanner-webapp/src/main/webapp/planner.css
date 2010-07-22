@@ -73,6 +73,12 @@ position: absolute;
 font-size: x-small;
 }
 
+
+.splash-screen {
+font-size: 135%;
+padding: 20px;
+}
+
 .clear-button {
 background-image: url(images/ui/buttons/clear.gif)!important;
 }

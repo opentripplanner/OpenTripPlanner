@@ -231,6 +231,13 @@ otp.util.ExtUtils = {
         if(isShow === true)
             retVal.show(this);
 
+        // timeout used to close this popup after so many seconds...
+        if(config.timeout && config.timeout > 0) {
+            setTimeout(function(){
+                retVal.close(this);
+            }, config.timeout * 1000);
+        }
+
         return retVal;
     },
 

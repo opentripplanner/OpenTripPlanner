@@ -83,6 +83,18 @@ otp.config = {
         attributionHtml: '<p class="disclaimer">Disclaimer goes here</p>'
     },
 
+    // presents a dialog on initial startup of the app, with a message for your customers
+    'splashScreen': {
+        enabled: false,
+        timeout: 20,   // seconds to stay open - if <= ZERO, then dialog does not timeout and requires the customer to close the dialog
+        title:   'Important: Please read',
+        html:    '<p class="splash-screen">'
+                 + 'Please note that the trip routing presented here is for demonstration purposes of the <a href="http://opentripplanner.com" target="#">OpenTripPlanner (OTP)</a> only, '
+                 + 'and not intended as a travel resource.  You will begin to see improvements in the planned trips as the project matures.  A public beta is scheduled for spring 2011. '
+                 + '</p>'
+    },
+
+    
     // if specified, uri path to a custom logo
     // otherwise use the default "images/ui/logoSmall.png"
     'logo': null,

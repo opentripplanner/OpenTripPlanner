@@ -84,6 +84,10 @@ otp.application.Controller = {
 
         this.load();
 
+        if (this.config.splashScreen.enabled) {
+            otp.util.ExtUtils.makePopup(this.config.splashScreen, this.config.splashScreen.title, true, 600, 300, true);
+        }
+
     },
 
    /**
