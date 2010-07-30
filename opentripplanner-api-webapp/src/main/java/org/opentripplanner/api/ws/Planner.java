@@ -173,7 +173,7 @@ public class Planner {
         if (showIntermediateStops != null && showIntermediateStops) {
             request.setShowIntermediateStops(true);
         }
-        if (intermediatePlaces != null && !intermediatePlaces.get(0).equals("")) {
+        if (intermediatePlaces != null && intermediatePlaces.size() > 0 && !intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
         }
 
