@@ -29,11 +29,6 @@
             <version>1.5.8</version>
         </dependency>
 
-        <dependency>
-            <groupId>commons-digester</groupId>
-            <artifactId>commons-digester</artifactId>
-            <version>1.8.1</version>
-        </dependency>
 
         <dependency>
             <groupId>org.onebusaway</groupId>

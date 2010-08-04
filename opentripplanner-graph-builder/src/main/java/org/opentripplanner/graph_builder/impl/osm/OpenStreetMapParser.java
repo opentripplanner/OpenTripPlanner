@@ -13,14 +13,15 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import org.apache.commons.digester.Digester;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMNodeRef;
-import org.opentripplanner.graph_builder.model.osm.OSMRelation;
-import org.opentripplanner.graph_builder.model.osm.OSMRelationMember;
 import org.opentripplanner.graph_builder.model.osm.OSMTag;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedInputStream;
@@ -29,67 +30,86 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 public class OpenStreetMapParser {
 
     public void parseMap(File path, OpenStreetMapContentHandler map) throws IOException,
             SAXException {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
-        parseMap(in,map);
+        parseMap(in, map);
     }
 
     public void parseMap(InputStream in, OpenStreetMapContentHandler map) throws IOException,
             SAXException {
-
-        Digester d = new Digester();
-        d.push(map);
-
-        addNodeRules(d);
-        addWayRules(d);
-        addRelationRules(d);
-
-        d.parse(in);
+        /* todo: process relations */
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = builder.parse(in);
+            Node osm = doc.getFirstChild();
+            Node node = osm.getFirstChild();
+            while (node != null) {
+                if (!(node instanceof Element)) {
+                    node = node.getNextSibling();
+                    continue;
+                }
+                Element element = (Element) node;
+                if (element.getTagName().equals("node")) {
+                    OSMNode osmNode = new OSMNode();
+                    
+                    osmNode.setId(Integer.parseInt(element.getAttribute("id")));
+                    osmNode.setLat(Double.parseDouble(element.getAttribute("lat")));
+                    osmNode.setLon(Double.parseDouble(element.getAttribute("lon")));
+                    
+                    processTags(osmNode, element);
+                    map.addNode(osmNode);
+                } else if (element.getTagName().equals("way")) {
+                    OSMWay osmWay = new OSMWay();
+                    osmWay.setId(Integer.parseInt(element.getAttribute("id")));
+                    processTags(osmWay, element);
+                    
+                    Node node2 = element.getFirstChild();
+                    while (node2 != null) {
+                        if (!(node2 instanceof Element)) {
+                            node2 = node2.getNextSibling();
+                            continue;
+                        }
+                        Element element2 = (Element) node2;
+                        if (element2.getNodeName().equals("nd")) {
+                            OSMNodeRef nodeRef = new OSMNodeRef();
+                            nodeRef.setRef(Integer.parseInt(element2.getAttribute("ref")));
+                            osmWay.addNodeRef(nodeRef);
+                        }
+                        node2 = node2.getNextSibling();
+                    }
+                    
+                    map.addWay(osmWay);
+                }
+                node = node.getNextSibling();
+            }
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    /****
-     * Protected Methods
-     ****/
-
-    protected void addNodeRules(Digester d) {
-        d.addObjectCreate("osm/node", OSMNode.class);
-        d.addSetProperties("osm/node");
-        d.addSetNext("osm/node", "addNode");
-
-        addTagRules(d, "osm/node");
+    private void processTags(OSMWithTags osm, Element element) {
+        Node node = element.getFirstChild();
+        while (node != null) {
+            if (!(node instanceof Element)) {
+                node = node.getNextSibling();
+                continue;
+            }
+            Element child = (Element) node;
+            if (child.getTagName().equals("tag")) {
+                OSMTag tag = new OSMTag();
+                tag.setK(child.getAttribute("k"));
+                tag.setV(child.getAttribute("v"));
+                osm.addTag(tag);
+            }
+            node = node.getNextSibling();
+        }
     }
 
-    protected void addWayRules(Digester d) {
-        d.addObjectCreate("osm/way", OSMWay.class);
-        d.addSetProperties("osm/way");
-        d.addSetNext("osm/way", "addWay");
-
-        d.addObjectCreate("osm/way/nd", OSMNodeRef.class);
-        d.addSetProperties("osm/way/nd");
-        d.addSetNext("osm/way/nd", "addNodeRef");
-
-        addTagRules(d, "osm/way");
-    }
-
-    protected void addRelationRules(Digester d) {
-
-        d.addObjectCreate("osm/relation", OSMRelation.class);
-        d.addSetProperties("osm/relation");
-        d.addSetNext("osm/relation", "addRelation");
-
-        d.addObjectCreate("osm/relation/member", OSMRelationMember.class);
-        d.addSetProperties("osm/relation/member");
-        d.addSetNext("osm/relation/member", "addMember");
-
-        addTagRules(d, "osm/relation");
-    }
-
-    protected void addTagRules(Digester d, String prefix) {
-        d.addObjectCreate(prefix + "/tag", OSMTag.class);
-        d.addSetProperties(prefix + "/tag");
-        d.addSetNext(prefix + "/tag", "addTag");
-    }
 }
