@@ -16,6 +16,9 @@ package org.opentripplanner.model;
 import java.io.File;
 import java.io.Serializable;
 
+/** 
+ * This is a bean that just holds the path of a serialized graph 
+ */
 public final class GraphBundle implements Serializable {
     
     private static final long serialVersionUID = 1L;

@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.OneStreetVertex;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -38,8 +38,8 @@ import processing.core.PApplet;
 import processing.core.PFont;
 
 /**
- * Show a map of the graph, intersections and TransitStops only.  The user can drag to zoom.
- * The user can also click, and a list of nearby vertices will be sent to the associated  
+ * Show a map of the graph, intersections and TransitStops only. The user can drag to zoom. The user
+ * can also click, and a list of nearby vertices will be sent to the associated
  * VertexSelectionListener
  */
 public class ShowGraph extends PApplet {
@@ -49,7 +49,7 @@ public class ShowGraph extends PApplet {
     Graph graph;
 
     STRtree vertexIndex;
-    
+
     STRtree edgeIndex;
 
     /*
@@ -82,57 +82,11 @@ public class ShowGraph extends PApplet {
         this.selector = selector;
         this.selectors = new ArrayList<VertexSelectionListener>();
     }
-    
+
+
     public void setup() {
         background(0);
         size(getSize().width, getSize().height, P2D);
-
-        vertexIndex = new STRtree();
-        edgeIndex = new STRtree();
-        for (Vertex v : graph.getVertices()) {
-            Envelope env = new Envelope(v.getCoordinate());
-            modelBounds.expandToInclude(env);
-            if (v instanceof TransitStop) {
-                vertexIndex.insert(env, v);
-            } else if(v instanceof OneStreetVertex) {
-                vertexIndex.insert(env, v);
-            } else if(v instanceof StreetLocation) {
-                vertexIndex.insert(env, v);
-            } else {
-                //a street-transit link, or a journey vertex.  no need for them in the ui.
-            }
-            
-            for (Edge e : v.getOutgoing()) {
-                if (e instanceof Street || e instanceof StreetTransitLink) {
-                    if(e.getGeometry() == null)
-                        continue;
-                    env = e.getGeometry().getEnvelopeInternal();
-                    edgeIndex.insert(env, e);
-                }
-            }
-        }
-        modelBounds.expandBy(0.02);
-        /* fix aspect ratio */
-        double yCenter = (modelBounds.getMaxY() + modelBounds.getMinY()) / 2;
-        float xScale = cos((float) (yCenter * Math.PI / 180));
-        double xSize = modelBounds.getMaxX() - modelBounds.getMinX();
-        double ySize = modelBounds.getMaxY() - modelBounds.getMinY();
-        double actualXSize = xSize * xScale;
-        System.out.println ("xs, ys, axs: " + xSize + ", " + ySize + "," + actualXSize);
-        if (ySize > actualXSize) {
-            //too tall, stretch horizontally
-            System.out.println ("stretching x by " + (ySize / xScale - actualXSize));
-            modelBounds.expandBy((ySize / xScale - actualXSize) / 2, 0);
-        } else {
-            //too wide, stretch vertically
-            System.out.println ("stretching y by " + (actualXSize - ySize));
-            modelBounds.expandBy(0, (actualXSize - ySize) / 2);
-        }
-
-        modelOuterBounds = new Envelope(modelBounds);
-        vertexIndex.build();
-        edgeIndex.build();
-
         addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
@@ -143,9 +97,31 @@ public class ShowGraph extends PApplet {
             }
         });
 
+        indexVertices();
+        
+        modelBounds.expandBy(0.02);
+        /* fix aspect ratio */
+        double yCenter = (modelBounds.getMaxY() + modelBounds.getMinY()) / 2;
+        float xScale = cos((float) (yCenter * Math.PI / 180));
+        double xSize = modelBounds.getMaxX() - modelBounds.getMinX();
+        double ySize = modelBounds.getMaxY() - modelBounds.getMinY();
+        double actualXSize = xSize * xScale;
+        System.out.println("xs, ys, axs: " + xSize + ", " + ySize + "," + actualXSize);
+        if (ySize > actualXSize) {
+            // too tall, stretch horizontally
+            System.out.println("stretching x by " + (ySize / xScale - actualXSize));
+            modelBounds.expandBy((ySize / xScale - actualXSize) / 2, 0);
+        } else {
+            // too wide, stretch vertically
+            System.out.println("stretching y by " + (actualXSize - ySize));
+            modelBounds.expandBy(0, (actualXSize - ySize) / 2);
+        }
+
+        modelOuterBounds = new Envelope(modelBounds);
+
         /* find and set up the appropriate font */
         String[] fonts = PFont.list();
-        String[] preferredFonts = {"Courier", "Mono"};
+        String[] preferredFonts = { "Courier", "Mono" };
         PFont font = null;
         for (String preferredFontName : preferredFonts) {
             for (String fontName : fonts) {
@@ -161,6 +137,35 @@ public class ShowGraph extends PApplet {
         textFont(font);
     }
 
+    public synchronized void indexVertices() {
+        vertexIndex = new STRtree();
+        edgeIndex = new STRtree();
+        for (GraphVertex gv : graph.getVertices()) {
+            Vertex v = gv.vertex;
+            Envelope env = new Envelope(v.getCoordinate());
+            modelBounds.expandToInclude(env);
+            if (v instanceof TransitStop) {
+                vertexIndex.insert(env, v);
+            } else if (v instanceof StreetLocation) {
+                vertexIndex.insert(env, v);
+            } else if (v instanceof GenericVertex) {
+                vertexIndex.insert(env, v);
+            } else {
+                // a street-transit link, or a journey vertex. no need for them in the ui.
+            }
+
+            for (Edge e : gv.getOutgoing()) {
+                if (e.getGeometry() == null) {
+                    continue;
+                }
+                env = e.getGeometry().getEnvelopeInternal();
+                edgeIndex.insert(env, e);
+            }
+        }
+        vertexIndex.build();
+        edgeIndex.build();
+    }
+
     public void zoomToDefault() {
         modelBounds = new Envelope(modelOuterBounds);
     }
@@ -171,27 +176,27 @@ public class ShowGraph extends PApplet {
         e.expandBy(0.002);
         modelBounds = e;
     }
-    
+
     public void zoomToVertex(Vertex v) {
         Envelope e = new Envelope();
         e.expandToInclude(v.getCoordinate());
         e.expandBy(0.002);
         modelBounds = e;
     }
-    
+
     public void zoomOut() {
-      modelBounds.expandBy(modelBounds.getWidth(), modelBounds.getHeight());
+        modelBounds.expandBy(modelBounds.getWidth(), modelBounds.getHeight());
     }
-    
+
     @SuppressWarnings("unchecked")
-    public void draw() {
+    public synchronized void draw() {
         fill(0);
         rect(0, 0, getSize().width - 1, getSize().height - 1);
         List<Vertex> vertices = (List<Vertex>) vertexIndex.query(modelBounds);
-        
+
         List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
         for (Edge e : edges) {
-            if(e == highlightedEdge)
+            if (e == highlightedEdge)
                 continue;
 
             if (e instanceof StreetTransitLink) {
@@ -201,21 +206,27 @@ public class ShowGraph extends PApplet {
             }
 
             Coordinate[] coords = e.getGeometry().getCoordinates();
-            for(int i = 1; i < coords.length; i++) {
-                line((float) toScreenX(coords[i-1].x), (float) toScreenY(coords[i-1].y), (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+            for (int i = 1; i < coords.length; i++) {
+                line((float) toScreenX(coords[i - 1].x), (float) toScreenY(coords[i - 1].y),
+                        (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
             }
         }
         if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
-            stroke (255, 70, 70);
+            stroke(255, 70, 70);
 
             Coordinate[] coords = highlightedEdge.getGeometry().getCoordinates();
-            for(int i = 1; i < coords.length; i++) {
-                line((float) toScreenX(coords[i-1].x), (float) toScreenY(coords[i-1].y), (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+            for (int i = 1; i < coords.length; i++) {
+                line((float) toScreenX(coords[i - 1].x), (float) toScreenY(coords[i - 1].y),
+                        (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
             }
+            stroke(0,255,0);
+            ellipse(toScreenX(coords[0].x), toScreenY(coords[0].y), 5, 5);
+            stroke(255,0,0);
+            ellipse(toScreenX(coords[coords.length-1].x), toScreenY(coords[coords.length-1].y), 5, 5);
         }
 
         for (Vertex v : vertices) {
-            if(v == highlightedVertex)
+            if (v == highlightedVertex)
                 continue;
 
             double x = v.getX();
@@ -239,7 +250,8 @@ public class ShowGraph extends PApplet {
         if (highlightedVertex != null) {
             stroke(255, 255, 30);
             fill(255, 255, 30);
-            ellipse(toScreenX(highlightedVertex.getX()), toScreenY(highlightedVertex.getY()), 7.0, 7.0);
+            ellipse(toScreenX(highlightedVertex.getX()), toScreenY(highlightedVertex.getY()), 7.0,
+                    7.0);
             noFill();
         }
         fill(255, 0, 0);
@@ -258,24 +270,25 @@ public class ShowGraph extends PApplet {
     public void mouseClicked() {
         Envelope screenEnv = new Envelope(new Coordinate(mouseX, mouseY));
         screenEnv.expandBy(3, 3);
-        Envelope env = new Envelope(toModelX(screenEnv.getMinX()), toModelX(screenEnv.getMaxX()), 
+        Envelope env = new Envelope(toModelX(screenEnv.getMinX()), toModelX(screenEnv.getMaxX()),
                 toModelY(screenEnv.getMinY()), toModelY(screenEnv.getMaxY()));
-        
+
         List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);
         selector.verticesSelected(nearby);
     }
-    
+
     public void mousePressed() {
         startDragX = mouseX;
         startDragY = mouseY;
     }
-    
+
     public void mouseReleased() {
-        if (startDragX == -1 || startDragY == -1 || Math.abs(mouseX - startDragX) < 5 || Math.abs(mouseY - startDragY) < 5) {
+        if (startDragX == -1 || startDragY == -1 || Math.abs(mouseX - startDragX) < 5
+                || Math.abs(mouseY - startDragY) < 5) {
             startDragX = startDragY = -1;
-            return; 
+            return;
         }
-        //rescale
+        // rescale
         double x1 = toModelX(startDragX);
         double x2 = toModelX(mouseX);
         if (x1 > x2) {
@@ -290,16 +303,16 @@ public class ShowGraph extends PApplet {
             y1 = y2;
             y2 = tmp;
         }
-        
+
         double yDist = y2 - y1;
         double xDist = x2 - x1;
-        
-        if (yDist < 0.00001 || xDist < 0.00001) { 
+
+        if (yDist < 0.00001 || xDist < 0.00001) {
             startDragX = startDragY = -1;
             return;
         }
-        
-        //fix ratio
+
+        // fix ratio
         double originalAspectRatio = modelOuterBounds.getWidth() / modelOuterBounds.getHeight();
         double zoomBoxAspectRatio = xDist / yDist;
         if (zoomBoxAspectRatio > originalAspectRatio) {
@@ -307,14 +320,14 @@ public class ShowGraph extends PApplet {
             y1 -= (desiredYDist - yDist) / 2;
             y2 += (desiredYDist - yDist) / 2;
         } else {
-            double desiredXDist = xDist *  originalAspectRatio / zoomBoxAspectRatio;
+            double desiredXDist = xDist * originalAspectRatio / zoomBoxAspectRatio;
             x1 -= (desiredXDist - xDist) / 2;
             x2 += (desiredXDist - xDist) / 2;
         }
-        
+
         modelBounds = new Envelope(x1, x2, y1, y2);
     }
-    
+
     private double toModelY(double y) {
         return map(y, 0, getSize().height, modelBounds.getMaxY(), modelBounds.getMinY());
     }
@@ -324,7 +337,9 @@ public class ShowGraph extends PApplet {
     }
 
     /**
-     * A version of ellipse that takes double args, because apparently Java is too stupid to downgrade automatically. 
+     * A version of ellipse that takes double args, because apparently Java is too stupid to
+     * downgrade automatically.
+     * 
      * @param d
      * @param e
      * @param f
@@ -333,16 +348,17 @@ public class ShowGraph extends PApplet {
     private void ellipse(double d, double e, double f, double g) {
         ellipse((float) d, (float) e, (float) f, (float) g);
     }
-    
+
     /**
      * Set the Vertex selector to newSelector, and store the old selector on the stack of selectors
+     * 
      * @param newSelector
      */
     public void pushSelector(VertexSelectionListener newSelector) {
         selectors.add(selector);
         selector = newSelector;
     }
-    
+
     /**
      * Restore the previous vertexSelector
      */
@@ -364,7 +380,7 @@ public class ShowGraph extends PApplet {
     }
 
     public void setHighlighed(Set<Vertex> vertices) {
-        highlightedVertices  = vertices;
+        highlightedVertices = vertices;
     }
 
     public void highlightEdge(Edge selected) {

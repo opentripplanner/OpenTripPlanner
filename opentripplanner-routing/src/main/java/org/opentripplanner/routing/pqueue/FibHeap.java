@@ -18,31 +18,33 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
 
-interface AbstractDirectoryPriorityQueue {
-    void insert(Object payload, double key);
+import org.opentripplanner.routing.spt.SPTVertex;
 
-    void insert_or_dec_key(Object payload, double key);
+interface AbstractDirectoryPriorityQueue<T> {
+    void insert(T payload, double key);
 
-    Object extract_min();
+    void insert_or_dec_key(T payload, double key);
 
-    int getN();
+    T extract_min();
+
+    int size();
 }
 
-class FibNode {
+class FibNode<T> {
     boolean mark;
 
     int degree;
 
-    LinkedList<FibNode> children;
+    LinkedList<FibNode<T>> children;
 
-    FibNode parent;
+    FibNode<T> parent;
 
     double key;
 
-    Object payload;
+    T payload;
 
-    FibNode(Object payload, double key) {
-        this.children = new LinkedList<FibNode>();
+    FibNode(T payload, double key) {
+        this.children = new LinkedList<FibNode<T>>();
         this.key = key;
         this.degree = 0;
         this.parent = null;
@@ -50,7 +52,7 @@ class FibNode {
         this.payload = payload;
     }
 
-    void addChild(FibNode child) {
+    void addChild(FibNode<T> child) {
         this.children.add(child);
     }
 
@@ -59,37 +61,41 @@ class FibNode {
     }
 }
 
-public class FibHeap implements AbstractDirectoryPriorityQueue {
-    private static final double LOG2 = Math.log(2);
+public class FibHeap<T> implements AbstractDirectoryPriorityQueue<T> {
 
     int n;
 
-    public FibNode min;
+    public FibNode<T> min;
 
-    public LinkedList<FibNode> root_list;
+    public LinkedList<FibNode<T>> root_list;
 
-    public HashMap<Object, FibNode> directory;
+    public HashMap<T, FibNode<T>> directory;
 
-    private FibNode[] rootnode_with_degree;
+    private FibNode<T>[] rootnode_with_degree;
 
     int maxSize, maxRootNodes;
 
+    private FibNode<T>[] roots;
+
     private int getMaxRootNodes(int maxSize) {
-        return (int) Math.ceil(Math.log(maxSize) / LOG2);
+        // ceil(log2(maxSize))
+        return 32 - Integer.numberOfLeadingZeros(maxSize);
     }
 
+    @SuppressWarnings("unchecked")
     public FibHeap(int maxSize) {
         n = 0;
         min = null;
-        root_list = new LinkedList<FibNode>();
-        directory = new HashMap<Object, FibNode>();
+        root_list = new LinkedList<FibNode<T>>();
+        directory = new HashMap<T, FibNode<T>>();
         this.maxSize = maxSize;
         maxRootNodes = getMaxRootNodes(maxSize);
         rootnode_with_degree = new FibNode[maxRootNodes];
+        roots = new FibNode[maxRootNodes];
     }
 
-    static FibHeap union(FibHeap H1, FibHeap H2) {
-        FibHeap H = new FibHeap(H1.maxSize + H2.maxSize);
+    FibHeap<T> union(FibHeap<T> H1, FibHeap<T> H2) {
+        FibHeap<T> H = new FibHeap<T>(H1.maxSize + H2.maxSize);
         H.root_list.addAll(H1.root_list);
         H.root_list.addAll(H2.root_list);
         H.min = H1.min;
@@ -103,7 +109,7 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         return H;
     }
 
-    void link(FibNode y, FibNode x) {
+    void link(FibNode<T> y, FibNode<T> x) {
         // System.out.println( y+" now child of "+x );
 
         this.root_list.remove(y);
@@ -122,18 +128,20 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
             rootnode_with_degree[i] = null;
         }
 
-        Object[] root_list_array = this.root_list.toArray();
-        for (int i = 0; i < root_list_array.length; i++) {
-            FibNode w = (FibNode) root_list_array[i];
-            FibNode x = w;
+        roots = root_list.toArray(roots);
+        for (int i = 0; i < roots.length; i++) {
+            FibNode<T> x = roots[i];
+            if (x == null) { 
+                break;
+            }
             int d = x.degree;
             while (rootnode_with_degree[d] != null) {
-                FibNode y = rootnode_with_degree[d];
+                FibNode<T> y = rootnode_with_degree[d];
 
                 // System.out.println( y+" and "+x+" with degree "+d+", link" );
 
                 if (x.key > y.key) {
-                    FibNode z = y;
+                    FibNode<T> z = y;
                     y = x;
                     x = z;
                 }
@@ -144,19 +152,17 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
             rootnode_with_degree[d] = x;
         }
 
-        this.min = null;
+        min = null;
 
-        ListIterator<FibNode> e = this.root_list.listIterator();
-        while (e.hasNext()) {
-            FibNode w = e.next();
-            if (this.min == null || w.key < this.min.key) {
-                this.min = w;
+        for (FibNode<T> w : root_list) {
+            if (min == null || w.key < min.key) {
+                min = w;
             }
         }
     }
 
-    public void insert(Object payload, double key) {
-        FibNode x = new FibNode(payload, key);
+    public void insert(T payload, double key) {
+        FibNode<T> x = new FibNode<T>(payload, key);
         this.directory.put(payload, x);
 
         this.root_list.add(x);
@@ -167,8 +173,8 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         this.n = this.n + 1;
     }
 
-    public void insert_or_dec_key(Object payload, double key) {
-        FibNode exists = (FibNode) this.directory.get(payload);
+    public void insert_or_dec_key(T payload, double key) {
+        FibNode<T> exists = this.directory.get(payload);
         if (exists != null) {
             this.decrease_node_key(exists, key);
         } else {
@@ -176,14 +182,14 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         }
     }
 
-    public Object extract_min() {
-        FibNode z = this.min;
+    public T extract_min() {
+        FibNode<T> z = this.min;
 
         // System.out.println( "going to return "+z+"; cleaning up" );
 
-        ListIterator<FibNode> e = z.children.listIterator();
+        ListIterator<FibNode<T>> e = z.children.listIterator();
         while (e.hasNext()) {
-            FibNode x = e.next();
+            FibNode<T> x = e.next();
             this.root_list.add(x);
             x.parent = null;
         }
@@ -197,17 +203,17 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         return z.payload;
     }
 
-    void decrease_node_key(FibNode x, double k) {
-        if (k <= x.key) {
+    void decrease_node_key(FibNode<T> x, double k) {
+        if (k >= x.key) {
             return;
         }
         assert k < x.key : "new key " + k + " is greater than current key " + x.key;
 
         x.key = k;
-        FibNode y = x.parent;
-        if (y != null && x.key < y.key) {
-            this.cut(x, y);
-            this.cascading_cut(y);
+        FibNode<T> parent = x.parent;
+        if (parent != null && x.key < parent.key) {
+            this.cut(x, parent);
+            this.cascading_cut(parent);
         }
 
         if (x.key < this.min.key) {
@@ -215,13 +221,31 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         }
     }
 
-    void decrease_key(Object payload, double k) {
-        FibNode x = (FibNode) this.directory.get(payload);
+    public boolean contains(Object payload) {
+        return directory.containsKey(payload);
+    }
+    
+    public void adjust_weight_if_exists(T payload, double k) {
+        FibNode<T> x =  directory.get(payload);
+        if (x == null) {
+            return;
+        }
+        if (x.key > k) {
+            decrease_node_key(x, k);
+        } else if (x.key < k) {
+            decrease_node_key(x, Double.NEGATIVE_INFINITY);
+            extract_min();
+            insert(payload, k);
+        }
+    }
+    
+    void decrease_key(T payload, double k) {
+        FibNode<T> x = this.directory.get(payload);
 
         this.decrease_node_key(x, k);
     }
 
-    void cut(FibNode x, FibNode y) {
+    void cut(FibNode<T> x, FibNode<T> y) {
         y.children.remove(x);
         y.degree = y.degree - 1;
         this.root_list.add(x);
@@ -229,8 +253,8 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         x.mark = false;
     }
 
-    void cascading_cut(FibNode y) {
-        FibNode z = y.parent;
+    void cascading_cut(FibNode<T> y) {
+        FibNode<T> z = y.parent;
         if (z != null) {
             if (y.mark == false) {
                 y.mark = true;
@@ -241,7 +265,7 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         }
     }
 
-    public int getN() {
+    public int size() {
         return this.n;
     }
 
@@ -249,20 +273,31 @@ public class FibHeap implements AbstractDirectoryPriorityQueue {
         return this.n == 0;
     }
 
-    public static void selfTest() {
-        FibHeap fh = new FibHeap(1000);
+    public static void main(String args[]) {
+        FibHeap<String> fh = new FibHeap<String>(1000);
 
         Random rr = new Random();
         for (int i = 0; i < 1000; i++) {
             int randkey = rr.nextInt(10000);
             System.out.println("inserting " + randkey);
-            fh.insert(Integer.toString(i), randkey);
+            fh.insert(Integer.toString(i) + " : " + randkey, randkey);
         }
 
         for (int i = 0; i < 1000; i++) {
             // System.out.print( fh.min.key+", " );
             System.out.println(fh.extract_min());
         }
+    }
+
+    public double min_priority() {
+        if (min == null) {
+            return Double.NaN;
+        }
+        return min.key;
+    }
+
+    public SPTVertex peek_min() {
+        return (SPTVertex) min.payload;
     }
 
 }

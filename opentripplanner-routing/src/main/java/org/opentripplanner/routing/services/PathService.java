@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Date;
 import java.util.List;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -25,5 +26,7 @@ public interface PathService {
     public List<GraphPath> plan(String from, String to, List<String> intermediates, Date dateTime,
             TraverseOptions options);
 
-    public boolean isAccessible(String place, double maxSlope);
+    public boolean isAccessible(String place, TraverseOptions options);
+
+    public boolean multipleOptionsBefore(Edge edge);
 }

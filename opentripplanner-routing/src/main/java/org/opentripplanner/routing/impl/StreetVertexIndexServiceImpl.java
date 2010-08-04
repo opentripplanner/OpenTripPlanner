@@ -20,9 +20,13 @@ import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.core.TransitStop;
@@ -51,11 +55,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private Graph graph;
 
     private SpatialIndex edgeTree;
+
     private STRtree transitStopTree;
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
-    private static final double MAX_SNAP_DISTANCE = 0.00005;
+    private static final double MAX_SNAP_DISTANCE = 0.0005;
 
     private static final double DISTANCE_ERROR = 0.000005;
 
@@ -80,30 +85,32 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private void postSetup() {
         transitStopTree = new STRtree();
-        for (Vertex v : graph.getVertices()) {
-            for (Edge e: v.getOutgoing()) {
-                if (e instanceof Street){
+        for (GraphVertex gv : graph.getVertices()) {
+            Vertex v = gv.vertex;
+            for (Edge e : gv.getOutgoing()) {
+                if (e instanceof TurnEdge || e instanceof OutEdge) {
                     if (e.getGeometry() == null) {
                         continue;
                     }
                     Envelope env = e.getGeometry().getEnvelopeInternal();
                     edgeTree.insert(env, e);
-                 }
+                }
             }
             if (v instanceof TransitStop) {
-                //only index transit stops that (a) are entrances, or (b) have no associated entrances
+                // only index transit stops that (a) are entrances, or (b) have no associated
+                // entrances
                 TransitStop ts = (TransitStop) v;
                 if (!ts.isEntrance()) {
                     boolean hasEntrance = false;
 
-                    for (Edge e: v.getOutgoing()) {
+                    for (Edge e : gv.getOutgoing()) {
                         if (e instanceof PathwayEdge) {
                             hasEntrance = true;
                             break;
                         }
                     }
                     if (hasEntrance) {
-                        //transit stop has entrances
+                        // transit stop has entrances
                         continue;
                     }
                 }
@@ -114,32 +121,32 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         transitStopTree.build();
     }
 
-    public Vertex getClosestVertex(final Coordinate c) {
-        return getClosestVertex(c, true);
+    public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options) {
+        return getClosestVertex(graph, c, true, options);
     }
 
     @SuppressWarnings("unchecked")
-    public Vertex getClosestVertex(final Coordinate c, boolean includeTransitStops) {
+    public Vertex getClosestVertex(Graph graph, final Coordinate c, boolean includeTransitStops,
+            TraverseOptions options) {
 
         Envelope envelope = new Envelope(c);
-        List<Street> nearby = new LinkedList<Street>();
+        List<Edge> nearby = new LinkedList<Edge>();
 
         int i = 0;
         double envelopeGrowthRate = 0.0018;
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(c);
-        while (nearby.size() < 1 && i < 4) {
+        while (nearby.size() < 1 && i < 10) {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
 
-            // TODO: it kinda sucks to have multiple return statements ... maybe refactor to have a single return at end of method
             if (includeTransitStops) {
                 double bestDistance = Double.MAX_VALUE;
                 List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
 
                 Vertex bestStop = null;
-                for (Vertex v: nearbyTransitStops) {
+                for (Vertex v : nearbyTransitStops) {
                     Coordinate sc = v.getCoordinate();
                     double distance = sc.distance(c);
                     if (distance < bestDistance) {
@@ -152,25 +159,25 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
             }
 
-            /* It is presumed, that edges which are the exact same distance from the examined
-             * coordinate are parallel (coincident) edges. If this is wrong in too many cases,
-             * than some finer logic will need to be added
-             *
+            /*
+             * It is presumed, that edges which are the exact same distance from the examined
+             * coordinate are parallel (coincident) edges. If this is wrong in too many cases, than
+             * some finer logic will need to be added
+             * 
              * Parallel edges are needed to account for (oneway) streets with varying permissions.
              * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
-             * a pedestrian should be able to go in any direction. */
+             * a pedestrian should be able to go in any direction.
+             */
 
             double bestDistance = Double.MAX_VALUE;
             nearby = edgeTree.query(envelope);
-            // FP - added condition and Double / null due to NPE problems
-            if (nearby != null)
-            {
-                Street bestStreet = null;
-                for (Street e: nearby) 
-                {
-                    if (e == null) continue;
+            if (nearby != null) {
+                Edge bestStreet = null;
+                for (Edge e : nearby) {
+                    if (e == null)
+                        continue;
                     Geometry g = e.getGeometry();
-                    if(g != null) {
+                    if (g != null) {
                         double distance = g.distance(p);
                         if (distance < bestDistance) {
                             bestStreet = e;
@@ -183,29 +190,35 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     LocationIndexedLine l = new LocationIndexedLine(g);
                     LinearLocation location = l.project(c);
 
-                    Coordinate start = bestStreet.getFromVertex().getCoordinate();
-                    Coordinate end = bestStreet.getToVertex().getCoordinate();
+                    Vertex fromv = bestStreet.getFromVertex();
+                    Vertex tov = bestStreet.getToVertex();
+                    Coordinate start = fromv.getCoordinate();
+                    Coordinate end = tov.getCoordinate();
                     Coordinate nearestPoint = location.getCoordinate(g);
                     if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
-                        return bestStreet.getFromVertex();
+                        return fromv;
                     } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
-                        return bestStreet.getToVertex();
+                        return tov;
                     }
 
-                    List<Street> parallel = new LinkedList<Street>();
-                    for (Street e: nearby) {
-                        if (e == null) continue;
+                    List<Edge> parallel = new LinkedList<Edge>();
+                    for (Edge e : nearby) {
+                        /* only include edges that this user can actually use */
+                        if (e == null ||
+                                (options != null && e instanceof StreetEdge && 
+                                  !((StreetEdge) e).canTraverse(options))) {
+                            continue;
+                        }
                         Geometry eg = e.getGeometry();
-                        if(eg != null) {
+                        if (eg != null) {
                             double distance = eg.distance(p);
-                            if (distance <= bestDistance + DISTANCE_ERROR && (
-                                    (bestStreet.getFromVertex() == e.getFromVertex() && bestStreet.getToVertex() == e.getToVertex() )
-                                    || (bestStreet.getToVertex() == e.getFromVertex() && bestStreet.getFromVertex() == e.getToVertex() ))) {
+                            if (distance <= bestDistance + DISTANCE_ERROR) {
                                 parallel.add(e);
                             }
                         }
                     }
-                    return StreetLocation.createStreetLocation(bestStreet.getName() + "_" + c.toString(), bestStreet.getName(), parallel, nearestPoint);
+                    return StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
+                            + c.toString(), bestStreet.getName(), parallel, nearestPoint);
                 }
             }
         }
@@ -222,17 +235,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     public void reified(StreetLocation vertex) {
-        if(vertex.streets == null) return;
-
-        for(Street e : vertex.streets) {
-            edgeTree.remove(e.getGeometry().getEnvelopeInternal(), e);
-        }
-        for(Edge e : vertex.getIncoming()) {
-            if(e instanceof Street)
+        for (Edge e : graph.getIncoming(vertex)) {
+            if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
-        for(Edge e : vertex.getOutgoing()) {
-            if(e instanceof Street)
+        for (Edge e : graph.getOutgoing(vertex)) {
+            if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
     }

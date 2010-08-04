@@ -3,11 +3,13 @@
     <wb-module deploy-name="opentripplanner-api-webapp">
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
-        <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/test/java"/>
+        <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/opentripplanner-routing/opentripplanner-routing">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/opentripplanner-graph-builder/opentripplanner-graph-builder">
             <dependency-type>uses</dependency-type>
         </dependent-module>
-        <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/opentripplanner-routing/opentripplanner-routing">
+        <dependent-module deploy-path="/WEB-INF/lib" handle="module:/resource/opentripplanner-utils/opentripplanner-utils">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="opentripplanner-api-webapp"/>

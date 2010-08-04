@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
@@ -9,20 +22,23 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.FareContext;
 
 /**
- * Consider the following code:
- * int myArray[] = new int[5];
- * something = Arrays.asList(myArray);
- * You would think that something would have type List<Integer>, but in fact it has type List<int[]>.  
- * This is because Java autoboxing is royally fucked.  So, this class.
+ * Consider the following code: 
+ * int myArray[] = new int[5]; 
+ * something = Arrays.asList(myArray); 
+ * You  would think that something would have type List<Integer>, but in fact 
+ * it has type List<int[]>. This is because Java autoboxing is completely broken. 
+ * So, this class.
  */
 class IntArrayIterator implements Iterator<Integer> {
 
     int nextPosition = 0;
+
     private int[] array;
+
     public IntArrayIterator(int[] array) {
         this.array = array;
     }
-    
+
     @Override
     public boolean hasNext() {
         return nextPosition == array.length;
@@ -37,7 +53,7 @@ class IntArrayIterator implements Iterator<Integer> {
     public void remove() {
         throw new UnsupportedOperationException();
     }
-    
+
 }
 
 /**
@@ -46,17 +62,33 @@ class IntArrayIterator implements Iterator<Integer> {
 public class ArrayTripPattern implements TripPattern, Serializable {
 
     private static final long serialVersionUID = -1283975534796913802L;
-    
+
+    /*
+     * All of these 2d arrays are [stop][trip].
+     */
     private Trip exemplar;
+
     private int[][] departureTimes;
+
     private int[][] runningTimes;
+
     private int[][] arrivalTimes;
+
     private int[][] dwellTimes;
+
     private String[] zones;
+
     private int[] perTripFlags;
+
     private int[] perStopFlags;
+
     private Trip[] trips;
+
     private FareContext fareContext;
+
+    int bestRunningTimes[];
+
+    int bestDwellTimes[];
 
     public ArrayTripPattern(Trip exemplar, ArrayList<Integer>[] departureTimes,
             ArrayList<Integer>[] runningTimes, ArrayList<Integer>[] arrivalTimes,
@@ -68,24 +100,31 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         if (arrivalTimes == null) {
             this.arrivalTimes = null;
             this.dwellTimes = null;
+            this.bestDwellTimes = null;
         } else {
             this.arrivalTimes = new int[arrivalTimes.length][arrivalTimes[0].size()];
             this.dwellTimes = new int[dwellTimes.length][dwellTimes[0].size()];
+            this.bestDwellTimes = new int[perStopFlags.length];
         }
         this.zones = zones;
         this.perTripFlags = new int[perTripFlags.size()];
         this.perStopFlags = perStopFlags;
+        this.bestRunningTimes = new int[perStopFlags.length];
         this.trips = new Trip[trips.size()];
         this.fareContext = fareContext;
-        
+
         for (int i = 0; i < departureTimes.length; ++i) {
             for (int j = 0; j < departureTimes[i].size(); ++j) {
                 this.departureTimes[i][j] = departureTimes[i].get(j);
             }
         }
         for (int i = 0; i < runningTimes.length; ++i) {
+            bestRunningTimes[i] = Integer.MAX_VALUE;
             for (int j = 0; j < runningTimes[i].size(); ++j) {
                 this.runningTimes[i][j] = runningTimes[i].get(j);
+                if (bestRunningTimes[i] > this.runningTimes[i][j]) {
+                    bestRunningTimes[i] = this.runningTimes[i][j];
+                }
             }
         }
         if (this.arrivalTimes != null) {
@@ -95,8 +134,12 @@ public class ArrayTripPattern implements TripPattern, Serializable {
                 }
             }
             for (int i = 0; i < dwellTimes.length; ++i) {
+                bestDwellTimes[i] = Integer.MAX_VALUE;
                 for (int j = 0; j < dwellTimes[i].size(); ++j) {
                     this.dwellTimes[i][j] = dwellTimes[i].get(j);
+                    if (bestDwellTimes[i] > this.dwellTimes[i][j]) {
+                        bestDwellTimes[i] = this.dwellTimes[i][j];
+                    }
                 }
             }
         }
@@ -108,7 +151,8 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         }
     }
 
-    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible, boolean pickup) {
+    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
+            boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex] & flag) == 0) {
             return -1;
@@ -127,7 +171,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
         if (wheelchairAccessible) {
             while ((perTripFlags[index] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-                index ++;
+                index++;
                 if (index == perTripFlags.length) {
                     return -1;
                 }
@@ -146,7 +190,8 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         return stopDepartureTimes[trip];
     }
 
-    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible, boolean pickup) {
+    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
+            boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex + 1] & flag) == 0) {
             return -1;
@@ -170,7 +215,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
         if (wheelchairAccessible) {
             while ((perTripFlags[index] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-                index --;
+                index--;
                 if (index == -1) {
                     return -1;
                 }
@@ -223,7 +268,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     public String getZone(int stopIndex) {
         return zones[stopIndex];
     }
-    
+
     public FareContext getFareContext() {
         return fareContext;
     }
@@ -231,5 +276,18 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     @Override
     public Trip getExemplar() {
         return exemplar;
+    }
+
+    @Override
+    public int getBestRunningTime(int stopIndex) {
+        return bestRunningTimes[stopIndex];
+    }
+
+    @Override
+    public int getBestDwellTime(int stopIndex) {
+        if (bestDwellTimes == null) {
+            return 0;
+        }
+        return bestDwellTimes[stopIndex];
     }
 }

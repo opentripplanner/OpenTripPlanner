@@ -11,10 +11,23 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.contraction;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public interface Drawable {
-    ArrayList<DrawablePoint> getDrawableGeometry();
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.spt.BasicShortestPathTree;
+
+public class WitnessSearchResult {
+    public List<Shortcut> shortcuts;
+    public int searchSpace;
+    public BasicShortestPathTree spt;
+    public Vertex vertex;
+    
+    public WitnessSearchResult(List<Shortcut> shortcuts, BasicShortestPathTree spt, Vertex vertex, int searchSpace) {
+        this.shortcuts = shortcuts;
+        this.spt = spt;
+        this.vertex = vertex;
+        this.searchSpace = searchSpace;
+    }
 }

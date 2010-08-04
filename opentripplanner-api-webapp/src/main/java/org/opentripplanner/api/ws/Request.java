@@ -137,17 +137,17 @@ public class Request implements RequestInf {
     }
 
     /**
-     * @return the walk
+     * @return the (soft) maximum walk distance
      */
-    public Double getWalk() {
+    public Double getMaxWalkDistance() {
         return maxWalkDistance;
     }
 
     /**
      * @param walk
-     *            the walk to set
+     *            the (soft) maximum walk distance to set
      */
-    public void setWalk(Double walk) {
+    public void setMaxWalkDistance(Double walk) {
         paramPush(MAX_WALK_DISTANCE, walk);
         this.maxWalkDistance = walk;
     }
@@ -273,7 +273,7 @@ public class Request implements RequestInf {
 
     /** */
     public String toString(String sep) {
-        return getFrom() + sep + getTo() + sep + getWalk() + sep + getDateTime() + sep
+        return getFrom() + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
                 + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
                 + getNumItineraries();
     }

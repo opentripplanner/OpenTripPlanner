@@ -18,10 +18,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -34,74 +34,8 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.util.NullExtraEdges;
 
-/** 
- * 
- * NullExtraEdges is used to speed up checks for extra edges in the (common) case 
- * where there are none. Extra edges come from StreetLocationFinder, where 
- * they represent the edges between a location on a street segment and the 
- * corners at the ends of that segment. 
- */
-class NullExtraEdges implements Map<Vertex, Edge> {
-
-    @Override
-    public void clear() {
-    }
-
-    @Override
-    public boolean containsKey(Object arg0) {
-        return false;
-    }
-
-    @Override
-    public boolean containsValue(Object arg0) {
-        return false;
-    }
-
-    @Override
-    public Set<java.util.Map.Entry<Vertex, Edge>> entrySet() {
-        return null;
-    }
-
-    @Override
-    public Edge get(Object arg0) {
-        return null;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
-
-    @Override
-    public Set<Vertex> keySet() {
-        return null;
-    }
-
-    @Override
-    public Edge put(Vertex arg0, Edge arg1) {
-        return null;
-    }
-
-    @Override
-    public void putAll(Map<? extends Vertex, ? extends Edge> arg0) {
-    }
-
-    @Override
-    public Edge remove(Object arg0) {
-        return null;
-    }
-
-    @Override
-    public int size() {
-        return 0;
-    }
-
-    @Override
-    public Collection<Edge> values() {
-        return null;
-    }
-}
 
 /**
  * Find the shortest path between graph vertices using A*. 
@@ -158,7 +92,6 @@ public class AStar {
      */
     public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
-
         if (!options.back) {
             throw new RuntimeException("Reverse paths must set options.back");
         }
@@ -180,15 +113,36 @@ public class AStar {
         target = tmp;
 
         /* generate extra edges for StreetLocations */
-        Map<Vertex, Edge> extraEdges;
-        if (target instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, Edge>();
-            Iterable<Edge> outgoing = target.getOutgoing();
-            for (Edge edge : outgoing) {
-                extraEdges.put(edge.getToVertex(), edge);
+        Map<Vertex, ArrayList<Edge>> extraEdges;
+        if (origin instanceof StreetLocation) {
+            extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            Iterable<Edge> extra = ((StreetLocation)origin).getExtra();
+            for (Edge edge : extra) {
+                Vertex tov = edge.getToVertex();
+                ArrayList<Edge> edges = extraEdges.get(tov);
+                if (edges == null) {
+                    edges = new ArrayList<Edge>(); 
+                    extraEdges.put(tov, edges);
+                }
+                edges.add(edge);
             }
         } else {
             extraEdges = new NullExtraEdges();
+        }
+        if (target instanceof StreetLocation) {
+            if (extraEdges instanceof NullExtraEdges) {
+                extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            }
+            Iterable<Edge> extra = ((StreetLocation)target).getExtra();
+            for (Edge edge : extra) {
+                Vertex tov = edge.getToVertex();
+                ArrayList<Edge> edges = extraEdges.get(tov);
+                if (edges == null) {
+                    edges = new ArrayList<Edge>(); 
+                    extraEdges.put(tov, edges);
+                }
+                edges.add(edge);
+            }
         }
         final double max_speed = getMaxSpeed(options);
         
@@ -196,28 +150,35 @@ public class AStar {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap pq = new FibHeap(graph.getVertices().size() + extraEdges.size());
+        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         // Iteration Variables
         SPTVertex spt_u, spt_v;
         while (!pq.empty()) { // Until the priority queue is empty:
-            spt_u = (SPTVertex) pq.extract_min(); // get the lowest-weightSum Vertex 'u',
+            spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
             Vertex tov = spt_u.mirror;
             if (tov == target)
                 break;
 
-            Iterable<Edge> incoming = tov.getIncoming();
-
+            GraphVertex gv = graph.getGraphVertex(tov);
+            
+            Collection<Edge> incoming;
+            if (gv == null) {
+                incoming = new ArrayList<Edge>();
+            } else {
+                incoming = gv.getIncoming();
+            }
+            
             if (extraEdges.containsKey(tov)) {
                 List<Edge> newIncoming = new ArrayList<Edge>();
-                for (Edge edge : tov.getIncoming()) {
+                for (Edge edge : incoming)
                     newIncoming.add(edge);
-                }
-                newIncoming.add(extraEdges.get(tov));
+                newIncoming.addAll(extraEdges.get(spt_u.mirror));
                 incoming = newIncoming;
             }
+
 
             for (Edge edge : incoming) {
                 State state = spt_u.state;
@@ -268,40 +229,66 @@ public class AStar {
         }
         
         /* generate extra edges for StreetLocations */
-        Map<Vertex, Edge> extraEdges;
-        if (target instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, Edge>();
-            Iterable<Edge> incoming = target.getIncoming();
-            for (Edge edge : incoming) {
-                extraEdges.put(edge.getFromVertex(), edge);
+        Map<Vertex, ArrayList<Edge>> extraEdges;
+        if (origin instanceof StreetLocation) {
+            extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            Iterable<Edge> extra = ((StreetLocation)origin).getExtra();
+            for (Edge edge : extra) {
+                Vertex fromv = edge.getFromVertex();
+                ArrayList<Edge> edges = extraEdges.get(fromv);
+                if (edges == null) {
+                    edges = new ArrayList<Edge>(); 
+                    extraEdges.put(fromv, edges);
+                }
+                edges.add(edge);
             }
         } else {
             extraEdges = new NullExtraEdges();
+        }
+        if (target instanceof StreetLocation) {
+            if (extraEdges instanceof NullExtraEdges) {
+                extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            }
+            Iterable<Edge> extra = ((StreetLocation)target).getExtra();
+            for (Edge edge : extra) {
+                Vertex fromv = edge.getFromVertex();
+                ArrayList<Edge> edges = extraEdges.get(fromv);
+                if (edges == null) {
+                    edges = new ArrayList<Edge>(); 
+                    extraEdges.put(fromv, edges);
+                }
+                edges.add(edge);
+            }
         }
         final double max_speed = getMaxSpeed(options);
         double distance = origin.fastDistance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap pq = new FibHeap(graph.getVertices().size() + extraEdges.size());
+        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
-        // Iteration Variables
-        SPTVertex spt_u, spt_v;
         while (!pq.empty()) { // Until the priority queue is empty:
-            spt_u = (SPTVertex) pq.extract_min(); // get the lowest-weightSum Vertex 'u',
+            SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
             Vertex fromv = spt_u.mirror;
             if (fromv == target)
                 break;
 
-            Iterable<Edge> outgoing = spt_u.mirror.getOutgoing();
-
+            GraphVertex gv = graph.getGraphVertex(spt_u.mirror);
+ 
+            Collection<Edge> outgoing;
+            if (gv == null) {
+                outgoing = new ArrayList<Edge>();
+            } else {
+                outgoing = gv.getOutgoing();
+            }
+            
             if (extraEdges.containsKey(spt_u.mirror)) {
                 List<Edge> newOutgoing = new ArrayList<Edge>();
-                for (Edge edge : spt_u.mirror.getOutgoing())
+                for (Edge edge : outgoing)
                     newOutgoing.add(edge);
-                newOutgoing.add(extraEdges.get(spt_u.mirror));
+                newOutgoing.addAll(extraEdges.get(spt_u.mirror));
                 outgoing = newOutgoing;
             }
 
@@ -327,10 +314,10 @@ public class AStar {
 
                 double new_w = spt_u.weightSum + wr.weight;
 
-                spt_v = spt.addVertex(tov, wr.state, new_w, options);
+                SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    distance = tov.fastDistance(target) / max_speed;                    
+                    distance = tov.fastDistance(target) / max_speed;
                     pq.insert_or_dec_key(spt_v, new_w + distance);
                 }
             }

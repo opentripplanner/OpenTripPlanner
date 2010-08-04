@@ -14,8 +14,10 @@ package org.opentripplanner.api.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.opentripplanner.routing.core.Fare;
@@ -85,7 +87,8 @@ public class Itinerary {
      * 6, then walks to their destination, has four legs.
      */
     @XmlElementWrapper(name = "legs")
-    public List<Leg> leg = new ArrayList<Leg>();
+    @XmlElement(name = "leg")
+    public List<Leg> legs = new ArrayList<Leg>();
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible 
@@ -99,18 +102,25 @@ public class Itinerary {
      */
     public void addLeg(Leg leg) {
         if(leg != null)
-            this.leg.add(leg);
+            legs.add(leg);
     }
 
     /** 
-     * finds the leg object in the array list (last entered if duplicates exist inthe list), and removes it 
+     * remove the leg from the list of legs 
      * @param leg object to be removed
      */
     public void removeLeg(Leg leg) {
         if(leg != null) {
-            int i = this.leg.lastIndexOf(leg);
-            if(i >= 0) {
-                this.leg.remove(leg);
+            legs.remove(leg);
+        }
+    }
+    
+    public void removeBogusLegs() {
+        Iterator<Leg> it = legs.iterator();
+        while (it.hasNext()) {
+            Leg leg = it.next();
+            if (leg.isBogusWalkLeg()) {
+                it.remove();
             }
         }
     }

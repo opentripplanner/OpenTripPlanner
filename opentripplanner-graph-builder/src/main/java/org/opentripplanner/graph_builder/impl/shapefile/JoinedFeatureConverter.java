@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
 
-    private static Logger log = LoggerFactory.getLogger(ShapefileStreetGraphBuilderImpl.class);
+    private static Logger log = LoggerFactory.getLogger(JoinedFeatureConverter.class);
 
     private SimpleFeatureConverter<T> converter;
 

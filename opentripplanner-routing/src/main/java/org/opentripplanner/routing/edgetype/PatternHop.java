@@ -28,11 +28,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class PatternHop extends PatternEdge implements HoppableEdge {
+/**
+ * A transit vehicle's journey between departure at one stop and arrival at the next.
+ * This version represents a set of such journeys specified by a TripPattern.
+ */
+public class PatternHop extends PatternEdge {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private Stop start, end;
@@ -67,6 +68,13 @@ public class PatternHop extends PatternEdge implements HoppableEdge {
         return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
 
+    public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
+        State state1 = state0.clone();
+        int runningTime = pattern.getBestRunningTime(stopIndex);
+        state1.incrementTimeInSeconds(-runningTime);
+        return new TraverseResult(runningTime, state1);
+    }
+    
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         int runningTime = pattern.getRunningTime(stopIndex, state0.getTrip());

@@ -13,7 +13,10 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.AbstractEdge;
+import java.io.Serializable;
+
+import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -24,22 +27,26 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
-/* This represents the connection between a street vertex and a transit vertex
+/** 
+ * This represents the connection between a street vertex and a transit vertex
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
-
-    private static GeometryFactory _geometryFactory = new GeometryFactory();
-    private boolean wheelchairAccessible;
-        
-    public StreetTransitLink(Vertex fromv, Vertex tov, boolean wheelchairAccessible) {
-        super(fromv, tov);
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
+public class StreetTransitLink implements Edge, Serializable {
 
     private static final long serialVersionUID = -3311099256178798981L;
     private static final double STL_TRAVERSE_COST = 1;
+
+    private static GeometryFactory _geometryFactory = new GeometryFactory();
+    private boolean wheelchairAccessible;
+    private Vertex tov;
+    private Vertex fromv;
+        
+    public StreetTransitLink(Vertex fromv, Vertex tov, boolean wheelchairAccessible) {
+        this.fromv = fromv;
+        this.tov = tov;
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
 
     public String getDirection() {
         return null;
@@ -50,7 +57,7 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
     }
 
     public LineString getGeometry() {
-        Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate()};
+        Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
         return _geometryFactory.createLineString(coordinates);
     }
 
@@ -92,4 +99,33 @@ public class StreetTransitLink extends AbstractEdge implements WalkableEdge {
         return new TraverseResult(STL_TRAVERSE_COST, s1);
     }
 
+    @Override
+    public Vertex getFromVertex() {
+        return fromv;
+    }
+
+    @Override
+    public Vertex getToVertex() {
+        return tov;
+    }
+
+    @Override
+    public Trip getTrip() {
+        return null;
+    }
+
+    @Override
+    public void setFromVertex(Vertex vertex) {
+        fromv = vertex;
+    }
+
+    @Override
+    public void setToVertex(Vertex vertex) {
+        tov = vertex;
+    }
+
+    @Override
+    public String getName(State state) {
+        return getName();
+    }
 }

@@ -56,7 +56,7 @@ public class TraverseModeSet {
 
     }
 
-    public TraverseModeSet(TraverseMode[] modes) {
+    public TraverseModeSet(TraverseMode... modes) {
         for (TraverseMode mode : modes) {
             this.modes |= getMaskForMode(mode);
         }
@@ -98,10 +98,6 @@ public class TraverseModeSet {
 
     public TraverseModeSet(List<TraverseMode> modeList) {
         this(modeList.toArray(new TraverseMode[0]));
-    }
-
-    public TraverseModeSet(TraverseMode mode) {
-        this.modes = getMaskForMode(mode);
     }
     
     public int getMask() {

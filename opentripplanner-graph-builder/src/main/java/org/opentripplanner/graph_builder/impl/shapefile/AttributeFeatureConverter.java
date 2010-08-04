@@ -16,6 +16,8 @@ package org.opentripplanner.graph_builder.impl.shapefile;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
+/** 
+ * Reads a single attribute from a feature and converts it to an object */
 public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
 
     private String _attributeName;

@@ -62,13 +62,13 @@ public interface RequestInf {
     /**
      * @return the walk
      */
-    public Double getWalk();
+    public Double getMaxWalkDistance();
 
     /**
      * @param walk
      *            the walk to set
      */
-    public void setWalk(Double walk);
+    public void setMaxWalkDistance(Double walk);
 
     /**
      * @return the modes

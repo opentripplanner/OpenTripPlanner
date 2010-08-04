@@ -33,8 +33,12 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/* A set of edges on a single route */
+/** 
+ * A set of edges on a single route 
+ * */
 class Ride {
     AgencyAndId route;
 
@@ -82,7 +86,12 @@ class Ride {
     }
 }
 
+/**
+ * A shortest path on the graph. 
+ */
 public class GraphPath {
+    private final Logger _log = LoggerFactory.getLogger(GraphPath.class);
+    
     public Vector<SPTVertex> vertices;
 
     public Vector<SPTEdge> edges;
@@ -198,7 +207,8 @@ public class GraphPath {
             if (bestFare == Float.MAX_VALUE) {
                 if (currentFare == -1) {
                     // Problem: there's no fare for this ride.
-                    throw new RuntimeException("No fare for a perfectly good ride: " + ride);
+                    _log.warn("No fare for a perfectly good ride: " + ride);
+                    return null;
                 }
 
                 // there's no fare, but we can fall back to the previous fare, and retry starting

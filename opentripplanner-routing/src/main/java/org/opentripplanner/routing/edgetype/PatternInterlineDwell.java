@@ -29,11 +29,17 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/** 
+ * A vehicle's wait between the end of one run and the beginning of another run on the same block 
+ * */
 class InterlineDwellData implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     public int dwellTime;
+
     public int patternIndex;
+
     public InterlineDwellData(int dwellTime, int patternIndex) {
         this.dwellTime = dwellTime;
         this.patternIndex = patternIndex;
@@ -57,12 +63,14 @@ public class PatternInterlineDwell extends AbstractEdge {
         this.targetTrip = targetTrip;
     }
 
-    public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime, int oldPatternIndex, int newPatternIndex) {
+    public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime,
+            int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
             throw new RuntimeException("Negative dwell time");
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
-        reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime, newPatternIndex));
+        reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
+                newPatternIndex));
     }
 
     public String getDirection() {

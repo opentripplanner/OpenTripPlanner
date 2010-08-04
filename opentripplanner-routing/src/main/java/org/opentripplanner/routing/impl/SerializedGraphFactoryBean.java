@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 public class SerializedGraphFactoryBean extends AbstractFactoryBean {
@@ -27,12 +27,12 @@ public class SerializedGraphFactoryBean extends AbstractFactoryBean {
 
     @Override
     public Class<?> getObjectType() {
-        return Graph.class;
+        return ContractionHierarchySet.class;
     }
 
     @Override
     protected Object createInstance() throws Exception {
-        return GraphSerializationLibrary.readGraph(_graphBundle.getGraphPath());
+        return ContractionHierarchySerializationLibrary.readGraph(_graphBundle.getGraphPath());
     }
 
 }

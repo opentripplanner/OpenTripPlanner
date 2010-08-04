@@ -27,22 +27,20 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternBoard extends PatternEdge {
 
-    /**
-     * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
-     * on vehicle. When traversed forward, the the resultant state has the time of the next
-     * departure, in addition the pattern that was boarded. When traversed backward, the result
-     * state is unchanged. An boarding penalty can also be applied to discourage transfers.
-     */
+/**
+ * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
+ * on vehicle. When traversed forward, the the resultant state has the time of the next
+ * departure, in addition the pattern that was boarded. When traversed backward, the result
+ * state is unchanged. A boarding penalty can also be applied to discourage transfers.
+ */
+public class PatternBoard extends PatternEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
     private static final long MILLI_IN_DAY = 24 * 60 * 60 * 1000;
 
     private static final int SEC_IN_DAY = 24 * 60 * 60;
-
-    private static final int BOARD_COST = 120;
 
     private int stopIndex;
 
@@ -73,7 +71,13 @@ public class PatternBoard extends PatternEdge {
     public String getName() {
         return "leave street network for transit network";
     }
-
+    
+    public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
+        State state1 = state0.clone();
+        state1.incrementTimeInSeconds(0);
+        return new TraverseResult(0, state1);
+    }
+    
     public TraverseResult traverse(State state0, TraverseOptions options) {
         if (!options.modes.get(modeMask)) {
             return null;
@@ -124,7 +128,7 @@ public class PatternBoard extends PatternEdge {
             //via a formal transfer or by walking.
             transfer_penalty = options.optimizeTransferPenalty;
         }
-        return new TraverseResult(wait + BOARD_COST + transfer_penalty, state1);
+        return new TraverseResult(wait + options.boardCost + transfer_penalty, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {

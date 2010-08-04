@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,10 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
 
-public class TraverseOptions {
+public class TraverseOptions implements Serializable {
+
+    private static final long serialVersionUID = 3836092451659658815L;
+
     public double speed; // in meters/second
 
     public TraverseModeSet modes;
@@ -64,7 +68,10 @@ public class TraverseOptions {
     /** How much worse walking is than waiting for an equivalent length of time, as 
      * a multiplier.
      */
-    public double walkReluctance = 1.1; 
+    public double walkReluctance = 1.1;
+
+    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
+    public int boardCost = 120; 
 
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -77,7 +84,8 @@ public class TraverseOptions {
         this();
         this.modes = modes;
         if (modes.getBicycle()) {
-            speed = 6; //6 m/s, ~13.5 mph, a random bicycling speed.
+            speed = 5; //5 m/s, ~11 mph, a random bicycling speed.
+            boardCost = 240; //cyclists hate loading their bike a second time
         }
     }
 

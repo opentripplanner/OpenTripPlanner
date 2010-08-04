@@ -15,6 +15,10 @@ package org.opentripplanner.common.model;
 
 import java.io.Serializable;
 
+/**
+ * An ordered pair of objects of potentially different types
+ *
+ */
 public class T2<E1, E2> implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -65,5 +69,9 @@ public class T2<E1, E2> implements Serializable {
         } else if (!_second.equals(other._second))
             return false;
         return true;
+    }
+    
+    public String toString() {
+        return "T2(" + _first + ", " + _second + ")";
     }
 }

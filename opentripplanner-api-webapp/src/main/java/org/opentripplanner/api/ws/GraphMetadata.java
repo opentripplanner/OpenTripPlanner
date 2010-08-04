@@ -15,8 +15,9 @@ package org.opentripplanner.api.ws;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -37,11 +38,15 @@ public class GraphMetadata {
     }
 
     @Autowired
+    public void setHierarchies(ContractionHierarchySet chs) {
+        setGraph(chs.getGraph());
+    }
+    
     public void setGraph(Graph graph) {
         /* generate extents */
         Envelope env = new Envelope();
-        for (Vertex v : graph.getVertices()) {
-            env.expandToInclude(v.getCoordinate());
+        for (GraphVertex gv : graph.getVertices()) {
+            env.expandToInclude(gv.vertex.getCoordinate());
         }
         setMinLongitude(env.getMinX());
         setMaxLongitude(env.getMaxX());

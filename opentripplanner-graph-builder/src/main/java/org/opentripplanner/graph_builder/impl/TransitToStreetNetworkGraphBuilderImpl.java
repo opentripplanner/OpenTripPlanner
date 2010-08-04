@@ -17,6 +17,10 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 
+/**
+ * {@link GraphBuilder} plugin that links up the stops of a transit network to a street network.
+ * Should be called after both the transit network and street network are loaded.
+ */
 public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
 
     @Override

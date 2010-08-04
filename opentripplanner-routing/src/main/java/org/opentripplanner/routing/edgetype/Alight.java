@@ -27,6 +27,12 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
+ * station off vehicle. When traversed backwards, the the resultant state has the time of the
+ * previous arrival, in addition the pattern that was boarded. When traversed forwards, the
+ * result state is unchanged. An boarding penalty can also be applied to discourage transfers.
+ */
 public class Alight extends AbstractEdge {
 
     public Hop hop;

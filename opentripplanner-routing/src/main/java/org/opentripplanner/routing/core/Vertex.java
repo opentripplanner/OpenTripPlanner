@@ -17,36 +17,37 @@ import java.io.Serializable;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public interface Vertex extends Serializable {
+public interface Vertex extends Serializable, Cloneable {
 
+    /**
+     * Every vertex has a label which is globally unique
+     */
     public String getLabel();
 
+    /**
+     * For vertices that represent stops, the passenger-facing stop ID (for systems like TriMet that
+     * have this feature). 
+     */
     public String getStopId();
 
-    /** This is fast but totally inaccurate distance function used as a heuristic in A* */
+    /** This is a fast but totally inaccurate distance function used as a heuristic in A* */
     public double fastDistance(Vertex v);
 
+    /**
+     * This is a correct distance function used during non-time-critical functions.
+     */
     public double distance(Coordinate c);
 
+    /**
+     * @return The location of the vertex in longitude/latitude
+     */
     public Coordinate getCoordinate();
-
-    public int getDegreeOut();
-
-    public int getDegreeIn();
-
-    public void addIncoming(Edge ee);
-
-    public void addOutgoing(Edge ee);
 
     public String toString();
 
     public double getX();
 
     public double getY();
-
-    public Iterable<Edge> getOutgoing();
-
-    public Iterable<Edge> getIncoming();
 
     public String getName();
 

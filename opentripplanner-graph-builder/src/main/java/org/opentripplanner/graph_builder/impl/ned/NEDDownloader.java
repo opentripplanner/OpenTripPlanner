@@ -62,6 +62,11 @@ import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * Downloads tiles from the National Elevation Dataset. 
+ * @author novalis
+ *
+ */
 public class NEDDownloader {
 
     private static Logger log = LoggerFactory.getLogger(NEDDownloader.class);
@@ -70,10 +75,8 @@ public class NEDDownloader {
 
     private File cacheDirectory;
 
-    static String dataset = "ND302XZ"; // 1/9 arcsecond data. TODO: fall back to
-
-    // ND302XZ (1/3 arcsecond) or NED02XZ (1 arcsecond) if necessary
-
+    static String dataset = "ND302XZ"; // 1/3 arcsecond data.
+    
     private double _latYStep = 0.16;
 
     private double _lonXStep = 0.16;
@@ -83,6 +86,12 @@ public class NEDDownloader {
         this.graph = graph;
     }
 
+    /**
+     * The cache directory stores NED tiles.  It is crucial that this be somewhere permanent
+     * with plenty of disk space.  Don't use /tmp -- the downloading process takes a long time
+     * and you don't want to repeat it if at all possible.
+     * @param cacheDirectory
+     */
     public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
@@ -154,7 +163,7 @@ public class NEDDownloader {
         return elements;
     }
 
-    public List<URL> getDownloadURLs() {
+    private List<URL> getDownloadURLs() {
         List<URL> urls = new ArrayList<URL>();
         List<String> payloads = getValidateElements();
         log.debug("Getting urls from request validation service");
@@ -246,11 +255,11 @@ public class NEDDownloader {
         }
     }
 
-    public static Document getXMLFromURL(URL url) {
+    private static Document getXMLFromURL(URL url) {
         return getXMLFromURL(url, false);
     }
 
-    public static Document getXMLFromURL(URL url, boolean htmlOK) {
+    private static Document getXMLFromURL(URL url, boolean htmlOK) {
         String contents = null;
         while (true) {
             try {
@@ -315,6 +324,9 @@ public class NEDDownloader {
         return lft + "_" + rgt + "_" + top + "_" + bot;
     }
 
+    /** 
+     * Download all the NED tiles into the cache.
+     */
     public List<File> downloadNED() {
         log.debug("Downloading NED");
         List<URL> urls = getDownloadURLsCached();

@@ -17,6 +17,10 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumSet;
 
+/** 
+ * Who can traverse a street in a single direction.
+ *
+ */
 public enum StreetTraversalPermission {
     NONE(0),
 
@@ -61,6 +65,6 @@ public enum StreetTraversalPermission {
     }
 
     public boolean allows(StreetTraversalPermission perm) {
-        return (this.getCode() & perm.getCode()) != 0;
+        return (code & perm.code) != 0;
     }
 }

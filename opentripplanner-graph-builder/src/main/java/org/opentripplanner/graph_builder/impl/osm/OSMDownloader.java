@@ -22,9 +22,13 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 public class OSMDownloader {
+    private final Logger _log = LoggerFactory.getLogger(OSMDownloader.class);
 
     private NumberFormat _format = new DecimalFormat("0.0000");
 
@@ -96,10 +100,10 @@ public class OSMDownloader {
             Envelope r = new Envelope(lon - _overlap, lon + _lonXStep + _overlap, lat - _overlap,
                     lat + _latYStep + _overlap);
 
-            System.out.println("downloading osm tile: " + key);
+            _log.debug("downloading osm tile: " + key);
 
             URL url = constructUrl(r);
-            System.out.println(url);
+            _log.debug(url.toString());
 
             FileOutputStream out = new FileOutputStream(path);
             InputStream in = url.openStream();

@@ -17,27 +17,25 @@ import java.io.File;
 import java.util.GregorianCalendar;
 
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.Transfer;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 import junit.framework.TestCase;
 
@@ -87,14 +85,12 @@ public class TestGraphPath extends TestCase {
         
         
         // add some street data to the graph
-        Vertex v1 = new GenericStreetIntersectionVertex("fake_intersection", -74, 41.000001); // near stop K
-        Vertex v2 = new GenericStreetIntersectionVertex("fake_intersection2", -73.000002, 41.000001); // near stop L
+        StreetVertex v1 = new StreetVertex("fake_intersection", GeometryUtils.makeLineString(-74, 41.000001, -73.000002, 41.000001), "fake intersection", 10, false); // near stop K
+        StreetVertex v2 = new StreetVertex("fake_intersection2", GeometryUtils.makeLineString(-73.000002, 41.000001, -73.000003, 41.000001), "fake intersection2", 10, false); // near stop L
 
         graph.addVertex(v1);
         graph.addVertex(v2);
-        Street street = new Street(v1, v2, "fake_street", 10);
-        GeometryFactory gf = new GeometryFactory();
-        street.setGeometry(gf.createLineString(new Coordinate[] { new Coordinate(-74, 41.000001), new Coordinate(-73.000002, 41.000001)}));
+        TurnEdge street = new TurnEdge(v1, v2);
         
         graph.addEdge(street);
         

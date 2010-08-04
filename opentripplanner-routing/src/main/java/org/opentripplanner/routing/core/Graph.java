@@ -18,75 +18,84 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.routing.edgetype.DrawHandler;
-import org.opentripplanner.routing.edgetype.Drawable;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * This holds the edge list for every vertex.  
+ *
+ */
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
     
     private Map<Class<?>,Object> _services = new HashMap<Class<?>, Object>();
 
-    HashMap<String, Vertex> vertices;
+    HashMap<String, GraphVertex> vertices;
 
     public Graph() {
-        this.vertices = new HashMap<String, Vertex>();
+        this.vertices = new HashMap<String, GraphVertex>();
     }
 
     public Vertex addVertex(Vertex vv) {
-        Vertex exists = this.vertices.get(vv.getLabel());
-        if (exists != null) {
-            return exists;
+        String label = vv.getLabel();
+        GraphVertex gv = vertices.get(label);
+        if (gv == null) {
+            gv = new GraphVertex(vv);
+            vertices.put(label, gv);
         }
-
-        this.vertices.put(vv.getLabel(), vv);
-        return vv;
+        return gv.vertex;
     }
 
     public Vertex addVertex(String label, double x, double y) {
-        Vertex exists = this.vertices.get(label);
-        if (exists != null) {
-            assert exists.getX() == x && exists.getY() == y;
-            return exists;
+        GraphVertex gv = vertices.get(label);
+        if (gv == null) {
+            Vertex vv = new GenericVertex(label, x, y);
+            gv = new GraphVertex(vv);
+            vertices.put(label, gv);
         }
-
-        Vertex ret = new GenericVertex(label, x, y);
-        this.vertices.put(label, ret);
-        return ret;
+        return gv.vertex;
     }
 
-    public Vertex addVertex(String id, String name, String stopId, double x, double y) {
-        Vertex exists = this.vertices.get(id);
-        if (exists != null) {
-            assert exists.getX() == x && exists.getY() == y;
-            return exists;
+    public Vertex addVertex(String label, String name, String stopId, double x, double y) {
+        GraphVertex gv = vertices.get(label);
+        if (gv == null) {
+            Vertex vv = new GenericVertex(label, x, y, name, stopId);
+            gv = new GraphVertex(vv);
+            vertices.put(label, gv);
         }
-
-        Vertex ret = new GenericVertex(id, x, y, name, stopId);
-        this.vertices.put(id, ret);
-        return ret;
+        return gv.vertex;
     }
 
     public Vertex getVertex(String label) {
-        return this.vertices.get(label);
+        GraphVertex gv = vertices.get(label);
+        if (gv == null) {
+            return null;
+        }
+        return gv.vertex;
     }
 
-    public Collection<Vertex> getVertices() {
-        return this.vertices.values();
+    public GraphVertex getGraphVertex(String label) {
+        return vertices.get(label);
+    }
+    
+    public Collection<GraphVertex> getVertices() {
+        return vertices.values();
     }
 
     public void addEdge(Vertex a, Vertex b, Edge ee) {
-        a.addOutgoing(ee);
-        b.addIncoming(ee);
+        a = addVertex(a);
+        b = addVertex(b);
+        vertices.get(a.getLabel()).addOutgoing(ee);
+        vertices.get(b.getLabel()).addIncoming(ee);
     }
 
     public void addEdge(Edge ee) {
         Vertex fromv = ee.getFromVertex();
         Vertex tov = ee.getToVertex();
-        fromv.addOutgoing(ee);
-        tov.addIncoming(ee);
+        fromv = addVertex(fromv);
+        tov = addVertex(tov);
+        vertices.get(fromv.getLabel()).addOutgoing(ee);
+        vertices.get(tov.getLabel()).addIncoming(ee);
     }
     
     public void addEdge(String from_label, String to_label, Edge ee) {
@@ -100,24 +109,14 @@ public class Graph implements Serializable {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
         Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : this.vertices.values()) {
-            double dist = vv.distance(c);
+        for (GraphVertex vv : vertices.values()) {
+            double dist = vv.vertex.distance(c);
             if (dist < minDist) {
-                ret = vv;
+                ret = vv.vertex;
                 minDist = dist;
             }
         }
         return ret;
-    }
-
-    public void draw(DrawHandler drawer) throws Exception {
-        for (Vertex vv : this.getVertices()) {
-            for (Edge ee : vv.getOutgoing()) {
-                if (ee instanceof Drawable) {
-                    drawer.handle((Drawable) ee);
-                }
-            }
-        }
     }
     
     @SuppressWarnings("unchecked")
@@ -137,12 +136,44 @@ public class Graph implements Serializable {
     public void removeVertex(Vertex vertex) {
         vertices.remove(vertex.getLabel());
     }
-
+    
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (Vertex v: this.getVertices()) {
-            env.expandToInclude(v.getCoordinate());
+        for (GraphVertex v: this.getVertices()) {
+            env.expandToInclude(v.vertex.getCoordinate());
         }
         return env;
+    }
+
+    public Collection<Edge> getOutgoing(Vertex v) {
+        return vertices.get(v.getLabel()).outgoing;
+    }
+    
+    public Collection<Edge> getIncoming(Vertex v) {
+        return vertices.get(v.getLabel()).incoming;
+    }
+
+    public int getDegreeOut(Vertex v) {
+        return vertices.get(v.getLabel()).outgoing.size();
+    }
+    
+    public int getDegreeIn(Vertex v) {
+        return vertices.get(v.getLabel()).incoming.size();
+    }
+
+    public Collection<Edge> getIncoming(String label) {
+        return vertices.get(label).incoming;
+    }
+    
+    public Collection<Edge> getOutgoing(String label) {
+        return vertices.get(label).outgoing;
+    }
+
+    public GraphVertex getGraphVertex(Vertex vertex) {
+        return getGraphVertex(vertex.getLabel());
+    }
+
+    public void addGraphVertex(GraphVertex graphVertex) {
+        vertices.put(graphVertex.vertex.getLabel(), graphVertex);
     }
 }

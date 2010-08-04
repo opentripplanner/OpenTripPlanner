@@ -3,7 +3,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <bean id="graphBundle" class="org.opentripplanner.model.GraphBundle">
-        <property name="path" value="target/graph-bundle" />
+        <property name="path" value="/home/novalis/otp/opentripplanner/newyork-osm-bundle" />
     </bean>
 
 </beans>

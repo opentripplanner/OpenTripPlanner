@@ -14,44 +14,66 @@
 package org.opentripplanner.graph_builder.services;
 
 import java.util.Collection;
+import java.util.Iterator;
 
-import org.opentripplanner.routing.core.DeadEnd;
-import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
+import org.opentripplanner.common.model.P2;
+
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Intersection;
-import org.opentripplanner.routing.core.IntersectionVertex;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.edgetype.EndpointVertex;
 
 public class StreetUtils {
 
+    /**
+     * Merge certain unnecessary vertices of a street graph.  Specifically,
+     * deletes a @{link StreetVertex} if it has connections only to two neighbors, 
+     * and has the same name as one of those neighbors.
+     *   
+     * @param graph
+     * @param endpoints all of the corners of the graph (in P2<in, out>)
+     */
+    public static void unify(Graph graph, Collection<P2<EndpointVertex>> endpoints) {
 
-    public static void unify(Graph graph, Collection<Intersection> intersections) {
-        for (Intersection intersection: intersections) {
-            if (intersection.getDegree() == 1) {
-                //a dead end can be represented more simply as a special case.
-                IntersectionVertex v = (IntersectionVertex) intersection.vertices.get(0);
-                DeadEnd d = new DeadEnd(v);
-                graph.addVertex(d);
-                graph.removeVertex(v);
-            } else if (intersection.getDegree() == 2) {
-                //this is an "intersection" of only two streets, and so can be simplified down
-                //to a single vertex.
-                IntersectionVertex v1 = (IntersectionVertex) intersection.vertices.get(0);
-                GenericVertex generic = new GenericStreetIntersectionVertex(v1.getLabel(), v1.getX(), v1.getY(), v1.getName());
-                for (Vertex v : intersection.vertices) {
-                    IntersectionVertex iv = (IntersectionVertex) v;
-                    if (iv.inStreet != null) {
-                        generic.addIncoming(iv.inStreet);
-                        iv.inStreet.setToVertex(generic);
+        for(P2<EndpointVertex> corner : endpoints) {
+            GraphVertex vIn = graph.getGraphVertex(corner.getFirst());
+            GraphVertex vOut = graph.getGraphVertex(corner.getSecond());
+            if (vOut.getDegreeOut() == 2 && vIn.getDegreeIn() == 2) {
+                //this corner may be entirely removable
+
+                Collection<Edge> edges = vOut.getOutgoing();
+                Iterator<Edge> it = edges.iterator();
+                Edge out1 = it.next();
+                Edge out2 = it.next();
+                
+                edges = vIn.getIncoming();
+                it = edges.iterator();
+                Edge in1 = it.next();
+                Edge in2 = it.next();
+                
+                if (out1.getName() == out2.getName() && out1.getName() != null) {
+                    //remove vertex
+                    GenericVertex tov1 = (GenericVertex) out1.getToVertex();
+                    GenericVertex tov2 = (GenericVertex) out2.getToVertex();
+                    graph.removeVertex(vOut.vertex);
+                    graph.removeVertex(vIn.vertex);
+                    for (Edge e: vIn.getIncoming()) {
+                        graph.getGraphVertex(e.getFromVertex()).removeOutgoing(e);
                     }
-                    if (iv.outStreet != null) {
-                        generic.addOutgoing(iv.outStreet);
-                        iv.outStreet.setFromVertex(generic);
+                    graph.getGraphVertex(tov1).removeIncoming(out1);
+                    graph.getGraphVertex(tov2).removeIncoming(out2);
+                    
+                    GenericVertex fromv1 = (GenericVertex) in1.getFromVertex();
+                    GenericVertex fromv2 = (GenericVertex) in2.getFromVertex();
+                    if (fromv1.getCoordinate().equals(tov1.getCoordinate())) {
+                        GenericVertex tmp = fromv1;
+                        fromv1 = fromv2;
+                        fromv2 = tmp;
                     }
-                    graph.removeVertex(v);
-                }
-                graph.addVertex(generic);
+                    tov1.mergeFrom(graph, fromv1);
+                    tov2.mergeFrom(graph, fromv2);
+                }                
             }
         }
     }

@@ -19,22 +19,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-class TSPPathFinder {
+public class TSPPathFinder {
     static class TSPPath {
         List<Vertex> vertices;
         double cost;
@@ -102,67 +97,4 @@ class TSPPathFinder {
         return graphPath.vertices.lastElement().weightSum;
     }
 
-}
-
-@Component
-public class RoutingServiceImpl implements RoutingService {
-
-    private Graph _graph;
-
-    @Autowired
-    public void setGraph(Graph graph) {
-        _graph = graph;
-    }
-
-    @Override
-    public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options) {
-        
-        if (options.back) {
-            ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex, state,
-                    options);
-            if (spt == null) {
-                return null;
-            }
-            GraphPath path = spt.getPath(fromVertex);
-            path.reverse();
-            return path;
-        } else {
-            ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex, toVertex, state,
-                    options);
-            if (spt == null) {
-                return null;
-            }
-            return spt.getPath(toVertex);
-        }
-    }
-
-    @Override
-    public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediates, State state, TraverseOptions options) {
-
-        Map<Vertex, HashMap<Vertex, GraphPath>> paths = new HashMap<Vertex, HashMap<Vertex,GraphPath>>();
-        
-        HashMap<Vertex, GraphPath> firstLegPaths = new HashMap<Vertex, GraphPath>();
-        paths.put(fromVertex, firstLegPaths);
-        
-        //compute shortest paths between each pair of vertices
-        for (Vertex v: intermediates) {
-            HashMap<Vertex, GraphPath> outPaths = new HashMap<Vertex, GraphPath>();
-            paths.put(v, outPaths);
-            GraphPath path = route(fromVertex, v, state, options);
-            firstLegPaths.put (v, path);
-            for (Vertex tv: intermediates) {
-                path = route(v, tv, state, options);
-                outPaths.put (tv, path);
-            }
-            path = route(v, toVertex, state, options);
-            outPaths.put(toVertex, path);
-        }
-    
-        //compute shortest path overall
-        HashSet<Vertex> vertices = new HashSet<Vertex>();
-        vertices.addAll(intermediates);
-        GraphPath shortestPath = TSPPathFinder.findShortestPath(toVertex, fromVertex, paths, vertices, state, options);
-        return shortestPath;
-    }
-    
 }

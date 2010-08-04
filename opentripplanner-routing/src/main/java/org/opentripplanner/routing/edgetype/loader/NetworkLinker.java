@@ -16,13 +16,11 @@ package org.opentripplanner.routing.edgetype.loader;
 import java.util.ArrayList;
 
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.OneStreetVertex;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -51,10 +49,10 @@ public class NetworkLinker {
         
         _log.debug("creating linkages...");
         int i = 0;
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
+        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(graph.getVertices());
         
-        for (Vertex v : vertices) {
-            
+        for (GraphVertex gv : vertices) {
+            Vertex v = gv.vertex;
             if( i % 500 == 0)
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;
@@ -65,7 +63,7 @@ public class NetworkLinker {
                 if (!ts.isEntrance()) {
                     boolean hasEntrance = false;
 
-                    for (Edge e: v.getOutgoing()) {
+                    for (Edge e: gv.getOutgoing()) {
                         if (e instanceof PathwayEdge) {
                             hasEntrance = true;
                             break;
@@ -76,40 +74,13 @@ public class NetworkLinker {
                         continue;
                     }
                 }
-                Vertex nearestIntersection = index.getClosestVertex(v.getCoordinate(), false);
+                Vertex nearestIntersection = index.getClosestVertex(graph, v.getCoordinate(), false, null);
 
                 if (nearestIntersection != null) {
                     if (nearestIntersection instanceof StreetLocation) {
-                        if(((StreetLocation) nearestIntersection).streets != null) {
-                            ((StreetLocation) nearestIntersection).reify(graph);
-                            index.reified((StreetLocation) nearestIntersection);
-                        }
-                    } else if (nearestIntersection instanceof OneStreetVertex) {
-                        //this kind of vertex can only have one Street edge in each direction
-                        //so we need to create a spare vertex to connect the STL to.
-                        OneStreetVertex osvertex = ((OneStreetVertex) nearestIntersection);
-                        GenericVertex newV = new GenericVertex(osvertex.getLabel() + " approach", osvertex.getX(), osvertex.getY());
-
-                        Street approach = new Street(osvertex, newV, 0);
-                        Street approachBack = new Street(newV, osvertex, 0);
-
-                        if(osvertex.inStreet != null) {
-                            osvertex.inStreet.setToVertex(newV);
-                            newV.addIncoming(osvertex.inStreet);
-                        }
-                        if(osvertex.outStreet != null) {
-                            osvertex.outStreet.setFromVertex(newV);
-                            newV.addOutgoing(osvertex.outStreet);
-                        }
-
-                        newV.addIncoming(approach);
-                        newV.addOutgoing(approachBack);
-
-                        osvertex.inStreet = approachBack;
-                        osvertex.outStreet = approach;
-
-                        nearestIntersection = newV;
-                        graph.addVertex(newV);
+                        StreetLocation streetLocation = (StreetLocation) nearestIntersection;
+                        streetLocation.reify(graph);
+                        index.reified(streetLocation);
                     }
                     boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                     graph.addEdge(new StreetTransitLink(nearestIntersection, v, wheelchairAccessible));

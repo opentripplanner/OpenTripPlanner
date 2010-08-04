@@ -11,19 +11,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.Graph;
 
-public class GenericStreetIntersectionVertex extends GenericVertex implements StreetIntersectionVertex {
+public interface DummyableEdge {
 
-    private static final long serialVersionUID = -4775427904985183660L;
-
-    public GenericStreetIntersectionVertex(String label, double x, double y) {
-        super(label, x, y);
-    }
-
-    public GenericStreetIntersectionVertex(String label, double x, double y, String name) {
-        super(label, x, y, name);
-    }
+    void replaceDummyVertices(Graph graph);
 
 }

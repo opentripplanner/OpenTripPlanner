@@ -22,12 +22,12 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternDwell extends PatternEdge {
 
-    /**
-     *  Models waiting in a station on a vehicle.  The vehicle may not change 
-     *  names during this time -- PatternInterlineDwell represents that case.
-     */
+/**
+ *  Models waiting in a station on a vehicle.  The vehicle may not change 
+ *  names during this time -- PatternInterlineDwell represents that case.
+ */
+public class PatternDwell extends PatternEdge {
     
     private static final long serialVersionUID = 1L;
 

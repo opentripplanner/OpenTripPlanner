@@ -13,34 +13,35 @@
 
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.routing.edgetype.StreetVertex;
+
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 import junit.framework.TestCase;
 
-public class TestIntersectionVertex extends TestCase {
+public class TestStreetVertex extends TestCase {
 
     public void testIntersectionVertex() {
 
-        Intersection intersection = new Intersection("Morx at Fleem", 0, 0);
         GeometryFactory gf = new GeometryFactory();
 
-        Geometry geometry = gf.createLineString(new Coordinate[] {
+        LineString geometry = gf.createLineString(new Coordinate[] {
                 new Coordinate(-10, 0),
                 new Coordinate(0, 0)
                 });
 
-        IntersectionVertex leftV = new IntersectionVertex(intersection, geometry, true);
+        StreetVertex leftV = new StreetVertex("morx", geometry, "morx", 10.0, true);
 
-        Geometry geometry2 = gf.createLineString(new Coordinate[] {
+        LineString geometry2 = gf.createLineString(new Coordinate[] {
                 new Coordinate(0, 0),
-                new Coordinate(10, 0)
+                new Coordinate(-10, 0)
                 });
 
-        IntersectionVertex rightV = new IntersectionVertex(intersection, geometry2, false);
+        StreetVertex rightV = new StreetVertex("fleem", geometry2, "fleem", 10.0, false);
 
-        assertEquals(180, Math.abs(leftV.angle - rightV.angle));
+        assertEquals(180, Math.abs(leftV.outAngle - rightV.outAngle));
 
     }
 

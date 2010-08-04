@@ -18,15 +18,19 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * This represents an edge in the graph. 
+ *
+ */
 public interface Edge {
 
     public Vertex getFromVertex();
 
     public Vertex getToVertex();
 
-    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException;
+    public TraverseResult traverse(State s0, TraverseOptions options) throws NegativeWeightException;
         
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException;
+    public TraverseResult traverseBack(State s0, TraverseOptions options) throws NegativeWeightException;
 
     public TraverseMode getMode();
 
@@ -39,4 +43,11 @@ public interface Edge {
     public double getDistance();
 
     public Trip getTrip();
+
+    public void setToVertex(Vertex vertex);
+
+    public void setFromVertex(Vertex vertex);
+
+    public String getName(State state);
+
 }

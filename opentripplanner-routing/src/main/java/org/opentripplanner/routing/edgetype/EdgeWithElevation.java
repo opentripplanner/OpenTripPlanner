@@ -13,20 +13,13 @@
 
 package org.opentripplanner.routing.edgetype;
 
-public class DrawablePoint {
-    public float x;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.core.Edge;
 
-    public float y;
-
-    public float z;
-
-    public DrawablePoint(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    public String toString() {
-        return "(" + x + " " + y + " " + z + ")";
-    }
+/**
+ * An edge which has an elevation profile -- a street, basically.
+ *
+ */
+public interface EdgeWithElevation extends Edge {
+    public PackedCoordinateSequence getElevationProfile();
 }

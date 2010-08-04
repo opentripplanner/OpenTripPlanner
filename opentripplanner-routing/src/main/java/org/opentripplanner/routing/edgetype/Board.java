@@ -29,6 +29,12 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
+ * on vehicle. When traversed forward, the the resultant state has the time of the next
+ * departure, in addition the pattern that was boarded. When traversed backward, the result
+ * state is unchanged.
+ */
 public class Board extends AbstractEdge {
 
     String start_id; // a street vertex's id

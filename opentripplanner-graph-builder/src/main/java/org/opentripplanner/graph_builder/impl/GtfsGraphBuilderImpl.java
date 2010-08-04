@@ -186,11 +186,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 if (entityClass.equals(Agency.class))
                     agencies.addAll(reader.getAgencies());
 
-                try {
-                    store.flush();
-                } catch (Exception e) {
-                    System.out.println("Error flushing");
-                }
+                store.flush();
             }
         }
 

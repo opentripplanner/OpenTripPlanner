@@ -27,8 +27,9 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -77,10 +78,10 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 Interpolator2D.create((GridCoverage2D) gridCov, new InterpolationBilinear()) :
                 gridCov;
 
-        for (Vertex vv : graph.getVertices()) {
-            for (Edge ee : vv.getOutgoing()) {
-                if (ee instanceof Street) {
-                    processEdge((Street) ee);
+        for (GraphVertex gv : graph.getVertices()) {
+            for (Edge ee : gv.getOutgoing()) {
+                if (ee instanceof TurnEdge) {
+                    processEdge((TurnEdge) ee);
                 }
             }
         }
@@ -92,7 +93,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * 
      * @param st the street edge
      */
-    private void processEdge(Street st) {
+    private void processEdge(TurnEdge st) {
         
         Geometry g = (Geometry) st.getGeometry();
         Coordinate[] coords = g.getCoordinates();
@@ -127,7 +128,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(coordList
                 .toArray(coordArr));
         
-        st.setElevationProfile(elevPCS);
+        ((StreetVertex) st.getFromVertex()).setElevationProfile(elevPCS);
             
     }
 

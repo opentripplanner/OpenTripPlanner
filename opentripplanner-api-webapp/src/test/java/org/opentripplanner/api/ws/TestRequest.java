@@ -29,15 +29,17 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFa
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.impl.PathServiceImpl;
-import org.opentripplanner.routing.impl.RoutingServiceImpl;
+import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
+import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.util.DateUtils;
@@ -47,7 +49,7 @@ import junit.framework.TestCase;
 class DataHolder {
     public Graph graph = null;
     public Planner planner = null;
-    public PathServiceImpl pathService = null;
+    public ContractionPathServiceImpl pathService = null;
     
     private static DataHolder instance = null;
     public static DataHolder getInstance() {
@@ -60,7 +62,7 @@ class DataHolder {
 
 public class TestRequest extends TestCase {
 
-    private PathServiceImpl pathService;
+    private ContractionPathServiceImpl pathService;
     private Graph graph;
     private Planner planner;
     
@@ -87,7 +89,7 @@ public class TestRequest extends TestCase {
             return;
         }
         planner = new Planner();
-        pathService = new PathServiceImpl();
+        pathService = new ContractionPathServiceImpl();
         graph = new Graph();
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
@@ -109,9 +111,10 @@ public class TestRequest extends TestCase {
 
         builder.setSchema(schema );
         builder.buildGraph(graph);
-        pathService.setGraph(graph);
-        RoutingServiceImpl routingService = new RoutingServiceImpl();
-        routingService.setGraph(graph);
+        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, null);
+        pathService.setHierarchies(hierarchies);
+        ContractionRoutingServiceImpl routingService = new ContractionRoutingServiceImpl();
+        routingService.setHierarchies(hierarchies);
         pathService.setRoutingService(routingService);
         planner.setPathService(pathService);
 
@@ -120,10 +123,13 @@ public class TestRequest extends TestCase {
         holder.pathService = pathService;
     }
     
-    private Vertex getVertexByCrossStreets(String s1, String s2) {
-        for (Vertex v : graph.getVertices()) {
+    private Vertex getVertexByCrossStreets(String s1, String s2, boolean in) {
+        for (GraphVertex gv : graph.getVertices()) {
+            Vertex v = gv.vertex;
             if (v.getName().contains(s1) && v.getName().contains(s2)) {
-                return v;
+                if (in == v.getLabel().endsWith(" in")) {
+                    return v;
+                }
             }
         }
         return null;
@@ -131,8 +137,8 @@ public class TestRequest extends TestCase {
 
     public void testPlanner() throws Exception {
         
-        Vertex v1 = getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST");
-        Vertex v2 = getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT");
+        Vertex v1 = getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST", false);
+        Vertex v2 = getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT", true);
         assertNotNull(v1);
         assertNotNull(v2);
         
@@ -152,7 +158,7 @@ public class TestRequest extends TestCase {
                 false);
         
         Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Leg leg = itinerary.leg.get(0);
+        Leg leg = itinerary.legs.get(0);
         List<WalkStep> steps = leg.walkSteps;
         assertEquals(3, steps.size());
         WalkStep step0 = steps.get(0);
@@ -173,10 +179,10 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
-        Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST");
-        Vertex v2 = getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST");
-        Vertex v3 = getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST");
-        Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST");
+        Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
+        Vertex v2 = graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST", false)).iterator().next().getToVertex();
+        Vertex v3 = graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
+        Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST", true);
         Vertex[] vertices = {v1, v2, v3, v4};
         assertNotNull(v1);
         assertNotNull(v2);

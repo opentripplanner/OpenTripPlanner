@@ -14,9 +14,9 @@
 package org.opentripplanner.routing.core;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.util.Collection;
 import java.util.Iterator;
-import java.util.Vector;
 
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
@@ -26,13 +26,9 @@ public class GenericVertex implements Vertex {
 
     private static final long serialVersionUID = 364261663335739528L;
 
-    private Vector<Edge> outgoing;
-
-    private Vector<Edge> incoming;
-
-    public String label;
+    public final String label;
     
-    private String name;
+    protected String name;
 
     private String stopId = null;
 
@@ -40,20 +36,23 @@ public class GenericVertex implements Vertex {
 
     private double x;
 
-    static final double COS_MAX_LAT = Math.cos(46 * Math.PI / 180);
+    private transient int index;
+
+    private static int maxIndex = 0;
+
+    static final double COS_MAX_LAT = Math.cos(49 * Math.PI / 180);
 
     static final double METERS_PER_DEGREE_AT_EQUATOR = 111319.9;
 
     public GenericVertex(String label, Coordinate coord, String name) {
-		this(label, coord.x, coord.y, name);
-	}
+        this(label, coord.x, coord.y, name);
+    }
 
     public GenericVertex(String label, double x, double y) {
         this.label = label;
         this.x = x;
         this.y = y;
-        this.outgoing = new Vector<Edge>();
-        this.incoming = new Vector<Edge>();
+        this.index = maxIndex  ++;
     }
 
     public GenericVertex(String label, double x, double y, String name) {
@@ -73,8 +72,6 @@ public class GenericVertex implements Vertex {
         double yd = v.getY() - getY();
         return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR * COS_MAX_LAT;
 
-        /* This is more accurate but slower */
-        // return GtfsLibrary.distance(y, x, v.y, v.x);
     }
 
     public double distance(Coordinate c) {
@@ -85,24 +82,8 @@ public class GenericVertex implements Vertex {
         return new Coordinate(getX(), getY());
     }
 
-    public int getDegreeOut() {
-        return this.outgoing.size();
-    }
-
-    public int getDegreeIn() {
-        return this.incoming.size();
-    }
-
-    public void addIncoming(Edge ee) {
-        this.incoming.add(ee);
-    }
-
-    public void addOutgoing(Edge ee) {
-        this.outgoing.add(ee);
-    }
-
     public String toString() {
-        return "<" + this.label + " " + this.getOutgoing().size() + " " + this.getIncoming().size() + ">";
+        return "<" + this.label + ">";
     }
 
     public void setX(double x) {
@@ -121,31 +102,9 @@ public class GenericVertex implements Vertex {
         return y;
     }
 
-    public void setOutgoing(Vector<Edge> outgoing) {
-        this.outgoing = outgoing;
-    }
-
-    public Vector<Edge> getOutgoing() {
-        return outgoing;
-    }
-
-    public void setIncoming(Vector<Edge> incoming) {
-        this.incoming = incoming;
-    }
-
-    public Vector<Edge> getIncoming() {
-        return incoming;
-    }
-
     @Override
     public String getLabel() {
         return label;
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        incoming.trimToSize();
-        outgoing.trimToSize();
-        out.defaultWriteObject();
     }
 
     @Override
@@ -158,14 +117,23 @@ public class GenericVertex implements Vertex {
         return stopId;
     }
 
+    /**
+     * Merge another vertex into this one.  Useful during graph construction for handling 
+     * sequential non-branching streets, and empty dwells.
+     */
     public void mergeFrom(Graph graph, GenericVertex other) {
+        GraphVertex gv = graph.getGraphVertex(this);
+        Collection<Edge> incoming = gv.incoming;
+        Collection<Edge> outgoing = gv.outgoing;
         Iterator<Edge> it = incoming.iterator();
+        //remove incoming edges from other to this
         while(it.hasNext()) {
             Edge edge = it.next();
             if (edge.getFromVertex() == other) {
                 it.remove();
             }
         }
+        //remove outgoing edges from other to this
         it = outgoing.iterator();
         while(it.hasNext()) {
             Edge edge = it.next();
@@ -173,23 +141,32 @@ public class GenericVertex implements Vertex {
                 it.remove();
             }
         }
-        for (Edge edge: other.getIncoming()) {
-            AbstractEdge aedge = (AbstractEdge) edge;
-            if (aedge.getFromVertex() == this) {
+        //make incoming edges to other point to this 
+        for (Edge edge: graph.getIncoming(other)) {
+            if (edge.getFromVertex() == this) {
                 continue;
             }
 
-            aedge.setToVertex(this);
-            this.addIncoming(aedge);
+            edge.setToVertex(this);
+            gv.addIncoming(edge);
         }
-        for (Edge edge : other.getOutgoing()) {
-            AbstractEdge aedge = (AbstractEdge) edge;
-            if (aedge.getToVertex() == this) {
+        //add outgoing edges from other to outgoing from this
+        for (Edge edge : graph.getOutgoing(other)) {
+            if (edge.getToVertex() == this) {
                 continue;
             }
-            aedge.setFromVertex(this);
-            this.addOutgoing(aedge);
+            edge.setFromVertex(this);
+            gv.addOutgoing(edge);
         }
-        graph.vertices.remove(other.label);
+        graph.removeVertex(other);
+    }
+    
+    public int hashCode() {
+        return index;
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        index = maxIndex++;
     }
 }

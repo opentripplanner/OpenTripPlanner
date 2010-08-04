@@ -15,12 +15,15 @@ package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashMap;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -46,12 +49,13 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
             /*
              * This test requires the New York City base map, available at:
              * http://www.nyc.gov/html/dcp/html/bytes/dwnlion.shtml Download the MapInfo file. This
-             * must be converted to a ShapeFile. unzip nyc_lion09ami.zip ogr2ogr -f 'ESRI Shapefile'
-             * nyc_streets/streets.shp lion/MNLION1.tab ogr2ogr -update -append -f 'ESRI Shapefile'
-             * nyc_streets lion/SILION1.tab -nln streets ogr2ogr -update -append -f 'ESRI Shapefile'
-             * nyc_streets lion/QNLION1.tab -nln streets ogr2ogr -update -append -f 'ESRI Shapefile'
-             * nyc_streets lion/BKLION1.tab -nln streets ogr2ogr -update -append -f 'ESRI Shapefile'
-             * nyc_streets lion/BXLION1.tab -nln streets
+             * must be converted to a ShapeFile. mkdir nyc_streets;
+             * unzip nyc_lion10ami.zip
+             * ogr2ogr -f 'ESRI Shapefile' nyc_streets/streets.shp lion/MNLION1.tab 
+             * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/SILION1.tab -nln streets 
+             * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/QNLION1.tab -nln streets 
+             * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/BKLION1.tab -nln streets 
+             * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/BXLION1.tab -nln streets
              * 
              * It also requires the NYC Subway data in GTFS: cd src/test/resources wget
              * http://data.topplabs.org/data/mta_nyct_subway/subway.zip
@@ -65,6 +69,15 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         schema.setIdAttribute("SegmentID");
         schema.setNameAttribute("Street");
 
+        /* only featuretyp=0 are streets */
+        CaseBasedBooleanConverter selector = new CaseBasedBooleanConverter("FeatureTyp", false);
+
+        HashMap<String, Boolean> streets = new HashMap<String, Boolean>();
+        streets.put("0", true);
+        selector.setValues(streets);
+        schema.setFeatureSelector(selector);
+        
+        /* street directions */
         CaseBasedTraversalPermissionConverter perms = new CaseBasedTraversalPermissionConverter(
                 "TrafDir", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
@@ -82,27 +95,40 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
         loader.buildGraph(gg);
 
-        assertEquals(201520, gg.getVertices().size());
+        assertEquals(280772, gg.getVertices().size());
 
         //find start and end vertices
-        Vertex start = null;
-        Vertex end = null;
-        Vertex carlton = null;
-        for (Vertex v : gg.getVertices()) {
-            if (v.getLabel().startsWith("PARK PL at VANDERBILT AV")) {
-                start = v;
-            } else if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST")) {
-                end = v;
-            } else if (v.getLabel().startsWith("CARLTON AV at PARK PL")) {
-                carlton = v;
+        GraphVertex start = null;
+        GraphVertex end = null;
+        GraphVertex carlton = null;
+        for (GraphVertex gv : gg.getVertices()) {
+            Vertex v = gv.vertex;
+            if (v.getLabel().startsWith("PARK PL at VANDERBILT AV out")) {
+                start = gv;
+            } else if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST in")) {
+                end = gv;
+            } else if (v.getLabel().startsWith("CARLTON AV at PARK PL in")) {
+                carlton = gv;
             }
         }
         assertNotNull(start);
         assertNotNull(end);
         assertNotNull(carlton);
         
+        assertEquals(4, start.getDegreeOut());
+        assertEquals(0, start.getDegreeIn());
+        
+        GraphVertex sv = null;
+        for (Edge e : start.getOutgoing()) {
+            sv = gg.getGraphVertex(e.getToVertex());
+            break;
+        }
+        
+        assertEquals(4, sv.getDegreeOut());
+        assertEquals(4, sv.getDegreeIn());
+        
         TraverseOptions wo = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, new State(0), wo);
+        ShortestPathTree spt = AStar.getShortestPathTree(gg, start.vertex, end.vertex, new State(0), wo);
         assertNotNull(spt);
 
         //test that the option to walk bikes on the first or last segment works
@@ -114,17 +140,17 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         //force a change in preferences.
         wo.speed = 2; 
         
-        spt = AStar.getShortestPathTree(gg, start, carlton, new State(0), wo);
+        spt = AStar.getShortestPathTree(gg, start.vertex, carlton.vertex, new State(0), wo);
         assertNotNull(spt);
         
-        GraphPath path = spt.getPath(carlton);
+        GraphPath path = spt.getPath(carlton.vertex);
         assertTrue(path.edges.size() <= 3);
 
         wo.back = true;
-        spt = AStar.getShortestPathTreeBack(gg, start, carlton, new State(0), wo);
+        spt = AStar.getShortestPathTreeBack(gg, start.vertex, carlton.vertex, new State(0), wo);
         assertNotNull(spt);
         
-        path = spt.getPath(carlton);
+        path = spt.getPath(carlton.vertex);
         assertTrue(path.edges.size() <= 3);
 
     }

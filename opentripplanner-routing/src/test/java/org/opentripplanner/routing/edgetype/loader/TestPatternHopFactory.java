@@ -20,12 +20,13 @@ import java.util.GregorianCalendar;
 import junit.framework.TestCase;
 
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -36,18 +37,17 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.Street;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.Transfer;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class TestPatternHopFactory extends TestCase {
 
@@ -68,21 +68,18 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_c = graph.getVertex("agency_C");
         Vertex stop_d = graph.getVertex("agency_D");
 
-        Vertex near_a = graph.addVertex(new GenericStreetIntersectionVertex("near_a", stop_a.getX() + 0.00001, stop_a.getY() + 0.00001));
-        Vertex near_b = graph.addVertex(new GenericStreetIntersectionVertex("near_b", stop_b.getX() + 0.00001, stop_b.getY() + 0.00001));
-        Vertex near_c = graph.addVertex(new GenericStreetIntersectionVertex("near_c", stop_c.getX() + 0.00001, stop_c.getY() + 0.00001));
-        Vertex near_d = graph.addVertex(new GenericStreetIntersectionVertex("near_d", stop_d.getX() + 0.00001, stop_d.getY() + 0.00001));
+        StreetVertex near_a = (StreetVertex) graph.addVertex(new StreetVertex("near_a", GeometryUtils.makeLineString(stop_a.getX() + 0.00001, stop_a.getY() + 0.00001, stop_a.getX() - 0.00001, stop_a.getY() - 0.00001), "near a", 100, false));
+        StreetVertex near_b = (StreetVertex) graph.addVertex(new StreetVertex("near_b", GeometryUtils.makeLineString(stop_b.getX() + 0.00001, stop_b.getY() + 0.00001, stop_b.getX() - 0.00001, stop_b.getY() - 0.00001), "near b", 100, false));
+        StreetVertex near_c = (StreetVertex) graph.addVertex(new StreetVertex("near_c", GeometryUtils.makeLineString(stop_c.getX() + 0.00001, stop_c.getY() + 0.00001, stop_c.getX() - 0.00001, stop_c.getY() - 0.00001), "near c", 100, false));
+        StreetVertex near_d = (StreetVertex) graph.addVertex(new StreetVertex("near_d", GeometryUtils.makeLineString(stop_d.getX() + 0.00001, stop_d.getY() + 0.00001, stop_d.getX() - 0.00001, stop_d.getY() - 0.00001), "near d", 100, false));
 
-        Vertex[] nearPoints = {near_a, near_b, near_c, near_d};
+        StreetVertex[] nearPoints = {near_a, near_b, near_c, near_d};
 
-        Vertex nowhere = graph.addVertex(new GenericStreetIntersectionVertex("nowhere", 0, 0));
-
-        GeometryFactory gf = new GeometryFactory();
+        StreetVertex nowhere = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(0, 0, 0.0001, 0.0001), "nowhere", 100, false));
 
         for (int i = 0; i < nearPoints.length; ++i) {
-            Vertex a = nearPoints[i];
-            Street street = new Street(a, nowhere, 10000);
-            street.setGeometry(gf.createLineString(new Coordinate[] {a.getCoordinate(), nowhere.getCoordinate()}));
+            StreetVertex a = nearPoints[i];
+            TurnEdge street = new TurnEdge(a, nowhere);
             graph.addEdge(a, nowhere, street);
         }
 
@@ -92,8 +89,8 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testBoardAlight() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
+        GraphVertex stop_a = graph.getGraphVertex("agency_A");
+        GraphVertex stop_b = graph.getGraphVertex("agency_B");
 
         assertEquals(2, stop_a.getDegreeOut());
         assertEquals(4, stop_b.getDegreeOut());
@@ -102,7 +99,7 @@ public class TestPatternHopFactory extends TestCase {
             assertTrue(e instanceof PatternBoard || e instanceof StreetTransitLink);
         }
         
-        Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
+        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a.getOutgoing().iterator().next().getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
@@ -219,9 +216,9 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public Edge getHopOut(Vertex v) {
-        for (Edge e : v.getOutgoing()) {
+        for (Edge e : graph.getOutgoing(v)) {
             if (e instanceof PatternBoard) {
-                for (Edge f : e.getToVertex().getOutgoing()) {
+                for (Edge f : graph.getOutgoing(e.getToVertex())) {
                     if (f instanceof PatternHop) {
                         return f;
                     }
@@ -257,7 +254,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_o = graph.getVertex("agency_O");
         Vertex stop_p = graph.getVertex("agency_P");
         int i = 0;
-        for (@SuppressWarnings("unused") Edge e: stop_o.getOutgoing()) {
+        for (@SuppressWarnings("unused") Edge e: graph.getOutgoing(stop_o)) {
             ++i;
         }
         assertTrue(i == 3);
@@ -282,7 +279,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_k = graph.getVertex("agency_K");
         Vertex stop_n = graph.getVertex("agency_N");
         int transfers = 0;
-        for (Edge e : stop_n.getOutgoing()) {
+        for (Edge e : graph.getOutgoing(stop_n)) {
             if (e instanceof Transfer) {
                 assertEquals(e.getToVertex(), stop_k);
                 transfers += 1;

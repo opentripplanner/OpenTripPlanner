@@ -24,6 +24,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -53,8 +54,8 @@ public class TestHopFactory extends TestCase {
 
     public void testBoardAlight() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
+        GraphVertex stop_a = graph.getGraphVertex("agency_A");
+        GraphVertex stop_b = graph.getGraphVertex("agency_B");
 
         assertEquals(1, stop_a.getDegreeOut());
         assertEquals(3, stop_b.getDegreeOut());
@@ -63,7 +64,7 @@ public class TestHopFactory extends TestCase {
             assertEquals(PatternBoard.class, e.getClass());
         }
 
-        Vertex journey_a_1 = stop_a.getOutgoing().iterator().next().getToVertex();
+        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a.getOutgoing().iterator().next().getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 

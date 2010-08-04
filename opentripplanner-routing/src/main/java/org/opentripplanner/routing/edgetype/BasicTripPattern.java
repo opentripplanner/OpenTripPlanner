@@ -335,4 +335,35 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     public Trip getExemplar() {
         return exemplar;
     }
+    
+    /*
+     * This is a slow implementation because this class should not be used in production. 
+     */
+    @Override
+    public int getBestRunningTime(int stopIndex) {
+        int bestRunningTime = Integer.MAX_VALUE;
+        for (int runningTime : runningTimes[stopIndex]) {
+            if (bestRunningTime > runningTime) {
+                bestRunningTime = runningTime;
+            }
+        }
+        return bestRunningTime;
+    }
+    
+    /*
+     * This is a slow implementation because this class should not be used in production. 
+     */
+    @Override
+    public int getBestDwellTime(int stopIndex) {
+        if (dwellTimes == null) {
+            return 0;
+        }
+        int bestDwellTime = Integer.MAX_VALUE;
+        for (int dwellTime : dwellTimes[stopIndex]) {
+            if (bestDwellTime > dwellTime) {
+                bestDwellTime = dwellTime;
+            }
+        }
+        return bestDwellTime;        
+    }
 }

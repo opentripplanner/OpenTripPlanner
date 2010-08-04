@@ -22,15 +22,16 @@ import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.OneStreetVertex;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.PathService;
@@ -43,14 +44,14 @@ import org.springframework.stereotype.Component;
 import com.vividsolutions.jts.geom.Coordinate;
 
 @Component
-public class PathServiceImpl implements PathService {
+public class ContractionPathServiceImpl implements PathService {
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
     private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
 
-    private Graph _graph;
+    private ContractionHierarchySet hierarchies;
 
     private RoutingService _routingService;
 
@@ -59,11 +60,11 @@ public class PathServiceImpl implements PathService {
     private CalendarServiceImpl _calendarService = null;
 
     @Autowired
-    public void setGraph(Graph graph) {
-        _graph = graph;
+    public void setHierarchies(ContractionHierarchySet hierarchies) {
+        this.hierarchies = hierarchies;
 
-        if (_graph.hasService(CalendarServiceData.class)) {
-            CalendarServiceData data = _graph.getService(CalendarServiceData.class);
+        if (hierarchies.hasService(CalendarServiceData.class)) {
+            CalendarServiceData data = hierarchies.getService(CalendarServiceData.class);
             CalendarServiceImpl calendarService = new CalendarServiceImpl();
             calendarService.setData(data);
             _calendarService = calendarService;
@@ -85,11 +86,11 @@ public class PathServiceImpl implements PathService {
             TraverseOptions options) {
 
         ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = getVertexForPlace(fromPlace);
+        Vertex fromVertex = getVertexForPlace(fromPlace, options);
         if (fromVertex == null) {
             notFound.add("from");
         }
-        Vertex toVertex = getVertexForPlace(toPlace);
+        Vertex toVertex = getVertexForPlace(toPlace, options);
         if (toVertex == null) {
             notFound.add("to");
         }
@@ -115,11 +116,11 @@ public class PathServiceImpl implements PathService {
             Date targetTime, TraverseOptions options) {
 
         ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = getVertexForPlace(fromPlace);
+        Vertex fromVertex = getVertexForPlace(fromPlace, options);
         if (fromVertex == null) {
             notFound.add("from");
         }
-        Vertex toVertex = getVertexForPlace(toPlace);
+        Vertex toVertex = getVertexForPlace(toPlace, options);
         if (toVertex == null) {
             notFound.add("to");
         }
@@ -127,7 +128,7 @@ public class PathServiceImpl implements PathService {
 
         int i = 0;
         for (String intermediate : intermediates) {
-            Vertex vertex = getVertexForPlace(intermediate);
+            Vertex vertex = getVertexForPlace(intermediate, options);
             if (vertex == null) {
                 notFound.add("intermediate." + i);
             } else {
@@ -150,7 +151,7 @@ public class PathServiceImpl implements PathService {
         return Arrays.asList(path);
     }
 
-    private Vertex getVertexForPlace(String place) {
+    private Vertex getVertexForPlace(String place, TraverseOptions options) {
 
         Matcher matcher = _latLonPattern.matcher(place);
 
@@ -158,41 +159,46 @@ public class PathServiceImpl implements PathService {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(location);
+            return _indexService.getClosestVertex(hierarchies.getGraph(), location, options);
         }
 
-        return _graph.getVertex(place);
+        return hierarchies.getVertex(place);
     }
 
     @Override
-    public boolean isAccessible(String place, double maxSlope) {
-        Vertex vertex = getVertexForPlace(place);
+    public boolean isAccessible(String place, TraverseOptions options) {
+        /* fixme: take into account slope for wheelchair accessibility */
+        Vertex vertex = getVertexForPlace(place, options);
         if (vertex instanceof TransitStop) {
             TransitStop ts = (TransitStop) vertex;
             return ts.hasWheelchairEntrance();
-        } else if (vertex instanceof GenericStreetIntersectionVertex) {
-            for (Edge e : vertex.getIncoming()) {
-                if (e instanceof Street) {
-                    Street s = (Street) e;
-                    if (s.getWheelchairAccessible(maxSlope)) {
-                        return true;
-                    }
-                }
-            }
-            return false;
         } else if (vertex instanceof StreetLocation) {
             StreetLocation sl = (StreetLocation) vertex;
-            for (Street street : sl.streets) {
-                if (street.getWheelchairAccessible(maxSlope)) {
-                    return true;
-                }
-            }
-            return false;
-        } else if (vertex instanceof OneStreetVertex) {
-            OneStreetVertex osv = (OneStreetVertex) vertex;
-            return osv.outStreet.getWheelchairAccessible(maxSlope);
-        }
+            return sl.isWheelchairAccessible();
+        } 
         return true;
+    }
+
+    public boolean multipleOptionsBefore(Edge edge) {
+        Graph graph = hierarchies.getGraph();
+        boolean foundAlternatePaths = false;
+        Vertex start = edge.getFromVertex();
+        GraphVertex gv = graph.getGraphVertex(start);
+        if (gv == null) {
+            return false;
+        }
+        for (Edge out : gv.getOutgoing()) {
+            if (out == edge) {
+                continue;
+            }
+            if (!(out instanceof TurnEdge || out instanceof OutEdge)) {
+                continue;
+            }
+            // there were paths we didn't take.
+            foundAlternatePaths = true;
+            break;
+        }
+        return foundAlternatePaths;
     }
 
 }

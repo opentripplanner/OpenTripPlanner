@@ -13,33 +13,26 @@
 
 package org.opentripplanner.routing.core;
 
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+
 import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.impl.DummyReferenceVertex;
 
 public abstract class AbstractEdge implements Edge, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Vertex fromv, tov;
-    
-    public void replaceDummyVertices(Graph graph) {
-        if( fromv instanceof DummyReferenceVertex)
-            fromv = graph.getVertex(((DummyReferenceVertex) fromv).getLabel());
-        if( tov instanceof DummyReferenceVertex)
-            tov = graph.getVertex(((DummyReferenceVertex) tov).getLabel());
-    }
+    protected Vertex fromv;
+
+    protected Vertex tov;
 
     public String toString() {
-        return fromv.getLabel() + "-> " + tov.getLabel();
+        return fromv + "-> " + tov;
     }
 
-    public AbstractEdge(Vertex fromv, Vertex tov) {
-        this.fromv = fromv;
-        this.tov = tov;
+    public AbstractEdge(Vertex v1, Vertex v2) {
+        this.fromv = v1;
+        this.tov = v2;
     }
 
     @Override
@@ -63,13 +56,9 @@ public abstract class AbstractEdge implements Edge, Serializable {
     public Trip getTrip() {
         return null;
     }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        if( fromv != null)
-            fromv = new DummyReferenceVertex(fromv.getLabel());
-        if( tov != null)
-            tov = new DummyReferenceVertex(tov.getLabel());
-        out.defaultWriteObject();
+    
+    @Override
+    public String getName(State state) {
+        return getName();
     }
-
 }

@@ -27,14 +27,14 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class PatternAlight extends PatternEdge {
 
-    /**
-     * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
-     * station off vehicle. When traversed backwards, the the resultant state has the time of the
-     * previous arrival, in addition the pattern that was boarded. When traversed forwards, the
-     * result state is unchanged. An boarding penalty can also be applied to discourage transfers.
-     */
+/**
+ * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
+ * station off vehicle. When traversed backwards, the the resultant state has the time of the
+ * previous arrival, in addition the pattern that was boarded. When traversed forwards, the
+ * result state is unchanged. An boarding penalty can also be applied to discourage transfers.
+ */
+public class PatternAlight extends PatternEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
@@ -75,7 +75,7 @@ public class PatternAlight extends PatternEdge {
         return "leave transit network for street network";
     }
 
-
+    @Override
     public TraverseResult traverseBack(State state0, TraverseOptions options) {
         if (!options.modes.get(modeMask)) {
             return null;
@@ -130,6 +130,7 @@ public class PatternAlight extends PatternEdge {
         return new TraverseResult(-wait + BOARD_COST + transfer_penalty, state1);
     }
 
+    @Override
     public TraverseResult traverse(State state0, TraverseOptions options) {
 	if (!pattern.canAlight(stopIndex + 1)) {
 	    return null;

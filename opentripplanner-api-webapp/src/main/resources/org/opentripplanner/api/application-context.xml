@@ -10,8 +10,11 @@
 
     <import resource="classpath:org/opentripplanner/application-context.xml" />
 
-    <bean id="graph" class="org.opentripplanner.routing.impl.SerializedGraphFactoryBean">
+    <bean id="hierarchies" class="org.opentripplanner.routing.impl.SerializedGraphFactoryBean">
         <property name="graphBundle" ref="graphBundle" />
     </bean>
 
+    <bean id="graph" class="org.opentripplanner.routing.impl.GraphFromContractionHierarchySetBean">
+        <property name="hierarchies" ref="hierarchies" />
+    </bean>
 </beans>

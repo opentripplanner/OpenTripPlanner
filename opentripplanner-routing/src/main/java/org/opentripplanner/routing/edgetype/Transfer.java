@@ -23,6 +23,10 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * A transfer directly between two stops without using the street network.
+ *
+ */
 public class Transfer extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
@@ -34,6 +38,7 @@ public class Transfer extends AbstractEdge {
     private Geometry geometry = null;
 
     private boolean wheelchairAccessible;
+
 
     /**
      * @see Transfer(Vertex, Vertex, double, int)
@@ -59,8 +64,8 @@ public class Transfer extends AbstractEdge {
          * transfer is not accessible.  This will need to be changed when GTFS
          * and OneBusAway GTFS support accessible transfers.
          */
-        wheelchairAccessible = ((TransitStop)getFromVertex()).hasWheelchairEntrance() &&
-            ((TransitStop)getToVertex()).hasWheelchairEntrance();
+        wheelchairAccessible = ((TransitStop)fromv).hasWheelchairEntrance() &&
+            ((TransitStop)tov).hasWheelchairEntrance();
     }
 
     public String getDirection() {
@@ -120,10 +125,11 @@ public class Transfer extends AbstractEdge {
     }
     
     public int hashCode() {
-        return getToVertex().hashCode() ^ getFromVertex().hashCode();
+        return tov.hashCode() ^ fromv.hashCode();
     }
 
     public void setGeometry(Geometry geometry) {
         this.geometry  = geometry;
     }
+
 }

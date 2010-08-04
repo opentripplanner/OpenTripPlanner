@@ -25,7 +25,13 @@ import org.opengis.geometry.DirectPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * Stitches together multiple elevation maps into a single elevation map,
+ * hackily.  This is horrible, but the geotools way of doing things is
+ * too slow.   
+ * @author novalis
+ *
+ */
 public class UnifiedGridCoverage extends AbstractCoverage {
 
     private static final long serialVersionUID = -7798801307087575896L;
@@ -43,7 +49,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     @Override
     public Object evaluate(DirectPosition point) throws PointOutsideCoverageException,
             CannotEvaluateException {
-        /* we're don't care about this */
+        /* we don't care about this */
         return null;
     }
 

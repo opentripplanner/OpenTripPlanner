@@ -20,8 +20,10 @@ import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
+import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.impl.GraphSerializationLibrary;
+import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +39,10 @@ public class GraphBuilderTask {
     private GraphBundle _graphBundle;
     
     private boolean _alwaysRebuild = true;
+
+    private List<ModeAndOptimize> _modeList;
+
+    private double _contractionFactor = 1.0;
 
     @Autowired
     public void setGraph(Graph graph) {
@@ -58,6 +64,18 @@ public class GraphBuilderTask {
     public void setAlwaysRebuild(boolean alwaysRebuild) {
         _alwaysRebuild = alwaysRebuild;
     }
+    
+    public void addMode(ModeAndOptimize mo) {
+        _modeList.add(mo);
+    }
+
+    public void setModes(List<ModeAndOptimize> modeList) {
+        _modeList = modeList;
+    }
+
+    public void setContractionFactor(double contractionFactor) {
+        _contractionFactor = contractionFactor;
+    }
 
     public void run() throws IOException {
         
@@ -71,6 +89,8 @@ public class GraphBuilderTask {
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(_graph);
         
-        GraphSerializationLibrary.writeGraph(_graph, graphPath);
+        ContractionHierarchySet chs = new ContractionHierarchySet(_graph, _modeList, _contractionFactor);
+        chs.build();
+        ContractionHierarchySerializationLibrary.writeGraph(chs, graphPath);
     }
 }

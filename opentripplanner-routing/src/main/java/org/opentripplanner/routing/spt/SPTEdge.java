@@ -20,16 +20,17 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PatternAlight;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class SPTEdge implements Edge {
+public class SPTEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,85 +40,75 @@ public class SPTEdge implements Edge {
 
     public Edge payload;
 
-    SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep) {
+    public SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep) {
         this.fromv = fromv;
         this.tov = tov;
         this.payload = ep;
     }
 
-    @Override
     public String getDirection() {
         return payload.getDirection();
     }
 
-    @Override
     public double getDistance() {
         return payload.getDistance();
     }
 
-    @Override
     public Geometry getGeometry() {
         return payload.getGeometry();
     }
 
-    @Override
     public TraverseMode getMode() {
         return payload.getMode();
     }
 
-    @Override
     public String getName() {
-        return payload.getName();
+        if (payload instanceof PatternBoard) {
+            return payload.getName(tov.state);
+        } else {
+            return payload.getName(fromv.state);
+        }
     }
 
-    @Override
     public Trip getTrip() {
 
         if (payload instanceof Board || payload instanceof Hop || payload instanceof Alight) {
             return payload.getTrip();
         }
-
-        if (payload instanceof PatternEdge) {
-            int patternIndex = fromv.state.getTrip();
-            if (patternIndex == -1) {
-                patternIndex = tov.state.getTrip();
-            }
-
-            TripPattern pattern = ((PatternEdge)payload).getPattern();
-            return  pattern.getTrip(patternIndex);
+        int patternIndex = -1;
+        if (payload instanceof PatternAlight) {
+            patternIndex = fromv.state.getTrip();
+        } else if (payload instanceof PatternEdge) {
+            patternIndex = tov.state.getTrip();
+        } else {
+            return null;
         }
-        return null;
+
+        TripPattern pattern = ((PatternEdge)payload).getPattern();
+        return pattern.getTrip(patternIndex);
     }
 
-    @Override
     public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
         return payload.traverse(s0, wo);
     }
 
-    @Override
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
         return payload.traverseBack(s0, wo);
     }
 
-    public SPTVertex getToSPTVertex() {
-        return tov;
-    }
-
-    public SPTVertex getFromSPTVertex() {
+    public SPTVertex getFromVertex() {
         return fromv;
     }
 
-    @Override
-    public Vertex getFromVertex() {
-        return fromv;
-    }
-
-    @Override
-    public Vertex getToVertex() {
+    public SPTVertex getToVertex() {
         return tov;
     }
     
     public String toString() {
         return "SPTEdge(" + payload.toString() + ")";
+    }
+
+    public String getName(State state) {
+        return payload.getName(state);
     }
 }

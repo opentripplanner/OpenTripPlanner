@@ -50,8 +50,10 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.routing.edgetype.Turn;
+import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
@@ -134,10 +136,12 @@ public class Planner {
      */
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getItineraries(@QueryParam(RequestInf.FROM) String fromPlace,
+    public Response getItineraries(
+            @QueryParam(RequestInf.FROM) String fromPlace,
             @QueryParam(RequestInf.TO) String toPlace,
             @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
-            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time,
+            @QueryParam(RequestInf.DATE) String date,
+            @QueryParam(RequestInf.TIME) String time,
             @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
@@ -148,11 +152,13 @@ public class Planner {
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
             throws JSONException {
 
-        // TODO: add Lang / Locale parameter, and thus get localized content  (Messages & more...)
+        // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
 
         // TODO: test inputs, and prepare an error if we can't use said input.
-        // TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords / vertext ids to planner (or error back to user)
-        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing.  Abstrct that out so it's used here too...
+        // TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
+        // / vertext ids to planner (or error back to user)
+        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstrct that
+        // out so it's used here too...
 
         /* create request */
         Request request = new Request();
@@ -165,7 +171,7 @@ public class Planner {
             request.setNumItineraries(max);
         }
         if (maxWalkDistance != null) {
-            request.setWalk(maxWalkDistance);
+            request.setMaxWalkDistance(maxWalkDistance);
         }
         if (arriveBy != null && arriveBy) {
             request.setArriveBy(true);
@@ -173,7 +179,8 @@ public class Planner {
         if (showIntermediateStops != null && showIntermediateStops) {
             request.setShowIntermediateStops(true);
         }
-        if (intermediatePlaces != null && intermediatePlaces.size() > 0 && !intermediatePlaces.get(0).equals("")) {
+        if (intermediatePlaces != null && intermediatePlaces.size() > 0
+                && !intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
         }
 
@@ -202,38 +209,28 @@ public class Planner {
         }
 
         // TODO: TRANSIT TRIP ERRORS
-        //If no paths are returned, and the trip is transit, look at the date & time parameters, to see if that was cause for an issue (eg: schedule calendar might be outside of service dates; service times; etc...)
-        //If planed trip is just walking, and a transit trip is requested, and the walk itself is greater than the max walk requested, look at date & time parameters)
+        // If no paths are returned, and the trip is transit, look at the date & time parameters, to
+        // see if that was cause for an issue (eg: schedule calendar might be outside of service
+        // dates; service times; etc...)
+        // If planned trip is just walking, and a transit trip is requested, and the walk itself is
+        // greater than the max walk requested, look at date & time parameters)
 
         return response;
     }
 
-
     /**
      * Generates a TripPlan from a Request;
      * 
-     * @param request
-     * @return
-     * TODO this method if fugly... needs major refactoring to clarify the assembly rules and what is happening within the 240 lines of code
+     * @param the
+     *            request
      */
     private TripPlan generatePlan(Request request) {
-        TraverseModeSet modeSet = request.getModeSet();
-        assert (modeSet.isValid());
-        TraverseOptions options = new TraverseOptions(modeSet);
-        options.optimizeFor = request.getOptimize();
-        options.back = request.isArriveBy();
-        options.wheelchairAccessible = request.getWheelchair();
-        options.maxWalkDistance = request.getWalk();
-        if (request.getMaxSlope() > 0) { 
-            options.maxSlope = request.getMaxSlope();
-        }
-        if (request.getWheelchair()) {
-            //check if the start and end locations are accessible
-            if (!pathservice.isAccessible(request.getFrom(), options.maxSlope) || !pathservice.isAccessible(request.getTo(), options.maxSlope)) {
-                throw new LocationNotAccessible();
-            }
-            
-        }
+
+        TraverseOptions options = getOptions(request);
+
+        checkLocationsAccessible(request, options);
+
+        /* try to plan the trip */
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
@@ -242,11 +239,11 @@ public class Planner {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
                         options);
                 if (paths == null && request.getWheelchair()) {
-                    //There are no paths that meet the user's slope restrictions.
-                    //Try again without slope restrictions (and warn user).
-                    options.maxSlope = Double.MAX_VALUE; 
-                    paths = pathservice.plan(request.getFrom(), request.getTo(), 
-                            request.getDateTime(), options);
+                    // There are no paths that meet the user's slope restrictions.
+                    // Try again without slope restrictions (and warn user).
+                    options.maxSlope = Double.MAX_VALUE;
+                    paths = pathservice.plan(request.getFrom(), request.getTo(), request
+                            .getDateTime(), options);
                     tooSloped = true;
                 }
             } else {
@@ -258,17 +255,34 @@ public class Planner {
                     + request.getTo(), e);
             throw e;
         }
+
         if (paths == null || paths.size() == 0) {
             LOGGER
                     .log(Level.INFO, "Path not found: " + request.getFrom() + " : "
                             + request.getTo());
             throw new PathNotFoundException();
         }
+
+        TripPlan plan = generatePlan(paths, request, options);
+        if (plan != null) {
+            for (Itinerary i : plan.itinerary) {
+                i.tooSloped = tooSloped;
+            }
+        }
+        return plan;
+    }
+
+    /**
+     * Generates a TripPlan from a set of paths
+     */
+    public TripPlan generatePlan(List<GraphPath> paths, Request request, TraverseOptions options) {
+
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
         SPTVertex tripEndVertex = vertices.lastElement();
         String startName = tripStartVertex.getName();
         String endName = tripEndVertex.getName();
+
         // Use vertex labels if they don't have names
         if (startName == null) {
             startName = tripStartVertex.getLabel();
@@ -281,197 +295,277 @@ public class Planner {
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
-        GeometryFactory geometryFactory = new GeometryFactory();
-
         for (GraphPath path : paths) {
-
-            Itinerary itinerary = new Itinerary();
+            Itinerary itinerary = generateItinerary(path, request.getShowIntermediateStops(),
+                    options.modes.contains(TraverseMode.BICYCLE));
             plan.addItinerary(itinerary);
-
-            SPTVertex startVertex = path.vertices.firstElement();
-            State startState = startVertex.state;
-            SPTVertex endVertex = path.vertices.lastElement();
-            State endState = endVertex.state;
-
-            itinerary.startTime = new Date(startState.getTime());
-            itinerary.endTime = new Date(endState.getTime());
-            itinerary.duration = endState.getTime() - startState.getTime();
-            itinerary.fare = path.getCost();
-            itinerary.transfers = -1;
-            itinerary.tooSloped = tooSloped;
-            
-            Leg leg = null;
-            TraverseMode mode = null;
-            CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-            String name = null;
-
-            int startWalk = -1;
-            int i = -1;
-            SPTEdge lastEdge = null;
-            double lastElevation = Double.MAX_VALUE;
-            for (SPTEdge edge : path.edges) {
-                i++;
-                Edge graphEdge = edge.payload;
-
-                if (graphEdge instanceof Turn) {
-                    continue;
-                }
-                lastEdge = edge;
-
-                TraverseMode edgeMode = graphEdge.getMode();
-                // special case for bicycling on Street edges, where mode cannot be deduced from
-                // edge type
-                if (graphEdge instanceof Street && modeSet.contains(TraverseMode.BICYCLE)) {
-                    edgeMode = TraverseMode.BICYCLE;
-                }
-                double edgeTime = edge.tov.state.getTime() - edge.fromv.state.getTime();
-
-                if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
-                    //change of mode
-                    if (edgeMode != mode
-                            || (!mode.isOnStreetNonTransit() && graphEdge.getName() != name)) {
-                        name = graphEdge.getName();
-                        if (leg != null) {
-                            /* finalize leg */
-                            if (startWalk != -1) {
-                                leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i));
-                            }
-                            Vertex fromv = graphEdge.getFromVertex();
-                            Coordinate endCoord = fromv.getCoordinate();
-                            leg.to = new Place(endCoord.x, endCoord.y, fromv.getName());
-                            leg.to.stopId = fromv.getStopId();
-                            leg.endTime = new Date(edge.tov.state.getTime());
-                            Geometry geometry = geometryFactory.createLineString(coordinates);
-                            leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                            leg.duration = edge.tov.state.getTime() - leg.startTime.getTime();
-
-                            // removes 0.0 length legs from itinerary
-                            if(leg.isBogusWalkLeg()) {
-                                itinerary.removeLeg(leg);
-                            }
-                            leg = null;
-                            coordinates = new CoordinateArrayListSequence();
-                        }
-
-                        /* initialize new leg */
-                        // removes 0.0 length legs from itinerary
-                        if(leg != null && leg.isBogusWalkLeg()) {
-                            itinerary.removeLeg(leg);
-                        }
-                        leg = new Leg();
-                        itinerary.addLeg(leg);
-
-                        leg.startTime = new Date(edge.fromv.state.getTime());
-                        leg.route = graphEdge.getName();
-                        Trip trip = edge.getTrip();
-                        if (trip != null) {
-                            leg.headsign = trip.getTripHeadsign();
-                            leg.agencyId = trip.getId().getAgencyId();
-                        }
-                        mode = edgeMode;
-                        leg.mode = mode.toString();
-                        if (mode == TraverseMode.WALK || mode == TraverseMode.BICYCLE) {
-                            startWalk = i;
-                        } else {
-                            startWalk = -1;
-                        }
-                        leg.distance = 0.0;
-                        Vertex fromv = graphEdge.getFromVertex();
-                        Coordinate endCoord = fromv.getCoordinate();
-                        leg.from = new Place(endCoord.x, endCoord.y, fromv.getName());
-                        leg.from.stopId = fromv.getStopId();
-                    }
-                }
-                Geometry edgeGeometry = graphEdge.getGeometry();
-                
-                if (edgeGeometry != null) {
-                    coordinates.extend(edgeGeometry.getCoordinates());
-                }
-
-                leg.distance += edge.getDistance();
-
-                if (edgeMode == TraverseMode.TRANSFER) {
-                    itinerary.walkTime += edgeTime;
-                    itinerary.walkDistance += graphEdge.getDistance();
-                    continue;
-                }
-
-                if (edgeMode == TraverseMode.BOARDING) {
-                    itinerary.transfers++;
-                    itinerary.waitingTime += edgeTime;
-                    continue;
-                }
-
-                if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
-                    itinerary.walkTime += edgeTime;
-                    itinerary.walkDistance += graphEdge.getDistance();
-                    if (graphEdge instanceof Street) {
-                        PackedCoordinateSequence profile = ((Street)graphEdge).getElevationProfile();
-                        if (profile != null) {
-                            for (Coordinate coordinate : profile.toCoordinateArray()) {
-                                if (lastElevation == Double.MAX_VALUE) {
-                                    lastElevation = coordinate.y;
-                                    continue;
-                                }
-                                double elevationChange = lastElevation - coordinate.y;
-                                if (elevationChange > 0) {
-                                    itinerary.elevationGained += elevationChange;
-                                } else {
-                                    itinerary.elevationLost -= elevationChange;
-                                }
-                                lastElevation = coordinate.y;
-                            }
-                        }
-                    }
-                }
-
-                if (edgeMode.isTransit()) {
-                    itinerary.transitTime += edgeTime;
-                    mode = graphEdge.getMode();
-                    leg.mode = mode.toString();
-                    leg.route = graphEdge.getName();
-                    if (request.getShowIntermediateStops()) {
-                        /* add intermediate stop to current leg */
-                        if (leg.stop==null) {
-                            //first transit edge, just create the list (the initial stop is current "from" vertex)
-                            leg.stop = new ArrayList<Place>();
-                        } else {
-                            //any further transit edge, add "from" vertex to intermediate stops
-                            Place stop = new Place(edge.fromv.getX(), edge.fromv.getY(), edge.fromv.getName());
-                            stop.stopId = edge.fromv.getStopId();
-                            leg.stop.add(stop);
-                        }
-                    }
-                }
-            }
-
-            Edge graphEdge = lastEdge.payload;
-
-            if (leg != null) {
-                /* finalize leg */
-                Vertex tov = graphEdge.getToVertex();
-                Coordinate endCoord = tov.getCoordinate();
-                leg.to = new Place(endCoord.x, endCoord.y, tov.getName());
-                leg.to.stopId = tov.getStopId();
-                leg.endTime = new Date(lastEdge.tov.state.getTime());
-                Geometry geometry = geometryFactory.createLineString(coordinates);
-                leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                leg.duration = lastEdge.tov.state.getTime() - leg.startTime.getTime();
-                if (startWalk != -1) {
-                    leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
-                }
-
-                // removes 0.0 length legs from itinerary
-                if(leg.isBogusWalkLeg()) {
-                    itinerary.removeLeg(leg);
-                }
-                leg = null;
-            }
-            if (itinerary.transfers == -1) {
-                itinerary.transfers = 0;
-            }
         }
         return plan;
+    }
+
+    /**
+     * Generate an itinerary from a @{link GraphPath}. The algorithm here is to walk over each edge
+     * in the graph path, accumulating geometry, time, and length data. On mode change, a new leg is
+     * generated.  Street legs undergo an additional processing step to generate turn-by-turn directions.
+     * 
+     * @param path
+     * @param showIntermediateStops whether intermediate stops are included in the generated itinerary
+     * @param options
+     * @return
+     */
+    private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops,
+            boolean biking) {
+
+        GeometryFactory geometryFactory = new GeometryFactory();
+
+        Itinerary itinerary = makeItinerary(path);
+
+        Leg leg = null;
+        TraverseMode mode = null;
+        CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+        String name = null;
+
+        int startWalk = -1;
+        int i = -1;
+        SPTEdge previousEdge = null;
+        SPTEdge finalEdge = path.edges.lastElement();
+        double lastElevation = Double.MAX_VALUE;
+        for (SPTEdge sptEdge : path.edges) {
+            i++;
+            Edge edge = sptEdge.payload;
+
+            if (edge instanceof FreeEdge && sptEdge != finalEdge) {
+                continue;
+            }
+            previousEdge = sptEdge;
+
+            TraverseMode edgeMode = edge.getMode();
+
+            // special case for bicycling on Street edges, where mode cannot be deduced from
+            // edge type
+            if (isStreetEdge(edge) && biking) {
+                edgeMode = TraverseMode.BICYCLE;
+            }
+
+            double edgeTime = sptEdge.tov.state.getTime() - sptEdge.fromv.state.getTime();
+
+            if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
+                if (edgeMode != mode || (!mode.isOnStreetNonTransit() && edge.getName() != name)) {
+                    // change of mode or street name
+                    name = edge.getName();
+                    if (leg != null) {
+                        /* finalize prior leg */
+                        if (startWalk != -1) {
+                            leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i));
+                        }
+                        leg.to = makePlace(edge.getFromVertex());
+
+                        leg.endTime = new Date(sptEdge.fromv.state.getTime());
+                        Geometry geometry = geometryFactory.createLineString(coordinates);
+                        leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+                        
+                        leg = null;
+                        coordinates = new CoordinateArrayListSequence();
+                    }
+
+                    /* initialize new leg */
+                    mode = edgeMode;
+                    leg = makeLeg(sptEdge, mode);
+                    itinerary.addLeg(leg);
+
+                    if (mode == TraverseMode.WALK || mode == TraverseMode.BICYCLE) {
+                        startWalk = i;
+                    } else {
+                        startWalk = -1;
+                    }
+                }
+            }
+            Geometry edgeGeometry = edge.getGeometry();
+
+            if (edgeGeometry != null) {
+                Coordinate[] edgeCoordinates = edgeGeometry.getCoordinates();
+                if (coordinates.size() > 0
+                        && coordinates.getCoordinate(coordinates.size() - 1).equals(
+                                edgeCoordinates[0])) {
+                    coordinates.extend(edgeCoordinates, 1);
+                } else {
+                    coordinates.extend(edgeCoordinates);
+                }
+            }
+
+            leg.distance += sptEdge.getDistance();
+
+            if (edgeMode == TraverseMode.TRANSFER) {
+                itinerary.walkTime += edgeTime;
+                itinerary.walkDistance += edge.getDistance();
+                continue;
+            } else if (edgeMode == TraverseMode.BOARDING) {
+                itinerary.transfers++;
+                itinerary.waitingTime += edgeTime;
+                continue;
+            } else if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
+                itinerary.walkTime += edgeTime;
+                itinerary.walkDistance += edge.getDistance();
+                if (edge instanceof EdgeWithElevation) {
+                    PackedCoordinateSequence profile = ((EdgeWithElevation) edge)
+                            .getElevationProfile();
+                    lastElevation = applyElevation(profile, itinerary, lastElevation);
+                }
+            } else if (edgeMode.isTransit()) {
+                itinerary.transitTime += edgeTime;
+                mode = edge.getMode();
+                leg.mode = mode.toString();
+                leg.route = edge.getName();
+                if (showIntermediateStops) {
+                    /* add intermediate stop to current leg */
+                    if (leg.stop == null) {
+                        // first transit edge, just create the list (the initial stop is current
+                        // "from" vertex)
+                        leg.stop = new ArrayList<Place>();
+                    } else {
+                        // any further transit edge, add "from" vertex to intermediate stops
+                        Place stop = makePlace(sptEdge.fromv.mirror);
+                        leg.stop.add(stop);
+                    }
+                }
+            }
+        }
+
+        Edge graphEdge = previousEdge.payload;
+
+        if (leg != null) {
+            /* finalize leg */
+            leg.to = makePlace(graphEdge.getToVertex());
+            leg.endTime = new Date(previousEdge.tov.state.getTime());
+            Geometry geometry = geometryFactory.createLineString(coordinates);
+            leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+
+            if (startWalk != -1) {
+                leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
+            }
+
+            leg = null;
+        }
+        if (itinerary.transfers == -1) {
+            itinerary.transfers = 0;
+        }
+        itinerary.removeBogusLegs();
+        return itinerary;
+    }
+
+    /**
+     * Adjusts an Itinerary's elevation fields from an elevation profile
+     * 
+     * @return the elevation at the end of the profile
+     */
+    private double applyElevation(PackedCoordinateSequence profile, Itinerary itinerary,
+            double previousElevation) {
+        if (profile != null) {
+            for (Coordinate coordinate : profile.toCoordinateArray()) {
+                if (previousElevation == Double.MAX_VALUE) {
+                    previousElevation = coordinate.y;
+                    continue;
+                }
+                double elevationChange = previousElevation - coordinate.y;
+                if (elevationChange > 0) {
+                    itinerary.elevationGained += elevationChange;
+                } else {
+                    itinerary.elevationLost -= elevationChange;
+                }
+                previousElevation = coordinate.y;
+            }
+        }
+        return previousElevation;
+    }
+
+    /**
+     * Makes a new empty leg from a starting edge
+     */
+    private Leg makeLeg(SPTEdge edge, TraverseMode mode) {
+        Leg leg = new Leg();
+
+        leg.startTime = new Date(edge.fromv.state.getTime());
+        leg.route = edge.getName();
+        Trip trip = edge.getTrip();
+        if (trip != null) {
+            leg.headsign = trip.getTripHeadsign();
+            leg.agencyId = trip.getId().getAgencyId();
+        }
+
+        leg.mode = mode.toString();
+
+        leg.distance = 0.0;
+        leg.from = makePlace(edge.payload.getFromVertex());
+        return leg;
+    }
+
+    /**
+     * Makes a new empty Itinerary for a given path.
+     * 
+     * @return
+     */
+    private Itinerary makeItinerary(GraphPath path) {
+        Itinerary itinerary = new Itinerary();
+
+        SPTVertex startVertex = path.vertices.firstElement();
+        State startState = startVertex.state;
+        SPTVertex endVertex = path.vertices.lastElement();
+        State endState = endVertex.state;
+
+        itinerary.startTime = new Date(startState.getTime());
+        itinerary.endTime = new Date(endState.getTime());
+        itinerary.duration = endState.getTime() - startState.getTime();
+        itinerary.fare = path.getCost();
+        itinerary.transfers = -1;
+        return itinerary;
+    }
+
+    /**
+     * Makes a new Place from a vertex.
+     * 
+     * @return
+     */
+    private Place makePlace(Vertex vertex) {
+        Coordinate endCoord = vertex.getCoordinate();
+        Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
+        place.stopId = vertex.getStopId();
+        return place;
+    }
+
+    /**
+     * Throw an exception if the start and end locations are not wheelchair accessible given the
+     * user's specified maximum slope.
+     */
+    private void checkLocationsAccessible(Request request, TraverseOptions options) {
+        if (request.getWheelchair()) {
+            // check if the start and end locations are accessible
+            if (!pathservice.isAccessible(request.getFrom(), options)
+                    || !pathservice.isAccessible(request.getTo(), options)) {
+                throw new LocationNotAccessible();
+            }
+
+        }
+    }
+
+    private TraverseOptions getOptions(Request request) {
+
+        TraverseModeSet modeSet = request.getModeSet();
+        assert (modeSet.isValid());
+        TraverseOptions options = new TraverseOptions(modeSet);
+        options.optimizeFor = request.getOptimize();
+        options.back = request.isArriveBy();
+        options.wheelchairAccessible = request.getWheelchair();
+        if (request.getMaxSlope() > 0) {
+            options.maxSlope = request.getMaxSlope();
+        }
+        if (request.getMaxWalkDistance() > 0) {
+            options.maxWalkDistance = request.getMaxWalkDistance();
+        }
+        return options;
+    }
+
+    private boolean isStreetEdge(Edge edge) {
+        return edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof OutEdge;
     }
 
     /**
@@ -491,8 +585,7 @@ public class Planner {
 
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
-            if (edge instanceof Turn) {
-                // Turns do not exist outside of routing
+            if (edge instanceof FreeEdge) {
                 continue;
             }
             Geometry geom = edge.getGeometry();
@@ -502,98 +595,85 @@ public class Planner {
             String streetName = edge.getName();
             if (step == null) {
                 // first step
-                step = new WalkStep();
+                step = createWalkStep(sptEdge);
                 steps.add(step);
-                step.streetName = streetName;
-                step.lon = edge.getFromVertex().getX();
-                step.lat = edge.getFromVertex().getY();
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
+
+                double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
-                step.elevation = encodeElevationProfile(edge, 0);
+
                 distance = edge.getDistance();
             } else if (step.streetName != streetName
                     && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
-                step = new WalkStep();
+                step = createWalkStep(sptEdge);
                 steps.add(step);
-                step.streetName = streetName;
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
+
+                double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle);
-                step.lon = edge.getFromVertex().getX();
-                step.lat = edge.getFromVertex().getY();
-                step.becomes = !multipleOptionsBefore(edge);
-                step.elevation = encodeElevationProfile(edge, 0);
+                step.becomes = !pathservice.multipleOptionsBefore(edge);
+
                 distance = edge.getDistance();
             } else {
                 /* generate turn-to-stay-on directions, where needed */
-                double thisAngle = DirectionUtils.getInstance().getFirstAngle(geom);
+                double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
-                
+
                 if (direction == RelativeDirection.CONTINUE) {
                     // append elevation info
-                    if(step.elevation != null) {
+                    if (step.elevation != null) {
                         String s = encodeElevationProfile(edge, distance);
-                        if ((step.elevation.length() > 0) && !s.equals("")) step.elevation += ",";
+                        if (step.elevation.length() > 0 && s != null)
+                            step.elevation += ",";
                         step.elevation += s;
                     }
                     distance += edge.getDistance();
-                }
-                else {
-                //if (direction != RelativeDirection.CONTINUE) {
+                } else {
                     // figure out if there was another way we could have turned
-                    boolean optionsBefore = multipleOptionsBefore(edge);
+                    boolean optionsBefore = pathservice.multipleOptionsBefore(edge);
                     if (optionsBefore) {
-                        step = new WalkStep();
+                        // turn to stay on
+                        step = createWalkStep(sptEdge);
                         steps.add(step);
-                        step.streetName = streetName;
                         step.setDirections(lastAngle, thisAngle);
                         step.stayOn = true;
-                        step.lon = edge.getFromVertex().getX();
-                        step.lat = edge.getFromVertex().getY();
-                        step.elevation = encodeElevationProfile(edge, 0);
                         distance = edge.getDistance();
                     }
                 }
-                
+
             }
 
             step.distance += edge.getDistance();
 
-            lastAngle = DirectionUtils.getInstance().getLastAngle(geom);
+            lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
     }
 
+    private WalkStep createWalkStep(SPTEdge edge) {
+        WalkStep step;
+        step = new WalkStep();
+        step.streetName = edge.getName();
+        step.lon = edge.getFromVertex().getX();
+        step.lat = edge.getFromVertex().getY();
+        step.elevation = encodeElevationProfile(edge.payload, 0);
+        return step;
+    }
+
     private String encodeElevationProfile(Edge edge, double offset) {
-        if(!(edge instanceof Street)) {
+        if (!(edge instanceof EdgeWithElevation)) {
             return "";
         }
-        if(((Street) edge).getElevationProfile() == null) {
+        EdgeWithElevation elevEdge = (EdgeWithElevation) edge;
+        if (elevEdge.getElevationProfile() == null) {
             return "";
         }
         String str = "";
-        Coordinate[] coordArr = ((Street) edge).getElevationProfile().toCoordinateArray();
-        for(int i=0; i<coordArr.length; i++) {
-            str+= Math.round(coordArr[i].x+offset) + "," + Math.round(coordArr[i].y*10.0)/10.0 + 
-                  (i < coordArr.length-1 ? "," : "");
+        Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
+        for (int i = 0; i < coordArr.length; i++) {
+            str += Math.round(coordArr[i].x + offset) + "," + Math.round(coordArr[i].y * 10.0)
+                    / 10.0 + (i < coordArr.length - 1 ? "," : "");
         }
         return str;
     }
-    
-    private boolean multipleOptionsBefore(Edge edge) {
-        boolean foundAlternatePaths = false;
-        Vertex start = edge.getFromVertex();
-        for (Edge out : start.getOutgoing()) {
-            if (out == edge) {
-                continue;
-            }
-            if (!(out instanceof Turn)) {
-                continue;
-            }
-            // there were paths we didn't take.
-            foundAlternatePaths = true;
-            break;
-        }
-        return foundAlternatePaths;
-    }
+
 }

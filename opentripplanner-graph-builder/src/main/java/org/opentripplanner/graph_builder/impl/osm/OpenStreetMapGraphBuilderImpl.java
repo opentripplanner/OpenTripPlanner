@@ -32,12 +32,15 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Intersection;
-import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
+import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +49,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
+/**
+ * Builds a street graph from OpenStreetMap data.
+ *
+ */
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
@@ -55,6 +62,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
     private Map<String, KeyValuePermission> _tagPermissions = new LinkedHashMap<String, KeyValuePermission>();
+
+    private HashMap<P2<String>, P2<Double>> safetyFeatures = new HashMap<P2<String>, P2<Double>>();
 
     private class KeyValuePermission {
         public String key;
@@ -68,14 +77,25 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
     };
 
+    /**
+     * The source for OSM map data
+     */
     public void setProvider(OpenStreetMapProvider provider) {
         _providers.add(provider);
     }
 
+    /**
+     * Multiple sources for OSM map data
+     */
     public void setProviders(List<OpenStreetMapProvider> providers) {
         _providers.addAll(providers);
     }
 
+    /**
+     * The set of traversal permissions for a given set of tags.
+     *  
+     * @param provider
+     */
     public void setDefaultAccessPermissions(LinkedHashMap<String, StreetTraversalPermission> mappy) {
         for(String tag : mappy.keySet()) {
             int ch_eq = tag.indexOf("=");
@@ -114,7 +134,32 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
         return (T) v;
     }
-
+    
+    /**
+     * Sets processing of bicycle safety features from OSM tags.  Takes a map from key,value pairs
+     * to forwards,backwards multipliers.  In Spring XML, this looks like:
+     * 
+     * <property name="safetyFeatures">
+     *   <map>
+     *     <entry key="opposite_lane,cycleway" value="1,0.1" />
+     *     <entry key="this_lane,cycleway" value="0.1,1" />      
+     *    </map>
+     *  </property>
+     *
+     * Entries are multiplied 
+     *
+     * @param features
+     */
+    public void setSafetyFeatures(Map<String, String> features) {
+        safetyFeatures = new HashMap<P2<String>, P2<Double>>();
+        for (Map.Entry<String, String> entry : features.entrySet()) {
+            String[] kv = entry.getKey().split(",");
+            String[] strings = entry.getValue().split(",");
+            P2<Double> values = new P2<Double>(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]));
+            safetyFeatures.put(new P2<String>(kv), values);
+        }
+    }
+    
     private class Handler implements OpenStreetMapContentHandler {
 
         private Map<Integer, OSMNode> _nodes = new HashMap<Integer, OSMNode>();
@@ -137,8 +182,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             pruneFloatingIslands();
 
-            HashMap<Coordinate, Intersection> intersectionsByLocation = new HashMap<Coordinate, Intersection>();
-
             int wayIndex = 0;
 
             //figure out which nodes that are actually intersections
@@ -155,6 +198,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
+            ArrayList<P2<EndpointVertex>> endpoints = new ArrayList<P2<EndpointVertex>>();
+            
             for (OSMWay way : _ways.values()) {
 
                 if (wayIndex % 1000 == 0)
@@ -167,11 +212,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 List<Integer> nodes = way.getNodeRefs();
 
-                Intersection startIntersection = null, endIntersection = null;
+                P2<EndpointVertex> startEndpoints = null, endEndpoints = null;
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
                 GeometryFactory geometryFactory = new GeometryFactory();
 
+                /* Traverse through all the nodes of this edge.  For nodes 
+                 * which are not shared with any other edge, do not create
+                 * endpoints -- just accumulate them for geometry.  For nodes
+                 * which are shared, create endpoints and StreetVertex 
+                 * instances.
+                 */
+                
                 Integer startNode = null;
                 OSMNode osmStartNode = null;
                 for (int i = 0; i < nodes.size() - 1; i++) {
@@ -201,46 +253,81 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
 
-                    /* generate intersections */
-                    if (startIntersection == null) {
-                        startIntersection = intersectionsByLocation.get(getCoordinate(osmStartNode));
-                        if (startIntersection == null) {
-                            startIntersection = new Intersection(getVertexIdForNodeId(startNode), osmStartNode.getLon(), osmStartNode.getLat());
-                            intersectionsByLocation.put(startIntersection.getCoordinate(), startIntersection);
+                    /* generate endpoints */
+                    if (startEndpoints == null) {
+                        String label = "osm node " + osmStartNode.getId();
+                        
+                        startEndpoints = new P2<EndpointVertex>(
+                                (EndpointVertex) graph.getVertex(label + " in"),
+                                (EndpointVertex) graph.getVertex(label + " out"));
+                        if (startEndpoints.getFirst() == null) {
+                            Coordinate coordinate = getCoordinate(osmStartNode);
+                            EndpointVertex in = new EndpointVertex(label + " in", coordinate.x, coordinate.y, label);
+                            in = (EndpointVertex) graph.addVertex(in);
+                            EndpointVertex out = new EndpointVertex(label + " out", coordinate.x, coordinate.y, label);
+                            out = (EndpointVertex) graph.addVertex(out);
+                            startEndpoints = new P2<EndpointVertex>(in, out);
+                            endpoints.add(startEndpoints);
                         }
                     } else {
-                        startIntersection = endIntersection;
+                        startEndpoints = endEndpoints;
                     }
 
-                    endIntersection = intersectionsByLocation.get(getCoordinate(osmEndNode));
-                    if (endIntersection == null) {
-                        endIntersection = new Intersection(getVertexIdForNodeId(endNode), osmEndNode.getLon(), osmEndNode.getLat());
-                        intersectionsByLocation.put(endIntersection.getCoordinate(), endIntersection);
+                    String label = "osm node " + osmEndNode.getId();
+                    endEndpoints = new P2<EndpointVertex>(
+                            (EndpointVertex) graph.getVertex(label + " in"),
+                            (EndpointVertex) graph.getVertex(label + " out"));
+                    if (endEndpoints.getFirst() == null) {
+                        Coordinate coordinate = getCoordinate(osmEndNode);
+                        EndpointVertex in = new EndpointVertex(label + " in", coordinate.x, coordinate.y, label);
+                        in = (EndpointVertex) graph.addVertex(in);
+                        EndpointVertex out = new EndpointVertex(label + " out", coordinate.x, coordinate.y, label);
+                        out = (EndpointVertex) graph.addVertex(out);
+                        endEndpoints = new P2<EndpointVertex>(in, out);
+                        endpoints.add(endEndpoints);
                     }
 
-                    IntersectionVertex from = new IntersectionVertex(startIntersection, geometry, true);
-                    graph.addVertex(from);
-                    IntersectionVertex to = new IntersectionVertex(endIntersection, geometry, false);
-                    graph.addVertex(to);
-
-                    P2<Street> streets = getEdgesForStreet(from, to, way, permissions, geometry);
-                    Street street = streets.getFirst();
+                    P2<StreetVertex> streets = getStreetVerticesForStreet(way, i, permissions, geometry);
+                    StreetVertex street = streets.getFirst();
                     if (street != null) {
-                        to.inStreet = street;
-                        from.outStreet = street;
+                        graph.addVertex(street);
+                        FreeEdge in = new FreeEdge(startEndpoints.getSecond(), street);
+                        OutEdge out = new OutEdge(street, endEndpoints.getFirst());
+                        graph.addEdge(in);
+                        graph.addEdge(out);
                     }
-                    Street backStreet = streets.getSecond();
+                    
+                    StreetVertex backStreet = streets.getSecond();
                     if (backStreet != null) {
-                        to.outStreet = backStreet;
-                        from.inStreet = backStreet;
+                        graph.addVertex(backStreet);
+                        FreeEdge in = new FreeEdge(endEndpoints.getSecond(), backStreet);
+                        OutEdge out = new OutEdge(backStreet, startEndpoints.getFirst());
+                        graph.addEdge(in);
+                        graph.addEdge(out);
                     }
 
                     startNode = endNode;
                     osmStartNode = _nodes.get(startNode);
                 }
             }
+            
+            /* generate turns */
 
-            StreetUtils.unify(graph, intersectionsByLocation.values());
+            for (P2<EndpointVertex> vertices: endpoints) {
+                Vertex in = vertices.getFirst();
+                Vertex out = vertices.getSecond();
+                for (Edge e : graph.getIncoming(in)) {
+                    StreetVertex v1 = (StreetVertex) e.getFromVertex();
+                    for (Edge e2 : graph.getOutgoing(out)) {
+                        StreetVertex v2 = (StreetVertex) e2.getToVertex();
+                        if (v1 != v2 && v1.getEdgeId() != v2.getEdgeId()) { 
+                            graph.addEdge(new TurnEdge(v1, v2));
+                        }
+                    }
+                }
+            }
+            
+            StreetUtils.unify(graph, endpoints);
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
@@ -271,15 +358,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     subgraphs.put(subnode, subgraph);
                 }
             }
-            /* find the largest subgraph */
-            HashSet<Integer> largestSubgraph = null;
+            /* remove all tiny subgraph */
             for (HashSet<Integer> subgraph : subgraphs.values()) {
-                if (largestSubgraph == null || largestSubgraph.size() < subgraph.size()) {
-                    largestSubgraph = subgraph;
+                if (subgraph.size() < 20) {
+                    _nodes.keySet().removeAll(subgraph);
                 }
             }
-            /* delete the rest */
-            _nodes.keySet().retainAll(largestSubgraph);
         }
 
         private HashSet<Integer> computeConnectedSubgraph(
@@ -328,16 +412,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         public void addRelation(OSMRelation relation) {
 
         }
-
-        private String getVertexIdForNodeId(int nodeId) {
-            return "osm node " + nodeId;
-        }
-
-        /* Attempt at handling oneway streets, cycleways, and whatnot. See
+        
+        /**
+         *  Handle oneway streets, cycleways, and whatnot. See
          * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios,
-         * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. */
-        private P2<Street> getEdgesForStreet(Vertex from, Vertex to, OSMWay way,
-                StreetTraversalPermission permissions, LineString geometry) {
+         * along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway. 
+         */
+        private P2<StreetVertex> getStreetVerticesForStreet(OSMWay way, int startNode, StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
@@ -345,44 +426,52 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 d += DistanceLibrary.distance(coordinates[i-1], coordinates[i]);
             }
 
+            LineString backGeometry = (LineString) geometry.reverse();
+            
             Map<String, String> tags = way.getTags();
 
             if(permissions == StreetTraversalPermission.NONE)
-                return new P2<Street>(null, null);;
+                return new P2<StreetVertex>(null, null);
 
-            Street street = null, backStreet = null;
+            StreetVertex street = null, backStreet = null;
 
-            /* Three basic cases, 1) bidirectonal for everyone, 2) unidirctional for cars only,
-             * 3) biderectional for pedestrians only. */
+            /* Three basic cases, 1) bidirectional for everyone, 2) unidirectional for cars only,
+             * 3) bidirectional for pedestrians only. */
+            
             if("yes".equals(tags.get("oneway")) &&
                     ("no".equals(tags.get("oneway:bicycle"))
                      || "opposite_lane".equals(tags.get("cycleway"))
                      || "opposite".equals(tags.get("cycleway")))) { // 2.
-                street = getEdgeForStreet(from, to, way, d, permissions);
+                street = getStreetVertexForStreet(way, startNode, d, permissions, geometry, false);
                 if(permissions.remove(StreetTraversalPermission.CAR) != StreetTraversalPermission.NONE)
-                    backStreet = getEdgeForStreet(to, from, way, d, permissions.remove(StreetTraversalPermission.CAR));
+                    backStreet = getStreetVertexForStreet(way, startNode, d, permissions.remove(StreetTraversalPermission.CAR), backGeometry, true);
             } else if ("yes".equals(tags.get("oneway")) || "roundabout".equals(tags.get("junction"))) { // 3
-                street = getEdgeForStreet(from, to, way, d, permissions);
+                street = getStreetVertexForStreet(way, startNode, d, permissions, geometry, false);
                 if(permissions.allows(StreetTraversalPermission.PEDESTRIAN))
-                    backStreet = getEdgeForStreet(to, from, way, d, StreetTraversalPermission.PEDESTRIAN);
+                    backStreet = getStreetVertexForStreet(way, startNode, d, StreetTraversalPermission.PEDESTRIAN, backGeometry, true);
             } else { // 1.
-               street = getEdgeForStreet(from, to, way, d, permissions);
-               backStreet = getEdgeForStreet(to, from, way, d, permissions);
+               street = getStreetVertexForStreet(way, startNode, d, permissions, geometry, false);
+               backStreet = getStreetVertexForStreet(way, startNode, d, permissions, backGeometry, true);
             }
-
-            if (street != null) {
-                street.setGeometry(geometry);
+            
+            /* set bicycle safety features according to configuration */
+            
+            for (Map.Entry<P2<String>, P2<Double>> feature : safetyFeatures.entrySet()) {
+                String key = feature.getKey().getFirst();
+                String value = feature.getKey().getSecond();
+                if (tags.get(key).equals(value)) {
+                    P2<Double> multipliers = feature.getValue();
+                    street.setBicycleSafetyEffectiveLength(street.getBicycleSafetyEffectiveLength() * multipliers.getFirst());
+                    backStreet.setBicycleSafetyEffectiveLength(backStreet.getBicycleSafetyEffectiveLength() * multipliers.getSecond());
+                }
             }
-            if (backStreet != null) {
-                backStreet.setGeometry((LineString) geometry.reverse());
-            }
-            return new P2<Street>(street, backStreet);
+            return new P2<StreetVertex>(street, backStreet);
         }
 
-        private Street getEdgeForStreet(Vertex from, Vertex to, OSMWay way, double d,
-                StreetTraversalPermission permissions) {
+        private StreetVertex getStreetVertexForStreet(OSMWay way, int startNode, double length, StreetTraversalPermission permissions, LineString geometry,
+                boolean back) {
 
-            String id = "way " + way.getId();
+            String id = "way " + way.getId() + " from " + startNode;
 
             id = unique(id);
 
@@ -390,7 +479,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (name == null) {
                 name = id;
             }
-            Street street = new Street(from, to, name, d, permissions);
+            StreetVertex street = new StreetVertex(id, geometry, name, length, back);
 
             /* TODO: This should probably generalized somehow? */
             if( "no".equals(way.getTags().get("wheelchair")) ||

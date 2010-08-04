@@ -19,6 +19,7 @@ import java.util.List;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -30,11 +31,6 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 public class Leg {
 
-    /**
-     * The amount of time in milliseconds it takes to traverse this leg.
-     */
-    public long duration = 0;
-    
     /**
      * The date and time this leg begins.
      */
@@ -107,7 +103,7 @@ public class Leg {
 
     /**
      * bogus walk legs are those that have 0.0 distance, and just one instruction 
-     * @return boolean to indicate a bogus 
+     * @return boolean true if the leg is bogus 
      */
     public boolean isBogusWalkLeg() {
         boolean retVal = false;
@@ -117,5 +113,13 @@ public class Leg {
             retVal = true;
         }
         return retVal;
+    }
+    
+    /** 
+     * The leg's duration in milliseconds
+     */
+    @XmlElement
+    public long getDuration() {
+        return endTime.getTime() - startTime.getTime();
     }
 }

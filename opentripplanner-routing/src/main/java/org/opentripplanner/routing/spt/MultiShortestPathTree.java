@@ -31,6 +31,10 @@ public class MultiShortestPathTree implements ShortestPathTree {
         vertexSets = new HashMap<Vertex, Collection<SPTVertex>>();
     }
 
+    public Collection<SPTVertex> getVertices() {
+        throw new UnsupportedOperationException();
+    }
+    
     public SPTVertex addVertex(Vertex vertex, State state, double weightSum, TraverseOptions options) {
 
         Collection<SPTVertex> vertices = vertexSets.get(vertex);

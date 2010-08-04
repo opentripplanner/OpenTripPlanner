@@ -19,6 +19,10 @@ import org.opentripplanner.graph_builder.services.RegionsSource;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * A rectangular region with fixed latitude/longitude boundaries
+ *
+ */
 public class FixedRegionSourceImpl implements RegionsSource {
 
     private double latFrom;

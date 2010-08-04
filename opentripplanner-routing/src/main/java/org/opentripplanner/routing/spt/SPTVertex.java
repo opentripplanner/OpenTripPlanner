@@ -13,21 +13,20 @@
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 
-public class SPTVertex extends GenericVertex {
+import com.vividsolutions.jts.geom.Coordinate;
+
+public class SPTVertex implements Vertex {
     
     private static final long serialVersionUID = -4422788581123655293L;
 
     public SPTEdge incoming;
-
-    public Vector<SPTEdge> outgoing;
 
     public Vertex mirror;
 
@@ -37,31 +36,35 @@ public class SPTVertex extends GenericVertex {
 
     public double weightSum;
 
-    SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options) {
-        super(mirror.getLabel(), mirror.getX(), mirror.getY());
+    public int hops;
+
+    public SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options) {
+        this(mirror, state, weightSum, options, 0);
+    }
+    
+    public SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options, int hops) {
         this.mirror = mirror;
         this.state = state;
         this.weightSum = weightSum;
         this.options = options;
-        this.outgoing = new Vector<SPTEdge>();
+        this.hops = hops;
     }
 
     public void addOutgoing(SPTEdge ee) {
-        this.outgoing.add(ee);
+        throw new UnsupportedOperationException();
     }
 
     public SPTEdge setParent(SPTVertex parent, Edge ep) {
-        // remove this edge from outgoing list of previous parent
-        if (incoming != null) {
-            incoming.fromv.outgoing.remove(incoming);
-        }
         incoming = new SPTEdge(parent, this, ep);
-        parent.outgoing.add(incoming);
+        return incoming;
+    }
+    
+    public SPTEdge getParent() {
         return incoming;
     }
 
     public String toString() {
-        return this.mirror.getLabel() + " (" + this.weightSum + ")";
+        return this.mirror + " (" + this.weightSum + ")";
     }
 
     public String getName() {
@@ -74,5 +77,45 @@ public class SPTVertex extends GenericVertex {
 
     public boolean equals(SPTVertex v) {
         return v.mirror == mirror && v.incoming == incoming;
+    }
+
+    @Override
+    public double distance(Coordinate c) {
+        return mirror.distance(c);
+    }
+
+    @Override
+    public double fastDistance(Vertex v) {
+        return mirror.fastDistance(v);
+    }
+
+    @Override
+    public Coordinate getCoordinate() {
+        return mirror.getCoordinate();
+    }
+
+    public Iterable<SPTEdge> getIncoming() {
+        ArrayList<SPTEdge> ret = new ArrayList<SPTEdge>(1);
+        ret.add(incoming);
+        return ret;
+    }
+
+    @Override
+    public String getLabel() {
+        return mirror.getLabel();
+    }
+
+    @Override
+    public double getX() {
+        return mirror.getX();
+    }
+
+    @Override
+    public double getY() {
+        return mirror.getY();
+    }
+
+    public int hashCode() {
+        return mirror.hashCode();
     }
 }

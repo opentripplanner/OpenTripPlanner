@@ -13,24 +13,33 @@
 
 package org.opentripplanner.routing;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.GenericStreetIntersectionVertex;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Street;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -41,17 +50,21 @@ public class TestHalfEdges extends TestCase {
 
     Graph graph;
 
-    private Street leftUp;
+    private StreetVertex top;
 
-    private Street rightUp;
+    private StreetVertex bottom;
 
-    private Street top;
+    private StreetVertex left;
 
-    private Street bottom;
+    private StreetVertex right;
 
-    private Street leftDown;
+    private StreetVertex leftBack;
 
-    private Street rightDown;
+    private StreetVertex rightBack;
+
+    private Vertex brOut;
+
+    private Vertex trOut;
 
     public LineString createGeometry(Vertex a, Vertex b) {
 
@@ -65,84 +78,141 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 0.1 degree x 0.1 degree square
-        Vertex tl = graph.addVertex(new GenericStreetIntersectionVertex("tl", -74.1, 40.1));
-        Vertex tr = graph.addVertex(new GenericStreetIntersectionVertex("tr", -74.0, 40.1));
-        Vertex bl = graph.addVertex(new GenericStreetIntersectionVertex("bl", -74.1, 40.0));
-        Vertex br = graph.addVertex(new GenericStreetIntersectionVertex("br", -74.0, 40.0));
+        top = new StreetVertex("top", GeometryUtils.makeLineString(-74.1, 40.1, -74.0, 40.1), "top", 1500, false);
+        bottom = new StreetVertex("bottom", GeometryUtils.makeLineString(-74.1, 40.0, -74.0, 40.0), "bottom", 1500, false);
+        left = new StreetVertex("left", GeometryUtils.makeLineString(-74.1, 40.0, -74.1, 40.1), "left", 1500, false);
+        right = new StreetVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.1), "right", 1500, false);
+        
+        StreetVertex topBack = new StreetVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.1, 40.1), "topBack", 1500, true);
+        StreetVertex bottomBack = new StreetVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.1, 40.0), "bottomBack", 1500, true);
+        leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.1, 40.1, -74.1, 40.0), "leftBack", 1500, true);
+        rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.0, 40.0), "rightBack", 1500, true);
 
+        right.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN);
+        
+        graph.addVertex(top);
+        graph.addVertex(bottom);
+        graph.addVertex(left);
+        graph.addVertex(right);
+        
+        graph.addVertex(topBack);
+        graph.addVertex(bottomBack);
+        graph.addVertex(leftBack);
+        graph.addVertex(rightBack);
+        
+        EndpointVertex tlIn = (EndpointVertex) graph.addVertex(new EndpointVertex("tl in", -74.1, 40.1));
+        EndpointVertex trIn = (EndpointVertex) graph.addVertex(new EndpointVertex("tr in", -74.0, 40.1));
+        EndpointVertex blIn = (EndpointVertex) graph.addVertex(new EndpointVertex("bl in", -74.0, 40.0));
+        EndpointVertex brIn = (EndpointVertex) graph.addVertex(new EndpointVertex("br in", -74.1, 40.0));
+
+        Vertex tlOut = graph.addVertex(new EndpointVertex("tl out", -74.1, 40.1));
+        trOut = graph.addVertex(new EndpointVertex("tr out", -74.0, 40.1));
+        Vertex blOut = graph.addVertex(new EndpointVertex("bl out", -74.0, 40.0));
+        brOut = graph.addVertex(new EndpointVertex("br out", -74.1, 40.0));
+        
+        graph.addEdge(new FreeEdge(tlOut, top));
+        graph.addEdge(new FreeEdge(tlOut, leftBack));
+        
+        graph.addEdge(new FreeEdge(trOut, topBack));
+        graph.addEdge(new FreeEdge(trOut, rightBack));
+        
+        graph.addEdge(new FreeEdge(blOut, bottom));
+        graph.addEdge(new FreeEdge(blOut, left));
+        
+        graph.addEdge(new FreeEdge(brOut, bottomBack));
+        graph.addEdge(new FreeEdge(brOut, right));
+        
+        graph.addEdge(new OutEdge(topBack, tlIn));
+        graph.addEdge(new OutEdge(left, tlIn));
+        
+        graph.addEdge(new OutEdge(top, trIn));
+        graph.addEdge(new OutEdge(right, trIn));
+        
+        graph.addEdge(new OutEdge(bottomBack, blIn));
+        graph.addEdge(new OutEdge(leftBack, blIn));
+        
+        graph.addEdge(new OutEdge(bottom, brIn));
+        graph.addEdge(new OutEdge(rightBack, brIn));      
+        
+        graph.addEdge(new TurnEdge(top, rightBack));
+        graph.addEdge(new TurnEdge(rightBack, bottomBack));
+        graph.addEdge(new TurnEdge(bottomBack, left));
+        graph.addEdge(new TurnEdge(left, top));
+        
+        graph.addEdge(new TurnEdge(topBack, leftBack));
+        graph.addEdge(new TurnEdge(leftBack, bottom));
+        graph.addEdge(new TurnEdge(bottom, right));
+        graph.addEdge(new TurnEdge(right, topBack));
+        
         graph.addVertex(new TransitStop("transitVertex", -74.05, 40.1, "transitVertex", "fleem station", null));
 
-        double td = DistanceLibrary.distance(tl.getCoordinate().y, tl.getCoordinate().x, tr
-                .getCoordinate().y, tr.getCoordinate().x);
-        top = new Street(tl, tr, td);
-        top.setGeometry(createGeometry(tl, tr));
-        graph.addEdge(top);
-
-        double bd = DistanceLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, br
-                .getCoordinate().y, br.getCoordinate().x);
-        bottom = new Street(bl, br, bd);
-        bottom.setGeometry(createGeometry(bl, br));
-        graph.addEdge(bottom);
-
-        double d = DistanceLibrary.distance(bl.getCoordinate().y, bl.getCoordinate().x, tl
-                .getCoordinate().y, tl.getCoordinate().x);
-
-        leftDown = new Street(tl, bl, d);
-        leftDown.setGeometry(createGeometry(tl, bl));
-        graph.addEdge(leftDown);
-
-        leftUp = new Street(bl, tl, d);
-        leftUp.setGeometry(createGeometry(bl, tl));
-        graph.addEdge(leftUp);
-
-        rightDown = new Street(tr, br, d);
-        rightDown.setGeometry(createGeometry(tr, br));
-        graph.addEdge(rightDown);
-
-        rightUp = new Street(br, tr, d);
-        rightUp.setGeometry(createGeometry(br, tr));
-        graph.addEdge(rightUp);
     }
 
     public void testHalfEdges() {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, (new LinearLocation(0, 0.4)).getCoordinate(leftUp.getGeometry()));
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, (new LinearLocation(0, 0.8)).getCoordinate(leftUp.getGeometry()));
+        HashSet<Edge> turns = new HashSet<Edge>(graph.getOutgoing(left));
+        turns.addAll(graph.getOutgoing(leftBack));
+        
+        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start", turns, new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
+        HashSet<Edge> endTurns = new HashSet<Edge>(graph.getOutgoing(right));
+        endTurns.addAll(graph.getOutgoing(rightBack));
+        
+        StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end", endTurns, new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
+        
+        assertTrue(start.getX() < end.getX());
+        assertTrue(start.getY() < end.getY());
+        
+        ArrayList<Edge> extra = new ArrayList<Edge>();
+        for (Edge e: end.getExtra()) {
+            extra.add(e);
+        }
+        
+        assertEquals(12, extra.size());
+        
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
+        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, new State(startTime
+                .getTimeInMillis()), new TraverseOptions());
+
+        GraphPath pathBr = spt1.getPath(end);
+        assertNotNull("There must be a path from br to end", pathBr);
+        
+        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, new State(startTime
+                .getTimeInMillis()), new TraverseOptions());
+
+        GraphPath pathTr = spt2.getPath(end);
+        assertNotNull("There must be a path from tr to end", pathTr);
+        assertTrue("path from bottom to end must be longer than path from top to end", pathBr.vertices.lastElement().weightSum > pathTr.vertices.lastElement().weightSum);
+        
         ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
                 .getTimeInMillis()), new TraverseOptions());
 
         GraphPath path = spt.getPath(end);
-        assertNotNull(path);
+        assertNotNull("There must be a path from start to end", path);
 
-        // the bottom-left point is not part of the shortest path
+        // the bottom is not part of the shortest path
         for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("bl"));
+            assertNotSame(v.mirror, graph.getVertex("bottom"));
+            assertNotSame(v.mirror, graph.getVertex("bottomBack"));
         }
 
-    }
-
-    public void testHalfEdgesBack() {
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", leftUp, (new LinearLocation(0, 0.4)).getCoordinate(leftUp.getGeometry()));
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", rightUp, (new LinearLocation(0, 0.8)).getCoordinate(rightUp.getGeometry()));
-
-        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+        startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         TraverseOptions options = new TraverseOptions();
         options.back = true;
-        ShortestPathTree spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
+        spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
                 .getTimeInMillis()), options);
 
-        GraphPath path = spt.getPath(start);
-        assertNotNull(path);
+        path = spt.getPath(start);
+        assertNotNull("There must be a path from start to end (looking back)", path);
 
-        // the bottom-left point is not part of the shortest path
+        // the bottom edge is not part of the shortest path
         for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("bl"));
+            assertNotSame(v.mirror, graph.getVertex("bottom"));
+            assertNotSame(v.mirror, graph.getVertex("bottomBack"));
         }
 
     }
@@ -152,27 +222,27 @@ public class TestHalfEdges extends TestCase {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
 
-        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.1, 40.04));
+        assertTrue(finder.getClosestVertex(graph, new Coordinate(-74.05000001, 40.1), null) instanceof TransitStop);
+        
+        StreetLocation start = (StreetLocation) finder.getClosestVertex(graph, new Coordinate(-74.1, 40.04), null);
         assertNotNull(start);
-        StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.08));
+
+        ArrayList<Edge> extra = new ArrayList<Edge>();
+        for (Edge e: start.getExtra()) {
+            extra.add(e);
+        }
+        assertEquals(12, extra.size());
+        
+        TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        StreetLocation end = (StreetLocation) finder.getClosestVertex(graph, new Coordinate(-74.0, 40.08), biking);
         assertNotNull(end);
-
-        if (start.streets.get(0) == leftUp) {
-            assertTrue(Math.abs(start.location.getSegmentFraction() - 0.4) < 0.00001);
-        } else {
-            assertTrue(Math.abs(start.location.getSegmentFraction() - 0.6) < 0.00001);
-            assertEquals(leftDown, start.streets.get(0));
+        
+        extra.clear();
+        for (Edge e: end.getExtra()) {
+            extra.add(e);
         }
-        assertTrue(start.getDegreeOut() == 2);
-
-        if (end.streets.get(0) == rightUp) {
-            assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.2 < 0.00001);
-        } else {
-            assertTrue(Math.abs(end.location.getSegmentFraction()) - 0.8 < 0.00001);
-            assertEquals(rightDown, end.streets.get(0));
-        }
-        assertTrue(end.getDegreeIn() == 2);
-
-        assertTrue(finder.getClosestVertex(new Coordinate(-74.05000001, 40.1)) instanceof TransitStop);
+        //bikes can only go on the back edge
+        assertEquals(6, extra.size());
+        
     }
 }

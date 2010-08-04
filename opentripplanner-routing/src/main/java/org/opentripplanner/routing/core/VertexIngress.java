@@ -11,12 +11,21 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.core;
 
-import com.vividsolutions.jts.geom.LineString;
+public class VertexIngress {
+    public Vertex vertex;
 
-public interface WalkableEdge {
+    public Edge edge;
 
-    public LineString getGeometry();
+    public double weight;
 
+    public long time;
+
+    public VertexIngress(Vertex vertex, Edge edge, double weight, long time) {
+        this.vertex = vertex;
+        this.edge = edge;
+        this.weight = weight;
+        this.time = time;
+    }
 }

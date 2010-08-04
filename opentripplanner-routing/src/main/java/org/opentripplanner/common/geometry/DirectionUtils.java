@@ -30,7 +30,7 @@ public class DirectionUtils {
         geodeticCalculator = new GeodeticCalculator();
     }
 
-    public static DirectionUtils getInstance() {
+    private static DirectionUtils getInstance() {
         if (instance == null) {
             instance = new DirectionUtils();
         }
@@ -44,7 +44,7 @@ public class DirectionUtils {
      *            a LineString or a MultiLineString
      * @return
      */
-    public double getLastAngle(Geometry geometry) {
+    public static double getLastAngle(Geometry geometry) {
         LineString line;
         if (geometry instanceof MultiLineString) {
             line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
@@ -56,9 +56,10 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(numPoints - 2);
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
 
-        geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
-        geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return geodeticCalculator.getAzimuth() * Math.PI / 180;
+        DirectionUtils utils = getInstance();
+        utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
+        utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
+        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
     }
 
     /**
@@ -68,7 +69,7 @@ public class DirectionUtils {
      *            a LineString or a MultiLineString
      * @return
      */
-    public double getFirstAngle(Geometry geometry) {
+    public static double getFirstAngle(Geometry geometry) {
         LineString line;
         if (geometry instanceof MultiLineString) {
             line = (LineString) geometry.getGeometryN(0);
@@ -80,8 +81,9 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(0);
         Coordinate coord1 = line.getCoordinateN(1);
 
-        geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
-        geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return geodeticCalculator.getAzimuth() * Math.PI / 180;
+        DirectionUtils utils = getInstance();
+        utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
+        utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
+        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
     }
 }

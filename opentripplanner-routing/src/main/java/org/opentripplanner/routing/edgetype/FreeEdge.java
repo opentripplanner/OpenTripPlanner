@@ -15,23 +15,40 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.IntersectionVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class Turn extends AbstractEdge {
+/**
+ * An edge that costs nothing to traverse.  Used for connecting intersection vertices to the main
+ * edge-based graph.
+ * @author novalis
+ *
+ */
+public class FreeEdge extends AbstractEdge {
 
-    private static final long serialVersionUID = 5348819949436171603L;
+    private static final long serialVersionUID = 3925814840369402222L;
 
-    public int turnAngle;
+    public FreeEdge(Vertex from, Vertex to) {
+        super(from, to);
+    }
+    
+    @Override
+    public TraverseResult traverse(State s0, TraverseOptions options)
+            throws NegativeWeightException {
+        State s1 = s0.clone();
+        return new TraverseResult(0, s1);
+    }
 
-    public Turn(IntersectionVertex in, IntersectionVertex out) {
-        super(in, out);
-        turnAngle = Math.abs(180 - Math.abs(in.angle - out.angle));
+    @Override
+    public TraverseResult traverseBack(State s0, TraverseOptions options)
+            throws NegativeWeightException {
+        State s1 = s0.clone();
+        return new TraverseResult(0, s1);
     }
 
     @Override
@@ -51,27 +68,11 @@ public class Turn extends AbstractEdge {
 
     @Override
     public TraverseMode getMode() {
-        return null;
+        return TraverseMode.WALK;
     }
 
     @Override
     public String getName() {
         return null;
-    }
-
-    @Override
-    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(turnAngle / 20);
-        s1.lastEdgeWasStreet = s0.lastEdgeWasStreet;
-        return new TraverseResult(turnAngle / 20.0, s1);
-    }
-
-    @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-turnAngle / 20);
-        s1.lastEdgeWasStreet = s0.lastEdgeWasStreet;
-        return new TraverseResult(turnAngle / 20.0, s1);
     }
 }

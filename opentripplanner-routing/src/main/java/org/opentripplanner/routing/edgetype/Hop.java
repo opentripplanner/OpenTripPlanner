@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, HoppableEdge {
+public class Hop extends AbstractEdge implements Comparable<Hop> {
 
     public static class HopArrivalTimeComparator implements Comparator<Hop> {
 
@@ -99,27 +99,9 @@ public class Hop extends AbstractEdge implements Comparable<Hop>, Drawable, Hopp
         return this.start + " " + this.end + " " + this._serviceId;
     }
 
-    ArrayList<DrawablePoint> geometryCache = null;
-
     private Geometry geometry = null;
 
     private FareContext fareContext;
-
-    public ArrayList<DrawablePoint> getDrawableGeometry() {
-        if (geometryCache != null) {
-            return geometryCache;
-        }
-
-        ArrayList<DrawablePoint> ret = new ArrayList<DrawablePoint>();
-
-        ret.add(new DrawablePoint((float) this.start.getStop().getLon(), (float) this.start
-                .getStop().getLat(), this.start.getDepartureTime()));
-        ret.add(new DrawablePoint((float) this.end.getStop().getLon(), (float) this.end.getStop()
-                .getLat(), this.end.getArrivalTime()));
-
-        geometryCache = ret;
-        return ret;
-    }
 
     public String getDirection() {
         return start.getTrip().getTripHeadsign();

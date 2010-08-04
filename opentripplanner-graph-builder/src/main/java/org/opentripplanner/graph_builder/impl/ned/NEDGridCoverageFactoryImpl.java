@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * Automatically downloads and caches NED to cover every vertex of a graph.
+ * A coverage factory that works off of the NED caches from {@link NEDDownloader}. 
  */
 public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 

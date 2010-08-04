@@ -29,14 +29,25 @@ public class ShapefileStreetSchema {
 
     private SimpleFeatureConverter<Boolean> slopeOverrideConverter = new CaseBasedBooleanConverter();
 
+    private SimpleFeatureConverter<Boolean> featureSelector = null;
+
     public SimpleFeatureConverter<String> getIdConverter() {
         return idConverter;
     }
 
+    /**
+     * Sets the converter which gets IDs from features.
+     * 
+     * @{see setIdAttribute}
+     */
     public void setIdConverter(SimpleFeatureConverter<String> idConverter) {
         this.idConverter = idConverter;
     }
 
+    /**
+     * The ID attribute is used to uniquely identify street segments. This is useful if a given
+     * street segment appears multiple times in a shapefile.
+     */
     public void setIdAttribute(String attributeName) {
         this.idConverter = new AttributeFeatureConverter<String>(attributeName);
     }
@@ -49,10 +60,19 @@ public class ShapefileStreetSchema {
         this.nameConverter = new AttributeFeatureConverter<String>(attributeName);
     }
 
+    /**
+     * The name converter gets the street name from a feature.
+     */
     public void setNameConverter(SimpleFeatureConverter<String> nameConverter) {
         this.nameConverter = nameConverter;
     }
 
+    /**
+     * The permission converter gets the {@link StreetTraversalPermission} for a street segment and
+     * its reverse.
+     * 
+     * @return
+     */
     public SimpleFeatureConverter<P2<StreetTraversalPermission>> getPermissionConverter() {
         return permissionConverter;
     }
@@ -62,6 +82,15 @@ public class ShapefileStreetSchema {
         this.permissionConverter = permissionConverter;
     }
 
+    /**
+     * The permission converter gets the bicycle safety factor for a street segment and its reverse.
+     * The safety factor is 1.0 for an ordinary street. For streets which are more or less safe for
+     * bicycles, the safety factor is the number of miles you would have to bike on an ordinary
+     * street to have the same odds of dying as if you biked one mile on this street. For example,
+     * if bike lanes reduce risk by a factor of 3, the safety factor would be 0.33...
+     * 
+     * @return
+     */
     public void setBicycleSafetyConverter(SimpleFeatureConverter<P2<Double>> safetyConverter) {
         this.bicycleSafetyConverter = safetyConverter;
     }
@@ -70,11 +99,39 @@ public class ShapefileStreetSchema {
         return bicycleSafetyConverter;
     }
 
+    /**
+     * @see setSlopeOverrideConverter
+     * @return
+     */
     public SimpleFeatureConverter<Boolean> getSlopeOverrideConverter() {
-        return slopeOverrideConverter ;
+        return slopeOverrideConverter;
     }
 
+    /**
+     * The slope override converter returns true if the slope found from NED is should be ignored
+     * (for instance, on bridges and tunnels)
+     * 
+     * @param slopeOverrideConverter
+     */
     public void setSlopeOverrideConverter(SimpleFeatureConverter<Boolean> slopeOverrideConverter) {
         this.slopeOverrideConverter = slopeOverrideConverter;
+    }
+
+    /**
+     * @param featureSelector
+     *            A featureSelector returns true if a feature is a street, and false otherwise.
+     *            Useful for centerline files that also have non-streets, such as political
+     *            boundaries or coastlines
+     */
+    public void setFeatureSelector(SimpleFeatureConverter<Boolean> featureSelector) {
+        this.featureSelector = featureSelector;
+    }
+
+    /**
+     * @see setFeatureSelector
+     * @return the current feature selector
+     */
+    public SimpleFeatureConverter<Boolean> getFeatureSelector() {
+        return featureSelector;
     }
 }

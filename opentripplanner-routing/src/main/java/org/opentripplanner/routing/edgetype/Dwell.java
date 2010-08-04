@@ -25,6 +25,9 @@ import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ *  Models waiting in a station on a vehicle. 
+ */
 public class Dwell extends AbstractEdge {
 
     /*

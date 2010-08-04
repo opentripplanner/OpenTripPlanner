@@ -12,9 +12,17 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;
 
+/**
+ * A superclass for general trip pattern related edges
+ * @author novalis
+ *
+ */
 public abstract class PatternEdge extends AbstractEdge {
 
     protected TripPattern pattern;
@@ -32,5 +40,11 @@ public abstract class PatternEdge extends AbstractEdge {
 
     public void setPattern(TripPattern pattern) {
         this.pattern = pattern;
+    }
+
+    @Override
+    public String getName(State state) {
+        Trip trip = pattern.getTrip(state.getTrip());
+        return GtfsLibrary.getRouteName(trip.getRoute());
     }
 }

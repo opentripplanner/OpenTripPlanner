@@ -8,6 +8,7 @@
     <name>opentripplanner-graph-builder</name>
     <url>http://maven.apache.org</url>
 
+
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
@@ -108,6 +109,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <argLine>-Xmx3300m</argLine>
+                    <disableXmlReport>true</disableXmlReport>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
