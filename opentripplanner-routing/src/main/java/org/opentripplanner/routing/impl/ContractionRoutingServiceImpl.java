@@ -47,7 +47,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         ContractionHierarchy hierarchy = hierarchies.getHierarchy(options);
         if (hierarchy == null) {
             Graph _graph = hierarchies.getGraph();
-            if (options.back) {
+            if (options.getArriveBy()) {
             
                 ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex, state,
                         options);

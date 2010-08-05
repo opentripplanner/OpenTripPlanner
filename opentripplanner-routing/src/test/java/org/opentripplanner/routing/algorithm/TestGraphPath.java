@@ -154,7 +154,7 @@ public class TestGraphPath extends TestCase {
         }
 
         // Test arrive by trip
-        options.back = true;
+        options.setArriveBy(true);
         State s1 = new State(new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis());
         spt = AStar.getShortestPathTreeBack(graph, stop_n.getLabel(), stop_l.getLabel(), s1,
                 options);

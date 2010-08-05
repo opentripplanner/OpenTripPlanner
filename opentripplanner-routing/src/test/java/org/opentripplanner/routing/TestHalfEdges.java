@@ -202,7 +202,7 @@ public class TestHalfEdges extends TestCase {
         startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         TraverseOptions options = new TraverseOptions();
-        options.back = true;
+        options.setArriveBy(true);
         spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
                 .getTimeInMillis()), options);
 

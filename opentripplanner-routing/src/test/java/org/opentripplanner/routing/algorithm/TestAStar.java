@@ -59,7 +59,7 @@ public class TestAStar extends TestCase {
         assertEquals(path.vertices.lastElement().state.getTime(), endTime);
 
         /* test backwards traversal */
-        options.back = true;
+        options.setArriveBy(true);
         spt = AStar.getShortestPathTreeBack(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", new State(endTime), options);
 
@@ -77,30 +77,34 @@ public class TestAStar extends TestCase {
 
     }
 
-    public void testPortland() throws Exception {
+    public void testBannedRoutes() {
 
         Graph graph;
-
         GtfsContext context;
 
         graph = ConstantsForTests.getInstance().getPortlandGraph();
         context = ConstantsForTests.getInstance().getPortlandContext();
 
-        /* blacklisting */
         Vertex start = graph.getVertex("TriMet_8371");
-        TraverseOptions wo = new TraverseOptions();
-        wo.setGtfsContext(context);
+        TraverseOptions options = new TraverseOptions();
+        options.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
         ShortestPathTree spt = null;
 
         Vertex end = graph.getVertex("TriMet_8374");
 
-       String[] maxLines = {"MAX Red Line", "MAX Blue Line", "MAX Green Line"};
+        /*
+         * The MAX Red, Blue, and Green lines all run along the same trackage between the stops 8374
+         * and 8371. Together, they form the white line. No, wait, that's light.  They make
+         * a pretty good test case for banned routes, since if one is banned, you can always take 
+         * another.
+         */
+        String[] maxLines = { "MAX Red Line", "MAX Blue Line", "MAX Green Line" };
         for (int i = 0; i < maxLines.length; ++i) {
             String line = maxLines[i];
-            wo.bannedRoutes.add(new RouteSpec("TriMet", line));
-            spt = AStar.getShortestPathTree(graph, start, end, new State(
-                    startTime.getTimeInMillis()), wo);
+            options.bannedRoutes.add(new RouteSpec("TriMet", line));
+            spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
+                    .getTimeInMillis()), options);
             GraphPath path = spt.getPath(end);
             for (SPTEdge e : path.edges) {
                 if (e.payload instanceof PatternBoard) {
@@ -113,24 +117,62 @@ public class TestAStar extends TestCase {
                             }
                         }
                     }
-                    assertTrue (foundMaxLine);
+                    assertTrue(foundMaxLine);
                 }
             }
-            wo.bannedRoutes.clear();
+            options.bannedRoutes.clear();
         }
+    }
+
+    public void testMaxTime() {
+
+        Graph graph;
+        GtfsContext context;
+
+        graph = ConstantsForTests.getInstance().getPortlandGraph();
+        context = ConstantsForTests.getInstance().getPortlandContext();
+
+        Vertex start = graph.getVertex("TriMet_8371");
+        TraverseOptions options = new TraverseOptions();
+        options.setGtfsContext(context);
+        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+        options.worstTime = startTime.getTimeInMillis() + 1000 * 60 * 60; //one hour is way too much time
+
+        Vertex end = graph.getVertex("TriMet_8374");
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, new State(startTime.getTimeInMillis()),
+                options);
+        GraphPath path = spt.getPath(end);
+        assertNotNull(path);
         
-        /* timing */
-        
+        options.worstTime = startTime.getTimeInMillis() + 1000 * 60; //but one minute is not enough
+
+        spt = AStar.getShortestPathTree(graph, start, end, new State(startTime.getTimeInMillis()),
+                options);
+        path = spt.getPath(end);
+        assertNull(path);        
+    }
+
+    public void testPerformance() throws Exception {
+
+        Graph graph;
+        GtfsContext context;
+
+        graph = ConstantsForTests.getInstance().getPortlandGraph();
+        context = ConstantsForTests.getInstance().getPortlandContext();
+        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+        TraverseOptions options = new TraverseOptions();
+        options.setGtfsContext(context);
+
         Vertex airport = graph.getVertex("TriMet_10579");
 
         long startClock, endClock;
 
         final int n_trials = 100;
         String random[] = new String[n_trials];
-        for (int i = 0; i < n_trials ; ++i) {
+        for (int i = 0; i < n_trials; ++i) {
             String label;
             while (true) {
-                int rand_id = (int)(Math.random() * 10000);
+                int rand_id = (int) (Math.random() * 10000);
                 label = "TriMet_" + rand_id;
                 if (graph.getVertex(label) != null) {
                     break;
@@ -141,9 +183,10 @@ public class TestAStar extends TestCase {
 
         /* time A* */
         startClock = System.nanoTime();
-        for (int i = 0; i < n_trials ; ++i) {
+        ShortestPathTree spt = null;
+        for (int i = 0; i < n_trials; ++i) {
             spt = AStar.getShortestPathTree(graph, random[i], airport.getLabel(), new State(
-                    startTime.getTimeInMillis()), wo);
+                    startTime.getTimeInMillis()), options);
         }
 
         endClock = System.nanoTime();

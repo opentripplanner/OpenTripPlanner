@@ -92,8 +92,8 @@ public class AStar {
      */
     public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
-        if (!options.back) {
-            throw new RuntimeException("Reverse paths must set options.back");
+        if (!options.getArriveBy()) {
+            throw new RuntimeException("Reverse paths must call options.getArriveBy(true)");
         }
         if (origin == null || target == null) {
             return null;
@@ -203,6 +203,11 @@ public class AStar {
                 distance = fromv.fastDistance(target) / max_speed;
                 double new_w = spt_u.weightSum + wr.weight;
 
+                if (new_w > options.maxWeight || wr.state.getTime() < options.worstTime) {
+                    //too expensive to get here
+                    continue;
+                }
+                
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
@@ -314,6 +319,11 @@ public class AStar {
 
                 double new_w = spt_u.weightSum + wr.weight;
 
+                if (new_w > options.maxWeight || wr.state.getTime() > options.worstTime) {
+                    //too expensive to get here
+                    continue;
+                }
+                
                 SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);

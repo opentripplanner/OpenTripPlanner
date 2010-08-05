@@ -218,7 +218,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         System.out.println("Contracted");
 
-        State init = new State(0);
+        State init = new State(1000000000);
 
         // test query
         GraphPath path = hierarchy.getShortestPath(verticesOut[0][0], verticesIn[N - 1][N - 1], init,
@@ -248,14 +248,14 @@ public class TestContractionHeirarchies extends TestCase {
                         if (x1 == x2 && y1 == y2) {
                             continue;
                         }
-                        options.back = false;
+                        options.setArriveBy(false);
                         path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], init,
                                 options);
 
                         assertNotNull(path);
                         assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.edges.size());
                         
-                        options.back = true;
+                        options.setArriveBy(true);
                         path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], init,
                                 options);
 
@@ -361,7 +361,8 @@ public class TestContractionHeirarchies extends TestCase {
     @Test
     public void testNYC() throws Exception {
 
-        State init = new State(new GregorianCalendar(2010, 4, 4, 12, 0, 0).getTimeInMillis());
+        long startTime = new GregorianCalendar(2010, 4, 4, 12, 0, 0).getTimeInMillis();
+        State init = new State(startTime);
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;
@@ -483,7 +484,7 @@ public class TestContractionHeirarchies extends TestCase {
         path = hierarchy.getShortestPath(start, end, init, options);
         assertNotNull(path);
 
-        init = new State(new GregorianCalendar(2010, 4, 4, 12, 0, 0).getTimeInMillis());
+        init = new State(startTime);
         GraphPath pathWithSubways = hierarchy.getShortestPath(start, end, init, options);
         assertNotNull(pathWithSubways);
         boolean subway = false;
@@ -497,7 +498,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         
         //try reverse routing
-        options.back = true;
+        options.setArriveBy(true);
         pathWithSubways = hierarchy.getShortestPath(start, end, init, options);
         assertNotNull("Reverse path must be found", pathWithSubways);
         subway = false;
@@ -509,6 +510,21 @@ public class TestContractionHeirarchies extends TestCase {
         }
         assertTrue("Reverse path must take subway", subway);
 
+        options.setArriveBy(false);
+        
+        // test max time 
+        options.worstTime = startTime + 1000 * 60 * 90; //an hour and a half is too much time
+
+        path = hierarchy.getShortestPath(start, end, new State(startTime),
+                options);
+        assertNotNull(path);
+            
+        options.worstTime = startTime + 1000 * 60; //but one minute is not enough
+
+        path = hierarchy.getShortestPath(start, end, new State(startTime),
+                options);
+        assertNull(path);        
+        
         
         long now = System.currentTimeMillis();
         int i = 0;
@@ -564,10 +580,14 @@ public class TestContractionHeirarchies extends TestCase {
                 if (v2.getLabel().endsWith(" out")) {
                     String label = v2.getLabel();
                     gv2 = hierarchy.down.getGraphVertex(label.substring(0, label.length() - 4) + " in");
+                    if (gv2 == null) {
+                        v2 = null;
+                        continue;
+                    }
                     v2 = gv2.vertex;
                 }
             }
-            options.back = i % 2 == 0; //half of all trips will be reverse trips just for fun
+            options.setArriveBy(i % 2 == 0); //half of all trips will be reverse trips just for fun
             GraphPath path2 = hierarchy.getShortestPath(v1, v2, init, options);
             //assertNotNull(path2);
             if (path2 != null) {

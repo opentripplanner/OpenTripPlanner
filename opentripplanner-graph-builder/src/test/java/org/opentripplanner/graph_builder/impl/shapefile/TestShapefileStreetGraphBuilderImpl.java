@@ -146,7 +146,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         GraphPath path = spt.getPath(carlton.vertex);
         assertTrue(path.edges.size() <= 3);
 
-        wo.back = true;
+        wo.setArriveBy(true);
         spt = AStar.getShortestPathTreeBack(gg, start.vertex, carlton.vertex, new State(0), wo);
         assertNotNull(spt);
         

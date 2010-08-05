@@ -41,7 +41,7 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     private Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
 
-    public boolean back = false;
+    private boolean back = false;
 
     public boolean wheelchairAccessible = false;
 
@@ -78,6 +78,17 @@ public class TraverseOptions implements Serializable, Cloneable {
      * to find alternate itineraries.
      */
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
+
+    /**
+     * The worst possible time (latest for depart-by and earliest for arrive-by) that 
+     * we will accept when planning a trip.
+     */
+    public long worstTime = Long.MAX_VALUE;
+
+    /**
+     * The worst possible weight that we will accept when planning a trip.
+     */
+    public double maxWeight = Double.MAX_VALUE;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -150,8 +161,10 @@ public class TraverseOptions implements Serializable, Cloneable {
         if (o instanceof TraverseOptions) {
             TraverseOptions to = (TraverseOptions) o;
         return speed == to.speed && 
+               maxWeight == to.maxWeight &&
+               worstTime == to.worstTime &&
                modes.equals(to.modes) &&
-               back == to.back &&
+               getArriveBy() == to.getArriveBy() &&
                wheelchairAccessible == to.wheelchairAccessible &&
                optimizeFor == to.optimizeFor &&
                maxWalkDistance == to.maxWalkDistance &&
@@ -166,8 +179,10 @@ public class TraverseOptions implements Serializable, Cloneable {
     
     public int hashCode() {
         return new Double(speed).hashCode() + 
+        new Double(maxWeight).hashCode() + 
+        (int) (worstTime & 0xffffffff) +
         modes.hashCode() + 
-        (back ? 8966786 : 0) +
+        (getArriveBy() ? 8966786 : 0) +
         (wheelchairAccessible ? 731980 : 0) +
         optimizeFor.hashCode() + 
         new Double(maxWalkDistance).hashCode() +
@@ -176,5 +191,18 @@ public class TraverseOptions implements Serializable, Cloneable {
         new Double(walkReluctance).hashCode() + 
         boardCost + 
         bannedRoutes.hashCode();
+    }
+
+    public void setArriveBy(boolean back) {
+        this.back = back;
+        if (back) {
+            this.worstTime = 0;
+        } else {
+            this.worstTime = Long.MAX_VALUE;
+        }
+    }
+
+    public boolean getArriveBy() {
+        return back;
     }
 }

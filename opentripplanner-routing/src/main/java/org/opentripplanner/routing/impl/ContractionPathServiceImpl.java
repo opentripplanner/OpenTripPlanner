@@ -124,13 +124,30 @@ public class ContractionPathServiceImpl implements PathService {
             busOnly.modes.setTrainish(false);
         }
         optionQueue.add(options);
+        
+        double maxWeight = Double.MAX_VALUE;
+        long maxTime = options.getArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
             options = optionQueue.poll();
             if (options == null) {
                 break;
             }
+            options.worstTime = maxTime;
+            options.maxWeight = maxWeight;
             GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
-
+            if (maxWeight == Double.MAX_VALUE) {
+                /* the worst trip we are willing to accept is at most twice
+                 * as bad or twice as long.
+                 */
+                maxWeight = path.vertices.lastElement().weightSum * 2;
+                long tripTime = path.vertices.lastElement().state.getTime() - 
+                    path.vertices.firstElement().state.getTime();
+                if (options.getArriveBy()) {
+                    maxTime = path.vertices.lastElement().state.getTime() - tripTime * 2;
+                } else {
+                    maxTime = path.vertices.firstElement().state.getTime() + tripTime * 2;
+                }
+            }
             if (path == null) {
                 continue;
             }

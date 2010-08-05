@@ -674,7 +674,7 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 GraphVertex fromgv = graph.getGraphVertex(fromLabel);
-                if (options.back && fromgv != null) {
+                if (options.getArriveBy() && fromgv != null) {
                     // up path can only explore until core vertices on reverse paths
                     continue;
                 }
@@ -729,7 +729,13 @@ public class ContractionHierarchy implements Serializable {
                     }
 
                     double new_w = up_u.weightSum + wr.weight;
-
+                    if (new_w > options.maxWeight) {
+                        //too expensive to get here
+                        continue;
+                    }
+                    if (!options.getArriveBy() && wr.state.getTime() > options.worstTime) {
+                        continue;
+                    }
                     SPTVertex up_v = upspt.addVertex(toVertex, wr.state, new_w, options);
                     if (up_v != null) {
                         up_v.setParent(up_u, edge);
@@ -765,7 +771,7 @@ public class ContractionHierarchy implements Serializable {
 
                 downclosed.add(tov);
                 GraphVertex maingv = graph.getGraphVertex(toLabel);
-                if (!options.back && maingv != null) {
+                if (!options.getArriveBy() && maingv != null) {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
@@ -819,6 +825,13 @@ public class ContractionHierarchy implements Serializable {
                     }
 
                     double new_w = down_u.weightSum + wr.weight;
+                    if (new_w > options.maxWeight) {
+                        //too expensive to get here
+                        continue;
+                    }
+                    if (options.getArriveBy() && wr.state.getTime() < options.worstTime) {
+                        continue;
+                    }
                     SPTVertex down_v = downspt.addVertex(fromVertex, wr.state, new_w, options);
                     if (down_v != null) {
                         down_v.setParent(down_u, edge);
@@ -854,7 +867,7 @@ public class ContractionHierarchy implements Serializable {
 
         path.edges = flatten(path.edges);
         // clean up edges & vertices
-        if (options.back) {
+        if (options.getArriveBy()) {
             cleanPathEdgesBack(init, path, options);
         } else {
             cleanPathEdges(init, path, options);

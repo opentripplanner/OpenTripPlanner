@@ -561,7 +561,7 @@ public class Planner {
         assert (modeSet.isValid());
         TraverseOptions options = new TraverseOptions(modeSet);
         options.optimizeFor = request.getOptimize();
-        options.back = request.isArriveBy();
+        options.setArriveBy(request.isArriveBy());
         options.wheelchairAccessible = request.getWheelchair();
         if (request.getMaxSlope() > 0) {
             options.maxSlope = request.getMaxSlope();
