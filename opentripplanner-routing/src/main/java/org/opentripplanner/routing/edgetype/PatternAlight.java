@@ -16,8 +16,12 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Calendar;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -80,6 +84,7 @@ public class PatternAlight extends PatternEdge {
         if (!options.modes.get(modeMask)) {
             return null;
         }
+
         long currentTime = state0.getTime();
         ServiceDate serviceDate = getServiceDate(currentTime, options.calendar);
         ServiceDate serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
@@ -118,7 +123,18 @@ public class PatternAlight extends PatternEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
-        state1.tripId = pattern.getTrip(patternIndex).getId();
+        Trip trip = getPattern().getTrip(patternIndex);
+        
+        /* check if route banned for this plan */
+        if (options.bannedRoutes != null) {
+            Route route = trip.getRoute();
+            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+            if (options.bannedRoutes.contains(spec)) {
+                return null;
+            }
+        }
+        
+        state1.tripId = trip.getId();
         state1.justTransferred = true;
         state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.getExemplar().getRoute().getId(), pattern.getFareContext());
         long transfer_penalty = 0;

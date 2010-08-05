@@ -23,11 +23,14 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -83,13 +86,44 @@ public class TestAStar extends TestCase {
         graph = ConstantsForTests.getInstance().getPortlandGraph();
         context = ConstantsForTests.getInstance().getPortlandContext();
 
-        Vertex airport = graph.getVertex("TriMet_10579");
+        /* blacklisting */
+        Vertex start = graph.getVertex("TriMet_8371");
         TraverseOptions wo = new TraverseOptions();
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
+        ShortestPathTree spt = null;
+
+        Vertex end = graph.getVertex("TriMet_8374");
+
+       String[] maxLines = {"MAX Red Line", "MAX Blue Line", "MAX Green Line"};
+        for (int i = 0; i < maxLines.length; ++i) {
+            String line = maxLines[i];
+            wo.bannedRoutes.add(new RouteSpec("TriMet", line));
+            spt = AStar.getShortestPathTree(graph, start, end, new State(
+                    startTime.getTimeInMillis()), wo);
+            GraphPath path = spt.getPath(end);
+            for (SPTEdge e : path.edges) {
+                if (e.payload instanceof PatternBoard) {
+                    assertFalse(e.getName().equals(line));
+                    boolean foundMaxLine = false;
+                    for (int j = 0; j < maxLines.length; ++j) {
+                        if (j != i) {
+                            if (e.getName().equals(maxLines[j])) {
+                                foundMaxLine = true;
+                            }
+                        }
+                    }
+                    assertTrue (foundMaxLine);
+                }
+            }
+            wo.bannedRoutes.clear();
+        }
+        
+        /* timing */
+        
+        Vertex airport = graph.getVertex("TriMet_10579");
 
         long startClock, endClock;
-        ShortestPathTree spt = null;
 
         final int n_trials = 100;
         String random[] = new String[n_trials];

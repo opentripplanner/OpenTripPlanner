@@ -247,4 +247,15 @@ public class GraphPath {
             e.tov = tmp;
         }
     }
+    
+    public boolean equals(Object o) {
+        if (o instanceof GraphPath) {
+            return this.edges.equals(((GraphPath)o).edges);
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return this.edges.hashCode();
+    }
 }

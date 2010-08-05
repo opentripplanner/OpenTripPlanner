@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,7 +27,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
 
-public class TraverseOptions implements Serializable {
+public class TraverseOptions implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3836092451659658815L;
 
@@ -73,6 +74,11 @@ public class TraverseOptions implements Serializable {
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int boardCost = 120; 
 
+    /** Do not use certain named routes, probably because we're trying
+     * to find alternate itineraries.
+     */
+    public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
+    
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
@@ -127,5 +133,48 @@ public class TraverseOptions implements Serializable {
         return fareContexts;
     }
 
-
+    @SuppressWarnings("unchecked")
+    @Override
+    public TraverseOptions clone() {
+        try {
+            TraverseOptions clone = (TraverseOptions) super.clone();
+            clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            /* this will never happen since our super is the cloneable object */
+            throw new RuntimeException(e); 
+        }
+    }
+    
+    public boolean equals(Object o) {
+        if (o instanceof TraverseOptions) {
+            TraverseOptions to = (TraverseOptions) o;
+        return speed == to.speed && 
+               modes.equals(to.modes) &&
+               back == to.back &&
+               wheelchairAccessible == to.wheelchairAccessible &&
+               optimizeFor == to.optimizeFor &&
+               maxWalkDistance == to.maxWalkDistance &&
+               optimizeTransferPenalty == to.optimizeTransferPenalty && 
+               maxSlope == to.maxSlope &&
+               walkReluctance == to.walkReluctance && 
+               boardCost == to.boardCost && 
+               bannedRoutes.equals(to.bannedRoutes);
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return new Double(speed).hashCode() + 
+        modes.hashCode() + 
+        (back ? 8966786 : 0) +
+        (wheelchairAccessible ? 731980 : 0) +
+        optimizeFor.hashCode() + 
+        new Double(maxWalkDistance).hashCode() +
+        new Double(optimizeTransferPenalty).hashCode() + 
+        new Double(maxSlope).hashCode() +
+        new Double(walkReluctance).hashCode() + 
+        boardCost + 
+        bannedRoutes.hashCode();
+    }
 }

@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TraverseModeSet {
+public class TraverseModeSet implements Cloneable {
 
     private static final int MODE_BICYCLE = 1;
 
@@ -275,6 +275,11 @@ public class TraverseModeSet {
         return (modes & (MODE_TRANSIT)) != 0;
     }
 
+    /** Returns true if any the trip may use some train-like (train, subway, tram) mode */
+    public boolean getTraininsh() {
+        return (modes & (MODE_TRAINISH)) != 0;
+    }
+
     public List<TraverseMode> getModes() {
         ArrayList<TraverseMode> modeList = new ArrayList<TraverseMode>();
         for (TraverseMode mode : TraverseMode.values()) {
@@ -308,5 +313,15 @@ public class TraverseModeSet {
             }
         }
         return "TraverseMode (" + out + ")";
+    }
+    
+    @Override
+    public TraverseModeSet clone() {
+        try {
+            return (TraverseModeSet) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* this will never happen since our super is the cloneable object */
+            throw new RuntimeException(e); 
+        }
     }
 }
