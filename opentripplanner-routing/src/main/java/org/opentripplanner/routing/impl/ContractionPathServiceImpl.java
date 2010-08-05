@@ -16,21 +16,29 @@ package org.opentripplanner.routing.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -38,6 +46,7 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -83,7 +92,7 @@ public class ContractionPathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
-            TraverseOptions options) {
+            TraverseOptions options, int nItineraries) {
 
         ArrayList<String> notFound = new ArrayList<String>();
         Vertex fromVertex = getVertexForPlace(fromPlace, options);
@@ -104,11 +113,47 @@ public class ContractionPathServiceImpl implements PathService {
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
 
-        GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
-        if (path == null) {
+        HashSet<GraphPath> paths = new HashSet<GraphPath>();
+
+        Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
+        optionQueue.add(options);
+        /* if the user wants to travel by transit, create a bus-only set of options */
+        if (options.modes.getTrainish() && options.modes.contains(TraverseMode.BUS)) {
+            TraverseOptions busOnly = options.clone();
+            busOnly.modes = options.modes.clone();
+            busOnly.modes.setTrainish(false);
+        }
+        optionQueue.add(options);
+        while (paths.size() < nItineraries) {
+            options = optionQueue.poll();
+            if (options == null) {
+                break;
+            }
+            GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
+
+            if (path == null) {
+                continue;
+            }
+            paths.add(path);
+            /* now, try various versions with blacklisted routes */
+            for (SPTEdge spte : path.edges) {
+                Edge e = spte.payload;
+                if (e instanceof PatternBoard) {
+                    Trip trip = spte.getTrip();
+                    RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), GtfsLibrary.getRouteName(trip
+                            .getRoute()));
+                    TraverseOptions newOptions = options.clone();
+                    newOptions.bannedRoutes.add(spec);
+                    if (!optionQueue.contains(newOptions)) {
+                        optionQueue.add(newOptions);
+                    }
+                }
+            }
+        }
+        if (paths.size() == 0) {
             return null;
         }
-        return Arrays.asList(path);
+        return new ArrayList<GraphPath>(paths);
     }
 
     @Override
@@ -146,7 +191,8 @@ public class ContractionPathServiceImpl implements PathService {
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
 
-        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state, options);
+        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state,
+                options);
 
         return Arrays.asList(path);
     }
@@ -175,7 +221,7 @@ public class ContractionPathServiceImpl implements PathService {
         } else if (vertex instanceof StreetLocation) {
             StreetLocation sl = (StreetLocation) vertex;
             return sl.isWheelchairAccessible();
-        } 
+        }
         return true;
     }
 

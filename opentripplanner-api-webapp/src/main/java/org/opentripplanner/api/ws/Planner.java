@@ -73,6 +73,8 @@ public class Planner {
 
     private static final Logger LOGGER = Logger.getLogger(Planner.class.getCanonicalName());
 
+    private static final int MAX_ITINERARIES = 3;
+
     private PathService pathservice;
 
     @Autowired
@@ -126,7 +128,7 @@ public class Planner {
      * @param modes
      *            The set of modes that a user is willing to use.
      * 
-     * @param max
+     * @param numItineraries
      *            The maximum number of possible itineraries to return.
      * 
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
@@ -148,7 +150,7 @@ public class Planner {
             @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer max,
+            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
             throws JSONException {
 
@@ -167,8 +169,14 @@ public class Planner {
         request.setDateTime(date, time);
         request.setWheelchair(wheelchair);
 
-        if (max != null) {
-            request.setNumItineraries(max);
+        if (numItineraries != null) {
+            if (numItineraries > MAX_ITINERARIES) {
+                numItineraries = MAX_ITINERARIES;
+            }
+            if (numItineraries < 1) {
+                numItineraries = 1;
+            }
+            request.setNumItineraries(numItineraries);
         }
         if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
@@ -237,13 +245,13 @@ public class Planner {
             List<String> intermediates = request.getIntermediatePlaces();
             if (intermediates.size() == 0) {
                 paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
-                        options);
+                        options, request.getNumItineraries());
                 if (paths == null && request.getWheelchair()) {
                     // There are no paths that meet the user's slope restrictions.
                     // Try again without slope restrictions (and warn user).
                     options.maxSlope = Double.MAX_VALUE;
                     paths = pathservice.plan(request.getFrom(), request.getTo(), request
-                            .getDateTime(), options);
+                            .getDateTime(), options, request.getNumItineraries());
                     tooSloped = true;
                 }
             } else {

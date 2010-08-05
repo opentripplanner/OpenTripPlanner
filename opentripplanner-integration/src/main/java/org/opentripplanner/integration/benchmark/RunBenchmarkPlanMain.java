@@ -103,7 +103,7 @@ public class RunBenchmarkPlanMain {
 
         try {
           long t0 = System.currentTimeMillis();
-          service.plan(from, to, plan.time, new TraverseOptions());
+          service.plan(from, to, plan.time, new TraverseOptions(), 1);
           long t1 = System.currentTimeMillis();
 
           System.out.println("t=" + (t1 - t0));

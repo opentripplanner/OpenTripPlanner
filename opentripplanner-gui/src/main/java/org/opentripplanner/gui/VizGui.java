@@ -608,7 +608,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         TraverseOptions options = new TraverseOptions();
         Date now = new Date(1260994200000L);
         System.out.println("Path from " + from + " to " + to + " at " + now);
-        List<GraphPath> paths = pathservice.plan(from, to, now, options);
+        List<GraphPath> paths = pathservice.plan(from, to, now, options, 1);
         if (paths.get(0) == null) {
             System.out.println("no path");
             return;

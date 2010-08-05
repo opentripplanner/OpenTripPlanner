@@ -21,6 +21,12 @@ public class RouteSpec implements Cloneable {
     public String routeName;
     
     public RouteSpec(String agency, String routeName) {
+        if (agency == null) {
+            throw new IllegalArgumentException("Agency must not be null");
+        }
+        if (routeName == null) {
+            throw new IllegalArgumentException("Route name must not be null");
+        }
         this.agency = agency;
         this.routeName = routeName;
     }
