@@ -164,6 +164,7 @@
                                     </deployable>
                                 </deployables>
                             </configuration>
+                            <wait>false</wait>
                         </configuration>
                     </execution>
                 </executions>
@@ -174,19 +175,14 @@
     <!-- when running inside Hudson, don't wait for user to kill container -->
     <profiles>
         <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>BUILD_NUMBER</name>
-                </property>
-            </activation>
+            <id>interactive</id>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
                         <configuration>
-                            <wait>false</wait>
+                            <wait>true</wait>
                         </configuration>
                     </plugin>
                 </plugins>
