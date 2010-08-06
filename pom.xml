@@ -60,11 +60,11 @@
             <name>OpenTripPlanner Docs</name>
             <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
-        <snapshotRepository>
+        <repository>
           <id>opengeo</id>
           <name>OpenGeo Maven Repository</name>
           <url>dav:http://repo.opengeo.org</url>
-        </snapshotRepository>
+        </repository>
       </distributionManagement>
 
       <reporting>
