@@ -2,14 +2,14 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-api-extended</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>war</packaging>
     <name>opentripplanner-api-extended</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.3</version>
     </parent>
 
     <repositories>
@@ -28,7 +28,7 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -135,7 +135,7 @@
       <dependency>
       	<groupId>org.opentripplanner</groupId>
       	<artifactId>opentripplanner-utils</artifactId>
-      	<version>0.4-SNAPSHOT</version>
+      	<version>0.3</version>
       	<type>jar</type>
       	<scope>compile</scope>
       </dependency>
