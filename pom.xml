@@ -35,6 +35,13 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-webdav</artifactId>
+        <version>1.0-beta-2</version>
+      </extension>
+    </extensions>
   </build>
 
   <profiles>
@@ -53,12 +60,11 @@
             <name>OpenTripPlanner Docs</name>
             <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
-        <repository>
+        <snapshotRepository>
           <id>opengeo</id>
           <name>OpenGeo Maven Repository</name>
           <url>dav:http://repo.opengeo.org</url>
-          <uniqueVersion>false</uniqueVersion>
-        </repository>
+        </snapshotRepository>
       </distributionManagement>
 
       <reporting>
