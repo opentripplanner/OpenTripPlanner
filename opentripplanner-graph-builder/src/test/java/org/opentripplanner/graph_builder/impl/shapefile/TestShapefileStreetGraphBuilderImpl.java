@@ -95,8 +95,6 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
         loader.buildGraph(gg);
 
-        assertEquals(280772, gg.getVertices().size());
-
         //find start and end vertices
         GraphVertex start = null;
         GraphVertex end = null;
