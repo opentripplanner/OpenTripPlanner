@@ -3,14 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
-  <version>0.3</version>
+  <version>0.4-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>OpenTripPlanner</name>
   <url>http://opentripplanner.org/</url>
   <scm>
-    <connection>scm:svn:http://svn.opentripplanner.org/tags/opentripplanner-0.3</connection>
-    <developerConnection>scm:svn:https://svn.opentripplanner.org/tags/opentripplanner-0.3</developerConnection>
+    <connection>scm:svn:http://svn.opentripplanner.org/</connection>
+    <developerConnection>scm:svn:https://svn.opentripplanner.org/</developerConnection>
   </scm>
 
   <modules>
