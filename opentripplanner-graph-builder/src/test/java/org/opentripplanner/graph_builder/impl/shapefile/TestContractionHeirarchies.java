@@ -459,7 +459,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         ContractionHierarchySet chs = new ContractionHierarchySet();
         chs.addModeAndOptimize(new ModeAndOptimize(TraverseMode.WALK, OptimizeType.QUICK));
-        chs.setContractionFactor(0.95);
+        chs.setContractionFactor(0.90);
         chs.setGraph(graph);
         chs.build();
         
@@ -556,8 +556,8 @@ public class TestContractionHeirarchies extends TestCase {
         
         for (GraphVertex gv1 : vertices) {
             Vertex v1 = gv1.vertex;
-            if (++i == 1000) {
-                //only look at 1000 pairs of vertices
+            if (++i == 100) {
+                //only look at 100 pairs of vertices
                 break; 
             }
             if (v1.getLabel().endsWith(" in")) {
@@ -596,7 +596,7 @@ public class TestContractionHeirarchies extends TestCase {
         }
 
         System.out.println("not null: " + notNull + " of " + i);
-        System.out.println("time for 1000 shortest paths: " + (System.currentTimeMillis() - now) / 1000.0);
+        System.out.println("time for 100 shortest paths (on a not-particularly-contracted graph): " + (System.currentTimeMillis() - now) / 1000.0);
         
         //occasionally, a few paths will be null because they start on bridges going out of the city
         assertTrue(notNull / (float) i > 0.95); 
