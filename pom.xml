@@ -3,11 +3,16 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.3</version>
   <packaging>pom</packaging>
 
   <name>OpenTripPlanner</name>
   <url>http://opentripplanner.org/</url>
+  <scm>
+    <connection>scm:svn:http://svn.opentripplanner.org/tags/0.3</connection>
+    <developerConnection>scm:svn:https://svn.opentripplanner.org/tags/0.3</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
 
   <modules>
       <module>opentripplanner-api-webapp</module>
@@ -49,14 +54,21 @@
             <name>OpenTripPlanner Docs</name>
             <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
+        <repository>
+          <id>opengeo</id>
+          <name>OpenGeo Maven Repository</name>
+          <url>dav:http://repo.opengeo.org</url>
+          <uniqueVersion>false</uniqueVersion>
+        </repository>
       </distributionManagement>
+
       <reporting>
         <plugins>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-project-info-reports-plugin</artifactId>
               <reportSets>
-                  <reportSet></reportSet>
+                  <reportSet />
               </reportSets>
           </plugin>
           <plugin>
@@ -145,6 +157,13 @@
   		<groupId>org.hsqldb</groupId>
   		<artifactId>hsqldb</artifactId>
   		<version>2.0.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.onebusaway</groupId>
+  		<artifactId>onebusaway-gtfs</artifactId>
+  		<version>1.1.4</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
   	</dependency>
   </dependencies>
 

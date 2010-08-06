@@ -1,16 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.opentripplanner</groupId>
     <artifactId>opentripplanner-integration</artifactId>
-    <version>0.4-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>jar</packaging>
     <name>opentripplanner-integration</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.4-SNAPSHOT</version>
+        <version>0.3</version>
     </parent>
 
     <properties>
@@ -21,24 +20,24 @@
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-api-webapp</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-webapp</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3</version>
             <type>war</type>
         </dependency>
         <dependency>
             <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-api-extended</artifactId>
-            <version>0.4-SNAPSHOT</version>
+            <version>0.3</version>
             <type>war</type>
         </dependency>
         <dependency>
@@ -101,7 +100,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Create a custom opentriplanner-api-webapp war with the path to our graph -->
+            <!-- Create a custom opentriplanner-api-webapp war with the path to our graph>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -120,7 +119,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Start up tomcat with our custom wars and graph -->
+            <!- Start up tomcat with our custom wars and graph >
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -147,12 +146,8 @@
                                 <properties>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>high</cargo.logging>
-                                   <!-- -->
                                     <cargo.jvmargs>-Xmx700m</cargo.jvmargs>
-                                     <!-- -->
-                                    <!-- ->
                                     <cargo.jvmargs><![CDATA[-Xmx1500m -Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=n]]></cargo.jvmargs>
-                                    <!- -->
                                 </properties>
                                 <deployables>
                                     <deployable>
@@ -172,7 +167,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin-->
         </plugins>
     </build>
 
