@@ -44,6 +44,20 @@
     </extensions>
   </build>
 
+  <distributionManagement>
+    <repository>
+      <id>opengeo</id>
+      <name>OpenGeo Maven Repository</name>
+      <url>dav:http://repo.opengeo.org</url>
+    </repository>
+    <snapshotRepository>
+      <id>opengeo</id>
+      <name>OpenGeo Maven Repository</name>
+      <url>dav:http://repo.opengeo.org</url>
+      <uniqueVersion>false</uniqueVersion>
+    </snapshotRepository>
+  </distributionManagement>
+
   <profiles>
     <!-- Hudson by default defines a property BUILD_NUMBER which is used to enable the profile. -->
     <profile>
@@ -60,11 +74,6 @@
             <name>OpenTripPlanner Docs</name>
             <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
-        <repository>
-          <id>opengeo</id>
-          <name>OpenGeo Maven Repository</name>
-          <url>dav:http://repo.opengeo.org</url>
-        </repository>
       </distributionManagement>
 
       <reporting>

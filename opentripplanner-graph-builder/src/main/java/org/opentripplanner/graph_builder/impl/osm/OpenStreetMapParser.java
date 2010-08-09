@@ -104,8 +104,13 @@ public class OpenStreetMapParser {
             Element child = (Element) node;
             if (child.getTagName().equals("tag")) {
                 OSMTag tag = new OSMTag();
-                tag.setK(child.getAttribute("k"));
-                tag.setV(child.getAttribute("v"));
+                String key = child.getAttribute("k");
+                tag.setK(key);
+                String value = child.getAttribute("v");
+                if (key.equals("name")) {
+                    value = value.intern();
+                }
+                tag.setV(value);
                 osm.addTag(tag);
             }
             node = node.getNextSibling();
