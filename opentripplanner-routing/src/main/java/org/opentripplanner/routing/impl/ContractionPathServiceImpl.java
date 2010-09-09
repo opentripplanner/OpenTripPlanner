@@ -139,6 +139,10 @@ public class ContractionPathServiceImpl implements PathService {
                 /* the worst trip we are willing to accept is at most twice
                  * as bad or twice as long.
                  */
+                if (path == null) {
+                    //if there is no first path, there won't be any other paths
+                    return null;
+                }
                 maxWeight = path.vertices.lastElement().weightSum * 2;
                 long tripTime = path.vertices.lastElement().state.getTime() - 
                     path.vertices.firstElement().state.getTime();
@@ -151,18 +155,20 @@ public class ContractionPathServiceImpl implements PathService {
             if (path == null) {
                 continue;
             }
-            paths.add(path);
-            /* now, try various versions with blacklisted routes */
-            for (SPTEdge spte : path.edges) {
-                Edge e = spte.payload;
-                if (e instanceof PatternBoard) {
-                    Trip trip = spte.getTrip();
-                    RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), GtfsLibrary.getRouteName(trip
-                            .getRoute()));
-                    TraverseOptions newOptions = options.clone();
-                    newOptions.bannedRoutes.add(spec);
-                    if (!optionQueue.contains(newOptions)) {
-                        optionQueue.add(newOptions);
+            if (! paths.contains(path)) {
+                paths.add(path);
+                /* now, try various versions with blacklisted routes */
+                for (SPTEdge spte : path.edges) {
+                    Edge e = spte.payload;
+                    if (e instanceof PatternBoard) {
+                        Trip trip = spte.getTrip();
+                        String routeName = GtfsLibrary.getRouteName(trip.getRoute());
+                        RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
+                        TraverseOptions newOptions = options.clone();
+                        newOptions.bannedRoutes.add(spec);
+                        if (!optionQueue.contains(newOptions)) {
+                            optionQueue.add(newOptions);
+                        }
                     }
                 }
             }
@@ -222,7 +228,7 @@ public class ContractionPathServiceImpl implements PathService {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(hierarchies.getGraph(), location, options);
+            return _indexService.getClosestVertex(hierarchies.getGraph(), location, options, true);
         }
 
         return hierarchies.getVertex(place);

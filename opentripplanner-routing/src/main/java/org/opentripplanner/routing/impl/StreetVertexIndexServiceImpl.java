@@ -62,7 +62,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private static final double MAX_SNAP_DISTANCE = 0.0005;
 
-    private static final double DISTANCE_ERROR = 0.000005;
+    private static final double DISTANCE_ERROR = 0.00005;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -110,7 +110,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         }
                     }
                     if (hasEntrance) {
-                        // transit stop has entrances
                         continue;
                     }
                 }
@@ -122,12 +121,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options) {
-        return getClosestVertex(graph, c, true, options);
+        return getClosestVertex(graph, c, true, true, options);
     }
 
+    public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options, boolean forceEdges) {
+        return getClosestVertex(graph, c, !forceEdges, !forceEdges, options);
+    }
+
+    
     @SuppressWarnings("unchecked")
     public Vertex getClosestVertex(Graph graph, final Coordinate c, boolean includeTransitStops,
-            TraverseOptions options) {
+            boolean allowSnappingToIntersections, TraverseOptions options) {
 
         Envelope envelope = new Envelope(c);
         List<Edge> nearby = new LinkedList<Edge>();
@@ -195,18 +199,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     Coordinate start = fromv.getCoordinate();
                     Coordinate end = tov.getCoordinate();
                     Coordinate nearestPoint = location.getCoordinate(g);
-                    if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
-                        return fromv;
-                    } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
-                        return tov;
+                    if (allowSnappingToIntersections) {
+                        if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
+                            return fromv;
+                        } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
+                            return tov;
+                        }
                     }
-
                     List<Edge> parallel = new LinkedList<Edge>();
                     for (Edge e : nearby) {
                         /* only include edges that this user can actually use */
-                        if (e == null ||
-                                (options != null && e instanceof StreetEdge && 
-                                  !((StreetEdge) e).canTraverse(options))) {
+                        if (e == null
+                                || (options != null && e instanceof StreetEdge && !((StreetEdge) e)
+                                        .canTraverse(options))) {
                             continue;
                         }
                         Geometry eg = e.getGeometry();

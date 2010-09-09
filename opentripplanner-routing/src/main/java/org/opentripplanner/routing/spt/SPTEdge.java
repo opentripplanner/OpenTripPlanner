@@ -111,4 +111,16 @@ public class SPTEdge {
     public String getName(State state) {
         return payload.getName(state);
     }
+    
+    public boolean equals(Object o) {
+        if (o instanceof SPTEdge) {
+            SPTEdge e = (SPTEdge) o;
+            return e.payload.equals(payload);
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return 37 * payload.hashCode();
+    }
 }

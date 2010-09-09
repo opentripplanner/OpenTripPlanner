@@ -402,6 +402,7 @@ public class ContractionHierarchy implements Serializable {
         FibHeap<Vertex> pq = initPriorityQueue(graph, hopLimit);
 
         _log.debug("contract");
+        long lastNotified = System.currentTimeMillis();
         int i = 0;
         int nVertices = pq.size();
         int totalVertices = nVertices;
@@ -442,10 +443,12 @@ public class ContractionHierarchy implements Serializable {
                 shortcutsAndSearchSpace = getShortcuts(vertex, hopLimit, false);
             }
 
-            if (i % 1000 == 0 || totalVertices - i < 1000) {
+            long now = System.currentTimeMillis();
+            if (now - lastNotified > 5000) {
                 _log.debug("contracted: " + i + " / " + totalVertices + "  total time: "
-                        + (System.currentTimeMillis() - start) / 1000.0 + " average degree "
+                        + (now - start) / 1000.0 + " average degree "
                         + nEdges / (nVertices + 0.00001));
+                lastNotified = now;
             }
 
             // move edges from main graph to up and down graphs
@@ -536,6 +539,7 @@ public class ContractionHierarchy implements Serializable {
                 pq = rebuildPriorityQueue(options, hopLimit, deletedNeighbors);
             }
         }
+        threadPool.shutdownNow();
         threadPool = null;
     }
 

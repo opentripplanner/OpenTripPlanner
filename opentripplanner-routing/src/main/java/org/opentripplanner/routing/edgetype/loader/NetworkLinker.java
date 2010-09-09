@@ -74,7 +74,7 @@ public class NetworkLinker {
                         continue;
                     }
                 }
-                Vertex nearestIntersection = index.getClosestVertex(graph, v.getCoordinate(), false, null);
+                Vertex nearestIntersection = index.getClosestVertex(graph, v.getCoordinate(), false, false, null);
 
                 if (nearestIntersection != null) {
                     if (nearestIntersection instanceof StreetLocation) {

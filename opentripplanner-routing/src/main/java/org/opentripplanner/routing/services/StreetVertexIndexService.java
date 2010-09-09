@@ -21,4 +21,5 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public interface StreetVertexIndexService {
     public Vertex getClosestVertex(Graph graph, final Coordinate location, TraverseOptions options);
+    public Vertex getClosestVertex(Graph graph, final Coordinate location, TraverseOptions options, boolean forceEdges);
 }

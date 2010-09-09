@@ -630,7 +630,7 @@ public class Planner {
                     // append elevation info
                     if (step.elevation != null) {
                         String s = encodeElevationProfile(edge, distance);
-                        if (step.elevation.length() > 0 && s != null)
+                        if (step.elevation.length() > 0 && s != null && s.length() > 0)
                             step.elevation += ",";
                         step.elevation += s;
                     }

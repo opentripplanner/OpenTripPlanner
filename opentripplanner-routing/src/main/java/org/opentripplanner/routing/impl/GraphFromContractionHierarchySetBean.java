@@ -24,7 +24,6 @@ public class GraphFromContractionHierarchySetBean extends AbstractFactoryBean {
 
     @Autowired
     public void setHierarchies(ContractionHierarchySet chs) {
-        System.out.println("st called: " + chs);
         this.chs = chs;
     }
 
