@@ -50,7 +50,7 @@ public class MultiShortestPathTree implements ShortestPathTree {
 
         Iterator<SPTVertex> it = vertices.iterator();
 
-        if (options.getArriveBy()) {
+        if (options.isArriveBy()) {
             while (it.hasNext()) {
                 SPTVertex v = it.next();
                 double old_w = v.weightSum;

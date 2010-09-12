@@ -126,7 +126,7 @@ public class ContractionPathServiceImpl implements PathService {
         optionQueue.add(options);
         
         double maxWeight = Double.MAX_VALUE;
-        long maxTime = options.getArriveBy() ? 0 : Long.MAX_VALUE;
+        long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
             options = optionQueue.poll();
             if (options == null) {
@@ -146,7 +146,7 @@ public class ContractionPathServiceImpl implements PathService {
                 maxWeight = path.vertices.lastElement().weightSum * 2;
                 long tripTime = path.vertices.lastElement().state.getTime() - 
                     path.vertices.firstElement().state.getTime();
-                if (options.getArriveBy()) {
+                if (options.isArriveBy()) {
                     maxTime = path.vertices.lastElement().state.getTime() - tripTime * 2;
                 } else {
                     maxTime = path.vertices.firstElement().state.getTime() + tripTime * 2;

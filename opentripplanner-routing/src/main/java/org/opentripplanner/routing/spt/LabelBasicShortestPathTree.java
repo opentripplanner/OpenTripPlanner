@@ -30,10 +30,10 @@ public class LabelBasicShortestPathTree implements ShortestPathTree {
     }
 
     public SPTVertex addVertex(Vertex vv, State ss, double weightSum, TraverseOptions options) {
-        SPTVertex ret = this.vertices.get(vv.getLabel());
+        SPTVertex ret = vertices.get(vv.getLabel());
         if (ret == null) {
             ret = new SPTVertex(vv, ss, weightSum, options);
-            this.vertices.put(vv.getLabel(), ret);
+            vertices.put(vv.getLabel(), ret);
         } else {
             if (weightSum < ret.weightSum) {
                 ret.weightSum = weightSum;
@@ -47,11 +47,11 @@ public class LabelBasicShortestPathTree implements ShortestPathTree {
     }
 
     public Collection<SPTVertex> getVertices() {
-        return this.vertices.values();
+        return vertices.values();
     }
 
     public SPTVertex getVertex(Vertex vv) {
-        return (SPTVertex) this.vertices.get(vv.getLabel());
+        return (SPTVertex) vertices.get(vv.getLabel());
     }
 
     public GraphPath getPath(Vertex dest) {
@@ -80,7 +80,7 @@ public class LabelBasicShortestPathTree implements ShortestPathTree {
     }
 
     public String toString() {
-        return "SPT " + this.vertices.size();
+        return "SPT " + vertices.size();
     }
 
     @Override

@@ -47,6 +47,7 @@ import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class TestPatternHopFactory extends TestCase {
@@ -75,16 +76,24 @@ public class TestPatternHopFactory extends TestCase {
 
         StreetVertex[] nearPoints = {near_a, near_b, near_c, near_d};
 
-        StreetVertex nowhere = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(0, 0, 0.0001, 0.0001), "nowhere", 100, false));
+        Coordinate between = new Coordinate((stop_a.getX() + stop_b.getX()) / 2,
+                (stop_a.getY() + stop_b.getY()) / 2);
+        StreetVertex nowhere = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(between.x, between.y, between.x - 0.000001, between.y - 0.000001), "nowhere", 10000, false));
+        StreetVertex nowhere2 = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(between.x - 0.000001, between.y - 0.000001, between.x, between.y), "nowhere", 10000, true));
 
+        
         for (int i = 0; i < nearPoints.length; ++i) {
             StreetVertex a = nearPoints[i];
             TurnEdge street = new TurnEdge(a, nowhere);
             graph.addEdge(a, nowhere, street);
+            TurnEdge street2 = new TurnEdge(nowhere2, a);
+            graph.addEdge(nowhere2, a, street2);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
+        nl.createLinkage(true);
+        
+        assertTrue(graph.getIncoming(near_b.getLabel()).size() >= 2);
     }
 
     public void testBoardAlight() throws Exception {

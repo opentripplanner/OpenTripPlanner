@@ -31,7 +31,8 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3836092451659658815L;
 
-    public double speed; // in meters/second
+    /** max speed along streets, in meters per second */ 
+    public double speed;
 
     public TraverseModeSet modes;
 
@@ -89,6 +90,8 @@ public class TraverseOptions implements Serializable, Cloneable {
      * The worst possible weight that we will accept when planning a trip.
      */
     public double maxWeight = Double.MAX_VALUE;
+
+    public int maxTransfers = 2;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -164,7 +167,7 @@ public class TraverseOptions implements Serializable, Cloneable {
                maxWeight == to.maxWeight &&
                worstTime == to.worstTime &&
                modes.equals(to.modes) &&
-               getArriveBy() == to.getArriveBy() &&
+               isArriveBy() == to.isArriveBy() &&
                wheelchairAccessible == to.wheelchairAccessible &&
                optimizeFor == to.optimizeFor &&
                maxWalkDistance == to.maxWalkDistance &&
@@ -182,7 +185,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         new Double(maxWeight).hashCode() + 
         (int) (worstTime & 0xffffffff) +
         modes.hashCode() + 
-        (getArriveBy() ? 8966786 : 0) +
+        (isArriveBy() ? 8966786 : 0) +
         (wheelchairAccessible ? 731980 : 0) +
         optimizeFor.hashCode() + 
         new Double(maxWalkDistance).hashCode() +
@@ -202,7 +205,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         }
     }
 
-    public boolean getArriveBy() {
+    public boolean isArriveBy() {
         return back;
     }
 }

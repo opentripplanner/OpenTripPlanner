@@ -44,10 +44,14 @@ public class ContractionRoutingServiceImpl implements RoutingService {
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options) {
         
-        ContractionHierarchy hierarchy = hierarchies.getHierarchy(options);
+        ContractionHierarchy hierarchy = null;
+        //if (!options.modes.contains(TraverseMode.TRANSIT)) {
+            ///* only use hierarchies for non-transit modes for now */
+            hierarchy = hierarchies.getHierarchy(options);
+        //}
         if (hierarchy == null) {
             Graph _graph = hierarchies.getGraph();
-            if (options.getArriveBy()) {
+            if (options.isArriveBy()) {
             
                 ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex, state,
                         options);

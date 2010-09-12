@@ -89,7 +89,7 @@ public class TestFares extends TestCase {
         //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
         
         // complex trip
-
+        options.maxTransfers = 5;
         startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
         spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", new State(startTime),
                 options);

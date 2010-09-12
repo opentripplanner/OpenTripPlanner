@@ -220,7 +220,7 @@ public class StreetLocation extends GenericVertex {
     }
 
 
-    public Iterable<Edge> getExtra() {
+    public List<Edge> getExtra() {
         return extra;
     }
 

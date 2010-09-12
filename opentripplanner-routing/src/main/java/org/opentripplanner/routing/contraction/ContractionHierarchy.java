@@ -45,6 +45,7 @@ import org.opentripplanner.routing.core.VertexIngress;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -641,8 +642,8 @@ public class ContractionHierarchy implements Serializable {
         downqueue.insert(spt_target, spt_target.weightSum);
 
         // These sets are used not only to avoid revisiting nodes, but to find meetings
-        HashSet<Vertex> upclosed = new HashSet<Vertex>();
-        HashSet<Vertex> downclosed = new HashSet<Vertex>();
+        HashSet<Vertex> upclosed = new HashSet<Vertex>(10000);
+        HashSet<Vertex> downclosed = new HashSet<Vertex>(10000);
 
         Vertex meeting = null;
         double bestMeetingCost = Double.POSITIVE_INFINITY;
@@ -678,7 +679,7 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 GraphVertex fromgv = graph.getGraphVertex(fromLabel);
-                if (options.getArriveBy() && fromgv != null) {
+                if (options.isArriveBy() && fromgv != null) {
                     // up path can only explore until core vertices on reverse paths
                     continue;
                 }
@@ -719,6 +720,14 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
 
+                    if (edge instanceof OutEdge) {
+                        continue;
+                    }
+                    //two transfers rule
+                    if (edge instanceof PatternBoard && state.numBoardings > 2) {
+                        continue;
+                    }
+
                     TraverseResult wr = edge.traverse(state, options);
 
                     // When an edge leads nowhere (as indicated by returning NULL), the iteration is
@@ -737,7 +746,7 @@ public class ContractionHierarchy implements Serializable {
                         //too expensive to get here
                         continue;
                     }
-                    if (!options.getArriveBy() && wr.state.getTime() > options.worstTime) {
+                    if (!options.isArriveBy() && wr.state.getTime() > options.worstTime) {
                         continue;
                     }
                     SPTVertex up_v = upspt.addVertex(toVertex, wr.state, new_w, options);
@@ -775,7 +784,7 @@ public class ContractionHierarchy implements Serializable {
 
                 downclosed.add(tov);
                 GraphVertex maingv = graph.getGraphVertex(toLabel);
-                if (!options.getArriveBy() && maingv != null) {
+                if (!options.isArriveBy() && maingv != null) {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
@@ -815,6 +824,14 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
 
+                    if (edge instanceof OutEdge) {
+                        continue; 
+                    }
+                    //two transfers rule
+                    if (edge instanceof PatternBoard && state.numBoardings > 2) {
+                        continue;
+                    }
+
                     TraverseResult wr = edge.traverseBack(state, options);
 
                     // When an edge leads nowhere (as indicated by returning NULL), the iteration is
@@ -833,7 +850,7 @@ public class ContractionHierarchy implements Serializable {
                         //too expensive to get here
                         continue;
                     }
-                    if (options.getArriveBy() && wr.state.getTime() < options.worstTime) {
+                    if (options.isArriveBy() && wr.state.getTime() < options.worstTime) {
                         continue;
                     }
                     SPTVertex down_v = downspt.addVertex(fromVertex, wr.state, new_w, options);
@@ -871,7 +888,7 @@ public class ContractionHierarchy implements Serializable {
 
         path.edges = flatten(path.edges);
         // clean up edges & vertices
-        if (options.getArriveBy()) {
+        if (options.isArriveBy()) {
             cleanPathEdgesBack(init, path, options);
         } else {
             cleanPathEdges(init, path, options);

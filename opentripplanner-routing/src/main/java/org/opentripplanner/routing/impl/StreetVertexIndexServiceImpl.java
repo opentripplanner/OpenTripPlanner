@@ -93,6 +93,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         continue;
                     }
                     Envelope env = e.getGeometry().getEnvelopeInternal();
+                    System.out.println("adding " + e + " with env: " + env);
                     edgeTree.insert(env, e);
                 }
             }

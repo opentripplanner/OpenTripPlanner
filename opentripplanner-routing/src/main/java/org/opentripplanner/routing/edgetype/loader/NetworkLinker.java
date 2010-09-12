@@ -36,12 +36,18 @@ public class NetworkLinker {
     public NetworkLinker(Graph graph) {
         this.graph = graph;
     }
-
     /**
      * Link the transit network to the street network.  Connect each transit vertex to the nearest
      * Street edge with a StreetTransitLink.  
      */
     public void createLinkage() {
+        createLinkage(false);
+    }
+    /**
+     * Link the transit network to the street network.  Connect each transit vertex to the nearest
+     * Street edge with a StreetTransitLink.  
+     */
+    public void createLinkage(boolean allowSnapping) {
 
         _log.debug("constructing index...");
         StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(graph);
@@ -74,9 +80,10 @@ public class NetworkLinker {
                         continue;
                     }
                 }
-                Vertex nearestIntersection = index.getClosestVertex(graph, v.getCoordinate(), false, false, null);
-
-                if (nearestIntersection != null) {
+                Vertex nearestIntersection = index.getClosestVertex(graph, v.getCoordinate(), false, allowSnapping, null);
+                if (nearestIntersection == null) {
+                    _log.warn("Stop " + ts + " not near any streets; it will not be usable"); 
+                } else {
                     if (nearestIntersection instanceof StreetLocation) {
                         StreetLocation streetLocation = (StreetLocation) nearestIntersection;
                         streetLocation.reify(graph);

@@ -16,6 +16,7 @@ package org.opentripplanner.routing.algorithm;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,14 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Board;
+import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PatternAlight;
+import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -92,7 +101,7 @@ public class AStar {
      */
     public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
-        if (!options.getArriveBy()) {
+        if (!options.isArriveBy()) {
             throw new RuntimeException("Reverse paths must call options.getArriveBy(true)");
         }
         if (origin == null || target == null) {
@@ -152,7 +161,10 @@ public class AStar {
         // Priority Queue
         FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
-
+        
+        boolean useTransit = options.modes.getTransit();
+        HashSet<Vertex> closed = new HashSet<Vertex>(100000);
+        
         // Iteration Variables
         SPTVertex spt_u, spt_v;
         while (!pq.empty()) { // Until the priority queue is empty:
@@ -161,6 +173,8 @@ public class AStar {
             Vertex tov = spt_u.mirror;
             if (tov == target)
                 break;
+            
+            closed.add(tov);
 
             GraphVertex gv = graph.getGraphVertex(tov);
             
@@ -175,7 +189,7 @@ public class AStar {
                 List<Edge> newIncoming = new ArrayList<Edge>();
                 for (Edge edge : incoming)
                     newIncoming.add(edge);
-                newIncoming.addAll(extraEdges.get(spt_u.mirror));
+                newIncoming.addAll(extraEdges.get(tov));
                 incoming = newIncoming;
             }
 
@@ -186,7 +200,14 @@ public class AStar {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
                     state.justTransferred = spt_u.state.justTransferred;
+                } else if (edge instanceof OutEdge) {
+                    continue;
                 }
+                    
+                if (edge instanceof PatternAlight && state.numBoardings > options.maxTransfers) {
+                    continue;
+                }
+                
                 TraverseResult wr = edge.traverseBack(state, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
@@ -200,10 +221,15 @@ public class AStar {
                 }
 
                 Vertex fromv = edge.getFromVertex();
-                distance = fromv.fastDistance(target) / max_speed;
                 double new_w = spt_u.weightSum + wr.weight;
-
-                if (new_w > options.maxWeight || wr.state.getTime() < options.worstTime) {
+                distance = tov.fastDistance(target) / max_speed;
+                if (useTransit) {
+                    distance = Math.min(distance + options.boardCost,
+                        options.walkReluctance * tov.fastDistance(target) / options.speed);
+                }
+                
+                double heuristic_distance = new_w + distance;
+                if (heuristic_distance > options.maxWeight || wr.state.getTime() < options.worstTime) {
                     //too expensive to get here
                     continue;
                 }
@@ -211,7 +237,9 @@ public class AStar {
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    pq.insert_or_dec_key(spt_v, new_w + distance);
+                    if (!closed.contains(fromv)) {
+                        pq.insert_or_dec_key(spt_v, heuristic_distance);
+                    }
                 }
             }
         }
@@ -273,41 +301,67 @@ public class AStar {
         FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
+        boolean useTransit = options.modes.getTransit();
+        HashSet<Vertex> closed = new HashSet<Vertex>(100000);
+        
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
             Vertex fromv = spt_u.mirror;
-            if (fromv == target)
+            if (fromv == target) {
                 break;
+            }
 
-            GraphVertex gv = graph.getGraphVertex(spt_u.mirror);
+            closed.add(fromv);
+            
+            GraphVertex gv = graph.getGraphVertex(fromv);
  
             Collection<Edge> outgoing;
             if (gv == null) {
-                outgoing = new ArrayList<Edge>();
+                outgoing = new ArrayList<Edge>(1);
             } else {
                 outgoing = gv.getOutgoing();
             }
             
-            if (extraEdges.containsKey(spt_u.mirror)) {
+            if (extraEdges.containsKey(fromv)) {
                 List<Edge> newOutgoing = new ArrayList<Edge>();
                 for (Edge edge : outgoing)
                     newOutgoing.add(edge);
-                newOutgoing.addAll(extraEdges.get(spt_u.mirror));
+                newOutgoing.addAll(extraEdges.get(fromv));
                 outgoing = newOutgoing;
+            }
+            if (fromv instanceof StreetLocation) {
+                StreetLocation sl = (StreetLocation) fromv;
+                List<Edge> extra = sl.getExtra();
+                if (extra.size() > 0) {
+                    List<Edge> newOutgoing = new ArrayList<Edge>(outgoing.size() + extra.size());
+                    for (Edge edge : outgoing)
+                        newOutgoing.add(edge);
+                    newOutgoing.addAll(extra);
+                    outgoing = newOutgoing;
+                }
             }
 
             for (Edge edge : outgoing) {
                 State state = spt_u.state;
-                if (edge.getToVertex() == target) {
+                Vertex tov = edge.getToVertex();
+                if (tov == target) {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
                     state.justTransferred = spt_u.state.justTransferred;
+                } else if (edge instanceof OutEdge) {
+                    continue;
                 }
+                
+                if (edge instanceof PatternBoard && state.numBoardings > options.maxTransfers) {
+                    continue;
+                }
+
                 TraverseResult wr = edge.traverse(state, options);
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
                 if (wr == null) {
+                    wr = edge.traverse(state, options);
                     continue;
                 }
                 
@@ -315,27 +369,41 @@ public class AStar {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
                 
-                Vertex tov = edge.getToVertex();
-
                 double new_w = spt_u.weightSum + wr.weight;
 
-                if (new_w > options.maxWeight || wr.state.getTime() > options.worstTime) {
+                distance = tov.fastDistance(target) / max_speed;
+                if (useTransit) {
+                    int boardCost;
+                    if (edge instanceof PatternHop || edge instanceof PatternBoard || edge instanceof PatternDwell ||
+                            edge instanceof PatternInterlineDwell || edge instanceof Board || edge instanceof Hop) {
+                        boardCost = 0;
+                    } else {
+                        boardCost = options.boardCost;
+                    }
+                    distance = Math.min(distance + boardCost,
+                        options.walkReluctance * tov.fastDistance(target) / options.speed);
+                }
+                
+                double heuristic_distance = new_w + distance;
+                if (heuristic_distance > options.maxWeight || wr.state.getTime() > options.worstTime) {
                     //too expensive to get here
                     continue;
                 }
-                
+
                 SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    distance = tov.fastDistance(target) / max_speed;
-                    pq.insert_or_dec_key(spt_v, new_w + distance);
+                    if (!closed.contains(tov)) {
+                        pq.insert_or_dec_key(spt_v, heuristic_distance);
+                    }
                 }
             }
         }
+
         return spt;
     }
 
-    private static double getMaxSpeed(TraverseOptions options) {
+    public static double getMaxSpeed(TraverseOptions options) {
         if (options.modes.contains(TraverseMode.TRANSIT)) {
             //assume that the max average transit speed over a hop is 10 m/s, which is so far true for
             //New York and Portland

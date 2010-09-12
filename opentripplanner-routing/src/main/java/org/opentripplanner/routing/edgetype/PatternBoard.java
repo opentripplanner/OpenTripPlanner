@@ -125,6 +125,7 @@ public class PatternBoard extends PatternEdge {
         State state1 = state0.clone();
         state1.setPattern(patternIndex);
         state1.incrementTimeInSeconds(wait);
+        state1.numBoardings += 1;
         Trip trip = getPattern().getTrip(patternIndex);
               
         /* check if route banned for this plan */

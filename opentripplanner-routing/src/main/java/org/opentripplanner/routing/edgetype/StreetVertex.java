@@ -42,7 +42,7 @@ public class StreetVertex extends GenericVertex {
 
     public LineString geometry;
 
-    protected boolean wheelchairAccessible;
+    protected boolean wheelchairAccessible = true;
 
     protected double maxSlope;
 
