@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing;
 
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -215,7 +214,6 @@ public class TestHalfEdges extends TestCase {
 
     }
 
-    
     public void testStreetLocationFinder() {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
@@ -226,7 +224,7 @@ public class TestHalfEdges extends TestCase {
         assertNotNull(start);
 
         List<Edge> extra = start.getExtra();
-        assertEquals(12, extra.size());
+        assertEquals(5, extra.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         StreetLocation end = (StreetLocation) finder.getClosestVertex(graph, new Coordinate(-74.0, 40.08), biking);
@@ -234,7 +232,7 @@ public class TestHalfEdges extends TestCase {
         
         extra = end.getExtra();
         //bikes can only go on the back edge
-        assertEquals(6, extra.size());
+        assertEquals(5, extra.size());
         
     }
 }

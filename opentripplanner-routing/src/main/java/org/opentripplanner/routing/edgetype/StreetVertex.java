@@ -62,6 +62,8 @@ public class StreetVertex extends GenericVertex {
 
     public int outAngle;
 
+    protected boolean crossable = true; //can this street be safely crossed?
+    
     protected double bicycleSafetyEffectiveLength;
 
     protected String edgeId;
@@ -356,7 +358,7 @@ public class StreetVertex extends GenericVertex {
     }
 
     public String toString() {
-        return "<" + label + " " + name + ">";
+        return "<" + label + " (" + name + ")>";
     }
 
     public String getEdgeId() {
@@ -393,5 +395,13 @@ public class StreetVertex extends GenericVertex {
 
     public boolean isWheelchairAccessible() {
         return wheelchairAccessible;
+    }
+    
+    public void setCrossable(boolean crossable) {
+        this.crossable = crossable; 
+    }
+    
+    public boolean isCrossable() {
+        return crossable;
     }
 }

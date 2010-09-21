@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeMap;
 
 import javax.annotation.PostConstruct;
 
@@ -120,7 +121,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         transitStopTree.build();
     }
-
+    
+    @SuppressWarnings("unchecked")
+    public List<Vertex> getLocalTransitStops(Coordinate c, double distance) {
+        Envelope env = new Envelope(c);
+        env.expandBy(distance);
+        return transitStopTree.query(env);
+    }
+    
     public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options) {
         return getClosestVertex(graph, c, true, true, options);
     }
@@ -207,24 +215,27 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                             return tov;
                         }
                     }
-                    List<Edge> parallel = new LinkedList<Edge>();
+                    TreeMap<Double, Edge> parallel = new TreeMap<Double, Edge>();
                     for (Edge e : nearby) {
                         /* only include edges that this user can actually use */
-                        if (e == null
-                                || (options != null && e instanceof StreetEdge && !((StreetEdge) e)
-                                        .canTraverse(options))) {
+                        if (e == null) {
                             continue;
+                        }
+                        if (options != null && e instanceof StreetEdge) {
+                            if (!((StreetEdge) e).canTraverse(options)) {
+                                continue;
+                            }
                         }
                         Geometry eg = e.getGeometry();
                         if (eg != null) {
                             double distance = eg.distance(p);
                             if (distance <= bestDistance + DISTANCE_ERROR) {
-                                parallel.add(e);
+                                parallel.put(distance, e);
                             }
                         }
-                    }
+                    } 
                     return StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
-                            + c.toString(), bestStreet.getName(), parallel, nearestPoint);
+                            + c.toString(), bestStreet.getName(), parallel.values(), nearestPoint);
                 }
             }
         }
