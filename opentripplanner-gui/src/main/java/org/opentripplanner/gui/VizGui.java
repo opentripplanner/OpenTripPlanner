@@ -107,7 +107,7 @@ class DisplayVertex {
  * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence
  * the iterable.
  */
-class EdgeListModel extends AbstractListModel {
+class EdgeListModel extends AbstractListModel<Edge> {
 
     private static final long serialVersionUID = 1L;
 
@@ -124,7 +124,7 @@ class EdgeListModel extends AbstractListModel {
         return edges.size();
     }
 
-    public Object getElementAt(int index) {
+    public Edge getElementAt(int index) {
         return edges.get(index);
     }
 }
@@ -132,7 +132,7 @@ class EdgeListModel extends AbstractListModel {
 /**
  * This is a ListModel that shows a TripPattern's departure times from a particular stop
  */
-class TripPatternListModel extends AbstractListModel {
+class TripPatternListModel extends AbstractListModel<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -154,12 +154,10 @@ class TripPatternListModel extends AbstractListModel {
         }
     }
 
-    @Override
-    public Object getElementAt(int index) {
+    public String getElementAt(int index) {
         return departureTimes.get(index);
     }
 
-    @Override
     public int getSize() {
         return departureTimes.size();
     }
@@ -169,7 +167,7 @@ class TripPatternListModel extends AbstractListModel {
 /**
  * A list of vertices where the internal container is exposed.
  */
-class VertexList extends AbstractListModel {
+class VertexList extends AbstractListModel<DisplayVertex> {
 
     private static final long serialVersionUID = 1L;
 
@@ -183,7 +181,7 @@ class VertexList extends AbstractListModel {
         return selected.size();
     }
 
-    public Object getElementAt(int index) {
+    public DisplayVertex getElementAt(int index) {
         return new DisplayVertex(selected.get(index));
     }
 };
@@ -203,13 +201,13 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private ShowGraph showGraph;
 
-    public JList nearbyVertices;
+    public JList<DisplayVertex> nearbyVertices;
 
-    private JList outgoingEdges;
+    private JList<Edge> outgoingEdges;
 
-    private JList incomingEdges;
+    private JList<Edge> incomingEdges;
 
-    private JList departurePattern;
+    private JList<String> departurePattern;
 
     private JLabel serviceIdLabel;
 
@@ -221,9 +219,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private ContractionRoutingServiceImpl routingService;
 
-    private DefaultListModel metadataModel;
+    private DefaultListModel<String> metadataModel;
 
     private ContractionHierarchySet hierarchies;
+
+    private HashSet<Vertex> closed;
+
+    private Vertex tracingVertex;
+
+    private HashSet<Vertex> open;
+
+    private HashSet<Vertex> seen;
 
     public VizGui(String graphName) {
         super();
@@ -263,22 +269,22 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         JLabel nvLabel = new JLabel("Vertices");
         vertexDataPanel.add(nvLabel);
-        nearbyVertices = new JList();
-        nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
+        nearbyVertices = new JList<DisplayVertex>();
+        //nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         nearbyVertices.setVisibleRowCount(4);
         JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
         vertexDataPanel.add(nvScrollPane);
 
         JLabel ogeLabel = new JLabel("Outgoing edges");
         vertexDataPanel.add(ogeLabel);
-        outgoingEdges = new JList();
+        outgoingEdges = new JList<Edge>();
         outgoingEdges.setVisibleRowCount(4);
         JScrollPane ogeScrollPane = new JScrollPane(outgoingEdges);
         vertexDataPanel.add(ogeScrollPane);
 
         JLabel iceLabel = new JLabel("Incoming edges");
         vertexDataPanel.add(iceLabel);
-        incomingEdges = new JList();
+        incomingEdges = new JList<Edge>();
         JScrollPane iceScrollPane = new JScrollPane(incomingEdges);
         vertexDataPanel.add(iceScrollPane);
         /*
@@ -287,8 +293,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         ListSelectionListener edgeChanged = new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
 
-                JList edgeList = (JList) e.getSource();
-                Edge selected = (Edge) edgeList.getSelectedValue();
+                JList<Edge> edgeList = (JList<Edge>) e.getSource();
+                Edge selected = edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
@@ -312,7 +318,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                             break;
                         }
                     }
-                    showGraph.setHighlighed(vertices);
+                    showGraph.setHighlighted(vertices);
                 }
 
                 /* add the connected vertices to the list of vertices */
@@ -372,7 +378,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     departurePattern.removeAll();
                     return;
                 }
-                ListModel model = new TripPatternListModel(pattern, stopIndex);
+                ListModel<String> model = new TripPatternListModel(pattern, stopIndex);
                 departurePattern.setModel(model);
 
                 Trip trip = pattern.getExemplar();
@@ -387,7 +393,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             public void valueChanged(ListSelectionEvent e) {
                 outgoingEdges.removeAll();
                 incomingEdges.removeAll();
-                DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+                DisplayVertex selected = nearbyVertices.getSelectedValue();
                 if (selected != null) {
                     Vertex nowSelected = selected.vertex;
                     showGraph.highlightVertex(nowSelected);
@@ -443,7 +449,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         
         JButton zoomOutButton = new JButton("Zoom out");
         zoomOutButton.addActionListener(new ActionListener() {
-          @Override
           public void actionPerformed(ActionEvent e) {
             showGraph.zoomOut();
           }
@@ -529,13 +534,13 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         serviceIdLabel = new JLabel("[service id]");
         rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
         
-        departurePattern = new JList();
+        departurePattern = new JList<String>();
         departurePattern.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
         rightPanelTabs.addTab("trip pattern", dpScrollPane);
 
-        JList metadataList = new JList();
-        metadataModel = new DefaultListModel();
+        JList<String> metadataList = new JList<String>();
+        metadataModel = new DefaultListModel<String>();
         metadataList.setModel(metadataModel);
         metadataList.setPrototypeCellValue("bicycleSafetyEffectiveLength : 10.42468803");
         JScrollPane mdScrollPane = new JScrollPane(metadataList);
@@ -548,6 +553,35 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     }
 
     protected void trace() {
+        DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
+        if (selected == null) {
+            return;
+        }
+        Vertex v = selected.vertex;
+
+        if (tracingVertex != v) {
+            tracingVertex = v;
+            closed = new HashSet<Vertex>();
+            open = new HashSet<Vertex>();
+            open.add(v);
+            seen = new HashSet<Vertex>();
+        }
+        HashSet<Vertex> newOpen = new HashSet<Vertex>();
+        for (Vertex v2 : open) {
+            closed.add(v2);
+            for (Edge e: graph.getOutgoing(v2)) {
+                Vertex target = e.getToVertex();
+                if (closed.contains(target)) {
+                    continue;
+                }
+                newOpen.add(target);
+            }      
+        }
+        seen.addAll(newOpen);
+        open = newOpen;
+        showGraph.setHighlighted(seen);
+    }
+    protected void traceOld() {
         HashSet<Vertex> seenVertices = new HashSet<Vertex>();
         DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
         if (selected == null) {
@@ -569,7 +603,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 }
             }
         }
-        showGraph.setHighlighed(seenVertices);
+        showGraph.setHighlighted(seenVertices);
         
     }
 
@@ -632,11 +666,11 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     }
 
-    @Override
     public void verticesSelected(final List<Vertex> selected) {
-        ListModel data = new VertexList(selected);
+        ListModel<DisplayVertex> data = new VertexList(selected);
         nearbyVertices.setModel(data);
     }
+    
     public void setGraph(ContractionHierarchySet chs) {
         hierarchies = chs;
         graph = chs.getGraph();

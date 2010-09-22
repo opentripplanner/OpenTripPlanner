@@ -28,7 +28,9 @@ import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -199,10 +201,12 @@ public class ShowGraph extends PApplet {
             if (e == highlightedEdge)
                 continue;
 
-            if (e instanceof StreetTransitLink) {
-                stroke(75, 150, 255);
+            if (e instanceof OutEdge || e instanceof TurnEdge) {
+                stroke(30, 255, 255); //teal
+            } else if (e instanceof StreetTransitLink) {
+                stroke(75, 150, 255); //wedgwood
             } else {
-                stroke(30, 255, 255);
+                stroke(255, 255, 30); //gold
             }
 
             Coordinate[] coords = e.getGeometry().getCoordinates();
@@ -219,9 +223,9 @@ public class ShowGraph extends PApplet {
                 line((float) toScreenX(coords[i - 1].x), (float) toScreenY(coords[i - 1].y),
                         (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
             }
-            stroke(0,255,0);
+            stroke(0,255,0); //green
             ellipse(toScreenX(coords[0].x), toScreenY(coords[0].y), 5, 5);
-            stroke(255,0,0);
+            stroke(255,0,0); //red
             ellipse(toScreenX(coords[coords.length-1].x), toScreenY(coords[coords.length-1].y), 5, 5);
         }
 
@@ -235,12 +239,12 @@ public class ShowGraph extends PApplet {
             y = toScreenY(y);
             if (v instanceof TransitStop) {
                 fill(0);
-                stroke(255, 30, 255);
+                stroke(255, 30, 255); //purple
                 ellipse(x, y, 5.0, 5.0);
             } else if (highlightedVertices.contains(v)) {
-                stroke(0, 255, 0);
-                fill(0, 255, 0);
-                ellipse(x, y, 3.0, 3.0);
+                stroke(255, 127, 0);
+                fill(255, 127, 0); //orange fill
+                ellipse(x, y, 5.0, 5.0);
             } else {
                 stroke(255);
                 fill(255, 0, 0);
@@ -379,7 +383,7 @@ public class ShowGraph extends PApplet {
         highlightedVertex = v;
     }
 
-    public void setHighlighed(Set<Vertex> vertices) {
+    public void setHighlighted(Set<Vertex> vertices) {
         highlightedVertices = vertices;
     }
 
