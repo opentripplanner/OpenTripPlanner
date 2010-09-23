@@ -141,8 +141,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * 
      * <property name="safetyFeatures">
      *   <map>
-     *     <entry key="opposite_lane,cycleway" value="1,0.1" />
-     *     <entry key="this_lane,cycleway" value="0.1,1" />      
+     *     <entry key="opposite_lane=cycleway" value="1,0.1" />
+     *     <entry key="this_lane=cycleway" value="0.1,1" />
      *    </map>
      *  </property>
      *
@@ -153,7 +153,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     public void setSafetyFeatures(Map<String, String> features) {
         safetyFeatures = new HashMap<P2<String>, P2<Double>>();
         for (Map.Entry<String, String> entry : features.entrySet()) {
-            String[] kv = entry.getKey().split(",");
+            String[] kv = entry.getKey().split("=");
             String[] strings = entry.getValue().split(",");
             P2<Double> values = new P2<Double>(Double.parseDouble(strings[0]), Double.parseDouble(strings[1]));
             safetyFeatures.put(new P2<String>(kv), values);
@@ -426,6 +426,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 d += DistanceLibrary.distance(coordinates[i-1], coordinates[i]);
             }
 
+            
             LineString backGeometry = (LineString) geometry.reverse();
             
             Map<String, String> tags = way.getTags();
@@ -459,10 +460,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (Map.Entry<P2<String>, P2<Double>> feature : safetyFeatures.entrySet()) {
                 String key = feature.getKey().getFirst();
                 String value = feature.getKey().getSecond();
-                if (tags.get(key).equals(value)) {
+                if (value.equals(tags.get(key))) {
                     P2<Double> multipliers = feature.getValue();
-                    street.setBicycleSafetyEffectiveLength(street.getBicycleSafetyEffectiveLength() * multipliers.getFirst());
-                    backStreet.setBicycleSafetyEffectiveLength(backStreet.getBicycleSafetyEffectiveLength() * multipliers.getSecond());
+                    if (street != null) {
+                        street.setBicycleSafetyEffectiveLength(street.getBicycleSafetyEffectiveLength() * multipliers.getFirst());
+                    }
+                    if (backStreet != null) {
+                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getBicycleSafetyEffectiveLength() * multipliers.getSecond());
+                    }
                 }
             }
             return new P2<StreetVertex>(street, backStreet);

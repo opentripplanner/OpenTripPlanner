@@ -94,7 +94,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         continue;
                     }
                     Envelope env = e.getGeometry().getEnvelopeInternal();
-                    System.out.println("adding " + e + " with env: " + env);
                     edgeTree.insert(env, e);
                 }
             }
@@ -198,6 +197,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         }
                     }
                 }
+
+                // find coincidence edges  
                 if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
                     Geometry g = bestStreet.getGeometry();
                     LocationIndexedLine l = new LocationIndexedLine(g);
