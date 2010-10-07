@@ -50,6 +50,7 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
@@ -58,6 +59,7 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -452,7 +454,6 @@ public class GTFSPatternHopFactory {
                     int dwellTime = departureTime - arrivalTime;
                     dwell.addTrip(trip.getId(), post.trip.getId(), dwellTime, eTrip.patternIndex, post.patternIndex);
                 }
-
             }
         }
 
@@ -478,8 +479,24 @@ public class GTFSPatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
-            graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
+            //add a vertex representing the stop
+            Vertex stopVertex = graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
                     stop.getLat(), stop.getName(), stop.getId().getId(), stop));
+            
+            if (stop.getLocationType() != 2) {
+                //add a vertex representing arriving at the stop
+                Vertex arrive = graph.addVertex(new GenericVertex(arrivalVertexId(id(stop.getId())), stop.getLon(),
+                        stop.getLat(), stop.getName(), stop.getId().getId()));
+
+                //add a vertex representing departing from at the stop
+                Vertex depart = graph.addVertex(new GenericVertex(departureVertexId(id(stop.getId())), stop.getLon(),
+                        stop.getLat(), stop.getName(), stop.getId().getId()));
+
+                //add edges from arrive to stop and stop to depart
+
+                graph.addEdge(new FreeEdge(arrive, stopVertex));
+                graph.addEdge(new FreeEdge(stopVertex, depart));
+            }
         }
     }
     /**
@@ -674,8 +691,8 @@ public class GTFSPatternHopFactory {
                     trip);
             graph.addEdge(hop);
 
-            Vertex startStation = graph.getVertex(id(s0.getId()));
-            Vertex endStation = graph.getVertex(id(s1.getId()));
+            Vertex startStation = graph.getVertex(departureVertexId(id(s0.getId())));
+            Vertex endStation = graph.getVertex(arrivalVertexId(id(s1.getId())));
 
             PatternBoard boarding = new PatternBoard(startStation, startJourneyDepart, tripPattern,
                     i, mode);
@@ -686,6 +703,14 @@ public class GTFSPatternHopFactory {
         tripPattern.setTripFlags(0, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
 
         return tripPattern;
+    }
+
+    private String arrivalVertexId(String id) {
+        return id + "_arrive";
+    }
+
+    private String departureVertexId(String id) {
+        return id + "_depart";
     }
 
     private void clearCachedData() {
@@ -699,23 +724,23 @@ public class GTFSPatternHopFactory {
 
     private void loadTransfers(Graph graph) {
         Collection<Transfer> transfers = _dao.getAllTransfers();
-        Set<org.opentripplanner.routing.edgetype.Transfer> createdTransfers = new HashSet<org.opentripplanner.routing.edgetype.Transfer>();
+        Set<TransferEdge> createdTransfers = new HashSet<TransferEdge>();
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
             if (fromStop == toStop) {
                 continue;
             }
-            TransitStop fromStation = (TransitStop) graph.getVertex(id(fromStop.getId()));
-            TransitStop toStation = (TransitStop) graph.getVertex(id(toStop.getId()));
+            Vertex fromStation = graph.getVertex(arrivalVertexId(id(fromStop.getId())));
+            Vertex toStation = graph.getVertex(departureVertexId(id(toStop.getId())));
             double distance = fromStation.distance(toStation.getCoordinate());
             if (t.getTransferType() < 3) {
-                org.opentripplanner.routing.edgetype.Transfer edge;
+                TransferEdge edge;
                 if (t.getTransferType() == 2) { // transfer has minimum transfer time
-                    edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation,
+                    edge = new TransferEdge(fromStation,
                             toStation, distance, t.getMinTransferTime());
                 } else {
-                    edge = new org.opentripplanner.routing.edgetype.Transfer(fromStation,
+                    edge = new TransferEdge(fromStation,
                             toStation, distance);
                 }
 
@@ -744,8 +769,8 @@ public class GTFSPatternHopFactory {
             Stop s0 = st0.getStop();
             StopTime st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
-            Vertex startStation = graph.getVertex(id(s0.getId()));
-            Vertex endStation = graph.getVertex(id(s1.getId()));
+            Vertex startStation = graph.getVertex(departureVertexId(id(s0.getId())));
+            Vertex endStation = graph.getVertex(arrivalVertexId(id(s1.getId())));
 
             // create journey vertices
             Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId + "_" + st0.getStopSequence() + "_A",  s0.getName(), s0.getId().getId(), s0.getLon(),

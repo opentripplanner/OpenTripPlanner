@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing;
 
+import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -66,6 +68,9 @@ public class TestHalfEdges extends TestCase {
 
     private Vertex trOut;
 
+    private TransitStop station1;
+    private TransitStop station2;
+
     public LineString createGeometry(Vertex a, Vertex b) {
 
         GeometryFactory factory = new GeometryFactory();
@@ -88,7 +93,7 @@ public class TestHalfEdges extends TestCase {
         leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.1, 40.1, -74.1, 40.0), "leftBack", 1500, true);
         rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.0, 40.0), "rightBack", 1500, true);
 
-        right.setTraversalPermission(StreetTraversalPermission.PEDESTRIAN);
+        right.setPermission(StreetTraversalPermission.PEDESTRIAN);
         
         graph.addVertex(top);
         graph.addVertex(bottom);
@@ -144,8 +149,10 @@ public class TestHalfEdges extends TestCase {
         graph.addEdge(new TurnEdge(bottom, right));
         graph.addEdge(new TurnEdge(right, topBack));
         
-        graph.addVertex(new TransitStop("transitVertex", -74.05, 40.1, "transitVertex", "fleem station", null));
-
+        station1 = new TransitStop("transitVertex 1", -74.05, 40.099999, "transitVertex 1", "fleem station", null);
+        graph.addVertex(station1);
+        station2 = new TransitStop("transitVertex 2", -74.02, 40.099999, "transitVertex 2", "morx station", null);
+        graph.addVertex(station2);
     }
 
     public void testHalfEdges() {
@@ -218,21 +225,43 @@ public class TestHalfEdges extends TestCase {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
 
-        assertTrue(finder.getClosestVertex(graph, new Coordinate(-74.05000001, 40.1), null) instanceof TransitStop);
+        assertTrue(finder.getLocalTransitStops(new Coordinate(-74.05000001, 40.1), 100).size() > 0);
         
-        StreetLocation start = (StreetLocation) finder.getClosestVertex(graph, new Coordinate(-74.1, 40.04), null);
+        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.1, 40.04), null);
         assertNotNull(start);
 
         List<Edge> extra = start.getExtra();
-        assertEquals(5, extra.size());
+        assertEquals(10, extra.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
-        StreetLocation end = (StreetLocation) finder.getClosestVertex(graph, new Coordinate(-74.0, 40.08), biking);
+        StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.08), biking);
         assertNotNull(end);
         
         extra = end.getExtra();
         //bikes can only go on the back edge
         assertEquals(5, extra.size());
+        
+    }
+    
+    public void testNetworkLinker() {
+        int numVerticesBefore = graph.getVertices().size();
+        NetworkLinker nl = new NetworkLinker(graph);
+        nl.createLinkage();
+        int numVerticesAfter = graph.getVertices().size();
+        assertEquals (4, numVerticesAfter - numVerticesBefore);
+        Collection<Edge> outgoing = graph.getOutgoing(station1);
+        assertTrue(outgoing.size() == 1);
+        Edge edge = outgoing.iterator().next();
+        
+        Vertex midpoint = edge.getToVertex();
+        assertTrue(Math.abs(midpoint.getCoordinate().y - 40.1) < 0.00000001);
+        
+        outgoing = graph.getOutgoing(station2);
+        assertTrue(outgoing.size() == 1);
+        edge = outgoing.iterator().next();
+        
+        Vertex station2point = edge.getToVertex();
+        assertTrue(Math.abs(station2point.getCoordinate().x - -74.02) < 0.00000001);
         
     }
 }

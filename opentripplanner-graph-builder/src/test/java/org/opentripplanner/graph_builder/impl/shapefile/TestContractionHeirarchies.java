@@ -57,6 +57,7 @@ import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -104,11 +105,13 @@ public class TestContractionHeirarchies extends TestCase {
             verticesIn[y] = new Vertex[N];
             verticesOut[y] = new Vertex[N];
             for (int x = 0; x < N; ++x) {
-                Vertex in = new EndpointVertex("(" + x + ", " + y + ") in", x, y);
+                double xc = x * 0.001 - 71;
+                double yc = y * 0.001 + 40;
+                Vertex in = new EndpointVertex("(" + x + ", " + y + ") in", xc, yc);
                 graph.addVertex(in);
                 verticesIn[y][x] = in;
 
-                Vertex out = new EndpointVertex("(" + x + ", " + y + ") out", x, y);
+                Vertex out = new EndpointVertex("(" + x + ", " + y + ") out", xc, yc);
                 graph.addVertex(out);
                 verticesOut[y][x] = out;
             }
@@ -116,16 +119,20 @@ public class TestContractionHeirarchies extends TestCase {
 
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N - 1; ++x) {
-                LineString geometry = GeometryUtils.makeLineString(x, y, x + 1, y);
-                StreetVertex left = new StreetVertex("a(" + x + ", " + y + ")", geometry, "", 100, false);
-                StreetVertex right = new StreetVertex("a(" + x + ", " + y + ")", (LineString) geometry.reverse(), "", 100, true);
+                double xc = x * 0.001 - 71;
+                double yc = y * 0.001 + 40;
+                LineString geometry = GeometryUtils.makeLineString(xc, yc, xc + 0.001, yc);
+                double d = DistanceLibrary.distance(yc, xc, yc, xc + 0.001);
+                StreetVertex left = new StreetVertex("a(" + x + ", " + y + ")", geometry, "", d, false);
+                StreetVertex right = new StreetVertex("a(" + x + ", " + y + ")", (LineString) geometry.reverse(), "", d, true);
                 
                 graph.addVertex(left);
                 graph.addVertex(right);
-                
-                geometry = GeometryUtils.makeLineString(y, x, y, x + 1);
-                StreetVertex down = new StreetVertex("d(" + y + ", " + x + ")", geometry, "", 100, false);
-                StreetVertex up = new StreetVertex("d(" + y + ", " + x + ")", (LineString) geometry.reverse(), "", 100, true);
+
+                d = DistanceLibrary.distance(xc, yc, xc + 0.001, yc);
+                geometry = GeometryUtils.makeLineString(yc, xc, yc, xc + 0.001);
+                StreetVertex down = new StreetVertex("d(" + y + ", " + x + ")", geometry, "", d, false);
+                StreetVertex up = new StreetVertex("d(" + y + ", " + x + ")", (LineString) geometry.reverse(), "", d, true);
 
                 graph.addVertex(down);
                 graph.addVertex(up);

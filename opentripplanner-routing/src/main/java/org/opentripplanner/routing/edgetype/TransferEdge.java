@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * A transfer directly between two stops without using the street network.
  *
  */
-public class Transfer extends AbstractEdge {
+public class TransferEdge extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
     
@@ -43,7 +43,7 @@ public class Transfer extends AbstractEdge {
     /**
      * @see Transfer(Vertex, Vertex, double, int)
      */
-    public Transfer(TransitStop fromv, TransitStop tov, double distance) {
+    public TransferEdge(Vertex fromv, Vertex tov, double distance) {
         super(fromv, tov);
         this.distance = distance;
         this.time = (int) distance; //(int) distance * 3;
@@ -56,7 +56,7 @@ public class Transfer extends AbstractEdge {
      * @param distance  the distance in meters from the origin Vertex to the destination
      * @param time      the minimum time in seconds it takes to complete this transfer
      */
-    public Transfer(Vertex fromv, Vertex tov, double distance, int time) {
+    public TransferEdge(Vertex fromv, Vertex tov, double distance, int time) {
         super(fromv, tov);
         this.distance = distance;
         this.time = time;
@@ -91,36 +91,28 @@ public class Transfer extends AbstractEdge {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
-        if (s0.justTransferred) {
-            return null;
-        }
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(time);
-        s1.justTransferred = true;
         return new TraverseResult(time, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
-        if (s0.justTransferred) {
-            return null;
-        }
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-time);
-        s1.justTransferred = true;
         return new TraverseResult(time, s1);
     }
     
     public boolean equals(Object o) {
-        if (!(o instanceof Transfer)) {
+        if (!(o instanceof TransferEdge)) {
             return false;
         }
-        Transfer t = (Transfer) o;
+        TransferEdge t = (TransferEdge) o;
         return t.getToVertex().equals(getToVertex()) && t.getFromVertex().equals(getFromVertex());
     }
     

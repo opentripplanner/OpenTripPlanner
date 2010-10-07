@@ -45,10 +45,8 @@ public class ContractionRoutingServiceImpl implements RoutingService {
     public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options) {
         
         ContractionHierarchy hierarchy = null;
-        //if (!options.modes.contains(TraverseMode.TRANSIT)) {
-            ///* only use hierarchies for non-transit modes for now */
-            hierarchy = hierarchies.getHierarchy(options);
-        //}
+        hierarchy = hierarchies.getHierarchy(options);
+
         if (hierarchy == null) {
             Graph _graph = hierarchies.getGraph();
             if (options.isArriveBy()) {

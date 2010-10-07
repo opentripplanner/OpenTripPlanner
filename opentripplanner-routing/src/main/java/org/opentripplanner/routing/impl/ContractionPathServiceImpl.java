@@ -228,7 +228,7 @@ public class ContractionPathServiceImpl implements PathService {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(hierarchies.getGraph(), location, options, true);
+            return _indexService.getClosestVertex(location, options);
         }
 
         return hierarchies.getVertex(place);

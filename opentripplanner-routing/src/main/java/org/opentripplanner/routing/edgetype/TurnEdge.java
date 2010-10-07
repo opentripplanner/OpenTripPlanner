@@ -104,7 +104,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
         State s1 = s0.clone();
         double time = angleLength / wo.speed;
         double weight = fromv.computeWeight(s0, wo, time);
-        s1.walkDistance += angleLength;
+        s1.walkDistance += fromv.getLength();
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) time);
         s1.lastEdgeWasStreet = true;
@@ -120,7 +120,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
         State s1 = s0.clone();
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
-        s1.walkDistance += angleLength;
+        s1.walkDistance += fromv.getLength();
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
         s1.lastEdgeWasStreet = true;
@@ -168,5 +168,20 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
     @Override
     public boolean canTraverse(TraverseOptions options) {
         return fromv.canTraverse(options);
+    }
+
+    @Override
+    public double getLength() {
+        return fromv.getLength();
+    }
+
+    @Override
+    public PackedCoordinateSequence getElevationProfile(double start, double end) {
+        return fromv.getElevationProfile(start, end);
+    }
+
+    @Override
+    public StreetTraversalPermission getPermission() {
+        return fromv.getPermission();
     }
 }

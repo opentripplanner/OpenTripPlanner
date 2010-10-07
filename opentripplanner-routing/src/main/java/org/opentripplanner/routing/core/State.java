@@ -24,8 +24,6 @@ public class State {
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
 
-    public boolean justTransferred = false;
-
     public String zone = null;
     
     public AgencyAndId route = null;

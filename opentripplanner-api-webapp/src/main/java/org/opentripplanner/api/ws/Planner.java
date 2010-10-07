@@ -53,6 +53,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -555,6 +556,11 @@ public class Planner {
         }
     }
 
+    /**
+     * Get the traverse options for a request
+     * @param request
+     * @return
+     */
     private TraverseOptions getOptions(Request request) {
 
         TraverseModeSet modeSet = request.getModeSet();
@@ -573,7 +579,7 @@ public class Planner {
     }
 
     private boolean isStreetEdge(Edge edge) {
-        return edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof OutEdge;
+        return edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof OutEdge || edge instanceof PlainStreetEdge;
     }
 
     /**

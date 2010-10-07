@@ -13,13 +13,11 @@
 
 package org.opentripplanner.routing.services;
 
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface StreetVertexIndexService {
-    public Vertex getClosestVertex(Graph graph, final Coordinate location, TraverseOptions options);
-    public Vertex getClosestVertex(Graph graph, final Coordinate location, TraverseOptions options, boolean forceEdges);
+    public Vertex getClosestVertex(final Coordinate location, TraverseOptions options);
 }

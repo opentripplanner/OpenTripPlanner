@@ -30,6 +30,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/** An edge in the ShortestPathTree */
 public class SPTEdge {
 
     private static final long serialVersionUID = 1L;

@@ -17,22 +17,17 @@ import java.io.File;
 import java.util.GregorianCalendar;
 
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.Transfer;
-import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -56,8 +51,8 @@ public class TestGraphPath extends TestCase {
 
     public void testGraphPathOptimize() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_e = graph.getVertex("agency_E");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -70,7 +65,7 @@ public class TestGraphPath extends TestCase {
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 10);
+        assertTrue(path.vertices.size() == 12);
 
         long bestStart = new GregorianCalendar(2009, 8, 7, 0, 20, 0).getTimeInMillis();
         assertNotSame(bestStart, path.vertices.firstElement().state.getTime());
@@ -78,55 +73,12 @@ public class TestGraphPath extends TestCase {
         assertEquals(bestStart, path.vertices.firstElement().state.getTime());
     }
 
-    public void testNoStationExitAfterTransfer() throws Exception {
-        // You should never leave the transit network right after transferring. The only time you
-        // should transfer and *not* immediately board a new trip is when your destination vertex is
-        // the station itself, in which case the transfer will be the final edge.
-        
-        
-        // add some street data to the graph
-        StreetVertex v1 = new StreetVertex("fake_intersection", GeometryUtils.makeLineString(-74, 41.000001, -73.000002, 41.000001), "fake intersection", 10, false); // near stop K
-        StreetVertex v2 = new StreetVertex("fake_intersection2", GeometryUtils.makeLineString(-73.000002, 41.000001, -73.000003, 41.000001), "fake intersection2", 10, false); // near stop L
-
-        graph.addVertex(v1);
-        graph.addVertex(v2);
-        TurnEdge street = new TurnEdge(v1, v2);
-        
-        graph.addEdge(street);
-        
-        NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage();
-        
-        Vertex startVertex = graph.getVertex("agency_N");
-        Vertex destVertex = graph.getVertex("fake_intersection2");
-        TraverseOptions options = new TraverseOptions();
-        options.setGtfsContext(context);
-        
-        ShortestPathTree spt;
-        GraphPath path;
-        
-        State s0 = new State(new GregorianCalendar(2009, 8, 7, 15, 0, 0).getTimeInMillis());
-        spt = AStar.getShortestPathTree(graph, startVertex.getLabel(), destVertex.getLabel(), s0, options);
-        
-        path = spt.getPath(destVertex);
-        
-        assertNotNull(path);
-        Edge prevEdge = null;
-        for (SPTEdge e : path.edges) {
-            if (prevEdge instanceof Transfer) {
-                assertFalse(e.payload instanceof StreetTransitLink);
-            }
-            prevEdge = e.payload;
-        }
-    }
-
     public void testNoConsecutiveTransfers() throws Exception {
         // You should never make a transfer if you have just made one. Put another way, you can only
         // transfer if you have just alighted, or, if traversing backwards, you can only transfer if
-        // you have just boarded. We also allow transfers to be made at the end points of a trip
-        // (see http://opentripplanner.org/ticket/87)
-        Vertex stop_n = graph.getVertex("agency_N");
-        Vertex stop_l = graph.getVertex("agency_L");
+        // you have just boarded. 
+        Vertex stop_n = graph.getVertex("agency_N_arrive");
+        Vertex stop_l = graph.getVertex("agency_L_depart");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -136,7 +88,7 @@ public class TestGraphPath extends TestCase {
 
         // Test depart at trip
         State s0 = new State(new GregorianCalendar(2009, 8, 7, 15, 0, 0).getTimeInMillis());
-        spt = AStar.getShortestPathTree(graph, stop_n.getLabel(), stop_l.getLabel(), s0, options);
+        spt = AStar.getShortestPathTree(graph, stop_n, stop_l, s0, options);
 
         path = spt.getPath(stop_l);
 
@@ -144,9 +96,9 @@ public class TestGraphPath extends TestCase {
         boolean transferAllowed = true;
         for (SPTEdge e : path.edges) {
             if (!transferAllowed) {
-                assertFalse(e.payload instanceof Transfer);
+                assertFalse(e.payload instanceof TransferEdge);
             }
-            if (e.payload instanceof Alight || e.payload instanceof PatternAlight) {
+            if (e.payload instanceof Alight || e.payload instanceof PatternAlight || e.payload instanceof FreeEdge) {
                 transferAllowed = true; // Can only transfer if we've just alighted
             } else {
                 transferAllowed = false;
@@ -166,9 +118,9 @@ public class TestGraphPath extends TestCase {
         transferAllowed = true;
         for (SPTEdge e : path.edges) {
             if (!transferAllowed) {
-                assertFalse(e.payload instanceof Transfer);
+                assertFalse(e.payload instanceof TransferEdge);
             }
-            if (e.payload instanceof Alight || e.payload instanceof PatternAlight) {
+            if (e.payload instanceof Alight || e.payload instanceof PatternAlight || e.payload instanceof FreeEdge) {
                 transferAllowed = true;
             } else {
                 transferAllowed = false;

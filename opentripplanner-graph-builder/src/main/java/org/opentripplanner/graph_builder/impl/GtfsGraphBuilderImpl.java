@@ -96,9 +96,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph) {
-
-        try {
-            readGtfs();
+            try {
+                readGtfs();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
 
             CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
             factory.setGtfsDao(_dao);
@@ -123,9 +125,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             // We need to save the calendar service data so we can use it later
             graph.putService(CalendarServiceData.class, data);
 
-        } catch (Exception ex) {
-            throw new IllegalStateException("error building graph from gtfs", ex);
-        }
     }
 
     /****
@@ -142,6 +141,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
 
             File path = getPathForGtfsBundle(gtfsBundle);
+            if (!path.isFile()) {
+                throw new IOException(path + " is not a normal file");
+            }
             _log.info("gtfs=" + path);
 
             GtfsReader reader = new GtfsReader();

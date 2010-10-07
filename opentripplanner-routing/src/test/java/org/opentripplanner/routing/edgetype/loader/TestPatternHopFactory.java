@@ -39,7 +39,7 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.Transfer;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -47,7 +47,6 @@ import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class TestPatternHopFactory extends TestCase {
@@ -64,51 +63,39 @@ public class TestPatternHopFactory extends TestCase {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
-        Vertex stop_c = graph.getVertex("agency_C");
-        Vertex stop_d = graph.getVertex("agency_D");
+        String[] stops = {"agency_A", "agency_B", "agency_C", "agency_D", "agency_E"};
+        for (int i = 0; i < stops.length; ++i) {
+            Vertex stop = graph.getVertex(stops[i]);
+            
+            StreetVertex front = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false));
+            StreetVertex back = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true));
 
-        StreetVertex near_a = (StreetVertex) graph.addVertex(new StreetVertex("near_a", GeometryUtils.makeLineString(stop_a.getX() + 0.00001, stop_a.getY() + 0.00001, stop_a.getX() - 0.00001, stop_a.getY() - 0.00001), "near a", 100, false));
-        StreetVertex near_b = (StreetVertex) graph.addVertex(new StreetVertex("near_b", GeometryUtils.makeLineString(stop_b.getX() + 0.00001, stop_b.getY() + 0.00001, stop_b.getX() - 0.00001, stop_b.getY() - 0.00001), "near b", 100, false));
-        StreetVertex near_c = (StreetVertex) graph.addVertex(new StreetVertex("near_c", GeometryUtils.makeLineString(stop_c.getX() + 0.00001, stop_c.getY() + 0.00001, stop_c.getX() - 0.00001, stop_c.getY() - 0.00001), "near c", 100, false));
-        StreetVertex near_d = (StreetVertex) graph.addVertex(new StreetVertex("near_d", GeometryUtils.makeLineString(stop_d.getX() + 0.00001, stop_d.getY() + 0.00001, stop_d.getX() - 0.00001, stop_d.getY() - 0.00001), "near d", 100, false));
-
-        StreetVertex[] nearPoints = {near_a, near_b, near_c, near_d};
-
-        Coordinate between = new Coordinate((stop_a.getX() + stop_b.getX()) / 2,
-                (stop_a.getY() + stop_b.getY()) / 2);
-        StreetVertex nowhere = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(between.x, between.y, between.x - 0.000001, between.y - 0.000001), "nowhere", 10000, false));
-        StreetVertex nowhere2 = (StreetVertex) graph.addVertex(new StreetVertex("nowhere", GeometryUtils.makeLineString(between.x - 0.000001, between.y - 0.000001, between.x, between.y), "nowhere", 10000, true));
-
-        
-        for (int i = 0; i < nearPoints.length; ++i) {
-            StreetVertex a = nearPoints[i];
-            TurnEdge street = new TurnEdge(a, nowhere);
-            graph.addEdge(a, nowhere, street);
-            TurnEdge street2 = new TurnEdge(nowhere2, a);
-            graph.addEdge(nowhere2, a, street2);
+            TurnEdge street = new TurnEdge(front, back);
+            graph.addEdge(street);
+            TurnEdge street2 = new TurnEdge(back, front);
+            graph.addEdge(street2);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);
-        nl.createLinkage(true);
+        nl.createLinkage();
+        
+        Vertex near_b = graph.getVertex("near_B");
         
         assertTrue(graph.getIncoming(near_b.getLabel()).size() >= 2);
     }
 
     public void testBoardAlight() throws Exception {
+        GraphVertex stop_a_depart = graph.getGraphVertex("agency_A_depart");
+        GraphVertex stop_b_depart = graph.getGraphVertex("agency_B_depart");
+        
+        assertEquals(1, stop_a_depart.getDegreeOut());
+        assertEquals(3, stop_b_depart.getDegreeOut());
 
-        GraphVertex stop_a = graph.getGraphVertex("agency_A");
-        GraphVertex stop_b = graph.getGraphVertex("agency_B");
-
-        assertEquals(2, stop_a.getDegreeOut());
-        assertEquals(4, stop_b.getDegreeOut());
-
-        for (Edge e : stop_a.getOutgoing()) {
-            assertTrue(e instanceof PatternBoard || e instanceof StreetTransitLink);
+        for (Edge e : stop_a_depart.getOutgoing()) {
+            assertTrue(e instanceof PatternBoard);
         }
         
-        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a.getOutgoing().iterator().next().getToVertex());
+        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a_depart.getOutgoing().iterator().next().getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
@@ -123,11 +110,11 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
-        Vertex stop_c = graph.getVertex("agency_C");
-        Vertex stop_d = graph.getVertex("agency_D");
-        Vertex stop_e = graph.getVertex("agency_E");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_b = graph.getVertex("agency_B_arrive");
+        Vertex stop_c = graph.getVertex("agency_C_arrive");
+        Vertex stop_d = graph.getVertex("agency_D_arrive");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -151,22 +138,23 @@ public class TestPatternHopFactory extends TestCase {
         assertNotNull(path);
         assertEquals(6, path.vertices.size());
 
-        // A to D
+        // A to D (change at C)
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 9);
+        assertTrue(path.vertices.size() == 11);
         long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
 
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
 
+        //A to E (change at C)
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 10);
+        assertTrue(path.vertices.size() == 12);
         endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
     }
@@ -175,8 +163,8 @@ public class TestPatternHopFactory extends TestCase {
      * Test that useless dwell edges are in fact removed.
      */
     public void testDwellSimplification() {
-        Vertex stop_f = graph.getVertex("agency_F");
-        Vertex stop_h = graph.getVertex("agency_H");
+        Vertex stop_f = graph.getVertex("agency_F_depart");
+        Vertex stop_h = graph.getVertex("agency_H_arrive");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -184,7 +172,7 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        spt = AStar.getShortestPathTree(graph, stop_f.getLabel(), stop_h.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_f, stop_h, new State(
                 new GregorianCalendar(2009, 8, 18, 5, 0, 0).getTimeInMillis()), options);
 
         path = spt.getPath(stop_h);
@@ -194,8 +182,8 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testRoutingOverMidnight() throws Exception {
         // this route only runs on weekdays
-        Vertex stop_g = graph.getVertex("agency_G");
-        Vertex stop_h = graph.getVertex("agency_H");
+        Vertex stop_g = graph.getVertex("agency_G_depart");
+        Vertex stop_h = graph.getVertex("agency_H_arrive");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -238,12 +226,12 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testShapeByLocation() throws Exception {
-        Vertex stop_g = graph.getVertex("agency_G");
+        Vertex stop_g = graph.getVertex("agency_G_depart");
         Edge hop = getHopOut(stop_g);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
 
-        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
         hop = getHopOut(stop_a);
         geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 0.009999);
@@ -252,7 +240,7 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testShapeByDistance() throws Exception {
-        Vertex stop_i = graph.getVertex("agency_I");
+        Vertex stop_i = graph.getVertex("agency_I_depart");
         Edge hop = getHopOut(stop_i);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
@@ -260,7 +248,7 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testPickupDropoff() throws Exception {
-        Vertex stop_o = graph.getVertex("agency_O");
+        Vertex stop_o = graph.getVertex("agency_O_depart");
         Vertex stop_p = graph.getVertex("agency_P");
         int i = 0;
         for (@SuppressWarnings("unused") Edge e: graph.getOutgoing(stop_o)) {
@@ -285,11 +273,11 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testTransfers() throws Exception {
-        Vertex stop_k = graph.getVertex("agency_K");
-        Vertex stop_n = graph.getVertex("agency_N");
+        Vertex stop_k = graph.getVertex("agency_K_depart");
+        Vertex stop_n = graph.getVertex("agency_N_arrive");
         int transfers = 0;
         for (Edge e : graph.getOutgoing(stop_n)) {
-            if (e instanceof Transfer) {
+            if (e instanceof TransferEdge) {
                 assertEquals(e.getToVertex(), stop_k);
                 transfers += 1;
             }
@@ -298,14 +286,14 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testInterlining() throws Exception {
-        Vertex stop_i = graph.getVertex("agency_I");
-        Vertex stop_k = graph.getVertex("agency_K");
+        Vertex stop_i = graph.getVertex("agency_I_depart");
+        Vertex stop_k = graph.getVertex("agency_K_arrive");
 
         long startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 0).getTimeInMillis();
         TraverseOptions options = new TraverseOptions(context);
 
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_i.getLabel(), stop_k
-                .getLabel(), new State(startTime), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_i, stop_k, 
+                new State(startTime), options);
         GraphPath path = spt.getPath(stop_k);
         int num_alights = 0;
         for (SPTEdge e : path.edges) {
@@ -322,8 +310,8 @@ public class TestPatternHopFactory extends TestCase {
     }
     
     public void testTraverseMode() throws Exception {
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_b = graph.getVertex("agency_B_arrive");
 
         ShortestPathTree spt;
 
@@ -357,11 +345,18 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_a");
-        Vertex near_b = graph.getVertex("near_b");
-        Vertex near_c = graph.getVertex("near_c");
-        Vertex near_d = graph.getVertex("near_d");
+        Vertex near_a = graph.getVertex("near_A");
+        Vertex near_b = graph.getVertex("near_B");
+        Vertex near_c = graph.getVertex("near_C");
 
+        Vertex stop_d = graph.getVertex("agency_D");
+        Vertex split_d = null;
+        for (Edge e : graph.getOutgoing(stop_d)) {
+            if (e instanceof StreetTransitLink) {
+                split_d = e.getToVertex();
+            }
+        }
+        
         TraverseOptions options = new TraverseOptions(context);
         options.wheelchairAccessible = true;
 
@@ -384,23 +379,29 @@ public class TestPatternHopFactory extends TestCase {
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
-        spt = AStar.getShortestPathTree(graph, near_a, near_d, new State(time
+        spt = AStar.getShortestPathTree(graph, near_a, split_d, new State(time
                 .getTimeInMillis()), options);
         
         time.add(Calendar.HOUR, 1);
         time.add(Calendar.SECOND, 1); //for the StreetTransitLink
-        path = spt.getPath(near_d);
+        path = spt.getPath(split_d);
         assertNotNull(path);
         assertEquals(time.getTimeInMillis(), path.vertices.lastElement().state.getTime());
     }
 
     public void testRunForTrain() {
-
-        Vertex destination = graph.getVertex("agency_T");
+        /** This is the notorious Byrd bug: we're going from Q to T at 8:30.  
+         *  There's a trip from S to T at 8:50 and a second one at 9:50.  
+         *  To get to S by 8:50, we need to take trip 12.1 from Q to R, and 13.1
+         *  from R to S.  If we take the direct-but-slower 11.1, we'll miss
+         *  the 8:50 and have to catch the 9:50.
+         */
+        
+        Vertex destination = graph.getVertex("agency_T_depart");
         TraverseOptions wo = new TraverseOptions();
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q", destination.getLabel(),
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q_arrive", destination.getLabel(),
                 new State(startTime.getTimeInMillis()), wo);
         GraphPath path = spt.getPath(destination);
 
@@ -411,8 +412,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testFrequencies() {
-        Vertex stop_u = graph.getVertex("agency_U");
-        Vertex stop_v = graph.getVertex("agency_V");
+        Vertex stop_u = graph.getVertex("agency_U_depart");
+        Vertex stop_v = graph.getVertex("agency_V_arrive");
 
         ShortestPathTree spt;
         GraphPath path;
@@ -421,7 +422,7 @@ public class TestPatternHopFactory extends TestCase {
         options.modes = new TraverseModeSet("TRANSIT");
 
         // U to V - original stop times - shouldn't be used
-        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
+        spt = AStar.getShortestPathTree(graph, stop_u, stop_v, new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
         path = spt.getPath(stop_v);
         assertNotNull(path);

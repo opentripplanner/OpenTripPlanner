@@ -145,7 +145,11 @@ public class PatternBoard extends PatternEdge {
             //via a formal transfer or by walking.
             transfer_penalty = options.optimizeTransferPenalty;
         }
-        return new TraverseResult(wait + options.boardCost + transfer_penalty, state1);
+        long wait_cost = wait;
+        if (state0.numBoardings == 0) {
+            wait_cost *= options.waitAtBeginningFactor;
+        }
+        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {

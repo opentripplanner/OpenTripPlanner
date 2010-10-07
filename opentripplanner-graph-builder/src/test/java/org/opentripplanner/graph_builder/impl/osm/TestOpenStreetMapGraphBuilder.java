@@ -21,7 +21,6 @@ import org.junit.Test;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 
 
@@ -42,14 +41,12 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         loader.buildGraph(gg);
 
-        Vertex v1 = gg.getVertex("osm node 288969929 in");
         Vertex v2 = gg.getVertex("way 25660216 from 1"); //Kamiennogorska
         Vertex v2back = gg.getVertex("way 25660216 from 1 back"); //Kamiennogorska back
         Vertex v3 = gg.getVertex("way 25691274 from 0"); //Mariana Smoluchowskiego, right from Kamiennogorska
         Vertex v3back = gg.getVertex("way 25691274 from 0 back"); //ditto back
         Vertex v4 = gg.getVertex("way 25691274 from 3"); //Mariana Smoluchowskiego, left from Kamiennogorska
         Vertex v4back = gg.getVertex("way 25691274 from 3 back"); //ditto back
-        assertNotNull(v1);
         assertNotNull(v2);
         assertNotNull(v2back);
         assertNotNull(v3);
@@ -60,17 +57,12 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertTrue ("name of v2 must be like \"Kamiennog\u00F3rska\"; was " + v2.getName(), v2.getName().contains("Kamiennog\u00F3rska"));
         assertTrue ("name of v3 must be like \"Mariana Smoluchowskiego\"; was " + v3.getName(), v3.getName().contains("Mariana Smoluchowskiego"));
         
-        boolean v1EdgeExists = false;
         boolean v3EdgeExists = false;
         boolean v4EdgeExists = false;
         boolean v4BackEdgeExists = false;
         for (Edge e : gg.getOutgoing(v2)) {
             Vertex tov = e.getToVertex();
 
-            if (tov == v1) {
-                assertTrue(e instanceof OutEdge);
-                v1EdgeExists = true;
-            }
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 if (tov == v3 || tov == v3back) {
@@ -82,10 +74,6 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         
         for (Edge e : gg.getOutgoing(v2back)) {
             Vertex tov = e.getToVertex();
-            if (tov == v1) {
-                assertTrue(e instanceof OutEdge);
-                v1EdgeExists = true;
-            }
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 if (tov == v3 || tov == v3back) {
@@ -116,7 +104,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                 }
             }
         }
-        assertTrue("There is no edge from v2 to v1", v1EdgeExists);
+
         assertTrue("There is no edge from v2 to v3", v3EdgeExists);
         assertTrue("There is no edge from v3 to v4", v4EdgeExists);
         assertTrue("There is no edge from v4back to v3back", v4BackEdgeExists);

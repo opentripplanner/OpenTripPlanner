@@ -71,9 +71,6 @@ public class StreetTransitLink implements Edge, Serializable {
     }
 
     public TraverseResult traverse(State s0, TraverseOptions wo) {
-        if (s0.justTransferred) {
-            return null;
-        }
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
@@ -82,20 +79,15 @@ public class StreetTransitLink implements Edge, Serializable {
         //technically, we only need to do this when we're going
         //off the street onto transit, but it won't hurt 
         //to do it unconditionally.
-        s1.justTransferred = true;
         return new TraverseResult(STL_TRAVERSE_COST, s1);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
-        if (s0.justTransferred) {
-            return null;
-        }
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-1);
-        s1.justTransferred = true;
         return new TraverseResult(STL_TRAVERSE_COST, s1);
     }
 

@@ -13,16 +13,14 @@
 
 package org.opentripplanner.graph_builder.services;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.opentripplanner.common.model.P2;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
 
 public class StreetUtils {
 
@@ -32,48 +30,32 @@ public class StreetUtils {
      * and has the same name as one of those neighbors.
      *   
      * @param graph
-     * @param endpoints all of the corners of the graph (in P2<in, out>)
      */
-    public static void unify(Graph graph, Collection<P2<EndpointVertex>> endpoints) {
-
-        for(P2<EndpointVertex> corner : endpoints) {
-            GraphVertex vIn = graph.getGraphVertex(corner.getFirst());
-            GraphVertex vOut = graph.getGraphVertex(corner.getSecond());
-            if (vOut.getDegreeOut() == 2 && vIn.getDegreeIn() == 2) {
+    public static void unify(Graph graph) {
+        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(graph.getVertices());
+        for (GraphVertex gv : vertices) {
+            if (gv.getDegreeOut() == 2 && gv.getDegreeIn() == 2) {
                 //this corner may be entirely removable
 
-                Collection<Edge> edges = vOut.getOutgoing();
+                Collection<Edge> edges = gv.getOutgoing();
                 Iterator<Edge> it = edges.iterator();
                 Edge out1 = it.next();
                 Edge out2 = it.next();
-                
-                edges = vIn.getIncoming();
-                it = edges.iterator();
-                Edge in1 = it.next();
-                Edge in2 = it.next();
-                
+
                 if (out1.getName() == out2.getName() && out1.getName() != null) {
                     //remove vertex
                     GenericVertex tov1 = (GenericVertex) out1.getToVertex();
+                    /*
                     GenericVertex tov2 = (GenericVertex) out2.getToVertex();
-                    graph.removeVertex(vOut.vertex);
-                    graph.removeVertex(vIn.vertex);
-                    for (Edge e: vIn.getIncoming()) {
+                    graph.removeVertex(gv.vertex);
+                    for (Edge e: gv.getIncoming()) {
                         graph.getGraphVertex(e.getFromVertex()).removeOutgoing(e);
                     }
                     graph.getGraphVertex(tov1).removeIncoming(out1);
                     graph.getGraphVertex(tov2).removeIncoming(out2);
-                    
-                    GenericVertex fromv1 = (GenericVertex) in1.getFromVertex();
-                    GenericVertex fromv2 = (GenericVertex) in2.getFromVertex();
-                    if (fromv1.getCoordinate().equals(tov1.getCoordinate())) {
-                        GenericVertex tmp = fromv1;
-                        fromv1 = fromv2;
-                        fromv2 = tmp;
-                    }
-                    tov1.mergeFrom(graph, fromv1);
-                    tov2.mergeFrom(graph, fromv2);
-                }                
+*/
+                    tov1.mergeFrom(graph, (GenericVertex) gv.vertex);
+                }
             }
         }
     }

@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
-import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -89,7 +88,7 @@ public class AStar {
     }
 
     /**
-     * Plots a path on graph from origin to target, arriving at the time 
+     * Plots a path on graph from origin to target, ARRIVING at the time 
      * given in state and with the options options.  
      * 
      * @param graph
@@ -102,7 +101,7 @@ public class AStar {
     public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
         if (!options.isArriveBy()) {
-            throw new RuntimeException("Reverse paths must call options.getArriveBy(true)");
+            throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
         }
         if (origin == null || target == null) {
             return null;
@@ -199,9 +198,6 @@ public class AStar {
                 if (edge.getFromVertex() == target) {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
-                    state.justTransferred = spt_u.state.justTransferred;
-                } else if (edge instanceof OutEdge) {
-                    continue;
                 }
                     
                 if (edge instanceof PatternAlight && state.numBoardings > options.maxTransfers) {
@@ -246,6 +242,17 @@ public class AStar {
         return spt;
     }
 
+    /**
+     * Plots a path on graph from origin to target, DEPARTING at the time 
+     * given in state and with the options options.  
+     * 
+     * @param graph
+     * @param origin
+     * @param target
+     * @param init
+     * @param options
+     * @return the shortest path, or null if none is found
+     */
     public static ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
             State init, TraverseOptions options) {
 
@@ -302,8 +309,8 @@ public class AStar {
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         boolean useTransit = options.modes.getTransit();
-        HashSet<Vertex> closed = new HashSet<Vertex>(100000);
         
+        /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
@@ -311,9 +318,6 @@ public class AStar {
             if (fromv == target) {
                 break;
             }
-
-            closed.add(fromv);
-            
             GraphVertex gv = graph.getGraphVertex(fromv);
  
             Collection<Edge> outgoing;
@@ -343,14 +347,12 @@ public class AStar {
             }
 
             for (Edge edge : outgoing) {
+
                 State state = spt_u.state;
                 Vertex tov = edge.getToVertex();
                 if (tov == target) {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
-                    state.justTransferred = spt_u.state.justTransferred;
-                } else if (edge instanceof OutEdge) {
-                    continue;
                 }
                 
                 if (edge instanceof PatternBoard && state.numBoardings > options.maxTransfers) {
@@ -361,7 +363,6 @@ public class AStar {
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
                 if (wr == null) {
-                    wr = edge.traverse(state, options);
                     continue;
                 }
                 
@@ -393,9 +394,7 @@ public class AStar {
                 SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
-                    if (!closed.contains(tov)) {
-                        pq.insert_or_dec_key(spt_v, heuristic_distance);
-                    }
+                    pq.insert_or_dec_key(spt_v, heuristic_distance);
                 }
             }
         }

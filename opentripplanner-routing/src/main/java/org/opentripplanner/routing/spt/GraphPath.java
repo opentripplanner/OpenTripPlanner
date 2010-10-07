@@ -124,6 +124,8 @@ public class GraphPath {
         }
     }
 
+    /** See the thread on gtfs-changes explaining the proper interpretation of fares.txt */
+    
     public Fare getCost() {
         State state = vertices.lastElement().state;
         FareContext fareContext = state.fareContext;

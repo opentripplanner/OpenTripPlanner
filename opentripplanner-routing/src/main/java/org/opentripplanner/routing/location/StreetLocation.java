@@ -23,9 +23,10 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 
@@ -59,13 +60,13 @@ public class StreetLocation extends GenericVertex {
      * the location parameter, which represents a distance along the edge between 0 (the from
      * vertex) and 1 (the to vertex).
      * 
-     * This is a little bit complicated, because TurnEdges and OutEdges get most of their data from
+     * This is a little bit complicated, because TurnEdges get most of their data from
      * their fromVertex. So we have to create a separate fromVertex located at the start of the set
      * of turns, with a free edge into it from the from vertex.
      * 
      * @param label
      * @param name
-     * @param turns
+     * @param edges
      *            A List of nearby edges, which probably represent one street but might represent a
      *            more complicated situation (imagine a bus stop at the asterisk: *_||). These are
      *            ordered by ascending distance from nearestPoint
@@ -74,7 +75,7 @@ public class StreetLocation extends GenericVertex {
      * @return the new StreetLocation
      */
     public static StreetLocation createStreetLocation(Graph graph, String label, String name,
-            Collection<Edge> turns, Coordinate nearestPoint) {
+            Collection<Edge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
 
@@ -83,15 +84,17 @@ public class StreetLocation extends GenericVertex {
         location.nearestPoint = nearestPoint;
 
         HashMap<Geometry, P2<StreetVertex>> cache = new HashMap<Geometry, P2<StreetVertex>>();
-        
-        for (Edge street : turns) {
+        for (Edge street : edges) {
             /* TODO: need to check for crossing uncrossable streets (in 
-             * previous elements of turns) */
+             * previous elements of edges) */
 
-            StreetVertex fromv = (StreetVertex) street.getFromVertex();
-            wheelchairAccessible |= fromv.isWheelchairAccessible();
-
-            boolean seen = cache.containsKey(fromv.getGeometry());
+            Vertex fromv = street.getFromVertex();
+            if (street instanceof PlainStreetEdge) {
+                wheelchairAccessible |= ((PlainStreetEdge) street).isWheelchairAccessible();
+            } else {
+                wheelchairAccessible |= ((StreetVertex) fromv).isWheelchairAccessible();
+            }
+            boolean seen = cache.containsKey(street.getGeometry());
             /* forward edges and vertices */
             StreetVertex edgeLocation = createHalfLocation(graph, location, label + " to "
                     + street.getToVertex().getLabel(), name, nearestPoint, street, cache);
@@ -99,7 +102,7 @@ public class StreetLocation extends GenericVertex {
             if (!seen) {
                 Edge l1in = new FreeEdge(location, edgeLocation);
                 Edge l1out = new FreeEdge(edgeLocation, location);
-            
+
                 location.extra.add(l1in);
                 location.extra.add(l1out);
             }
@@ -131,34 +134,36 @@ public class StreetLocation extends GenericVertex {
     }
 
     private static StreetVertex createHalfLocation(Graph graph, StreetLocation base, String label,
-            String name, Coordinate nearestPoint, Edge street, HashMap<Geometry, P2<StreetVertex>> cache) {
+            String name, Coordinate nearestPoint, Edge edge, HashMap<Geometry, P2<StreetVertex>> cache) {
 
-        StreetVertex fromv = (StreetVertex) street.getFromVertex();
+        StreetEdge street = (StreetEdge) edge;
+        Vertex fromv = street.getFromVertex();
         StreetVertex newFrom, location;
-        if (cache.containsKey (fromv.getGeometry())) {
-            P2<StreetVertex> cached = cache.get(fromv.getGeometry());
+        Geometry geometry = street.getGeometry();
+        if (cache.containsKey (geometry)) {
+            P2<StreetVertex> cached = cache.get(geometry);
             newFrom = cached.getFirst();
             location = cached.getSecond();
         } else {
-            P2<LineString> geometries = getGeometry(fromv, nearestPoint);
+            P2<LineString> geometries = getGeometry(street, nearestPoint);
 
-            double totalGeomLength = fromv.getGeometry().getLength();
+            double totalGeomLength = geometry.getLength();
             double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
 
-            double lengthIn = fromv.getLength() * lengthRatioIn;
-            double lengthOut = fromv.getLength() * (1 - lengthRatioIn);
+            double lengthIn = street.getLength() * lengthRatioIn;
+            double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-            newFrom = new StreetVertex(label + " (vertex going in)", geometries.getFirst(), name,
+            newFrom = new StreetVertex(label + " (vertex going in to splitter)", geometries.getFirst(), name,
                     lengthIn, false);
-            newFrom.setElevationProfile(fromv.getElevationProfile(0, lengthIn));
-            newFrom.setPermission(fromv.getPermission());
+            newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn));
+            newFrom.setPermission(street.getPermission());
 
-            location = new StreetVertex(label + "(vertex at location)", geometries.getSecond(), name, lengthOut,
+            location = new StreetVertex(label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
                     false);
-            location.setElevationProfile(fromv.getElevationProfile(lengthIn, totalGeomLength));
-            location.setPermission(fromv.getPermission());
+            location.setElevationProfile(street.getElevationProfile(lengthIn, totalGeomLength));
+            location.setPermission(street.getPermission());
             
-            cache.put(fromv.getGeometry(), new P2<StreetVertex>(newFrom, location));
+            cache.put(geometry, new P2<StreetVertex>(newFrom, location));
 
             FreeEdge free = new FreeEdge(fromv, newFrom);
             TurnEdge incoming = new TurnEdge(newFrom, location);
@@ -171,27 +176,28 @@ public class StreetLocation extends GenericVertex {
         if (tov instanceof StreetVertex) {
             e = new TurnEdge(location, (StreetVertex) tov);
         } else {
-            e = new OutEdge(location, (EndpointVertex) tov);
+            e = new OutEdge(location, tov);
         }
         base.extra.add(e);
         
         return location;
     }
 
-    private static P2<LineString> getGeometry(StreetVertex fromv, Coordinate nearestPoint) {
-        StreetVertex startVertex = fromv;
-
-        LocationIndexedLine line = new LocationIndexedLine(startVertex.getGeometry());
+    private static P2<LineString> getGeometry(Edge e, Coordinate nearestPoint) {
+        Geometry geometry = e.getGeometry();
+        return splitGeometryAtPoint(geometry, nearestPoint);
+    }
+    
+    public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
+        LocationIndexedLine line = new LocationIndexedLine(geometry);
         LinearLocation l = line.indexOf(nearestPoint);
 
         LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
         LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
-
+        
         return new P2<LineString>(beginning, ending);
-
     }
-
-    // @SuppressWarnings("unchecked")
+    
     public void reify(Graph graph) {
         if (graph.getVertex(label) != null) {
             // already reified

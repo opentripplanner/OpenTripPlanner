@@ -63,6 +63,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
@@ -302,18 +303,18 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 showGraph.highlightEdge(selected);
 
                 /* for turns, highlight the outgoing street's ends */
-                if (selected instanceof TurnEdge) {
+                if (selected instanceof TurnEdge || selected instanceof PlainStreetEdge) {
                     HashSet<Vertex> vertices = new HashSet<Vertex>();
                     Vertex tov = selected.getToVertex();
                     for (Edge og : graph.getOutgoing(tov)) {
-                        if (og instanceof TurnEdge) {
+                        if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
                             vertices.add (og.getToVertex());
                             break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : graph.getIncoming(fromv)) {
-                        if (ic instanceof TurnEdge) {
+                        if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
                             vertices.add (ic.getFromVertex());
                             break;
                         }

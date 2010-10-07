@@ -46,8 +46,6 @@ public class PatternAlight extends PatternEdge {
 
     private static final int SEC_IN_DAY = 24 * 60 * 60;
 
-    private static final int BOARD_COST = 120;
-
     private int stopIndex;
 
     private int modeMask;
@@ -136,7 +134,6 @@ public class PatternAlight extends PatternEdge {
         }
         
         state1.tripId = trip.getId();
-        state1.justTransferred = true;
         state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.getExemplar().getRoute().getId(), pattern.getFareContext());
         long transfer_penalty = 0;
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
@@ -144,7 +141,11 @@ public class PatternAlight extends PatternEdge {
             //via a formal transfer or by walking.
             transfer_penalty = options.optimizeTransferPenalty;
         }
-        return new TraverseResult(-wait + BOARD_COST + transfer_penalty, state1);
+        long wait_cost = -wait;
+        if (state0.numBoardings == 0) {
+            wait_cost *= options.waitAtBeginningFactor;
+        }
+        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1);
     }
 
     @Override

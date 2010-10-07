@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;

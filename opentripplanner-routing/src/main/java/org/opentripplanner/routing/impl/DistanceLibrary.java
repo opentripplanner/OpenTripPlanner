@@ -84,4 +84,9 @@ public class DistanceLibrary {
     private static final double p2(double a) {
         return a * a;
     }
+
+    /** this is an overestimate */
+    public static double metersToDegrees(double distance) {
+        return 360 * distance / (2 * Math.PI * RADIUS_OF_EARTH_IN_KM * 1000);
+    }
 }

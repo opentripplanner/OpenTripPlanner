@@ -286,6 +286,7 @@ otp.planner.StaticForms = {
         } 
         catch(e) 
         {
+        	console.log("exception with somethingorother: " + e);
             if(message == null || message == '')
                 message = this.locale.tripPlanner.error.deadMsg;
         }

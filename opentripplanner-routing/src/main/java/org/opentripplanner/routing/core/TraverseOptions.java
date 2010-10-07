@@ -92,6 +92,11 @@ public class TraverseOptions implements Serializable, Cloneable {
     public double maxWeight = Double.MAX_VALUE;
 
     public int maxTransfers = 2;
+
+    /*
+     * How much less bad waiting at the beginning of the trip is
+     */
+    public double waitAtBeginningFactor = 0.1;
     
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -207,5 +212,13 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public boolean isArriveBy() {
         return back;
+    }
+
+    public double distanceWalkFactor(double walkDistance) {
+        if (walkDistance > maxWalkDistance && modes.getTransit()) {
+            double weightFactor = (walkDistance - maxWalkDistance) / 20;
+            return weightFactor < 1 ? 1 : weightFactor;
+        }
+        return 1;
     }
 }

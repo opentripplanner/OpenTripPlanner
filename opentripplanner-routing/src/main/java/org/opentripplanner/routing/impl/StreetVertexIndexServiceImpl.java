@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -24,9 +26,13 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -46,7 +52,10 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
- * This creates a StreetLocation representing a location on a street that's not at an intersection,
+ * Indexes all edges and transit vertices of the graph spatially.  Has a variety of query methods used
+ * during network linking and trip planning.
+ * 
+ * Creates a StreetLocation representing a location on a street that's not at an intersection,
  * based on input latitude and longitude. Instantiating this class is expensive, because it creates
  * a spatial index of all of the intersections in the graph.
  */
@@ -59,11 +68,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private STRtree transitStopTree;
 
-    public static final double MAX_DISTANCE_FROM_STREET = 0.005;
-
-    private static final double MAX_SNAP_DISTANCE = 0.0005;
+    private STRtree intersectionTree;
+    
+    public static final double MAX_DISTANCE_FROM_STREET = 0.05;
 
     private static final double DISTANCE_ERROR = 0.00005;
+
+    private static final double DIRECTION_ERROR = 0.05;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -86,10 +97,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private void postSetup() {
         transitStopTree = new STRtree();
+        intersectionTree = new STRtree();
         for (GraphVertex gv : graph.getVertices()) {
             Vertex v = gv.vertex;
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof TurnEdge || e instanceof OutEdge) {
+                if (e instanceof TurnEdge || e instanceof OutEdge || e instanceof PlainStreetEdge) {
                     if (e.getGeometry() == null) {
                         continue;
                     }
@@ -117,128 +129,60 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
+            if (v instanceof StreetVertex || v instanceof EndpointVertex) {
+                Envelope env = new Envelope(v.getCoordinate());
+                intersectionTree.insert(env, v);
+            }
         }
         transitStopTree.build();
     }
     
+    /** 
+     * Get all transit stops within a given distance of a coordinate
+     * 
+     *  @param distance in meters
+     */
     @SuppressWarnings("unchecked")
     public List<Vertex> getLocalTransitStops(Coordinate c, double distance) {
         Envelope env = new Envelope(c);
-        env.expandBy(distance);
-        return transitStopTree.query(env);
+        env.expandBy(DistanceLibrary.metersToDegrees(distance));
+        List<Vertex> nearby = transitStopTree.query(env);
+        List<Vertex> results = new ArrayList<Vertex>();
+        for (Vertex v : nearby) {
+            if (v.distance(c) <= distance) {
+                results.add(v);
+            }
+        }
+        return results;
     }
     
-    public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options) {
-        return getClosestVertex(graph, c, true, true, options);
-    }
-
-    public Vertex getClosestVertex(Graph graph, final Coordinate c, TraverseOptions options, boolean forceEdges) {
-        return getClosestVertex(graph, c, !forceEdges, !forceEdges, options);
-    }
-
-    
-    @SuppressWarnings("unchecked")
-    public Vertex getClosestVertex(Graph graph, final Coordinate c, boolean includeTransitStops,
-            boolean allowSnappingToIntersections, TraverseOptions options) {
-
-        Envelope envelope = new Envelope(c);
-        List<Edge> nearby = new LinkedList<Edge>();
-
-        int i = 0;
-        double envelopeGrowthRate = 0.0018;
-        GeometryFactory factory = new GeometryFactory();
-        Point p = factory.createPoint(c);
-        while (nearby.size() < 1 && i < 10) {
-            ++i;
-            envelope.expandBy(envelopeGrowthRate);
-            envelopeGrowthRate *= 2;
-
-            if (includeTransitStops) {
-                double bestDistance = Double.MAX_VALUE;
-                List<Vertex> nearbyTransitStops = transitStopTree.query(envelope);
-
-                Vertex bestStop = null;
-                for (Vertex v : nearbyTransitStops) {
-                    Coordinate sc = v.getCoordinate();
-                    double distance = sc.distance(c);
-                    if (distance < bestDistance) {
-                        bestDistance = distance;
-                        bestStop = v;
-                    }
-                }
-                if (bestDistance <= MAX_SNAP_DISTANCE) {
-                    return bestStop;
-                }
+    /**
+     * Gets the closest vertex to a coordinate.  If necessary,
+     * this vertex will be created by splitting nearby edges (non-permanently).
+     */
+    public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options) {
+        List<Vertex> vertices = getIntersectionAt(coordinate);
+        if (vertices != null && !vertices.isEmpty()) {
+            StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, "");
+            for (Vertex v : vertices) {
+                Edge e = new FreeEdge(closest, v);
+                closest.getExtra().add(e);
+                e = new FreeEdge(v, closest);
+                closest.getExtra().add(e);
             }
+            return closest;
+        }
 
-            /*
-             * It is presumed, that edges which are the exact same distance from the examined
-             * coordinate are parallel (coincident) edges. If this is wrong in too many cases, than
-             * some finer logic will need to be added
-             * 
-             * Parallel edges are needed to account for (oneway) streets with varying permissions.
-             * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
-             * a pedestrian should be able to go in any direction.
-             */
+        Collection<Edge> edges = getClosestEdges(coordinate, options);
+        if (edges != null) {
+            Edge bestStreet = edges.iterator().next();
+            Geometry g = bestStreet.getGeometry();
+            LocationIndexedLine l = new LocationIndexedLine(g);
+            LinearLocation location = l.project(coordinate);
 
-            double bestDistance = Double.MAX_VALUE;
-            nearby = edgeTree.query(envelope);
-            if (nearby != null) {
-                Edge bestStreet = null;
-                for (Edge e : nearby) {
-                    if (e == null)
-                        continue;
-                    Geometry g = e.getGeometry();
-                    if (g != null) {
-                        double distance = g.distance(p);
-                        if (distance < bestDistance) {
-                            bestStreet = e;
-                            bestDistance = distance;
-                        }
-                    }
-                }
-
-                // find coincidence edges  
-                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                    Geometry g = bestStreet.getGeometry();
-                    LocationIndexedLine l = new LocationIndexedLine(g);
-                    LinearLocation location = l.project(c);
-
-                    Vertex fromv = bestStreet.getFromVertex();
-                    Vertex tov = bestStreet.getToVertex();
-                    Coordinate start = fromv.getCoordinate();
-                    Coordinate end = tov.getCoordinate();
-                    Coordinate nearestPoint = location.getCoordinate(g);
-                    if (allowSnappingToIntersections) {
-                        if (nearestPoint.distance(start) < MAX_SNAP_DISTANCE) {
-                            return fromv;
-                        } else if (nearestPoint.distance(end) < MAX_SNAP_DISTANCE) {
-                            return tov;
-                        }
-                    }
-                    TreeMap<Double, Edge> parallel = new TreeMap<Double, Edge>();
-                    for (Edge e : nearby) {
-                        /* only include edges that this user can actually use */
-                        if (e == null) {
-                            continue;
-                        }
-                        if (options != null && e instanceof StreetEdge) {
-                            if (!((StreetEdge) e).canTraverse(options)) {
-                                continue;
-                            }
-                        }
-                        Geometry eg = e.getGeometry();
-                        if (eg != null) {
-                            double distance = eg.distance(p);
-                            if (distance <= bestDistance + DISTANCE_ERROR) {
-                                parallel.put(distance, e);
-                            }
-                        }
-                    } 
-                    return StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
-                            + c.toString(), bestStreet.getName(), parallel.values(), nearestPoint);
-                }
-            }
+            Coordinate nearestPoint = location.getCoordinate(g);
+            return StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
+                    + coordinate.toString(), bestStreet.getName(), edges, nearestPoint);
         }
         return null;
     }
@@ -261,5 +205,123 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<Edge> getClosestEdges(Coordinate coordinate, TraverseOptions options) {
+        Envelope envelope = new Envelope(coordinate);
+        List<Edge> nearby = new LinkedList<Edge>();
+        int i = 0;
+        double envelopeGrowthRate = 0.0005;
+        GeometryFactory factory = new GeometryFactory();
+        Point p = factory.createPoint(coordinate);
+        while (nearby.size() < 1 && i < 10) {
+            ++i;
+            envelope.expandBy(envelopeGrowthRate);
+            envelopeGrowthRate *= 2;
+
+            /*
+             * It is presumed, that edges which are roughly the same distance from the examined
+             * coordinate in the same direction are parallel (coincident) edges. 
+             * 
+             * Parallel edges are needed to account for (oneway) streets with varying permissions,
+             * as well as the edge-based nature of the graph.
+             * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
+             * a pedestrian should be able to go in any direction.
+             */
+
+            double bestDistance = Double.MAX_VALUE;
+            Edge bestEdge = null;
+            nearby = edgeTree.query(envelope);
+            if (nearby != null) {
+                for (Edge e : nearby) {
+                    if (e == null || e instanceof OutEdge)
+                        continue;
+                    Geometry g = e.getGeometry();
+                    if (g != null) {
+                        double distance = g.distance(p);
+                        if (distance < bestDistance) {
+                            bestDistance = distance;
+                            bestEdge = e;
+                        }
+                    }
+                }
+
+                // find coincidence edges  
+                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
+                    LocationIndexedLine lil = new LocationIndexedLine(bestEdge.getGeometry());
+                    LinearLocation location = lil.project(coordinate);
+                    Coordinate nearestPointOnEdge = lil.extractPoint(location);
+                    double xd = nearestPointOnEdge.x - coordinate.x;
+                    double yd = nearestPointOnEdge.y - coordinate.y;
+                    double edgeDirection = Math.atan2(yd, xd);
+                        
+                    TreeMap<Double, Edge> parallel = new TreeMap<Double, Edge>();
+                    for (Edge e : nearby) {
+                        /* only include edges that this user can actually use */
+                        if (e == null || e instanceof OutEdge) {
+                            continue;
+                        }
+                        if (options != null && e instanceof StreetEdge) {
+                            if (!((StreetEdge) e).canTraverse(options)) {
+                                continue;
+                            }
+                        }
+                        Geometry eg = e.getGeometry();
+                        if (eg != null) {
+                            double distance = eg.distance(p);
+                            
+                            if (distance <= bestDistance + DISTANCE_ERROR) {
+
+                                lil = new LocationIndexedLine(eg);
+                                location = lil.project(coordinate);
+                                nearestPointOnEdge = lil.extractPoint(location);
+
+                                if (distance > bestDistance) {
+                                    /* ignore edges caught end-on unless they're the 
+                                     * only choice */
+                                    Coordinate[] coordinates = eg.getCoordinates();
+                                    if (nearestPointOnEdge.equals(coordinates[0]) ||
+                                        nearestPointOnEdge.equals(coordinates[coordinates.length - 1])) {
+                                        continue;
+                                    }
+                                }
+                                    
+                                /* compute direction from coordinate to edge */
+                                xd = nearestPointOnEdge.x - coordinate.x;
+                                yd = nearestPointOnEdge.y - coordinate.y;
+                                double direction = Math.atan2(yd, xd);
+                                                             
+                                if (Math.abs(direction - edgeDirection) < DIRECTION_ERROR) {
+                                    while (parallel.containsKey(distance)) {
+                                        distance += 0.00000001; 
+                                    }
+                                    parallel.put(distance, e);
+                                }
+                            }
+                        }
+                    }
+                    return parallel.values();
+                }
+            }
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Vertex> getIntersectionAt(Coordinate coordinate) {
+        Envelope envelope = new Envelope(coordinate);
+        envelope.expandBy(DISTANCE_ERROR * 2);
+        List<Vertex> nearby = intersectionTree.query(envelope);
+        List<Vertex> atIntersection = new ArrayList<Vertex>(nearby.size());
+        for (Vertex v: nearby) {
+            if (coordinate.distance(v.getCoordinate()) < DISTANCE_ERROR) {
+                atIntersection.add(v);
+            }
+        }
+        if (atIntersection.isEmpty()) {
+            return null;
+        }
+        return atIntersection;
     }
 }

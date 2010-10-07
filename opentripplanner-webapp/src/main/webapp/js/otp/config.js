@@ -6,14 +6,14 @@ otp.config = {
 
         // uris and layer names
         // these match up with geoserver
-        layerUrlRoutes: 'http://routelayer.example.com/wms',
-        layerUrlStops: 'http://stoplayer.example.com/wms',
-        layerUrlRoutesHighlighted: 'http://routelayerhighlighted.example.com/wms',
-        layerUrlStopsHighlighted: 'http://stoplayerhighlighted.example.com/wms',
-        layerNamesRoute: 'routeLayerName',
-        layerNamesStop: 'stopLayerName',
-        layerNamesRouteHighlighted: 'routeLayerHighlightedName',
-        layerNamesStopHighlighted: 'stopLayerHighlightedName',
+        layerUrlRoutes: 'http://localhost:5180/geoserver/wms',
+        layerUrlStops: 'http://localhost:5180/geoserver/wms',
+        layerUrlRoutesHighlighted: 'http://localhost:5180/geoserver/wms',
+        layerUrlStopsHighlighted: 'http://localhost:5180/geoserver/wms',
+        layerNamesRoute: 'routes',
+        layerNamesStop: 'stops',
+        layerNamesRouteHighlighted: 'routes_highlighted',
+        layerNamesStopHighlighted: 'stops_highlighted',
         
         // this is the uri to the extended api that proxies to geoserver
         controlStopsUrl: '/opentripplanner-api-extended/wms'
@@ -36,7 +36,15 @@ otp.config = {
             {separator:true, name:'On other walking direction planners'},
             {name: 'Google Walking',  url:'http://www.google.com/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
-        'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
+        // this controls whether selecting some options, like mode, affects
+        // what other options are shown in the form
+        'useOptionDependencies': false,
+        'geocoder': {
+            enabled: true,
+            url: "/geocoder/geocode",
+            addressParamName: "address"
+        }
+        //'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
     },
 
     'map': {
@@ -63,7 +71,7 @@ otp.config = {
               "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
           ],
         numZoomLevels: 20
-        }), 
+        }),
         
         // Base tile information 
         'baseLayerOptions': {
@@ -94,7 +102,7 @@ otp.config = {
                  + '</p>'
     },
 
-    
+
     // if specified, uri path to a custom logo
     // otherwise use the default "images/ui/logoSmall.png"
     'logo': null,

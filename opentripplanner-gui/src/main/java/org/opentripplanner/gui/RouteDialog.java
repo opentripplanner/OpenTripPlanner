@@ -55,7 +55,6 @@ public class RouteDialog extends JDialog {
         final RouteDialog outer = this;
         goButton.addActionListener(new ActionListener() {
 
-            @Override
             public void actionPerformed(ActionEvent e) {
                 from = fromField.getText().trim();
                 to = toField.getText().trim();

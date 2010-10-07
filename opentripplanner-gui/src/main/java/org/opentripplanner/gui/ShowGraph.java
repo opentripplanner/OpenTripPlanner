@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -205,6 +206,8 @@ public class ShowGraph extends PApplet {
                 stroke(30, 255, 255); //teal
             } else if (e instanceof StreetTransitLink) {
                 stroke(75, 150, 255); //wedgwood
+            } else if (e instanceof TransferEdge) {
+            	stroke(50, 50, 50); //dark gray
             } else {
                 stroke(255, 255, 30); //gold
             }

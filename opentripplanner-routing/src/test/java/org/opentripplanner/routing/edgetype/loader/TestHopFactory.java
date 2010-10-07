@@ -54,11 +54,11 @@ public class TestHopFactory extends TestCase {
 
     public void testBoardAlight() throws Exception {
 
-        GraphVertex stop_a = graph.getGraphVertex("agency_A");
-        GraphVertex stop_b = graph.getGraphVertex("agency_B");
+        GraphVertex stop_a = graph.getGraphVertex("agency_A_depart");
+        GraphVertex stop_b_depart = graph.getGraphVertex("agency_B_depart");
 
         assertEquals(1, stop_a.getDegreeOut());
-        assertEquals(3, stop_b.getDegreeOut());
+        assertEquals(3, stop_b_depart.getDegreeOut());
 
         for (Edge e : stop_a.getOutgoing()) {
             assertEquals(PatternBoard.class, e.getClass());
@@ -78,8 +78,8 @@ public class TestHopFactory extends TestCase {
     }
 
     public void testDwell() throws Exception {
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_c = graph.getVertex("agency_C_arrive");
 
         TraverseOptions options = new TraverseOptions(context);
 
@@ -97,11 +97,11 @@ public class TestHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A");
-        Vertex stop_b = graph.getVertex("agency_B");
-        Vertex stop_c = graph.getVertex("agency_C");
-        Vertex stop_d = graph.getVertex("agency_D");
-        Vertex stop_e = graph.getVertex("agency_E");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_b = graph.getVertex("agency_B_arrive");
+        Vertex stop_c = graph.getVertex("agency_C_arrive");
+        Vertex stop_d = graph.getVertex("agency_D_arrive");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
@@ -131,7 +131,7 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 9);
+        assertTrue(path.vertices.size() <= 11);
         long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
 
@@ -141,7 +141,7 @@ public class TestHopFactory extends TestCase {
 
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 10);
+        assertTrue(path.vertices.size() <= 12);
         endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
     }

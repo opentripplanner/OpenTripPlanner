@@ -136,6 +136,27 @@ public class Graph implements Serializable {
     public void removeVertex(Vertex vertex) {
         vertices.remove(vertex.getLabel());
     }
+
+    public void removeVertexAndEdges(Vertex vertex) {
+        GraphVertex gv = getGraphVertex(vertex);
+        if (gv == null) {
+            return;
+        }
+        vertices.remove(vertex.getLabel());
+        for (Edge e: gv.getOutgoing()) {
+            GraphVertex target = vertices.get(e.getToVertex().getLabel());
+            if (target != null) {
+                target.removeIncoming(e);
+            }
+        }
+        for (Edge e: gv.getIncoming()) {
+            GraphVertex source = vertices.get(e.getFromVertex().getLabel());
+            if (source != null) {
+                source.removeIncoming(e);
+            }
+        }
+    }
+    
     
     public Envelope getExtent() {
         Envelope env = new Envelope();

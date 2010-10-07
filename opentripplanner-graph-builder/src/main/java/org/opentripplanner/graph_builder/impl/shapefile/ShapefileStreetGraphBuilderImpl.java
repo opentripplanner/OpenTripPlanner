@@ -217,8 +217,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
-                street.setTraversalPermission(permissions.getFirst());
-                backStreet.setTraversalPermission(permissions.getSecond());
+                street.setPermission(permissions.getFirst());
+                backStreet.setPermission(permissions.getSecond());
 
                 P2<Double> effectiveLength;
                 if (safetyConverter != null) {
@@ -246,7 +246,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             }
             features.close(it2);
 
-            StreetUtils.unify(graph, intersectionsByLocation.values());
+            //StreetUtils.unify(graph, intersectionsByLocation.values());
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);
         }       

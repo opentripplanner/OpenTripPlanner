@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -73,8 +72,8 @@ public class StreetVertex extends GenericVertex {
     }
 
     public StreetVertex(String id, LineString geometry, String name, double length, boolean back) {
-        super((id + (back ? " back" : "")).intern(), getCoord(geometry), name);
-        this.edgeId = id;
+        super(id.intern() + (back ? " back" : ""), getCoord(geometry), name);
+        this.edgeId = id.intern();
         this.geometry = geometry;
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
@@ -312,45 +311,39 @@ public class StreetVertex extends GenericVertex {
         return false;
     }
 
-    public double computeWeight(State s0, TraverseOptions wo, double time) {
+    public double computeWeight(State s0, TraverseOptions options, double time) {
         double weight;
-        if (wo.wheelchairAccessible) {
+        if (options.wheelchairAccessible) {
             // in fact, a wheelchair user will probably be going slower
             // than a cyclist, having less wind resistance, but will have
             // a stronger preference for less work. Maybe it
             // evens out?
-            weight = slopeSpeedEffectiveLength / wo.speed;
-        } else if (wo.modes.contains(TraverseMode.BICYCLE)) {
-            switch (wo.optimizeFor) {
+            weight = slopeSpeedEffectiveLength / options.speed;
+        } else if (options.modes.contains(TraverseMode.BICYCLE)) {
+            switch (options.optimizeFor) {
             case SAFE:
-                weight = bicycleSafetyEffectiveLength / wo.speed;
+                weight = bicycleSafetyEffectiveLength / options.speed;
                 break;
             case FLAT:
                 weight = slopeCostEffectiveLength;
                 break;
             case QUICK:
-                weight = slopeSpeedEffectiveLength / wo.speed;
+                weight = slopeSpeedEffectiveLength / options.speed;
                 break;
             default:
                 // TODO: greenways
-                weight = length / wo.speed;
+                weight = length / options.speed;
             }
         } else {
             weight = time;
         }
-        if (s0.walkDistance > wo.maxWalkDistance && wo.modes.getTransit()) {
-            weight *= 100;
-        }
-        weight *= wo.walkReluctance;
+        weight *= options.distanceWalkFactor(s0.walkDistance + length / 2);
+        weight *= options.walkReluctance;
         return weight;
     }
 
     public void setSlopeOverride(boolean slopeOverride) {
         this.slopeOverride = slopeOverride;
-    }
-
-    public void setTraversalPermission(StreetTraversalPermission permission) {
-        this.permission = permission;
     }
 
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
@@ -365,7 +358,7 @@ public class StreetVertex extends GenericVertex {
         return edgeId;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return geometry;
     }
 
@@ -383,10 +376,6 @@ public class StreetVertex extends GenericVertex {
 
     public void setPermission(StreetTraversalPermission permission) {
         this.permission = permission;
-    }
-
-    public boolean getWheelchairAccessible(double slope) {
-        return wheelchairAccessible && maxSlope <= slope;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {

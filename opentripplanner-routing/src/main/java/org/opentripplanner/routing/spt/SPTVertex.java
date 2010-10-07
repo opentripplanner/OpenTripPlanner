@@ -22,6 +22,8 @@ import org.opentripplanner.routing.core.State;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/** A vertex in the ShortestPathTree */
+
 public class SPTVertex implements Vertex {
     
     private static final long serialVersionUID = -4422788581123655293L;
@@ -34,6 +36,7 @@ public class SPTVertex implements Vertex {
     
     public TraverseOptions options;
 
+    /** Total cost to this vertex */
     public double weightSum;
 
     public int hops;

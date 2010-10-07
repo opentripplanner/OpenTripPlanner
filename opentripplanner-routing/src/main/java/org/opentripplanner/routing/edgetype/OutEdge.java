@@ -20,6 +20,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -32,7 +34,7 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     private static final long serialVersionUID = -4922790993642455605L;
 
 
-    public OutEdge(StreetVertex fromv, EndpointVertex tov) {
+    public OutEdge(StreetVertex fromv, Vertex tov) {
         super(fromv, tov);
     }
     private static String getDirection(Coordinate a, Coordinate b) {
@@ -119,5 +121,17 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
 
     public boolean canTraverse(TraverseOptions options) {
         return ((StreetVertex) fromv).canTraverse(options);
+    }
+    @Override
+    public double getLength() {
+        return ((StreetVertex) fromv).getLength();
+    }
+    @Override
+    public PackedCoordinateSequence getElevationProfile(double start, double end) {
+        return ((StreetVertex) fromv).getElevationProfile(start, end);
+    }
+    @Override
+    public StreetTraversalPermission getPermission() {
+        return ((StreetVertex) fromv).getPermission();
     }
 }
