@@ -321,6 +321,22 @@ otp.planner.poi.Control = {
         {
         }
     },
+    
+    /**
+     * reverse the styles on the markers
+     * (this happens when the user reverses start/end locations
+     */
+    reverseStyles : function() {
+        for (var i = 0; i < this.m_features.length; i++) {
+            var feature = this.m_features[i];
+            if (feature.style === otp.planner.poi.Style.fromTrip) {
+                feature.style = otp.planner.poi.Style.toTrip;
+            } else if (feature.style === otp.planner.poi.Style.toTrip) {
+                feature.style = otp.planner.poi.Style.fromTrip;
+            }
+        }
+        this.layer.redraw();
+    },
 
     CLASS_NAME: "otp.planner.poi.Control"
 };

@@ -37,6 +37,8 @@ otp.planner.Planner = {
     poi                     : null,
     fromToOverride          : null,
     linkTemplates           : null,
+    geocoder                : null,
+    useOptionDependencies   : null,
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -294,6 +296,7 @@ otp.planner.Planner = {
                 this.ui.innerSouth.hide();
                 this.ui.viewport.doLayout();
             }
+            this.m_forms.panelActivated();
         }
     },
 

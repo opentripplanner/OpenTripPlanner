@@ -29,6 +29,7 @@ otp.core.ComboBox = {
     label        : 'Form',
     display      : 'display',
     cls          : '',
+    changeHandler : null,
 
     anchor       : '95%',
     msgTarget    : 'qtip',
@@ -40,7 +41,14 @@ otp.core.ComboBox = {
     initialize : function(config)
     {
         otp.configure(this, config);
-
+        
+        // we can also have a change handler passed in,
+        // which otp.configure doesn't copy over because
+        // it's a function
+        if (typeof config.changeHandler === "function") {
+            this.changeHandler = config.changeHandler;
+        }
+        
         this.m_store = new Ext.data.SimpleStore({
             fields: [this.display],
             data: Ext.state.Manager.get(this.id, [])
@@ -53,34 +61,39 @@ otp.core.ComboBox = {
             '</div>',
             '</tpl>'
         );
+        
+        var formOptions = {
+                id:            this.id,
+                cls:           this.cls,
+                hiddenName:    this.name,
+                fieldLabel:    this.label,
+                displayField:  this.display,
+                msgTarget:     this.msgTarget,
+                tpl:           this.m_template,
+                emptyText:     this.emptyText,
+                valueNotFoundText: '',
+                store:         this.m_store,
+                mode:          'local',
+                anchor:        this.anchor,
+                triggerAction: 'all',
+                allowBlank:    false,
+                typeAhead:     false,
+                resizable:     true,
+                maxHeight :    this.maxHeight,
+                lazyRender:    false,
+                selectOnFocus: true,
+                hideLabel:     true
+        };
+        if (this.changeHandler) {
+            formOptions.listeners = {change: this.changeHandler};
+        }
 
-        this.m_form  = new Ext.form.ComboBox({
-            id:            this.id,
-            cls:           this.cls,
-            hiddenName:    this.name,
-            fieldLabel:    this.label,
-            displayField:  this.display,
-            msgTarget:     this.msgTarget,
-            tpl:           this.m_template,
-            emptyText:     this.emptyText,
-            valueNotFoundText: '',
-            store:         this.m_store,
-            mode:          'local',
-            anchor:        this.anchor,
-            triggerAction: 'all',
-            allowBlank:    false,
-            typeAhead:     false,
-            resizable:     true,
-            maxHeight :    this.maxHeight,
-            lazyRender:    false,
-            selectOnFocus: true,
-            hideLabel:     true
-        });
+        this.m_form  = new Ext.form.ComboBox(formOptions);
     },
 
     /**
-     * persist Ext ComboBox's text field content into a Cookie 
-     */
+	 * persist Ext ComboBox's text field content into a Cookie
+	 */
     persist : function(text) 
     {
         // either use passed in text

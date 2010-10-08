@@ -22,6 +22,8 @@
     <js>/js/otp/core/Measure.js</js>
     <js>/js/otp/core/UI.js</js>
     <js>/js/otp/planner/Utils.js</js>
+    <js>/js/otp/planner/FormsOptionsManager.js</js>
+    <js>/js/otp/planner/GeocoderResultsSelector.js</js>
     <js>/js/otp/planner/Forms.js</js>
     <js>/js/otp/planner/Itinerary.js</js>
     <js>/js/otp/planner/Planner.js</js>

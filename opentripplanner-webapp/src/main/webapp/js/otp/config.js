@@ -40,11 +40,11 @@ otp.config = {
         // what other options are shown in the form
         'useOptionDependencies': false,
         'geocoder': {
-            enabled: true,
+            enabled: false,
             url: "/geocoder/geocode",
             addressParamName: "address"
         }
-        //'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
+        'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
     },
 
     'map': {
