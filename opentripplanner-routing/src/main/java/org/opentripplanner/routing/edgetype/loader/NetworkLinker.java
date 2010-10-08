@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -56,6 +57,9 @@ public class NetworkLinker {
     private GeometryFactory geometryFactory;
 
     private StreetVertexIndexServiceImpl index;
+
+    /* by default traverse options support walking only, which is what we want */
+    private TraverseOptions options = new TraverseOptions();
 
     public NetworkLinker(Graph graph) {
         replacements = new HashMap<HashSet<Edge>, LinkedList<P2<PlainStreetEdge>>>();
@@ -106,6 +110,7 @@ public class NetworkLinker {
                 Vertex location = getLocation(v, index);
                 if (location == null) {
                     _log.warn("Stop " + ts + " not near any streets; it will not be usable");
+                    getLocation(v, index);
                 } else {
                     boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                     graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
@@ -140,7 +145,7 @@ public class NetworkLinker {
         }
 
         /* split an edge bundle? */
-        Collection<Edge> edges = index.getClosestEdges(coordinate, null);
+        Collection<Edge> edges = index.getClosestEdges(coordinate, options );
         if (edges == null || edges.size() < 2) {
             return null;
         }
@@ -280,9 +285,7 @@ public class NetworkLinker {
         
         List<Vertex> startVertices = index.getIntersectionAt(startVertex.getCoordinate());
         for (Vertex v : startVertices) {
-            if (v != startVertex) {
-                graph.addEdge(new FreeEdge(newStart, v));
-            }
+            graph.addEdge(new FreeEdge(newStart, v));
         }
         
         /* and likewise end */
@@ -292,9 +295,7 @@ public class NetworkLinker {
         
         List<Vertex> endVertices = index.getIntersectionAt(endVertex.getCoordinate());
         for (Vertex v : endVertices) {
-            if (v != endVertex) {
-                graph.addEdge(new FreeEdge(newEnd, v));
-            }
+            graph.addEdge(new FreeEdge(newEnd, v));
         }
         
         /* create the replacement edges */

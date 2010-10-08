@@ -212,7 +212,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Envelope envelope = new Envelope(coordinate);
         List<Edge> nearby = new LinkedList<Edge>();
         int i = 0;
-        double envelopeGrowthRate = 0.0005;
+        double envelopeGrowthRate = 0.0002;
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
         while (nearby.size() < 1 && i < 10) {
@@ -239,6 +239,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         continue;
                     Geometry g = e.getGeometry();
                     if (g != null) {
+                        if (options != null && e instanceof StreetEdge) {
+                            if (!((StreetEdge) e).canTraverse(options)) {
+                                continue;
+                            }
+                        }
                         double distance = g.distance(p);
                         if (distance < bestDistance) {
                             bestDistance = distance;

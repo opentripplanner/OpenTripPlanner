@@ -15,49 +15,70 @@ package org.opentripplanner.graph_builder.services;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 
 public class StreetUtils {
 
     /**
-     * Merge certain unnecessary vertices of a street graph.  Specifically,
-     * deletes a @{link StreetVertex} if it has connections only to two neighbors, 
-     * and has the same name as one of those neighbors.
-     *   
-     * @param graph
+     * Make an ordinary graph into an edge-based graph.
+     * @param endpoints 
+     * @param coordinateToStreetNames 
      */
-    public static void unify(Graph graph) {
-        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(graph.getVertices());
-        for (GraphVertex gv : vertices) {
-            if (gv.getDegreeOut() == 2 && gv.getDegreeIn() == 2) {
-                //this corner may be entirely removable
-
-                Collection<Edge> edges = gv.getOutgoing();
-                Iterator<Edge> it = edges.iterator();
-                Edge out1 = it.next();
-                Edge out2 = it.next();
-
-                if (out1.getName() == out2.getName() && out1.getName() != null) {
-                    //remove vertex
-                    GenericVertex tov1 = (GenericVertex) out1.getToVertex();
-                    /*
-                    GenericVertex tov2 = (GenericVertex) out2.getToVertex();
-                    graph.removeVertex(gv.vertex);
-                    for (Edge e: gv.getIncoming()) {
-                        graph.getGraphVertex(e.getFromVertex()).removeOutgoing(e);
+    public static void makeEdgeBased(Graph graph, Collection<Vertex> endpoints) {
+        /* generate turns */
+        
+        ArrayList<Edge> turns = new ArrayList<Edge>(endpoints.size());
+        for (Vertex v : endpoints) {
+            for (Edge e : graph.getIncoming(v)) {
+                boolean replaced = false;
+                StreetVertex v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
+                for (Edge e2 : graph.getOutgoing(v)) {
+                    StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
+                    if (v1 != v2 && !v1.getEdgeId().equals(v2.getEdgeId())) {
+                        turns.add(new TurnEdge(v1, v2));
+                        replaced = true;
                     }
-                    graph.getGraphVertex(tov1).removeIncoming(out1);
-                    graph.getGraphVertex(tov2).removeIncoming(out2);
-*/
-                    tov1.mergeFrom(graph, (GenericVertex) gv.vertex);
+                }
+                if (!replaced) {
+                    e.setFromVertex(v1);
+                    turns.add(e);
                 }
             }
         }
+        /* remove standard graph */
+
+        for (Vertex v : endpoints) {
+            graph.removeVertexAndEdges(v);
+        }
+        /* add turns */
+        for (Edge e : turns) {
+            graph.addEdge(e);
+        }
     }
 
+    private static StreetVertex getStreetVertexForEdge(Graph graph, PlainStreetEdge e) {
+        boolean back = e.back;
+        
+        String id = e.getId();
+        Vertex v = graph.getVertex(id + (back ? " back" : ""));
+        if (v != null) {
+            return (StreetVertex) v;
+        }
+
+        StreetVertex newv = new StreetVertex(id, e.getGeometry(), e.getName(), e.getLength(), back);
+        newv.setWheelchairAccessible(e.isWheelchairAccessible());
+        newv.setBicycleSafetyEffectiveLength(e.getBicycleSafetyEffectiveLength());
+        newv.setCrossable(e.isCrossable());
+        newv.setPermission(e.getPermission());
+        newv.setSlopeOverride(e.getSlopeOverride());
+        newv.setElevationProfile(e.getElevationProfile());
+        graph.addVertex(newv);
+        return newv;
+    }
 }

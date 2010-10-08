@@ -278,4 +278,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWit
         return new PackedCoordinateSequence.Double(coordList.toArray(coordArr));
     }
 
+    public void setSlopeOverride(boolean slopeOverride) {
+        this.slopeOverride = slopeOverride;
+    }
+
 }

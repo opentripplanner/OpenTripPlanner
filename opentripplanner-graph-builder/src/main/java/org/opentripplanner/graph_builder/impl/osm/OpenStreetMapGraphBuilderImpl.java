@@ -29,16 +29,15 @@ import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -206,7 +205,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (wayIndex % 1000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
-
                 StreetTraversalPermission permissions = getPermissionsForEntity(way);
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
@@ -301,57 +299,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            /* create an edge-based graph */
+            StreetUtils.makeEdgeBased(graph, endpoints);
             
-            /* generate turns */
-
-            ArrayList<Edge> turns = new ArrayList<Edge>(endpoints.size());
-            for (Vertex v : endpoints) {
-                for (Edge e : graph.getIncoming(v)) {
-                    boolean replaced = false;
-                    StreetVertex v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
-                    for (Edge e2 : graph.getOutgoing(v)) {
-                        StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
-                        if (v1 != v2 && !v1.getEdgeId().equals(v2.getEdgeId())) {
-                            turns.add(new TurnEdge(v1, v2));
-                            replaced = true;
-                        }
-                    }
-                    if (!replaced) {
-                        e.setFromVertex(v1);
-                        turns.add(e);
-                    }
-                }
-            }
-            /* remove standard graph */
-
-            for (Vertex v : endpoints) {
-                graph.removeVertexAndEdges(v);
-            }
-            /* add turns */
-            for (Edge e : turns) {
-                graph.addEdge(e);
-            }
-        }
-
-        private StreetVertex getStreetVertexForEdge(Graph graph, PlainStreetEdge e) {
-            boolean back = e.back;
-            
-            String id = e.getId();
-            Vertex v = graph.getVertex(id + (back ? " back" : ""));
-            if (v != null) {
-                return (StreetVertex) v;
-            }
-
-            StreetVertex newv = new StreetVertex(id, e.getGeometry(), e.getName(), e.getLength(), back);
-            newv.setWheelchairAccessible(e.isWheelchairAccessible());
-            newv.setBicycleSafetyEffectiveLength(e.getBicycleSafetyEffectiveLength());
-            newv.setCrossable(e.isCrossable());
-            newv.setPermission(e.getPermission());
-            newv.setSlopeOverride(e.getSlopeOverride());
-            newv.setElevationProfile(e.getElevationProfile());
-            graph.addVertex(newv);
-            return newv;
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {

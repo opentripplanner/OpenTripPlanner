@@ -69,19 +69,16 @@ public class TestPatternHopFactory extends TestCase {
             
             StreetVertex front = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false));
             StreetVertex back = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true));
-
+            
             TurnEdge street = new TurnEdge(front, back);
             graph.addEdge(street);
+            
             TurnEdge street2 = new TurnEdge(back, front);
             graph.addEdge(street2);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);
         nl.createLinkage();
-        
-        Vertex near_b = graph.getVertex("near_B");
-        
-        assertTrue(graph.getIncoming(near_b.getLabel()).size() >= 2);
     }
 
     public void testBoardAlight() throws Exception {
