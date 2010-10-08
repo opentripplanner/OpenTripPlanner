@@ -43,7 +43,7 @@ otp.config = {
             enabled: false,
             url: "/geocoder/geocode",
             addressParamName: "address"
-        }
+        },
         'fromToOverride' : new Ext.Template("<div class='mapHelp'>Right-click on the map to designate the start and end of your trip.</div>")
     },
 
