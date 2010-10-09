@@ -86,9 +86,27 @@ class NonFreeEdge extends FreeEdge {
     
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
-    State s1 = s0.clone();
-    return new TraverseResult(weight, s1);
+        State s1 = s0.clone();
+        return new TraverseResult(weight, s1);
+    }
 }
+
+class ForbiddenEdge extends FreeEdge {
+    private static final long serialVersionUID = 1L;
+
+    public ForbiddenEdge(Vertex from, Vertex to) {
+        super(from, to);
+    }
+
+    @Override
+    public TraverseResult traverse(State s0, TraverseOptions options) {
+        return null;
+    }
+    
+    @Override
+    public TraverseResult traverseBack(State s0, TraverseOptions options) {
+        return null;
+    }
 }
 
 public class TestContractionHeirarchies extends TestCase {
@@ -304,7 +322,7 @@ public class TestContractionHeirarchies extends TestCase {
             Envelope env = new Envelope(c);
             env.expandBy(50 * expansion);
             List<Vertex> nearby = tree.query(env);
-            while (nearby.size() < 6) {
+            while (nearby.size() < 7) {
                 env.expandBy(50);
                 expansion += 1;
                 nearby = tree.query(env);
@@ -318,6 +336,8 @@ public class TestContractionHeirarchies extends TestCase {
                 graph.addEdge(new FreeEdge(v, n));
                 graph.addEdge(new FreeEdge(n, v));
             }
+            Vertex badTarget = nearby.get(6);
+            graph.addEdge(new ForbiddenEdge(badTarget, v));
         }
 
         // ensure that graph is connected

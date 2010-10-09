@@ -105,6 +105,9 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
             TraverseResult result = e.traverse(state, options);
+            if (result == null) {
+                continue;
+            }
             Vertex u = e.getFromVertex();
             us.add(new VertexIngress(u, e, result.weight, result.state.getTime()));
         }
@@ -124,6 +127,9 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
             TraverseResult result = e.traverse(state, options);
+            if (result == null) {
+                continue;
+            }
             Vertex w = e.getToVertex();
             wSet.add(w);
             ws.add(new VertexIngress(w, e, result.weight, result.state.getTime()));
@@ -141,6 +147,9 @@ public class ContractionHierarchy implements Serializable {
                     continue;
                 }
                 result = incoming.traverse(state, options);
+                if (result == null) {
+                    continue;
+                }
                 List<VertexIngress> xneighbors = neighbors.get(x);
                 if (xneighbors == null) {
                     xneighbors = new ArrayList<VertexIngress>();
@@ -186,6 +195,10 @@ public class ContractionHierarchy implements Serializable {
                             continue;
                         }
                         TraverseResult result = e.traverse(state, options);
+                        if (result == null) {
+                            toRemove.add(e);
+                            continue;
+                        }
                         if (s.weightSum < result.weight) {
                             // the path found by Dijkstra from u to e.tov is better
                             // than the path through e. Therefore e can be deleted.
@@ -588,6 +601,11 @@ public class ContractionHierarchy implements Serializable {
                 Vertex toVertex = e.getToVertex();
                 curs = spt.getVertex(toVertex);
                 TraverseResult result = e.traverse(dummy, options);
+                if (result == null) {
+                    //it is safe to remove edges that are not traversable anyway
+                    toRemove.add(e);
+                    continue;
+                }
                 if (curs != null && curs.getParent().getFromVertex().mirror != v
                         && curs.weightSum <= result.weight + .01) {
                     toRemove.add(e);
