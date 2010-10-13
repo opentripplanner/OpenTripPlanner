@@ -67,10 +67,24 @@ otp.planner.StaticForms = {
     m_fromCoord      : otp.util.Constants.BLANK_LAT_LON,
     m_toCoord        : otp.util.Constants.BLANK_LAT_LON,
 
-    m_xmlRespRecord  : null, 
+    m_xmlRespRecord  : null,
+    
+    // geocoder config
+    geocoder         : {},
+    
+    // to enable masking of the from/to fields
+    m_fromToFP       : null,
+    
+    // hold state for whether geocoding is currently active
+    m_fromGeocoding  : false,
+    m_toGeocoding    : false,
+    
+    // whether to have the planner form options dependent
+    // ie, selecting the mode affects what others options you can select
+    useOptionDependencies : false,
 
     /**
-     * @consturctor
+     * @constructor
      * @param {Object} config
      */
     initialize : function(config)
@@ -86,11 +100,11 @@ otp.planner.StaticForms = {
             },
             ['date', 'time', 'from', 'to', 'locations', 'fromList', 'toList']
         );
-
+        
         this.makeMainPanel();
 
-        // step 3: set the singleton & statis stuff to this 
-        otp.planner.StaticForms = this;
+        // step 3: set the singleton & status stuff to this 
+        otp.planner.StaticForms = this;        
     },
 
     /**
@@ -106,6 +120,25 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
+        if (this.m_fromGeocoding || this.m_toGeocoding) {
+            // if we are currently waiting for a geocoder response,
+            // then let's wait until we get a response before we submit
+            // the form
+            setTimeout(this.submit.createDelegate(this), 5);
+            return;
+        }
+        
+        if (this.m_fromForm.getComboBox().activeError ||
+            this.m_toForm.getComboBox().activeError) {
+            Ext.Msg.show({
+                title: "Review trip plan",
+                msg: "Please correct errors before planning your trip"
+            });
+            setTimeout(function() { Ext.Msg.hide(); }, 3000);
+            return;
+        }
+        
+
         // hide stuff that might be open
         this.collapseComboBoxes();
         this.hideErrorDialogs();
@@ -136,7 +169,7 @@ otp.planner.StaticForms = {
         this.collapseComboBoxes();
         this.hideErrorDialogs();
 
-        // step 3: fixe up some of the form values before sending onto the trip planner web service
+        // step 3: fix up some of the form values before sending onto the trip planner web service
         form.setValues({
             fromPlace: this.getFrom(),
             toPlace:   this.getTo()
@@ -361,12 +394,17 @@ otp.planner.StaticForms = {
     /** TODO: from & to form values must be re-thought we only allow one value x,y -or- string value */ 
     getFrom : function()
     {
+        /*
         var retVal = this.m_fromForm.getRawValue();
         if(retVal == null || retVal.length < 1)
             retVal = this.m_fromPlace.getRawValue();
         if(retVal == null || retVal.length < 1)
             retVal = this.m_fromCoord;
         return retVal;
+        */
+        return this.m_fromCoord ||
+               this.m_fromForm ||
+               this.m_fromPlace;
     },
 
 
@@ -378,12 +416,12 @@ otp.planner.StaticForms = {
     setFrom : function(fString, x, y, moveMap, noPoi)
     {
         this.focus();
-        otp.util.ExtUtils.formSetRawValue(this.m_fromForm, fString);
+//        otp.util.ExtUtils.formSetRawValue(this.m_fromForm, fString);
         if(x && x > -181.1 && y && y > -181.1) 
         {
             this.m_fromCoord = x + ',' + y;
-            this.setRawInput(this.m_fromCoord, this.m_fromForm);
-            this.setRawInput(this.m_fromCoord, this.m_fromPlace);
+//            this.setRawInput(this.m_fromCoord, this.m_fromForm);
+//            this.setRawInput(this.m_fromCoord, this.m_fromPlace);
             if(this.poi && !noPoi) this.poi.setFrom(y, x, fString, moveMap);
         }
     },
@@ -391,12 +429,17 @@ otp.planner.StaticForms = {
     /** will look in text forms first, then hidden form variable, then coordinate for value */
     getTo : function()
     {
+        /*
         var retVal = this.m_toForm.getRawValue();
         if(retVal == null || retVal.length < 1)
             retVal = this.m_toPlace.getRawValue();
         if(retVal == null || retVal.length < 1)
             retVal = this.m_toCoord;
         return retVal;
+        */
+        return this.m_toCoord ||
+               this.m_toForm ||
+               this.m_toPlace;
     },
 
     /**
@@ -406,12 +449,12 @@ otp.planner.StaticForms = {
     setTo : function(tString, x, y, moveMap, noPoi)
     {
         this.focus();
-        otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString);
+//        otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString);
         if(x && x > -180.1 && y && y > -181.1) 
         {
             this.m_toCoord = x + ',' + y;
-            this.setRawInput(this.m_toCoord, this.m_toForm);
-            this.setRawInput(this.m_toCoord, this.m_toPlace);
+//            this.setRawInput(this.m_toCoord, this.m_toForm);
+//            this.setRawInput(this.m_toCoord, this.m_toPlace);
             if(this.poi && !noPoi) this.poi.setTo(y, x, tString, moveMap);
         }
     },
@@ -455,6 +498,17 @@ otp.planner.StaticForms = {
             this.setRawInput(params.fromPlace, forms.m_fromPlace);
             this.setRawInput(params.toPlace,   forms.m_toForm);
             this.setRawInput(params.toPlace,   forms.m_toPlace);
+            
+            if (params.fromPlace && params.fromPlace.length > 2 && params.fromPlace.indexOf(",") > 0) {
+                var lat = this.getLat(params.fromPlace);
+                var lon = this.getLon(params.fromPlace);
+                this.setFrom(params.fromPlace, lat, lon, false, false);
+            }
+            if (params.toPlace && params.toPlace.length > 2 && params.toPlace.indexOf(",") > 0) {
+                var lat = this.getLat(params.toPlace);
+                var lon = this.getLon(params.toPlace);
+                this.setTo(params.toPlace, lat, lon, false, false);
+            }
 
             if(params.fromCoord && params.fromCoord.indexOf('0.0') != 0)
                 this.m_fromCoord = params.fromCoord;
@@ -679,7 +733,10 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getMapCoordinate();
-                this.setFrom(ll.lat+ "," + ll.lon, ll.lat, ll.lon);
+                var latlon = ll.lat + "," + ll.lon;
+                this.setFrom(latlon, ll.lat, ll.lon);
+                this.m_fromForm.setRawValue(latlon);
+                this.m_fromForm.getComboBox().clearInvalid();
             }
         }
         ,
@@ -689,7 +746,10 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getMapCoordinate();
-                this.setTo(ll.lat + "," + ll.lon, ll.lat, ll.lon);
+                var latlon = ll.lat + "," + ll.lon;
+                this.setTo(latlon, ll.lat, ll.lon);
+                this.m_toForm.setRawValue(latlon);
+                this.m_toForm.getComboBox().clearInvalid();
             }
         }
         ];
@@ -717,6 +777,7 @@ otp.planner.StaticForms = {
             border:      false,
             items:       fromToArray
         });
+        this.m_fromToFP = fromToFP;
 
         var optForms = this.makeOptionForms();
         var optFP = new Ext.form.FieldSet({
@@ -766,7 +827,36 @@ otp.planner.StaticForms = {
                 actioncomplete:  this.submitSuccess
         });
     },
-
+    
+    /**
+     * Restore the points of interest when the panel is activated
+     * Note that currently planner.js calls this function directly
+     * instead of it being wired in as an event handler, so that this
+     * can be called after the tabchange handler has been called
+     * (otherwise the renderer would clear the work done here because
+     * tabchange gets triggered after activate)
+     */
+    panelActivated: function() {
+        if (!this.poi) {
+            return;
+        }
+        if (this.m_fromCoord && this.m_fromCoord.length > 2) {
+            var x = this.getLat(this.m_fromCoord);
+            var y = this.getLon(this.m_fromCoord);
+            if (x != 0 && y != 0) {
+                this.poi.setFrom(y, x, this.m_fromCoord);
+            }
+        }
+        if (this.m_toCoord && this.m_toCoord.length > 2) {
+            var x = this.getLat(this.m_toCoord);
+            var y = this.getLon(this.m_toCoord);
+            if (x != 0 && y != 0) {
+                this.poi.setTo(y, x, this.m_toCoord);
+            }
+        }
+        var map = otp.core.MapSingleton.map;
+        var poiLayer = map.layers[1];
+    },
 
     /**
      * from & to form creation
@@ -780,8 +870,15 @@ otp.planner.StaticForms = {
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        this.m_fromForm = new otp.core.ComboBox({layout: 'anchor', id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from, label: '', cls: 'nudgeRight'});
-        this.m_toForm   = new otp.core.ComboBox({layout: 'anchor', id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to, label: '',   cls: 'nudgeRight'});
+        var comboBoxOptions = {layout: 'anchor', label: '', cls: 'nudgeRight', msgTarget: "under"};
+        var fromFormOptions = Ext.apply({}, {id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
+        var toFormOptions = Ext.apply({}, {id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to}, comboBoxOptions);
+        if (this.geocoder.enabled) {
+            fromFormOptions.changeHandler = this.fromChanged.createDelegate(this);
+            toFormOptions.changeHandler = this.toChanged.createDelegate(this);
+        }
+        this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
+        this.m_toForm   = new otp.core.ComboBox(toFormOptions);
         var rev  = new Ext.Button({
             tooltip:   this.locale.buttons.reverseMiniTip,
             id:        "form.reverse.id",
@@ -792,16 +889,29 @@ otp.planner.StaticForms = {
             tabIndex:  -1,
             handler : function(obj)
             {
+                // this reverses the form values
                 this.m_fromForm.reverse(this.m_toForm);
+                // but we should also reverse the coordinates themselves
+                var tmp = this.m_fromCoord;
+                this.m_fromCoord = this.m_toCoord;
+                this.m_toCoord = tmp;
+                // and also update the style on the map markers
+                if (this.poi) {
+                    this.poi.reverseStyles();
+                }
                 otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_FORM_REVERSE);
             }
         });
 
         // change events will clear out the from/to coordinate forms (don't want coords from old places getting confused with new requests)
-        this.m_fromForm.getComboBox().on({scope: this, focus  : this.clearFrom  });
-        this.m_fromForm.getComboBox().on({scope: this, select : this.selectFrom });
-        this.m_toForm.getComboBox().on(  {scope: this, focus  : this.clearTo    });
-        this.m_toForm.getComboBox().on(  {scope: this, select : this.selectTo   });
+        if (!this.geocoder.enabled) {
+            // but we only do this when the geocoder isn't enabled, because the forms have a separate change listener
+            // that manages this state when the geocoder is enabled
+            this.m_fromForm.getComboBox().on({scope: this, focus  : this.clearFrom  });
+            this.m_fromForm.getComboBox().on({scope: this, select : this.selectFrom });
+            this.m_toForm.getComboBox().on(  {scope: this, focus  : this.clearTo    });
+            this.m_toForm.getComboBox().on(  {scope: this, select : this.selectTo   });
+        }
 
         var inputPanel = {
             xtype:    'panel',
@@ -830,7 +940,170 @@ otp.planner.StaticForms = {
 
         return inputPanel;
     },
+    
+    _makeGeocoderRequest : function(address, successFn, failureFn, comboBoxIdentifier) {
+        if (!address || address.length < 1) {
+            return;
+        }
+        var loadMask = new Ext.LoadMask(this.m_fromToFP.getEl(), {msg: "Looking up address ...."});
+        loadMask.show();
+        
+        if (comboBoxIdentifier === "from") {
+            this.m_fromGeocoding = true;
+        } else if (comboBoxIdentifier === "to") {
+            this.m_toGeocoding = true;
+        }
 
+        var params = {};
+        params[this.geocoder.addressParamName] = address;
+        
+        var self = this;
+        Ext.Ajax.request( {
+            url: this.geocoder.url,
+            method: "GET",
+            success: successFn,
+            failure: failureFn,
+            callback: function() {
+                loadMask.hide();
+                if (comboBoxIdentifier === "from") {
+                    self.m_fromGeocoding = false;
+                } else if (comboBoxIdentifier === "to") {
+                    self.m_toGeocoding = false;
+                }
+            },
+            params: params
+        });
+        ;
+    },
+    
+    fromChanged : function(comboBox, value) {
+        if (this.isCoordinate(value)) {
+            var lat = this.getLat(value);
+            var lng = this.getLon(value);
+            this.setFrom(value, lat, lng, true, false);
+        } else {
+            this._makeGeocoderRequest(value,
+                    this.handleGeocoderResponse.createDelegate(this, ['from'], true),
+                    this.handleGeocoderFailure.createDelegate(this, ['from'], true),
+                    "from"
+            );
+        }
+    },
+    
+    toChanged : function(comboBox, value) {
+        if (this.isCoordinate(value)) {
+            var lat = this.getLat(value);
+            var lng = this.getLon(value);
+            this.setTo(value, lat, lng, true, false);
+        } else {
+            this._makeGeocoderRequest(value,
+                    this.handleGeocoderResponse.createDelegate(this, ['to'], true),
+                    this.handleGeocoderFailure.createDelegate(this, ['to'], true),
+                    "to"
+            );
+        }
+    },
+    
+    /**
+     * predicate to check if string looks like a lat,lon string
+     */
+    isCoordinate : function(value) {
+        var lat = parseFloat(this.getLat(value));
+        var lon = parseFloat(this.getLon(value));
+        return !isNaN(lat) && !isNaN(lon);
+    },
+
+    handleGeocoderResponse: function(response, ajaxOptions, comboBoxIdentifier) {
+        var xml = response.responseXML;
+        var errorNode = Ext.DomQuery.selectNode("error", xml);
+        if (errorNode) {
+            var errMsg = "error geocoding: " + errorNode.firstChild.nodeValue;
+            if (comboBoxIdentifier === "from") {
+                this.m_fromForm.getComboBox().markInvalid(errMsg);
+            } else if (comboBoxIdentifier === "to") {
+                this.m_toForm.getComboBox().markInvalid(errMsg);
+            }
+            return;
+        }
+
+        var countNode = Ext.DomQuery.selectNode("count", xml);
+
+        if (!countNode) {
+            var errMsg = "error parsing geocoder response";
+            if (comboBoxIdentifier === "from") {
+                this.m_fromForm.getComboBox().markInvalid(errMsg);
+            } else if (comboBoxIdentifier === "to") {
+                this.m_toForm.getComboBox().markInvalid(errMsg);
+            }
+            return;
+        }
+        
+        var count = parseInt(countNode.firstChild.nodeValue);
+        
+        if (isNaN(count) || count < 1) {
+            var errMsg = "Did not receive any results";
+            if (comboBoxIdentifier === "from") {
+                this.m_fromForm.getComboBox().markInvalid(errMsg);
+            } else if (comboBoxIdentifier === "to") {
+                this.m_toForm.getComboBox().markInvalid(errMsg);
+            }
+            return;
+        }
+        
+        if (count > 1) {
+            // ambiguous geocoder results
+            // ask the user to pick one
+            var self = this;
+            var xmlNodes = Ext.DomQuery.jsSelect("result", xml);
+            var resultsSelector = new otp.planner.GeocoderResultsSelector({
+                callback: function(lat, lng, description) {
+                  if (comboBoxIdentifier === "from") {
+                      self.setFrom(description, lat, lng, true, false);
+                  } else if (comboBoxIdentifier === "to") {
+                      self.setTo(description, lat, lng, true, false);
+                  }
+                },
+                geocoderResults: this.parseGeocoderResultXml(xmlNodes)
+            });
+            resultsSelector.displayDialog();
+        } else {
+            // should have only 1 result
+            // parse that result and set appropriately
+            var lat = Ext.DomQuery.selectNode("lat", xml).firstChild.nodeValue;
+            var lng = Ext.DomQuery.selectNode("lng", xml).firstChild.nodeValue;
+            var description = Ext.DomQuery.selectNode("description", xml).firstChild.nodeValue;
+            var latlng = lat + "," + lng;
+            
+            if (comboBoxIdentifier === "from") {
+                this.m_fromForm.getComboBox().clearInvalid();
+                this.setFrom(description, lat, lng, true, false);
+            } else if (comboBoxIdentifier === "to") {
+                this.m_toForm.getComboBox().clearInvalid();
+                this.setTo(description, lat, lng, true, false);
+            }
+        }        
+    },
+    
+    handleGeocoderFailure: function(response, ajaxOptions, comboBoxIdentifier) {
+        console.log("geocoder failure");
+        console.log(response);
+        console.log("geocoder failure options");
+        console.log(ajaxOptions);
+        console.log("geocoding for combobox: " + comboBoxIdentifier);
+    },
+
+    // parse xml nodes returned from geocoder into an array of arrays
+    // suitable to pass into the geocoder results selector
+    parseGeocoderResultXml : function(xmlNodes) {
+        var result = [];
+        Ext.each(xmlNodes, function(node) {
+            var lat = Ext.DomQuery.selectNode("lat", node).firstChild.nodeValue;
+            var lng = Ext.DomQuery.selectNode("lng", node).firstChild.nodeValue;
+            var description = Ext.DomQuery.selectNode("description", node).firstChild.nodeValue;
+            result.push([lat, lng, description]);
+        });
+        return result;
+    },
 
     /**
      * from & to form creation
@@ -941,7 +1214,9 @@ otp.planner.StaticForms = {
             lazyRender:     false,
             typeAhead:      true,
             forceSelection: true,
-            selectOnFocus:  true
+            selectOnFocus:  true,
+            // lastQuery prevents any filters from being cleared initially
+            lastQuery:      ''
         });
 
         this.m_maxWalkDistanceForm = new Ext.form.ComboBox({
@@ -1004,7 +1279,16 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        return [this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_modeForm, this.m_wheelchairForm];
+        if (this.useOptionDependencies) {
+            this.m_optionsChangeManager = new otp.planner.FormsOptionsManager({
+                mode:        this.m_modeForm,
+                optimize:    this.m_optimizeForm,
+                maxWalk:     this.m_maxWalkDistanceForm,
+                wheelchair:  this.m_wheelchairForm
+            });
+        }
+
+        return [this.m_modeForm, this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_wheelchairForm];
     },
 
     CLASS_NAME: "otp.planner.Forms"
