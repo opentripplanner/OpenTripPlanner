@@ -47,6 +47,7 @@ public class TransitServerGtfs {
     private File gtfsFile;
     private GtfsContext gtfsContext;
     private String geoserverBaseUri;
+	private String defaultAgencyId;
 
     public void setGtfsFile(File gtfsFile) {
         this.gtfsFile = gtfsFile;
@@ -58,6 +59,14 @@ public class TransitServerGtfs {
     
     public void setGtfsContext(GtfsContext gtfsContext) {
         this.gtfsContext = gtfsContext;
+    }
+    
+    public String getDefaultAgencyId() {
+    	return defaultAgencyId;
+    }
+    
+    public void setDefaultAgencyId(String defaultAgencyId) {
+    	this.defaultAgencyId = defaultAgencyId;
     }
 
     public GtfsContext getGtfsContext() {
@@ -79,8 +88,11 @@ public class TransitServerGtfs {
         if (geoserverBaseUri == null) {
             throw new IllegalStateException("Geoserver base uri not set");
         }
+        if (defaultAgencyId == null) {
+        	throw new IllegalStateException("defaultAgencyId not set");
+        }
         System.out.println("Reading gtfs file: " + gtfsFile.getPath());
-        this.setGtfsContext(GtfsLibrary.readGtfs(gtfsFile));
+        this.setGtfsContext(GtfsLibrary.readGtfs(gtfsFile, defaultAgencyId));
         System.out.println("GTFS loaded");
         this.assembleGtfsData();
         System.out.println("GTFS data assembled");

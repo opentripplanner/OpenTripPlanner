@@ -457,11 +457,12 @@ otp.planner.Itinerary = {
     {
         var fmTxt = otp.planner.Templates.TP_START.applyTemplate(from.data);
         var toTxt = otp.planner.Templates.TP_END.applyTemplate(to.data);
-        var tpTxt = otp.planner.Templates.TP_TRIPDETAILS.applyTemplate(itin.data);
 
         var fmId  = this.id + '-' + otp.planner.Utils.FROM_ID;
         var toId  = this.id + '-' + otp.planner.Utils.TO_ID;
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
+        
+        var containsBikeMode = false;
 
         var retVal = new Array();
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true},
@@ -479,7 +480,13 @@ otp.planner.Itinerary = {
             var agencyId = leg.get('agencyId');
             if(mode === 'walk' || mode === 'bicycle') 
             {
-                var verb = (mode === 'bicycle') ? 'Bike' : 'Walk';
+                var verb;
+                if (mode === 'bicycle') {
+                    verb = 'Bike';
+                    containsBikeMode = true;
+                } else {
+                    verb = 'Walk';
+                }
                 hasKids = false;
                 if (!leg.data.formattedSteps)
                 {
@@ -546,6 +553,11 @@ otp.planner.Itinerary = {
             icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
             retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }
+
+        var tripDetailsDistanceVerb = containsBikeMode ? "Bike" : "Walk";
+        var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
+        var tpTxt = otp.planner.Templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
+
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
 

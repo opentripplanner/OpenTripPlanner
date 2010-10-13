@@ -45,8 +45,6 @@ public class StreetLocation extends GenericVertex {
 
     private ArrayList<Edge> extra = new ArrayList<Edge>();
 
-    private Coordinate nearestPoint;
-
     private boolean wheelchairAccessible;
 
     public StreetLocation(String id, Coordinate nearestPoint, String name) {
@@ -81,7 +79,6 @@ public class StreetLocation extends GenericVertex {
 
         /* linking vertex with epsilon transitions */
         StreetLocation location = new StreetLocation(label, nearestPoint, name);
-        location.nearestPoint = nearestPoint;
 
         HashMap<Geometry, P2<StreetVertex>> cache = new HashMap<Geometry, P2<StreetVertex>>();
         for (Edge street : edges) {
@@ -116,21 +113,6 @@ public class StreetLocation extends GenericVertex {
 
     private void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    @Override
-    public double getX() {
-        return nearestPoint.x;
-    }
-
-    @Override
-    public double getY() {
-        return nearestPoint.y;
-    }
-
-    @Override
-    public Coordinate getCoordinate() {
-        return nearestPoint;
     }
 
     private static StreetVertex createHalfLocation(Graph graph, StreetLocation base, String label,

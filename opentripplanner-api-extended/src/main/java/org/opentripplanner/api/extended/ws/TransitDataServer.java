@@ -107,18 +107,20 @@ public class TransitDataServer {
                 }
             }
             reader.close();
+            
+            String defaultAgencyId = transitServerGtfs.getDefaultAgencyId();
 
             // if we have any stops, then that's the type of result we return
             if (stopIds.size() > 0) {
                 // if we've found any stop ids then we we use the first one
                 String stopId = stopIds.get(0);
-                return new WmsInfo(transitServerGtfs, new AgencyAndId("MTA NYCT", stopId));
+                return new WmsInfo(transitServerGtfs, new AgencyAndId(defaultAgencyId, stopId));
             } else if (routeIds.size() > 0) {
                 // we have only route ids back
                 // first we have to convert the ids to have the agency and id on them too
                 List<String> routeIdsWithAgencyId = new ArrayList<String>();
                 for (String routeId : routeIds) {
-                    routeIdsWithAgencyId.add("MTA NYCT " + routeId);
+                    routeIdsWithAgencyId.add(defaultAgencyId + " " + routeId);
                 }
                 return new WmsInfo(transitServerGtfs, routeIdsWithAgencyId);
             }            

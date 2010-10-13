@@ -53,7 +53,7 @@ otp.planner.Templates = {
         '<tr><td>Travel</td><td>{startTimeDisplay}</td></tr>',
         '<tr><td>Valid</td><td>{[new Date().format("F jS, Y @ g:ia")]}</td></tr>',
         '<tr><td>Time</td><td>{duration} minute<tpl if="duration != 1">s</tpl></td></tr>',
-        '<tpl if="walkDistance"><tr><td>Walk</td><td>{walkDistance}</td></tr></tpl>',
+        '<tpl if="walkDistance"><tr><td>{distanceVerb}</td><td>{walkDistance}</td></tr></tpl>',
     '</table></div>'
     ).compile(),
 
