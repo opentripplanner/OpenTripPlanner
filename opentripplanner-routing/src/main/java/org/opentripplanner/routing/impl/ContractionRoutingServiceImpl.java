@@ -57,6 +57,9 @@ public class ContractionRoutingServiceImpl implements RoutingService {
                     return null;
                 }
                 GraphPath path = spt.getPath(fromVertex);
+                if (path == null) {
+                    return null;
+                }
                 path.reverse();
                 return path;
             } else {
