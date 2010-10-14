@@ -26,6 +26,7 @@
     	    </bean>
     	</property>
     	<property name="geoserverBaseUri" value="http://openlayers.example.com/geoserver/wms" />
+		<property name="defaultAgencyId" value="DefaultAgencyIdGoesHere" />
     </bean>
     
 </beans>
