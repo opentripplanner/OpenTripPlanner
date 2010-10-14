@@ -14,8 +14,6 @@
 package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -37,15 +35,11 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,8 +91,6 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             FeatureCollection<SimpleFeatureType, SimpleFeature> features = featureSource
                     .getFeatures(query);
 
-            HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(features);
-
             features = featureSource.getFeatures(query);
 
             HashMap<String, HashMap<Coordinate, Integer>> intersectionNameToId = new HashMap<String, HashMap<Coordinate, Integer>>();
@@ -108,7 +100,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             SimpleFeatureConverter<P2<StreetTraversalPermission>> permissionConverter = _schema
                     .getPermissionConverter();
 
-            HashMap<Coordinate, P2<EndpointVertex>> intersectionsByLocation = new HashMap<Coordinate, P2<EndpointVertex>>();
+            HashMap<Coordinate, Vertex> intersectionsByLocation = new HashMap<Coordinate, Vertex>();
 
             SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
 
@@ -130,7 +122,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             }
             features.close(it2);
 
+            HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(featureList);
+            
+            int j = 0;
             for (SimpleFeature feature : featureList) {
+                System.out.println(j + "/" + featureList.size());
+                j++;
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
                 Object o = streetIdConverter.convert(feature);
@@ -161,29 +158,21 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
 
-                P2<EndpointVertex> startIntersection = intersectionsByLocation.get(startCoordinate);
+                Vertex startIntersection = intersectionsByLocation.get(startCoordinate);
                 if (startIntersection == null) {
-                    EndpointVertex in = new EndpointVertex(startIntersectionName + " in", startCoordinate.x,
-                            startCoordinate.y, startIntersectionName);
-                    EndpointVertex out = new EndpointVertex(startIntersectionName + " out", startCoordinate.x,
+                    startIntersection = new EndpointVertex(startIntersectionName, startCoordinate.x,
                             startCoordinate.y, startIntersectionName);
                     
-                    in = (EndpointVertex) graph.addVertex(in);
-                    out = (EndpointVertex) graph.addVertex(out);
-                    
-                    startIntersection = new P2<EndpointVertex>(in, out);
+                    startIntersection = (EndpointVertex) graph.addVertex(startIntersection);                  
+                    startIntersection = graph.addVertex(startIntersection);
                     intersectionsByLocation.put(startCoordinate, startIntersection);
                 }
 
-                P2<EndpointVertex> endIntersection = intersectionsByLocation.get(endCoordinate);
+                Vertex endIntersection = intersectionsByLocation.get(endCoordinate);
                 if (endIntersection == null) {
-                    EndpointVertex in = new EndpointVertex(endIntersectionName + " in", endCoordinate.x,
+                    endIntersection = new EndpointVertex(endIntersectionName, endCoordinate.x,
                             endCoordinate.y, endIntersectionName);
-                    EndpointVertex out = new EndpointVertex(endIntersectionName + " out", endCoordinate.x,
-                                    endCoordinate.y, endIntersectionName);
-                    in = (EndpointVertex) graph.addVertex(in);
-                    out = (EndpointVertex) graph.addVertex(out);
-                    endIntersection = new P2<EndpointVertex>(in, out);
+                    endIntersection = graph.addVertex(endIntersection);
                     intersectionsByLocation.put(endCoordinate, endIntersection);
                 }
 
@@ -192,33 +181,20 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     length += JTS.orthodromicDistance(coordinates[i],
                             coordinates[i + 1], worldCRS);
                 }
-                
-                StreetVertex street = new StreetVertex(id, geom, name, length, false);
-                graph.addVertex(street);
-                //StreetVertexImpl backStreet = new StreetVertexImpl(id, (LineString) geom.reverse(), name, length, false);
-                /* reverse is sometimes missing(?!) */
-                coordinates = geom.getCoordinates();
-                
-                Coordinate[] coordinatesCopy = Arrays.asList(coordinates).toArray(new Coordinate[0]);
-                Collections.reverse(Arrays.asList(coordinatesCopy));
-                LineString reversed = new GeometryFactory().createLineString(coordinatesCopy);
-                StreetVertex backStreet = new StreetVertex(id, reversed, name, length, true);
-                graph.addVertex(backStreet);
-                
-                graph.addEdge(new OutEdge(street, endIntersection.getFirst()));
-                graph.addEdge(new FreeEdge(startIntersection.getSecond(), street));
-                
-                graph.addEdge(new FreeEdge(endIntersection.getSecond(), backStreet));
-                graph.addEdge(new OutEdge(backStreet, startIntersection.getFirst()));
 
+                P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
+                PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
+                street.setId(id);
+                graph.addEdge(street);
+                
+                LineString reversed = (LineString) geom.reverse();
+                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
+                backStreet.setId(id);
+                graph.addEdge(backStreet);
+                
                 boolean slopeOverride = slopeOverrideCoverter.convert(feature);
                 street.setSlopeOverride(slopeOverride);
                 backStreet.setSlopeOverride(slopeOverride);
-
-                P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
-
-                street.setPermission(permissions.getFirst());
-                backStreet.setPermission(permissions.getSecond());
 
                 P2<Double> effectiveLength;
                 if (safetyConverter != null) {
@@ -231,36 +207,23 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             }
             /* generate turns */
             
-            for (P2<EndpointVertex> vertices: intersectionsByLocation.values()) {
-                Vertex in = vertices.getFirst();
-                Vertex out = vertices.getSecond();
-                for (Edge e : graph.getIncoming(in)) {
-                    StreetVertex v1 = (StreetVertex) e.getFromVertex();
-                    for (Edge e2 : graph.getOutgoing(out)) {
-                        StreetVertex v2 = (StreetVertex) e2.getToVertex();
-                        if (v1 != v2 && v1.getEdgeId() != v2.getEdgeId()) { 
-                            graph.addEdge(new TurnEdge(v1, v2));                            
-                        }
-                    }
-                }
-            }
+            StreetUtils.makeEdgeBased(graph, intersectionsByLocation.values());
+
             features.close(it2);
 
-            //StreetUtils.unify(graph, intersectionsByLocation.values());
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);
         }       
     }
 
     private HashMap<Coordinate, TreeSet<String>> getCoordinatesToStreetNames(
-            FeatureCollection<SimpleFeatureType, SimpleFeature> features) {
+            List<SimpleFeature> features) {
         HashMap<Coordinate, TreeSet<String>> coordinateToStreets = new HashMap<Coordinate, TreeSet<String>>();
         SimpleFeatureConverter<String> streetNameConverter = _schema.getNameConverter();
 
         SimpleFeatureConverter<Boolean> featureSelector = _schema.getFeatureSelector();
         Iterator<SimpleFeature> it = features.iterator();
         while (it.hasNext()) {
-
             SimpleFeature feature = it.next();
             if (featureSelector != null && !featureSelector.convert(feature)) {
                 continue;
@@ -283,7 +246,6 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        features.close(it);
         return coordinateToStreets;
     }
 

@@ -30,8 +30,9 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class TestShapefileStreetGraphBuilderImpl extends TestCase {
 
@@ -99,13 +100,51 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         GraphVertex start = null;
         GraphVertex end = null;
         GraphVertex carlton = null;
+        
+        Coordinate vanderbiltAtPark = new Coordinate(-73.969178, 40.676785);
+        Coordinate grandAtLafayette = new Coordinate(-73.999095, 40.720005);
+        Coordinate carltonAtPark = new Coordinate(-73.972347, 40.677447);
+
         for (GraphVertex gv : gg.getVertices()) {
             Vertex v = gv.vertex;
-            if (v.getLabel().startsWith("PARK PL at VANDERBILT AV out")) {
+            if (v.getCoordinate().distance(vanderbiltAtPark) < 0.00005) {
+                /* we need the correct vanderbilt at park.  In this case,
+                 * that's the one facing west on vanderbilt.
+                 */
+                int numParks = 0;
+                int numCarltons = 0;
+                for (Edge e: gv.getOutgoing()) {
+                    if (e.getToVertex().getName().contains("PARK")) {
+                        numParks ++;
+                    }
+                    if (e.getToVertex().getName().contains("CARLTON")) {
+                        numCarltons ++;
+                    }
+                }
+                if (numCarltons != 2 || numParks != 1) {
+                    continue;
+                }
                 start = gv;
-            } else if (v.getLabel().startsWith("GRAND ST at LAFAYETTE ST in")) {
+            } else if (v.getCoordinate().distance(grandAtLafayette) < 0.0001) {
                 end = gv;
-            } else if (v.getLabel().startsWith("CARLTON AV at PARK PL in")) {
+            } else if (v.getCoordinate().distance(carltonAtPark) < 0.00005) {
+                /* we need the correct carlton at park.  In this case,
+                 * that's the one facing west.
+                 */
+                int numFlatbushes = 0;
+                int numParks = 0;
+
+                for (Edge e: gv.getOutgoing()) {
+                    if (e.getToVertex().getName().contains("FLATBUSH")) {
+                        numFlatbushes ++;
+                    }
+                    if (e.getToVertex().getName().contains("PARK")) {
+                        numParks ++;
+                    }
+                }
+                if (numFlatbushes != 2 || numParks != 1) {
+                    continue;
+                }
                 carlton = gv;
             }
         }
@@ -113,18 +152,9 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertNotNull(end);
         assertNotNull(carlton);
         
-        assertEquals(4, start.getDegreeOut());
-        assertEquals(0, start.getDegreeIn());
-        
-        GraphVertex sv = null;
-        for (Edge e : start.getOutgoing()) {
-            sv = gg.getGraphVertex(e.getToVertex());
-            break;
-        }
-        
-        assertEquals(4, sv.getDegreeOut());
-        assertEquals(4, sv.getDegreeIn());
-        
+        assertEquals(3, start.getDegreeOut());
+        assertEquals(3, start.getDegreeIn());
+
         TraverseOptions wo = new TraverseOptions();
         ShortestPathTree spt = AStar.getShortestPathTree(gg, start.vertex, end.vertex, new State(0), wo);
         assertNotNull(spt);
@@ -140,8 +170,10 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         
         spt = AStar.getShortestPathTree(gg, start.vertex, carlton.vertex, new State(0), wo);
         assertNotNull(spt);
-        
+        /* commented out as bike walking is not supported */
+        /*
         GraphPath path = spt.getPath(carlton.vertex);
+        assertNotNull(path);
         assertTrue(path.edges.size() <= 3);
 
         wo.setArriveBy(true);
@@ -150,6 +182,6 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         
         path = spt.getPath(carlton.vertex);
         assertTrue(path.edges.size() <= 3);
-
+         */
     }
 }

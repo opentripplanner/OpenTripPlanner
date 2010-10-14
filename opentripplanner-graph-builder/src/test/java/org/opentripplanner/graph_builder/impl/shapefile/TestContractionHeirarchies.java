@@ -465,8 +465,8 @@ public class TestContractionHeirarchies extends TestCase {
         calendarService.setData(data);
         options.setCalendarService(calendarService);
         
-        Vertex start1 = getVertex(graph, "W 187 ST at WADSWORTH AV", true);
-        Vertex end1 = getVertex(graph, "GRAND ST at LAFAYETTE ST", false);
+        Vertex start1 = graph.getVertex("0072480");
+        Vertex end1 = graph.getVertex("0032341");
 
         assertNotNull(end1);
         assertNotNull(start1);
@@ -500,9 +500,8 @@ public class TestContractionHeirarchies extends TestCase {
         Vertex start = null;
         Vertex end = null;
 
-        //start = getVertex(hierarchy, "PARK PL at VANDERBILT AV", true);
-        start = getVertex(hierarchy, "W 187 ST at WADSWORTH AV", true);
-        end = getVertex(hierarchy, "GRAND ST at LAFAYETTE ST", false);
+        start = hierarchy.graph.getVertex("0072480");
+        end = hierarchy.graph.getVertex("0032341");
 
         assertNotNull(start);
         assertNotNull(end);
@@ -629,30 +628,4 @@ public class TestContractionHeirarchies extends TestCase {
         assertTrue(notNull / (float) i > 0.95); 
     }
 
-    private Vertex getVertex(ContractionHierarchy hierarchy, String name, boolean out) {
-        Vertex v = getVertex(hierarchy.graph, name, out);
-        if (v == null) {
-            if (out) {
-                v = getVertex(hierarchy.up, name, out);
-            } else {
-                v = getVertex(hierarchy.down, name, out);
-            }
-        }
-
-        return v;
-    }
-
-    private Vertex getVertex(Graph graph, String name, boolean out) {
-        String direction = out ? "out" : "in";
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
-            String label = v.getLabel();
-            if (label.startsWith(name)) {
-                if (label.endsWith(direction)) {
-                    return v;
-                }
-            }
-        }
-        return null;
-    }
 }
