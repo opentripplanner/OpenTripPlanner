@@ -46,6 +46,7 @@ import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -303,7 +304,7 @@ public class ContractionHierarchy implements Serializable {
      * edges.
      */
     private static boolean isContractable(Edge edge) {
-        return (edge instanceof TurnEdge || edge instanceof OutEdge || edge instanceof FreeEdge || edge instanceof Shortcut);
+        return (edge instanceof TurnEdge || edge instanceof OutEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge);
     }
 
     /**
