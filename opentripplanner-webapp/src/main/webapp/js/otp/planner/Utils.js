@@ -174,29 +174,29 @@ otp.planner.Utils = {
     },
     
     /**
-	 * parse the <fare> tag in the response document, extracting the data
-	 * associated with fareType.
-	 * 
-	 * @param {Object}
-	 *            rec XML object to parse
-	 * @param {String}
-	 *            fareType type of fare to parse
-	 * 
-	 * @returns {String} formatted string representation of the fare (e.g.,
-	 *          $2.25) or null if fare can't be parsed.
-	 * 
-	 */
+     * parse the <fare> tag in the response document, extracting the data
+     * associated with fareType.
+     * 
+     * @param {Object}
+     *            rec XML object to parse
+     * @param {String}
+     *            fareType type of fare to parse
+     * 
+     * @returns {String} formatted string representation of the fare (e.g.,
+     *          $2.25) or null if fare can't be parsed.
+     * 
+     */
     getFare : function(rec, fareType) {
-    	var nodes = Ext.DomQuery.select('fare/entry', rec);
-    	var fare = null;
-    	for (var i = 0; i < nodes.length; i++) {
-    		if (Ext.DomQuery.selectValue('key', rec) === fareType) {
-    			var cents = parseInt(Ext.DomQuery.selectValue('value/cents', rec));
-    			//TODO Use currency in value/currency once available
-    			fare = Ext.util.Format.usMoney(cents/100);
-    		}
-    	}
-    	return fare;
+        var nodes = Ext.DomQuery.select('fare/entry', rec);
+        var fare = null;
+        for (var i = 0; i < nodes.length; i++) {
+            if (Ext.DomQuery.selectValue('key', rec) === fareType) {
+                var cents = parseInt(Ext.DomQuery.selectValue('value/cents', rec));
+                //TODO Use currency in value/currency once available
+                fare = Ext.util.Format.usMoney(cents/100);
+            }
+        }
+        return fare;
     },
     
     /** */
@@ -312,22 +312,22 @@ otp.planner.Utils = {
             return "";
         }
         if (otp.config.metricsSystem == 'english') {
-	        var miles = metersToMiles(meters);
-	        // Display distances < 0.1 miles in feet
-	        if (miles < 0.1) {
-	            return metersToFeet(meters) + " ft";
-	        } else {
-	            return miles + " mi";
-	        }
+            var miles = metersToMiles(meters);
+            // Display distances < 0.1 miles in feet
+            if (miles < 0.1) {
+                return metersToFeet(meters) + " ft";
+            } else {
+                return miles + " mi";
+            }
         }        
         // Meters / Km
         if (otp.config.metricsSystem == 'international') {
-	        var km = meters / 1000.0;
-	        if (km < 1) {
-	        	return parseInt(meters) + " m";
-	        } else {
-	        	return km.toFixed(2) + " km";
-	        }
+            var km = meters / 1000.0;
+            if (km < 1) {
+                return parseInt(meters) + " m";
+            } else {
+                return km.toFixed(2) + " km";
+            }
         }
     },
     

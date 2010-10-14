@@ -145,10 +145,10 @@ otp.core.Measure = {
     /** turn the measure control on */
     on : function()
     {
-    	this.m_control.activate();
-    	this.toggleOutput(true);
-    	this.m_onOff = true;
-    	otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.MEASURE);
+        this.m_control.activate();
+        this.toggleOutput(true);
+        this.m_onOff = true;
+        otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.MEASURE);
     },
 
     /** turn the measure control off */
@@ -188,18 +188,18 @@ otp.core.Measure = {
         var retVal = {};
         // step 1: button config object
         retVal = {
-        		id:            'measure-button',
-        		iconCls:       'measure-button',
-        		text:          this.locale.buttons.measure,
-        		tooltip:       this.locale.buttons.measureTip,
-        		enableToggle:  true,
-        		scope:         this,
-        		handler:       this.toggle
+                id:            'measure-button',
+                iconCls:       'measure-button',
+                text:          this.locale.buttons.measure,
+                tooltip:       this.locale.buttons.measureTip,
+                enableToggle:  true,
+                scope:         this,
+                handler:       this.toggle
         };
 
         // step 2: add button to tbar
         if (tbar != null) {
-        	tbar.addButton(retVal);
+            tbar.addButton(retVal);
         }
         
         return retVal;

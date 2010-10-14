@@ -93,7 +93,7 @@ otp.core.MapStatic = {
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
-        	this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
+            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
         }
         
 
@@ -306,7 +306,7 @@ otp.core.MapStatic = {
         if(minZoom == null)
             minZoom = Math.floor(this.map.getNumZoomLevels() / 2);
         if(maxZoom == null)
-        	maxZoom = this.map.getNumZoomLevels() - 1;
+            maxZoom = this.map.getNumZoomLevels() - 1;
 
         otp.util.OpenLayersUtils.panZoomWithLimits(this.map, x, y, zoom, minZoom, maxZoom);
     },

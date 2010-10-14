@@ -114,7 +114,7 @@ otp.core.UI = {
                     html:    'this is the (inner) south panel',
                     layout:  'fit',
                     style: {
-                	  overflow: 'auto'		//otherwise IE won't scroll the elevation plot
+                      overflow: 'auto'      //otherwise IE won't scroll the elevation plot
                     },
                     height:  140,
                     border:  false,

@@ -92,8 +92,8 @@ otp.core.ComboBox = {
     },
 
     /**
-	 * persist Ext ComboBox's text field content into a Cookie
-	 */
+     * persist Ext ComboBox's text field content into a Cookie
+     */
     persist : function(text) 
     {
         // either use passed in text

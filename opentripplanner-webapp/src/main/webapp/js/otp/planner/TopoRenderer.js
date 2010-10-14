@@ -22,9 +22,9 @@ otp.namespace("otp.planner");
   */
 
 otp.planner.TopoRenderer = {
-	
-	panel : null,
-	
+    
+    panel : null,
+    
     /** */
     initialize : function(config)
     {
@@ -148,11 +148,17 @@ otp.planner.TopoRenderer = {
         // draw the "ground"
         ctx.fillStyle = "rgba(0,128,0, 0.5)"; 
         ctx.beginPath();
+        console.log(xCoords.length);
+        console.log(yCoords.length);
         for (i = 0; i < xCoords.length; i++) {
             if (i == 0) {
                 ctx.moveTo(xCoords[i], yCoords[i]);
             } else {
-                ctx.lineTo(xCoords[i], yCoords[i]);
+                try {
+                    ctx.lineTo(xCoords[i], yCoords[i]);
+                } catch (err) {
+                    console.log("failed at " + xCoords[i] + " - " + yCoords[i] + " - " + i);
+                }
             }
         }
         ctx.lineTo(axisWidth+topoWidth, height);
@@ -167,7 +173,11 @@ otp.planner.TopoRenderer = {
             if (i == 0) {
                 ctx.moveTo(xCoords[i], yCoords[i]);
             } else {
-                ctx.lineTo(xCoords[i], yCoords[i]);
+                try {
+                    ctx.lineTo(xCoords[i], yCoords[i]);
+                } catch (err) {
+                    console.log("failed at " + xCoords[i] + " - " + yCoords[i] + " - " + i);
+                }
             }
         }
         ctx.stroke();

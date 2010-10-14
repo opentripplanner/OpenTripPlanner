@@ -62,9 +62,9 @@ otp.util.OpenLayersUtils = {
     /** */
     makeMapBaseLayer : function(map, defaultOptions)
     {
-    	var options = Ext.apply({}, defaultOptions, {
-    		isBaseLayer : true
-    	});
+        var options = Ext.apply({}, defaultOptions, {
+            isBaseLayer : true
+        });
         var layer = new OpenLayers.Layer.WMS("Map", options.url, {
                 layers : options.layers,
                 format : options.format
@@ -630,9 +630,9 @@ otp.util.OpenLayersUtils = {
     },
     
     geo_json_converter: function(n,p) {
-    	var formatter = new OpenLayers.Format.GeoJSON();
-    	var geoJsonObj = formatter.read(n,'Geometry');
-    	return geoJsonObj;
+        var formatter = new OpenLayers.Format.GeoJSON();
+        var geoJsonObj = formatter.read(n,'Geometry');
+        return geoJsonObj;
     },
     
     encoded_polyline_converter: function(n,p) {
@@ -661,7 +661,7 @@ otp.util.OpenLayersUtils = {
      },
     
     decodeSignedNumber: function(value) {
-    	var r = this.decodeSignedNumberWithIndex(value, 0);
+        var r = this.decodeSignedNumberWithIndex(value, 0);
         return r.number;
     },
     
@@ -683,7 +683,7 @@ otp.util.OpenLayersUtils = {
     decodeNumberWithIndex: function(value, index) {
 
         if (value.length == 0)
-        	throw "string is empty";
+            throw "string is empty";
 
         var num = 0;
         var v = 0;

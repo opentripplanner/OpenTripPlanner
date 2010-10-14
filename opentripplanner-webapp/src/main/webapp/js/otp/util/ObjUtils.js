@@ -187,7 +187,7 @@ otp.util.ObjUtils = {
         for(var name in obj)
         {
             retVal = this.fixNameValue({n: name, v: obj[name]});
-	    if(retVal != null && retVal.length > 0)
+        if(retVal != null && retVal.length > 0)
                 break;
         }
 
