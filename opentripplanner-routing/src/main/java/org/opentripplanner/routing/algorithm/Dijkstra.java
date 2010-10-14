@@ -26,6 +26,7 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.VertexIngress;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -173,7 +174,7 @@ public class Dijkstra {
             State state = spt_u.state;
 
             for (Edge edge : outgoing) {
-                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut)) {
+                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
                     //only consider street edges when contracting
                     continue;
                 }
