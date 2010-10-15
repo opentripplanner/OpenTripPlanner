@@ -33,6 +33,8 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
     private RegionsSource _regionsSource;
 
     private File _cacheDirectory;
+
+    private OSMDownloader downloader;
     
     public void setRegionsSource(RegionsSource regionsSource) {
         _regionsSource = regionsSource;
@@ -44,24 +46,36 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
 
     @Override
     public void readOSM(OpenStreetMapContentHandler handler) {
-
-        OSMDownloader downloader = new OSMDownloader();
         
         if( _cacheDirectory != null)
-            downloader.setCacheDirectory(_cacheDirectory);
+            getDownloader().setCacheDirectory(_cacheDirectory);
         
         DownloadHandler downloadHandler = new DownloadHandler(handler);
 
         try {
             int regionIndex = 0;
             for (Envelope region : _regionsSource.getRegions()) {
-                downloader.visitRegion(region, downloadHandler);
-                _log.debug("regions=" + regionIndex);
+                getDownloader().visitRegion(region, downloadHandler);
+                if (regionIndex % 100 == 0) {
+                    _log.debug("regions=" + regionIndex);
+                }
                 regionIndex++;
             }
         } catch (IOException ex) {
             throw new IllegalStateException("error downloading osm", ex);
         }
+    }
+
+    /**
+     * Set a custom OSM downloader 
+     * @param downloader
+     */
+    public void setDownloader(OSMDownloader downloader) {
+        this.downloader = downloader;
+    }
+
+    public OSMDownloader getDownloader() {
+        return downloader;
     }
 
     private static class DownloadHandler implements OSMDownloaderListener {

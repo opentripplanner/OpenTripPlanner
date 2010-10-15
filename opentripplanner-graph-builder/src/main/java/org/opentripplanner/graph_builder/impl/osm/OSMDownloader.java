@@ -42,6 +42,9 @@ public class OSMDownloader {
 
     private int _updateIfOlderThanDuration = 0;
 
+    //if this fails, try http://osmxapi.hypercube.telascience.org/api/0.6/
+    private String apiBaseUrl = "http://api.openstreetmap.org/api/0.6/";
+
     public void setLatStep(double latStep) {
         _latYStep = latStep;
 
@@ -105,8 +108,8 @@ public class OSMDownloader {
             URL url = constructUrl(r);
             _log.debug(url.toString());
 
-            FileOutputStream out = new FileOutputStream(path);
             InputStream in = url.openStream();
+            FileOutputStream out = new FileOutputStream(path);            
             byte[] data = new byte[4096];
             while (true) {
                 int numBytes = in.read(data);
@@ -150,10 +153,21 @@ public class OSMDownloader {
         double bottom = r.getMinY();
         double top = r.getMaxY();
         try {
-            return new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + left + "," + bottom
+            return new URL(getApiBaseUrl() + "map?bbox=" + left + "," + bottom
                     + "," + right + "," + top);
         } catch (MalformedURLException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /** 
+     * Set the base OSM API URL from which OSM tiles will be downloaded.    
+     */
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getApiBaseUrl() {
+        return apiBaseUrl;
     }
 }
