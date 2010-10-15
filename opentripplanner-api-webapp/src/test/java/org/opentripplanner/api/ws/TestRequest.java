@@ -137,8 +137,8 @@ public class TestRequest extends TestCase {
 
     public void testPlanner() throws Exception {
         
-        Vertex v1 = getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST", false);
-        Vertex v2 = getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT", true);
+        Vertex v1 = graph.getVertex("113410");//getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST", false);
+        Vertex v2 = graph.getVertex("137427");//getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT", true);
         assertNotNull(v1);
         assertNotNull(v2);
         
@@ -160,6 +160,7 @@ public class TestRequest extends TestCase {
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
         List<WalkStep> steps = leg.walkSteps;
+        System.out.println("Steps: " + steps);
         assertEquals(3, steps.size());
         WalkStep step0 = steps.get(0);
         WalkStep step1 = steps.get(1);
@@ -179,10 +180,10 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
-        Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
-        Vertex v2 = graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST", false)).iterator().next().getToVertex();
-        Vertex v3 = graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
-        Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST", true);
+        Vertex v1 = graph.getVertex("114080 back");//getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
+        Vertex v2 = graph.getVertex("108406");//graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST", false)).iterator().next().getToVertex();
+        Vertex v3 = graph.getVertex("115250");//graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
+        Vertex v4 = graph.getVertex("192532");//getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST", true);
         Vertex[] vertices = {v1, v2, v3, v4};
         assertNotNull(v1);
         assertNotNull(v2);
