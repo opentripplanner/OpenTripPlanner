@@ -34,7 +34,7 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
 
     private File _cacheDirectory;
 
-    private OSMDownloader downloader;
+    private OSMDownloader downloader = new OSMDownloader();
     
     public void setRegionsSource(RegionsSource regionsSource) {
         _regionsSource = regionsSource;
@@ -48,7 +48,7 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
     public void readOSM(OpenStreetMapContentHandler handler) {
         
         if( _cacheDirectory != null)
-            getDownloader().setCacheDirectory(_cacheDirectory);
+            downloader.setCacheDirectory(_cacheDirectory);
         
         DownloadHandler downloadHandler = new DownloadHandler(handler);
 
