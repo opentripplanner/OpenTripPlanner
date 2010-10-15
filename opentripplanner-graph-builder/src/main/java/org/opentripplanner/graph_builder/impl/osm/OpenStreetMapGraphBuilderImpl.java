@@ -362,7 +362,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             _nodes.put(node.getId(), node);
 
-            if (_nodes.size() % 1000 == 0)
+            if (_nodes.size() % 10000 == 0)
                 _log.debug("nodes=" + _nodes.size());
         }
 

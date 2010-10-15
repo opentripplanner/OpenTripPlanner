@@ -31,7 +31,6 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -122,18 +121,6 @@ public class TestRequest extends TestCase {
         holder.planner = planner;
         holder.pathService = pathService;
     }
-    
-    private Vertex getVertexByCrossStreets(String s1, String s2, boolean in) {
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
-            if (v.getName().contains(s1) && v.getName().contains(s2)) {
-                if (in == v.getLabel().endsWith(" in")) {
-                    return v;
-                }
-            }
-        }
-        return null;
-    }
 
     public void testPlanner() throws Exception {
         
@@ -160,7 +147,6 @@ public class TestRequest extends TestCase {
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
         List<WalkStep> steps = leg.walkSteps;
-        System.out.println("Steps: " + steps);
         assertEquals(3, steps.size());
         WalkStep step0 = steps.get(0);
         WalkStep step1 = steps.get(1);
