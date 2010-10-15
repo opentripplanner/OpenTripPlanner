@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -113,10 +114,11 @@ public class ContractionPathServiceImpl implements PathService {
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
 
-        HashSet<GraphPath> paths = new HashSet<GraphPath>();
+        ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
         optionQueue.add(options);
+
         /* if the user wants to travel by transit, create a bus-only set of options */
         if (options.modes.getTrainish() && options.modes.contains(TraverseMode.BUS)) {
             TraverseOptions busOnly = options.clone();
@@ -157,12 +159,16 @@ public class ContractionPathServiceImpl implements PathService {
             }
             if (! paths.contains(path)) {
                 paths.add(path);
-                /* now, try various versions with blacklisted routes */
+                // now, create a list of options, one with each route in this trip banned.
+                // the HashSet banned is not strictly necessary as the optionsQueue will
+                // already remove duplicate options, but it might be slightly faster as
+                // hashing TraverseOptions is slow.
                 for (SPTEdge spte : path.edges) {
                     Edge e = spte.payload;
                     if (e instanceof PatternBoard) {
                         Trip trip = spte.getTrip();
                         String routeName = GtfsLibrary.getRouteName(trip.getRoute());
+                        
                         RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
                         TraverseOptions newOptions = options.clone();
                         newOptions.bannedRoutes.add(spec);
@@ -176,7 +182,9 @@ public class ContractionPathServiceImpl implements PathService {
         if (paths.size() == 0) {
             return null;
         }
-        return new ArrayList<GraphPath>(paths);
+        // We order the list of returned routes by the time of arrival (not the duration of the trip)
+        Collections.sort(paths, new PathComparator());
+        return paths;
     }
 
     @Override
