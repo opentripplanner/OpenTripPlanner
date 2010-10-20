@@ -346,7 +346,6 @@ public class Planner {
             if (edge instanceof FreeEdge && sptEdge != finalEdge) {
                 continue;
             }
-            previousEdge = sptEdge;
 
             TraverseMode edgeMode = edge.getMode();
 
@@ -369,7 +368,7 @@ public class Planner {
                         }
                         leg.to = makePlace(edge.getFromVertex());
 
-                        leg.endTime = new Date(sptEdge.fromv.state.getTime());
+                        leg.endTime = new Date(previousEdge.fromv.state.getTime());
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         
@@ -389,6 +388,7 @@ public class Planner {
                     }
                 }
             }
+            previousEdge = sptEdge;
             Geometry edgeGeometry = edge.getGeometry();
 
             if (edgeGeometry != null) {
