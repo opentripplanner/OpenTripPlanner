@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -96,7 +97,21 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWit
     public PackedCoordinateSequence getElevationProfile() {
         return elevationProfile;
     }
-
+    @Override
+    public void setElevationProfile(PackedCoordinateSequence elev) {
+        if (elev == null) {
+            return;
+        }
+        if (slopeOverride) {
+            elev = new PackedCoordinateSequence.Float(new Coordinate[] { new Coordinate(0f, 0f) },
+                    2);
+        }
+        elevationProfile = elev;
+        P2<Double> result = StreetVertex.computeSlopeCost(elev, getName());
+        slopeCostEffectiveLength = result.getFirst();
+        maxSlope = result.getSecond();
+    }
+    
     @Override
     public String getDirection() {
         return null;

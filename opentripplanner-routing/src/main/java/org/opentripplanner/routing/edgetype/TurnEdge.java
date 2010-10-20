@@ -184,4 +184,9 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
     public StreetTraversalPermission getPermission() {
         return fromv.getPermission();
     }
+
+    @Override
+    public void setElevationProfile(PackedCoordinateSequence elev) {
+        fromv.setElevationProfile(elev);
+    }
 }

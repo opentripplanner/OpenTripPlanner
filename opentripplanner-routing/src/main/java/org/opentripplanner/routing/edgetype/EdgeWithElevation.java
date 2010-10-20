@@ -23,4 +23,5 @@ import org.opentripplanner.routing.core.Edge;
 public interface EdgeWithElevation extends Edge {
     public PackedCoordinateSequence getElevationProfile();
     public PackedCoordinateSequence getElevationProfile(double from, double to);
+    public void setElevationProfile(PackedCoordinateSequence elevPCS);
 }

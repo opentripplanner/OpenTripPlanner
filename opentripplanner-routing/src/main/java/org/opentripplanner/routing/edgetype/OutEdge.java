@@ -134,4 +134,9 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     public StreetTraversalPermission getPermission() {
         return ((StreetVertex) fromv).getPermission();
     }
+
+    @Override
+    public void setElevationProfile(PackedCoordinateSequence elev) {
+        ((StreetVertex)fromv).setElevationProfile(elev);
+    }
 }

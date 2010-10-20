@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -136,9 +137,17 @@ public class StreetVertex extends GenericVertex {
         }
         elevationProfile = elev;
         // compute the cost of the elevation changes
-        Coordinate[] coordinates = elevationProfile.toCoordinateArray();
-        slopeSpeedEffectiveLength = 0;
-        slopeCostEffectiveLength = 0;
+        P2<Double> result = computeSlopeCost(elev, getName());
+        slopeCostEffectiveLength = result.getFirst();
+        maxSlope = result.getSecond();
+    }
+
+    public static P2<Double> computeSlopeCost(PackedCoordinateSequence elev, String name) {
+        Coordinate[] coordinates = elev.toCoordinateArray();
+        
+        double maxSlope = 0;
+        double slopeSpeedEffectiveLength = 0;
+        double slopeCostEffectiveLength = 0;
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -148,7 +157,7 @@ public class StreetVertex extends GenericVertex {
                 // grade of 35%. So, this must be a data error.
                 log
                         .warn("Warning: street "
-                                + this
+                                + name
                                 + " steeper than Baldwin Street.  This is an error in the algorithm or the data");
             }
             if (maxSlope < Math.abs(slope)) {
@@ -157,8 +166,8 @@ public class StreetVertex extends GenericVertex {
             slopeCostEffectiveLength += run * (1 + slope * slope * 10); // any slope is bad
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
         }
+        return new P2<Double>(slopeSpeedEffectiveLength, maxSlope); 
     }
-
     public static double slopeSpeedCoefficient(double slope, double altitude) {
         /*
          * computed by asking ZunZun for a quadratic b-spline approximating some values from
@@ -393,4 +402,5 @@ public class StreetVertex extends GenericVertex {
     public boolean isCrossable() {
         return crossable;
     }
+
 }
