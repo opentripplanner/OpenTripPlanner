@@ -29,7 +29,6 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -94,7 +93,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * @param ee the street edge
      */
     private void processEdge(EdgeWithElevation ee) {
-        
+        if (ee.getElevationProfile() != null) {
+            return; /* already set up */
+        }
         Geometry g = (Geometry) ee.getGeometry();
         Coordinate[] coords = g.getCoordinates();
         
@@ -128,7 +129,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(coordList
                 .toArray(coordArr));
         
-        ((StreetVertex) ee.getFromVertex()).setElevationProfile(elevPCS);
+        ee.setElevationProfile(elevPCS);
             
     }
 
