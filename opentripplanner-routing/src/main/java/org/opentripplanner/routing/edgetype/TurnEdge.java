@@ -99,7 +99,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
             return null;
         }
 
-        double angleLength = fromv.getLength();// + turnCost / 20;
+        double angleLength = fromv.getLength() + turnCost / 20;
 
         State s1 = s0.clone();
         double time = angleLength / wo.speed;
