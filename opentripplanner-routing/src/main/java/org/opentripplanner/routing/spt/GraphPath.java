@@ -105,22 +105,35 @@ public class GraphPath {
         State state = vertices.lastElement().state.clone();
         State state0 = vertices.firstElement().state;
         if (state0.getTime() >= state.getTime()) {
-            // reversed paths are already optimized, because preferences are asymmetric -- people
-            // want to arrive as late as possible, but also want to leave as late as possible.
-            return;
-        }
-        TraverseOptions options = vertices.lastElement().options;
-        ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-        SPTEdge firstEdge = edges.get(0);
-        while (iterator.hasPrevious()) {
-            SPTEdge edge = iterator.previous();
-            if (edge == firstEdge) {
-                state.lastEdgeWasStreet = false;
+            /* arrive-by trip */
+
+            TraverseOptions options = vertices.lastElement().options;
+            ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
+            SPTEdge firstEdge = edges.get(0);
+            while (iterator.hasPrevious()) {
+                SPTEdge edge = iterator.previous();
+                if (edge == firstEdge) {
+                    state.lastEdgeWasStreet = false;
+                }
+                TraverseResult result = edge.payload.traverse(state, options);
+                assert (result != null);
+                state = result.state;
+                edge.fromv.state = state;
             }
-            TraverseResult result = edge.payload.traverseBack(state, options);
-            assert (result != null);
-            state = result.state;
-            edge.fromv.state = state;
+        } else {
+            TraverseOptions options = vertices.lastElement().options;
+            ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
+            SPTEdge firstEdge = edges.get(0);
+            while (iterator.hasPrevious()) {
+                SPTEdge edge = iterator.previous();
+                if (edge == firstEdge) {
+                    state.lastEdgeWasStreet = false;
+                }
+                TraverseResult result = edge.payload.traverseBack(state, options);
+                assert (result != null);
+                state = result.state;
+                edge.fromv.state = state;
+            }
         }
     }
 
