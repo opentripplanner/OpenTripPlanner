@@ -17,42 +17,14 @@ import static java.lang.Math.atan2;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Math.sqrt;
+import static java.lang.Math.toDegrees;
 import static java.lang.Math.toRadians;
 
-import org.geotools.factory.Hints;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.ReferencingFactoryFinder;
-import org.opengis.referencing.crs.CRSAuthorityFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
-
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 public class DistanceLibrary {
 
-    public static final CoordinateReferenceSystem WORLD_CRS;
-
-    static {
-        try {
-
-            Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
-            CRSAuthorityFactory factory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG",
-                    hints);
-            WORLD_CRS = factory
-                    .createCoordinateReferenceSystem("EPSG:4326");
-        } catch (Exception ex) {
-            throw new IllegalStateException("error creating EPSG:4326 coordinate ref system", ex);
-        }
-    }
-
-    public static double orthodromicDistance(Coordinate a, Coordinate b) {
-        try {
-            return JTS.orthodromicDistance(a,b,WORLD_CRS);
-        } catch (TransformException ex) {
-            throw new IllegalStateException("error computing distance: a=" + a + " b=" + b,ex);
-        }
-    }
-    
     public static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
 
     public static final double distance(Coordinate from, Coordinate to) {
@@ -88,5 +60,28 @@ public class DistanceLibrary {
     /** this is an overestimate */
     public static double metersToDegrees(double distance) {
         return 360 * distance / (2 * Math.PI * RADIUS_OF_EARTH_IN_KM * 1000);
+    }
+
+    public static final Envelope bounds(double lat, double lon, double latDistance,
+            double lonDistance) {
+
+        double radiusOfEarth = RADIUS_OF_EARTH_IN_KM * 1000;
+
+        double latRadians = toRadians(lat);
+        double lonRadians = toRadians(lon);
+
+        double latRadius = radiusOfEarth;
+        double lonRadius = Math.cos(latRadians) * radiusOfEarth;
+
+        double latOffset = latDistance / latRadius;
+        double lonOffset = lonDistance / lonRadius;
+
+        double latFrom = toDegrees(latRadians - latOffset);
+        double latTo = toDegrees(latRadians + latOffset);
+
+        double lonFrom = toDegrees(lonRadians - lonOffset);
+        double lonTo = toDegrees(lonRadians + lonOffset);
+
+        return new Envelope(new Coordinate(lonFrom, latFrom), new Coordinate(lonTo, latTo));
     }
 }
