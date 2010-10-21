@@ -23,7 +23,7 @@ import java.util.Collection;
  * @author novalis
  *
  */
-public class GraphVertex implements Serializable {
+public class GraphVertex implements Serializable, HasEdges {
     private static final long serialVersionUID = 5209227015108443460L;
     
     public Vertex vertex;
@@ -59,6 +59,10 @@ public class GraphVertex implements Serializable {
         incoming.remove(ee);
     }
     
+    /****
+     * {@link HasEdges} Interface
+     ****/
+    
     public int getDegreeIn() {
         return incoming.size();
     }
@@ -74,6 +78,10 @@ public class GraphVertex implements Serializable {
     public Collection<Edge> getIncoming() {
         return incoming;
     }
+    
+    /****
+     * Private Methods
+     *****/
     
     private void writeObject(ObjectOutputStream out) throws IOException {
         incoming.trimToSize();
