@@ -15,6 +15,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Iterator;
 
@@ -22,7 +23,7 @@ import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class GenericVertex implements Vertex {
+public class GenericVertex implements Vertex, Serializable {
 
     private static final long serialVersionUID = 364261663335739528L;
 

@@ -13,11 +13,9 @@
 
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-
 import com.vividsolutions.jts.geom.Coordinate;
 
-public interface Vertex extends Serializable, Cloneable {
+public interface Vertex extends Cloneable {
 
     /**
      * Every vertex has a label which is globally unique
@@ -26,7 +24,7 @@ public interface Vertex extends Serializable, Cloneable {
 
     /**
      * For vertices that represent stops, the passenger-facing stop ID (for systems like TriMet that
-     * have this feature). 
+     * have this feature).
      */
     public String getStopId();
 

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.spt;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -24,7 +25,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 /** A vertex in the ShortestPathTree */
 
-public class SPTVertex implements Vertex {
+public class SPTVertex implements Vertex, Serializable {
     
     private static final long serialVersionUID = -4422788581123655293L;
 
