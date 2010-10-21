@@ -139,4 +139,12 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     public void setElevationProfile(PackedCoordinateSequence elev) {
         ((StreetVertex)fromv).setElevationProfile(elev);
     }
+    
+    public boolean equals(Object o) {
+        if (o instanceof OutEdge) {
+            OutEdge other = (OutEdge) o;
+            return other.fromv.equals(fromv) && other.tov.equals(tov);
+        }
+        return false;
+    }
 }

@@ -99,7 +99,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
             return null;
         }
 
-        double angleLength = fromv.getLength() + turnCost / 20;
+        double angleLength = fromv.getLength();// + turnCost / 20;
 
         State s1 = s0.clone();
         double time = angleLength / wo.speed;
@@ -188,5 +188,13 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
     @Override
     public void setElevationProfile(PackedCoordinateSequence elev) {
         fromv.setElevationProfile(elev);
+    }
+    
+    public boolean equals(Object o) {
+        if (o instanceof TurnEdge) {
+            TurnEdge other = (TurnEdge) o;
+            return other.fromv.equals(fromv) && other.getToVertex().equals(tov);
+        }
+        return false;
     }
 }

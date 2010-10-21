@@ -198,5 +198,12 @@ public class StreetLocation extends GenericVertex {
     public boolean isWheelchairAccessible() {
         return wheelchairAccessible;
     }
-
+    
+    public boolean equals(Object o) {
+        if (o instanceof StreetLocation) {
+            StreetLocation other = (StreetLocation) o;
+            return other.getCoordinate().equals(getCoordinate());
+        }
+        return false;
+    }
 }
