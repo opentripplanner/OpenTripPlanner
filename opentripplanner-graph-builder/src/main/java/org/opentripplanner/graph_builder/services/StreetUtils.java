@@ -22,8 +22,12 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreetUtils {
+
+    private static Logger _log = LoggerFactory.getLogger(StreetUtils.class);
 
     /**
      * Make an ordinary graph into an edge-based graph.
@@ -31,7 +35,10 @@ public class StreetUtils {
      * @param coordinateToStreetNames 
      */
     public static void makeEdgeBased(Graph graph, Collection<Vertex> endpoints) {
+        
         /* generate turns */
+
+        _log.debug("converting to edge-based graph");
         
         ArrayList<Edge> turns = new ArrayList<Edge>(endpoints.size());
         for (Vertex v : endpoints) {
