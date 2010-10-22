@@ -492,10 +492,11 @@ otp.util.OpenLayersUtils = {
     {
         try
         {
+            var yOffsetToTip = 30; // place to mouse-click the icon is 30 pixels higher than the 'point'
             if(prj == null)
                 prj = otp.core.MapStatic.dataProjection;
-        
-            var px     = new OpenLayers.Pixel(pixelX, pixelY);
+
+            var px     = new OpenLayers.Pixel(pixelX, pixelY + yOffsetToTip);
             var lonLat = map.getLonLatFromPixel(px);
             lonLat.transform(map.getProjectionObject(), prj);
             return this.roundCoord(lonLat);
@@ -507,7 +508,7 @@ otp.util.OpenLayersUtils = {
     },
 
     /**
-     * from Wyatt's context menu stuff
+     * context menu stuff
      */
     setCenterByPixel: function (center) {
       var px = new OpenLayers.Pixel(center.x, center.y);
@@ -530,7 +531,7 @@ otp.util.OpenLayersUtils = {
         }
         catch(e)
         {
-            console.log("ERROR: " + e)
+            console.log("ERROR: " + e);
         }
     },
 

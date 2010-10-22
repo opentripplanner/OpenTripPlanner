@@ -854,8 +854,6 @@ otp.planner.StaticForms = {
                 this.poi.setTo(y, x, this.m_toCoord);
             }
         }
-        var map = otp.core.MapSingleton.map;
-        var poiLayer = map.layers[1];
     },
 
     /**
