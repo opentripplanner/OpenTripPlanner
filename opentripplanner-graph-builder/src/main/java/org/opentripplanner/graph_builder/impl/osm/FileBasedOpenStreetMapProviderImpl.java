@@ -43,4 +43,8 @@ public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider
             throw new IllegalStateException("error loading OSM from path " + _path, ex);
         }
     }
+    
+    public String toString() {
+        return "FileBasedOpenStreetMapProviderImpl(" + _path + ")";
+    }
 }
