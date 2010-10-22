@@ -104,6 +104,10 @@ public class GraphPath {
     public void optimize() {
         State state = vertices.lastElement().state.clone();
         State state0 = vertices.firstElement().state;
+        if (edges.isEmpty()) {
+            /* nothing to optimize */
+            return;
+        }
         if (state0.getTime() >= state.getTime()) {
             /* arrive-by trip */
 

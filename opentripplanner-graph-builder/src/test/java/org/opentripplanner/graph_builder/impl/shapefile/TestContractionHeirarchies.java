@@ -370,7 +370,8 @@ public class TestContractionHeirarchies extends TestCase {
         options.speed = 1;
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), init, options);
         assertNotNull(path);
-
+        assertTrue(path.edges.size() != 0);
+        
         long now = System.currentTimeMillis();
         for (Vertex start : vertices) {
             int j = (int) (Math.random() * vertices.size());
