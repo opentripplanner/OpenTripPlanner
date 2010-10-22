@@ -195,7 +195,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
-
+            GeometryFactory geometryFactory = new GeometryFactory();
+            
             /* build an ordinary graph, which we will convert to an edge-based graph */
             ArrayList<Vertex> endpoints = new ArrayList<Vertex>();
 
@@ -213,7 +214,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Vertex startEndpoint = null, endEndpoint = null;
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
-                GeometryFactory geometryFactory = new GeometryFactory();
 
                 /*
                  * Traverse through all the nodes of this edge. For nodes which are not shared with
