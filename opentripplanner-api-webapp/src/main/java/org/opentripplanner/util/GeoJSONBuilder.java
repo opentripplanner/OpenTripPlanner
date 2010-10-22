@@ -12,10 +12,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 /*
- * Copyright (c) 2001 - 2007 TOPP - www.openplans.org.  All rights reserved.
- * This code is licensed under the GPL 2.0 license, availible at the root
- * application directory.
+ * Copyright (c) 2001 - 2007 OpenPlans - www.openplans.org.  All rights reserved.
  */
+
 package org.opentripplanner.util;
 
 import java.io.StringWriter;
@@ -40,10 +39,8 @@ import com.vividsolutions.jts.geom.Polygon;
  * This class extends the JSONBuilder to be able to write out geometric types. It is coded against
  * the draft 5 version of the spec on http://geojson.org
  * 
- * @author Chris Holmes, The Open Planning Project
- * @version $Id$
- * 
- * TODO - This class blatantly copied by bdferris.  
+ * @author Chris Holmes, OpenPlans
+ * @version $Id$  
  * 
  */
 public class GeoJSONBuilder extends JSONBuilder {
