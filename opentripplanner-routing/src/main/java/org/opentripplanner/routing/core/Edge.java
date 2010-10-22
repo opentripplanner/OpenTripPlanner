@@ -15,12 +15,30 @@ package org.opentripplanner.routing.core;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.spt.GraphPath;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * This represents an edge in the graph. 
- *
+ * This represents an edge in the graph.
+ * 
+ * <h2>A note about multiple traverse results:</h2>
+ * 
+ * The {@link TraverseResult} supports a simple chaining mechanism through
+ * {@link TraverseResult#addToExistingResultChain(TraverseResult)} and
+ * {@link TraverseResult#getNextResult()} that allows one to construct a chain of multiple traverse
+ * result objects that can be returned from an {@link Edge} traversal operation. It's important to
+ * note that while this can be a powerful mechanism to allow for more dynamic edge-traversal
+ * behavior, care must be taken when implementing.
+ * 
+ * Specifically, we currently forbid an edge from returning multiple results in both
+ * {@link #traverse(State, TraverseOptions)} and {@link #traverseBack(State, TraverseOptions)}. If
+ * one traverse operations returns multiple results, the inverse operation must always return a
+ * single result. We've set this rule primarily to support the reverse path optimization in
+ * {@link GraphPath#optimize()}.
+ * 
+ * If you think of a compelling reason where you need multiple traverse results in BOTH directions,
+ * let us know.
  */
 public interface Edge {
 
@@ -28,9 +46,11 @@ public interface Edge {
 
     public Vertex getToVertex();
 
-    public TraverseResult traverse(State s0, TraverseOptions options) throws NegativeWeightException;
-        
-    public TraverseResult traverseBack(State s0, TraverseOptions options) throws NegativeWeightException;
+    public TraverseResult traverse(State s0, TraverseOptions options)
+            throws NegativeWeightException;
+
+    public TraverseResult traverseBack(State s0, TraverseOptions options)
+            throws NegativeWeightException;
 
     public TraverseMode getMode();
 
