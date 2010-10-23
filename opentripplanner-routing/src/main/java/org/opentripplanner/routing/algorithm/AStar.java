@@ -44,15 +44,14 @@ import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.NullExtraEdges;
 
-
 /**
- * Find the shortest path between graph vertices using A*. 
+ * Find the shortest path between graph vertices using A*.
  */
 public class AStar {
 
     /**
-     * Plots a path on graph from origin to target, departing at the time 
-     * given in state and with the options options.
+     * Plots a path on graph from origin to target, departing at the time given in state and with
+     * the options options.
      * 
      * @param graph
      * @param origin
@@ -88,8 +87,8 @@ public class AStar {
     }
 
     /**
-     * Plots a path on graph from origin to target, ARRIVING at the time 
-     * given in state and with the options options.  
+     * Plots a path on graph from origin to target, ARRIVING at the time given in state and with the
+     * options options.
      * 
      * @param graph
      * @param origin
@@ -98,23 +97,23 @@ public class AStar {
      * @param options
      * @return the shortest path, or null if none is found
      */
-    public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin, Vertex target,
-            State init, TraverseOptions options) {
+    public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin,
+            Vertex target, State init, TraverseOptions options) {
         if (!options.isArriveBy()) {
             throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
         }
         if (origin == null || target == null) {
             return null;
         }
-        
+
         // Return Tree
         ShortestPathTree spt;
-        if (options.modes.getTransit()) { 
+        if (options.modes.getTransit()) {
             spt = new MultiShortestPathTree();
         } else {
             spt = new BasicShortestPathTree();
         }
-        
+
         /* Run backwards from the target to the origin */
         Vertex tmp = origin;
         origin = target;
@@ -124,12 +123,12 @@ public class AStar {
         Map<Vertex, ArrayList<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
-            Iterable<Edge> extra = ((StreetLocation)origin).getExtra();
+            Iterable<Edge> extra = ((StreetLocation) origin).getExtra();
             for (Edge edge : extra) {
                 Vertex tov = edge.getToVertex();
                 ArrayList<Edge> edges = extraEdges.get(tov);
                 if (edges == null) {
-                    edges = new ArrayList<Edge>(); 
+                    edges = new ArrayList<Edge>();
                     extraEdges.put(tov, edges);
                 }
                 edges.add(edge);
@@ -141,29 +140,30 @@ public class AStar {
             if (extraEdges instanceof NullExtraEdges) {
                 extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
             }
-            Iterable<Edge> extra = ((StreetLocation)target).getExtra();
+            Iterable<Edge> extra = ((StreetLocation) target).getExtra();
             for (Edge edge : extra) {
                 Vertex tov = edge.getToVertex();
                 ArrayList<Edge> edges = extraEdges.get(tov);
                 if (edges == null) {
-                    edges = new ArrayList<Edge>(); 
+                    edges = new ArrayList<Edge>();
                     extraEdges.put(tov, edges);
                 }
                 edges.add(edge);
             }
         }
         final double max_speed = getMaxSpeed(options);
-        
+
         double distance = origin.fastDistance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
+        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size()
+                + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
-        
+
         boolean useTransit = options.modes.getTransit();
         HashSet<Vertex> closed = new HashSet<Vertex>(100000);
-        
+
         // Iteration Variables
         SPTVertex spt_u, spt_v;
         while (!pq.empty()) { // Until the priority queue is empty:
@@ -172,18 +172,18 @@ public class AStar {
             Vertex tov = spt_u.mirror;
             if (tov == target)
                 break;
-            
+
             closed.add(tov);
 
             GraphVertex gv = graph.getGraphVertex(tov);
-            
+
             Collection<Edge> incoming;
             if (gv == null) {
                 incoming = new ArrayList<Edge>();
             } else {
                 incoming = gv.getIncoming();
             }
-            
+
             if (extraEdges.containsKey(tov)) {
                 List<Edge> newIncoming = new ArrayList<Edge>();
                 for (Edge edge : incoming)
@@ -192,18 +192,17 @@ public class AStar {
                 incoming = newIncoming;
             }
 
-
             for (Edge edge : incoming) {
                 State state = spt_u.state;
                 if (edge.getFromVertex() == target) {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
                 }
-                    
+
                 if (edge instanceof PatternAlight && state.numBoardings > options.maxTransfers) {
                     continue;
                 }
-                
+
                 TraverseResult wr = edge.traverseBack(state, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
@@ -213,7 +212,8 @@ public class AStar {
                 }
 
                 if (wr.weight < 0) {
-                    throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge " + edge);
+                    throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge "
+                            + edge);
                 }
 
                 Vertex fromv = edge.getFromVertex();
@@ -221,15 +221,16 @@ public class AStar {
                 distance = tov.fastDistance(target) / max_speed;
                 if (useTransit) {
                     distance = Math.min(distance + options.boardCost,
-                        options.walkReluctance * tov.fastDistance(target) / options.speed);
+                            options.walkReluctance * tov.fastDistance(target) / options.speed);
                 }
-                
+
                 double heuristic_distance = new_w + distance;
-                if (heuristic_distance > options.maxWeight || wr.state.getTime() < options.worstTime) {
-                    //too expensive to get here
+                if (heuristic_distance > options.maxWeight
+                        || wr.state.getTime() < options.worstTime) {
+                    // too expensive to get here
                     continue;
                 }
-                
+
                 spt_v = spt.addVertex(fromv, wr.state, new_w, options);
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge);
@@ -243,8 +244,8 @@ public class AStar {
     }
 
     /**
-     * Plots a path on graph from origin to target, DEPARTING at the time 
-     * given in state and with the options options.  
+     * Plots a path on graph from origin to target, DEPARTING at the time given in state and with
+     * the options options.
      * 
      * @param graph
      * @param origin
@@ -262,22 +263,22 @@ public class AStar {
 
         // Return Tree
         ShortestPathTree spt;
-        if (options.modes.getTransit()) { 
+        if (options.modes.getTransit()) {
             spt = new MultiShortestPathTree();
         } else {
             spt = new BasicShortestPathTree();
         }
-        
+
         /* generate extra edges for StreetLocations */
         Map<Vertex, ArrayList<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
-            Iterable<Edge> extra = ((StreetLocation)origin).getExtra();
+            Iterable<Edge> extra = ((StreetLocation) origin).getExtra();
             for (Edge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
                 ArrayList<Edge> edges = extraEdges.get(fromv);
                 if (edges == null) {
-                    edges = new ArrayList<Edge>(); 
+                    edges = new ArrayList<Edge>();
                     extraEdges.put(fromv, edges);
                 }
                 edges.add(edge);
@@ -289,12 +290,12 @@ public class AStar {
             if (extraEdges instanceof NullExtraEdges) {
                 extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
             }
-            Iterable<Edge> extra = ((StreetLocation)target).getExtra();
+            Iterable<Edge> extra = ((StreetLocation) target).getExtra();
             for (Edge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
                 ArrayList<Edge> edges = extraEdges.get(fromv);
                 if (edges == null) {
-                    edges = new ArrayList<Edge>(); 
+                    edges = new ArrayList<Edge>();
                     extraEdges.put(fromv, edges);
                 }
                 edges.add(edge);
@@ -305,11 +306,12 @@ public class AStar {
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
-        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size() + extraEdges.size());
+        FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size()
+                + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
         boolean useTransit = options.modes.getTransit();
-        
+
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
@@ -319,14 +321,14 @@ public class AStar {
                 break;
             }
             GraphVertex gv = graph.getGraphVertex(fromv);
- 
+
             Collection<Edge> outgoing;
             if (gv == null) {
                 outgoing = new ArrayList<Edge>(1);
             } else {
                 outgoing = gv.getOutgoing();
             }
-            
+
             if (extraEdges.containsKey(fromv)) {
                 List<Edge> newOutgoing = new ArrayList<Edge>();
                 for (Edge edge : outgoing)
@@ -354,7 +356,7 @@ public class AStar {
                     state = state.clone();
                     state.lastEdgeWasStreet = false;
                 }
-                
+
                 if (edge instanceof PatternBoard && state.numBoardings > options.maxTransfers) {
                     continue;
                 }
@@ -365,29 +367,32 @@ public class AStar {
                 if (wr == null) {
                     continue;
                 }
-                
+
                 if (wr.weight < 0) {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
-                
+
                 double new_w = spt_u.weightSum + wr.weight;
 
                 distance = tov.fastDistance(target) / max_speed;
                 if (useTransit) {
                     int boardCost;
-                    if (edge instanceof PatternHop || edge instanceof PatternBoard || edge instanceof PatternDwell ||
-                            edge instanceof PatternInterlineDwell || edge instanceof Board || edge instanceof Hop) {
+                    if (edge instanceof PatternHop || edge instanceof PatternBoard
+                            || edge instanceof PatternDwell
+                            || edge instanceof PatternInterlineDwell || edge instanceof Board
+                            || edge instanceof Hop) {
                         boardCost = 0;
                     } else {
                         boardCost = options.boardCost;
                     }
                     distance = Math.min(distance + boardCost,
-                        options.walkReluctance * tov.fastDistance(target) / options.speed);
+                            options.walkReluctance * tov.fastDistance(target) / options.speed);
                 }
-                
+
                 double heuristic_distance = new_w + distance;
-                if (heuristic_distance > options.maxWeight || wr.state.getTime() > options.worstTime) {
-                    //too expensive to get here
+                if (heuristic_distance > options.maxWeight
+                        || wr.state.getTime() > options.worstTime) {
+                    // too expensive to get here
                     continue;
                 }
 
@@ -404,16 +409,17 @@ public class AStar {
 
     public static double getMaxSpeed(TraverseOptions options) {
         if (options.modes.contains(TraverseMode.TRANSIT)) {
-            //assume that the max average transit speed over a hop is 10 m/s, which is so far true for
-            //New York and Portland
+            // assume that the max average transit speed over a hop is 10 m/s, which is so far true
+            // for
+            // New York and Portland
             return 10;
         } else {
             if (options.optimizeFor == OptimizeType.QUICK) {
                 return options.speed;
             } else {
-                //assume that the best route is no more than 10 times better than
-                //the as-the-crow-flies flat base route.  
-                return options.speed * 10; 
+                // assume that the best route is no more than 10 times better than
+                // the as-the-crow-flies flat base route.
+                return options.speed * 10;
             }
         }
     }
