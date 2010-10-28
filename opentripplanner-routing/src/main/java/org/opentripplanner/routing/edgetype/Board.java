@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * departure, in addition the pattern that was boarded. When traversed backward, the result
  * state is unchanged.
  */
-public class Board extends AbstractEdge {
+public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
     String start_id; // a street vertex's id
 

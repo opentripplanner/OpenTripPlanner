@@ -104,6 +104,10 @@ public class GraphPath {
     public void optimize() {
         State state = vertices.lastElement().state.clone();
         State state0 = vertices.firstElement().state;
+        
+        state.alightedLocal = false;
+        state.everBoarded = false;
+        
         if (edges.isEmpty()) {
             /* nothing to optimize */
             return;
@@ -134,7 +138,6 @@ public class GraphPath {
                     state.lastEdgeWasStreet = false;
                 }
                 TraverseResult result = edge.payload.traverseBack(state, options);
-                assert (result != null);
                 state = result.state;
                 edge.fromv.state = state;
             }

@@ -63,7 +63,7 @@ public class BasicShortestPathTree implements ShortestPathTree {
 
     
     public SPTVertex getVertex(Vertex vv) {
-        return (SPTVertex) this.vertices.get(vv);
+        return this.vertices.get(vv);
     }
 
     public GraphPath getPath(Vertex dest) {

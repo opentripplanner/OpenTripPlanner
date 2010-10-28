@@ -162,12 +162,12 @@ public class TestHalfEdges extends TestCase {
         HashSet<Edge> turns = new HashSet<Edge>(graph.getOutgoing(left));
         turns.addAll(graph.getOutgoing(leftBack));
         
-        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start", turns, new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        StreetLocation start = StreetLocation.createStreetLocation("start", "start", turns, new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         HashSet<Edge> endTurns = new HashSet<Edge>(graph.getOutgoing(right));
         endTurns.addAll(graph.getOutgoing(rightBack));
         
-        StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end", endTurns, new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
+        StreetLocation end = StreetLocation.createStreetLocation("end", "end", endTurns, new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
         
         assertTrue(start.getX() < end.getX());
         assertTrue(start.getY() < end.getY());

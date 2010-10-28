@@ -304,6 +304,24 @@ public class TestPatternHopFactory extends TestCase {
             }
         }
         assertEquals(1, num_alights);
+        
+        options.setArriveBy(true);
+        spt = AStar.getShortestPathTreeBack(graph, stop_i, stop_k, 
+                new State(startTime), options);
+        path = spt.getPath(stop_i);
+        path.reverse();
+        num_alights = 0;
+        for (SPTEdge e : path.edges) {
+            if (e.payload instanceof PatternAlight || e.payload instanceof Alight) {
+                num_alights += 1;
+            }
+            if (e.payload instanceof PatternDwell) {
+                State state0 = e.fromv.state;
+                State state1 = e.tov.state;
+                assertEquals(10 * 60 * 1000, state1.getTime() - state0.getTime());
+            }
+        }
+        assertEquals(1, num_alights);
     }
     
     public void testTraverseMode() throws Exception {

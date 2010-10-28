@@ -39,6 +39,8 @@ public class GenericVertex implements Vertex, Serializable {
 
     private transient int index;
 
+    private double distanceToNearestTransitStop = Double.MAX_VALUE;
+
     private static int maxIndex = 0;
 
     static final double COS_MAX_LAT = Math.cos(49 * Math.PI / 180);
@@ -169,5 +171,13 @@ public class GenericVertex implements Vertex, Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         index = maxIndex++;
+    }
+
+    public void setDistanceToNearestTransitStop(double distance) {
+        distanceToNearestTransitStop = distance;
+    }
+
+    public double getDistanceToNearestTransitStop() {
+        return distanceToNearestTransitStop;
     }
 }

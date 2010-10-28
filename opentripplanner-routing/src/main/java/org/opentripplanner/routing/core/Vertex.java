@@ -49,4 +49,7 @@ public interface Vertex extends Cloneable {
 
     public String getName();
 
+    public void setDistanceToNearestTransitStop(double distance);
+
+    public double getDistanceToNearestTransitStop();
 }

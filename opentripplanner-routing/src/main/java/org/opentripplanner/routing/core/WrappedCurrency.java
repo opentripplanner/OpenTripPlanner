@@ -67,4 +67,9 @@ public class WrappedCurrency {
     public Currency getCurrency() {
         return value;
     }
+
+    @Override
+    public int hashCode() {
+        return value.hashCode();
+    }
 }

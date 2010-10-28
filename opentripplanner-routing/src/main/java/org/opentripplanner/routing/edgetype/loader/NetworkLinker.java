@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,5 +83,7 @@ public class NetworkLinker {
         }
 
         networkLinkerLibrary.addAllReplacementEdgesToGraph();
+        networkLinkerLibrary.markLocalStops();
+        FindMaxWalkDistances.find(graph);        
     }
 }

@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /** 
  * A vehicle's wait between the end of one run and the beginning of another run on the same block 
  * */
-class InterlineDwellData implements Serializable {
+class InterlineDwellData implements Serializable, OnBoardForwardEdge, OnBoardReverseEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class PatternInterlineDwell extends AbstractEdge {
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
-                newPatternIndex));
+                oldPatternIndex));
     }
 
     public String getDirection() {

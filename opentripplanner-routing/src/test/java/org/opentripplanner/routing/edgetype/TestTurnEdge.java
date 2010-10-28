@@ -25,6 +25,7 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -186,6 +187,11 @@ public class TestTurnEdge extends TestCase {
         graph.addEdge(new MockTransfer(bottom, trIn, 99999));
         graph.addEdge(new MockTransfer(bottomBack, trIn, 99999));
 
+        for (GraphVertex gv : graph.getVertices()) {
+            //set distance to nearest transit stop
+            gv.vertex.setDistanceToNearestTransitStop(0);
+        }
+        
         // with no maxWalkDistance, the transfer will not be taken
 
         TraverseOptions options = new TraverseOptions();

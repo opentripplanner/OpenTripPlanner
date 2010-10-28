@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * previous arrival, in addition the pattern that was boarded. When traversed forwards, the
  * result state is unchanged. An boarding penalty can also be applied to discourage transfers.
  */
-public class PatternAlight extends PatternEdge {
+public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 

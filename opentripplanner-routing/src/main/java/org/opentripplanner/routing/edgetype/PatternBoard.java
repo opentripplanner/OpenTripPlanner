@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * departure, in addition the pattern that was boarded. When traversed backward, the result
  * state is unchanged. A boarding penalty can also be applied to discourage transfers.
  */
-public class PatternBoard extends PatternEdge {
+public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 

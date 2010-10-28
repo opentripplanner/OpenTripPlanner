@@ -260,14 +260,14 @@ public class ContractionHierarchy implements Serializable {
         }
 
         public WitnessSearchResult call() {
-            return searchWitnesses(vertex, hopLimit, nodeLimit, dummy, neighbors, weightLimit, wSet,
+            return searchWitnesses(vertex, hopLimit, nodeLimit, neighbors, weightLimit, wSet,
                     ws, u);
         }
     }
 
     @SuppressWarnings("unchecked")
     private WitnessSearchResult searchWitnesses(Vertex vertex, int hopLimit, int nodeLimit,
-            State dummy, HashMap<Vertex, List<VertexIngress>> neighbors, double baseWeightLimit,
+            HashMap<Vertex, List<VertexIngress>> neighbors, double baseWeightLimit,
             HashSet<Vertex> wSet, List<VertexIngress> ws, VertexIngress u) {
         Dijkstra dijkstra = new Dijkstra(graph, u.vertex, options, vertex, hopLimit - 1);
         dijkstra.setNeighbors(neighbors);
@@ -551,7 +551,7 @@ public class ContractionHierarchy implements Serializable {
 
             // after a hop limit upgrade, rebuild the priority queue
             if (oldHopLimit != hopLimit) {
-                pq = rebuildPriorityQueue(options, hopLimit, deletedNeighbors);
+                pq = rebuildPriorityQueue(hopLimit, deletedNeighbors);
             }
         }
         threadPool.shutdownNow();
@@ -565,7 +565,7 @@ public class ContractionHierarchy implements Serializable {
         threadPool = new ThreadPoolExecutor(nThreads, nThreads, 10, TimeUnit.SECONDS, taskQueue);
     }
 
-    private FibHeap<Vertex> rebuildPriorityQueue(TraverseOptions options, int hopLimit,
+    private FibHeap<Vertex> rebuildPriorityQueue(int hopLimit,
             HashMap<Vertex, Integer> deletedNeighbors) {
         FibHeap<Vertex> newpq = new FibHeap<Vertex>(graph.getVertices().size());
         for (GraphVertex gv : graph.getVertices()) {

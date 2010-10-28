@@ -42,7 +42,6 @@ import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
@@ -50,13 +49,13 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -154,6 +153,11 @@ class EncodedTrip implements Comparable<EncodedTrip> {
     public StopTime getFirstStop(GtfsRelationalDao dao) {
         List<StopTime> stops = dao.getStopTimesForTrip(pattern.getExemplar());
         return stops.get(0);
+    }
+
+    @Override
+    public int hashCode() {
+        return (trip.hashCode() * 31 + patternIndex) * 31 + pattern.hashCode();
     }
 }
 
@@ -264,7 +268,7 @@ public class GTFSPatternHopFactory {
 
         for (Trip trip : trips) {
 
-            if (index % 100 == 0)
+            if (index % 1000 == 0)
                 _log.debug("trips=" + index + "/" + trips.size());
             index++;
 
@@ -459,7 +463,6 @@ public class GTFSPatternHopFactory {
 
         loadTransfers(graph);
         deleteUselessDwells(graph);
-        shrinkPatterns(graph);
         clearCachedData();
       }
 
@@ -494,24 +497,8 @@ public class GTFSPatternHopFactory {
 
                 //add edges from arrive to stop and stop to depart
 
-                graph.addEdge(new FreeEdge(arrive, stopVertex));
-                graph.addEdge(new FreeEdge(stopVertex, depart));
-            }
-        }
-    }
-    /**
-     * Replace BasicTripPatterns with ArrayTripPatterns.
-     */
-    private void shrinkPatterns(Graph graph) {
-        for (GraphVertex gv : graph.getVertices()) {
-            for (Edge e: gv.getOutgoing()) {
-                if (e instanceof PatternEdge) {
-                    PatternEdge pe = (PatternEdge) e;
-                    TripPattern pattern = pe.getPattern();
-                    if (pattern instanceof BasicTripPattern) {
-                        pe.setPattern(((BasicTripPattern) pattern).convertToArrayTripPattern());
-                    }
-                }
+                graph.addEdge(new PreAlightEdge(arrive, stopVertex));
+                graph.addEdge(new PreBoardEdge(stopVertex, depart));
             }
         }
     }

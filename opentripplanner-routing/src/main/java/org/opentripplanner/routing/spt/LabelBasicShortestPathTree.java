@@ -51,7 +51,7 @@ public class LabelBasicShortestPathTree implements ShortestPathTree {
     }
 
     public SPTVertex getVertex(Vertex vv) {
-        return (SPTVertex) vertices.get(vv.getLabel());
+        return vertices.get(vv.getLabel());
     }
 
     public GraphPath getPath(Vertex dest) {

@@ -181,7 +181,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             LinearLocation location = l.project(coordinate);
 
             Coordinate nearestPoint = location.getCoordinate(g);
-            return StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
+            return StreetLocation.createStreetLocation(bestStreet.getName() + "_"
                     + coordinate.toString(), bestStreet.getName(), edges, nearestPoint);
         }
         return null;

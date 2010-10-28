@@ -68,13 +68,13 @@ public class TestFares extends TestCase {
         long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();
 
         // from zone 3 to zone 2
-        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8346", new State(startTime),
+        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", new State(startTime),
                 options);
 
-        path = spt.getPath(gg.getVertex("TriMet_8346"));
+        path = spt.getPath(gg.getVertex("TriMet_8371"));
         assertNotNull(path);
         Fare cost = path.getCost();
-        assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 200));
+        assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
 
         // long trip
 

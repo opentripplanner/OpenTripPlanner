@@ -72,7 +72,7 @@ public class StreetLocation extends GenericVertex {
      * 
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
+    public static StreetLocation createStreetLocation(String label, String name,
             Collection<Edge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
@@ -93,7 +93,7 @@ public class StreetLocation extends GenericVertex {
             }
             boolean seen = cache.containsKey(street.getGeometry());
             /* forward edges and vertices */
-            StreetVertex edgeLocation = createHalfLocation(graph, location, label + " to "
+            StreetVertex edgeLocation = createHalfLocation(location, label + " to "
                     + street.getToVertex().getLabel(), name, nearestPoint, street, cache);
 
             if (!seen) {
@@ -102,6 +102,11 @@ public class StreetLocation extends GenericVertex {
 
                 location.extra.add(l1in);
                 location.extra.add(l1out);
+            }
+            
+            double distance = fromv.getDistanceToNearestTransitStop();
+            if (distance < location.getDistanceToNearestTransitStop()) {
+                location.setDistanceToNearestTransitStop(distance);
             }
         }
 
@@ -115,7 +120,7 @@ public class StreetLocation extends GenericVertex {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    private static StreetVertex createHalfLocation(Graph graph, StreetLocation base, String label,
+    private static StreetVertex createHalfLocation(StreetLocation base, String label,
             String name, Coordinate nearestPoint, Edge edge, HashMap<Geometry, P2<StreetVertex>> cache) {
 
         StreetEdge street = (StreetEdge) edge;

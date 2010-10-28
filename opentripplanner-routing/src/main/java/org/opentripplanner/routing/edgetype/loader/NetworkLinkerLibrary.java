@@ -32,6 +32,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.slf4j.Logger;
@@ -355,6 +356,11 @@ public class NetworkLinkerLibrary {
         }
 
         return new P2<Entry<StreetVertex, Set<Edge>>>(startingVertex, endingVertex);
+    }
+
+    public void markLocalStops() {
+        LocalStopFinder localStopFinder = new LocalStopFinder(index, graph);
+        localStopFinder.markLocalStops();
     }
 
 }

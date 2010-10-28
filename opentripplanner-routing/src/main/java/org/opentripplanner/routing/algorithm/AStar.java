@@ -29,13 +29,10 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.OnBoardReverseEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -119,6 +116,10 @@ public class AStar {
         origin = target;
         target = tmp;
 
+        options = options.clone();
+        /** max walk distance cannot be less than distances to nearest transit stops */
+        options.maxWalkDistance += origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
+        
         /* generate extra edges for StreetLocations */
         Map<Vertex, ArrayList<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
@@ -218,10 +219,31 @@ public class AStar {
 
                 Vertex fromv = edge.getFromVertex();
                 double new_w = spt_u.weightSum + wr.weight;
-                distance = tov.fastDistance(target) / max_speed;
+                double euclidianDistance = fromv.fastDistance(target);
                 if (useTransit) {
-                    distance = Math.min(distance + options.boardCost,
-                            options.walkReluctance * tov.fastDistance(target) / options.speed);
+                    if (spt_u.state.alightedLocal) {
+                        distance = options.walkReluctance * euclidianDistance / options.speed;
+                    } else {
+                        int boardCost;
+                        if (edge instanceof OnBoardReverseEdge) {
+                            boardCost = options.boardCost;
+                        } else {
+                            boardCost = 0;
+                        }
+
+                        if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
+                            distance = options.walkReluctance * euclidianDistance / options.speed;
+                        } else {                            
+                            double mandatoryWalkDistance = target.getDistanceToNearestTransitStop() + fromv.getDistanceToNearestTransitStop();
+                            distance = (euclidianDistance - mandatoryWalkDistance) / max_speed + 
+                                mandatoryWalkDistance * options.walkReluctance / options.speed + 
+                                boardCost;
+                            distance = Math.min(distance,
+                                    options.walkReluctance * euclidianDistance / options.speed);
+                        }
+                    }
+                } else {
+                    distance = options.walkReluctance * euclidianDistance / max_speed;
                 }
 
                 double heuristic_distance = new_w + distance;
@@ -312,6 +334,10 @@ public class AStar {
 
         boolean useTransit = options.modes.getTransit();
 
+        options = options.clone();
+        /** max walk distance cannot be less than distances to nearest transit stops */
+        options.maxWalkDistance += origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
+        
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
@@ -349,7 +375,6 @@ public class AStar {
             }
 
             for (Edge edge : outgoing) {
-
                 State state = spt_u.state;
                 Vertex tov = edge.getToVertex();
                 if (tov == target) {
@@ -373,20 +398,31 @@ public class AStar {
                 }
 
                 double new_w = spt_u.weightSum + wr.weight;
-
-                distance = tov.fastDistance(target) / max_speed;
+                double euclidianDistance = tov.fastDistance(target);
                 if (useTransit) {
-                    int boardCost;
-                    if (edge instanceof PatternHop || edge instanceof PatternBoard
-                            || edge instanceof PatternDwell
-                            || edge instanceof PatternInterlineDwell || edge instanceof Board
-                            || edge instanceof Hop) {
-                        boardCost = 0;
+                    if (spt_u.state.alightedLocal) {
+                        distance = options.walkReluctance * euclidianDistance / options.speed;
                     } else {
-                        boardCost = options.boardCost;
+                        int boardCost;
+                        if (edge instanceof OnBoardForwardEdge) {
+                            boardCost = options.boardCost;
+                        } else {
+                            boardCost = 0;
+                        }
+
+                        if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
+                            distance = options.walkReluctance * euclidianDistance / options.speed;
+                        } else {                            
+                            double mandatoryWalkDistance = target.getDistanceToNearestTransitStop() + tov.getDistanceToNearestTransitStop();
+                            distance = (euclidianDistance - mandatoryWalkDistance) / max_speed + 
+                                mandatoryWalkDistance * options.walkReluctance / options.speed + 
+                                boardCost;
+                            distance = Math.min(distance,
+                                    options.walkReluctance * euclidianDistance / options.speed);
+                        }
                     }
-                    distance = Math.min(distance + boardCost,
-                            options.walkReluctance * tov.fastDistance(target) / options.speed);
+                } else {
+                    distance = options.walkReluctance * euclidianDistance / max_speed;
                 }
 
                 double heuristic_distance = new_w + distance;

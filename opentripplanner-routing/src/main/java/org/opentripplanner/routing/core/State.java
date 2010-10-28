@@ -31,6 +31,8 @@ public class State {
     public FareContext fareContext;
     public boolean lastEdgeWasStreet = false;
     public int numBoardings = 0;
+    public boolean alightedLocal = false;
+    public boolean everBoarded = false;
 
     public State() {
         this(System.currentTimeMillis());
@@ -41,11 +43,11 @@ public class State {
     }    
 
     public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
-        this(time, pattern, tripId, walkDistance, null, null, null, 0);
+        this(time, pattern, tripId, walkDistance, null, null, null, 0, false, false);
     }
 
     public State(long time, int trip, AgencyAndId tripId, double walkDistance,
-            AgencyAndId route, String zone, FareContext fareContext, int numBoardings) {
+            AgencyAndId route, String zone, FareContext fareContext, int numBoardings, boolean alightedLocal, boolean everBoarded) {
         _time = time;
         this.trip = trip;
         this.tripId = tripId;
@@ -54,6 +56,8 @@ public class State {
         this.zone = zone;
         this.fareContext = fareContext;
         this.numBoardings = numBoardings;
+        this.alightedLocal = alightedLocal;
+        this.everBoarded = everBoarded;
     }
 
     public void setZoneAndRoute(String zone, AgencyAndId route, FareContext context) {
@@ -74,7 +78,7 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(_time, trip, tripId, walkDistance, route, zone, fareContext, numBoardings);
+        State ret = new State(_time, trip, tripId, walkDistance, route, zone, fareContext, numBoardings, alightedLocal, everBoarded);
         return ret;
     }
 

@@ -122,4 +122,14 @@ public class SPTVertex implements Vertex, Serializable {
     public int hashCode() {
         return mirror.hashCode();
     }
+
+    @Override
+    public double getDistanceToNearestTransitStop() {
+        return mirror.getDistanceToNearestTransitStop();
+    }
+
+    @Override
+    public void setDistanceToNearestTransitStop(double distance) {
+        throw new UnsupportedOperationException();
+    }
 }

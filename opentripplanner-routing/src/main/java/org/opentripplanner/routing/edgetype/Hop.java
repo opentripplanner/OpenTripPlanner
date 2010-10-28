@@ -34,7 +34,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Hop extends AbstractEdge implements Comparable<Hop> {
+public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwardEdge, OnBoardReverseEdge {
 
     public static class HopArrivalTimeComparator implements Comparator<Hop> {
 

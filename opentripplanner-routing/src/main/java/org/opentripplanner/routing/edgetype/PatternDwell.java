@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Geometry;
  *  Models waiting in a station on a vehicle.  The vehicle may not change 
  *  names during this time -- PatternInterlineDwell represents that case.
  */
-public class PatternDwell extends PatternEdge {
+public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge {
     
     private static final long serialVersionUID = 1L;
 

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.FareContext;
@@ -57,6 +58,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     public FareContext fareContext;
 
     public ArrayTripPattern arrayPattern = null;
+
+    public ArrayList<Stop> stops;
     
     @SuppressWarnings("unchecked")
     public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes, FareContext fareContext) {
@@ -79,8 +82,10 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             arrivalTimes[i] = new ArrayList<Integer>();
         }
 
+        stops = new ArrayList<Stop>(stopTimes.size());
         i = 0;
         for (StopTime stopTime : stopTimes) {
+            stops.add(stopTime.getStop());
             zones[i] = stopTimes.get(i).getStop().getZoneId();
             if (stopTime.getStop().getWheelchairBoarding() != 0) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;

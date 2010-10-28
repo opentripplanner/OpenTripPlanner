@@ -81,4 +81,9 @@ public class Money implements Comparable<Money> {
     public int getCents() {
         return cents;
     }
+
+    @Override
+    public int hashCode() {
+        return currency.hashCode() * 31 + cents;
+    }
 }

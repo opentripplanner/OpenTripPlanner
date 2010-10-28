@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.PrecisionModel;
  * A transit vehicle's journey between departure at one stop and arrival at the next.
  * This version represents a set of such journeys specified by a TripPattern.
  */
-public class PatternHop extends PatternEdge {
+public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge {
 
     private static final long serialVersionUID = 1L;
 
