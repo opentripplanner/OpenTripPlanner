@@ -87,7 +87,7 @@ public class Dijkstra {
         closed.add(taboo);
         
         while (!queue.empty()) { // Until the priority queue is empty:
-            spt_u = (SPTVertex) queue.peek_min(); // get the lowest-weightSum Vertex 'u',
+            spt_u = queue.peek_min(); // get the lowest-weightSum Vertex 'u',
             if (spt_u.weightSum > weightLimit) {
                 return spt;
             }
@@ -152,7 +152,7 @@ public class Dijkstra {
 
         while (!queue.empty()) { // Until the priority queue is empty:
             
-            spt_u = (SPTVertex) queue.peek_min(); // get the lowest-weightSum Vertex 'u',
+            spt_u = queue.peek_min(); // get the lowest-weightSum Vertex 'u',
 
             Vertex fromv = spt_u.mirror;
 

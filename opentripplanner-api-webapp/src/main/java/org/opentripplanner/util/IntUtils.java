@@ -31,7 +31,7 @@ public class IntUtils {
     }
 
     public static final double roundDouble(double d, int places) {
-        return Math.round(d * Math.pow(10, (double) places)) / Math.pow(10, (double) places);
+        return Math.round(d * Math.pow(10, places)) / Math.pow(10, places);
     }
 
     /** take a string of ints (eg: 1,2,3,4), and return a List of Integers */

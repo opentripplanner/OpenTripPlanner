@@ -104,7 +104,7 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
      */
     private Coordinate[] getCachedCoords() {
         if (coordRef != null) {
-            Coordinate[] coords = (Coordinate[]) coordRef.get();
+            Coordinate[] coords = coordRef.get();
             if (coords != null) {
                 return coords;
             } else {

@@ -96,7 +96,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         if (ee.getElevationProfile() != null) {
             return; /* already set up */
         }
-        Geometry g = (Geometry) ee.getGeometry();
+        Geometry g = ee.getGeometry();
         Coordinate[] coords = g.getCoordinates();
         
         List<Coordinate> coordList = new LinkedList<Coordinate>();

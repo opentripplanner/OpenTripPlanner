@@ -163,7 +163,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     startIntersection = new EndpointVertex(startIntersectionName, startCoordinate.x,
                             startCoordinate.y, startIntersectionName);
                     
-                    startIntersection = (EndpointVertex) graph.addVertex(startIntersection);                  
+                    startIntersection = graph.addVertex(startIntersection);                  
                     startIntersection = graph.addVertex(startIntersection);
                     intersectionsByLocation.put(startCoordinate, startIntersection);
                 }

@@ -185,7 +185,7 @@ public class TestContractionHeirarchies extends TestCase {
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
                         }
-                        graph.addEdge(new TurnEdge((StreetVertex) fromv, (StreetVertex) tov));
+                        graph.addEdge(new TurnEdge(fromv, tov));
                     }
                     assertTrue(graph.getDegreeOut(fromv) <= 4);
                 }

@@ -54,8 +54,8 @@ public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
             if (path == null) {
                 throw new RuntimeException("Path not set");
             }
-            reader = (GeoTiffReader) format.getReader(path);
-            coverage = (GridCoverage2D) reader.read(null);
+            reader = format.getReader(path);
+            coverage = reader.read(null);
         } catch (IOException e) {
             throw new RuntimeException("Error getting coverage automatically. ", e);
         }
