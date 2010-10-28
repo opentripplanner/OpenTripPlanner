@@ -1,0 +1,8 @@
+package org.opentripplanner.routing.edgetype;
+
+/* marker interface for edges which are on board a transit vehicle
+ * when traversing forward
+ */
+public interface OnBoardForwardEdge {
+
+}
