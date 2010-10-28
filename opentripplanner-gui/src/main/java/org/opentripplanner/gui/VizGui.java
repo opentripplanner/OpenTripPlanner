@@ -343,9 +343,37 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 /* set up metadata tab */
                 metadataModel.clear();
                 Class<?> c = selected.getClass();
-                metadataModel.addElement("Class:" + c);
-                Field[] fields = c.getDeclaredFields();
-                for (int i = 0; i < fields.length; i++) {
+                Field[] fields;
+                while (c != null && c != Object.class) {
+                    metadataModel.addElement("Class:" + c);
+                    fields = c.getDeclaredFields();
+                    for (int i = 0; i < fields.length; i++) {
+                        Field field = fields[i];
+                        int modifiers = field.getModifiers();
+                        if ((modifiers & Modifier.STATIC) != 0) {
+                            continue;
+                        }
+                        field.setAccessible(true);
+                        String name = field.getName();
+                        String value = "(unknown -- see console for stack trace)";
+                        try {
+                            value = "" + field.get(selected);
+                        } catch (IllegalArgumentException e1) {
+                            e1.printStackTrace();
+                        } catch (IllegalAccessException e1) {
+                            e1.printStackTrace();
+                        }
+                        metadataModel.addElement(name + ": " + value);
+                    }
+                    c = c.getSuperclass();
+                }
+                //fromv
+                Vertex fromv = selected.getFromVertex();
+                c = fromv.getClass();
+                while (c != null && c != Object.class) {
+                    metadataModel.addElement("From vertex class:" + c);
+                    fields = c.getFields();
+                    for (int i = 0; i < fields.length; i++) {
                     Field field = fields[i];
                     int modifiers = field.getModifiers();
                     if ((modifiers & Modifier.STATIC) != 0) {
@@ -355,13 +383,15 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     String name = field.getName();
                     String value = "(unknown -- see console for stack trace)";
                     try {
-                        value = "" + field.get(selected);
+                        value = "" + field.get(fromv);
                     } catch (IllegalArgumentException e1) {
                         e1.printStackTrace();
                     } catch (IllegalAccessException e1) {
                         e1.printStackTrace();
                     }
                     metadataModel.addElement(name + ": " + value);
+                }
+                c = c.getSuperclass();
                 }
 
                 // figure out the pattern, if any
