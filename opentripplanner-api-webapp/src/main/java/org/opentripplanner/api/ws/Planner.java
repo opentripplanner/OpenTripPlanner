@@ -412,6 +412,9 @@ public class Planner {
                 itinerary.transfers++;
                 itinerary.waitingTime += edgeTime;
                 continue;
+            } else if (edgeMode == TraverseMode.ALIGHTING) {
+                    itinerary.waitingTime += edgeTime;
+                    continue;
             } else if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
                 itinerary.walkTime += edgeTime;
                 itinerary.walkDistance += edge.getDistance();
