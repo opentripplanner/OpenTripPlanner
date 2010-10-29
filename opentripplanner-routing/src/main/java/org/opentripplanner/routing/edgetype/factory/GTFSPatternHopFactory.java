@@ -910,7 +910,7 @@ public class GTFSPatternHopFactory {
         double prevDistance = distances[index - 1];
         if (prevDistance == distances[index]) {
             _log.warn("duplicate shape_dist_traveled value for some shape in shapes.txt.  For what it's worth, the value is " + prevDistance);
-            return new LinearLocation(0, 0.0);
+            return new LinearLocation(index - 1, 1.0);
         }
         double indexPart = (distance - distances[index - 1])
                 / (distances[index] - prevDistance);
