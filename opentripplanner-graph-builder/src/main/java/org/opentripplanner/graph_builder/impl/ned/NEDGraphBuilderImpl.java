@@ -28,7 +28,11 @@ import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -95,6 +99,14 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     private void processEdge(EdgeWithElevation ee) {
         if (ee.getElevationProfile() != null) {
             return; /* already set up */
+        }
+        Vertex fromv = ee.getFromVertex();
+        if (fromv instanceof StreetVertex) {
+            StreetVertex sv = ((StreetVertex) fromv);
+            if (!sv.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+                /* non-bikeable streets don't care about elevation */
+                return;
+            }
         }
         Geometry g = ee.getGeometry();
         Coordinate[] coords = g.getCoordinates();
