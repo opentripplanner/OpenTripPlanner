@@ -176,7 +176,7 @@ public class ContractionHierarchy implements Serializable {
             //allow about a second of inefficiency in routes in the name of planning 
             //efficiency (+ 1)
             double weightLimit = u.weight + maxWWeight - minXWeight + 1;
-            WitnessSearch task = new WitnessSearch(vertex, hopLimit, nodeLimit, state, neighbors,
+            WitnessSearch task = new WitnessSearch(vertex, hopLimit, nodeLimit, neighbors,
                     weightLimit, wSet, ws, u);
             tasks.add(task);
         }
@@ -233,8 +233,6 @@ public class ContractionHierarchy implements Serializable {
 
         private HashMap<Vertex, List<VertexIngress>> neighbors;
 
-        private State dummy;
-
         private int hopLimit;
 
         private HashSet<Vertex> wSet;
@@ -245,13 +243,12 @@ public class ContractionHierarchy implements Serializable {
 
         private int nodeLimit;
 
-        public WitnessSearch(Vertex vertex, int hopLimit, int nodeLimit, State dummy,
+        public WitnessSearch(Vertex vertex, int hopLimit, int nodeLimit,
                 HashMap<Vertex, List<VertexIngress>> neighbors, double weightLimit,
                 HashSet<Vertex> wSet, List<VertexIngress> ws, VertexIngress u) {
             this.vertex = vertex;
             this.hopLimit = hopLimit;
             this.nodeLimit = nodeLimit;
-            this.dummy = dummy;
             this.neighbors = neighbors;
             this.weightLimit = weightLimit;
             this.wSet = wSet;

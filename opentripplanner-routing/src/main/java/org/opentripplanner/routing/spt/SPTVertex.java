@@ -54,10 +54,6 @@ public class SPTVertex implements Vertex, Serializable {
         this.hops = hops;
     }
 
-    public void addOutgoing(SPTEdge ee) {
-        throw new UnsupportedOperationException();
-    }
-
     public SPTEdge setParent(SPTVertex parent, Edge ep) {
         incoming = new SPTEdge(parent, this, ep);
         return incoming;

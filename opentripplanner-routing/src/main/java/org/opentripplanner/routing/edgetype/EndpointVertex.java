@@ -14,11 +14,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.GenericVertex;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
-
-import com.vividsolutions.jts.geom.Geometry;
-
 
 /** in an edge-based graph, represents what would be a vertex in a normal graph */
 
@@ -33,26 +28,6 @@ public class EndpointVertex extends GenericVertex {
     }
 
     private static final long serialVersionUID = 1L;
-
-    public boolean canTraverse(TraverseOptions wo) {
-        throw new UnsupportedOperationException();
-    }
-
-    public double computeWeight(State s0, TraverseOptions wo, double time) {
-        throw new UnsupportedOperationException();
-    }
-
-    public double getBicycleSafetyEffectiveLength() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Geometry getGeometry() {
-        throw new UnsupportedOperationException();
-    }
-
-    public double getLength() {
-        throw new UnsupportedOperationException();
-    }
 
     public StreetTraversalPermission getPermission() {
         throw new UnsupportedOperationException();
