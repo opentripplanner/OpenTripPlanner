@@ -61,6 +61,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private HashMap<P2<String>, P2<Double>> safetyFeatures = new HashMap<P2<String>, P2<Double>>();
 
+    private HashSet<P2<String>> _slopeOverrideTags = new HashSet<P2<String>>();
+
     private class KeyValuePermission {
         public String key;
 
@@ -108,6 +110,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
         if (!_tagPermissions.containsKey("__default__")) {
             _log.warn("No default permissions for osm tags...");
+        }
+    }
+
+    /**
+     * Streets where the slope is assumed to be flat because the underlying topographic
+     * data cannot be trusted
+     * 
+     * @param features a list of osm attributes in the form key=value
+     */
+    public void setSlopeOverride(List<String> features) {
+        for (String tag : features) {
+            int ch_eq = tag.indexOf("=");
+
+            if (ch_eq >= 0) {
+                String key = tag.substring(0, ch_eq), value = tag.substring(ch_eq + 1);
+                _slopeOverrideTags.add(new P2<String>(key, value));
+            } 
         }
     }
 
@@ -477,6 +496,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     || ("steps".equals(way.getTags().get("highway")) && !"yes".equals(way.getTags()
                             .get("wheelchair")))) {
                 street.setWheelchairAccessible(false);
+            }
+            
+            Map<String, String> tags = way.getTags();
+            for (P2<String> kvp : _slopeOverrideTags) {
+                String key = kvp.getFirst();
+                String value = kvp.getSecond();
+                if (value.equals(tags.get(key))) {
+                    street.setSlopeOverride(true);
+                    break;
+                }
             }
 
             return street;
