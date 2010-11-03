@@ -29,18 +29,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * {@link GraphBuilder} plugin that supports adding transit network data from a GTFS feed to the
- * routing {@link Graph}.
- * 
- * Supports reading from multiple {@link GtfsReader} instances sequentially with respect to GTFS
- * entity classes. That is to say, given three feeds A, B, and C, all {@link Agency} entities will
- * be read from A, B, and C in turn, and then all {@link ShapePoint} entities will be read from A,
- * B, and C in turn, and so forth. This sequential reading scheme allows for cases where two
- * separate feeds may have cross-feed references (ex. StopTime => Stop) as facilitated by the use of
- * an {@link EntityReplacementStrategy}.
- * 
- * @author bdferris
- * 
+ * Check the geometry of every edge in the graph for any bogus geometry --
+ * that is, geometry with coordinates of NaN.
+ * This is mainly good for debugging, but probably worth keeping on for production
+ * because the cost is small compared to the pain of debugging.
  */
 public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
