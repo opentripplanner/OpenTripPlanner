@@ -63,7 +63,7 @@ public class NetworkLinkerLibrary {
 
         _log.debug("constructing index...");
         this.index = new StreetVertexIndexServiceImpl(graph);
-        this.index.setup_modifiable();
+        this.index.setup();
     }
 
     /**

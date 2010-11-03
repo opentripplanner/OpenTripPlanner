@@ -52,7 +52,7 @@ public class NetworkLinker {
 
         for (GraphVertex gv : vertices) {
             Vertex v = gv.vertex;
-            if (i % 500 == 0)
+            if (i % 10000 == 0)
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;
 
@@ -84,6 +84,6 @@ public class NetworkLinker {
 
         networkLinkerLibrary.addAllReplacementEdgesToGraph();
         networkLinkerLibrary.markLocalStops();
-        FindMaxWalkDistances.find(graph);        
+        FindMaxWalkDistances.find(graph);
     }
 }
