@@ -104,15 +104,11 @@ public class TransitServerGtfs {
         
         GtfsRelationalDao dao = getGtfsContext().getDao();
         
-        // associate routes with stops and shape points
+        // associate routes with stops
         for (StopTime stopTime : dao.getAllStopTimes()) {
             Stop stop = stopTime.getStop();
             Trip trip = stopTime.getTrip();
-            String shapeId = trip.getShapeId().toString();
-            if (shapeId == null) {
-                System.out.println("shape id is null, continuing");
-                continue;
-            }
+
             Route route = trip.getRoute();
             String routeId = route.getId().toString();            
             String stopId = stop.getId().toString();
