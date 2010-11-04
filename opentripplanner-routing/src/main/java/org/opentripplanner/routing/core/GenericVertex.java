@@ -72,8 +72,8 @@ public class GenericVertex implements Vertex, Serializable {
     public double fastDistance(Vertex v) {
 
         double xd = v.getX() - getX();
-        double yd = v.getY() - getY();
-        return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR * COS_MAX_LAT;
+        double yd = v.getY() - getY() * COS_MAX_LAT;
+        return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR;
 
     }
 
