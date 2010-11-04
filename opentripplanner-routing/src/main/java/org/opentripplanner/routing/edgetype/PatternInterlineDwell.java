@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /** 
  * A vehicle's wait between the end of one run and the beginning of another run on the same block 
  * */
-class InterlineDwellData implements Serializable, OnBoardForwardEdge, OnBoardReverseEdge {
+class InterlineDwellData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -46,7 +46,7 @@ class InterlineDwellData implements Serializable, OnBoardForwardEdge, OnBoardRev
     }
 }
 
-public class PatternInterlineDwell extends AbstractEdge {
+public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,6 +54,8 @@ public class PatternInterlineDwell extends AbstractEdge {
 
     private Map<AgencyAndId, InterlineDwellData> reverseTripIdToInterlineDwellData;
 
+    private int bestDwellTime = Integer.MAX_VALUE;
+    
     private Trip targetTrip;
 
     public PatternInterlineDwell(Vertex startJourney, Vertex endJourney, Trip targetTrip) {
@@ -71,6 +73,9 @@ public class PatternInterlineDwell extends AbstractEdge {
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
                 oldPatternIndex));
+        if (dwellTime < bestDwellTime) {
+            bestDwellTime = dwellTime;
+        }
     }
 
     public String getDirection() {
@@ -89,6 +94,10 @@ public class PatternInterlineDwell extends AbstractEdge {
         return GtfsLibrary.getRouteName(targetTrip.getRoute());
     }
 
+    public double optimisticTraverse(TraverseOptions wo) {
+        return bestDwellTime;
+    }
+    
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
 

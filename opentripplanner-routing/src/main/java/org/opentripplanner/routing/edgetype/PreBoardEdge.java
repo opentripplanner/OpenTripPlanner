@@ -21,7 +21,7 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 /** Applies the local stop rules (see TransitStop.java and LocalStopFinder.java) */
-public class PreBoardEdge extends FreeEdge implements OnBoardForwardEdge {
+public class PreBoardEdge extends FreeEdge {
 
     private static final long serialVersionUID = -8046937388471651897L;
 
@@ -58,7 +58,7 @@ public class PreBoardEdge extends FreeEdge implements OnBoardForwardEdge {
             s1.alightedLocal = true;
         }
 
-        return new TraverseResult(0, s0);
+        return new TraverseResult(0, s1);
     }
 
 }

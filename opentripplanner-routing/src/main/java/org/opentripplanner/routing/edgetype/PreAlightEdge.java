@@ -55,7 +55,7 @@ public class PreAlightEdge extends FreeEdge {
         }
         s1.everBoarded = true;
 
-        return new TraverseResult(0, s0);
+        return new TraverseResult(0, s1);
     }
 
 }
