@@ -124,10 +124,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(featureList);
             
-            int j = 0;
             for (SimpleFeature feature : featureList) {
-                System.out.println(j + "/" + featureList.size());
-                j++;
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
                 Object o = streetIdConverter.convert(feature);
