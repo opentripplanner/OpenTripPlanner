@@ -124,6 +124,9 @@ otp.util.DateUtils = {
     isoDateStringToDate : function(str) {
         if (!str)
             return null;
+        if (str.lastIndexOf("Z") != -1) {
+        	str = str.substring(0, str.length - 1);
+        }
         var tokens = str.split(/[\-\+T:]/);
         var date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3],
                 tokens[4], tokens[5], 0);
