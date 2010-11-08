@@ -40,8 +40,17 @@ public class FindMaxWalkDistances {
     public static void find(Graph graph) {
         _log.debug("finding max walk distances");
         for (GraphVertex gv : graph.getVertices()) {
+            gv.vertex.setDistanceToNearestTransitStop(Double.MAX_VALUE);
+        }
+        for (GraphVertex gv : graph.getVertices()) {
             if (gv.vertex instanceof TransitStop) { 
                 assignStopDistances(graph, (TransitStop) gv.vertex);
+            }
+        }
+        for (GraphVertex gv : graph.getVertices()) {
+            if (gv.vertex.getDistanceToNearestTransitStop() == Double.MAX_VALUE) {
+                /* transit vertices don't get explored by assignStopDistances */
+                gv.vertex.setDistanceToNearestTransitStop(0);
             }
         }
     }
