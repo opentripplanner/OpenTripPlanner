@@ -75,6 +75,9 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWit
         super(v1, v2);
         this.geometry = geometry;
         this.length = length;
+        slopeSpeedEffectiveLength = length;
+        bicycleSafetyEffectiveLength = length;
+        slopeCostEffectiveLength = length;
         this.name = name;
         this.permission = permission;
         this.back = back;
