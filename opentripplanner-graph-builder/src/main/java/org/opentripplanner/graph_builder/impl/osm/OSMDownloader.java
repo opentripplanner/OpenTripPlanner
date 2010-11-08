@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class OSMDownloader {
-    private final Logger _log = LoggerFactory.getLogger(OSMDownloader.class);
+    private static final Logger _log = LoggerFactory.getLogger(OSMDownloader.class);
 
     private NumberFormat _format = new DecimalFormat("0.0000");
 

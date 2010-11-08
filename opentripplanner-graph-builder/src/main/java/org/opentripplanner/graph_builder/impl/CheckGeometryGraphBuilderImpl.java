@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
-    private final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
 
     @Override
     public void buildGraph(Graph graph) {

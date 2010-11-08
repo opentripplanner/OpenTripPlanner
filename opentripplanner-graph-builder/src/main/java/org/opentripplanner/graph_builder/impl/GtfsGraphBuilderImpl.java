@@ -68,7 +68,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GtfsGraphBuilderImpl implements GraphBuilder {
 
-    private final Logger _log = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
+    private static final Logger _log = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
 
     private GtfsBundles _gtfsBundles;
 

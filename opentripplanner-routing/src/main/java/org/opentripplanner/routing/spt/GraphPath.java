@@ -90,7 +90,7 @@ class Ride {
  * A shortest path on the graph. 
  */
 public class GraphPath {
-    private final Logger _log = LoggerFactory.getLogger(GraphPath.class);
+    private static final Logger _log = LoggerFactory.getLogger(GraphPath.class);
     
     public Vector<SPTVertex> vertices;
 
