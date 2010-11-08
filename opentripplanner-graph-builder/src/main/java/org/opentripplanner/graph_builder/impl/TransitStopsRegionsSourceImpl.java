@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -31,11 +32,19 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class TransitStopsRegionsSourceImpl implements RegionsSource {
 
+    private static final double METERS_PER_DEGREE_LAT = 111111;
+    private double distance = 2000;
+    
     private Graph _graph;
 
     @Autowired
     public void setGraph(Graph graph) {
         _graph = graph;
+    }
+
+
+    public void setDistance(double distance) {
+        this.distance = distance;
     }
 
     @Override
@@ -46,9 +55,12 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
         for (GraphVertex gv : _graph.getVertices()) {
             Vertex vertex = gv.vertex;
             if (vertex instanceof TransitStop) {
-                Envelope env = new Envelope(vertex.getCoordinate());
-                // TODO - Would be nice to express this in meters
-                env.expandBy(0.02);
+                Coordinate c = vertex.getCoordinate();
+                Envelope env = new Envelope(c);
+                double meters_per_degree_lon_here =  
+                    METERS_PER_DEGREE_LAT * Math.cos(Math.toRadians(c.y));
+                env.expandBy(distance / meters_per_degree_lon_here,  
+                        distance / METERS_PER_DEGREE_LAT);
                 regions.add(env);
             }
         }
