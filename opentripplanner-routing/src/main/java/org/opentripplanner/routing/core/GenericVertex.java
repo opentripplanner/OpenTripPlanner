@@ -39,7 +39,7 @@ public class GenericVertex implements Vertex, Serializable {
 
     private transient int index;
 
-    private double distanceToNearestTransitStop = Double.MAX_VALUE;
+    private double distanceToNearestTransitStop = 0;
 
     private static int maxIndex = 0;
 
