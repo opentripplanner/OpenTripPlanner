@@ -28,13 +28,15 @@ public interface Vertex extends Cloneable {
      */
     public String getStopId();
 
-    /** This is a fast but totally inaccurate distance function used as a heuristic in A* */
-    public double fastDistance(Vertex v);
-
     /**
-     * This is a correct distance function used during non-time-critical functions.
+     * Distance in meters to the coordinate
      */
     public double distance(Coordinate c);
+    
+    /**
+     * Distance in meters to the vertex
+     */
+    public double distance(Vertex v);
 
     /**
      * @return The location of the vertex in longitude/latitude

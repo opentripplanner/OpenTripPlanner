@@ -154,7 +154,7 @@ public class AStar {
         }
         final double max_speed = getMaxSpeed(options);
 
-        double distance = origin.fastDistance(target) / max_speed;
+        double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -219,7 +219,7 @@ public class AStar {
 
                 Vertex fromv = edge.getFromVertex();
                 double new_w = spt_u.weightSum + wr.weight;
-                double euclidianDistance = fromv.fastDistance(target);
+                double euclidianDistance = fromv.distance(target);
                 if (useTransit) {
                     if (spt_u.state.alightedLocal) {
                         distance = options.walkReluctance * euclidianDistance / options.speed;
@@ -324,7 +324,7 @@ public class AStar {
             }
         }
         final double max_speed = getMaxSpeed(options);
-        double distance = origin.fastDistance(target) / max_speed;
+        double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -398,7 +398,7 @@ public class AStar {
                 }
 
                 double new_w = spt_u.weightSum + wr.weight;
-                double euclidianDistance = tov.fastDistance(target);
+                double euclidianDistance = tov.distance(target);
                 if (useTransit) {
                     if (spt_u.state.alightedLocal) {
                         distance = options.walkReluctance * euclidianDistance / options.speed;

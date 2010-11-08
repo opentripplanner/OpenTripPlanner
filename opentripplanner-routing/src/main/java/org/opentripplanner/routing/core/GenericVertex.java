@@ -43,10 +43,6 @@ public class GenericVertex implements Vertex, Serializable {
 
     private static int maxIndex = 0;
 
-    static final double COS_MAX_LAT = Math.cos(49 * Math.PI / 180);
-
-    static final double METERS_PER_DEGREE_AT_EQUATOR = 111319.9;
-
     public GenericVertex(String label, Coordinate coord, String name) {
         this(label, coord.x, coord.y, name);
     }
@@ -69,16 +65,13 @@ public class GenericVertex implements Vertex, Serializable {
         this.stopId = stopId;
     }
 
-    public double fastDistance(Vertex v) {
-
-        double xd = v.getX() - getX();
-        double yd = v.getY() - getY() * COS_MAX_LAT;
-        return Math.sqrt(xd * xd + yd * yd) * METERS_PER_DEGREE_AT_EQUATOR;
-
-    }
-
     public double distance(Coordinate c) {
         return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
+    }
+
+    @Override
+    public double distance(Vertex v) {
+        return DistanceLibrary.distance(getY(), getX(), v.getY(), v.getX());
     }
 
     public Coordinate getCoordinate() {
@@ -180,4 +173,5 @@ public class GenericVertex implements Vertex, Serializable {
     public double getDistanceToNearestTransitStop() {
         return distanceToNearestTransitStop;
     }
+
 }

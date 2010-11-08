@@ -85,8 +85,8 @@ public class SPTVertex implements Vertex, Serializable {
     }
 
     @Override
-    public double fastDistance(Vertex v) {
-        return mirror.fastDistance(v);
+    public double distance(Vertex v) {
+        return mirror.distance(v);
     }
 
     @Override
