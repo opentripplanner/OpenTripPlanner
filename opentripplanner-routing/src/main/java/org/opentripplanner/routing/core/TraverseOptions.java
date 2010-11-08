@@ -70,7 +70,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     /** How much worse walking is than waiting for an equivalent length of time, as 
      * a multiplier.
      */
-    public double walkReluctance = 1.1;
+    public double walkReluctance = 2.0;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int boardCost = 120; 
