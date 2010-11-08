@@ -52,7 +52,7 @@ public class LocalStopFinder {
 
     private static final int MAX_SUBOPTIMAL_DISTANCE = 10; /* allow a slop of ~10 seconds */
 
-    private static final double LOCAL_STOP_SEARCH_RADIUS = 800; /* how far to search for nearby stops */
+    private static final double LOCAL_STOP_SEARCH_RADIUS = 1000; /* how far to search for nearby stops */
 
     private HashSet<TripPattern> patterns;
 
@@ -119,10 +119,9 @@ public class LocalStopFinder {
                 Stop nextStop = stops.get(i + 1);
                 nextDistances = getNeighborhood(nextStop);
 
-                /* todo: check that biking works too */
-
                 if (previousDistances == null) {
-                    /* first stop is never local */
+                    // first stop is never local
+                    nonLocal ++;
                     transitStop.setLocal(false);
                     continue;
                 } else {
@@ -160,14 +159,15 @@ public class LocalStopFinder {
                         if (transitStop.isLocal()) {
                             nonLocal ++;
                         }
-                        transitStop.setLocal(local);
+                        transitStop.setLocal(false);
                     }
                 }
             }
-            /* last stop is never local */
+            // last stop is never local
             Stop stop = stops.get(stops.size() - 1);
             TransitStop transitStop = getVertexForStop(stop);
             transitStop.setLocal(false);
+            nonLocal++;
         }
         _log.debug("Local stops: " + (total - nonLocal) + " / " + total);
     }
