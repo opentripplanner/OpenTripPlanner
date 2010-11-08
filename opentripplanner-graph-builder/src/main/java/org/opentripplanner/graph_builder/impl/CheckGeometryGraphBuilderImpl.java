@@ -13,10 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.ShapePoint;
-import org.onebusaway.gtfs.serialization.GtfsReader;
-import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
