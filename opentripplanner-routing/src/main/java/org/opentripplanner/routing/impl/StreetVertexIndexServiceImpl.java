@@ -215,7 +215,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double envelopeGrowthRate = 0.0002;
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
-        while (nearby.size() < 1 && i < 10) {
+        double bestDistance = Double.MAX_VALUE;
+        while (bestDistance > MAX_DISTANCE_FROM_STREET && i < 10) {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
             envelopeGrowthRate *= 2;
@@ -230,7 +231,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
              * a pedestrian should be able to go in any direction.
              */
 
-            double bestDistance = Double.MAX_VALUE;
+            bestDistance = Double.MAX_VALUE;
             Edge bestEdge = null;
             nearby = edgeTree.query(envelope);
             if (nearby != null) {
@@ -245,6 +246,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                             }
                         }
                         double distance = g.distance(p);
+                        if (distance > envelope.getWidth() / 2) {
+                            // Even if an edge is outside the query envelope, bounding boxes can  
+                            // still intersect. In this case, distance to the edge is greater 
+                            // than the query envelope size.
+                            continue;
+                        }
                         if (distance < bestDistance) {
                             bestDistance = distance;
                             bestEdge = e;
