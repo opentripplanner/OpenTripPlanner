@@ -265,7 +265,10 @@ public class TestContractionHeirarchies extends TestCase {
         if (path == null || path.edges.size() != 4) {
             path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], init, options);
         }
-
+        
+        options = new TraverseOptions();
+        options.optimizeFor = OptimizeType.QUICK;
+        options.speed = 1;
         for (int x1 = 0; x1 < N; ++x1) {
             for (int y1 = 0; y1 < N; ++y1) {
                 for (int x2 = 0; x2 < N; ++x2) {

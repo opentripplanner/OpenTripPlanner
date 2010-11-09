@@ -69,7 +69,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 public class ContractionHierarchy implements Serializable {
-    private final Logger _log = LoggerFactory.getLogger(ContractionHierarchy.class);
+    private static final Logger _log = LoggerFactory.getLogger(ContractionHierarchy.class);
 
     private static final long serialVersionUID = 6651191142274381518L;
 
@@ -381,6 +381,7 @@ public class ContractionHierarchy implements Serializable {
 
         options = new TraverseOptions(new TraverseModeSet(mode));
         options.optimizeFor = optimize;
+        options.maxWalkDistance = Double.MAX_VALUE;
         this.contractionFactor = contractionFactor;
 
         init();
