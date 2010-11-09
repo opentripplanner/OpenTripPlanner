@@ -16,12 +16,12 @@ package org.opentripplanner.routing.edgetype.factory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -110,54 +110,79 @@ class StopPattern {
     }
 }
 
-/**
- * An EncodedTrip is an intermediate object used during GTFS processing. It represents a trip as it
- * will be put into a TripPattern. It's used during interlining processing, to create that the extra
- * PatternDwell edges where someone stays on a vehicle as its number changes.
- */
-class EncodedTrip implements Comparable<EncodedTrip> {
-    Trip trip;
+class InterliningTrip  implements Comparable<InterliningTrip> {
+    public Trip trip;
+    public StopTime firstStopTime;
+    public StopTime lastStopTime;
+    BasicTripPattern tripPattern;
 
-    int patternIndex;
-
-    BasicTripPattern pattern;
-
-    public EncodedTrip(Trip trip, int i, BasicTripPattern pattern) {
+    InterliningTrip(Trip trip, List<StopTime> stopTimes, BasicTripPattern tripPattern) {
         this.trip = trip;
-        this.patternIndex = i;
-        this.pattern = pattern;
+        this.firstStopTime = stopTimes.get(0);
+        this.lastStopTime = stopTimes.get(stopTimes.size() - 1);
+        this.tripPattern = tripPattern;
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof EncodedTrip))
-            return false;
-        EncodedTrip eto = (EncodedTrip) o;
-        return trip.equals(eto.trip) && patternIndex == eto.patternIndex
-                && pattern.equals(eto.pattern);
+    public int getPatternIndex() {
+        return tripPattern.getPatternIndex(trip);
     }
-
-    public String toString() {
-        return "EncodedTrip(" + this.trip + ", " + this.patternIndex + ", " + this.pattern + ")";
-    }
-
+    
     @Override
-    public int compareTo(EncodedTrip other) {
-        return patternIndex - other.patternIndex;
+    public int compareTo(InterliningTrip o) {
+        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime(); 
     }
+    
+}
 
-    public StopTime getLastStop(GtfsRelationalDao dao) {
-        List<StopTime> stops = dao.getStopTimesForTrip(pattern.getExemplar());
-        return stops.get(stops.size() - 1);
+class BlockIdAndServiceId {
+    public String blockId;
+    public AgencyAndId serviceId;
+
+    BlockIdAndServiceId(String blockId, AgencyAndId serviceId) {
+        this.blockId = blockId;
+        this.serviceId = serviceId;
     }
-
-    public StopTime getFirstStop(GtfsRelationalDao dao) {
-        List<StopTime> stops = dao.getStopTimesForTrip(pattern.getExemplar());
-        return stops.get(0);
+    
+    public boolean equals(Object o) {
+        if (o instanceof BlockIdAndServiceId) {
+            BlockIdAndServiceId other = ((BlockIdAndServiceId) o);
+            return other.blockId.equals(blockId) && other.serviceId.equals(serviceId);
+        }
+        return false;
     }
 
     @Override
     public int hashCode() {
-        return (trip.hashCode() * 31 + patternIndex) * 31 + pattern.hashCode();
+        return blockId.hashCode() * 31 + serviceId.hashCode();
+    }
+}
+
+class InterlineSwitchoverKey {
+
+    public Stop s0, s1;
+    public BasicTripPattern pattern1, pattern2;
+
+    public InterlineSwitchoverKey(Stop s0, Stop s1, BasicTripPattern pattern1,
+            BasicTripPattern pattern2) {
+        this.s0 = s0;
+        this.s1 = s1;
+        this.pattern1 = pattern1;
+        this.pattern2 = pattern2;
+    }
+    
+    public boolean equals(Object o) {
+        if (o instanceof InterlineSwitchoverKey) {
+            InterlineSwitchoverKey other = (InterlineSwitchoverKey) o;
+            return other.s0.equals(s0) && 
+                other.s1.equals(s1) &&
+                other.pattern1 == pattern1 &&
+                other.pattern2 == pattern2;
+        }
+        return false;
+    }
+    
+    public int hashCode() {
+        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode(); 
     }
 }
 
@@ -166,7 +191,7 @@ class EncodedTrip implements Comparable<EncodedTrip> {
  */
 public class GTFSPatternHopFactory {
 
-    private final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
+    private static final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
 
     private static GeometryFactory _factory = new GeometryFactory();
 
@@ -181,6 +206,10 @@ public class GTFSPatternHopFactory {
     private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
     private FareContext fareContext = null;
+
+    private HashMap<BlockIdAndServiceId, List<InterliningTrip>> tripsForBlock = new HashMap<BlockIdAndServiceId, List<InterliningTrip>>();
+
+    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -239,23 +268,6 @@ public class GTFSPatternHopFactory {
 
         int index = 0;
 
-        /*
-         * To handle interlining, we need some fairly complex machinery.
-         * 
-         * Keep in mind that the block_id represents a trip that is on a particular vehicle. There
-         * are cases where a vehicle's route is a loop, and when it hits the end, it simply starts
-         * over. Then there are cases where a bus goes from A to B on trip 1, then from B to C on
-         * trip 2, then from C to A on trip 3. This may or may not repeat.
-         * 
-         * When we see a trip on a given block, we add it to a set of trips on that block starting
-         * at a given stop, ordered by its departure time.
-         * 
-         * In post-processing, we then take each trip, and try to hook it up to its next trip, if
-         * any, by looking up its last stop, and finding the first trip with a later departure time
-         * and the same block_id from that stop.
-         */
-
-        HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart = new HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>>();
         HashMap<Trip, List<Frequency>> tripFrequencies = new HashMap<Trip, List<Frequency>>();
         for(Frequency freq : _dao.getAllFrequencies()) {
             List<Frequency> freqs= tripFrequencies.get(freq.getTrip());
@@ -326,8 +338,7 @@ public class GTFSPatternHopFactory {
 
                     patterns.put(stopPattern, tripPattern);
                     if (blockId != null && !blockId.equals("")) {
-                        addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
-                                blockId);
+                        addTripToInterliningMap(trip, stopTimes, tripPattern);
                     }
                 } else {
                     int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
@@ -375,8 +386,7 @@ public class GTFSPatternHopFactory {
                     }
                     if (!simple) {
                         if (blockId != null && !blockId.equals("")) {
-                            addTripToInterliningMap(tripsByBlockAndStart, trip, stopTimes, tripPattern,
-                                    blockId);
+                            addTripToInterliningMap(trip, stopTimes, tripPattern);
                         }
                         tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
                     }
@@ -384,80 +394,56 @@ public class GTFSPatternHopFactory {
             }
         }
 
-        HashMap<TripPattern, HashMap<TripPattern, PatternInterlineDwell>> dwellEdges = new HashMap<TripPattern, HashMap<TripPattern, PatternInterlineDwell>>();
-
-        /* for interlined trips, add final dwell edge */
-        for (HashMap<Stop, TreeSet<EncodedTrip>> blockStops : tripsByBlockAndStart.values()) {
-            for (Stop stop : blockStops.keySet()) {
-                TreeSet<EncodedTrip> tripsStartingAt = blockStops.get(stop);
-
-                // now we would like to find a list of trips which might follow
-                // these trips
-
-                for (EncodedTrip eTrip : tripsStartingAt) {
-                    Trip trip = eTrip.trip;
-                    List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
-                    StopTime lastStopTime = stopTimes.get(stopTimes.size() - 1);
-                    Stop lastStop = lastStopTime.getStop();
-                    TreeSet<EncodedTrip> possiblePosts = null;
-                    if (blockStops.containsKey(lastStop)) {
-                        possiblePosts = blockStops.get(lastStop);
-                    } else {
-                        continue;
-                    }
-
-                    EncodedTrip[] postArray = possiblePosts.toArray(new EncodedTrip[0]);
-                    int postIndex = 0;
-
-                    // find the actual posts
-                    int arrivalTime = lastStopTime.getArrivalTime();
-                    EncodedTrip post;
-                    do {
-                        post = postArray[postIndex];
-                        ++postIndex;
-                    } while (postIndex < postArray.length
-                            && postArray[postIndex].getFirstStop(_dao).getDepartureTime() < arrivalTime);
-
-                    if (post == null || post.getFirstStop(_dao).getDepartureTime() < arrivalTime) {
-                        continue;
-                    }
-
-                    // now create or update dwell edge between prior and this
-
-                    // does the dwell edge already exist?
-                    PatternInterlineDwell dwell = null;
-
-                    HashMap<TripPattern, PatternInterlineDwell> edges = dwellEdges
-                            .get(eTrip.pattern);
-
-                    if (edges != null) {
-                        dwell = edges.get(post.pattern);
-                    }
-                    if (dwell == null) {
-                        Trip extrip = eTrip.pattern.getExemplar();
-                        List<StopTime> exStopTimes = _dao.getStopTimesForTrip(extrip);
-                        StopTime exLastStopTime = exStopTimes.get(exStopTimes.size() - 1);
-                        String arriveId = id(lastStop.getId()) + "_"
-                                + id(extrip.getId()) + "_" + exLastStopTime.getStopSequence() + "_A";
-                        Vertex arrive = graph.getVertex(arriveId);
-
-                        String departId = id(lastStop.getId()) + "_"
-                                + id(post.pattern.getExemplar().getId()) + "_" + post.getFirstStop(_dao).getStopSequence() + "_D";
-                        Vertex depart = graph.getVertex(departId);
-
-                        dwell = new PatternInterlineDwell(arrive, depart, trip);
-                        graph.addEdge(dwell);
-
-                        if (edges == null) {
-                            edges = new HashMap<TripPattern, PatternInterlineDwell>();
-                            dwellEdges.put(eTrip.pattern, edges);
-                        }
-                        edges.put(eTrip.pattern, dwell);
-                    }
-                    int departureTime = post.getFirstStop(_dao).getArrivalTime();
-                    int dwellTime = departureTime - arrivalTime;
-                    dwell.addTrip(trip.getId(), post.trip.getId(), dwellTime, eTrip.patternIndex, post.patternIndex);
+        for (List<InterliningTrip> blockTrips : tripsForBlock.values()) {
+            if (blockTrips.size() == 1) {
+                //blocks of only a single trip do not need processing
+                continue;
+            }            
+            Collections.sort(blockTrips); 
+            
+            /* this is all the trips for this block/schedule */
+            
+            for (int i = 0; i < blockTrips.size() - 1; ++i) {
+                InterliningTrip fromInterlineTrip = blockTrips.get(i);
+                InterliningTrip toInterlineTrip = blockTrips.get(i + 1);
+                
+                Trip fromTrip = fromInterlineTrip.trip;                
+                Trip toTrip = toInterlineTrip.trip;
+                
+                StopTime st0 = fromInterlineTrip.lastStopTime;
+                StopTime st1 = toInterlineTrip.firstStopTime;
+                
+                Stop s0 = st0.getStop();
+                Stop s1 = st1.getStop();
+                
+                Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
+                Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
+                
+                List<StopTime> fromStopTimes = _dao.getStopTimesForTrip(fromExemplar);
+                int exemplarStopSequence0 = fromStopTimes.get(fromStopTimes.size() - 1).getStopSequence();
+                
+                List<StopTime> toStopTimes = _dao.getStopTimesForTrip(toExemplar);
+                int exemplarStopSequence1 = toStopTimes.get(0).getStopSequence();
+                
+                PatternInterlineDwell dwell;
+                // do we already have a PID for this dwell?
+                InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(s0, s1, fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
+                dwell = getInterlineDwell(dwellKey);
+                if (dwell == null) {
+                    
+                    // create the dwell
+                    String startId = id(s0.getId()) + "_" + id(fromExemplar.getId()) + "_"  + exemplarStopSequence0 + "_A";
+                    Vertex startJourney = graph.getVertex(startId);
+                    String endId = id(s1.getId()) + "_" + id(toExemplar.getId()) + "_"  + exemplarStopSequence1 + "_D";
+                    Vertex endJourney = graph.getVertex(endId);
+                    dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
+                    putInterlineDwell(dwellKey, dwell);
+                    graph.addEdge(dwell);
                 }
+                int dwellTime = st1.getDepartureTime() - st0.getArrivalTime();
+                dwell.addTrip(fromTrip.getId(), toTrip.getId(), dwellTime, 
+                        fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
+
             }
         }
 
@@ -465,6 +451,14 @@ public class GTFSPatternHopFactory {
         deleteUselessDwells(graph);
         clearCachedData();
       }
+
+    private void putInterlineDwell(InterlineSwitchoverKey key, PatternInterlineDwell dwell) {
+        interlineDwells.put(key, dwell);
+    }
+
+    private PatternInterlineDwell getInterlineDwell(InterlineSwitchoverKey key) {
+        return interlineDwells.get(key);
+    }
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : _dao.getAllPathways()) {
@@ -538,21 +532,15 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private void addTripToInterliningMap(
-            HashMap<String, HashMap<Stop, TreeSet<EncodedTrip>>> tripsByBlockAndStart, Trip trip,
-            List<StopTime> stopTimes, BasicTripPattern tripPattern, String blockId) {
-        HashMap<Stop, TreeSet<EncodedTrip>> blockStops = tripsByBlockAndStart.get(blockId);
-        if (blockStops == null) {
-            blockStops = new HashMap<Stop, TreeSet<EncodedTrip>>();
-            tripsByBlockAndStart.put(blockId, blockStops);
+    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, BasicTripPattern tripPattern) {
+        String blockId = trip.getBlockId();
+        BlockIdAndServiceId key = new BlockIdAndServiceId(blockId, trip.getServiceId()); 
+        List<InterliningTrip> trips = tripsForBlock.get(key);
+        if (trips == null) {
+            trips = new ArrayList<InterliningTrip>();
+            tripsForBlock.put(key, trips);
         }
-        Stop firstStop = stopTimes.get(0).getStop();
-        TreeSet<EncodedTrip> stopTrips = blockStops.get(firstStop);
-        if (stopTrips == null) {
-            stopTrips = new TreeSet<EncodedTrip>();
-            blockStops.put(firstStop, stopTrips);
-        }
-        stopTrips.add(new EncodedTrip(trip, 0, tripPattern));
+        trips.add(new InterliningTrip(trip, stopTimes, tripPattern));
     }
 
     private void interpolateStopTimes(List<StopTime> stopTimes) {

@@ -371,4 +371,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         }
         return bestDwellTime;        
     }
+
+    public int getPatternIndex(Trip trip) {
+        return trips.indexOf(trip);
+    }
 }

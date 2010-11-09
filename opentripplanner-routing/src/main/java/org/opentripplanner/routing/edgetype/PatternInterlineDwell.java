@@ -68,7 +68,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime,
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
-            throw new RuntimeException("Negative dwell time");
+            throw new RuntimeException("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId());
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
@@ -94,7 +94,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         return GtfsLibrary.getRouteName(targetTrip.getRoute());
     }
 
-    public double optimisticTraverse(TraverseOptions wo) {
+    public double optimisticTraverse(TraverseOptions options) {
         return bestDwellTime;
     }
     
