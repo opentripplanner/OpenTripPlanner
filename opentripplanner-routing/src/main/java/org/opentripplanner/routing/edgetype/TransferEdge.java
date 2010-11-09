@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -37,8 +36,7 @@ public class TransferEdge extends AbstractEdge {
 
     private Geometry geometry = null;
 
-    private boolean wheelchairAccessible;
-
+    private boolean wheelchairAccessible = true;
 
     /**
      * @see Transfer(Vertex, Vertex, double, int)
@@ -59,13 +57,7 @@ public class TransferEdge extends AbstractEdge {
     public TransferEdge(Vertex fromv, Vertex tov, double distance, int time) {
         super(fromv, tov);
         this.distance = distance;
-        this.time = time;
-        /* Assume that if either stop is not accessible from the street, the
-         * transfer is not accessible.  This will need to be changed when GTFS
-         * and OneBusAway GTFS support accessible transfers.
-         */
-        wheelchairAccessible = ((TransitStop)fromv).hasWheelchairEntrance() &&
-            ((TransitStop)tov).hasWheelchairEntrance();
+        this.time = time; 
     }
 
     public String getDirection() {
@@ -122,6 +114,14 @@ public class TransferEdge extends AbstractEdge {
 
     public void setGeometry(Geometry geometry) {
         this.geometry  = geometry;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
+
+    public boolean isWheelchairAccessible() {
+        return wheelchairAccessible;
     }
 
 }

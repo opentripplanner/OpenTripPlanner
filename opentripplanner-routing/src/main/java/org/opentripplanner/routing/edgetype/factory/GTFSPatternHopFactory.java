@@ -639,9 +639,9 @@ public class GTFSPatternHopFactory {
             st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-            
+
             String departId = id(s0.getId()) + "_" + id(trip.getId()) + "_"  + st0.getStopSequence() + "_D";
-            
+
             String arriveId = id(s1.getId()) + "_" + id(trip.getId()) + "_" + st1.getStopSequence() + "_A";
 
             // create journey vertices
@@ -734,6 +734,15 @@ public class GTFSPatternHopFactory {
                 if (createdTransfers.contains(edge)) {
                     continue;
                 }
+                                
+                /* Assume that if either stop is not accessible from the street, the
+                 * transfer is not accessible.  This will need to be changed when GTFS
+                 * and OneBusAway GTFS support accessible transfers.
+                 */
+                TransitStop fromStopVertex = (TransitStop) graph.getVertex(id(fromStop.getId()));
+                TransitStop toStopVertex = (TransitStop) graph.getVertex(id(toStop.getId()));
+                edge.setWheelchairAccessible(fromStopVertex.hasWheelchairEntrance() &&
+                        toStopVertex.hasWheelchairEntrance());
 
                 LineString geometry = _factory.createLineString(new Coordinate[] {
                         new Coordinate(fromStop.getLon(), fromStop.getLat()),
@@ -909,7 +918,6 @@ public class GTFSPatternHopFactory {
 
         double prevDistance = distances[index - 1];
         if (prevDistance == distances[index]) {
-            _log.warn("duplicate shape_dist_traveled value for some shape in shapes.txt.  For what it's worth, the value is " + prevDistance);
             return new LinearLocation(index - 1, 1.0);
         }
         double indexPart = (distance - distances[index - 1])
