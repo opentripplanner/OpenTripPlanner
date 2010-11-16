@@ -73,8 +73,8 @@ public class StreetVertex extends GenericVertex {
     }
 
     public StreetVertex(String id, LineString geometry, String name, double length, boolean back) {
-        super(id.intern() + (back ? " back" : ""), getCoord(geometry), name);
-        this.edgeId = id.intern();
+        super(id + (back ? " back" : ""), getCoord(geometry), name);
+        this.edgeId = id;
         this.geometry = geometry;
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
