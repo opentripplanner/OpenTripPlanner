@@ -104,7 +104,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait, state1);
+        return new TraverseResult(wait, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
@@ -112,7 +112,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	    return null;
 	}
         State s1 = state0.clone();
-        return new TraverseResult(1, s1);
+        return new TraverseResult(1, s1, this);
     }
 
     private Date getServiceDate(long currentTime, boolean useArrival) {

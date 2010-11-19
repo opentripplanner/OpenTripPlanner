@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -69,7 +71,7 @@ public class ShowGraph extends PApplet {
 
     int startDragX, startDragY;
 
-    private Edge highlightedEdge;
+    private DirectEdge highlightedEdge;
 
     private Vertex highlightedVertex;
 
@@ -157,7 +159,7 @@ public class ShowGraph extends PApplet {
                 // a street-transit link, or a journey vertex. no need for them in the ui.
             }
 
-            for (Edge e : gv.getOutgoing()) {
+            for (DirectEdge e : IterableLibrary.filter(gv.getOutgoing(),DirectEdge.class)) {
                 if (e.getGeometry() == null) {
                     continue;
                 }
@@ -198,7 +200,7 @@ public class ShowGraph extends PApplet {
         List<Vertex> vertices = (List<Vertex>) vertexIndex.query(modelBounds);
 
         List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
-        for (Edge e : edges) {
+        for (DirectEdge e : IterableLibrary.filter(edges,DirectEdge.class)) {
             if (e == highlightedEdge)
                 continue;
 
@@ -390,7 +392,7 @@ public class ShowGraph extends PApplet {
         highlightedVertices = vertices;
     }
 
-    public void highlightEdge(Edge selected) {
+    public void highlightEdge(DirectEdge selected) {
         highlightedEdge = selected;
     }
 }

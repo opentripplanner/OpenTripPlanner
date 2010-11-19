@@ -80,14 +80,14 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(elapsed);
         state1.setZoneAndRoute(getEndStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
-        return new TraverseResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-elapsed);
         state1.setZoneAndRoute(getStartStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
-        return new TraverseResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1, this);
     }
 
     public int compareTo(Hop arg0) {

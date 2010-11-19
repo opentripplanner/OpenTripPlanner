@@ -79,7 +79,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(0);
-        return new TraverseResult(0, state1);
+        return new TraverseResult(0, state1, this);
     }
     
     public TraverseResult traverse(State state0, TraverseOptions options) {
@@ -149,7 +149,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         if (state0.numBoardings == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }
-        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1);
+        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
@@ -158,7 +158,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         }
         State s1 = state0.clone();
         s1.tripId = null;
-        return new TraverseResult(1, s1);
+        return new TraverseResult(1, s1, this);
     }
 
     private ServiceDate getServiceDate(long currentTime, Calendar c) {

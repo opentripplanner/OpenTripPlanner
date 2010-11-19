@@ -38,7 +38,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author novalis
  * 
  */
-public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWithElevation {
+public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -189,7 +189,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWit
         s1.walkDistance += length;
         s1.incrementTimeInSeconds((int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1, this);
     }
 
     @Override
@@ -231,7 +231,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge, EdgeWit
         s1.walkDistance += length;
         s1.incrementTimeInSeconds(-(int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1, this);
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {

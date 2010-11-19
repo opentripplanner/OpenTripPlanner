@@ -89,7 +89,7 @@ public class Graph implements Serializable {
         vertices.get(b.getLabel()).addIncoming(ee);
     }
 
-    public void addEdge(Edge ee) {
+    public void addEdge(DirectEdge ee) {
         Vertex fromv = ee.getFromVertex();
         Vertex tov = ee.getToVertex();
         fromv = addVertex(fromv);
@@ -143,14 +143,18 @@ public class Graph implements Serializable {
             return;
         }
         vertices.remove(vertex.getLabel());
-        for (Edge e: gv.getOutgoing()) {
-            GraphVertex target = vertices.get(e.getToVertex().getLabel());
-            if (target != null) {
-                target.removeIncoming(e);
+        for (Edge e : gv.getOutgoing()) {
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                GraphVertex target = vertices.get(edge.getToVertex().getLabel());
+                if (target != null) {
+                    target.removeIncoming(e);
+                }
             }
         }
         for (Edge e: gv.getIncoming()) {
-            GraphVertex source = vertices.get(e.getFromVertex().getLabel());
+            DirectEdge edge = (DirectEdge) e;
+            GraphVertex source = vertices.get(edge.getFromVertex().getLabel());
             if (source != null) {
                 source.removeIncoming(e);
             }

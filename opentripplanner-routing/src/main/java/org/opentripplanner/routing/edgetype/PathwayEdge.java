@@ -80,7 +80,7 @@ public class PathwayEdge extends AbstractEdge {
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(time);
-        return new TraverseResult(time, s1);
+        return new TraverseResult(time, s1, this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -93,6 +93,6 @@ public class PathwayEdge extends AbstractEdge {
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-time);
-        return new TraverseResult(time, s1);
+        return new TraverseResult(time, s1, this);
     }
 }

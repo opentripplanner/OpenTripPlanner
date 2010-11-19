@@ -13,14 +13,11 @@
 
 package org.opentripplanner.routing.core;
 
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.spt.GraphPath;
 
-import com.vividsolutions.jts.geom.Geometry;
-
 /**
- * This represents an edge in the graph.
+ * This represents an edge transition function in the graph.
  * 
  * <h2>A note about multiple traverse results:</h2>
  * 
@@ -44,30 +41,10 @@ public interface Edge {
 
     public Vertex getFromVertex();
 
-    public Vertex getToVertex();
-
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException;
 
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException;
-
-    public TraverseMode getMode();
-
-    public String getName();
-
-    public String getDirection();
-
-    public Geometry getGeometry();
-
-    public double getDistance();
-
-    public Trip getTrip();
-
-    public void setToVertex(Vertex vertex);
-
-    public void setFromVertex(Vertex vertex);
-
-    public String getName(State state);
 
 }

@@ -16,7 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.LineString;
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink implements Edge, Serializable {
+public class StreetTransitLink implements DirectEdge, Serializable {
 
     private static final long serialVersionUID = -3311099256178798981L;
     private static final double STL_TRAVERSE_COST = 1;
@@ -79,7 +79,7 @@ public class StreetTransitLink implements Edge, Serializable {
         //technically, we only need to do this when we're going
         //off the street onto transit, but it won't hurt 
         //to do it unconditionally.
-        return new TraverseResult(STL_TRAVERSE_COST, s1);
+        return new TraverseResult(STL_TRAVERSE_COST, s1, this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -88,7 +88,7 @@ public class StreetTransitLink implements Edge, Serializable {
         }
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-1);
-        return new TraverseResult(STL_TRAVERSE_COST, s1);
+        return new TraverseResult(STL_TRAVERSE_COST, s1, this);
     }
 
     @Override
@@ -106,6 +106,8 @@ public class StreetTransitLink implements Edge, Serializable {
         return null;
     }
 
+    /*
+     * Is this ever used?  Any reason we can't extend from AbstractEdge
     @Override
     public void setFromVertex(Vertex vertex) {
         fromv = vertex;
@@ -115,6 +117,7 @@ public class StreetTransitLink implements Edge, Serializable {
     public void setToVertex(Vertex vertex) {
         tov = vertex;
     }
+    */
 
     @Override
     public String getName(State state) {

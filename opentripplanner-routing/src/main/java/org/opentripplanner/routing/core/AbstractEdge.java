@@ -18,7 +18,7 @@ import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.Trip;
 
-public abstract class AbstractEdge implements Edge, Serializable {
+public abstract class AbstractEdge implements DirectEdge, Serializable {
 
     private static final long serialVersionUID = 1L;
 

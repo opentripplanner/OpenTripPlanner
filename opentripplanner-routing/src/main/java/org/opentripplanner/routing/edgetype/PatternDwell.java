@@ -59,14 +59,14 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         State state1 = state0.clone();
         int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(dwellTime);
-        return new TraverseResult(dwellTime, state1);
+        return new TraverseResult(dwellTime, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
         state1.incrementTimeInSeconds(-dwellTime);
-        return new TraverseResult(dwellTime, state1);
+        return new TraverseResult(dwellTime, state1, this);
     }
 
     public Geometry getGeometry() {

@@ -14,11 +14,11 @@
 package org.opentripplanner.routing.location;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -43,7 +43,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  */
 public class StreetLocation extends GenericVertex {
 
-    private ArrayList<Edge> extra = new ArrayList<Edge>();
+    private ArrayList<DirectEdge> extra = new ArrayList<DirectEdge>();
 
     private boolean wheelchairAccessible;
 
@@ -65,7 +65,7 @@ public class StreetLocation extends GenericVertex {
      * @param label
      * @param name
      * @param edges
-     *            A List of nearby edges, which probably represent one street but might represent a
+     *            A collection of nearby edges, which probably represent one street but might represent a
      *            more complicated situation (imagine a bus stop at the asterisk: *_||). These are
      *            ordered by ascending distance from nearestPoint
      * @param nearestPoint
@@ -73,7 +73,7 @@ public class StreetLocation extends GenericVertex {
      * @return the new StreetLocation
      */
     public static StreetLocation createStreetLocation(String label, String name,
-            Collection<Edge> edges, Coordinate nearestPoint) {
+            Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
 
@@ -81,7 +81,7 @@ public class StreetLocation extends GenericVertex {
         StreetLocation location = new StreetLocation(label, nearestPoint, name);
 
         HashMap<Geometry, P2<StreetVertex>> cache = new HashMap<Geometry, P2<StreetVertex>>();
-        for (Edge street : edges) {
+        for (StreetEdge street : edges) {
             /* TODO: need to check for crossing uncrossable streets (in 
              * previous elements of edges) */
 
@@ -97,8 +97,8 @@ public class StreetLocation extends GenericVertex {
                     + street.getToVertex().getLabel(), name, nearestPoint, street, cache);
 
             if (!seen) {
-                Edge l1in = new FreeEdge(location, edgeLocation);
-                Edge l1out = new FreeEdge(edgeLocation, location);
+                FreeEdge l1in = new FreeEdge(location, edgeLocation);
+                FreeEdge l1out = new FreeEdge(edgeLocation, location);
 
                 location.extra.add(l1in);
                 location.extra.add(l1out);
@@ -159,7 +159,7 @@ public class StreetLocation extends GenericVertex {
             base.extra.add(incoming);
         }
         Vertex tov = street.getToVertex();
-        Edge e;
+        StreetEdge e;
         if (tov instanceof StreetVertex) {
             e = new TurnEdge(location, (StreetVertex) tov);
         } else {
@@ -170,7 +170,7 @@ public class StreetLocation extends GenericVertex {
         return location;
     }
 
-    private static P2<LineString> getGeometry(Edge e, Coordinate nearestPoint) {
+    private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
         Geometry geometry = e.getGeometry();
         return splitGeometryAtPoint(geometry, nearestPoint);
     }
@@ -191,12 +191,12 @@ public class StreetLocation extends GenericVertex {
             return;
         }
 
-        for (Edge e : extra) {
+        for (DirectEdge e : extra) {
             graph.addEdge(e);
         }
     }
 
-    public List<Edge> getExtra() {
+    public List<DirectEdge> getExtra() {
         return extra;
     }
 

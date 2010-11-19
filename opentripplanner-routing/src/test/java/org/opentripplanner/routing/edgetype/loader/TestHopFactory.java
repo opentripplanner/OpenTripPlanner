@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.common.IterableLibrary.*;
 import java.io.File;
 import java.util.GregorianCalendar;
 
@@ -22,6 +23,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -64,11 +66,12 @@ public class TestHopFactory extends TestCase {
             assertEquals(PatternBoard.class, e.getClass());
         }
 
-        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a.getOutgoing().iterator().next().getToVertex());
+        PatternBoard pb = (PatternBoard) stop_a.getOutgoing().iterator().next();
+        GraphVertex journey_a_1 = graph.getGraphVertex(pb.getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (Edge e : journey_a_1.getOutgoing()) {
+        for (DirectEdge e : filter(journey_a_1.getOutgoing(),DirectEdge.class)) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(PatternAlight.class, e.getClass());
             } else {

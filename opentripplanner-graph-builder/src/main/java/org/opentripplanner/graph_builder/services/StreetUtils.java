@@ -16,6 +16,7 @@ package org.opentripplanner.graph_builder.services;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
@@ -40,11 +41,13 @@ public class StreetUtils {
 
         _log.debug("converting to edge-based graph");
         
-        ArrayList<Edge> turns = new ArrayList<Edge>(endpoints.size());
+        ArrayList<DirectEdge> turns = new ArrayList<DirectEdge>(endpoints.size());
+        
         for (Vertex v : endpoints) {
             for (Edge e : graph.getIncoming(v)) {
+                PlainStreetEdge pse = (PlainStreetEdge) e;
                 boolean replaced = false;
-                StreetVertex v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
+                StreetVertex v1 = getStreetVertexForEdge(graph, pse);
                 for (Edge e2 : graph.getOutgoing(v)) {
                     StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
                     if (v1 != v2 && !v1.getEdgeId().equals(v2.getEdgeId())) {
@@ -53,8 +56,8 @@ public class StreetUtils {
                     }
                 }
                 if (!replaced) {
-                    e.setFromVertex(v1);
-                    turns.add(e);
+                    pse.setFromVertex(v1);
+                    turns.add(pse);
                 }
             }
         }
@@ -64,7 +67,7 @@ public class StreetUtils {
             graph.removeVertexAndEdges(v);
         }
         /* add turns */
-        for (Edge e : turns) {
+        for (DirectEdge e : turns) {
             graph.addEdge(e);
         }
     }

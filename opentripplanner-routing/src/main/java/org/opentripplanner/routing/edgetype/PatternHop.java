@@ -72,7 +72,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         State state1 = state0.clone();
         int runningTime = pattern.getBestRunningTime(stopIndex);
         state1.incrementTimeInSeconds(-runningTime);
-        return new TraverseResult(runningTime, state1);
+        return new TraverseResult(runningTime, state1, this);
     }
     
     public TraverseResult traverse(State state0, TraverseOptions wo) {
@@ -81,7 +81,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         state1.incrementTimeInSeconds(runningTime);
         state1.setZoneAndRoute(getEndStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
                 context);
-        return new TraverseResult(runningTime, state1);
+        return new TraverseResult(runningTime, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
@@ -90,7 +90,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         state1.incrementTimeInSeconds(-runningTime);
         state1.setZoneAndRoute(getStartStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
                 context);
-        return new TraverseResult(runningTime, state1);
+        return new TraverseResult(runningTime, state1, this);
     }
 
     public void setGeometry(Geometry geometry) {

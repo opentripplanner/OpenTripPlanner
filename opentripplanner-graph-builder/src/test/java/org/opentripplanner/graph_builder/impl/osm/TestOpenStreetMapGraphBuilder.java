@@ -61,10 +61,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         boolean v4EdgeExists = false;
         boolean v4BackEdgeExists = false;
         for (Edge e : gg.getOutgoing(v2)) {
-            Vertex tov = e.getToVertex();
-
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
+                Vertex tov = t.getToVertex();
                 if (tov == v3 || tov == v3back) {
                     assertTrue("Turn cost wrong; expected ~90, was: " + t.turnCost, Math.abs(t.turnCost - 90) < 3);
                     v3EdgeExists = true;
@@ -73,9 +72,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         }
         
         for (Edge e : gg.getOutgoing(v2back)) {
-            Vertex tov = e.getToVertex();
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
+                Vertex tov = t.getToVertex();
                 if (tov == v3 || tov == v3back) {
                     assertTrue(Math.abs(t.turnCost - 90) < 5);
                     v3EdgeExists = true;
@@ -84,9 +83,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         }
         
         for (Edge e : gg.getOutgoing(v3)) {
-            Vertex tov = e.getToVertex();
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
+                Vertex tov = t.getToVertex();
                 if (tov == v4) {
                     assertTrue("Turn cost too big: " + t.turnCost, t.turnCost < 5);
                     v4EdgeExists = true;
@@ -95,9 +94,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         }
         
         for (Edge e : gg.getOutgoing(v4back)) {
-            Vertex tov = e.getToVertex();
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
+                Vertex tov = t.getToVertex();
                 if (tov == v3back) {
                     assertTrue("Turn cost too big: " + t.turnCost, t.turnCost < 5);
                     v4BackEdgeExists = true;

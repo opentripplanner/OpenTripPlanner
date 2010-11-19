@@ -14,7 +14,6 @@
 package org.opentripplanner.graph_builder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class GraphBuilderTask {
+public class GraphBuilderTask implements Runnable {
     
     private static Logger _log = LoggerFactory.getLogger(GraphBuilderTask.class); 
 
@@ -77,7 +76,7 @@ public class GraphBuilderTask {
         _contractionFactor = contractionFactor;
     }
 
-    public void run() throws IOException {
+    public void run() {
         
         File graphPath = _graphBundle.getGraphPath();
         
@@ -91,6 +90,10 @@ public class GraphBuilderTask {
         
         ContractionHierarchySet chs = new ContractionHierarchySet(_graph, _modeList, _contractionFactor);
         chs.build();
-        ContractionHierarchySerializationLibrary.writeGraph(chs, graphPath);
+        try {
+            ContractionHierarchySerializationLibrary.writeGraph(chs, graphPath);
+        } catch (Exception ex) {
+            throw new IllegalStateException(ex);
+        }
     }
 }

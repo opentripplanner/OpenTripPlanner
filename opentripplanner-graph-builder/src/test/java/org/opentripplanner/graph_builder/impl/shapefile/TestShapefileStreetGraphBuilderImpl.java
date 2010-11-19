@@ -13,6 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -21,7 +23,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
@@ -113,7 +115,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                  */
                 int numParks = 0;
                 int numCarltons = 0;
-                for (Edge e: gv.getOutgoing()) {
+                for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
                     if (e.getToVertex().getName().contains("PARK")) {
                         numParks ++;
                     }
@@ -134,7 +136,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numFlatbushes = 0;
                 int numParks = 0;
 
-                for (Edge e: gv.getOutgoing()) {
+                for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
                     if (e.getToVertex().getName().contains("FLATBUSH")) {
                         numFlatbushes ++;
                     }

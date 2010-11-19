@@ -145,7 +145,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         if (state0.numBoardings == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }
-        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1);
+        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1, this);
     }
 
     @Override
@@ -155,7 +155,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 	}
         State s1 = state0.clone();
         s1.tripId = null;
-        return new TraverseResult(1, s1);
+        return new TraverseResult(1, s1, this);
     }
 
     private ServiceDate getServiceDate(long currentTime, Calendar c) {

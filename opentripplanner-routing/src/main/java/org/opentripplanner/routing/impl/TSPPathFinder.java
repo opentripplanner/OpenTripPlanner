@@ -82,8 +82,8 @@ public class TSPPathFinder {
                 SPTEdge edge = subPath.edges.get(i);
                 TraverseResult result = edge.traverse(state, options);
                 state = result.state;
-                SPTVertex tov = spt.addVertex(edge.payload.getToVertex(), state, result.weight, options);
-                SPTEdge newEdge = tov.setParent(fromv, edge.payload);
+                SPTVertex tov = spt.addVertex(edge.narrative.getToVertex(), state, result.weight, options);
+                SPTEdge newEdge = tov.setParent(fromv, edge.payload,edge.narrative);
                 newPath.vertices.add(fromv);
                 newPath.edges.add(newEdge);
                 fromv = tov;

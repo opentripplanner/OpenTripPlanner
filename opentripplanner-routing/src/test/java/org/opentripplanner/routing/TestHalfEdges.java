@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing;
 
+import static org.opentripplanner.common.IterableLibrary.*;
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -22,6 +23,7 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
@@ -38,6 +40,7 @@ import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
@@ -162,17 +165,17 @@ public class TestHalfEdges extends TestCase {
         HashSet<Edge> turns = new HashSet<Edge>(graph.getOutgoing(left));
         turns.addAll(graph.getOutgoing(leftBack));
         
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", turns, new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        StreetLocation start = StreetLocation.createStreetLocation("start", "start", cast(turns,StreetEdge.class), new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         HashSet<Edge> endTurns = new HashSet<Edge>(graph.getOutgoing(right));
         endTurns.addAll(graph.getOutgoing(rightBack));
         
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", endTurns, new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
+        StreetLocation end = StreetLocation.createStreetLocation("end", "end", cast(endTurns,StreetEdge.class), new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
         
         assertTrue(start.getX() < end.getX());
         assertTrue(start.getY() < end.getY());
         
-        List<Edge> extra = end.getExtra();
+        List<DirectEdge> extra = end.getExtra();
         
         assertEquals(12, extra.size());
         
@@ -230,7 +233,7 @@ public class TestHalfEdges extends TestCase {
         StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01, 40.004), null);
         assertNotNull(start);
 
-        List<Edge> extra = start.getExtra();
+        List<DirectEdge> extra = start.getExtra();
         assertEquals(10, extra.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
@@ -251,14 +254,14 @@ public class TestHalfEdges extends TestCase {
         assertEquals (4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = graph.getOutgoing(station1);
         assertTrue(outgoing.size() == 1);
-        Edge edge = outgoing.iterator().next();
+        DirectEdge edge = (DirectEdge) outgoing.iterator().next();
         
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
         
         outgoing = graph.getOutgoing(station2);
         assertTrue(outgoing.size() == 1);
-        edge = outgoing.iterator().next();
+        edge = (DirectEdge) outgoing.iterator().next();
         
         Vertex station2point = edge.getToVertex();
         assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);

@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
@@ -55,6 +56,9 @@ public class FindMaxWalkDistances {
         }
     }
     
+    /**
+     * TODO - Can this reuse one of the existing search algorithms? 
+     */
     private static void assignStopDistances(Graph graph, TransitStop origin) {
         
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
@@ -85,11 +89,6 @@ public class FindMaxWalkDistances {
             State state = spt_u.state;
 
             for (Edge edge : outgoing) {
-                Vertex toVertex = edge.getToVertex();
-
-                if (closed.contains(toVertex)) {
-                    continue;
-                }
 
                 TraverseResult wr = edge.traverse(state, options);
 
@@ -102,6 +101,15 @@ public class FindMaxWalkDistances {
                 if (wr.weight < 0) {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
+                
+                
+                EdgeNarrative en = wr.getEdgeNarrative();
+                Vertex toVertex = en.getToVertex();
+
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
+
 
                 double new_w = spt_u.weightSum + wr.weight;
 
@@ -116,7 +124,7 @@ public class FindMaxWalkDistances {
                 spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
 
                 if (spt_v != null) {
-                    spt_v.setParent(spt_u, edge);
+                    spt_v.setParent(spt_u, edge,en);
                     queue.insert_or_dec_key(spt_v, new_w);
                 }
             }

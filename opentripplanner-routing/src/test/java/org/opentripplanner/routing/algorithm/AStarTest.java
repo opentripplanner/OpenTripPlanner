@@ -239,7 +239,7 @@ public class AStarTest {
                 throws NegativeWeightException {
             double d = getDistance();
             long t = (long) (d / options.speed);
-            return new TraverseResult(t, new State(s0.getTime() + t));
+            return new TraverseResult(t, new State(s0.getTime() + t), this);
         }
 
         @Override
@@ -247,7 +247,7 @@ public class AStarTest {
                 throws NegativeWeightException {
             double d = getDistance();
             long t = (long) (d / options.speed);
-            return new TraverseResult(t, new State(s0.getTime() - t));
+            return new TraverseResult(t, new State(s0.getTime() - t), this);
         }
 
         @Override

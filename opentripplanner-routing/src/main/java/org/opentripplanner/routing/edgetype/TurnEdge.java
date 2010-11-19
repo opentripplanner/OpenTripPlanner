@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -31,7 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * graph.
  * 
  */
-public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
+public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     public static final String[] DIRECTIONS = { "north", "northeast", "east", "southeast", "south",
             "southwest", "west", "northwest" };
@@ -108,7 +109,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1,this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
@@ -124,7 +125,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1,this);
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -150,6 +151,8 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
         return tov;
     }
 
+    /*
+     * Is this needed?  Can we extend from AbstractVertex instead?
     @Override
     public void setFromVertex(Vertex vertex) {
         fromv = (StreetVertex) vertex;
@@ -159,6 +162,7 @@ public class TurnEdge implements EdgeWithElevation, StreetEdge, Serializable {
     public void setToVertex(Vertex vertex) {
         tov = (StreetVertex) vertex;
     }
+    */
 
     @Override
     public String getName(State state) {

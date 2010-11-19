@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.common.IterableLibrary.*;
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -24,6 +25,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -92,11 +94,12 @@ public class TestPatternHopFactory extends TestCase {
             assertTrue(e instanceof PatternBoard);
         }
         
-        GraphVertex journey_a_1 = graph.getGraphVertex(stop_a_depart.getOutgoing().iterator().next().getToVertex());
+        PatternBoard pb = (PatternBoard) stop_a_depart.getOutgoing().iterator().next();
+        GraphVertex journey_a_1 = graph.getGraphVertex(pb.getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (Edge e : journey_a_1.getOutgoing()) {
+        for (DirectEdge e : filter(journey_a_1.getOutgoing(), DirectEdge.class)) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(Alight.class, e.getClass());
             } else {
@@ -209,14 +212,10 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue(endTime < startTime + 1000 * 60 * 60);
     }
 
-    public Edge getHopOut(Vertex v) {
-        for (Edge e : graph.getOutgoing(v)) {
-            if (e instanceof PatternBoard) {
-                for (Edge f : graph.getOutgoing(e.getToVertex())) {
-                    if (f instanceof PatternHop) {
-                        return f;
-                    }
-                }
+    public PatternHop getHopOut(Vertex v) {
+        for (PatternBoard e : filter(graph.getOutgoing(v), PatternBoard.class)) {
+            for (PatternHop f : filter(graph.getOutgoing(e.getToVertex()), PatternHop.class)) {
+                return (PatternHop) f;
             }
         }
         return null;
@@ -224,7 +223,7 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testShapeByLocation() throws Exception {
         Vertex stop_g = graph.getVertex("agency_G_depart");
-        Edge hop = getHopOut(stop_g);
+        PatternHop hop = getHopOut(stop_g);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
 
@@ -238,7 +237,7 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testShapeByDistance() throws Exception {
         Vertex stop_i = graph.getVertex("agency_I_depart");
-        Edge hop = getHopOut(stop_i);
+        PatternHop hop = getHopOut(stop_i);
         Geometry geometry = hop.getGeometry();
         assertTrue(geometry.getLength() > 1.0);
         assertTrue(geometry.getLength() < 2.0);
@@ -273,11 +272,9 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_k = graph.getVertex("agency_K_depart");
         Vertex stop_n = graph.getVertex("agency_N_arrive");
         int transfers = 0;
-        for (Edge e : graph.getOutgoing(stop_n)) {
-            if (e instanceof TransferEdge) {
-                assertEquals(e.getToVertex(), stop_k);
-                transfers += 1;
-            }
+        for (TransferEdge e : filter(graph.getOutgoing(stop_n), TransferEdge.class)) {
+            assertEquals(e.getToVertex(), stop_k);
+            transfers += 1;
         }
         assertTrue(transfers > 0);
     }
@@ -350,7 +347,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_c = graph.getVertex("agency_C");
         TraverseOptions options = new TraverseOptions(context);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(), stop_c.getLabel(), new State(
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(),stop_c.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 1, 10, 0, 0).getTimeInMillis()), options);
 
         GraphPath path = spt.getPath(stop_c);
@@ -366,10 +363,8 @@ public class TestPatternHopFactory extends TestCase {
 
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex split_d = null;
-        for (Edge e : graph.getOutgoing(stop_d)) {
-            if (e instanceof StreetTransitLink) {
-                split_d = e.getToVertex();
-            }
+        for (StreetTransitLink e : filter(graph.getOutgoing(stop_d), StreetTransitLink.class)) {
+            split_d = e.getToVertex();
         }
         
         TraverseOptions options = new TraverseOptions(context);
@@ -395,7 +390,7 @@ public class TestPatternHopFactory extends TestCase {
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
         spt = AStar.getShortestPathTree(graph, near_a, split_d, new State(time
-                .getTimeInMillis()), options);
+               .getTimeInMillis()), options);
         
         time.add(Calendar.HOUR, 1);
         time.add(Calendar.SECOND, 1); //for the StreetTransitLink

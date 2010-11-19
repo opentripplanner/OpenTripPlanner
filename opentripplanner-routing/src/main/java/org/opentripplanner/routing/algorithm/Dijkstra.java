@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -104,10 +105,6 @@ public class Dijkstra {
 
             for (Edge edge : outgoing) {
                 State state = spt_u.state;
-                Vertex toVertex = edge.getToVertex();
-                if (closed.contains(toVertex)) {
-                    continue;
-                }
 
                 TraverseResult wr = edge.traverse(state, options);
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
@@ -120,12 +117,18 @@ public class Dijkstra {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
                 
+                EdgeNarrative er = wr.getEdgeNarrative();
+                Vertex toVertex = er.getToVertex();
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
+                
                 double new_w = spt_u.weightSum + wr.weight;
              
                 spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
 
                 if (spt_v != null) {
-                    spt_v.setParent(spt_u, edge);
+                    spt_v.setParent(spt_u, edge,er);
 
                     if (spt_u.hops < hopLimit) {
                         queue.insert_or_dec_key(spt_v, new_w);
@@ -178,11 +181,6 @@ public class Dijkstra {
                     //only consider street edges when contracting
                     continue;
                 }
-                Vertex toVertex = edge.getToVertex();
-
-                if (closed.contains(toVertex)) {
-                    continue;
-                }
 
                 TraverseResult wr = edge.traverse(state, options);
 
@@ -196,12 +194,19 @@ public class Dijkstra {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
                 
+                EdgeNarrative er = wr.getEdgeNarrative();
+                Vertex toVertex = er.getToVertex();
+
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
+                
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
 
                 if (spt_v != null) {
-                    spt_v.setParent(spt_u, edge);
+                    spt_v.setParent(spt_u, edge,er);
                     
                     if (spt_u.hops < hopLimit && new_w < weightLimit) {
                         queue.insert_or_dec_key(spt_v, new_w);
@@ -217,7 +222,7 @@ public class Dijkstra {
                         if (neighborWeight < weightLimit) {
                             SPTVertex spt_w = spt.addVertex(w.vertex, newState, neighborWeight, options, spt_u.hops + 2);
                             if (spt_w != null) {
-                                spt_w.setParent(parent, w.edge);
+                                spt_w.setParent(parent, w.edge,w.edge);
                                 queue.insert_or_dec_key(spt_w, neighborWeight);
                             }
                         }

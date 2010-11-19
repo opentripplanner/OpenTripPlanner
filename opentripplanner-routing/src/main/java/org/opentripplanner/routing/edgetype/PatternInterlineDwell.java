@@ -110,7 +110,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         state1.tripId = targetTrip.getId();
         state1.setPattern(dwellData.patternIndex);
 
-        return new TraverseResult(dwellData.dwellTime, state1);
+        return new TraverseResult(dwellData.dwellTime, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
@@ -124,7 +124,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         state1.incrementTimeInSeconds(-dwellData.dwellTime);
         state1.tripId = targetTrip.getId();
         state1.setPattern(dwellData.patternIndex);
-        return new TraverseResult(dwellData.dwellTime, state1);
+        return new TraverseResult(dwellData.dwellTime, state1, this);
     }
 
     public Geometry getGeometry() {

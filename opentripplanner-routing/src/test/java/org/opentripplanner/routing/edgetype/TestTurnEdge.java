@@ -23,7 +23,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
@@ -60,7 +59,7 @@ public class TestTurnEdge extends TestCase {
         TraverseOptions wo = new TraverseOptions();
         wo.speed = ConstantsForTests.WALKING_SPEED;
         
-        Edge ee = new TurnEdge(start, end);
+        TurnEdge ee = new TurnEdge(start, end);
         gg.addEdge(ee);
 
         // Start at October 21, 2009 at 1:00:00pm
@@ -265,13 +264,13 @@ class MockTransfer extends AbstractEdge {
     public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(cost);
-        return new TraverseResult(cost, s1);
+        return new TraverseResult(cost, s1, this);
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
         State s1 = s0.clone();
         s1.incrementTimeInSeconds(-cost);
-        return new TraverseResult(cost, s1);
+        return new TraverseResult(cost, s1, this);
     }
 }

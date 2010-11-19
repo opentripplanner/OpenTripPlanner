@@ -17,7 +17,7 @@ import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -28,19 +28,19 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-public class Shortcut implements Edge, Serializable {
+public class Shortcut implements DirectEdge, Serializable {
     private static final long serialVersionUID = -5813252201367498850L;
     
     Vertex startVertex, endVertex;
     
-    Edge edge1;
-    Edge edge2;
+    DirectEdge edge1;
+    DirectEdge edge2;
     int time;
     double weight = -1;
    
-    public Shortcut(Edge edge1, Edge edge2, int time, double weight) {
-        startVertex = edge1.getFromVertex();
-        endVertex = edge2.getToVertex();
+    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight) {
+        this.startVertex = edge1.getFromVertex();
+        this.endVertex = edge2.getToVertex();
         this.edge1 = edge1;
         this.edge2 = edge2;
         this.time = time;
@@ -83,7 +83,7 @@ public class Shortcut implements Edge, Serializable {
         if (weight != -1) {
             State s1 = s0.clone();
             s1.incrementTimeInSeconds(time);
-            return new TraverseResult(weight, s1);
+            return new TraverseResult(weight, s1,this);
         }
         State state = s0;
         long startTime = state.getTime();
@@ -101,7 +101,7 @@ public class Shortcut implements Edge, Serializable {
         weight = aweight + wr.weight;
         
         time = (int) ((state.getTime() - startTime) / 1000);
-        return new TraverseResult(weight, state);
+        return new TraverseResult(weight, state,this);
     }
 
     @Override
@@ -109,7 +109,7 @@ public class Shortcut implements Edge, Serializable {
         if (weight != -1) {
             State s1 = s0.clone();
             s1.incrementTimeInSeconds(-time);
-            return new TraverseResult(weight, s1);
+            return new TraverseResult(weight, s1,this);
         }
         State state = s0;
         long startTime = state.getTime();
@@ -130,7 +130,7 @@ public class Shortcut implements Edge, Serializable {
         
         
         time = (int) ((startTime - state.getTime()) / 1000);
-        return new TraverseResult(weight, state);
+        return new TraverseResult(weight, state,this);
     }
     
     public String toString() {
@@ -145,16 +145,6 @@ public class Shortcut implements Edge, Serializable {
     @Override
     public Vertex getToVertex() {
         return endVertex;
-    }
-
-    @Override
-    public void setFromVertex(Vertex vertex) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void setToVertex(Vertex vertex) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

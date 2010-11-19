@@ -37,7 +37,7 @@ public class PreAlightEdge extends FreeEdge {
         if (toVertex.isLocal()) {
             s1.alightedLocal = true;
         }
-        return new TraverseResult(0, s1);
+        return new TraverseResult(0, s1, this);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class PreAlightEdge extends FreeEdge {
         }
         s1.everBoarded = true;
 
-        return new TraverseResult(0, s1);
+        return new TraverseResult(0, s0, this);
     }
 
 }

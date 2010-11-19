@@ -16,6 +16,7 @@ package org.opentripplanner.routing.spt;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -40,41 +41,44 @@ public class SPTEdge {
     public SPTVertex tov;
 
     public Edge payload;
+    
+    public EdgeNarrative narrative;
 
-    public SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep) {
+    public SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep, EdgeNarrative narrative) {
         this.fromv = fromv;
         this.tov = tov;
         this.payload = ep;
+        this.narrative = narrative;
     }
 
     public String getDirection() {
-        return payload.getDirection();
+        return narrative.getDirection();
     }
 
     public double getDistance() {
-        return payload.getDistance();
+        return narrative.getDistance();
     }
 
     public Geometry getGeometry() {
-        return payload.getGeometry();
+        return narrative.getGeometry();
     }
 
     public TraverseMode getMode() {
-        return payload.getMode();
+        return narrative.getMode();
     }
 
     public String getName() {
         if (payload instanceof PatternBoard) {
-            return payload.getName(tov.state);
+            return narrative.getName(tov.state);
         } else {
-            return payload.getName(fromv.state);
+            return narrative.getName(fromv.state);
         }
     }
 
     public Trip getTrip() {
 
         if (payload instanceof Board || payload instanceof Hop || payload instanceof Alight) {
-            return payload.getTrip();
+            return narrative.getTrip();
         }
         int patternIndex = -1;
         if (payload instanceof PatternAlight) {
@@ -110,7 +114,7 @@ public class SPTEdge {
     }
 
     public String getName(State state) {
-        return payload.getName(state);
+        return narrative.getName(state);
     }
     
     public boolean equals(Object o) {

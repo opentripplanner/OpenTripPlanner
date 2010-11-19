@@ -26,7 +26,7 @@ public class TraverseResultTest {
         TraverseResult resultChain = null;
 
         for (int i = 0; i < 4; i++) {
-            TraverseResult r = new TraverseResult(i, null);
+            TraverseResult r = new TraverseResult(i, null, null);
             resultChain = r.addToExistingResultChain(resultChain);
         }
 

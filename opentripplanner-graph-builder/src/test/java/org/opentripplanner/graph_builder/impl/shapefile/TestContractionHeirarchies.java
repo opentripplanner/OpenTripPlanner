@@ -13,6 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -27,7 +29,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.contraction.Shortcut;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -81,13 +83,13 @@ class NonFreeEdge extends FreeEdge {
     @Override
     public TraverseResult traverse(State s0, TraverseOptions options) {
         State s1 = s0.clone();
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1,this);
     }
     
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
         State s1 = s0.clone();
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1,this);
     }
 }
 
@@ -177,10 +179,10 @@ public class TestContractionHeirarchies extends TestCase {
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N; ++x) {
                 Vertex vertexIn = verticesIn[y][x];
-                for (Edge e1: graph.getIncoming(vertexIn)) {
+                for (DirectEdge e1: filter(graph.getIncoming(vertexIn),DirectEdge.class)) {
                     Vertex vertexOut = verticesOut[y][x];
                     StreetVertex fromv = (StreetVertex) e1.getFromVertex();
-                    for (Edge e2: graph.getOutgoing(vertexOut)) {
+                    for (DirectEdge e2: filter(graph.getOutgoing(vertexOut),DirectEdge.class)) {
                         StreetVertex tov = (StreetVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
@@ -347,7 +349,7 @@ public class TestContractionHeirarchies extends TestCase {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         Vertex last = null;
         for (Vertex v : vertices) {
-            for (Edge e: graph.getOutgoing(v)) {
+            for (DirectEdge e: filter(graph.getOutgoing(v),DirectEdge.class)) {
                 components.union(v, e.getToVertex());
             }
             last = v;
@@ -561,9 +563,9 @@ public class TestContractionHeirarchies extends TestCase {
         int notNull = 0;
         ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(hierarchy.up.getVertices());
                
-        DisjointSet<Vertex> components = new DisjointSet();
+        DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         for (GraphVertex gv : vertices) {
-            for (Edge e: gv.getOutgoing()) {
+            for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
                 components.union(gv.vertex, e.getToVertex());
             }
         }

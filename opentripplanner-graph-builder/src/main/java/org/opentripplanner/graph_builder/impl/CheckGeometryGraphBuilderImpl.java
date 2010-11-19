@@ -13,8 +13,10 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
@@ -42,7 +44,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                 _log.warn("Vertex " + v + " has NaN location; this will cause doom.");
             }
             
-            for (Edge e : gv.getOutgoing()) {
+            for (EdgeNarrative e : filter(gv.getOutgoing(),EdgeNarrative.class)) {
                 Geometry g = e.getGeometry();
                 if (g == null) {
                     continue;

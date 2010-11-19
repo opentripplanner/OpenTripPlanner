@@ -16,13 +16,13 @@ package org.opentripplanner.routing.core;
 public class VertexIngress {
     public Vertex vertex;
 
-    public Edge edge;
-
+    public DirectEdge edge;
+    
     public double weight;
 
     public long time;
 
-    public VertexIngress(Vertex vertex, Edge edge, double weight, long time) {
+    public VertexIngress(Vertex vertex, DirectEdge edge, double weight, long time) {
         this.vertex = vertex;
         this.edge = edge;
         this.weight = weight;

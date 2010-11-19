@@ -41,14 +41,14 @@ public class FreeEdge extends AbstractEdge {
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException {
         State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1);
+        return new TraverseResult(0.000001, s1, this);
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
         State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1);
+        return new TraverseResult(0.000001, s1, this);
     }
 
     @Override

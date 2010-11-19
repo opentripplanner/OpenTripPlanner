@@ -15,9 +15,6 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 
 public class TestGraph extends TestCase {
@@ -43,7 +40,7 @@ public class TestGraph extends TestCase {
         Graph gg = new Graph();
         Vertex a = gg.addVertex("A", 5, 5);
         Vertex b = gg.addVertex("B", 6, 6);
-        Edge ee = new FreeEdge(a,b);
+        FreeEdge ee = new FreeEdge(a,b);
         gg.addEdge(ee);
         assertNotNull(ee);
     }

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
+import static org.opentripplanner.common.IterableLibrary.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,9 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -196,6 +199,14 @@ public class LocalStopFinder {
         return neighborhood;
     }
 
+    /**
+     * TODO - Any way this can use the existing search code?  AStar or Dijkstra
+     * @param graph
+     * @param origin
+     * @param options
+     * @param nearbyPatterns
+     * @return
+     */
     private HashMap<TripPattern, Double> getBestDistanceForPatterns(Graph graph, Vertex origin,
             TraverseOptions options, Set<TripPattern> nearbyPatterns) {
 
@@ -233,11 +244,7 @@ public class LocalStopFinder {
             State state = spt_u.state;
 
             for (Edge edge : outgoing) {
-                Vertex toVertex = edge.getToVertex();
-
-                if (closed.contains(toVertex)) {
-                    continue;
-                }
+         
 
                 TraverseResult wr = edge.traverse(state, options);
 
@@ -250,6 +257,13 @@ public class LocalStopFinder {
                 if (wr.weight < 0) {
                     throw new NegativeWeightException(String.valueOf(wr.weight));
                 }
+                
+                EdgeNarrative en = wr.getEdgeNarrative();
+                Vertex toVertex = en.getToVertex();
+
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
 
                 double new_w = spt_u.weightSum + wr.weight;
 
@@ -257,7 +271,7 @@ public class LocalStopFinder {
 
                 if (toVertex instanceof TransitStop) {
                     Vertex departureVertex = null;
-                    for (Edge e : graph.getOutgoing(toVertex)) {
+                    for (DirectEdge e : filter(graph.getOutgoing(toVertex),DirectEdge.class)) {
                         /* to departure vertex */
                         departureVertex = e.getToVertex();
                         break;
@@ -283,7 +297,7 @@ public class LocalStopFinder {
                 }
 
                 if (spt_v != null) {
-                    spt_v.setParent(spt_u, edge);
+                    spt_v.setParent(spt_u, edge,en);
                     queue.insert_or_dec_key(spt_v, new_w);
                 }
             }
@@ -307,12 +321,12 @@ public class LocalStopFinder {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
                     // enter to get to actual stop
-                    for (Edge e : graph.getOutgoing(v)) {
+                    for (DirectEdge e : filter(graph.getOutgoing(v),DirectEdge.class)) {
                         v = e.getToVertex();
                         break;
                     }
                 }
-                for (Edge e : graph.getOutgoing(v)) {
+                for (DirectEdge e : filter(graph.getOutgoing(v),DirectEdge.class)) {
                     for (Edge e2 : graph.getOutgoing(e.getToVertex())) {
                         if (e2 instanceof PatternBoard) {
                             neighborhood.add(((PatternBoard) e2).getPattern());

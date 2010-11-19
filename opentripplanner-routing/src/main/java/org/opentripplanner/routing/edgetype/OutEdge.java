@@ -91,7 +91,7 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         // it takes time to walk/bike along a street, so update state accordingly
         s1.incrementTimeInSeconds((int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1, this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
@@ -108,7 +108,7 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         // time moves *backwards* when traversing an edge in the opposite direction
         s1.incrementTimeInSeconds(-(int) time);
         s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1);
+        return new TraverseResult(weight, s1, this);
     }
 
     public String toString() {

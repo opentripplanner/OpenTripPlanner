@@ -44,6 +44,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -342,12 +343,13 @@ public class Planner {
         for (SPTEdge sptEdge : path.edges) {
             i++;
             Edge edge = sptEdge.payload;
+            EdgeNarrative edgeResult = sptEdge.narrative;
 
             if (edge instanceof FreeEdge && sptEdge != finalEdge) {
                 continue;
             }
 
-            TraverseMode edgeMode = edge.getMode();
+            TraverseMode edgeMode = edgeResult.getMode();
 
             // special case for bicycling on Street edges, where mode cannot be deduced from
             // edge type
@@ -358,15 +360,15 @@ public class Planner {
             double edgeTime = sptEdge.tov.state.getTime() - sptEdge.fromv.state.getTime();
 
             if (!edgeMode.isTransit() && edgeMode != TraverseMode.ALIGHTING) {
-                if (edgeMode != mode || (!mode.isOnStreetNonTransit() && edge.getName() != name)) {
+                if (edgeMode != mode || (!mode.isOnStreetNonTransit() && edgeResult.getName() != name)) {
                     // change of mode or street name
-                    name = edge.getName();
+                    name = edgeResult.getName();
                     if (leg != null) {
                         /* finalize prior leg */
                         if (startWalk != -1) {
                             leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i));
                         }
-                        leg.to = makePlace(edge.getFromVertex());
+                        leg.to = makePlace(edgeResult.getFromVertex());
 
                         leg.endTime = new Date(previousEdge.fromv.state.getTime());
                         Geometry geometry = geometryFactory.createLineString(coordinates);
@@ -389,7 +391,7 @@ public class Planner {
                 }
             }
             previousEdge = sptEdge;
-            Geometry edgeGeometry = edge.getGeometry();
+            Geometry edgeGeometry = edgeResult.getGeometry();
 
             if (edgeGeometry != null) {
                 Coordinate[] edgeCoordinates = edgeGeometry.getCoordinates();
@@ -406,7 +408,7 @@ public class Planner {
 
             if (edgeMode == TraverseMode.TRANSFER) {
                 itinerary.walkTime += edgeTime;
-                itinerary.walkDistance += edge.getDistance();
+                itinerary.walkDistance += edgeResult.getDistance();
                 continue;
             } else if (edgeMode == TraverseMode.BOARDING) {
                 itinerary.transfers++;
@@ -417,7 +419,7 @@ public class Planner {
                     continue;
             } else if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
                 itinerary.walkTime += edgeTime;
-                itinerary.walkDistance += edge.getDistance();
+                itinerary.walkDistance += edgeResult.getDistance();
                 if (edge instanceof EdgeWithElevation) {
                     PackedCoordinateSequence profile = ((EdgeWithElevation) edge)
                             .getElevationProfile();
@@ -425,9 +427,9 @@ public class Planner {
                 }
             } else if (edgeMode.isTransit()) {
                 itinerary.transitTime += edgeTime;
-                mode = edge.getMode();
+                mode = edgeResult.getMode();
                 leg.mode = mode.toString();
-                leg.route = edge.getName();
+                leg.route = edgeResult.getName();
                 if (showIntermediateStops) {
                     /* add intermediate stop to current leg */
                     if (leg.stop == null) {
@@ -443,11 +445,11 @@ public class Planner {
             }
         }
 
-        Edge graphEdge = previousEdge.payload;
+        EdgeNarrative graphEdgeResult = previousEdge.narrative;
 
         if (leg != null) {
             /* finalize leg */
-            leg.to = makePlace(graphEdge.getToVertex());
+            leg.to = makePlace(graphEdgeResult.getToVertex());
             leg.endTime = new Date(previousEdge.tov.state.getTime());
             Geometry geometry = geometryFactory.createLineString(coordinates);
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
@@ -507,7 +509,7 @@ public class Planner {
         leg.mode = mode.toString();
 
         leg.distance = 0.0;
-        leg.from = makePlace(edge.payload.getFromVertex());
+        leg.from = makePlace(edge.narrative.getFromVertex());
         return leg;
     }
 
@@ -602,14 +604,15 @@ public class Planner {
 
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
+            EdgeNarrative edgeResult = sptEdge.narrative;
             if (edge instanceof FreeEdge) {
                 continue;
             }
-            Geometry geom = edge.getGeometry();
+            Geometry geom = edgeResult.getGeometry();
             if (geom == null) {
                 continue;
             }
-            String streetName = edge.getName();
+            String streetName = edgeResult.getName();
             if (step == null) {
                 // first step
                 step = createWalkStep(sptEdge);
@@ -618,7 +621,7 @@ public class Planner {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
 
-                distance = edge.getDistance();
+                distance = edgeResult.getDistance();
             } else if (step.streetName != streetName
                     && (step.streetName != null && !step.streetName.equals(streetName))) {
                 // change of street name
@@ -629,7 +632,7 @@ public class Planner {
                 step.setDirections(lastAngle, thisAngle);
                 step.becomes = !pathservice.multipleOptionsBefore(edge);
 
-                distance = edge.getDistance();
+                distance = edgeResult.getDistance();
             } else {
                 /* generate turn-to-stay-on directions, where needed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
@@ -643,7 +646,7 @@ public class Planner {
                             step.elevation += ",";
                         step.elevation += s;
                     }
-                    distance += edge.getDistance();
+                    distance += edgeResult.getDistance();
                 } else {
                     // figure out if there was another way we could have turned
                     boolean optionsBefore = pathservice.multipleOptionsBefore(edge);
@@ -653,13 +656,13 @@ public class Planner {
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle);
                         step.stayOn = true;
-                        distance = edge.getDistance();
+                        distance = edgeResult.getDistance();
                     }
                 }
 
             }
 
-            step.distance += edge.getDistance();
+            step.distance += edgeResult.getDistance();
 
             lastAngle = DirectionUtils.getLastAngle(geom);
         }

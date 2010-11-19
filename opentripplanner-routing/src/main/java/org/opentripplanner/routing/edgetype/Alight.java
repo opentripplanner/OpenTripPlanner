@@ -77,7 +77,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 	    return null;
 	}
         State s1 = s0.clone();
-        return new TraverseResult(1, s1);
+        return new TraverseResult(1, s1,this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -102,7 +102,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
         State state1 = s0.clone();
         state1.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait, state1);
+        return new TraverseResult(wait, state1,this);
     }
 
     private Date getServiceDate(long currentTime, boolean useArrival) {

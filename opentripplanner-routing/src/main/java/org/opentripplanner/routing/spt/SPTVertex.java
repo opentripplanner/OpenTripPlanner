@@ -16,6 +16,7 @@ package org.opentripplanner.routing.spt;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Edge;
@@ -54,8 +55,8 @@ public class SPTVertex implements Vertex, Serializable {
         this.hops = hops;
     }
 
-    public SPTEdge setParent(SPTVertex parent, Edge ep) {
-        incoming = new SPTEdge(parent, this, ep);
+    public SPTEdge setParent(SPTVertex parent, Edge ep, EdgeNarrative edgeNarrative) {
+        incoming = new SPTEdge(parent, this, ep, edgeNarrative);
         return incoming;
     }
     

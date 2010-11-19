@@ -13,10 +13,11 @@
 
 package org.opentripplanner.routing.core;
 
+import static org.opentripplanner.common.IterableLibrary.cast;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -119,12 +120,14 @@ public class GenericVertex implements Vertex, Serializable {
      */
     public void mergeFrom(Graph graph, GenericVertex other) {
         GraphVertex gv = graph.getGraphVertex(this);
-        Collection<Edge> incoming = gv.incoming;
-        Collection<Edge> outgoing = gv.outgoing;
-        Iterator<Edge> it = incoming.iterator();
+
+        // We only support Vertices that are direct edges when merging
+        Iterable<DirectEdge> incoming = cast(gv.incoming);
+        Iterable<DirectEdge> outgoing = cast(gv.outgoing);
+        Iterator<DirectEdge> it = incoming.iterator();
         //remove incoming edges from other to this
         while(it.hasNext()) {
-            Edge edge = it.next();
+            DirectEdge edge = it.next();
             if (edge.getFromVertex() == other) {
                 it.remove();
             }
@@ -132,13 +135,13 @@ public class GenericVertex implements Vertex, Serializable {
         //remove outgoing edges from other to this
         it = outgoing.iterator();
         while(it.hasNext()) {
-            Edge edge = it.next();
+            DirectEdge edge = it.next();
             if (edge.getToVertex() == other) {
                 it.remove();
             }
         }
-        //make incoming edges to other point to this 
-        for (Edge edge: graph.getIncoming(other)) {
+        //make incoming edges to other point to this
+        for (AbstractEdge edge : cast(graph.getIncoming(other), AbstractEdge.class)) {
             if (edge.getFromVertex() == this) {
                 continue;
             }
@@ -147,7 +150,7 @@ public class GenericVertex implements Vertex, Serializable {
             gv.addIncoming(edge);
         }
         //add outgoing edges from other to outgoing from this
-        for (Edge edge : graph.getOutgoing(other)) {
+        for (AbstractEdge edge : cast(graph.getOutgoing(other), AbstractEdge.class)) {
             if (edge.getToVertex() == this) {
                 continue;
             }

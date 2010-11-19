@@ -45,7 +45,7 @@ public class PreBoardEdge extends FreeEdge {
         }
         s1.everBoarded = true;
 
-        return new TraverseResult(0, s1);
+        return new TraverseResult(0, s1, this);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class PreBoardEdge extends FreeEdge {
             s1.alightedLocal = true;
         }
 
-        return new TraverseResult(0, s1);
+        return new TraverseResult(0, s0, this);
     }
 
 }

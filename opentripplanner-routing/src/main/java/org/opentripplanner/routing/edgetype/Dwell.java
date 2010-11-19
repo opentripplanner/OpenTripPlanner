@@ -58,13 +58,13 @@ public class Dwell extends AbstractEdge {
     public TraverseResult traverse(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(elapsed);
-        return new TraverseResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1, this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
         State state1 = state0.clone();
         state1.incrementTimeInSeconds(-elapsed);
-        return new TraverseResult(elapsed, state1);
+        return new TraverseResult(elapsed, state1, this);
     }
 
     public String toString() {

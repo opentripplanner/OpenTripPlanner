@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
@@ -154,7 +155,7 @@ public class NetworkLinkerLibrary {
         }
 
         /* split an edge bundle? */
-        Collection<Edge> edges = index.getClosestEdges(coordinate, options);
+        Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options);
         if (edges == null || edges.size() < 2) {
             return null;
         }
@@ -163,7 +164,7 @@ public class NetworkLinkerLibrary {
 
     /** Create a vertex splitting the set of edges. If necessary, create new edges. */
 
-    private Vertex createVertex(String label, Collection<Edge> edges, Coordinate coordinate) {
+    private Vertex createVertex(String label, Collection<StreetEdge> edges, Coordinate coordinate) {
 
         if (edges.size() < 2) {
             // can't replace too few edges
@@ -190,7 +191,7 @@ public class NetworkLinkerLibrary {
 
         Point p = geometryFactory.createPoint(coordinate);
         for (P2<PlainStreetEdge> pair : replacement) {
-            Edge e1 = pair.getFirst();
+            PlainStreetEdge e1 = pair.getFirst();
             double dist = e1.getGeometry().distance(p);
             if (dist < bestDist) {
                 bestDist = dist;
@@ -267,7 +268,7 @@ public class NetworkLinkerLibrary {
      *            the set of turns (mostly) to replace
      * @return
      */
-    private P2<PlainStreetEdge> replace(Collection<Edge> edges) {
+    private P2<PlainStreetEdge> replace(Collection<StreetEdge> edges) {
 
         P2<Entry<StreetVertex, Set<Edge>>> ends = findEndVertices(edges);
 
@@ -326,7 +327,7 @@ public class NetworkLinkerLibrary {
         return replacement;
     }
 
-    private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<Edge> edges) {
+    private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
         // find most common start and end points, which will be ends of this street
         HashMap<StreetVertex, Set<Edge>> numEdgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
         for (Edge edge : edges) {

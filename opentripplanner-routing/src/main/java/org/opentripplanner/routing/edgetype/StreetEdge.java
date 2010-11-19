@@ -13,10 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.TraverseOptions;
 
 /** Interface for edges representing streets */
-public interface StreetEdge extends EdgeWithElevation {
+public interface StreetEdge extends EdgeWithElevation, DirectEdge {
     public boolean canTraverse(TraverseOptions options);
     public double getLength();
     public StreetTraversalPermission getPermission();

@@ -25,12 +25,7 @@ public class TraverseResult {
 
     public State state;
 
-    /**
-     * Traditionally, we examine {@link Edge#getFromVertex()} and {@link Edge#getToVertex()} for
-     * determining the source and dest vertex in edge traversal. However, in the case of multiple
-     * traversal results, we allow the result to override the target vertex.
-     */
-    private Vertex vertex;
+    private final EdgeNarrative edgeNarrative;
 
     /**
      * Optional next result that allows {@link Edge} to return multiple results from
@@ -39,35 +34,18 @@ public class TraverseResult {
      */
     private TraverseResult nextResult;
 
-    public TraverseResult(double weight, State sprime) {
+    public TraverseResult(double weight, State sprime, EdgeNarrative edgeNarrative) {
         this.weight = weight;
         this.state = sprime;
+        this.edgeNarrative = edgeNarrative;
+    }
+
+    public EdgeNarrative getEdgeNarrative() {
+        return edgeNarrative;
     }
 
     public String toString() {
         return this.weight + " " + this.state;
-    }
-
-    /**
-     * Traditionally, we examine {@link Edge#getFromVertex()} and {@link Edge#getToVertex()} for
-     * determining the source and dest vertex in edge traversal. However, in the case of multiple
-     * traversal results, we allow the result to override the target vertex.
-     * 
-     * @return the target vertex for a traversal result, or null if the default edge vertex should
-     *         be used.
-     */
-    public Vertex getVertex() {
-        return vertex;
-    }
-
-    /**
-     * See {@link #getVertex()}.
-     * 
-     * @param vertex
-     *            the target vertext for a traversal result
-     */
-    public void setVertex(Vertex vertex) {
-        this.vertex = vertex;
     }
 
     /**

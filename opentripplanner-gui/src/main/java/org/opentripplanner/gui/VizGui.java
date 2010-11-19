@@ -13,6 +13,8 @@
 
 package org.opentripplanner.gui;
 
+import static org.opentripplanner.common.IterableLibrary.*;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -56,6 +58,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -64,6 +67,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
@@ -295,7 +299,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             public void valueChanged(ListSelectionEvent e) {
 
                 JList edgeList = (JList) e.getSource();
-                Edge selected = (Edge) edgeList.getSelectedValue();
+                DirectEdge selected = (DirectEdge) edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
@@ -308,14 +312,16 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     Vertex tov = selected.getToVertex();
                     for (Edge og : graph.getOutgoing(tov)) {
                         if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
-                            vertices.add (og.getToVertex());
+                            StreetEdge streetEdge = (StreetEdge) og;
+                            vertices.add (streetEdge.getToVertex());
                             break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : graph.getIncoming(fromv)) {
                         if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
-                            vertices.add (ic.getFromVertex());
+                            StreetEdge streetEdge = (StreetEdge) ic;
+                            vertices.add (streetEdge.getFromVertex());
                             break;
                         }
                     }
@@ -526,7 +532,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
                         JOptionPane.PLAIN_MESSAGE);
                 for (GraphVertex gv : getGraph().getVertices()) {
-                    for (Edge edge: gv.getOutgoing()) {
+                    for (DirectEdge edge: filter(gv.getOutgoing(),DirectEdge.class)) {
                         if (edge.getName() != null && edge.getName().contains(edgeName)) {
                             showGraph.highlightVertex(gv.vertex);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -600,7 +606,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         HashSet<Vertex> newOpen = new HashSet<Vertex>();
         for (Vertex v2 : open) {
             closed.add(v2);
-            for (Edge e: graph.getOutgoing(v2)) {
+            for (DirectEdge e: filter(graph.getOutgoing(v2),DirectEdge.class)) {
                 Vertex target = e.getToVertex();
                 if (closed.contains(target)) {
                     continue;
@@ -626,7 +632,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (Edge e : graph.getOutgoing(src)) {
+            for (DirectEdge e : filter(graph.getOutgoing(src),DirectEdge.class)) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);
@@ -649,7 +655,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (Edge e : graph.getOutgoing(src)) {
+            for (DirectEdge e : filter(graph.getOutgoing(src),DirectEdge.class)) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);
