@@ -243,8 +243,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         continue;
                     Geometry g = e.getGeometry();
                     if (g != null) {
-                        if (options != null && e instanceof StreetEdge) {
-                            if (!((StreetEdge) e).canTraverse(options)) {
+                        if (options != null) {
+                            if (!e.canTraverse(options)) {
                                 continue;
                             }
                         }
@@ -277,8 +277,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         if (e == null || e instanceof OutEdge) {
                             continue;
                         }
-                        if (options != null && e instanceof StreetEdge) {
-                            if (!((StreetEdge) e).canTraverse(options)) {
+                        if (options != null) {
+                            if (!e.canTraverse(options)) {
                                 continue;
                             }
                         }
