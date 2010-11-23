@@ -306,7 +306,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         }
 
         Coordinate coordArr[] = new Coordinate[coordList.size()];
-        return new PackedCoordinateSequence.Double(coordList.toArray(coordArr));
+        return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
 
     public void setSlopeOverride(boolean slopeOverride) {

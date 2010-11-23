@@ -124,7 +124,7 @@ public class StreetVertex extends GenericVertex {
         }
 
         Coordinate coordArr[] = new Coordinate[coordList.size()];
-        return new PackedCoordinateSequence.Double(coordList.toArray(coordArr));
+        return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
 
     public void setElevationProfile(PackedCoordinateSequence elev) {
