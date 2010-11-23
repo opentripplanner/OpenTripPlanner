@@ -243,12 +243,17 @@ public class NetworkLinkerLibrary {
                 e1.getPermission(), false);
         PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
-
+        
         PlainStreetEdge forward2 = new PlainStreetEdge(v2, midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
         PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, v1, backGeometryPair.getSecond(),
                 name, lengthIn, e2.getPermission(), true);
 
+        forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn));
+        forward2.setElevationProfile(e2.getElevationProfile(0, lengthOut));
+        backward1.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength));
+        backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength));
+        
         ListIterator<P2<PlainStreetEdge>> it = replacement.listIterator();
         while (it.hasNext()) {
             P2<PlainStreetEdge> pair = it.next();
@@ -322,6 +327,9 @@ public class NetworkLinkerLibrary {
 
         forward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
         backward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
+
+        forward.setElevationProfile(startVertex.getElevationProfile());
+        backward.setElevationProfile(endVertex.getElevationProfile());
 
         P2<PlainStreetEdge> replacement = new P2<PlainStreetEdge>(forward, backward);
         return replacement;

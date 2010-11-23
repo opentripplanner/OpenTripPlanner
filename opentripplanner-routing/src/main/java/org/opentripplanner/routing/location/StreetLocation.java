@@ -147,7 +147,7 @@ public class StreetLocation extends GenericVertex {
 
             location = new StreetVertex(label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
                     false);
-            location.setElevationProfile(street.getElevationProfile(lengthIn, totalGeomLength));
+            location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut));
             location.setPermission(street.getPermission());
             
             cache.put(geometry, new P2<StreetVertex>(newFrom, location));
