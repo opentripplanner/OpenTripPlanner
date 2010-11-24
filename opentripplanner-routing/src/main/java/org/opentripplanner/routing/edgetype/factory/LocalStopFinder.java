@@ -124,8 +124,10 @@ public class LocalStopFinder {
 
                 if (previousDistances == null) {
                     // first stop is never local
-                    nonLocal ++;
-                    transitStop.setLocal(false);
+                    if (!transitStop.isLocal()) {
+                        nonLocal ++;
+                        transitStop.setLocal(false);
+                    }
                     continue;
                 } else {
                     boolean local = true;
@@ -169,8 +171,10 @@ public class LocalStopFinder {
             // last stop is never local
             Stop stop = stops.get(stops.size() - 1);
             TransitStop transitStop = getVertexForStop(stop);
-            transitStop.setLocal(false);
-            nonLocal++;
+            if (!transitStop.isLocal()) {
+                nonLocal ++;
+                transitStop.setLocal(false);
+            }
         }
         _log.debug("Local stops: " + (total - nonLocal) + " / " + total);
     }
