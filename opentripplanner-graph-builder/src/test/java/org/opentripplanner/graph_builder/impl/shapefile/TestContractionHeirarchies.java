@@ -446,10 +446,21 @@ public class TestContractionHeirarchies extends TestCase {
         loader.buildGraph(graph);       
         
         // load gtfs 
-        
+
+        resource = getClass().getResource("subway.zip");
+        file = null;
+        if (resource != null) {
+            file = new File(resource.getFile());
+        } 
+        if (file == null || !file.exists()) {
+            System.out
+                    .println("No New York City subway GTFS; skipping; see comment in TestShapefileStreetGraphBuilderImpl for details");
+            return;
+        }
+
         GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
         GtfsBundle bundle = new GtfsBundle();
-        bundle.setPath(new File("/home/novalis/Desktop/nyct_subway_100308.zip"));
+        bundle.setPath(file);
         ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
         bundleList.add(bundle); 
         GtfsBundles bundles = new GtfsBundles();
