@@ -124,7 +124,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             // We need to save the calendar service data so we can use it later
             graph.putService(CalendarServiceData.class, data);
-
+            
+            // if in-memory DAO is being used, replace it with an empty one
+            // to free up some space for other graphbuilders
+            if (_dao instanceof GtfsRelationalDaoImpl) 
+                _dao = new GtfsRelationalDaoImpl();
     }
 
     /****
