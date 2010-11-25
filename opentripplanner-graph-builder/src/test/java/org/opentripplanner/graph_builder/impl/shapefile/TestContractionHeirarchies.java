@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -31,7 +32,6 @@ import org.junit.Test;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.DisjointSet;
@@ -42,7 +42,6 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -394,7 +393,7 @@ public class TestContractionHeirarchies extends TestCase {
     @Test
     public void testNYC() throws Exception {
 
-        long startTime = new GregorianCalendar(2010, 4, 4, 12, 0, 0).getTimeInMillis();
+        long startTime = new GregorianCalendar(2010, 10, 11, 12, 0, 0).getTimeInMillis();
         State init = new State(startTime);
         GraphPath path;
         Graph graph = new Graph();
@@ -461,6 +460,7 @@ public class TestContractionHeirarchies extends TestCase {
         GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
         GtfsBundle bundle = new GtfsBundle();
         bundle.setPath(file);
+
         ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
         bundleList.add(bundle); 
         GtfsBundles bundles = new GtfsBundles();
@@ -473,7 +473,7 @@ public class TestContractionHeirarchies extends TestCase {
         nl.createLinkage();
 
         TraverseOptions options = new TraverseOptions();
-        options.modes = new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY);
+        options.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY));
         options.optimizeFor = OptimizeType.QUICK;
         
         CalendarServiceData data = graph.getService(CalendarServiceData.class);
@@ -503,7 +503,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         ContractionHierarchySet chs = new ContractionHierarchySet();
         chs.addModeAndOptimize(new ModeAndOptimize(TraverseMode.WALK, OptimizeType.QUICK));
-        chs.setContractionFactor(0.90);
+        chs.setContractionFactor(0.50);
         chs.setGraph(graph);
         chs.build();
         
@@ -517,9 +517,13 @@ public class TestContractionHeirarchies extends TestCase {
         Vertex start = null;
         Vertex end = null;
 
-        start = hierarchy.graph.getVertex("0072480");
-        end = hierarchy.graph.getVertex("0032341");
-
+        start = hierarchy.up.getVertex("0072480");
+        end = hierarchy.up.getVertex("0032341");
+        if (start == null) start = hierarchy.down.getVertex("0072480");
+        if (start == null) start = hierarchy.graph.getVertex("0072480");
+        if (end == null) end = hierarchy.down.getVertex("0032341");
+        if (end == null) end = hierarchy.graph.getVertex("0032341");
+        
         assertNotNull(start);
         assertNotNull(end);
         
@@ -572,11 +576,14 @@ public class TestContractionHeirarchies extends TestCase {
         long now = System.currentTimeMillis();
         int i = 0;
         int notNull = 0;
-        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(hierarchy.up.getVertices());
+        Collection<GraphVertex> upVertices = hierarchy.up.getVertices();
+        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(upVertices);
+        vertices.addAll(hierarchy.down.getVertices());
+        vertices.addAll(hierarchy.graph.getVertices());
                
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         for (GraphVertex gv : vertices) {
-            for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
+            for (DirectEdge e: filter(gv.getOutgoing(), DirectEdge.class)) {
                 components.union(gv.vertex, e.getToVertex());
             }
         }
@@ -584,12 +591,15 @@ public class TestContractionHeirarchies extends TestCase {
         ArrayList<GraphVertex> verticesOut = new ArrayList<GraphVertex>();
         for (GraphVertex gv : vertices) {
             Vertex v = gv.vertex;
-            if (components.size(components.find(v)) > vertices.size() / 2) {
+            int componentSize = components.size(components.find(v));
+            if (componentSize > upVertices.size() / 2) {
                 if (gv.getDegreeOut() != 0) {
                     verticesOut.add(gv);
                 }
             }
         }
+        
+        assertTrue(verticesOut.size() > 0);
         
         //nyc has islands
         assertTrue(vertices.size() > verticesOut.size());
@@ -603,13 +613,9 @@ public class TestContractionHeirarchies extends TestCase {
                 //only look at 100 pairs of vertices
                 break; 
             }
-            if (v1.getLabel().endsWith(" in")) {
-                String label = v1.getLabel();
-                v1 = hierarchy.up.getVertex(label.substring(0, label.length() - 3) + " out");
-                if (v1 == null) {
-                    --i;
-                    continue;
-                }
+            if (hierarchy.up.getVertex(v1.getLabel()) == null) {
+                --i;
+                continue;
             }
             GraphVertex gv2 = null;
             Vertex v2 = null;
@@ -617,20 +623,18 @@ public class TestContractionHeirarchies extends TestCase {
                 int j = Math.abs(random.nextInt()) % vertices.size();
                 gv2 = vertices.get(j);
                 v2 = gv2.vertex;
-                if (v1 == v2) {
+                if (v1.getLabel() == v2.getLabel()) {
                     continue;
                 }
-                if (v2.getLabel().endsWith(" out")) {
-                    String label = v2.getLabel();
-                    gv2 = hierarchy.down.getGraphVertex(label.substring(0, label.length() - 4) + " in");
-                    if (gv2 == null) {
-                        v2 = null;
-                        continue;
-                    }
-                    v2 = gv2.vertex;
+                
+                if (hierarchy.down.getVertex(v2.getLabel()) == null) {
+                    v2 = null;
+                    continue;
                 }
             }
             options.setArriveBy(i % 2 == 0); //half of all trips will be reverse trips just for fun
+            assertNotNull(v1);
+            assertNotNull(v2);
             GraphPath path2 = hierarchy.getShortestPath(v1, v2, init, options);
             //assertNotNull(path2);
             if (path2 != null) {
