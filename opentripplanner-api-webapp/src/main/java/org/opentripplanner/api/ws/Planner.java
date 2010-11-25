@@ -53,9 +53,6 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
@@ -273,7 +270,7 @@ public class Planner {
             throw new PathNotFoundException();
         }
 
-        TripPlan plan = generatePlan(paths, request, options);
+        TripPlan plan = generatePlan(paths, request);
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
@@ -285,7 +282,7 @@ public class Planner {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public TripPlan generatePlan(List<GraphPath> paths, Request request, TraverseOptions options) {
+    public TripPlan generatePlan(List<GraphPath> paths, Request request) {
 
         Vector<SPTVertex> vertices = paths.get(0).vertices;
         SPTVertex tripStartVertex = vertices.firstElement();
@@ -306,8 +303,7 @@ public class Planner {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.getShowIntermediateStops(),
-                    options.modes.contains(TraverseMode.BICYCLE));
+            Itinerary itinerary = generateItinerary(path, request.getShowIntermediateStops());
             plan.addItinerary(itinerary);
         }
         return plan;
@@ -323,8 +319,7 @@ public class Planner {
      * @param options
      * @return
      */
-    private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops,
-            boolean biking) {
+    private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
 
         GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -350,12 +345,6 @@ public class Planner {
             }
 
             TraverseMode edgeMode = edgeResult.getMode();
-
-            // special case for bicycling on Street edges, where mode cannot be deduced from
-            // edge type
-            if (isStreetEdge(edge) && biking) {
-                edgeMode = TraverseMode.BICYCLE;
-            }
 
             double edgeTime = sptEdge.tov.state.getTime() - sptEdge.fromv.state.getTime();
 
@@ -383,7 +372,7 @@ public class Planner {
                     leg = makeLeg(sptEdge, mode);
                     itinerary.addLeg(leg);
 
-                    if (mode == TraverseMode.WALK || mode == TraverseMode.BICYCLE) {
+                    if (mode.isOnStreetNonTransit()) {
                         startWalk = i;
                     } else {
                         startWalk = -1;
@@ -417,7 +406,7 @@ public class Planner {
             } else if (edgeMode == TraverseMode.ALIGHTING) {
                     itinerary.waitingTime += edgeTime;
                     continue;
-            } else if (edgeMode == TraverseMode.WALK || edgeMode == TraverseMode.BICYCLE) {
+            } else if (edgeMode.isOnStreetNonTransit()) {
                 itinerary.walkTime += edgeTime;
                 itinerary.walkDistance += edgeResult.getDistance();
                 if (edge instanceof EdgeWithElevation) {
@@ -581,10 +570,6 @@ public class Planner {
             options.maxWalkDistance = request.getMaxWalkDistance();
         }
         return options;
-    }
-
-    private boolean isStreetEdge(Edge edge) {
-        return edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof OutEdge || edge instanceof PlainStreetEdge;
     }
 
     /**

@@ -328,7 +328,7 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
 
         TraverseOptions options = new TraverseOptions(context);
-        options.modes = new TraverseModeSet("TRAINISH");
+        options.setModes(new TraverseModeSet("TRAINISH"));
 
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
@@ -336,7 +336,7 @@ public class TestPatternHopFactory extends TestCase {
         //a to b is bus only
         assertNull(spt.getPath(stop_b));
         
-        options.modes = new TraverseModeSet("TRAINISH,BUSISH");
+        options.setModes(new TraverseModeSet("TRAINISH,BUSISH"));
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
 
@@ -429,7 +429,7 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path;
 
         TraverseOptions options = new TraverseOptions(context);
-        options.modes = new TraverseModeSet("TRANSIT");
+        options.setModes(new TraverseModeSet("TRANSIT"));
 
         // U to V - original stop times - shouldn't be used
         spt = AStar.getShortestPathTree(graph, stop_u, stop_v, new State(

@@ -305,15 +305,15 @@ public class StreetVertex extends GenericVertex {
             }
         }
 
-        if (wo.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+        if (wo.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
         }
 
-        if (wo.modes.getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
+        if (wo.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         }
 
-        if (wo.modes.getCar() && permission.allows(StreetTraversalPermission.CAR)) {
+        if (wo.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
         }
 
@@ -328,7 +328,7 @@ public class StreetVertex extends GenericVertex {
             // a stronger preference for less work. Maybe it
             // evens out?
             weight = slopeSpeedEffectiveLength / options.speed;
-        } else if (options.modes.contains(TraverseMode.BICYCLE)) {
+        } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
                 weight = bicycleSafetyEffectiveLength / options.speed;

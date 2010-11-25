@@ -83,7 +83,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
     
     public TraverseResult traverse(State state0, TraverseOptions options) {
-        if (!options.modes.get(modeMask)) {
+        if (!options.getModes().get(modeMask)) {
             return null;
         }
         

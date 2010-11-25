@@ -94,38 +94,34 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return null;
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions wo) {
-
-        if (!fromv.canTraverse(wo)) {
-            return null;
-        }
-
-        double angleLength = fromv.getLength() + turnCost / 20;
-
-        State s1 = s0.clone();
-        double time = angleLength / wo.speed;
-        double weight = fromv.computeWeight(s0, wo, time);
-        s1.walkDistance += fromv.getLength();
-        // it takes time to walk/bike along a street, so update state accordingly
-        s1.incrementTimeInSeconds((int) time);
-        s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1,this);
+    public TraverseResult traverse(State s0, TraverseOptions options) {
+        return doTraverse(s0, options, false);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
+        return doTraverse(s0, options, true);
+    }
+
+    private TraverseResult doTraverse(State s0, TraverseOptions options, boolean back) {
         if (!fromv.canTraverse(options)) {
-            return null;
+            return tryWalkBike(s0, options, back);
         }
+        
         double angleLength = fromv.getLength() + turnCost / 20;
 
         State s1 = s0.clone();
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.walkDistance += fromv.getLength();
-        // time moves *backwards* when traversing an edge in the opposite direction
-        s1.incrementTimeInSeconds(-(int) time);
-        s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1,this);
+        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        return new TraverseResult(weight, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+    }
+
+    private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
+        if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            return doTraverse(s0, options.getWalkingOptions(), back);
+        }
+        return null;
     }
 
     public Object clone() throws CloneNotSupportedException {
@@ -200,5 +196,10 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
             return other.fromv.equals(fromv) && other.getToVertex().equals(tov);
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return fromv.hashCode() * 31 + tov.hashCode();
     }
 }

@@ -275,6 +275,14 @@ public class TraverseModeSet implements Cloneable {
         return (modes & (MODE_TRANSIT)) != 0;
     }
 
+    public void setTransit(boolean transit) {
+        if (transit) {
+            modes |= MODE_TRANSIT;
+        } else {
+            modes &= ~MODE_TRANSIT;
+        }
+    }
+    
     /** Returns true if any the trip may use some train-like (train, subway, tram) mode */
     public boolean getTraininsh() {
         return (modes & (MODE_TRAINISH)) != 0;
@@ -324,4 +332,18 @@ public class TraverseModeSet implements Cloneable {
             throw new RuntimeException(e); 
         }
     }
+
+    public TraverseMode getNonTransitMode() {
+        if (contains(TraverseMode.CAR)) {
+            return TraverseMode.CAR;
+        }
+        if (contains(TraverseMode.BICYCLE)) {
+            return TraverseMode.BICYCLE;
+        }
+        if (contains(TraverseMode.WALK)) {
+            return TraverseMode.WALK;
+        }
+        return null;
+    }
+
 }

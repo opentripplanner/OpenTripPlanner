@@ -80,7 +80,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        if (!wo.modes.contains(hop.getMode())) {
+        if (!wo.getModes().contains(hop.getMode())) {
             return null;
         }
 

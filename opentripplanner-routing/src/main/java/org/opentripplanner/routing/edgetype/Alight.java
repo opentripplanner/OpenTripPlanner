@@ -81,7 +81,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
-        if (!wo.modes.contains(hop.getMode())) {
+        if (!wo.getModes().contains(hop.getMode())) {
             return null;
         }
 	if (wo.wheelchairAccessible && !wheelchairAccessible) {

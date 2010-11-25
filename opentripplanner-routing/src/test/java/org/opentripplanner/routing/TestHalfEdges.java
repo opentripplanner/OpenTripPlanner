@@ -222,6 +222,38 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(v.mirror, graph.getVertex("bottomBack"));
         }
 
+        /* Now, the right edge is not bikeable.  But the user can walk their bike.  So here are some tests
+         * that prove (a) that walking bikes works, but that (b) it is not preferred to riding a tiny bit longer.
+         */
+        
+        options = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
+        end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
+        spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
+                .getTimeInMillis()), options);
+
+        path = spt.getPath(start);
+        assertNotNull("There must be a path from top to bottom along the right", path);
+
+        // the left edge is not part of the shortest path (even though the bike must be walked along the right)
+        for (SPTVertex v : path.vertices) {
+            assertNotSame(v.mirror, graph.getVertex("left"));
+            assertNotSame(v.mirror, graph.getVertex("leftBack"));
+        }
+        
+        start = StreetLocation.createStreetLocation("start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
+        end = StreetLocation.createStreetLocation("end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
+        spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
+                .getTimeInMillis()), options);
+
+        path = spt.getPath(start);
+        assertNotNull("There must be a path from top to bottom", path);
+
+        // the right edge is not part of the shortest path, e
+        for (SPTVertex v : path.vertices) {
+            assertNotSame(v.mirror, graph.getVertex("right"));
+            assertNotSame(v.mirror, graph.getVertex("rightBack"));
+        }
     }
 
     public void testStreetLocationFinder() {
@@ -241,9 +273,7 @@ public class TestHalfEdges extends TestCase {
         assertNotNull(end);
         
         extra = end.getExtra();
-        //bikes can only go on the back edge
-        assertEquals(5, extra.size());
-        
+        assertEquals(10, extra.size());
     }
     
     public void testNetworkLinker() {

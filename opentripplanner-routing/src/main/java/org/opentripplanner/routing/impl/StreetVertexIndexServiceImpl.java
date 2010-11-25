@@ -219,6 +219,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
         double bestDistance = Double.MAX_VALUE;
+        
+        TraverseOptions walkingOptions = null;
+        if (options != null) {
+            walkingOptions = options.getWalkingOptions();
+        }
         while (bestDistance > MAX_DISTANCE_FROM_STREET && i < 10) {
             ++i;
             envelope.expandBy(envelopeGrowthRate);
@@ -244,7 +249,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     Geometry g = e.getGeometry();
                     if (g != null) {
                         if (options != null) {
-                            if (!e.canTraverse(options)) {
+                            if (!(e.canTraverse(options) || e.canTraverse(walkingOptions))) {
                                 continue;
                             }
                         }
@@ -278,7 +283,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                             continue;
                         }
                         if (options != null) {
-                            if (!e.canTraverse(options)) {
+                            if (!(e.canTraverse(options) || e.canTraverse(walkingOptions))) {
                                 continue;
                             }
                         }

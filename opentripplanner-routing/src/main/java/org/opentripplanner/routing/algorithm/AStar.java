@@ -109,7 +109,7 @@ public class AStar {
 
         // Return Tree
         ShortestPathTree spt;
-        if (options.modes.getTransit()) {
+        if (options.getModes().getTransit()) {
             spt = new MultiShortestPathTree();
         } else {
             spt = new BasicShortestPathTree();
@@ -167,7 +167,7 @@ public class AStar {
                 + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
-        boolean useTransit = options.modes.getTransit();
+        boolean useTransit = options.getModes().getTransit();
         HashSet<Vertex> closed = new HashSet<Vertex>(100000);
 
         // Iteration Variables
@@ -199,10 +199,6 @@ public class AStar {
 
             for (Edge edge : incoming) {
                 State state = spt_u.state;
-                if (edge instanceof DirectEdge && ((DirectEdge) edge).getFromVertex() == target) {
-                    state = state.clone();
-                    state.lastEdgeWasStreet = false;
-                }
 
                 if (edge instanceof PatternAlight && state.numBoardings > options.maxTransfers) {
                     continue;
@@ -296,7 +292,7 @@ public class AStar {
 
         // Return Tree
         ShortestPathTree spt;
-        if (options.modes.getTransit()) {
+        if (options.getModes().getTransit()) {
             spt = new MultiShortestPathTree();
         } else {
             spt = new BasicShortestPathTree();
@@ -343,7 +339,7 @@ public class AStar {
                 + extraEdges.size());
         pq.insert(spt_origin, spt_origin.weightSum + distance);
 
-        boolean useTransit = options.modes.getTransit();
+        boolean useTransit = options.getModes().getTransit();
 
         options = options.clone();
         /** max walk distance cannot be less than distances to nearest transit stops */
@@ -382,11 +378,6 @@ public class AStar {
 
             for (Edge edge : outgoing) {
                 State state = spt_u.state;
-
-                /*
-                 * Not sure what this does if (tov == target) { stateHere = stateHere.clone();
-                 * stateHere.lastEdgeWasStreet = false; }
-                 */
 
                 if (edge instanceof PatternBoard && state.numBoardings > options.maxTransfers) {
                     continue;
@@ -478,7 +469,7 @@ public class AStar {
     }
 
     public static double getMaxSpeed(TraverseOptions options) {
-        if (options.modes.contains(TraverseMode.TRANSIT)) {
+        if (options.getModes().contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 10 m/s, which is so far true
             // for
             // New York and Portland

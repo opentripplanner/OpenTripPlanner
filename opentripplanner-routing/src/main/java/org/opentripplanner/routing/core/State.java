@@ -29,7 +29,6 @@ public class State {
     public AgencyAndId route = null;
 
     public FareContext fareContext;
-    public boolean lastEdgeWasStreet = false;
     public int numBoardings = 0;
     public boolean alightedLocal = false;
     public boolean everBoarded = false;

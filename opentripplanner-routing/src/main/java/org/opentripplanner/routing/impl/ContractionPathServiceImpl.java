@@ -119,10 +119,10 @@ public class ContractionPathServiceImpl implements PathService {
         optionQueue.add(options);
 
         /* if the user wants to travel by transit, create a bus-only set of options */
-        if (options.modes.getTrainish() && options.modes.contains(TraverseMode.BUS)) {
+        if (options.getModes().getTrainish() && options.getModes().contains(TraverseMode.BUS)) {
             TraverseOptions busOnly = options.clone();
-            busOnly.modes = options.modes.clone();
-            busOnly.modes.setTrainish(false);
+            busOnly.setModes(options.getModes().clone());
+            busOnly.getModes().setTrainish(false);
         }
         optionQueue.add(options);
         

@@ -79,7 +79,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     @Override
     public TraverseResult traverseBack(State state0, TraverseOptions options) {
-        if (!options.modes.get(modeMask)) {
+        if (!options.getModes().get(modeMask)) {
             return null;
         }
 

@@ -34,7 +34,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     /** max speed along streets, in meters per second */ 
     public double speed;
 
-    public TraverseModeSet modes;
+    private TraverseModeSet modes;
 
     public Calendar calendar;
 
@@ -97,20 +97,30 @@ public class TraverseOptions implements Serializable, Cloneable {
      * How much less bad waiting at the beginning of the trip is
      */
     public double waitAtBeginningFactor = 0.1;
+
+    private TraverseOptions walkingOptions;
     
+    /** Constructor for options; modes defaults to walk and transit */ 
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        modes = new TraverseModeSet(new TraverseMode[]{TraverseMode.WALK, TraverseMode.TRANSIT});
+        setModes(new TraverseModeSet(new TraverseMode[]{TraverseMode.WALK, TraverseMode.TRANSIT}));
         calendar = Calendar.getInstance();
+        walkingOptions = this;
     }
     
     public TraverseOptions(TraverseModeSet modes) {
         this();
-        this.modes = modes;
+        this.setModes(modes);
         if (modes.getBicycle()) {
             speed = 5; //5 m/s, ~11 mph, a random bicycling speed.
             boardCost = 240; //cyclists hate loading their bike a second time
+            walkingOptions = new TraverseOptions();
+            walkingOptions.getModes().setTransit(false);
+        } else if (modes.getCar()) {
+            speed = 15; //15 m/s, ~35 mph, a random driving speed
+            walkingOptions = new TraverseOptions();
+            walkingOptions.getModes().setTransit(false);
         }
     }
 
@@ -142,7 +152,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     }
 
     public boolean transitAllowed() {
-        return modes.getTransit();
+        return getModes().getTransit();
     }
 
     /**
@@ -171,7 +181,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         return speed == to.speed && 
                maxWeight == to.maxWeight &&
                worstTime == to.worstTime &&
-               modes.equals(to.modes) &&
+               getModes().equals(to.getModes()) &&
                isArriveBy() == to.isArriveBy() &&
                wheelchairAccessible == to.wheelchairAccessible &&
                optimizeFor == to.optimizeFor &&
@@ -189,7 +199,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         return new Double(speed).hashCode() + 
         new Double(maxWeight).hashCode() + 
         (int) (worstTime & 0xffffffff) +
-        modes.hashCode() + 
+        getModes().hashCode() + 
         (isArriveBy() ? 8966786 : 0) +
         (wheelchairAccessible ? 731980 : 0) +
         optimizeFor.hashCode() + 
@@ -215,10 +225,25 @@ public class TraverseOptions implements Serializable, Cloneable {
     }
 
     public double distanceWalkFactor(double walkDistance) {
-        if (walkDistance > maxWalkDistance && modes.getTransit()) {
+        if (walkDistance > maxWalkDistance && getModes().getTransit()) {
             double weightFactor = (walkDistance - maxWalkDistance) / 20;
             return weightFactor < 1 ? 1 : weightFactor;
         }
         return 1;
+    }
+
+    public TraverseOptions getWalkingOptions() {
+        return walkingOptions;
+    }
+
+    public void setModes(TraverseModeSet modes) {
+        this.modes = modes;
+        if (modes.getBicycle() || modes.getCar()) {
+            walkingOptions = new TraverseOptions();
+        }
+    }
+
+    public TraverseModeSet getModes() {
+        return modes;
     }
 }

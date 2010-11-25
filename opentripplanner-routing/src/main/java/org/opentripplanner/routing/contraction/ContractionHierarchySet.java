@@ -59,7 +59,7 @@ public class ContractionHierarchySet implements Serializable {
     }
 
     public ContractionHierarchy getHierarchy(TraverseOptions options) {
-        TraverseMode mode = options.modes.contains(TraverseMode.BICYCLE) ? TraverseMode.BICYCLE : TraverseMode.WALK;
+        TraverseMode mode = options.getModes().contains(TraverseMode.BICYCLE) ? TraverseMode.BICYCLE : TraverseMode.WALK;
         ModeAndOptimize mo = new ModeAndOptimize(mode, options.optimizeFor);
         return hierarchiesByMode.get(mo);
     }

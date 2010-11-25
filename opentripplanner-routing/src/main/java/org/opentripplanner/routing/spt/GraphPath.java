@@ -117,26 +117,22 @@ public class GraphPath {
 
             TraverseOptions options = vertices.lastElement().options;
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-            SPTEdge firstEdge = edges.get(0);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
-                if (edge == firstEdge) {
-                    state.lastEdgeWasStreet = false;
-                }
                 TraverseResult result = edge.payload.traverse(state, options);
                 assert (result != null);
+                if (result == null) {
+                    System.out.println("doom: " + edge.payload);
+                    edge.payload.traverse(state, options);
+                }
                 state = result.state;
                 edge.fromv.state = state;
             }
         } else {
             TraverseOptions options = vertices.lastElement().options;
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-            SPTEdge firstEdge = edges.get(0);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
-                if (edge == firstEdge) {
-                    state.lastEdgeWasStreet = false;
-                }
                 TraverseResult result = edge.payload.traverseBack(state, options);
                 state = result.state;
                 edge.fromv.state = state;

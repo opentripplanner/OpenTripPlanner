@@ -94,15 +94,15 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             }
         }
 
-        if (options.modes.getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+        if (options.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
         }
 
-        if (options.modes.getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
+        if (options.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         }
 
-        if (options.modes.getCar() && permission.allows(StreetTraversalPermission.CAR)) {
+        if (options.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
         }
 
@@ -157,8 +157,12 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException {
 
+        return doTraverse(s0, options, false);
+    }
+
+    private TraverseResult doTraverse(State s0, TraverseOptions options, boolean back) {
         if (!canTraverse(options)) {
-            return null;
+            return tryWalkBike(s0, options, back);
         }
 
         State s1 = s0.clone();
@@ -166,7 +170,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         double weight;
         if (options.wheelchairAccessible) {
             weight = getSlopeSpeedEffectiveLength() / options.speed;
-        } else if (options.modes.contains(TraverseMode.BICYCLE)) {
+        } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
                 weight = getBicycleSafetyEffectiveLength() / options.speed;
@@ -187,51 +191,21 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         weight *= options.distanceWalkFactor(s0.walkDistance + length / 2);
         weight *= options.walkReluctance;
         s1.walkDistance += length;
-        s1.incrementTimeInSeconds((int) time);
-        s1.lastEdgeWasStreet = true;
+        s1.incrementTimeInSeconds((int) (back ? -time : time));
         return new TraverseResult(weight, s1, this);
+    }
+
+    private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
+        if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            return doTraverse(s0, options.getWalkingOptions(), back);
+        }
+        return null;
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
-
-        if (!canTraverse(options)) {
-            return null;
-        }
-
-        State s1 = s0.clone();
-        double time = length / options.speed;
-        double weight;
-        if (options.wheelchairAccessible) {
-            weight = getSlopeSpeedEffectiveLength() / options.speed;
-        } else if (options.modes.contains(TraverseMode.BICYCLE)) {
-            switch (options.optimizeFor) {
-            case SAFE:
-                weight = getBicycleSafetyEffectiveLength() / options.speed;
-                break;
-            case FLAT:
-                weight = slopeCostEffectiveLength;
-                break;
-            case QUICK:
-                weight = getSlopeSpeedEffectiveLength() / options.speed;
-                break;
-            default:
-                // TODO: greenways
-                weight = length / options.speed;
-            }
-        } else {
-            weight = time;
-        }
-        if (s0.walkDistance > options.maxWalkDistance && options.modes.getTransit()) {
-            double weightFactor = (s0.walkDistance - options.maxWalkDistance) / 10;
-            weight *= weightFactor > 1 ? 1 : weightFactor;
-        }
-        weight *= options.walkReluctance;
-        s1.walkDistance += length;
-        s1.incrementTimeInSeconds(-(int) time);
-        s1.lastEdgeWasStreet = true;
-        return new TraverseResult(weight, s1, this);
+        return doTraverse(s0, options, true);
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
