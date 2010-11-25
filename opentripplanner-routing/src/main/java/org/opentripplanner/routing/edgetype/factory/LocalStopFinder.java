@@ -237,6 +237,33 @@ public class LocalStopFinder {
             queue.extract_min();
 
             closed.add(fromv);
+
+            if (fromv instanceof TransitStop) {
+                Vertex departureVertex = null;
+                for (DirectEdge e : filter(graph.getOutgoing(fromv),DirectEdge.class)) {
+                    /* to departure vertex */
+                    departureVertex = e.getToVertex();
+                    break;
+                }
+                for (Edge e : graph.getOutgoing(departureVertex)) {
+                    if (e instanceof PatternBoard) {
+                        /* finally, a PatternBoard */
+                        TripPattern pattern = ((PatternBoard) e).getPattern();
+                        if (nearbyPatterns.contains(pattern)) {
+                            Double cost = patternCosts.get(pattern);
+                            if (cost == null) {
+                                patternCosts.put(pattern, spt_u.weightSum);
+                                patternsSeen++;
+                                if (patternsSeen == nearbyPatterns.size()) {
+                                    return patternCosts;
+                                }
+                            } else if (cost > spt_u.weightSum) {
+                                patternCosts.put(pattern, spt_u.weightSum);
+                            }
+                        }
+                    }
+                }
+            }
             
             if (fromv.distance(origin) > LOCAL_STOP_SEARCH_RADIUS) {
                 /* we have now traveled far from the origin, so we know that anything we find
@@ -273,33 +300,6 @@ public class LocalStopFinder {
                 double new_w = spt_u.weightSum + wr.weight;
 
                 spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
-
-                if (toVertex instanceof TransitStop) {
-                    Vertex departureVertex = null;
-                    for (DirectEdge e : filter(graph.getOutgoing(toVertex),DirectEdge.class)) {
-                        /* to departure vertex */
-                        departureVertex = e.getToVertex();
-                        break;
-                    }
-                    for (Edge e : graph.getOutgoing(departureVertex)) {
-                        if (e instanceof PatternBoard) {
-                            /* finally, a PatternBoard */
-                            TripPattern pattern = ((PatternBoard) e).getPattern();
-                            if (nearbyPatterns.contains(pattern)) {
-                                Double cost = patternCosts.get(pattern);
-                                if (cost == null) {
-                                    patternCosts.put(pattern, new_w);
-                                    patternsSeen++;
-                                    if (patternsSeen == nearbyPatterns.size()) {
-                                        return patternCosts;
-                                    }
-                                } else if (cost > new_w) {
-                                    patternCosts.put(pattern, new_w);
-                                }
-                            }
-                        }
-                    }
-                }
 
                 if (spt_v != null) {
                     spt_v.setParent(spt_u, edge,en);
