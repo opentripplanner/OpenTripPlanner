@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.DisjointSet;
