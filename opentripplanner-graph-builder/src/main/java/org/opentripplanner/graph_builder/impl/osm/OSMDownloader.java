@@ -19,8 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +28,6 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class OSMDownloader {
     private static final Logger _log = LoggerFactory.getLogger(OSMDownloader.class);
-
-    private NumberFormat _format = new DecimalFormat("0.0000");
 
     private double _latYStep = 0.04;
 
@@ -90,9 +87,13 @@ public class OSMDownloader {
         return step * Math.ceil(value / step);
     }
 
+    private String formatNumberWithoutLocale(double number) {
+	return String.format((Locale) null, "%.4f", number);
+    }
+
     private String getKey(double x, double y) {
-        return _format.format(y) + "_" + _format.format(x) + "_" + _format.format(_latYStep)
-                + "_" + _format.format(_lonXStep) + "_" + _format.format(_overlap);
+        return formatNumberWithoutLocale(y) + "_" + formatNumberWithoutLocale(x) + "_" + formatNumberWithoutLocale(_latYStep)
+                + "_" + formatNumberWithoutLocale(_lonXStep) + "_" + formatNumberWithoutLocale(_overlap);
     }
 
     private File getPathToUpToDateMapTile(double lat, double lon, String key) throws IOException {
