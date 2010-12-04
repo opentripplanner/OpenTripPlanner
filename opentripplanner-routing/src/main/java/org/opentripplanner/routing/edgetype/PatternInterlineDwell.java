@@ -26,6 +26,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -47,6 +49,7 @@ class InterlineDwellData implements Serializable {
 }
 
 public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge {
+    private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -68,7 +71,8 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime,
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
-            throw new RuntimeException("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId());
+	    dwellTime = 0;
+            _log.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
