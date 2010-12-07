@@ -119,7 +119,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             return;
         }
         if (slopeOverride) {
-            elev = new PackedCoordinateSequence.Float(new Coordinate[] { new Coordinate(0f, 0f) },
+            elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),elev.getCoordinate((elev.size()-1))},
                     2);
         }
         elevationProfile = elev;
