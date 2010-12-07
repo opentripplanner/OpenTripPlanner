@@ -96,7 +96,7 @@ public class LocalStopFinder {
 
         neighborhoods = new HashMap<Stop, HashMap<TripPattern, P2<Double>>>();
 
-        walkingOptions = new TraverseOptions();
+        walkingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         bikingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         bikingOptions.optimizeFor = OptimizeType.SAFE;
 
