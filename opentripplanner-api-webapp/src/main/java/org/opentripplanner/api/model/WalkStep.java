@@ -86,7 +86,8 @@ public class WalkStep {
     public double lat;
 
     /**
-     * The elevation profile as a comma-separated list of x,y values
+     * The elevation profile as a comma-separated list of x,y values. 
+     * x is the distance from the start of the step, y is the elevation at this distance.
      */
     public String elevation;
     
