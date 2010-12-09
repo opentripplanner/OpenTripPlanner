@@ -128,8 +128,8 @@ public class OSMDownloader {
 
     private File getPathToMapTile(String key) throws IOException {
         if( _cacheDirectory == null) {
-            _cacheDirectory = File.createTempFile("OpenStreetMapDownloader-", "-tmp");
-            _cacheDirectory.delete();
+            File tmpDir = new File(System.getProperty("java.io.tmpdir"));
+            _cacheDirectory = new File(tmpDir,"osm-tiles");
         }
         
         _cacheDirectory.mkdirs();
