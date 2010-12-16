@@ -13,10 +13,7 @@
  
 package org.opentripplanner.graph_builder.impl.osm;
 
-import org.opentripplanner.graph_builder.model.osm.OSMNode;
-import org.opentripplanner.graph_builder.model.osm.OSMNodeRef;
-import org.opentripplanner.graph_builder.model.osm.OSMTag;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.*;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 
 import java.io.BufferedInputStream;
@@ -39,10 +36,12 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class StreamedOpenStreetMapParser {
 
-    private static final QName qNode = new QName("node");
-    private static final QName qWay  = new QName("way");
-    private static final QName qNd   = new QName("nd");
-    private static final QName qTag  = new QName("tag");
+    private static final QName qNode     = new QName("node");
+    private static final QName qWay      = new QName("way");
+    private static final QName qRelation = new QName("relation");
+    private static final QName qNd       = new QName("nd");
+    private static final QName qMember   = new QName("member");
+    private static final QName qTag      = new QName("tag");
     
     private static final QName qId   = new QName("id");
     private static final QName qLat  = new QName("lat");
@@ -50,6 +49,8 @@ public class StreamedOpenStreetMapParser {
     private static final QName qRef  = new QName("ref");
     private static final QName qKey  = new QName("k");
     private static final QName qVal  = new QName("v");
+    private static final QName qType = new QName("type");
+    private static final QName qRole = new QName("role");
     
     public static void parseMap(final File path, OpenStreetMapContentHandler map) throws IOException,
             XMLStreamException {
@@ -63,11 +64,11 @@ public class StreamedOpenStreetMapParser {
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
         XMLEventReader xmlEventReader = inputFactory.createXMLEventReader(in);
 
-        OSMNode osmNode = null;
-        OSMWay  osmWay  = null;
+        OSMRelation osmRelation = null;
+        OSMNode     osmNode     = null;
+        OSMWay      osmWay      = null;
 
         while (xmlEventReader.hasNext()) {
-            /* todo: process relations */
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 StartElement element = xmlEvent.asStartElement();
@@ -79,7 +80,19 @@ public class StreamedOpenStreetMapParser {
                     
                 } else if (element.getName().equals(qWay)) {
                     osmWay = new OSMWay();
+                    osmWay.setId(Integer.parseInt(element.getAttributeByName(qId).getValue()));
                     
+                } else if (element.getName().equals(qRelation)) {
+                    osmRelation = new OSMRelation();
+                    osmRelation.setId(Integer.parseInt(element.getAttributeByName(qId).getValue()));
+
+                } else if (element.getName().equals(qMember)) {
+                    OSMRelationMember relMember = new OSMRelationMember();
+                    relMember.setType(element.getAttributeByName(qType).getValue());
+                    relMember.setRole(element.getAttributeByName(qRole).getValue());
+                    relMember.setRef(Integer.parseInt(element.getAttributeByName(qRef).getValue()));
+                    osmRelation.addMember(relMember);
+
                 } else if (element.getName().equals(qNd)) {
                     OSMNodeRef nodeRef = new OSMNodeRef();
                     nodeRef.setRef(Integer.parseInt(element.getAttributeByName(qRef).getValue()));
@@ -90,7 +103,7 @@ public class StreamedOpenStreetMapParser {
                     String key = element.getAttributeByName(qKey).getValue();
                     tag.setK(key.intern());
                     String value = element.getAttributeByName(qVal).getValue();
-                    if (key.equals("name") || key.equals("highway")) {
+                    if (key.equals("name") || key.equals("ref") || key.equals("highway")) {
                         value = value.intern();
                     }
                     tag.setV(value);
@@ -98,6 +111,8 @@ public class StreamedOpenStreetMapParser {
                         osmNode.addTag(tag);
                     } else if (osmWay != null) {
                         osmWay.addTag(tag);
+                    } else if (osmRelation != null) {
+                        osmRelation.addTag(tag);
                     }
                 }
 
@@ -109,6 +124,9 @@ public class StreamedOpenStreetMapParser {
                 }  else if (element.getName().equals(qWay)) {
                     map.addWay(osmWay);
                     osmWay = null;
+                }  else if (element.getName().equals(qRelation)) {
+                    map.addRelation(osmRelation);
+                    osmRelation = null;
                 }
             }
         }
