@@ -50,18 +50,28 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         if (file == null || !file.exists()) {
             System.out.println("No New York City basemap; skipping; see comment here for details");
             /*
-             * This test requires the New York City base map, available at:
-             * http://www.nyc.gov/html/dcp/html/bytes/dwnlion.shtml Download the MapInfo file. This
-             * must be converted to a ShapeFile. mkdir nyc_streets;
-             * unzip nyc_lion10ami.zip
+             * This test requires the New York City base map. Place it among the source 
+             * resources and Eclipse should automatically copy it over to the target directory.
+             * Once you have prepared these files, you may need to 'refresh' in Eclipse's package 
+             * explorer to force Eclipse to notice the new resources.
+             * 
+             * Recent versions of this map are available only in Arcview Geodatabase format.
+             * For conversion to a Shapefile, you will need the archived MapInfo version at:
+             * http://www.nyc.gov/html/dcp/html/bytes/bytesarchive.shtml#lion
+             * Download the MapInfo file of Lion version 10B. 
+             * 
+             * This must then be converted to a ShapeFile as follows:
+             * cd opentripplanner-graph-builder/src/test/resources/org/opentripplanner/graph_builder/impl/shapefile 
+             * mkdir nyc_streets       (this is where we will store the shapefile)
+             * unzip nyc_lion10ami.zip (this should place zipfile contents in a ./lion directory)
              * ogr2ogr -f 'ESRI Shapefile' nyc_streets/streets.shp lion/MNLION1.tab 
              * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/SILION1.tab -nln streets 
              * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/QNLION1.tab -nln streets 
              * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/BKLION1.tab -nln streets 
              * ogr2ogr -update -append -f 'ESRI Shapefile' nyc_streets lion/BXLION1.tab -nln streets
              * 
-             * It also requires the NYC Subway data in GTFS: cd src/test/resources wget
-             * http://data.topplabs.org/data/mta_nyct_subway/subway.zip
+             * Testing also requires NYC Subway data in GTFS in the same location: 
+             * wget http://data.topplabs.org/data/mta_nyct_subway/subway.zip
              */
             return;
         }
