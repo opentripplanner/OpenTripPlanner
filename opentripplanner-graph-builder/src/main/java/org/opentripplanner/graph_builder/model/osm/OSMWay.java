@@ -40,4 +40,8 @@ public class OSMWay extends OSMWithTags {
   public List<Integer> getNodeRefs() {
     return _nodes;
   }
+
+  public String toString() {
+    return "osm way " + id;
+  }
 }

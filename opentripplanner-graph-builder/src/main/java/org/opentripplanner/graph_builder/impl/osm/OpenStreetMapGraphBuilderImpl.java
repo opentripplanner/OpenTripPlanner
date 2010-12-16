@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
+
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.model.osm.OSMNode;
-import org.opentripplanner.graph_builder.model.osm.OSMRelation;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.graph_builder.model.osm.*;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
@@ -58,6 +58,44 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
     private Map<String, KeyValuePermission> _tagPermissions = new LinkedHashMap<String, KeyValuePermission>();
+    private Map<List<OSMKeyValue>, String>  _creativeNaming = new LinkedHashMap<List<OSMKeyValue>, String>();
+
+    private class OSMKeyValue {
+        public String key;
+        public String value;
+        public boolean wildcard;
+
+        public OSMKeyValue(String key, String value, boolean wildcard) {
+            this.key        = key;
+            this.value      = value;
+            this.wildcard   = wildcard;
+        }
+
+        public boolean equals(Object obj) {
+            if(this == obj)
+                return true;
+
+            if(obj == null || !(obj instanceof OSMKeyValue))
+                return false;
+
+            OSMKeyValue other = (OSMKeyValue) obj;
+
+            if(this.wildcard != other.wildcard)
+                return false;
+
+            if(this.wildcard == true && this.key.equals(other.key))
+                return true;
+
+            return this.key.equals(other.key) && this.value.equals(other.value);
+        }
+
+        public int hashCode() {
+            if(wildcard) {
+                return key.hashCode();
+            }
+            return key.hashCode() ^ value.hashCode();
+        }
+    };
 
     private HashMap<P2<String>, P2<Double>> safetyFeatures = new HashMap<P2<String>, P2<Double>>();
 
@@ -127,6 +165,30 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 String key = tag.substring(0, ch_eq), value = tag.substring(ch_eq + 1);
                 _slopeOverrideTags.add(new P2<String>(key, value));
             } 
+		}
+	}
+
+    public void setCreativeNaming(LinkedHashMap<String, String> mappy) {
+        for(String taglist : mappy.keySet()) {
+            List<OSMKeyValue> vals = new ArrayList<OSMKeyValue>();
+
+            for(String tag : taglist.split(";")) {
+                int ch_eq = tag.indexOf("=");
+
+                if(ch_eq < 0) {
+                    _log.warn("Missing equal sign: " + taglist + " >> " + tag);
+                } else {
+                    String key   = tag.substring(0, ch_eq),
+                           value = tag.substring(ch_eq + 1);
+
+                    if(value.equals("")) {
+                        vals.add(new OSMKeyValue(key, null, true));
+                    } else {
+                        vals.add(new OSMKeyValue(key, value, false));
+                    }
+                }
+            }
+            _creativeNaming.put(vals, mappy.get(taglist));
         }
     }
 
@@ -183,6 +245,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<Integer, OSMWay> _ways = new HashMap<Integer, OSMWay>();
 
+        private Map<Integer, OSMRelation> _relations = new HashMap<Integer, OSMRelation>();
+
         public void buildGraph(Graph graph) {
 
             // We want to prune nodes that don't have any edges
@@ -200,6 +264,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             pruneFloatingIslands();
 
             int wayIndex = 0;
+
+            processRelations();
+            createUsefulNames();
 
             // figure out which nodes that are actually intersections
             Set<Integer> possibleIntersectionNodes = new HashSet<Integer>();
@@ -401,7 +468,141 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addRelation(OSMRelation relation) {
+            if (_relations.containsKey(relation.getId()))
+                return;
 
+            /* Currently only type=route;route=road relations are handled */
+            if (!("route".equals(relation.getTags().get("type")) && "road".equals(relation.getTags().get("route")))) {
+                return;
+            }
+
+            _relations.put(relation.getId(), relation);
+
+            if (_relations.size() % 100 == 0)
+                _log.debug("relations=" + _relations.size());
+
+        }
+        
+        /** Copies useful metadata from relations to the relavant ways/nodes.
+         */
+        private void processRelations() {
+			_log.debug("Processing relations...");
+            for(OSMRelation relation : _relations.values()) {
+                for( OSMRelationMember member : relation.getMembers()) {
+                    if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
+                        OSMWay way = _ways.get(member.getRef());
+                        if(relation.getTags().containsKey("name")) {
+                            if(way.getTags().containsKey("otp:route_name")) {
+                                way.addTag(new OSMTag("otp:route_name", way.getTags().get("otp:route_name") + ", " + relation.getTags().get("name")));
+                            } else {
+                                way.addTag(new OSMTag("otp:route_name", relation.getTags().get("name")));
+                            }
+                        }
+                        if(relation.getTags().containsKey("ref")) {
+                            if(way.getTags().containsKey("otp:route_ref")) {
+                                way.addTag(new OSMTag("otp:route_ref", way.getTags().get("otp:route_ref") + ", " + relation.getTags().get("ref")));
+                            } else {
+                                way.addTag(new OSMTag("otp:route_ref", relation.getTags().get("ref")));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /**
+         */
+
+        private void createUsefulNames() {
+            Map<String, Set<OSMWay>> key_map = new HashMap<String, Set<OSMWay>>();
+            Map<OSMKeyValue, Set<OSMWay>> keyvalue_map = new HashMap<OSMKeyValue, Set<OSMWay>>();
+            Set<OSMWay> processed_ways = new HashSet<OSMWay>();
+            Pattern p = Pattern.compile("\\{(.+?)\\}");
+            Matcher m = p.matcher("");
+
+			_log.debug("Generating creative names...");
+
+            for(OSMWay way : _ways.values()) {
+                Map<String, String> tags = way.getTags();
+
+                /* If a way already has a name, then trying to give it another one
+                 * doesn't make alot of sense... */
+                if(tags.containsKey("name")) {
+                    continue;
+                }
+
+                for(String key : tags.keySet()) {
+                    OSMKeyValue kv = new OSMKeyValue(key, tags.get(key), false);
+                    Set<OSMWay> keyvalue_map_set = keyvalue_map.get(kv);
+                    Set<OSMWay> key_map_set = key_map.get(key);
+
+                    if(keyvalue_map_set == null) {
+                        keyvalue_map_set = new HashSet<OSMWay>();
+                        keyvalue_map.put(kv, keyvalue_map_set);
+                    }
+                    keyvalue_map_set.add(way);
+
+                    if(key_map_set == null) {
+                        key_map_set = new HashSet<OSMWay>();
+                        key_map.put(key, key_map_set);
+                    }
+                    key_map_set.add(way);
+                }
+            }
+
+            for(List<OSMKeyValue> lkv : _creativeNaming.keySet()) {
+                Set<OSMWay> hope   = null;
+                Map<String, Matcher> replace = new HashMap<String, Matcher>();
+                String format = _creativeNaming.get(lkv);
+
+                for(OSMKeyValue kv : lkv) {
+                    if(hope == null) {
+                        hope = new HashSet<OSMWay>();
+                        if(kv.wildcard) {
+                            if(key_map.containsKey(kv.key)) {
+                                hope.addAll(key_map.get(kv.key));
+                            }
+                        } else {
+                            if(keyvalue_map.containsKey(kv)) {
+                                hope.addAll(keyvalue_map.get(kv));
+                            }
+                        }
+                        hope.removeAll(processed_ways);
+                    } else {
+                        if(kv.wildcard) {
+                            if(key_map.containsKey(kv.key)) {
+                                hope.retainAll(key_map.get(kv.key));
+                            }
+                        } else {
+                            if(keyvalue_map.containsKey(kv)) {
+                                hope.retainAll(keyvalue_map.get(kv));
+                            }
+                        }
+                    }
+                }
+
+                m.reset(format);
+                while(m.find()) {
+                    replace.put(m.group(1), Pattern.compile("\\{" + m.group(1) + "\\}").matcher(""));
+                }
+
+                for(OSMWay way : hope) {
+                    String gen_name = format;
+                    for(String key : replace.keySet()) {
+                        Matcher nm = replace.get(key);
+                        nm.reset(gen_name);
+                        gen_name = nm.replaceAll(way.getTags().get(key));
+                    }
+
+                    way.getTags().put("otp:gen_name", gen_name);
+                    processed_ways.add(way);
+                    _log.debug("generated name: " + way + " >> " + gen_name);
+                }
+            }
+        }
+
+        private String getVertexIdForNodeId(int nodeId) {
+            return "osm node " + nodeId;
         }
 
         /**
@@ -484,7 +685,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             String id = "way " + way.getId() + " from " + startNode;
             id = unique(id);
 
-            String name = way.getTags().get("name");
+            String name = way.getAssumedName();
             if (name == null) {
                 name = id;
             }

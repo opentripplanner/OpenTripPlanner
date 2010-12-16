@@ -48,4 +48,7 @@ public class OSMNode extends OSMWithTags {
     this.lon = lon;
   }
 
+  public String toString() {
+    return "osm node " + id;
+  }
 }

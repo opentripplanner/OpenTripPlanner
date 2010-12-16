@@ -39,4 +39,8 @@ public class OSMRelation extends OSMWithTags {
   public List<OSMRelationMember> getMembers() {
     return _members;
   }
+
+  public String toString() {
+    return "osm relation " + _id;
+  }
 }

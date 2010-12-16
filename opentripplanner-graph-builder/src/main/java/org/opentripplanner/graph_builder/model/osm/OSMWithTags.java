@@ -29,4 +29,26 @@ public class OSMWithTags {
   public Map<String,String> getTags() {
     return _tags;
   }
+
+  /** Returns a name-like value for an entity (if one exists). The otp: namespaced
+   *  tags are created by {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations processRelations}
+   */
+  public String getAssumedName() {
+    if(_tags.containsKey("name"))
+      return _tags.get("name");
+
+    if(_tags.containsKey("otp:route_name"))
+      return _tags.get("otp:route_name");
+
+    if(_tags.containsKey("otp:gen_name"))
+      return _tags.get("otp:gen_name");
+
+    if(_tags.containsKey("otp:route_ref"))
+      return _tags.get("otp:route_ref");
+
+    if(_tags.containsKey("ref"))
+      return _tags.get("ref");
+
+    return null;
+  }
 }
