@@ -59,4 +59,8 @@ public class FixedModeEdge implements EdgeNarrative {
     public String getName(State state) {
         return base.getName(state);
     }
+    
+    public String toString() {
+        return "FixedModeEdge(" + base + ", " + mode + ")";
+    }
 }

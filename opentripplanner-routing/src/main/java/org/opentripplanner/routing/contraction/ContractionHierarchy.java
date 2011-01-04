@@ -390,6 +390,7 @@ public class ContractionHierarchy implements Serializable {
         options = new TraverseOptions(new TraverseModeSet(mode));
         options.optimizeFor = optimize;
         options.maxWalkDistance = Double.MAX_VALUE;
+        options.freezeTraverseMode();
         this.contractionFactor = contractionFactor;
 
         init();
@@ -904,11 +905,18 @@ public class ContractionHierarchy implements Serializable {
         path.edges.addAll(upPath.edges);
 
         ListIterator<SPTEdge> it = downPath.edges.listIterator(downPath.edges.size());
+        boolean firstDown = true;
         while (it.hasPrevious()) {
             SPTEdge e = it.previous();
             SPTVertex swap = e.tov;
             e.tov = e.fromv;
             e.fromv = swap;
+            e.tov.setParent(e.fromv, e.payload, e.narrative);
+            if (firstDown) {
+                firstDown = false;
+                SPTEdge lastUpEdge = upPath.edges.lastElement();
+                e.fromv.setParent(upPath.vertices.lastElement(), lastUpEdge.payload, lastUpEdge.narrative);
+            }
             path.edges.add(e);
         }
 
@@ -923,6 +931,7 @@ public class ContractionHierarchy implements Serializable {
         } else {
             cleanPathEdges(init, path, options);
         }
+        path.optimize();
         return path;
     }
 
@@ -977,6 +986,7 @@ public class ContractionHierarchy implements Serializable {
 
             TraverseResult result = e.traverse(state, options);
 
+            e.narrative = result.getEdgeNarrative();
             state = result.state;
             SPTVertex tov = e.getToVertex();
             tov.state = state;
@@ -1005,6 +1015,7 @@ public class ContractionHierarchy implements Serializable {
 
             TraverseResult result = e.traverseBack(state, options);
 
+            e.narrative = result.getEdgeNarrative();
             state = result.state;
             SPTVertex fromv = e.getFromVertex();
             fromv.state = state;
@@ -1031,10 +1042,13 @@ public class ContractionHierarchy implements Serializable {
                 Shortcut shortcut = (Shortcut) edge.payload;
                 for (DirectEdge e : flatten(shortcut)) {
                     SPTVertex next = new SPTVertex(e.getToVertex(), null, 0, options);
+                    next.setParent(last, e, e);
                     out.add(new SPTEdge(last, next, e, e));
                     last = next;
                 }
-                out.lastElement().tov = edge.getToVertex();
+                SPTEdge lastEdge = out.lastElement();
+                lastEdge.tov = edge.getToVertex();
+                lastEdge.tov.setParent(edge.getFromVertex(), lastEdge.payload, lastEdge.narrative);
             } else {
                 out.add(edge);
             }

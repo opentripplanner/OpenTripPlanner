@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.FixedModeEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -37,6 +38,8 @@ public class Shortcut implements DirectEdge, Serializable {
     DirectEdge edge2;
     int time;
     double weight = -1;
+
+    private transient TraverseMode mode;
    
     public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight) {
         this.startVertex = edge1.getFromVertex();
@@ -65,7 +68,7 @@ public class Shortcut implements DirectEdge, Serializable {
 
     @Override
     public TraverseMode getMode() {
-        return null;
+        return mode;
     }
 
     @Override
@@ -83,7 +86,7 @@ public class Shortcut implements DirectEdge, Serializable {
         if (weight != -1) {
             State s1 = s0.clone();
             s1.incrementTimeInSeconds(time);
-            return new TraverseResult(weight, s1,this);
+            return new TraverseResult(weight, s1, this);
         }
         State state = s0;
         long startTime = state.getTime();
@@ -101,7 +104,8 @@ public class Shortcut implements DirectEdge, Serializable {
         weight = aweight + wr.weight;
         
         time = (int) ((state.getTime() - startTime) / 1000);
-        return new TraverseResult(weight, state,this);
+        mode =  wr.getEdgeNarrative().getMode();
+        return new TraverseResult(weight, state, new FixedModeEdge(this, mode));
     }
 
     @Override

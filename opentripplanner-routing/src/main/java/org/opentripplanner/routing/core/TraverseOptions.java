@@ -246,4 +246,11 @@ public class TraverseOptions implements Serializable, Cloneable {
     public TraverseModeSet getModes() {
         return modes;
     }
+
+    /** only allow traversal by the specified mode; don't allow walking bikes.
+     * This is used during contraction to reduce the number of possible paths. */
+    public void freezeTraverseMode() {
+        walkingOptions = clone();
+        walkingOptions.walkingOptions = new TraverseOptions(new TraverseModeSet());
+    }
 }

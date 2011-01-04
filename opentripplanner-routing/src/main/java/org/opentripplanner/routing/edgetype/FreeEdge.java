@@ -41,14 +41,14 @@ public class FreeEdge extends AbstractEdge {
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException {
         State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1, this);
+        return new TraverseResult(0.000001, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
         State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1, this);
+        return new TraverseResult(0.000001, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     @Override
@@ -82,5 +82,9 @@ public class FreeEdge extends AbstractEdge {
             return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
         }
         return false;
+    }
+    
+    public String toString() {
+        return"FreeEdge(" + fromv + "-> " + tov + ")";
     }
 }

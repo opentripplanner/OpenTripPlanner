@@ -192,7 +192,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         weight *= options.walkReluctance;
         s1.walkDistance += length;
         s1.incrementTimeInSeconds((int) (back ? -time : time));
-        return new TraverseResult(weight, s1, this);
+        return new TraverseResult(weight, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {

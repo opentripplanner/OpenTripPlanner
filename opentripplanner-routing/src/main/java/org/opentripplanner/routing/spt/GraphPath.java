@@ -121,12 +121,9 @@ public class GraphPath {
                 SPTEdge edge = iterator.previous();
                 TraverseResult result = edge.payload.traverse(state, options);
                 assert (result != null);
-                if (result == null) {
-                    System.out.println("doom: " + edge.payload);
-                    edge.payload.traverse(state, options);
-                }
                 state = result.state;
                 edge.fromv.state = state;
+                edge.narrative = result.getEdgeNarrative();
             }
         } else {
             TraverseOptions options = vertices.lastElement().options;
@@ -136,6 +133,7 @@ public class GraphPath {
                 TraverseResult result = edge.payload.traverseBack(state, options);
                 state = result.state;
                 edge.fromv.state = state;
+                edge.narrative = result.getEdgeNarrative();
             }
         }
     }
