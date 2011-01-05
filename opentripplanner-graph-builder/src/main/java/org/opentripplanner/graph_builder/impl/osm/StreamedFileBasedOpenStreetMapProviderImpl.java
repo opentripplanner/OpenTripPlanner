@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 /**
  * @author Vincent Privat
@@ -37,6 +38,9 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
         try {
             if (_path.getName().endsWith(".gz")) {
                 InputStream in = new GZIPInputStream(new FileInputStream(_path));
+                StreamedOpenStreetMapParser.parseMap(in, handler);
+            } else if (_path.getName().endsWith(".bz2")) {
+                InputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
                 StreamedOpenStreetMapParser.parseMap(in, handler);
             } else {
                 StreamedOpenStreetMapParser.parseMap(_path, handler);

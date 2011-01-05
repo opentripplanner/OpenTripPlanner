@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
+import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
@@ -35,6 +36,9 @@ public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider
             OpenStreetMapParser parser = new OpenStreetMapParser();
             if (_path.getName().endsWith(".gz")) {
                 InputStream in = new GZIPInputStream(new FileInputStream(_path));
+                parser.parseMap(in, handler);
+            } else if (_path.getName().endsWith(".bz2")) {
+                BZip2CompressorInputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
                 parser.parseMap(in, handler);
             } else {
                 parser.parseMap(_path, handler);
