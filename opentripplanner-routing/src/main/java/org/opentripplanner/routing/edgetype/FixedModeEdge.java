@@ -18,11 +18,6 @@ public class FixedModeEdge implements EdgeNarrative {
     }
 
     @Override
-    public String getDirection() {
-	return base.getDirection();
-    }
-
-    @Override
     public double getDistance() {
         return base.getDistance();
     }

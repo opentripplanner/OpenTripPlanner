@@ -127,11 +127,6 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         slopeCostEffectiveLength = result.getFirst();
         maxSlope = result.getSecond();
     }
-    
-    @Override
-    public String getDirection() {
-        return null;
-    }
 
     @Override
     public double getDistance() {

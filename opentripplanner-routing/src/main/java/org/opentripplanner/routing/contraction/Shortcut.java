@@ -51,11 +51,6 @@ public class Shortcut implements DirectEdge, Serializable {
     }
 
     @Override
-    public String getDirection() {
-        return null;
-    }
-
-    @Override
     public double getDistance() {
         return 0;
     }

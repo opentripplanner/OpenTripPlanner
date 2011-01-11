@@ -22,7 +22,6 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -36,20 +35,6 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
 
     public OutEdge(StreetVertex fromv, Vertex tov) {
         super(fromv, tov);
-    }
-    private static String getDirection(Coordinate a, Coordinate b) {
-        double run = b.x - a.x;
-        double rise = b.y - a.y;
-        double direction = Math.atan2(run, rise);
-        int octant = (int) (8 + Math.round(direction * 8 / (Math.PI * 2))) % 8;
-
-        return TurnEdge.DIRECTIONS[octant];
-    }
-
-    @Override
-    public String getDirection() {
-        Coordinate[] coordinates = ((StreetVertex) fromv).getGeometry().getCoordinates();
-        return getDirection(coordinates[0], coordinates[coordinates.length - 1]);
     }
 
     @Override

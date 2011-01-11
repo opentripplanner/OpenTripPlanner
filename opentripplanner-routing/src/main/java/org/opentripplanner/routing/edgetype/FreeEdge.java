@@ -52,11 +52,6 @@ public class FreeEdge extends AbstractEdge {
     }
 
     @Override
-    public String getDirection() {
-        return null;
-    }
-
-    @Override
     public double getDistance() {
         return 0;
     }

@@ -51,10 +51,6 @@ public class SPTEdge {
         this.narrative = narrative;
     }
 
-    public String getDirection() {
-        return narrative.getDirection();
-    }
-
     public double getDistance() {
         return narrative.getDistance();
     }

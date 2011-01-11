@@ -64,12 +64,6 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     }
 
     @Override
-    public String getDirection() {
-        Coordinate[] coordinates = fromv.getGeometry().getCoordinates();
-        return getDirection(coordinates[0], coordinates[coordinates.length - 1]);
-    }
-
-    @Override
     public double getDistance() {
         return fromv.getLength();
     }

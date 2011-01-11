@@ -85,33 +85,6 @@ public class TestTurnEdge extends TestCase {
         assertTrue(Math.abs(wr.state.getTime() - startTime.getTimeInMillis()) < 10000);
     }
 
-    public void testStreetDirection() {
-
-        StreetVertex streetN = createStreet("north", 47.670300419806246, -122.28909730911255, 47.67212102588157,
-                -122.28914022445679);
-
-        StreetVertex streetNE = createStreet("northeast", 47.670300419806246, -122.28909730911255, 47.67209212786854,
-                -122.28796005249023);
-
-        TurnEdge nne = new TurnEdge(streetN, streetNE);
-        
-        assertEquals("north", nne.getDirection());
-        
-        StreetVertex streetS = createStreet("south", 47.670300419806246, -122.28909730911255, 47.668494200226334,
-                -122.28914022445679);
-
-        TurnEdge nes = new TurnEdge(streetS, streetNE);
-        
-        assertEquals("south", nes.getDirection());
-
-    }
-
-    private StreetVertex createStreet(String name, double latFrom, double lonFrom, double latTo, double lonTo) {
-        double len = DistanceLibrary.distance(latFrom, lonFrom, latTo, lonTo);
-        StreetVertex street = new StreetVertex(name, GeometryUtils.makeLineString(lonFrom, latFrom, lonTo, latTo), name, len, false);
-        return street;
-    }
-
     public void testMaxWalkDistance() {
         /* create a square */
 
@@ -233,11 +206,6 @@ class MockTransfer extends AbstractEdge {
     public MockTransfer(Vertex fromv, Vertex tov, int cost) {
         super(fromv, tov);
         this.cost = cost;
-    }
-
-    @Override
-    public String getDirection() {
-        return null;
     }
 
     @Override

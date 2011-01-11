@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
 import java.util.GregorianCalendar;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
@@ -166,13 +167,15 @@ public class TestAStar extends TestCase {
         Vertex airport = graph.getVertex("TriMet_10579");
 
         long startClock, endClock;
-
+        Random rng = new Random();
+        rng.setSeed(0);
+        
         final int n_trials = 100;
         String random[] = new String[n_trials];
         for (int i = 0; i < n_trials; ++i) {
             String label;
             while (true) {
-                int rand_id = (int) (Math.random() * 10000);
+                int rand_id = rng.nextInt() % 10000;
                 label = "TriMet_" + rand_id;
                 if (graph.getVertex(label) != null) {
                     break;
@@ -193,7 +196,7 @@ public class TestAStar extends TestCase {
         long aStarTime = endClock - startClock;
 
         GraphPath path = spt.getPath(airport);
-        assertNotNull(path);
+        assertNotNull("A path could not be found to the airport from " + random[n_trials - 1], path);
         double time = aStarTime / n_trials / 1000000000.0;
         assertTrue("Actual time " + time + "s greater than 500 ms", time <= 0.5);
 

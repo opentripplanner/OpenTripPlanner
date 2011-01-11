@@ -263,12 +263,6 @@ public class AStarTest {
         }
 
         @Override
-        public String getDirection() {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
         public Geometry getGeometry() {
             // TODO Auto-generated method stub
             return null;

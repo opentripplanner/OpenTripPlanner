@@ -17,6 +17,12 @@ import org.onebusaway.gtfs.model.Trip;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+/**
+ * An EdgeNarrative holds the data needed to generate a human-readable
+ * set of directions for an edge.
+ * @author novalis
+ *
+ */
 public interface EdgeNarrative {
 
     public Vertex getFromVertex();
@@ -26,8 +32,6 @@ public interface EdgeNarrative {
     public TraverseMode getMode();
 
     public String getName();
-
-    public String getDirection();
 
     public Geometry getGeometry();
 
