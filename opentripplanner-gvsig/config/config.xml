@@ -7,7 +7,7 @@
 		<extension class-name="org.gvsig.scolab.otp.LoadOTPGraphExtension"
 			description="Extension that shows edges and vertices from OTP graph object"
 			active="true">
-			<menu text="OTP/load_otp_graph" icon="load_otp_graph"/>
+			<menu text="OTP/load_otp_graph" icon="show-coords"/>
 			<tool-bar name="OTP" position="13">
 				<action-tool icon="load_otp_graph"	tooltip="load_otp_graph" position="2"/>
 			</tool-bar>
