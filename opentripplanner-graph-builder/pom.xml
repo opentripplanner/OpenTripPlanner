@@ -11,14 +11,20 @@
         <version>0.4.4-SNAPSHOT</version>
     </parent>
 
-    <dependencies>
+    <repositories>
+        <repository>
+            <id>opengeo</id>
+            <name>OpenGeo Maven Repository</name>
+            <url>http://repo.opengeo.org/</url>
+        </repository>
+    </repositories>
 
+    <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-routing</artifactId>
             <version>${project.version}</version>
         </dependency>
-
 
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -32,7 +38,6 @@
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.5.8</version>
         </dependency>
-
 
         <dependency>
             <groupId>org.onebusaway</groupId>
@@ -98,6 +103,11 @@
 	        <version>1.0</version>
 	    </dependency>
 
+        <dependency>
+            <groupId>crosby.binary</groupId>
+            <artifactId>osmpbf</artifactId>
+            <version>1.2.1</version>
+        </dependency>
     </dependencies>
 
     <build>
