@@ -150,6 +150,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _log.warn("No default permissions for osm tags...");
         }
     }
+    
+    /**
+     * Set the traversal permissions from a {@link StreetTraversalPermissionsSource} source.
+     * 
+     * @param source the permissions source
+     */
+    public void setDefaultAccessPermissionsSource(StreetTraversalPermissionsSource source) {
+        LinkedHashMap<String, StreetTraversalPermission> permisions = new LinkedHashMap<String,StreetTraversalPermission>(source.getPermissions());
+        setDefaultAccessPermissions(permisions);
+    }
 
     /**
      * Streets where the slope is assumed to be flat because the underlying topographic
