@@ -24,6 +24,8 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.routing.algorithm.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
 
@@ -99,6 +101,8 @@ public class TraverseOptions implements Serializable, Cloneable {
     public double waitAtBeginningFactor = 0.1;
 
     private TraverseOptions walkingOptions;
+    
+    public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
     
     /** Constructor for options; modes defaults to walk and transit */ 
     public TraverseOptions() {

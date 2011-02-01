@@ -27,14 +27,10 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.HasEdges;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
-import org.opentripplanner.routing.edgetype.OnBoardReverseEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -157,17 +153,19 @@ public class AStar {
                 edges.add(edge);
             }
         }
-        final double max_speed = getMaxSpeed(options);
+        
+        final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
+        
+        double initialWeight = heuristic.computeInitialWeight(origin, target, options);
 
-        double distance = origin.distance(target) / max_speed;
+        //double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
         FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size()
                 + extraEdges.size());
-        pq.insert(spt_origin, spt_origin.weightSum + distance);
+        pq.insert(spt_origin, spt_origin.weightSum + initialWeight);
 
-        boolean useTransit = options.getModes().getTransit();
         HashSet<Vertex> closed = new HashSet<Vertex>(100000);
 
         // Iteration Variables
@@ -219,42 +217,13 @@ public class AStar {
                     Vertex fromv = er.getFromVertex();
 
                     double new_w = spt_u.weightSum + wr.weight;
-                    double euclidianDistance = fromv.distance(target);
-                    if (useTransit) {
-                        if (spt_u.state.alightedLocal) {
-                            distance = options.walkReluctance * euclidianDistance / options.speed;
-                        } else {
-                            int boardCost;
-                            if (edge instanceof OnBoardReverseEdge) {
-                                boardCost = options.boardCost;
-                            } else {
-                                boardCost = 0;
-                            }
-
-                            if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
-                                distance = options.walkReluctance * euclidianDistance
-                                        / options.speed;
-                            } else {
-                                double mandatoryWalkDistance = target
-                                        .getDistanceToNearestTransitStop()
-                                        + fromv.getDistanceToNearestTransitStop();
-                                distance = (euclidianDistance - mandatoryWalkDistance) / max_speed
-                                        + mandatoryWalkDistance * options.walkReluctance
-                                        / options.speed + boardCost;
-                                distance = Math.min(distance, options.walkReluctance
-                                        * euclidianDistance / options.speed);
-                            }
-                        }
-                    } else {
-                        distance = options.walkReluctance * euclidianDistance / max_speed;
-                    }
-
-                    double heuristic_distance = new_w + distance;
+                    double remaining_w = heuristic.computeReverseWeight(spt_u, edge, wr, target);
+                    double heuristic_distance = new_w + remaining_w;
+                    
                     if (heuristic_distance > options.maxWeight
                             || wr.state.getTime() < options.worstTime) {
                         // too expensive to get here
-                    }
-                    else {
+                    } else {
                         spt_v = spt.addVertex(fromv, wr.state, new_w, options);
                         if (spt_v != null) {
                             spt_v.setParent(spt_u, edge, er);
@@ -330,16 +299,16 @@ public class AStar {
                 edges.add(edge);
             }
         }
-        final double max_speed = getMaxSpeed(options);
-        double distance = origin.distance(target) / max_speed;
+        
+        final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
+        
+        double initialWeight = heuristic.computeInitialWeight(origin, target, options);
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
         FibHeap<SPTVertex> pq = new FibHeap<SPTVertex>(graph.getVertices().size()
                 + extraEdges.size());
-        pq.insert(spt_origin, spt_origin.weightSum + distance);
-
-        boolean useTransit = options.getModes().getTransit();
+        pq.insert(spt_origin, spt_origin.weightSum + initialWeight);
 
         options = options.clone();
         /** max walk distance cannot be less than distances to nearest transit stops */
@@ -349,7 +318,7 @@ public class AStar {
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
-            
+
             Vertex fromv = spt_u.mirror;
             if (fromv == target) {
                 break;
@@ -398,49 +367,22 @@ public class AStar {
                     Vertex tov = er.getToVertex();
 
                     double new_w = spt_u.weightSum + wr.weight;
-                    double euclidianDistance = tov.distance(target);
 
-                    if (useTransit) {
-                        if (spt_u.state.alightedLocal) {
-                            distance = options.walkReluctance * euclidianDistance / options.speed;
-                        } else {
-                            int boardCost;
-                            if (edge instanceof OnBoardForwardEdge) {
-                                boardCost = options.boardCost;
-                            } else {
-                                boardCost = 0;
-                            }
+                    double remaining_w = heuristic.computeForwardWeight(spt_u, edge, wr, target);
 
-                            if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
-                                distance = options.walkReluctance * euclidianDistance
-                                        / options.speed;
-                            } else {
-                                double mandatoryWalkDistance = target
-                                        .getDistanceToNearestTransitStop()
-                                        + tov.getDistanceToNearestTransitStop();
-                                distance = (euclidianDistance - mandatoryWalkDistance) / max_speed
-                                        + mandatoryWalkDistance * options.walkReluctance
-                                        / options.speed + boardCost;
-                                distance = Math.min(distance, options.walkReluctance
-                                        * euclidianDistance / options.speed);
-                            }
-                        }
-                    }
+                    double heuristic_distance = new_w + remaining_w;
 
-                    double heuristic_distance = new_w + distance;
-                    
                     if (heuristic_distance > options.maxWeight
                             || wr.state.getTime() > options.worstTime) {
                         // too expensive to get here
-                    }
-                    else {
+                    } else {
                         SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
                         if (spt_v != null) {
                             spt_v.setParent(spt_u, edge, er);
                             pq.insert_or_dec_key(spt_v, heuristic_distance);
                         }
                     }
-                    
+
                     // Iterate to next result
                     wr = wr.getNextResult();
                 }
@@ -468,21 +410,5 @@ public class AStar {
         return edges;
     }
 
-    public static double getMaxSpeed(TraverseOptions options) {
-        if (options.getModes().contains(TraverseMode.TRANSIT)) {
-            // assume that the max average transit speed over a hop is 10 m/s, which is so far true
-            // for
-            // New York and Portland
-            return 10;
-        } else {
-            if (options.optimizeFor == OptimizeType.QUICK) {
-                return options.speed;
-            } else {
-                // assume that the best route is no more than 10 times better than
-                // the as-the-crow-flies flat base route.
-                return options.speed * 10;
-            }
-        }
-    }
 
 }
