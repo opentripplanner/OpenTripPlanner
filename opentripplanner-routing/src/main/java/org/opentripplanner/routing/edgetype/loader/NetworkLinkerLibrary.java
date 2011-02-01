@@ -117,7 +117,7 @@ public class NetworkLinkerLibrary {
             getLocation(v);
             return false;
         } else {
-            graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
+            graph.addEdge(new StreetTransitLink(v, location, wheelchairAccessible));
             return true;
         }
     }
