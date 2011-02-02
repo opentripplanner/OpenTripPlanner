@@ -73,6 +73,18 @@ public class TraverseOptions implements Serializable, Cloneable {
      * a multiplier.
      */
     public double walkReluctance = 2.0;
+    
+    /**
+     * How much worse is waiting for a transit vehicle than being on a transit vehicle,
+     * as a multiplier.  The default value treats wait and on-vehicle time as the same.
+     */
+    public double waitReluctance = 1.0;
+
+    /**
+     * How much less bad is waiting at the beginning of the trip
+     */
+    public double waitAtBeginningFactor = 0.1;
+
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int boardCost = 120; 
@@ -94,11 +106,6 @@ public class TraverseOptions implements Serializable, Cloneable {
     public double maxWeight = Double.MAX_VALUE;
 
     public int maxTransfers = 2;
-
-    /*
-     * How much less bad waiting at the beginning of the trip is
-     */
-    public double waitAtBeginningFactor = 0.1;
 
     private TraverseOptions walkingOptions;
     
@@ -192,7 +199,8 @@ public class TraverseOptions implements Serializable, Cloneable {
                maxWalkDistance == to.maxWalkDistance &&
                optimizeTransferPenalty == to.optimizeTransferPenalty && 
                maxSlope == to.maxSlope &&
-               walkReluctance == to.walkReluctance && 
+               walkReluctance == to.walkReluctance &&
+               waitReluctance == to.waitReluctance &&
                boardCost == to.boardCost && 
                bannedRoutes.equals(to.bannedRoutes);
         }
@@ -211,6 +219,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         new Double(optimizeTransferPenalty).hashCode() + 
         new Double(maxSlope).hashCode() +
         new Double(walkReluctance).hashCode() + 
+        new Double(waitReluctance).hashCode() +
         boardCost + 
         bannedRoutes.hashCode();
     }

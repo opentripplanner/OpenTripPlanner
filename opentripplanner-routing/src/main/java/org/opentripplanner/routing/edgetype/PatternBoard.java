@@ -149,6 +149,10 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         if (state0.numBoardings == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }
+        else {
+            wait_cost *= options.waitReluctance;
+        }
+        
         return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1, this);
     }
 
