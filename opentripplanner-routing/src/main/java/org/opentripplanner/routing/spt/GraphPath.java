@@ -25,9 +25,11 @@ import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -36,8 +38,8 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** 
- * A set of edges on a single route 
+/**
+ * A set of edges on a single route
  * */
 class Ride {
     AgencyAndId route;
@@ -47,7 +49,7 @@ class Ride {
     String startZone;
 
     String endZone;
-    
+
     long startTime;
 
     public Ride() {
@@ -87,11 +89,11 @@ class Ride {
 }
 
 /**
- * A shortest path on the graph. 
+ * A shortest path on the graph.
  */
 public class GraphPath {
     private static final Logger _log = LoggerFactory.getLogger(GraphPath.class);
-    
+
     public Vector<SPTVertex> vertices;
 
     public Vector<SPTEdge> edges;
@@ -104,10 +106,10 @@ public class GraphPath {
     public void optimize() {
         State state = vertices.lastElement().state.clone();
         State state0 = vertices.firstElement().state;
-        
+
         state.alightedLocal = false;
         state.everBoarded = false;
-        
+
         if (edges.isEmpty()) {
             /* nothing to optimize */
             return;
@@ -119,27 +121,31 @@ public class GraphPath {
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
+                EdgeNarrative existingNarrative = edge.narrative;
                 TraverseResult result = edge.payload.traverse(state, options);
                 assert (result != null);
                 state = result.state;
                 edge.fromv.state = state;
                 edge.narrative = result.getEdgeNarrative();
+                copyExistingNarrativeToNewNarrativeAsAppropriate(existingNarrative, edge.narrative);
             }
         } else {
             TraverseOptions options = vertices.lastElement().options;
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
+                EdgeNarrative existingNarrative = edge.narrative;
                 TraverseResult result = edge.payload.traverseBack(state, options);
                 state = result.state;
                 edge.fromv.state = state;
                 edge.narrative = result.getEdgeNarrative();
+                copyExistingNarrativeToNewNarrativeAsAppropriate(existingNarrative, edge.narrative);
             }
         }
     }
 
     /** See the thread on gtfs-changes explaining the proper interpretation of fares.txt */
-    
+
     public Fare getCost() {
         State state = vertices.lastElement().state;
         FareContext fareContext = state.fareContext;
@@ -178,7 +184,7 @@ public class GraphPath {
         if (rides.size() == 0) {
             return null;
         }
-        
+
         // greedily consume rides
 
         Set<String> zones = new HashSet<String>();
@@ -198,7 +204,7 @@ public class GraphPath {
             transfersUsed += 1;
 
             long tripTime = ride.startTime - startTime;
-            
+
             // find the best fare that matches this set of rides
             for (AgencyAndId fareId : fareRules.keySet()) {
                 FareRuleSet ruleSet = fareRules.get(fareId);
@@ -207,9 +213,10 @@ public class GraphPath {
                     if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                         continue;
                     }
-                    //assume transfers are evaluated at boarding time,
-                    //as trimet does
-                    if (attribute.isTransferDurationSet() && tripTime > attribute.getTransferDuration() * 1000) {
+                    // assume transfers are evaluated at boarding time,
+                    // as trimet does
+                    if (attribute.isTransferDurationSet()
+                            && tripTime > attribute.getTransferDuration() * 1000) {
                         continue;
                     }
                     float newFare = attribute.getPrice();
@@ -245,8 +252,8 @@ public class GraphPath {
         totalFare += currentFare;
 
         Fare fare = new Fare();
-        fare.addFare(FareType.regular, new WrappedCurrency(currency), (int) Math.round(totalFare * Math.pow(
-                10, currency.getDefaultFractionDigits())));
+        fare.addFare(FareType.regular, new WrappedCurrency(currency),
+                (int) Math.round(totalFare * Math.pow(10, currency.getDefaultFractionDigits())));
         return fare;
     }
 
@@ -263,15 +270,34 @@ public class GraphPath {
             e.tov = tmp;
         }
     }
-    
+
     public boolean equals(Object o) {
         if (o instanceof GraphPath) {
-            return this.edges.equals(((GraphPath)o).edges);
+            return this.edges.equals(((GraphPath) o).edges);
         }
         return false;
     }
-    
+
     public int hashCode() {
         return this.edges.hashCode();
+    }
+
+    /****
+     * Private Methods
+     ****/
+
+    private void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
+            EdgeNarrative to) {
+        
+        if( ! ( to instanceof MutableEdgeNarrative))
+            return;
+        
+        MutableEdgeNarrative m = (MutableEdgeNarrative) to;
+        
+        if( to.getFromVertex() == null)
+            m.setFromVertex(from.getFromVertex());
+        
+        if( to.getToVertex() == null)
+            m.setToVertex(from.getToVertex());
     }
 }
