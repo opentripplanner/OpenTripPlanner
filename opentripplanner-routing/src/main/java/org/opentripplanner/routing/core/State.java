@@ -19,7 +19,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 
 public class State {
 
-    private long _time;
+    public long time;
     private int trip = -1;
     public AgencyAndId tripId = null;
     public double walkDistance = 0;
@@ -38,7 +38,7 @@ public class State {
     }
 
     public State(long time) {
-        _time = time;
+        this.time = time;
     }    
 
     public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
@@ -47,7 +47,7 @@ public class State {
 
     public State(long time, int trip, AgencyAndId tripId, double walkDistance,
             AgencyAndId route, String zone, FareContext fareContext, int numBoardings, boolean alightedLocal, boolean everBoarded) {
-        _time = time;
+        this.time = time;
         this.trip = trip;
         this.tripId = tripId;
         this.walkDistance = walkDistance;
@@ -69,20 +69,20 @@ public class State {
      * @return the time in milliseconds since the epoch.
      */
     public long getTime() {
-        return _time;
+        return time;
     }
 
     public void incrementTimeInSeconds(int numOfSeconds) {
-        _time += numOfSeconds * 1000;
+        time += numOfSeconds * 1000;
     }
 
     public State clone() {
-        State ret = new State(_time, trip, tripId, walkDistance, route, zone, fareContext, numBoardings, alightedLocal, everBoarded);
+        State ret = new State(time, trip, tripId, walkDistance, route, zone, fareContext, numBoardings, alightedLocal, everBoarded);
         return ret;
     }
 
     public String toString() {
-        return "<State " + new Date(_time) + "," + trip + ">";
+        return "<State " + new Date(time) + "," + trip + ">";
     }
 
     public void setPattern(int curPattern) {
