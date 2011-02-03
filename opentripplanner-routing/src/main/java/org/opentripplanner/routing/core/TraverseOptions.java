@@ -33,7 +33,7 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3836092451659658815L;
 
-    /** max speed along streets, in meters per second */ 
+    /** max speed along streets, in meters per second */
     public double speed;
 
     private TraverseModeSet modes;
@@ -54,29 +54,28 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     private HashMap<AgencyAndId, FareRuleSet> fareContexts;
 
-    /** When optimizing for few transfers, we don't actually optimize for fewest
-     * transfers, as this can lead to absurd results.  Consider a trip in New York
-     * from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon.  The true 
-     * lowest transfers route is to wait until midnight, when the 4 train runs local 
-     * the whole way.  The actual fastest route is the 2/3 to the 4/5 at Nevins to 
-     * the 6 at Union Square, which takes half an hour.  Even someone optimizing 
-     * for fewest transfers doesn't want to wait until midnight.  Maybe they would  
-     * be willing to walk to 7th Ave and take the Q to Union Square, then transfer 
-     * to the 6.  If this takes less than optimize_transfer_penalty seconds, then 
-     * that's what we'll return.
+    /**
+     * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
+     * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
+     * Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to wait until midnight,
+     * when the 4 train runs local the whole way. The actual fastest route is the 2/3 to the 4/5 at
+     * Nevins to the 6 at Union Square, which takes half an hour. Even someone optimizing for fewest
+     * transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave
+     * and take the Q to Union Square, then transfer to the 6. If this takes less than
+     * optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    public long optimizeTransferPenalty = 1800; 
+    public long optimizeTransferPenalty = 1800;
 
-    public double maxSlope = 0.0833333333333; //ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
-    /** How much worse walking is than waiting for an equivalent length of time, as 
-     * a multiplier.
+    /**
+     * How much worse walking is than waiting for an equivalent length of time, as a multiplier.
      */
     public double walkReluctance = 2.0;
-    
+
     /**
-     * How much worse is waiting for a transit vehicle than being on a transit vehicle,
-     * as a multiplier.  The default value treats wait and on-vehicle time as the same.
+     * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
+     * multiplier. The default value treats wait and on-vehicle time as the same.
      */
     public double waitReluctance = 1.0;
 
@@ -85,18 +84,17 @@ public class TraverseOptions implements Serializable, Cloneable {
      */
     public double waitAtBeginningFactor = 0.1;
 
-
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    public int boardCost = 120; 
+    public int boardCost = 120;
 
-    /** Do not use certain named routes, probably because we're trying
-     * to find alternate itineraries.
+    /**
+     * Do not use certain named routes, probably because we're trying to find alternate itineraries.
      */
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
 
     /**
-     * The worst possible time (latest for depart-by and earliest for arrive-by) that 
-     * we will accept when planning a trip.
+     * The worst possible time (latest for depart-by and earliest for arrive-by) that we will accept
+     * when planning a trip.
      */
     public long worstTime = Long.MAX_VALUE;
 
@@ -105,31 +103,39 @@ public class TraverseOptions implements Serializable, Cloneable {
      */
     public double maxWeight = Double.MAX_VALUE;
 
+    /**
+     * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
+     * must pass between exiting one transit vehicle and boarding another. This time is in addition
+     * to time it might take to walk between transit stops. This time should also be overridden by
+     * specific transfer timing information in transfers.txt
+     */
+    public int minTransferTime = 0;
+
     public int maxTransfers = 2;
 
     private TraverseOptions walkingOptions;
-    
+
     public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
-    
-    /** Constructor for options; modes defaults to walk and transit */ 
+
+    /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
-        setModes(new TraverseModeSet(new TraverseMode[]{TraverseMode.WALK, TraverseMode.TRANSIT}));
+        setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
         calendar = Calendar.getInstance();
         walkingOptions = this;
     }
-    
+
     public TraverseOptions(TraverseModeSet modes) {
         this();
         this.setModes(modes);
         if (modes.getBicycle()) {
-            speed = 5; //5 m/s, ~11 mph, a random bicycling speed.
-            boardCost = 240; //cyclists hate loading their bike a second time
+            speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
+            boardCost = 240; // cyclists hate loading their bike a second time
             walkingOptions = new TraverseOptions();
             walkingOptions.getModes().setTransit(false);
         } else if (modes.getCar()) {
-            speed = 15; //15 m/s, ~35 mph, a random driving speed
+            speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
             walkingOptions.getModes().setTransit(false);
         }
@@ -148,7 +154,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     public void setCalendarService(CalendarServiceImpl calendarService) {
         this.calendarService = calendarService;
     }
-    
+
     public CalendarService getCalendarService() {
         return calendarService;
     }
@@ -182,46 +188,33 @@ public class TraverseOptions implements Serializable, Cloneable {
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
-            throw new RuntimeException(e); 
+            throw new RuntimeException(e);
         }
     }
-    
+
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions to = (TraverseOptions) o;
-        return speed == to.speed && 
-               maxWeight == to.maxWeight &&
-               worstTime == to.worstTime &&
-               getModes().equals(to.getModes()) &&
-               isArriveBy() == to.isArriveBy() &&
-               wheelchairAccessible == to.wheelchairAccessible &&
-               optimizeFor == to.optimizeFor &&
-               maxWalkDistance == to.maxWalkDistance &&
-               optimizeTransferPenalty == to.optimizeTransferPenalty && 
-               maxSlope == to.maxSlope &&
-               walkReluctance == to.walkReluctance &&
-               waitReluctance == to.waitReluctance &&
-               boardCost == to.boardCost && 
-               bannedRoutes.equals(to.bannedRoutes);
+            return speed == to.speed && maxWeight == to.maxWeight && worstTime == to.worstTime
+                    && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
+                    && wheelchairAccessible == to.wheelchairAccessible
+                    && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
+                    && optimizeTransferPenalty == to.optimizeTransferPenalty
+                    && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
+                    && waitReluctance == to.waitReluctance && boardCost == to.boardCost
+                    && bannedRoutes.equals(to.bannedRoutes);
         }
         return false;
     }
-    
+
     public int hashCode() {
-        return new Double(speed).hashCode() + 
-        new Double(maxWeight).hashCode() + 
-        (int) (worstTime & 0xffffffff) +
-        getModes().hashCode() + 
-        (isArriveBy() ? 8966786 : 0) +
-        (wheelchairAccessible ? 731980 : 0) +
-        optimizeFor.hashCode() + 
-        new Double(maxWalkDistance).hashCode() +
-        new Double(optimizeTransferPenalty).hashCode() + 
-        new Double(maxSlope).hashCode() +
-        new Double(walkReluctance).hashCode() + 
-        new Double(waitReluctance).hashCode() +
-        boardCost + 
-        bannedRoutes.hashCode();
+        return new Double(speed).hashCode() + new Double(maxWeight).hashCode()
+                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
+                + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
+                + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
+                + new Double(optimizeTransferPenalty).hashCode() + new Double(maxSlope).hashCode()
+                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+                + boardCost + bannedRoutes.hashCode();
     }
 
     public void setArriveBy(boolean back) {
@@ -260,8 +253,10 @@ public class TraverseOptions implements Serializable, Cloneable {
         return modes;
     }
 
-    /** only allow traversal by the specified mode; don't allow walking bikes.
-     * This is used during contraction to reduce the number of possible paths. */
+    /**
+     * only allow traversal by the specified mode; don't allow walking bikes. This is used during
+     * contraction to reduce the number of possible paths.
+     */
     public void freezeTraverseMode() {
         walkingOptions = clone();
         walkingOptions.walkingOptions = new TraverseOptions(new TraverseModeSet());
