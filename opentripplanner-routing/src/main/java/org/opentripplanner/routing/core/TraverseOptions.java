@@ -117,6 +117,13 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
 
+    /**
+     * Extensions to the trip planner will require additional traversal options beyond the default
+     * set. We provide an extension point for adding arbitrary parameters with an extension-specific
+     * key.
+     */
+    private Map<Object, Object> extensions = new HashMap<Object, Object>();
+
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -260,5 +267,38 @@ public class TraverseOptions implements Serializable, Cloneable {
     public void freezeTraverseMode() {
         walkingOptions = clone();
         walkingOptions.walkingOptions = new TraverseOptions(new TraverseModeSet());
+    }
+
+    /**
+     * Add an extension parameter with the specified key. Extensions allow you to add arbitrary
+     * traversal options.
+     * 
+     * @param key
+     * @param value
+     */
+    public void putExtension(Object key, Object value) {
+        extensions.put(key, value);
+    }
+
+    /**
+     * Determine if a particular extension parameter is present for the specified key.
+     * 
+     * @param key
+     * @return
+     */
+    public boolean containsExtension(Object key) {
+        return extensions.containsKey(key);
+    }
+
+    /**
+     * Get the extension parameter with the specified key.
+     * 
+     * @param <T>
+     * @param key
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getExtension(Object key) {
+        return (T) extensions.get(key);
     }
 }
