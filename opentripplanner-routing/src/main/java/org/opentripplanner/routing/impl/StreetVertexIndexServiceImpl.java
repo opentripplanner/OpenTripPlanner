@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -277,6 +278,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     double xd = nearestPointOnEdge.x - coordinate.x;
                     double yd = nearestPointOnEdge.y - coordinate.y;
                     double edgeDirection = Math.atan2(yd, xd);
+
+                    /**
+                     * If the edgeDirection is NaN, it means the edge has no length and therefore no
+                     * direction, so we just return it directly instead of looking for parallel
+                     * edges
+                     */
+                    if (Double.isNaN(edgeDirection))
+                        return Arrays.asList(bestEdge);
 
                     TreeMap<Double, StreetEdge> parallel = new TreeMap<Double, StreetEdge>();
                     for (StreetEdge e : nearby) {
