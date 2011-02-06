@@ -13,11 +13,20 @@
 
 package org.opentripplanner.routing.services;
 
+import java.util.Collection;
+
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 public interface StreetVertexIndexService {
+    
     public Vertex getClosestVertex(final Coordinate location, TraverseOptions options);
+    
+    public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
+    
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options);
 }

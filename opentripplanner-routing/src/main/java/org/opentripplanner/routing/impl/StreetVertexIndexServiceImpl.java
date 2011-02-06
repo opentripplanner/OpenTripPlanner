@@ -88,6 +88,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         this.graph = graph;
     }
 
+    @Autowired
+    public void setGraph(Graph graph) {
+        this.graph = graph;
+    }
+
+    public Graph getGraph() {
+        return graph;
+    }
+
     public void setup_modifiable() {
         edgeTree = new Quadtree();
         postSetup();
@@ -193,15 +202,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return null;
     }
 
-    @Autowired
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    public Graph getGraph() {
-        return graph;
-    }
-
     public void reified(StreetLocation vertex) {
         for (StreetEdge e : filter(graph.getIncoming(vertex), StreetEdge.class)) {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
@@ -211,6 +211,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<Vertex> getVerticesForEnvelope(Envelope envelope) {
+        return intersectionTree.query(envelope);
     }
 
     @SuppressWarnings("unchecked")
