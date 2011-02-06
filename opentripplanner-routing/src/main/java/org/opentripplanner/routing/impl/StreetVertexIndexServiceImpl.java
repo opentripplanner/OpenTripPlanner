@@ -53,12 +53,12 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
- * Indexes all edges and transit vertices of the graph spatially.  Has a variety of query methods used
- * during network linking and trip planning.
+ * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
+ * used during network linking and trip planning.
  * 
- * Creates a StreetLocation representing a location on a street that's not at an intersection,
- * based on input latitude and longitude. Instantiating this class is expensive, because it creates
- * a spatial index of all of the intersections in the graph.
+ * Creates a StreetLocation representing a location on a street that's not at an intersection, based
+ * on input latitude and longitude. Instantiating this class is expensive, because it creates a
+ * spatial index of all of the intersections in the graph.
  */
 @Component
 public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
@@ -73,7 +73,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private STRtree transitStopTree;
 
     private STRtree intersectionTree;
-    
+
     public static final double MAX_DISTANCE_FROM_STREET = 0.05;
 
     private static final double DISTANCE_ERROR = 0.00005;
@@ -105,7 +105,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (GraphVertex gv : graph.getVertices()) {
             Vertex v = gv.vertex;
             // We only care about StreetEdges
-            for (StreetEdge e : filter(gv.getOutgoing(),StreetEdge.class)) {
+            for (StreetEdge e : filter(gv.getOutgoing(), StreetEdge.class)) {
                 if (e.getGeometry() == null) {
                     continue;
                 }
@@ -139,11 +139,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         transitStopTree.build();
     }
-    
-    /** 
+
+    /**
      * Get all transit stops within a given distance of a coordinate
      * 
-     *  @param distance in meters
+     * @param distance
+     *            in meters
      */
     @SuppressWarnings("unchecked")
     public List<Vertex> getLocalTransitStops(Coordinate c, double distance) {
@@ -158,10 +159,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return results;
     }
-    
+
     /**
-     * Gets the closest vertex to a coordinate.  If necessary,
-     * this vertex will be created by splitting nearby edges (non-permanently).
+     * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by
+     * splitting nearby edges (non-permanently).
      */
     public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options) {
         List<Vertex> vertices = getIntersectionAt(coordinate);
@@ -184,8 +185,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             LinearLocation location = l.project(coordinate);
 
             Coordinate nearestPoint = location.getCoordinate(g);
-            return StreetLocation.createStreetLocation(bestStreet.getName() + "_"
-                    + coordinate.toString(), bestStreet.getName(), edges, nearestPoint);
+            return StreetLocation.createStreetLocation(
+                    bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
+                    edges, nearestPoint);
         }
         return null;
     }
@@ -200,11 +202,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     public void reified(StreetLocation vertex) {
-        for (StreetEdge e : filter(graph.getIncoming(vertex),StreetEdge.class)) {
+        for (StreetEdge e : filter(graph.getIncoming(vertex), StreetEdge.class)) {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
-        for (StreetEdge e : filter(graph.getOutgoing(vertex),StreetEdge.class)) {
+        for (StreetEdge e : filter(graph.getOutgoing(vertex), StreetEdge.class)) {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
         }
@@ -219,7 +221,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
         double bestDistance = Double.MAX_VALUE;
-        
+
         TraverseOptions walkingOptions = null;
         if (options != null) {
             walkingOptions = options.getWalkingOptions();
@@ -231,12 +233,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
             /*
              * It is presumed, that edges which are roughly the same distance from the examined
-             * coordinate in the same direction are parallel (coincident) edges. 
+             * coordinate in the same direction are parallel (coincident) edges.
              * 
              * Parallel edges are needed to account for (oneway) streets with varying permissions,
-             * as well as the edge-based nature of the graph.
-             * i.e. using a C point on a oneway street a cyclist may go in one direction only, while
-             * a pedestrian should be able to go in any direction.
+             * as well as the edge-based nature of the graph. i.e. using a C point on a oneway
+             * street a cyclist may go in one direction only, while a pedestrian should be able to
+             * go in any direction.
              */
 
             bestDistance = Double.MAX_VALUE;
@@ -255,8 +257,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         }
                         double distance = g.distance(p);
                         if (distance > envelope.getWidth() / 2) {
-                            // Even if an edge is outside the query envelope, bounding boxes can  
-                            // still intersect. In this case, distance to the edge is greater 
+                            // Even if an edge is outside the query envelope, bounding boxes can
+                            // still intersect. In this case, distance to the edge is greater
                             // than the query envelope size.
                             continue;
                         }
@@ -267,7 +269,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     }
                 }
 
-                // find coincidence edges  
+                // find coincidence edges
                 if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
                     LocationIndexedLine lil = new LocationIndexedLine(bestEdge.getGeometry());
                     LinearLocation location = lil.project(coordinate);
@@ -275,7 +277,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     double xd = nearestPointOnEdge.x - coordinate.x;
                     double yd = nearestPointOnEdge.y - coordinate.y;
                     double edgeDirection = Math.atan2(yd, xd);
-                        
+
                     TreeMap<Double, StreetEdge> parallel = new TreeMap<Double, StreetEdge>();
                     for (StreetEdge e : nearby) {
                         /* only include edges that this user can actually use */
@@ -290,7 +292,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         Geometry eg = e.getGeometry();
                         if (eg != null) {
                             double distance = eg.distance(p);
-                            
+
                             if (distance <= bestDistance + DISTANCE_ERROR) {
 
                                 lil = new LocationIndexedLine(eg);
@@ -298,23 +300,25 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                                 nearestPointOnEdge = lil.extractPoint(location);
 
                                 if (distance > bestDistance) {
-                                    /* ignore edges caught end-on unless they're the 
-                                     * only choice */
+                                    /*
+                                     * ignore edges caught end-on unless they're the only choice
+                                     */
                                     Coordinate[] coordinates = eg.getCoordinates();
-                                    if (nearestPointOnEdge.equals(coordinates[0]) ||
-                                        nearestPointOnEdge.equals(coordinates[coordinates.length - 1])) {
+                                    if (nearestPointOnEdge.equals(coordinates[0])
+                                            || nearestPointOnEdge
+                                                    .equals(coordinates[coordinates.length - 1])) {
                                         continue;
                                     }
                                 }
-                                    
+
                                 /* compute direction from coordinate to edge */
                                 xd = nearestPointOnEdge.x - coordinate.x;
                                 yd = nearestPointOnEdge.y - coordinate.y;
                                 double direction = Math.atan2(yd, xd);
-                                                             
+
                                 if (Math.abs(direction - edgeDirection) < DIRECTION_ERROR) {
                                     while (parallel.containsKey(distance)) {
-                                        distance += 0.00000001; 
+                                        distance += 0.00000001;
                                     }
                                     parallel.put(distance, e);
                                 }
@@ -334,7 +338,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         envelope.expandBy(DISTANCE_ERROR * 2);
         List<Vertex> nearby = intersectionTree.query(envelope);
         List<Vertex> atIntersection = new ArrayList<Vertex>(nearby.size());
-        for (Vertex v: nearby) {
+        for (Vertex v : nearby) {
             if (coordinate.distance(v.getCoordinate()) < DISTANCE_ERROR) {
                 atIntersection.add(v);
             }
