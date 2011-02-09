@@ -178,11 +178,11 @@ public class AStar {
                 break;
 
             closed.add(tov);
-
+            
             Collection<Edge> incoming = null;
 
             if (tov instanceof HasEdges) {
-                incoming = extendEdges(incoming, ((HasEdges) tov).getOutgoing());
+                incoming = extendEdges(incoming, ((HasEdges) tov).getIncoming());
             } else {
                 GraphVertex gv = graph.getGraphVertex(tov);
                 if (gv != null)
