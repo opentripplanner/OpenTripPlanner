@@ -101,7 +101,9 @@ otp.locale.English = {
         'continue':     "continue on",
         to_continue:    "to continue on",
         becomes:        "becomes",
-        at:             "at"
+        at:             "at",
+        circle_counterclockwise: "follow roundabout",
+        circle_clockwise:        "follow roundabout"
     },
 
     time:

@@ -69,6 +69,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     private boolean slopeOverride = false;
 
     public boolean back;
+    
+    private boolean roundabout = false;
 
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
@@ -280,6 +282,14 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     public void setSlopeOverride(boolean slopeOverride) {
         this.slopeOverride = slopeOverride;
+    }
+
+    public void setRoundabout(boolean roundabout) {
+        this.roundabout = roundabout;
+    }
+
+    public boolean isRoundabout() {
+        return roundabout;
     }
 
 }

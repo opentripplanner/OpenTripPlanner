@@ -670,6 +670,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         backGeometry, true);
             }
 
+            /* mark edges that are on roundabouts */
+            if ("roundabout".equals(tags.get("junction"))) {
+                street.setRoundabout(true);
+                if (backStreet != null) backStreet.setRoundabout(true);
+            }
+
             /* set bicycle safety features according to configuration */
 
             for (Map.Entry<P2<String>, P2<Double>> feature : safetyFeatures.entrySet()) {

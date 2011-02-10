@@ -72,6 +72,8 @@ public class StreetVertex extends GenericVertex {
         return geometry.getCoordinateN(0);
     }
 
+    private boolean roundabout = false;
+
     public StreetVertex(String id, LineString geometry, String name, double length, boolean back) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
@@ -401,6 +403,14 @@ public class StreetVertex extends GenericVertex {
     
     public boolean isCrossable() {
         return crossable;
+    }
+
+    public void setRoundabout(boolean roundabout) {
+        this.roundabout = roundabout;
+    }
+
+    public boolean isRoundabout() {
+        return roundabout;
     }
 
 }

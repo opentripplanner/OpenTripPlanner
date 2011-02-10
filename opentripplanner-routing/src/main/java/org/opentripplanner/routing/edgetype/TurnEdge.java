@@ -84,6 +84,11 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     }
 
     @Override
+    public boolean isRoundabout() {
+        return fromv.isRoundabout();
+    }
+
+    @Override
     public Trip getTrip() {
         return null;
     }

@@ -40,4 +40,7 @@ public interface EdgeNarrative {
     public Trip getTrip();
 
     public String getName(State state);
+
+    public boolean isRoundabout();
+
 }

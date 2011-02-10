@@ -58,4 +58,9 @@ public class FixedModeEdge implements EdgeNarrative {
     public String toString() {
         return "FixedModeEdge(" + base + ", " + mode + ")";
     }
+
+    @Override
+    public boolean isRoundabout() {
+        return base.isRoundabout();
+    }
 }

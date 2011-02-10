@@ -626,7 +626,11 @@ public class Planner {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle);
                 step.becomes = !pathservice.multipleOptionsBefore(edge);
-
+                if (edgeResult.isRoundabout()) {
+                    step = createWalkStep(sptEdge);
+                    steps.add(step);
+                    step.relativeDirection = RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+                }
                 distance = edgeResult.getDistance();
             } else {
                 /* generate turn-to-stay-on directions, where needed */

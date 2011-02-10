@@ -112,7 +112,8 @@ public class WalkStep {
         }
         double ccwAngleDiff = Math.PI * 2 - angleDiff;
 
-        if (angleDiff < 0.15 || ccwAngleDiff < 0.15) {
+        // less than 0.3 rad counts as straight, to simplify walking instructions
+        if (angleDiff < 0.3 || ccwAngleDiff < 0.3) {
             return RelativeDirection.CONTINUE;
         } else if (angleDiff < 0.7) {
             return RelativeDirection.SLIGHTLY_RIGHT;

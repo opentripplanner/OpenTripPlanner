@@ -123,4 +123,9 @@ public class StreetTransitLink implements DirectEdge, Serializable {
     public String getName(State state) {
         return getName();
     }
+
+    @Override
+    public boolean isRoundabout() {
+        return false;
+    }
 }

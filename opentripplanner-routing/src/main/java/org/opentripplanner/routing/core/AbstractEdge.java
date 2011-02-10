@@ -66,4 +66,9 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     public int hashCode() {
         return fromv.hashCode() * 31 + tov.hashCode();
     }
+
+    @Override
+    public boolean isRoundabout() {
+        return false;
+    }
 }
