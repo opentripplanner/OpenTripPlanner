@@ -112,7 +112,7 @@ otp.planner.poi.Control = {
             ll.lon = ll.lat;
             ll.lat = tmp; 
 
-            f.attributes.m_text = ll.lon + "," + ll.lat
+            f.attributes.m_text = ll.lon + "," + ll.lat;
             if(f.attributes.m_to)
                 otp.planner.StaticForms.setTo(f.attributes.m_text, ll.lon, ll.lat, true, true);
             if(f.attributes.m_from)

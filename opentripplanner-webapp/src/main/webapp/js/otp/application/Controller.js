@@ -35,11 +35,12 @@ otp.application.Controller = {
         if(this.config == null || this.config.map == null)
             this.config = otp.config;
 
-        Ext.apply(this.config.map, {
+        // set defaults on the config.map if things don't already exist
+        otp.inherit(this.config.map, {
             cm               : this.cm, 
             attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
             options: {
-                 controls: []
+                controls: []
             }
         });
 

@@ -55,26 +55,34 @@ otp.config = {
      
         // These options are passed directly to the OpenLayers.Map constructor.
         'options': {
-            projection: "EPSG:4326",
-            numZoomLevels: 20
+            projection        : new OpenLayers.Projection("EPSG:900913"),
+            displayProjection : new OpenLayers.Projection("EPSG:4326"),
+            numZoomLevels: 20,
+            controls: []
         },
-        
+
         // Instead of specifying just the base layer options, you can instead
         // specify the full base layer object.
         // The example below creates a new base layer that uses the default OSM
         // tiles.
-        
         baseLayer: new OpenLayers.Layer.OSM({
-        url: [
-              "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-              "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-              "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
-          ],
-        numZoomLevels: 20
+            url: [
+                  "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+                  "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+                  "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
+            ],
+            numZoomLevels: 20
         }),
-        
-        // Base tile information 
-        'baseLayerOptions': {
+
+        // here's the MapQuest baseMap - note, the attribution is wrong (leaves out MapQuest info), so it's commented
+        // to use, remove the MQ_ 
+        MQ_baseLayer: new OpenLayers.Layer.OSM("MapQuest", "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"),
+
+
+        // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
+        // config object used in the creation of a new base layer for the map. 
+        baseLayerOptions: {
+            projection : new OpenLayers.Projection("EPSG:4326"),
             url: 'http://maps.opengeo.org/geowebcache/service/wms',
             layers: ['openstreetmap'],
             format: 'image/png',

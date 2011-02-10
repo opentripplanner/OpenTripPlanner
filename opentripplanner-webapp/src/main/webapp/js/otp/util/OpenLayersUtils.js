@@ -49,6 +49,7 @@ catch (e)
   */
 otp.util.OpenLayersUtils = {
     MAP_PANEL       : 'map-panel',
+    yOffsetToTip    : 30,             // place to mouse-click the icon is 30 pixels higher than the 'point'
 
     /**
      * static function to make the OpenLayers map object
@@ -60,11 +61,9 @@ otp.util.OpenLayersUtils = {
     },
 
     /** */
-    makeMapBaseLayer : function(map, defaultOptions)
+    makeMapBaseLayer : function(map, options)
     {
-        var options = Ext.apply({}, defaultOptions, {
-            isBaseLayer : true
-        });
+        options.isBaseLayer = true;
         var layer = new OpenLayers.Layer.WMS("Map", options.url, {
                 layers : options.layers,
                 format : options.format
@@ -477,7 +476,7 @@ otp.util.OpenLayersUtils = {
         }
         catch(e)
         {
-            console.log('OpenLayersUtils.getLatLonOfPixel exception ' + e);
+            console.log('OpenLayersUtils.roundCoord exception ' + e);
            
         }
 
@@ -492,11 +491,10 @@ otp.util.OpenLayersUtils = {
     {
         try
         {
-            var yOffsetToTip = 30; // place to mouse-click the icon is 30 pixels higher than the 'point'
             if(prj == null)
                 prj = otp.core.MapStatic.dataProjection;
 
-            var px     = new OpenLayers.Pixel(pixelX, pixelY + yOffsetToTip);
+            var px     = new OpenLayers.Pixel(pixelX, pixelY + this.yOffsetToTip);
             var lonLat = map.getLonLatFromPixel(px);
             lonLat.transform(map.getProjectionObject(), prj);
             return this.roundCoord(lonLat);

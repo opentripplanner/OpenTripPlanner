@@ -715,14 +715,12 @@ otp.planner.StaticForms = {
     },
 
     /** */
-    selectTo : function(combo, record, num)
-    {
+    selectTo : function(combo, record, num) {
         this.m_toCoord = otp.util.ExtUtils.getCoordinate(record);
     },
 
     /** */
-    getContextMenu : function(cm)
-    {
+    getContextMenu : function(cm) {
         if(cm != null)
             this.contextMenu = cm;
 
@@ -732,7 +730,7 @@ otp.planner.StaticForms = {
             iconCls : 'cFromHere',
             scope   : this,
             handler : function () {
-                var ll = this.contextMenu.getMapCoordinate();
+                var ll = this.contextMenu.getYOffsetMapCoordinate();
                 var latlon = ll.lat + "," + ll.lon;
                 this.setFrom(latlon, ll.lat, ll.lon);
                 this.m_fromForm.setRawValue(latlon);
@@ -745,7 +743,7 @@ otp.planner.StaticForms = {
             iconCls : 'cToHere',
             scope   : this,
             handler : function () {
-                var ll = this.contextMenu.getMapCoordinate();
+                var ll = this.contextMenu.getYOffsetMapCoordinate();
                 var latlon = ll.lat + "," + ll.lon;
                 this.setTo(latlon, ll.lat, ll.lon);
                 this.m_toForm.setRawValue(latlon);
@@ -760,8 +758,7 @@ otp.planner.StaticForms = {
     /**
      * from & to form creation
      */
-    makeMainPanel : function()
-    {
+    makeMainPanel : function() {
         var fromToForms = this.makeFromToForms();
         var dateTime    = this.makeDateTime();
         var fromToArray = [fromToForms, dateTime];

@@ -101,11 +101,20 @@ otp.planner.ContextMenu = {
     /**
      * get map coordinate lat/lon given the position of the context menu click 
      */
-    getMapCoordinate : function ()
-    {
+    getMapCoordinate : function () {
+
         // Use actual click location rather than CM loc because the two aren't
         // neceesarily the same (e.g., when click is near the window border)
         return otp.util.OpenLayersUtils.getLatLonOfPixel(this.map.getMap(), this.clickX, this.clickY);
+    },
+
+    /**
+     * get map coordinate lat/lon given the position of the context menu click 
+     */
+    getYOffsetMapCoordinate : function () {
+        // Use actual click location rather than CM loc because the two aren't
+        // neceesarily the same (e.g., when click is near the window border)
+        return otp.util.OpenLayersUtils.getLatLonOfPixel(this.map.getMap(), this.clickX, this.clickY - otp.util.OpenLayersUtils.yOffsetToTip);
     },
 
     /**

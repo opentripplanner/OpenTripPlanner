@@ -65,7 +65,6 @@ otp.core.MapStatic = {
      * used within OpenLayers for now -- from/to form fields are populated using
      * dataProjection
      */
-    displayProjection : new OpenLayers.Projection("EPSG:4326"),
     dataProjection    : new OpenLayers.Projection("EPSG:4326"),
 
     /** 
@@ -89,15 +88,13 @@ otp.core.MapStatic = {
         this.map.setBaseLayer(this.baseLayer, true);
 
         otp.core.MapSingleton = this;
+        var self = this;
 
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
             this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
         }
-        
-
-        var self = this;
 
         if (this.defaultExtent === 'automatic') {
             // ask the server for the extent
@@ -150,9 +147,9 @@ otp.core.MapStatic = {
             };
             self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
         }
-
     },
 
+    /** */
     zoomToDefaultExtent : function() {
         if (this.defaultExtent && this.defaultExtent !== 'automatic') {
             this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
@@ -160,8 +157,7 @@ otp.core.MapStatic = {
     },
 
     /** */
-    getContextMenu : function(cm)
-    {
+    getContextMenu : function(cm) {
         if(cm != null)
         {
             this.contextMenu = cm;
