@@ -72,11 +72,11 @@ otp.application.Controller = {
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
 
-        if (this.config.systemMap.enabled) {
+        if(this.config.systemMap && this.config.systemMap.enabled) {
             this.sm = new otp.systemmap.Systemmap(Ext.apply({}, {map: this.map}, config.systemMap));
         }
 
-        if (this.config.attributionPanel.enabled) {
+        if(this.config.attributionPanel && this.config.attributionPanel.enabled) {
             this.attributionPanel = new otp.application.Attribution(this.config.attributionPanel);
             this.ui.accordion.add(this.attributionPanel.getPanel());
         }
@@ -85,10 +85,9 @@ otp.application.Controller = {
 
         this.load();
 
-        if (this.config.splashScreen.enabled) {
+        if(this.config.splashScreen && this.config.splashScreen.enabled) {
             otp.util.ExtUtils.makePopup(this.config.splashScreen, this.config.splashScreen.title, true, 600, 300, true);
         }
-
     },
 
    /**
