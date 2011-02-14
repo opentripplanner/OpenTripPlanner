@@ -173,6 +173,10 @@ public class AStar {
         while (!pq.empty()) { // Until the priority queue is empty:
             spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
+            // hard limit on walk distance. to be replaced with something more subtle later.
+            if (spt_u.state.walkDistance >= options.maxWalkDistance)
+                continue;
+
             Vertex tov = spt_u.mirror;
             if (tov == target)
                 break;
@@ -318,6 +322,10 @@ public class AStar {
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
+
+            // hard limit on walk distance. to be replaced with something more subtle later.
+            if (spt_u.state.walkDistance >= options.maxWalkDistance)
+                continue;
 
             Vertex fromv = spt_u.mirror;
             if (fromv == target) {

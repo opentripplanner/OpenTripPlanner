@@ -348,7 +348,6 @@ public class StreetVertex extends GenericVertex {
         } else {
             weight = time;
         }
-        weight *= options.distanceWalkFactor(s0.walkDistance + length / 2);
         weight *= options.walkReluctance;
         return weight;
     }

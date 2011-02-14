@@ -185,7 +185,6 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         } else {
             weight = time;
         }
-        weight *= options.distanceWalkFactor(s0.walkDistance + length / 2);
         weight *= options.walkReluctance;
         s1.walkDistance += length;
         s1.incrementTimeInSeconds((int) (back ? -time : time));

@@ -237,14 +237,6 @@ public class TraverseOptions implements Serializable, Cloneable {
         return back;
     }
 
-    public double distanceWalkFactor(double walkDistance) {
-        if (walkDistance > maxWalkDistance && getModes().getTransit()) {
-            double weightFactor = (walkDistance - maxWalkDistance) / 20;
-            return weightFactor < 1 ? 1 : weightFactor;
-        }
-        return 1;
-    }
-
     public TraverseOptions getWalkingOptions() {
         return walkingOptions;
     }
