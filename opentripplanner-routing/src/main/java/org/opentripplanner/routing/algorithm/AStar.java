@@ -13,15 +13,11 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
@@ -31,7 +27,6 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
@@ -118,44 +113,15 @@ public class AStar {
         options.maxWalkDistance += origin.getDistanceToNearestTransitStop()
                 + target.getDistanceToNearestTransitStop();
 
-        /* generate extra edges for StreetLocations */
-        Map<Vertex, List<Edge>> extraEdges;
-        if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, List<Edge>>();
-            Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
-            for (DirectEdge edge : extra) {
-                Vertex tov = edge.getToVertex();
-                List<Edge> edges = extraEdges.get(tov);
-                if (edges == null) {
-                    edges = new ArrayList<Edge>();
-                    extraEdges.put(tov, edges);
-                }
-                edges.add(edge);
-            }
-        } else {
-            extraEdges = Collections.emptyMap();
-        }
-        if (target instanceof StreetLocation) {
-            if (extraEdges.isEmpty()) {
-                extraEdges = new HashMap<Vertex, List<Edge>>();
-            }
-            Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
-            for (DirectEdge edge : extra) {
-                Vertex tov = edge.getToVertex();
-                List<Edge> edges = extraEdges.get(tov);
-                if (edges == null) {
-                    edges = new ArrayList<Edge>();
-                    extraEdges.put(tov, edges);
-                }
-                edges.add(edge);
-            }
-        }
-        
+        final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
+        Map<Vertex, List<Edge>> extraEdges = extraEdgesStrategy.getIncomingExtraEdges(origin,
+                target);
+
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
-        
+
         double initialWeight = heuristic.computeInitialWeight(origin, target, options);
 
-        //double distance = origin.distance(target) / max_speed;
+        // double distance = origin.distance(target) / max_speed;
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 
         // Priority Queue
@@ -179,7 +145,7 @@ public class AStar {
                 break;
 
             closed.add(tov);
-            
+
             Collection<Edge> incoming = GraphLibrary.getIncomingEdges(graph, tov, extraEdges);
 
             for (Edge edge : incoming) {
@@ -206,7 +172,7 @@ public class AStar {
                     double new_w = spt_u.weightSum + wr.weight;
                     double remaining_w = heuristic.computeReverseWeight(spt_u, edge, wr, target);
                     double heuristic_distance = new_w + remaining_w;
-                    
+
                     if (heuristic_distance > options.maxWeight
                             || wr.state.getTime() < options.worstTime) {
                         // too expensive to get here
@@ -254,42 +220,12 @@ public class AStar {
             spt = new BasicShortestPathTree();
         }
 
-        /* generate extra edges for StreetLocations */
-        Map<Vertex, List<Edge>> extraEdges;
-        if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, List<Edge>>();
-            Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
-            for (DirectEdge edge : extra) {
-                Vertex fromv = edge.getFromVertex();
-                List<Edge> edges = extraEdges.get(fromv);
-                if (edges == null) {
-                    edges = new ArrayList<Edge>();
-                    extraEdges.put(fromv, edges);
-                }
-                edges.add(edge);
-            }
-        } else {
-            extraEdges = Collections.emptyMap();
-        }
-        
-        if (target instanceof StreetLocation) {
-            if (extraEdges.isEmpty()) {
-                extraEdges = new HashMap<Vertex, List<Edge>>();
-            }
-            Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
-            for (DirectEdge edge : extra) {
-                Vertex fromv = edge.getFromVertex();
-                List<Edge> edges = extraEdges.get(fromv);
-                if (edges == null) {
-                    edges = new ArrayList<Edge>();
-                    extraEdges.put(fromv, edges);
-                }
-                edges.add(edge);
-            }
-        }
-        
+        final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
+        Map<Vertex, List<Edge>> extraEdges = extraEdgesStrategy.getOutgoingExtraEdges(origin,
+                target);
+
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
-        
+
         double initialWeight = heuristic.computeInitialWeight(origin, target, options);
         SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
 

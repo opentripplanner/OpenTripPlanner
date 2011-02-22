@@ -24,10 +24,11 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.routing.algorithm.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.DefaultRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.gtfs.GtfsContext;
+import org.opentripplanner.routing.algorithm.DefaultExtraEdgesStrategy;
+import org.opentripplanner.routing.algorithm.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.ExtraEdgesStrategy;
+import org.opentripplanner.routing.algorithm.RemainingWeightHeuristic;
 
 public class TraverseOptions implements Serializable, Cloneable {
 
@@ -116,6 +117,8 @@ public class TraverseOptions implements Serializable, Cloneable {
     private TraverseOptions walkingOptions;
 
     public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
+    
+    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy(); 
 
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default
