@@ -39,7 +39,6 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.util.NullExtraEdges;
 
 /**
  * Find the shortest path between graph vertices using A*.
@@ -122,13 +121,13 @@ public class AStar {
                 + target.getDistanceToNearestTransitStop();
 
         /* generate extra edges for StreetLocations */
-        Map<Vertex, ArrayList<Edge>> extraEdges;
+        Map<Vertex, List<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            extraEdges = new HashMap<Vertex, List<Edge>>();
             Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex tov = edge.getToVertex();
-                ArrayList<Edge> edges = extraEdges.get(tov);
+                List<Edge> edges = extraEdges.get(tov);
                 if (edges == null) {
                     edges = new ArrayList<Edge>();
                     extraEdges.put(tov, edges);
@@ -136,16 +135,16 @@ public class AStar {
                 edges.add(edge);
             }
         } else {
-            extraEdges = new NullExtraEdges();
+            extraEdges = Collections.emptyMap();
         }
         if (target instanceof StreetLocation) {
-            if (extraEdges instanceof NullExtraEdges) {
-                extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            if (extraEdges.isEmpty()) {
+                extraEdges = new HashMap<Vertex, List<Edge>>();
             }
             Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex tov = edge.getToVertex();
-                ArrayList<Edge> edges = extraEdges.get(tov);
+                List<Edge> edges = extraEdges.get(tov);
                 if (edges == null) {
                     edges = new ArrayList<Edge>();
                     extraEdges.put(tov, edges);
@@ -183,21 +182,7 @@ public class AStar {
 
             closed.add(tov);
             
-            Collection<Edge> incoming = null;
-
-            if (tov instanceof HasEdges) {
-                incoming = extendEdges(incoming, ((HasEdges) tov).getIncoming());
-            } else {
-                GraphVertex gv = graph.getGraphVertex(tov);
-                if (gv != null)
-                    incoming = extendEdges(incoming, gv.getIncoming());
-            }
-
-            if (extraEdges.containsKey(tov))
-                incoming = extendEdges(incoming, extraEdges.get(tov));
-
-            if (incoming == null)
-                incoming = Collections.emptyList();
+            Collection<Edge> incoming = GraphLibrary.getIncomingEdges(graph, tov, extraEdges);
 
             for (Edge edge : incoming) {
                 State state = spt_u.state;
@@ -272,13 +257,13 @@ public class AStar {
         }
 
         /* generate extra edges for StreetLocations */
-        Map<Vertex, ArrayList<Edge>> extraEdges;
+        Map<Vertex, List<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            extraEdges = new HashMap<Vertex, List<Edge>>();
             Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
-                ArrayList<Edge> edges = extraEdges.get(fromv);
+                List<Edge> edges = extraEdges.get(fromv);
                 if (edges == null) {
                     edges = new ArrayList<Edge>();
                     extraEdges.put(fromv, edges);
@@ -286,16 +271,17 @@ public class AStar {
                 edges.add(edge);
             }
         } else {
-            extraEdges = new NullExtraEdges();
+            extraEdges = Collections.emptyMap();
         }
+        
         if (target instanceof StreetLocation) {
-            if (extraEdges instanceof NullExtraEdges) {
-                extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
+            if (extraEdges.isEmpty()) {
+                extraEdges = new HashMap<Vertex, List<Edge>>();
             }
             Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
-                ArrayList<Edge> edges = extraEdges.get(fromv);
+                List<Edge> edges = extraEdges.get(fromv);
                 if (edges == null) {
                     edges = new ArrayList<Edge>();
                     extraEdges.put(fromv, edges);
@@ -332,7 +318,7 @@ public class AStar {
                 break;
             }
 
-            Collection<Edge> outgoing = null;
+            Collection<Edge> outgoing = GraphLibrary.getOutgoingEdges(graph, fromv, extraEdges);
 
             if (fromv instanceof HasEdges) {
                 outgoing = extendEdges(outgoing, ((HasEdges) fromv).getOutgoing());
