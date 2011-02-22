@@ -14,6 +14,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -113,9 +115,15 @@ public class AStar {
         options.maxWalkDistance += origin.getDistanceToNearestTransitStop()
                 + target.getDistanceToNearestTransitStop();
 
+        /**
+         * Populate any extra edges
+         */
         final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
-        Map<Vertex, List<Edge>> extraEdges = extraEdgesStrategy.getIncomingExtraEdges(origin,
-                target);
+        Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
+        extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin);
+        extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
+        if( extraEdges.isEmpty() )
+            extraEdges = Collections.emptyMap();
 
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
 
@@ -220,9 +228,15 @@ public class AStar {
             spt = new BasicShortestPathTree();
         }
 
+        /**
+         * Populate any extra edges
+         */
         final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
-        Map<Vertex, List<Edge>> extraEdges = extraEdgesStrategy.getOutgoingExtraEdges(origin,
-                target);
+        Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
+        extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin);
+        extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
+        if( extraEdges.isEmpty() )
+            extraEdges = Collections.emptyMap();
 
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
 

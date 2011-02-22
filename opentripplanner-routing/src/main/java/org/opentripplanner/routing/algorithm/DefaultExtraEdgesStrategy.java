@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,12 +12,8 @@ import org.opentripplanner.routing.location.StreetLocation;
 public class DefaultExtraEdgesStrategy implements ExtraEdgesStrategy {
 
     @Override
-    public Map<Vertex, List<Edge>> getIncomingExtraEdges(Vertex origin, Vertex target) {
-
-        /* generate extra edges for StreetLocations */
-        Map<Vertex, List<Edge>> extraEdges;
+    public void addIncomingEdgesForOrigin(Map<Vertex, List<Edge>> extraEdges, Vertex origin) {
         if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, List<Edge>>();
             Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex tov = edge.getToVertex();
@@ -30,36 +24,28 @@ public class DefaultExtraEdgesStrategy implements ExtraEdgesStrategy {
                 }
                 edges.add(edge);
             }
-        } else {
-            extraEdges = Collections.emptyMap();
         }
-        if (target instanceof StreetLocation) {
-            if (extraEdges.isEmpty()) {
-                extraEdges = new HashMap<Vertex, List<Edge>>();
-            }
-            Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
-            for (DirectEdge edge : extra) {
-                Vertex tov = edge.getToVertex();
-                List<Edge> edges = extraEdges.get(tov);
-                if (edges == null) {
-                    edges = new ArrayList<Edge>();
-                    extraEdges.put(tov, edges);
-                }
-                edges.add(edge);
-            }
-        }
-
-        return extraEdges;
     }
 
     @Override
-    public Map<Vertex, List<Edge>> getOutgoingExtraEdges(Vertex origin, Vertex target) {
+    public void addIncomingEdgesForTarget(Map<Vertex, List<Edge>> extraEdges, Vertex target) {
+        if (target instanceof StreetLocation) {
+            Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
+            for (DirectEdge edge : extra) {
+                Vertex tov = edge.getToVertex();
+                List<Edge> edges = extraEdges.get(tov);
+                if (edges == null) {
+                    edges = new ArrayList<Edge>();
+                    extraEdges.put(tov, edges);
+                }
+                edges.add(edge);
+            }
+        }
+    }
 
-        /* generate extra edges for StreetLocations */
-        Map<Vertex, List<Edge>> extraEdges;
-
+    @Override
+    public void addOutgoingEdgesForOrigin(Map<Vertex, List<Edge>> extraEdges, Vertex origin) {
         if (origin instanceof StreetLocation) {
-            extraEdges = new HashMap<Vertex, List<Edge>>();
             Iterable<DirectEdge> extra = ((StreetLocation) origin).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
@@ -70,14 +56,12 @@ public class DefaultExtraEdgesStrategy implements ExtraEdgesStrategy {
                 }
                 edges.add(edge);
             }
-        } else {
-            extraEdges = Collections.emptyMap();
         }
+    }
 
+    @Override
+    public void addOutgoingEdgesForTarget(Map<Vertex, List<Edge>> extraEdges, Vertex target) {
         if (target instanceof StreetLocation) {
-            if (extraEdges.isEmpty()) {
-                extraEdges = new HashMap<Vertex, List<Edge>>();
-            }
             Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
             for (DirectEdge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
@@ -89,8 +73,5 @@ public class DefaultExtraEdgesStrategy implements ExtraEdgesStrategy {
                 edges.add(edge);
             }
         }
-
-        return extraEdges;
     }
-
 }
