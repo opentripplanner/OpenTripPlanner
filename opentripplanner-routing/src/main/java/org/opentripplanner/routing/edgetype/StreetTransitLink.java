@@ -106,24 +106,6 @@ public class StreetTransitLink implements DirectEdge, Serializable {
         return null;
     }
 
-    /*
-     * Is this ever used?  Any reason we can't extend from AbstractEdge
-    @Override
-    public void setFromVertex(Vertex vertex) {
-        fromv = vertex;
-    }
-
-    @Override
-    public void setToVertex(Vertex vertex) {
-        tov = vertex;
-    }
-    */
-
-    @Override
-    public String getName(State state) {
-        return getName();
-    }
-
     @Override
     public boolean isRoundabout() {
         return false;

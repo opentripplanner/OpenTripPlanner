@@ -28,7 +28,7 @@ import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
@@ -108,7 +108,7 @@ public class TestAStar extends TestCase {
                     .getTimeInMillis()), options);
             GraphPath path = spt.getPath(end);
             for (SPTEdge e : path.edges) {
-                if (e.payload instanceof PatternBoard) {
+                if (e.payload instanceof PatternHop) {
                     assertFalse(e.getName().equals(line));
                     boolean foundMaxLine = false;
                     for (int j = 0; j < maxLines.length; ++j) {

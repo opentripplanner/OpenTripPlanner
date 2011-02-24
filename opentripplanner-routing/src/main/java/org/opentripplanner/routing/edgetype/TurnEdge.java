@@ -146,24 +146,6 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return tov;
     }
 
-    /*
-     * Is this needed?  Can we extend from AbstractVertex instead?
-    @Override
-    public void setFromVertex(Vertex vertex) {
-        fromv = (StreetVertex) vertex;
-    }
-
-    @Override
-    public void setToVertex(Vertex vertex) {
-        tov = (StreetVertex) vertex;
-    }
-    */
-
-    @Override
-    public String getName(State state) {
-        return getName();
-    }
-
     @Override
     public boolean canTraverse(TraverseOptions options) {
         return fromv.canTraverse(options);

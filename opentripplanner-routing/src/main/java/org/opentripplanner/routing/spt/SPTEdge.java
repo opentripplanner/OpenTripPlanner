@@ -64,11 +64,7 @@ public class SPTEdge {
     }
 
     public String getName() {
-        if (payload instanceof PatternBoard) {
-            return narrative.getName(tov.state);
-        } else {
-            return narrative.getName(fromv.state);
-        }
+        return narrative.getName();
     }
 
     public Trip getTrip() {
@@ -109,10 +105,6 @@ public class SPTEdge {
         return "SPTEdge(" + payload.toString() + ")";
     }
 
-    public String getName(State state) {
-        return narrative.getName(state);
-    }
-    
     public boolean equals(Object o) {
         if (o instanceof SPTEdge) {
             SPTEdge e = (SPTEdge) o;

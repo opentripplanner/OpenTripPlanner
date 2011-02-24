@@ -58,11 +58,6 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     }
     
     @Override
-    public String getName(State state) {
-        return getName();
-    }
-    
-    @Override
     public int hashCode() {
         return fromv.hashCode() * 31 + tov.hashCode();
     }

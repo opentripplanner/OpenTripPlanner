@@ -147,11 +147,6 @@ public class Shortcut implements DirectEdge, Serializable {
     }
 
     @Override
-    public String getName(State state) {
-        return getName();
-    }
-
-    @Override
     public boolean isRoundabout() {
         return false;
     }
