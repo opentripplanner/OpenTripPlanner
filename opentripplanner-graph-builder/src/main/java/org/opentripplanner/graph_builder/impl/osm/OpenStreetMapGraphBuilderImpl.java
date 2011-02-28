@@ -775,7 +775,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if ("no".equals(access) || "private".equals(access)) {
                     permission = StreetTraversalPermission.NONE;
                 } else {
-                    permission = StreetTraversalPermission.ALL;
+                    permission = def;
                 }
             } else if (motorcar != null || bicycle != null || foot != null) {
                 permission = def;
