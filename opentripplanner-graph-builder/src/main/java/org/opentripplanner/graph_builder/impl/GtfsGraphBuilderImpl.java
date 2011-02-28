@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.onebusaway.gtfs.csv.EntityHandler;
+import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
@@ -153,7 +153,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             GtfsReader reader = new GtfsReader();
             reader.setInputLocation(path);
             reader.setEntityStore(store);
-
+            reader.setInternStrings(true);
+            
             if (gtfsBundle.getDefaultAgencyId() != null)
                 reader.setDefaultAgencyId(gtfsBundle.getDefaultAgencyId());
 
@@ -307,6 +308,16 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         @Override
         public <T> Collection<T> getAllEntitiesForType(Class<T> type) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void saveOrUpdateEntity(Object entity) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void updateEntity(Object entity) {
             throw new UnsupportedOperationException();
         }
     }
