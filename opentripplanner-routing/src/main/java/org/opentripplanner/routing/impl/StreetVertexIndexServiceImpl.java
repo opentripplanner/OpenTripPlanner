@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
@@ -39,6 +40,8 @@ import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -81,6 +84,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private static final double DIRECTION_ERROR = 0.05;
 
+    private static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
+    
     public StreetVertexIndexServiceImpl() {
     }
 
@@ -175,6 +180,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * splitting nearby edges (non-permanently).
      */
     public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options) {
+        // first, check for intersections very close by
         List<Vertex> vertices = getIntersectionAt(coordinate);
         if (vertices != null && !vertices.isEmpty()) {
             StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, "");
@@ -186,7 +192,28 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
             return closest;
         }
-
+       
+        // then find closest transit stop
+        // (we can return stops here because this method is not used when street-transit linking)
+        double closest_stop_distance = Double.POSITIVE_INFINITY;            
+        Vertex closest_stop = null;
+        // dummy vertex is not terribly elegant but geometry/distance methods are slated to be modified
+        GenericVertex gv = new GenericVertex("x", coordinate, "x");
+        // elsewhere options=null means no restrictions, find anything.
+        // here we skip examining stops, as they are really only relevant when transit is being used
+        if (options != null && options.getModes().getTransit()) {            
+            for (Vertex v : getLocalTransitStops(coordinate, 400)) {
+                double d = v.distance(coordinate);
+                _log.debug("stop " + v + " distance " + d);
+                if ( d < closest_stop_distance) {
+                    closest_stop_distance = d;
+                    closest_stop = v;
+                }
+            }
+        }
+        _log.debug("best stop: " + closest_stop + " distance " + closest_stop_distance);
+        
+        // then find closest walkable street
         Collection<StreetEdge> edges = getClosestEdges(coordinate, options);
         if (edges != null) {
             StreetEdge bestStreet = edges.iterator().next();
@@ -195,11 +222,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             LinearLocation location = l.project(coordinate);
 
             Coordinate nearestPoint = location.getCoordinate(g);
-            return StreetLocation.createStreetLocation(
-                    bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
-                    edges, nearestPoint);
-        }
-        return null;
+            // if street is closer than stop, return street (split as needed)
+            _log.debug("best street: " + bestStreet.toString() + gv.distance(nearestPoint));
+            if (gv.distance(nearestPoint) < closest_stop_distance) {
+                _log.debug("returning split street");
+                return StreetLocation.createStreetLocation(
+                        bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
+                        edges, nearestPoint);            
+            }
+        } 
+        // if no street was found nearby, or the transit stop was closer, return the stop
+        _log.debug("returning transit stop (closer than street)");
+        return closest_stop;  // which will be null if none was found
     }
 
     public void reified(StreetLocation vertex) {
