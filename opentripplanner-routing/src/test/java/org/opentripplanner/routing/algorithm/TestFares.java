@@ -30,8 +30,6 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
-import org.opentripplanner.routing.edgetype.factory.TransitGraphStopLinker;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -43,6 +41,7 @@ import com.vividsolutions.jts.geom.Envelope;
 import junit.framework.TestCase;
 
 public class TestFares extends TestCase {
+
     public void testBasic() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
@@ -105,11 +104,9 @@ public class TestFares extends TestCase {
         path = spt.getPath(gg.getVertex("TriMet_4231"));
         assertNotNull(path);
         cost = path.getCost();
-        /*
-         * this is commented out because portland's fares are, I think, broken in the gtfs. see
-         * thread on gtfs-changes.
-         */
+        //
+        // this is commented out because portland's fares are, I think, broken in the gtfs. see
+        // thread on gtfs-changes.
         // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
-
     }
 }
