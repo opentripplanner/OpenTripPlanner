@@ -1,12 +1,16 @@
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.opentripplanner.common.model.P2;
 
-public class TransferTable {
+public class TransferTable implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     public static final int UNKNOWN_TRANSFER = -999;
 
     public static final int PREFERRED_TRANSFER = -2;
