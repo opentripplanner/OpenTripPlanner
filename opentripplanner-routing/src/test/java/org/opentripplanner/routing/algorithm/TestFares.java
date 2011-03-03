@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.GregorianCalendar;
 
 import org.opentripplanner.ConstantsForTests;
@@ -24,11 +25,20 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
+import org.opentripplanner.routing.edgetype.factory.TransitGraphStopLinker;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 import junit.framework.TestCase;
 
@@ -56,13 +66,11 @@ public class TestFares extends TestCase {
 
     public void testPortland() throws Exception {
 
-        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.PORTLAND_GTFS));
+        Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
         TraverseOptions options = new TraverseOptions();
-        options.setGtfsContext(context);
-
-        Graph gg = new Graph();
-        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
-        factory.run(gg);
+        options.setGtfsContext(ConstantsForTests.getInstance().getPortlandContext());
+        StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(gg);
+        index.setup();
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();

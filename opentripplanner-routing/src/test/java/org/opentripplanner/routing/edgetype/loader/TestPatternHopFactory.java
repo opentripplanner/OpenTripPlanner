@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -39,9 +40,9 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -215,7 +216,7 @@ public class TestPatternHopFactory extends TestCase {
     public PatternHop getHopOut(Vertex v) {
         for (PatternBoard e : filter(graph.getOutgoing(v), PatternBoard.class)) {
             for (PatternHop f : filter(graph.getOutgoing(e.getToVertex()), PatternHop.class)) {
-                return (PatternHop) f;
+                return f;
             }
         }
         return null;
@@ -269,14 +270,32 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testTransfers() throws Exception {
-        Vertex stop_k = graph.getVertex("agency_K_depart");
-        Vertex stop_n = graph.getVertex("agency_N_arrive");
-        int transfers = 0;
-        for (TransferEdge e : filter(graph.getOutgoing(stop_n), TransferEdge.class)) {
-            assertEquals(e.getToVertex(), stop_k);
-            transfers += 1;
-        }
-        assertTrue(transfers > 0);
+        TransferTable transferTable = graph.getTransferTable();
+        assertTrue(transferTable.hasPreferredTransfers());
+        assertTrue(transferTable.getTransferTime(graph.getVertex("agency_K_arrive"), 
+                graph.getVertex("agency_N_depart")) == TransferTable.PREFERRED_TRANSFER);
+        
+        Vertex e_arrive = graph.getVertex("agency_E_arrive");
+        Vertex f_depart = graph.getVertex("agency_F_depart");
+        Edge edge = new SimpleEdge(e_arrive, f_depart, 10000, 10000);
+        graph.addEdge(e_arrive, f_depart, edge);
+        
+        long startTime = new GregorianCalendar(2009, 8, 18, 0, 50, 0).getTimeInMillis();
+        Vertex stop_b = graph.getVertex("agency_B_depart");
+        Vertex stop_g = graph.getVertex("agency_G_arrive");
+        TraverseOptions options = new TraverseOptions(context);
+
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_b, stop_g, 
+                new State(startTime), options);
+        
+        GraphPath path = spt.getPath(stop_g);
+        assertNotNull(path);
+        
+        assertTrue("expected to use much later trip due to min transfer time", path.vertices.lastElement().state.time - startTime > 4.5 * 60 * 60 * 1000);
+        
+        /* cleanup */
+        graph.getGraphVertex(e_arrive).removeOutgoing(edge);
+        graph.getGraphVertex(f_depart).removeIncoming(edge);
     }
 
     public void testInterlining() throws Exception {

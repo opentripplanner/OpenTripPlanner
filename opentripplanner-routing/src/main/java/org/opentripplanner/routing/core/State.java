@@ -20,18 +20,28 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 public class State {
 
     public long time;
+
     private int trip = -1;
+
     public AgencyAndId tripId = null;
+
     public double walkDistance = 0;
 
     public String zone = null;
-    
+
     public AgencyAndId route = null;
 
     public FareContext fareContext;
+
     public int numBoardings = 0;
+
     public boolean alightedLocal = false;
+
     public boolean everBoarded = false;
+
+    public Vertex previousStop = null;
+
+    public long lastAlightedTime;
 
     public State() {
         this(System.currentTimeMillis());
@@ -39,14 +49,15 @@ public class State {
 
     public State(long time) {
         this.time = time;
-    }    
-
-    public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
-        this(time, pattern, tripId, walkDistance, null, null, null, 0, false, false);
     }
 
-    public State(long time, int trip, AgencyAndId tripId, double walkDistance,
-            AgencyAndId route, String zone, FareContext fareContext, int numBoardings, boolean alightedLocal, boolean everBoarded) {
+    public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
+        this(time, pattern, tripId, walkDistance, null, null, null, 0, false, false, null, 0);
+    }
+
+    public State(long time, int trip, AgencyAndId tripId, double walkDistance, AgencyAndId route,
+            String zone, FareContext fareContext, int numBoardings, boolean alightedLocal,
+            boolean everBoarded, Vertex previousStop, long lastAlighted) {
         this.time = time;
         this.trip = trip;
         this.tripId = tripId;
@@ -57,6 +68,8 @@ public class State {
         this.numBoardings = numBoardings;
         this.alightedLocal = alightedLocal;
         this.everBoarded = everBoarded;
+        this.previousStop = previousStop;
+        this.lastAlightedTime = lastAlighted;
     }
 
     public void setZoneAndRoute(String zone, AgencyAndId route, FareContext context) {
@@ -64,7 +77,7 @@ public class State {
         this.route = route;
         fareContext = context;
     }
-    
+
     /**
      * @return the time in milliseconds since the epoch.
      */
@@ -77,7 +90,8 @@ public class State {
     }
 
     public State clone() {
-        State ret = new State(time, trip, tripId, walkDistance, route, zone, fareContext, numBoardings, alightedLocal, everBoarded);
+        State ret = new State(time, trip, tripId, walkDistance, route, zone, fareContext,
+                numBoardings, alightedLocal, everBoarded, previousStop, lastAlightedTime);
         return ret;
     }
 

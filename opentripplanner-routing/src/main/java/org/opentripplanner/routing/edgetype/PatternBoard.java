@@ -23,6 +23,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -87,34 +88,62 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             return null;
         }
         
-        long currentTime = state0.getTime();
-        ServiceDate serviceDate = getServiceDate(currentTime, options.calendar);
-        ServiceDate serviceDateYesterday = getServiceDate(currentTime - MILLI_IN_DAY, options.calendar);
-        int secondsSinceMidnight = (int) ((currentTime - serviceDate.getAsDate().getTime()) / 1000);
+        long current_time = state0.getTime();
+        long transfer_penalty = 0;
+        
+        /* apply transfer rules */
+        /* look in the global transfer table for the rules from the previous stop to
+         * this stop. 
+         */
+        if (state0.lastAlightedTime != 0) { /* this is a transfer rather than an initial boarding */
+            TransferTable transferTable = options.getTransferTable();
+            
+            if (transferTable.hasPreferredTransfers()) {
+                transfer_penalty = options.baseTransferPenalty;
+            }
+            
+            int transfer_time = transferTable.getTransferTime(state0.previousStop, getFromVertex());
+            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
+                transfer_time = options.minTransferTime;
+            }
+            if (transfer_time > 0 && transfer_time > (current_time - state0.lastAlightedTime) * 1000) {
+                /* minimum time transfers */
+                current_time += state0.lastAlightedTime + transfer_time * 1000;
+            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+                return null;
+            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
+                /* depenalize preferred transfers */
+                transfer_penalty = 0; 
+            }
+        }
+        
+        ServiceDate service_date = getServiceDate(current_time, options.calendar);
+        ServiceDate service_date_yesterday = getServiceDate(current_time - MILLI_IN_DAY, options.calendar);
+        int seconds_since_midnight = (int) ((current_time - service_date.getAsDate().getTime()) / 1000);
 
         int wait = -1;
         int patternIndex = -1;
         AgencyAndId service = getPattern().getExemplar().getServiceId();
-        if (options.serviceOn(service, serviceDate)) {
+        if (options.serviceOn(service, service_date)) {
             // try to get the departure time on today's schedule
-            patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, true);
+            patternIndex = getPattern().getNextTrip(stopIndex, seconds_since_midnight, options.wheelchairAccessible, true);
             if (patternIndex >= 0) {
-                wait = getPattern().getDepartureTime(stopIndex, patternIndex) - secondsSinceMidnight;
+                wait = getPattern().getDepartureTime(stopIndex, patternIndex) - seconds_since_midnight;
             }
         }
-        if (options.serviceOn(service, serviceDateYesterday)) {
+        if (options.serviceOn(service, service_date_yesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
-            int yesterdayPatternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight
+            int yesterday_pattern_index = getPattern().getNextTrip(stopIndex, seconds_since_midnight
                     + SEC_IN_DAY, options.wheelchairAccessible, true);
-            if (yesterdayPatternIndex >= 0) {
-                int waitYesterday = getPattern().getDepartureTime(stopIndex, yesterdayPatternIndex)
-                        - secondsSinceMidnight - SEC_IN_DAY;
-                if (wait < 0 || waitYesterday < wait) {
+            if (yesterday_pattern_index >= 0) {
+                int wait_yesterday = getPattern().getDepartureTime(stopIndex, yesterday_pattern_index)
+                        - seconds_since_midnight - SEC_IN_DAY;
+                if (wait < 0 || wait_yesterday < wait) {
                     // choose the better time
-                    wait = waitYesterday;
-                    patternIndex = yesterdayPatternIndex;
+                    wait = wait_yesterday;
+                    patternIndex = yesterday_pattern_index;
                 }
             }
         }
@@ -139,11 +168,10 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         
         state1.tripId = trip.getId();
         state1.setZoneAndRoute(getPattern().getZone(stopIndex), getPattern().getExemplar().getRoute().getId(), getPattern().getFareContext());
-        long transfer_penalty = 0;
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
-            transfer_penalty = options.optimizeTransferPenalty;
+            transfer_penalty += options.optimizeTransferPenalty;
         }
         long wait_cost = wait;
         if (state0.numBoardings == 0) {
@@ -162,6 +190,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         }
         State s1 = state0.clone();
         s1.tripId = null;
+        s1.lastAlightedTime = s1.time;
+        s1.previousStop = tov;
         return new TraverseResult(1, s1, this);
     }
 

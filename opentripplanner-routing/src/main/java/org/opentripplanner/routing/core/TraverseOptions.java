@@ -127,6 +127,10 @@ public class TraverseOptions implements Serializable, Cloneable {
      */
     private Map<Object, Object> extensions = new HashMap<Object, Object>();
 
+    private TransferTable transferTable;
+
+    public long baseTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -212,7 +216,8 @@ public class TraverseOptions implements Serializable, Cloneable {
                     && optimizeTransferPenalty == to.optimizeTransferPenalty
                     && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
                     && waitReluctance == to.waitReluctance && boardCost == to.boardCost
-                    && bannedRoutes.equals(to.bannedRoutes);
+                    && bannedRoutes.equals(to.bannedRoutes) && minTransferTime == to.minTransferTime
+                    && baseTransferPenalty == to.baseTransferPenalty;
         }
         return false;
     }
@@ -224,7 +229,7 @@ public class TraverseOptions implements Serializable, Cloneable {
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(optimizeTransferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode();
+                + boardCost + bannedRoutes.hashCode() + minTransferTime * 20996011 + (int)baseTransferPenalty;
     }
 
     public void setArriveBy(boolean back) {
@@ -295,5 +300,13 @@ public class TraverseOptions implements Serializable, Cloneable {
     @SuppressWarnings("unchecked")
     public <T> T getExtension(Object key) {
         return (T) extensions.get(key);
+    }
+
+    public TransferTable getTransferTable() {
+        return transferTable;
+    }
+
+    public void setTransferTable(TransferTable transferTable) {
+        this.transferTable = transferTable;
     }
 }

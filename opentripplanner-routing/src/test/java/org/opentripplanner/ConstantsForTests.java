@@ -19,6 +19,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 
 public class ConstantsForTests {
@@ -73,6 +74,8 @@ public class ConstantsForTests {
             portlandGraph = new Graph();
             GTFSPatternHopFactory factory = new GTFSPatternHopFactory(portlandContext);
             factory.run(portlandGraph);
+            TransferGraphLinker linker = new TransferGraphLinker(portlandGraph);
+            linker.run();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);

@@ -54,6 +54,7 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
@@ -70,28 +71,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.strtree.STRtree;
-
-class NonFreeEdge extends FreeEdge {
-    private static final long serialVersionUID = 1L;
-    private double weight;
-
-    public NonFreeEdge (Vertex v1, Vertex v2, double weight) {
-        super(v1, v2);
-        this.weight = weight;
-    }
-    
-    @Override
-    public TraverseResult traverse(State s0, TraverseOptions options) {
-        State s1 = s0.clone();
-        return new TraverseResult(weight, s1,this);
-    }
-    
-    @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options) {
-        State s1 = s0.clone();
-        return new TraverseResult(weight, s1,this);
-    }
-}
 
 class ForbiddenEdge extends FreeEdge {
     private static final long serialVersionUID = 1L;
@@ -361,8 +340,8 @@ public class TestContractionHeirarchies extends TestCase {
                 lastKey = components.union(v, last);
                 last = v;
                 Coordinate c = v.getCoordinate();
-                graph.addEdge(new NonFreeEdge(v, last, last.distance(c)));
-                graph.addEdge(new NonFreeEdge(last, v, last.distance(c)));
+                graph.addEdge(new SimpleEdge(v, last, last.distance(c), 0));
+                graph.addEdge(new SimpleEdge(last, v, last.distance(c), 0));
             }
         }
 
@@ -482,6 +461,7 @@ public class TestContractionHeirarchies extends TestCase {
         CalendarServiceImpl calendarService = new CalendarServiceImpl();
         calendarService.setData(data);
         options.setCalendarService(calendarService);
+        options.setTransferTable(graph.getTransferTable());
         
         Vertex start1 = graph.getVertex("0072480");
         Vertex end1 = graph.getVertex("0032341");

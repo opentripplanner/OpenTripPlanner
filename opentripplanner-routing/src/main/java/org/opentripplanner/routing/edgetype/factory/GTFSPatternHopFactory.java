@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -41,6 +40,7 @@ import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
@@ -698,45 +698,30 @@ public class GTFSPatternHopFactory {
 
     private void loadTransfers(Graph graph) {
         Collection<Transfer> transfers = _dao.getAllTransfers();
-        Set<TransferEdge> createdTransfers = new HashSet<TransferEdge>();
+        TransferTable transferTable = graph.getTransferTable();
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
-            if (fromStop == toStop) {
-                continue;
-            }
-            Vertex fromStation = graph.getVertex(arrivalVertexId(id(fromStop.getId())));
-            Vertex toStation = graph.getVertex(departureVertexId(id(toStop.getId())));
-            double distance = fromStation.distance(toStation.getCoordinate());
-            if (t.getTransferType() < 3) {
-                TransferEdge edge;
-                if (t.getTransferType() == 2) { // transfer has minimum transfer time
-                    edge = new TransferEdge(fromStation,
-                            toStation, distance, t.getMinTransferTime());
-                } else {
-                    edge = new TransferEdge(fromStation,
-                            toStation, distance);
-                }
-
-                if (createdTransfers.contains(edge)) {
-                    continue;
-                }
-                                
-                /* Assume that if either stop is not accessible from the street, the
-                 * transfer is not accessible.  This will need to be changed when GTFS
-                 * and OneBusAway GTFS support accessible transfers.
-                 */
-                TransitStop fromStopVertex = (TransitStop) graph.getVertex(id(fromStop.getId()));
-                TransitStop toStopVertex = (TransitStop) graph.getVertex(id(toStop.getId()));
-                edge.setWheelchairAccessible(fromStopVertex.hasWheelchairEntrance() &&
-                        toStopVertex.hasWheelchairEntrance());
-
-                LineString geometry = _factory.createLineString(new Coordinate[] {
-                        new Coordinate(fromStop.getLon(), fromStop.getLat()),
-                        new Coordinate(toStop.getLon(), toStop.getLat()) });
-                edge.setGeometry(geometry);
-                createdTransfers.add(edge);
-                graph.addEdge(edge);
+            Vertex fromVertex = graph.getVertex(arrivalVertexId(id(fromStop.getId())));
+            Vertex toVertex = graph.getVertex(departureVertexId(id(toStop.getId())));
+            switch (t.getTransferType()) {
+            case 1:
+                // timed transfer 
+                transferTable.setTransferTime(fromVertex, toVertex, TransferTable.TIMED_TRANSFER);
+                break;
+            case 2:
+                // min transfer time
+                transferTable.setTransferTime(fromVertex, toVertex, t.getMinTransferTime());
+                break;
+            case 3:
+                // forbidden transfer
+                transferTable.setTransferTime(fromVertex, toVertex, TransferTable.FORBIDDEN_TRANSFER);
+                break;
+            case 0:
+            default: 
+                // preferred transfer
+                transferTable.setTransferTime(fromVertex, toVertex, TransferTable.PREFERRED_TRANSFER);
+                break;
             }
         }
     }

@@ -32,6 +32,8 @@ public class Graph implements Serializable {
 
     HashMap<String, GraphVertex> vertices;
 
+    private TransferTable transferTable = new TransferTable();
+
     public Graph() {
         this.vertices = new HashMap<String, GraphVertex>();
     }
@@ -200,5 +202,9 @@ public class Graph implements Serializable {
 
     public void addGraphVertex(GraphVertex graphVertex) {
         vertices.put(graphVertex.vertex.getLabel(), graphVertex);
+    }
+
+    public TransferTable getTransferTable() {
+        return transferTable;
     }
 }

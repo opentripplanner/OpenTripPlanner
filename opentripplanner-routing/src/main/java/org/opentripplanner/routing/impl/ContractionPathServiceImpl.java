@@ -112,7 +112,7 @@ public class ContractionPathServiceImpl implements PathService {
 
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
-
+        options.setTransferTable(hierarchies.getGraph().getTransferTable());
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
@@ -221,6 +221,7 @@ public class ContractionPathServiceImpl implements PathService {
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
 
+        options.setTransferTable(hierarchies.getGraph().getTransferTable());
         GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state,
                 options);
 

@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
@@ -96,6 +97,8 @@ public class AStar {
         if (origin == null || target == null) {
             return null;
         }
+
+        options.setTransferTable(graph.getTransferTable());
 
         // Return Tree
         ShortestPathTree spt;
@@ -227,6 +230,8 @@ public class AStar {
         } else {
             spt = new BasicShortestPathTree();
         }
+
+        options.setTransferTable(graph.getTransferTable());
 
         /**
          * Populate any extra edges
