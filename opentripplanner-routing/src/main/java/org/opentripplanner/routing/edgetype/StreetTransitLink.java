@@ -74,8 +74,7 @@ public class StreetTransitLink implements DirectEdge, Serializable {
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(1);
+        State s1 = s0.incrementTimeInSeconds(1);
         //technically, we only need to do this when we're going
         //off the street onto transit, but it won't hurt 
         //to do it unconditionally.
@@ -86,8 +85,7 @@ public class StreetTransitLink implements DirectEdge, Serializable {
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-1);
+        State s1 = s0.incrementTimeInSeconds(-1);
         return new TraverseResult(STL_TRAVERSE_COST, s1, this);
     }
 

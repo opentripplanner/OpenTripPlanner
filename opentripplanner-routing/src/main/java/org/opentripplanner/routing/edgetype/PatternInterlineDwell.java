@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -103,32 +104,34 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     }
     
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
 
-        AgencyAndId tripId = state0.tripId;
+        AgencyAndId tripId = state0.getData().getTripId();
         InterlineDwellData dwellData = tripIdToInterlineDwellData.get(tripId);
         if (dwellData == null) {
             return null;
         }
-        state1.incrementTimeInSeconds(dwellData.dwellTime);
-        state1.tripId = targetTrip.getId();
-        state1.setPattern(dwellData.patternIndex);
+        
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(dwellData.dwellTime);
+        editor.setTripId(targetTrip.getId());
+        editor.setTrip(dwellData.patternIndex);
 
-        return new TraverseResult(dwellData.dwellTime, state1, this);
+        return new TraverseResult(dwellData.dwellTime, editor.createState(), this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
 
-        AgencyAndId tripId = state0.tripId;
+        AgencyAndId tripId = state0.getData().getTripId();
         InterlineDwellData dwellData = reverseTripIdToInterlineDwellData.get(tripId);
         if (dwellData == null) {
             return null;
         }
-        state1.incrementTimeInSeconds(-dwellData.dwellTime);
-        state1.tripId = targetTrip.getId();
-        state1.setPattern(dwellData.patternIndex);
-        return new TraverseResult(dwellData.dwellTime, state1, this);
+        
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(-dwellData.dwellTime);
+        editor.setTripId(targetTrip.getId());
+        editor.setTrip(dwellData.patternIndex);
+        return new TraverseResult(dwellData.dwellTime, editor.createState(), this);
     }
 
     public Geometry getGeometry() {

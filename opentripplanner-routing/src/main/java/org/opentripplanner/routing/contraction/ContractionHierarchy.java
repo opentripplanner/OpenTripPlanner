@@ -39,6 +39,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -739,13 +740,15 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 State state = up_u.state;
+                StateData stateData = state.getData();
+                
                 for (Edge edge : outgoing) {
 
                     if (edge instanceof OutEdge) {
                         continue;
                     }
                     //two transfers rule
-                    if (edge instanceof PatternBoard && state.numBoardings > 2) {
+                    if (edge instanceof PatternBoard && stateData.getNumBoardings() > 2) {
                         continue;
                     }
 
@@ -846,6 +849,8 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 State state = down_u.state;
+                StateData stateData = state.getData();
+                
                 for (Edge edge : incoming) {
                     Vertex fromVertex = edge.getFromVertex();
 
@@ -857,7 +862,7 @@ public class ContractionHierarchy implements Serializable {
                         continue; 
                     }
                     //two transfers rule
-                    if (edge instanceof PatternBoard && state.numBoardings > 2) {
+                    if (edge instanceof PatternBoard && stateData.getNumBoardings() > 2) {
                         continue;
                     }
 

@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -69,28 +70,31 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     }
 
     public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
         int runningTime = pattern.getBestRunningTime(stopIndex);
-        state1.incrementTimeInSeconds(-runningTime);
+        State state1 = state0.incrementTimeInSeconds(-runningTime);
         return new TraverseResult(runningTime, state1, this);
     }
     
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
-        int runningTime = pattern.getRunningTime(stopIndex, state0.getTrip());
-        state1.incrementTimeInSeconds(runningTime);
-        state1.setZoneAndRoute(getEndStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
-                context);
-        return new TraverseResult(runningTime, state1, new RouteNameNarrative(getPattern().getTrip(state0.getTrip()), this));
+        int trip = state0.getData().getTrip();
+        int runningTime = pattern.getRunningTime(stopIndex, trip);
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(runningTime);
+        editor.setZone(getEndStop().getZoneId());
+        editor.setRoute(pattern.getExemplar().getRoute().getId());
+        editor.setFareContext(context);
+        return new TraverseResult(runningTime, editor.createState(), new RouteNameNarrative(getPattern().getTrip(trip), this));
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
-        int runningTime = pattern.getRunningTime(stopIndex, state0.getTrip());
-        state1.incrementTimeInSeconds(-runningTime);
-        state1.setZoneAndRoute(getStartStop().getZoneId(), pattern.getExemplar().getRoute().getId(),
-                context);
-        return new TraverseResult(runningTime, state1, new RouteNameNarrative(getPattern().getTrip(state0.getTrip()), this));
+        int trip = state0.getData().getTrip();
+        int runningTime = pattern.getRunningTime(stopIndex, trip);
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(-runningTime);
+        editor.setZone(getStartStop().getZoneId());
+        editor.setRoute(pattern.getExemplar().getRoute().getId());
+        editor.setFareContext(context);
+        return new TraverseResult(runningTime, editor.createState(), new RouteNameNarrative(getPattern().getTrip(trip), this));
     }
 
     public void setGeometry(Geometry geometry) {

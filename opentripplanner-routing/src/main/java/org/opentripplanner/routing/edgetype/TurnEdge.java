@@ -19,12 +19,12 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -54,6 +54,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         }
     }
 
+    /*
     private static String getDirection(Coordinate a, Coordinate b) {
         double run = b.x - a.x;
         double rise = b.y - a.y;
@@ -62,6 +63,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
         return DIRECTIONS[octant];
     }
+    */
 
     @Override
     public double getDistance() {
@@ -108,12 +110,12 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         
         double angleLength = fromv.getLength() + turnCost / 20;
 
-        State s1 = s0.clone();
+        StateData.Editor s1 = s0.edit();
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
-        s1.walkDistance += fromv.getLength();
+        s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) (back ? -time : time));
-        return new TraverseResult(weight, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        return new TraverseResult(weight, s1.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {

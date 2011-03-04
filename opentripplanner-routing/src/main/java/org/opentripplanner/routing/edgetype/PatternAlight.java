@@ -23,6 +23,8 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -86,24 +88,26 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         long current_time = state0.getTime();
         long transfer_penalty = 0;
         
+        StateData data = state0.getData();
+        
         /* apply transfer rules */
         /* look in the global transfer table for the rules from the previous stop to
          * this stop. 
          */
-        if (state0.lastAlightedTime != 0) { /* this is a transfer rather than an initial boarding */
+        if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
             TransferTable transferTable = options.getTransferTable();
             
             if (transferTable.hasPreferredTransfers()) {
                 transfer_penalty = options.baseTransferPenalty;
             }
             
-            int transfer_time = transferTable.getTransferTime(getToVertex(), state0.previousStop);
+            int transfer_time = transferTable.getTransferTime(getToVertex(), data.getPreviousStop());
             if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
                 transfer_time = options.minTransferTime;
             }
-            if (transfer_time > 0 && transfer_time > (current_time + state0.lastAlightedTime) * 1000) {
+            if (transfer_time > 0 && transfer_time > (current_time + data.getLastAlightedTime()) * 1000) {
                 /* minimum time transfers */
-                current_time += state0.lastAlightedTime - transfer_time * 1000;
+                current_time += data.getLastAlightedTime() - transfer_time * 1000;
             } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
                 return null;
             } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
@@ -146,10 +150,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         if (wait > 0) {
             return null;
         }
-        State state1 = state0.clone();
-        state1.setPattern(patternIndex);
-        state1.incrementTimeInSeconds(wait);
-        state1.numBoardings += 1;
+        
         Trip trip = getPattern().getTrip(patternIndex);
         
         /* check if route banned for this plan */
@@ -161,23 +162,30 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             }
         }
         
-        state1.tripId = trip.getId();
-        state1.setZoneAndRoute(pattern.getZone(stopIndex), pattern.getExemplar().getRoute().getId(), pattern.getFareContext());
+        Editor editor = state0.edit();
+        editor.setTrip(patternIndex);
+        editor.incrementTimeInSeconds(wait);
+        editor.incrementNumBoardings();
+        editor.setTripId(trip.getId());
+        editor.setZone(pattern.getZone(stopIndex));
+        editor.setRoute(pattern.getExemplar().getRoute().getId());
+        editor.setFareContext(pattern.getFareContext());
+        
 
-        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getTrip() != -1) {
+        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getData().getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
             transfer_penalty += options.optimizeTransferPenalty;
         }
         long wait_cost = -wait;
-        if (state0.numBoardings == 0) {
+        if (state0.getData().getNumBoardings() == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }
         else {
             wait_cost *= options.waitReluctance;
         }
         
-        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, state1, this);
+        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, editor.createState(), this);
     }
 
     @Override
@@ -185,11 +193,11 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 	if (!pattern.canAlight(stopIndex + 1)) {
 	    return null;
 	}
-        State s1 = state0.clone();
-        s1.tripId = null;
-        s1.lastAlightedTime = s1.time;
-        s1.previousStop = tov;
-        return new TraverseResult(1, s1, this);
+        Editor s1 = state0.edit();
+        s1.setTripId(null);
+        s1.setLastAlightedTime(state0.getTime());
+        s1.setPreviousStop(tov);
+        return new TraverseResult(1, s1.createState(), this);
     }
 
     private ServiceDate getServiceDate(long currentTime, Calendar c) {

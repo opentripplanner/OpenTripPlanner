@@ -15,67 +15,25 @@ package org.opentripplanner.routing.core;
 
 import java.util.Date;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.core.StateData.Editor;
 
 public class State {
 
-    public long time;
+    private final long time;
 
-    private int trip = -1;
-
-    public AgencyAndId tripId = null;
-
-    public double walkDistance = 0;
-
-    public String zone = null;
-
-    public AgencyAndId route = null;
-
-    public FareContext fareContext;
-
-    public int numBoardings = 0;
-
-    public boolean alightedLocal = false;
-
-    public boolean everBoarded = false;
-
-    public Vertex previousStop = null;
-
-    public long lastAlightedTime;
+    private final StateData data;
 
     public State() {
         this(System.currentTimeMillis());
     }
 
     public State(long time) {
+        this(time, StateData.createDefault());
+    }
+
+    public State(long time, StateData data) {
         this.time = time;
-    }
-
-    public State(long time, int pattern, AgencyAndId tripId, double walkDistance) {
-        this(time, pattern, tripId, walkDistance, null, null, null, 0, false, false, null, 0);
-    }
-
-    public State(long time, int trip, AgencyAndId tripId, double walkDistance, AgencyAndId route,
-            String zone, FareContext fareContext, int numBoardings, boolean alightedLocal,
-            boolean everBoarded, Vertex previousStop, long lastAlighted) {
-        this.time = time;
-        this.trip = trip;
-        this.tripId = tripId;
-        this.walkDistance = walkDistance;
-        this.route = route;
-        this.zone = zone;
-        this.fareContext = fareContext;
-        this.numBoardings = numBoardings;
-        this.alightedLocal = alightedLocal;
-        this.everBoarded = everBoarded;
-        this.previousStop = previousStop;
-        this.lastAlightedTime = lastAlighted;
-    }
-
-    public void setZoneAndRoute(String zone, AgencyAndId route, FareContext context) {
-        this.zone = zone;
-        this.route = route;
-        fareContext = context;
+        this.data = data;
     }
 
     /**
@@ -85,25 +43,47 @@ public class State {
         return time;
     }
 
-    public void incrementTimeInSeconds(int numOfSeconds) {
-        time += numOfSeconds * 1000;
+    /**
+     * @return all data associated with this state
+     */
+    public StateData getData() {
+        return data;
+    }
+    
+    public StateData.Editor edit() {
+        Editor editor = data.edit();
+        editor.setTime(time);
+        return editor;
     }
 
-    public State clone() {
-        State ret = new State(time, trip, tripId, walkDistance, route, zone, fareContext,
-                numBoardings, alightedLocal, everBoarded, previousStop, lastAlightedTime);
-        return ret;
+    /****
+     * State Transition Methods
+     ****/
+
+    /**
+     * Create a new state whose time has been incremented the specified number of seconds and whose
+     * data remains the same. The current state object is not modified.
+     * 
+     * @param numOfSeconds
+     * @return the new state
+     */
+    public State incrementTimeInSeconds(int numOfSeconds) {
+        long t = this.time + numOfSeconds * 1000;
+        return new State(t, this.data);
+    }
+
+    /**
+     * Create a new state whose data has been updated as specified and whose time remains the same.
+     * The current state object is not modified.
+     * 
+     * @param updatedData
+     * @return the new state.
+     */
+    public State setData(StateData updatedData) {
+        return new State(this.time, updatedData);
     }
 
     public String toString() {
-        return "<State " + new Date(time) + "," + trip + ">";
-    }
-
-    public void setPattern(int curPattern) {
-        this.trip = curPattern;
-    }
-
-    public int getTrip() {
-        return trip;
+        return "<State " + new Date(time) + ">";
     }
 }

@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.WrappedCurrency;
@@ -104,11 +105,14 @@ public class GraphPath {
     }
 
     public void optimize() {
-        State state = vertices.lastElement().state.clone();
+        
         State state0 = vertices.firstElement().state;
 
-        state.alightedLocal = false;
-        state.everBoarded = false;
+        State state = vertices.lastElement().state;
+        StateData.Editor edit = state.edit();
+        edit.setAlightedLocal(false);
+        edit.setEverBoarded(false);
+        state = edit.createState();
 
         if (edges.isEmpty()) {
             /* nothing to optimize */
@@ -148,7 +152,8 @@ public class GraphPath {
 
     public Fare getCost() {
         State state = vertices.lastElement().state;
-        FareContext fareContext = state.fareContext;
+        StateData data = state.getData();
+        FareContext fareContext = data.getFareContext();
         if (fareContext == null) {
             // we have never actually visited any zones, so there's no fare data.
             // perhaps we're planning a biking-only trip.
@@ -163,8 +168,10 @@ public class GraphPath {
         List<Ride> rides = new ArrayList<Ride>();
         Ride newRide = null;
         for (SPTVertex vertex : vertices) {
-            String zone = vertex.state.zone;
-            AgencyAndId route = vertex.state.route;
+            State vState = vertex.state;
+            StateData vData = vState.getData();
+            String zone = vData.getZone();
+            AgencyAndId route = vData.getRoute();
             if (zone == null) {
                 newRide = null;
             } else {
@@ -173,7 +180,7 @@ public class GraphPath {
                     rides.add(newRide);
                     newRide.startZone = zone;
                     newRide.route = route;
-                    newRide.startTime = vertex.state.getTime();
+                    newRide.startTime = vState.getTime();
                 }
                 newRide.zones.add(zone);
                 newRide.endZone = zone;

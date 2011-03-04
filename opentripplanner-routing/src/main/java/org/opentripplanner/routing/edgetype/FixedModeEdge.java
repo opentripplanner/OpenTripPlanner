@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;

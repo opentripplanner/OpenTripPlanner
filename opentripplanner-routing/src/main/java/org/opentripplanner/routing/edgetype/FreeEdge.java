@@ -40,15 +40,13 @@ public class FreeEdge extends AbstractEdge {
     @Override
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException {
-        State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        return new TraverseResult(0.000001, s0, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
-        State s1 = s0.clone();
-        return new TraverseResult(0.000001, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        return new TraverseResult(0.000001, s0, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     @Override

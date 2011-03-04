@@ -30,7 +30,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -230,15 +229,13 @@ class MockTransfer extends AbstractEdge {
 
     @Override
     public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(cost);
+        State s1 = s0.incrementTimeInSeconds(cost);
         return new TraverseResult(cost, s1, this);
     }
 
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-cost);
+        State s1 = s0.incrementTimeInSeconds(-cost);
         return new TraverseResult(cost, s1, this);
     }
 }

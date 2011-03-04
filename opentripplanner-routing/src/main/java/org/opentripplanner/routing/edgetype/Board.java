@@ -102,8 +102,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             return null;
         }
 
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(-wait);
+        State state1 = state0.incrementTimeInSeconds(-wait);
         return new TraverseResult(wait, state1, this);
     }
 
@@ -111,8 +110,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	if (wo.wheelchairAccessible && !wheelchairAccessible) {
 	    return null;
 	}
-        State s1 = state0.clone();
-        return new TraverseResult(1, s1, this);
+        return new TraverseResult(1, state0, this);
     }
 
     private Date getServiceDate(long currentTime, boolean useArrival) {

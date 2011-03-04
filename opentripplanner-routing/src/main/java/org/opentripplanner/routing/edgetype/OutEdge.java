@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -77,13 +78,13 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
             return tryWalkBike(s0, options, back);
         }
 
-        State s1 = s0.clone();
+        Editor editor = s0.edit();
         double time = fromv.getLength() / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
-        s1.walkDistance += fromv.getLength();
+        editor.incrementWalkDistance(fromv.getLength());
         // time moves *backwards* when traversing an edge in the opposite direction
-        s1.incrementTimeInSeconds((int) (back ? -time : time));
-        return new TraverseResult(weight, s1, this);
+        editor.incrementTimeInSeconds((int) (back ? -time : time));
+        return new TraverseResult(weight, editor.createState(), this);
     }
 
     private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {

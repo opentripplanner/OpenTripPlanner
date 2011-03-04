@@ -79,8 +79,7 @@ public class Shortcut implements DirectEdge, Serializable {
     @Override
     public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
         if (weight != -1) {
-            State s1 = s0.clone();
-            s1.incrementTimeInSeconds(time);
+            State s1 = s0.incrementTimeInSeconds(time);
             return new TraverseResult(weight, s1, this);
         }
         State state = s0;
@@ -106,8 +105,7 @@ public class Shortcut implements DirectEdge, Serializable {
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
         if (weight != -1) {
-            State s1 = s0.clone();
-            s1.incrementTimeInSeconds(-time);
+            State s1 = s0.incrementTimeInSeconds(-time);
             return new TraverseResult(weight, s1,this);
         }
         State state = s0;

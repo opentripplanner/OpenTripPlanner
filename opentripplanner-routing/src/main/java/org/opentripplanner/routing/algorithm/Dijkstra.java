@@ -216,8 +216,7 @@ public class Dijkstra {
                 if (neighbors != null && neighbors.containsKey(toVertex)) {
                     SPTVertex parent = spt.getVertex(toVertex);
                     for (VertexIngress w : neighbors.get(toVertex)) {
-                        State newState = wr.state.clone();
-                        newState.incrementTimeInSeconds((int) w.time);
+                        State newState = wr.state.incrementTimeInSeconds((int) w.time);
                         double neighborWeight = w.weight + new_w;
                         if (neighborWeight < weightLimit) {
                             SPTVertex spt_w = spt.addVertex(w.vertex, newState, neighborWeight, options, spt_u.hops + 2);

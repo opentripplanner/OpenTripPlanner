@@ -24,12 +24,12 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
@@ -148,7 +148,9 @@ public class AStar {
             spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
             // hard limit on walk distance. to be replaced with something more subtle later.
-            if (spt_u.state.walkDistance >= options.maxWalkDistance)
+            State state_u = spt_u.state;
+            StateData data_u = state_u.getData();
+            if (data_u.getWalkDistance() >= options.maxWalkDistance)
                 continue;
 
             Vertex tov = spt_u.mirror;
@@ -160,13 +162,12 @@ public class AStar {
             Collection<Edge> incoming = GraphLibrary.getIncomingEdges(graph, tov, extraEdges);
 
             for (Edge edge : incoming) {
-                State state = spt_u.state;
 
-                if (edge instanceof PatternAlight && state.numBoardings > options.maxTransfers) {
+                if (edge instanceof PatternAlight && data_u.getNumBoardings() > options.maxTransfers) {
                     continue;
                 }
 
-                TraverseResult wr = edge.traverseBack(state, options);
+                TraverseResult wr = edge.traverseBack(state_u, options);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
@@ -263,7 +264,9 @@ public class AStar {
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
 
             // hard limit on walk distance. to be replaced with something more subtle later.
-            if (spt_u.state.walkDistance >= options.maxWalkDistance)
+            State state_u = spt_u.state;
+            StateData data_u = state_u.getData();
+            if (data_u.getWalkDistance() >= options.maxWalkDistance)
                 continue;
 
             Vertex fromv = spt_u.mirror;
@@ -276,7 +279,7 @@ public class AStar {
             for (Edge edge : outgoing) {
                 State state = spt_u.state;
 
-                if (edge instanceof PatternBoard && state.numBoardings > options.maxTransfers) {
+                if (edge instanceof PatternBoard && data_u.getNumBoardings() > options.maxTransfers) {
                     continue;
                 }
 

@@ -18,15 +18,13 @@ public class SimpleEdge extends FreeEdge {
     
     @Override
     public TraverseResult traverse(State s0, TraverseOptions options) {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(seconds);
+        State s1 = s0.incrementTimeInSeconds(seconds);
         return new TraverseResult(weight, s1,this);
     }
     
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options) {
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-seconds);
+        State s1 = s0.incrementTimeInSeconds(-seconds);
         return new TraverseResult(weight, s1,this);
     }
 }

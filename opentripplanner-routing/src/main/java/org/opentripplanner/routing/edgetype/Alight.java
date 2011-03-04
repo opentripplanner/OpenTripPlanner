@@ -76,8 +76,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 	if (wo.wheelchairAccessible && !wheelchairAccessible) {
 	    return null;
 	}
-        State s1 = s0.clone();
-        return new TraverseResult(1, s1,this);
+        return new TraverseResult(1, s0,this);
     }
 
     public TraverseResult traverseBack(State s0, TraverseOptions wo) {
@@ -100,8 +99,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             return null;
         }
 
-        State state1 = s0.clone();
-        state1.incrementTimeInSeconds(-wait);
+        State state1 = s0.incrementTimeInSeconds(-wait);
         return new TraverseResult(wait, state1,this);
     }
 

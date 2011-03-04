@@ -291,7 +291,7 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path = spt.getPath(stop_g);
         assertNotNull(path);
         
-        assertTrue("expected to use much later trip due to min transfer time", path.vertices.lastElement().state.time - startTime > 4.5 * 60 * 60 * 1000);
+        assertTrue("expected to use much later trip due to min transfer time", path.vertices.lastElement().state.getTime() - startTime > 4.5 * 60 * 60 * 1000);
         
         /* cleanup */
         graph.getGraphVertex(e_arrive).removeOutgoing(edge);

@@ -78,8 +78,7 @@ public class PathwayEdge extends AbstractEdge {
             }
             time = wheelchairTraversalTime;
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(time);
+        State s1 = s0.incrementTimeInSeconds(time);
         return new TraverseResult(time, s1, this);
     }
 
@@ -91,8 +90,7 @@ public class PathwayEdge extends AbstractEdge {
             }
             time = wheelchairTraversalTime;            
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-time);
+        State s1 = s0.incrementTimeInSeconds(-time);
         return new TraverseResult(time, s1, this);
     }
 }

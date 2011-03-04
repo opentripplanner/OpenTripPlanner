@@ -23,6 +23,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -77,17 +78,21 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
     }
 
     public TraverseResult traverse(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(elapsed);
-        state1.setZoneAndRoute(getEndStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
-        return new TraverseResult(elapsed, state1, this);
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(elapsed);
+        editor.setZone(getEndStop().getZoneId());
+        editor.setRoute(start.getTrip().getRoute().getId());
+        editor.setFareContext(fareContext);
+        return new TraverseResult(elapsed, editor.createState(), this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        State state1 = state0.clone();
-        state1.incrementTimeInSeconds(-elapsed);
-        state1.setZoneAndRoute(getStartStop().getZoneId(), start.getTrip().getRoute().getId(), fareContext);
-        return new TraverseResult(elapsed, state1, this);
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(-elapsed);
+        editor.setZone(getStartStop().getZoneId());
+        editor.setRoute(start.getTrip().getRoute().getId());
+        editor.setFareContext(fareContext);
+        return new TraverseResult(elapsed, editor.createState(), this);
     }
 
     public int compareTo(Hop arg0) {

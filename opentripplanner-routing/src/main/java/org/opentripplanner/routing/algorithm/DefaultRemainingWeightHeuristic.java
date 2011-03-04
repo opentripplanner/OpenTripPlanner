@@ -3,6 +3,8 @@ package org.opentripplanner.routing.algorithm;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -35,11 +37,15 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
         EdgeNarrative narrative = traverseResult.getEdgeNarrative();
         Vertex tov = narrative.getToVertex();
+        
+        State fromState = from.state;
+        StateData fromData = fromState.getData();
 
         double euclidianDistance = tov.distance(target);
 
         if (useTransit) {
-            if (from.state.alightedLocal) {
+            
+            if (fromData.isAlightedLocal()) {
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;
@@ -74,11 +80,14 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         
         EdgeNarrative narrative = traverseResult.getEdgeNarrative();
         Vertex fromv = narrative.getFromVertex();
+        
+        State fromState = from.state;
+        StateData fromData = fromState.getData();
 
         double euclidianDistance = fromv.distance(target);
         
         if (useTransit) {
-            if (from.state.alightedLocal) {
+            if (fromData.isAlightedLocal()) {
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;

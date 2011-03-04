@@ -86,8 +86,7 @@ public class TransferEdge extends AbstractEdge {
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(time);
+        State s1 = s0.incrementTimeInSeconds(time);
         return new TraverseResult(time, s1, this);
     }
 
@@ -95,8 +94,7 @@ public class TransferEdge extends AbstractEdge {
         if (wo.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.clone();
-        s1.incrementTimeInSeconds(-time);
+        State s1 = s0.incrementTimeInSeconds(-time);
         return new TraverseResult(time, s1, this);
     }
     

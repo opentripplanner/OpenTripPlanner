@@ -25,7 +25,6 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
@@ -74,9 +73,9 @@ public class SPTEdge {
         }
         int patternIndex = -1;
         if (payload instanceof PatternAlight) {
-            patternIndex = fromv.state.getTrip();
+            patternIndex = fromv.state.getData().getTrip();
         } else if (payload instanceof PatternEdge) {
-            patternIndex = tov.state.getTrip();
+            patternIndex = tov.state.getData().getTrip();
         } else {
             return null;
         }

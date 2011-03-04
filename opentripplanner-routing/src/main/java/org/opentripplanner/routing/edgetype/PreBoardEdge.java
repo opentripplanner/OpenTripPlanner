@@ -15,6 +15,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -32,18 +34,21 @@ public class PreBoardEdge extends FreeEdge {
     @Override
     public TraverseResult traverse(State s0, TraverseOptions options)
             throws NegativeWeightException {
-        State s1 = s0.clone();
 
-        if (s0.alightedLocal) {
+        StateData data = s0.getData();
+        if (data.isAlightedLocal()) {
             // can't alight from a local stop and board another
             return null;
         }
         TransitStop fromVertex = (TransitStop) getFromVertex();
-        if (fromVertex.isLocal() && s0.everBoarded) {
+        if (fromVertex.isLocal() && data.isEverBoarded()) {
             // can't board once one has alighted from a local stop
             return null;
         }
-        s1.everBoarded = true;
+        
+        Editor edit = s0.edit();
+        edit.setEverBoarded(true);
+        State s1 = edit.createState();
 
         return new TraverseResult(0, s1, this);
     }
@@ -51,14 +56,17 @@ public class PreBoardEdge extends FreeEdge {
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
-         State s1 = s0.clone();
+         
+        State s1 = s0;
 
         TransitStop fromVertex = (TransitStop) getFromVertex();
         if (fromVertex.isLocal()) {
-            s1.alightedLocal = true;
+            Editor editor = s0.edit();
+            editor.setAlightedLocal(true);
+            s1 = editor.createState();
         }
 
-        return new TraverseResult(0, s0, this);
+        return new TraverseResult(0, s1, this);
     }
 
 }

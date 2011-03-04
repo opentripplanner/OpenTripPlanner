@@ -23,6 +23,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
@@ -162,7 +163,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             return tryWalkBike(s0, options, back);
         }
 
-        State s1 = s0.clone();
+        
         double time = length / options.speed;
         double weight;
         if (options.wheelchairAccessible) {
@@ -186,9 +187,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             weight = time;
         }
         weight *= options.walkReluctance;
-        s1.walkDistance += length;
-        s1.incrementTimeInSeconds((int) (back ? -time : time));
-        return new TraverseResult(weight, s1, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        Editor editor = s0.edit();
+        editor.incrementWalkDistance(length);
+        editor.incrementTimeInSeconds((int) (back ? -time : time));
+        return new TraverseResult(weight, editor.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 
     private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
