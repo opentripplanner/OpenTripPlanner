@@ -102,8 +102,23 @@ otp.locale.English = {
         to_continue:    "to continue on",
         becomes:        "becomes",
         at:             "at",
-        circle_counterclockwise: "follow roundabout",
-        circle_clockwise:        "follow roundabout"
+        on:				"on",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+    
+    ordinal_exit:
+    {
+    	1:  "to first exit",
+    	2:  "to second exit",
+    	3:  "to third exit",
+    	4:  "to fourth exit",
+		5:  "to fifth exit",
+		6:  "to sixth exit",
+		7:  "to seventh exit",
+		8:  "to eighth exit",
+		9:  "to ninth exit",
+		10: "to tenth exit"
     },
 
     time:

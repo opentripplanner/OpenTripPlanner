@@ -590,13 +590,11 @@ public class Planner {
      * @return
      */
     private List<WalkStep> getWalkSteps(List<SPTEdge> edges) {
-
         List<WalkStep> steps = new ArrayList<WalkStep>();
-
         WalkStep step = null;
-
-        double lastAngle = 0, distance = 0;
-
+        double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
+        int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
+        
         for (SPTEdge sptEdge : edges) {
             Edge edge = sptEdge.payload;
             EdgeNarrative edgeResult = sptEdge.narrative;
@@ -612,57 +610,71 @@ public class Planner {
                 // first step
                 step = createWalkStep(sptEdge);
                 steps.add(step);
-
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
-
-                distance = edgeResult.getDistance();
+                // new step, set distance to length of first edge
+                distance = edgeResult.getDistance(); 
             } else if (step.streetName != streetName
                     && (step.streetName != null && !step.streetName.equals(streetName))) {
-                // change of street name
+                /* street name has changed */
+                if (roundaboutExit > 0) {
+                    // if we were just on a roundabout, 
+                    // make note of which exit was taken in the existing step
+                    step.exit = Integer.toString(roundaboutExit); // ordinal numbers from localization
+                    roundaboutExit = 0;
+                }
+                /* start a new step */
                 step = createWalkStep(sptEdge);
                 steps.add(step);
-
-                double thisAngle = DirectionUtils.getFirstAngle(geom);
-                step.setDirections(lastAngle, thisAngle);
-                step.becomes = !pathservice.multipleOptionsBefore(edge);
                 if (edgeResult.isRoundabout()) {
-                    step = createWalkStep(sptEdge);
-                    steps.add(step);
-                    step.relativeDirection = RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+                    // indicate that we are now on a roundabout
+                    // and use one-based exit numbering 
+                    roundaboutExit = 1;
                 }
+                double thisAngle = DirectionUtils.getFirstAngle(geom);
+                step.setDirections(lastAngle, thisAngle, edgeResult.isRoundabout());
+                step.becomes = !pathservice.multipleOptionsBefore(edge);
+                // new step, set distance to length of first edge
                 distance = edgeResult.getDistance();
             } else {
-                /* generate turn-to-stay-on directions, where needed */
+                /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
-                RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle);
-
-                if (direction == RelativeDirection.CONTINUE) {
-                    // append elevation info
+                RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle, edgeResult.isRoundabout());
+                boolean optionsBefore = pathservice.multipleOptionsBefore(edge);
+                if (edgeResult.isRoundabout()) {
+                    // we are on a roundabout, and have already traversed at least one edge of it.
+                    if (optionsBefore) {
+                        // increment exit count if we passed one.
+                        roundaboutExit += 1;
+                    } 
+                } 
+                if (edgeResult.isRoundabout() || direction == RelativeDirection.CONTINUE) {
+                    // we are continuing almost straight, or continuing along a roundabout.
+                    // just append elevation info onto the existing step.
                     if (step.elevation != null) {
                         String s = encodeElevationProfile(edge, distance);
                         if (step.elevation.length() > 0 && s != null && s.length() > 0)
                             step.elevation += ",";
                         step.elevation += s;
                     }
+                    // extending a step, increment the existing distance
                     distance += edgeResult.getDistance();
-                } else {
-                    // figure out if there was another way we could have turned
-                    boolean optionsBefore = pathservice.multipleOptionsBefore(edge);
+                } else { 
+                    // we are not on a roundabout, and not continuing straight through.
+                    // figure out if there were turn options at the last intersection.
                     if (optionsBefore) {
-                        // turn to stay on
+                        // turn to stay on same-named street
                         step = createWalkStep(sptEdge);
                         steps.add(step);
-                        step.setDirections(lastAngle, thisAngle);
+                        step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
+                        // new step, set distance to length of first edge
                         distance = edgeResult.getDistance();
                     }
                 }
-
             }
-
+            // increment the total length for this step
             step.distance += edgeResult.getDistance();
-
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;

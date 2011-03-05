@@ -529,7 +529,11 @@ otp.planner.Itinerary = {
                             }
                             else
                             {
-                                stepText += directionText + " " + this.locale.directions['at'] + ' <strong>' + step.streetName + '</strong>';
+                                stepText += directionText; 
+                                if (step.exit != null) {
+                            		stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
+                                }
+                                stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
                             }
                         }
                         stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';

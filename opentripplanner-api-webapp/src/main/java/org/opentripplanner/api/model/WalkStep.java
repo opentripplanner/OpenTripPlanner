@@ -91,8 +91,8 @@ public class WalkStep {
      */
     public String elevation;
     
-    public void setDirections(double lastAngle, double thisAngle) {
-        relativeDirection = getRelativeDirection(lastAngle, thisAngle);
+    public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
+        relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
         setAbsoluteDirection(thisAngle);
     }
 
@@ -104,13 +104,22 @@ public class WalkStep {
         return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 
-    public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle) {
+    public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle, boolean roundabout) {
 
         double angleDiff = thisAngle - lastAngle;
         if (angleDiff < 0) {
             angleDiff += Math.PI * 2;
         }
         double ccwAngleDiff = Math.PI * 2 - angleDiff;
+
+        if (roundabout) {
+            // roundabout: the direction we turn onto it implies the circling direction
+            if (angleDiff > ccwAngleDiff) {
+                return RelativeDirection.CIRCLE_CLOCKWISE; 
+            } else {
+                return RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+            }            
+        }
 
         // less than 0.3 rad counts as straight, to simplify walking instructions
         if (angleDiff < 0.3 || ccwAngleDiff < 0.3) {
