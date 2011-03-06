@@ -49,7 +49,7 @@ public class State {
     public StateData getData() {
         return data;
     }
-    
+
     public StateData.Editor edit() {
         Editor editor = data.edit();
         editor.setTime(time);
@@ -70,6 +70,17 @@ public class State {
     public State incrementTimeInSeconds(int numOfSeconds) {
         long t = this.time + numOfSeconds * 1000;
         return new State(t, this.data);
+    }
+
+    /**
+     * Create a new state with the specified time and the current state's data. The current state
+     * object is not modified.
+     * 
+     * @param time
+     * @return the new state
+     */
+    public State setTime(long time) {
+        return new State(time, this.data);
     }
 
     /**

@@ -24,11 +24,10 @@ public class StateData {
     private final boolean alightedLocal;
 
     private final boolean everBoarded;
-    
+
     private final Vertex previousStop;
 
     private final long lastAlightedTime;
-
 
     private final Map<Object, Object> extensions;
 
@@ -94,7 +93,7 @@ public class StateData {
     public boolean isEverBoarded() {
         return everBoarded;
     }
-    
+
     public Vertex getPreviousStop() {
         return previousStop;
     }
@@ -150,7 +149,7 @@ public class StateData {
         private boolean alightedLocal = false;
 
         private boolean everBoarded = false;
-        
+
         private Vertex previousStop;
 
         private long lastAlightedTime;
@@ -268,6 +267,28 @@ public class StateData {
 
         public void setExtensionsModified(boolean extensionsModified) {
             this.extensionsModified = extensionsModified;
+        }
+
+        /**
+         * Determine if a particular extension parameter is present for the specified key.
+         * 
+         * @param key
+         * @return
+         */
+        public boolean containsExtension(Object key) {
+            return extensions.containsKey(key);
+        }
+
+        /**
+         * Get the extension parameter with the specified key.
+         * 
+         * @param <T>
+         * @param key
+         * @return
+         */
+        @SuppressWarnings("unchecked")
+        public <T> T getExtension(Object key) {
+            return (T) extensions.get(key);
         }
 
         /**
