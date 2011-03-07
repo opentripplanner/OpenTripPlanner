@@ -161,7 +161,7 @@ public class StateData {
         private boolean created = false;
 
         private Editor() {
-
+            extensions = new HashMap<Object, Object>();
         }
 
         private Editor(StateData state) {
