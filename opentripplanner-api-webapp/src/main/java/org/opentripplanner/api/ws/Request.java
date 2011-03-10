@@ -88,6 +88,7 @@ public class Request implements RequestInf {
      * The complete list of parameters.
      */
     private final HashMap<String, String> parameters = new HashMap<String, String>();
+    private Integer minTransferTime;
 
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
@@ -347,5 +348,13 @@ public class Request implements RequestInf {
      */
     public boolean getShowIntermediateStops() {
         return showIntermediateStops;
+    }
+
+    public void setMinTransferTime(Integer minTransferTime) {
+        this.minTransferTime = minTransferTime;
+    }
+    
+    public Integer getMinTransferTime() {
+        return minTransferTime;
     }
 }

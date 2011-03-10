@@ -36,6 +36,7 @@ public interface RequestInf {
     public static String ARRIVE_BY = "arriveBy";
     public static String WALK_SPEED = "walkSpeed";
     public static String WHEELCHAIR = "wheelchair";
+    public static String MIN_TRANSFER_TIME = "minTransferTime";
 
     /**
      * @return the from

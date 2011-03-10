@@ -149,6 +149,7 @@ public class Planner {
             @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
+            @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
             @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
             throws JSONException {
@@ -167,7 +168,6 @@ public class Planner {
         request.setTo(toPlace);
         request.setDateTime(date, time);
         request.setWheelchair(wheelchair);
-
         if (numItineraries != null) {
             if (numItineraries > MAX_ITINERARIES) {
                 numItineraries = MAX_ITINERARIES;
@@ -193,6 +193,7 @@ public class Planner {
 
         request.setOptimize(optimize);
         request.setModes(modes);
+        request.setMinTransferTime(minTransferTime);
 
         /* use request to generate trip */
         Response response = new Response(request);
@@ -578,6 +579,9 @@ public class Planner {
         }
         if (request.getMaxWalkDistance() > 0) {
             options.maxWalkDistance = request.getMaxWalkDistance();
+        }
+        if (request.getMinTransferTime() != null) {
+            options.minTransferTime = request.getMinTransferTime();
         }
         return options;
     }
