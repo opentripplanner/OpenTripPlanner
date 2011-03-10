@@ -21,11 +21,15 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.StateData.Editor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,14 +49,23 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
     private boolean wheelchairAccessible;
 
+    private String zone;
+
+    private FareContext fareContext;
+
+    private Trip trip;
+
     public static final int SECS_IN_DAY = 86400;
 
     private static final long serialVersionUID = 2L;
 
-    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible) {
+    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible, String zone, Trip trip, FareContext fareContext) {
         super(startStation, startJourney);
         this.hop = hop;
 	this.wheelchairAccessible = wheelchairAccessible;
+	this.zone = zone;
+	this.trip = trip;
+	this.fareContext = fareContext;
     }
 
     public String getDirection() {
@@ -79,20 +92,45 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         return hop.getTrip();
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        if (!wo.getModes().contains(hop.getMode())) {
+    public TraverseResult traverse(State state0, TraverseOptions options) {
+        if (!options.getModes().contains(hop.getMode())) {
             return null;
         }
 
-	if (wo.wheelchairAccessible && !wheelchairAccessible) {
+	if (options.wheelchairAccessible && !wheelchairAccessible) {
 	    return null;
 	}
 
-        long currentTime = state0.getTime();
-        Date serviceDate = getServiceDate(currentTime, false);
-        int secondsSinceMidnight = (int) ((currentTime - serviceDate.getTime()) / 1000);
+        long current_time = state0.getTime();
+        long transfer_penalty = 0;
 
-        CalendarService service = wo.getCalendarService();
+        StateData data = state0.getData();
+        if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
+            TransferTable transferTable = options.getTransferTable();
+            
+            if (transferTable.hasPreferredTransfers()) {
+                transfer_penalty = options.baseTransferPenalty;
+            }
+            
+            int transfer_time = transferTable.getTransferTime(data.getPreviousStop(), getFromVertex());
+            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
+                transfer_time = options.minTransferTime;
+            }
+            if (transfer_time > 0 && transfer_time > (current_time - data.getLastAlightedTime()) * 1000) {
+                /* minimum time transfers */
+                current_time += data.getLastAlightedTime() + transfer_time * 1000;
+            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+                return null;
+            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
+                /* depenalize preferred transfers */
+                transfer_penalty = 0; 
+            }
+        }
+	
+	Date serviceDate = getServiceDate(current_time, false);
+        int secondsSinceMidnight = (int) ((current_time - serviceDate.getTime()) / 1000);
+
+        CalendarService service = options.getCalendarService();
         Set<ServiceDate> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
         if (!serviceDates.contains(serviceDate))
             return null;
@@ -102,8 +140,15 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             return null;
         }
 
-        State state1 = state0.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait, state1, this);
+        Editor editor = state0.edit();
+        editor.incrementTimeInSeconds(wait);
+        editor.incrementNumBoardings();
+        editor.setTripId(trip.getId());
+        editor.setZone(zone);
+        editor.setRoute(trip.getRoute().getId());
+        editor.setFareContext(fareContext);
+
+        return new TraverseResult(wait + options.boardCost + transfer_penalty, editor.createState(), this);
     }
 
     public TraverseResult traverseBack(State state0, TraverseOptions wo) {

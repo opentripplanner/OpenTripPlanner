@@ -757,12 +757,14 @@ public class GTFSPatternHopFactory {
 
             if (st0.getPickupType() != 1) {
                 Board boarding = new Board(startStation, startJourneyDepart, hop,
-                        tripWheelchairAccessible && s0.getWheelchairBoarding() != 0);
+                        tripWheelchairAccessible && s0.getWheelchairBoarding() != 0,
+                        st0.getStop().getZoneId(), trip, fareContext);
                 graph.addEdge(boarding);
             }
             if (st0.getDropOffType() != 1) {
                 graph.addEdge(new Alight(endJourneyArrive, endStation, hop, tripWheelchairAccessible
-                        && s1.getWheelchairBoarding() != 0));
+                        && s1.getWheelchairBoarding() != 0,
+                        st0.getStop().getZoneId(), trip, fareContext));
             }
         }
     }
