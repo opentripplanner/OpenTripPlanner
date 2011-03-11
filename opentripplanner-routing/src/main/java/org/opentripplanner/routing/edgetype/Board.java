@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
@@ -127,8 +126,8 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             }
         }
 	
-	Date serviceDate = getServiceDate(current_time, false);
-        int secondsSinceMidnight = (int) ((current_time - serviceDate.getTime()) / 1000);
+	ServiceDate serviceDate = getServiceDate(current_time);
+        int secondsSinceMidnight = (int) ((current_time - serviceDate.getAsDate().getTime()) / 1000);
 
         CalendarService service = options.getCalendarService();
         Set<ServiceDate> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
@@ -158,9 +157,8 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         return new TraverseResult(1, state0, this);
     }
 
-    private Date getServiceDate(long currentTime, boolean useArrival) {
-        int scheduleTime = useArrival ? hop.getEndStopTime().getArrivalTime() : hop
-                .getStartStopTime().getDepartureTime();
+    private ServiceDate getServiceDate(long currentTime) {
+        int scheduleTime = hop.getStartStopTime().getDepartureTime();
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(currentTime);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -170,6 +168,6 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
         int dayOverflow = scheduleTime / SECS_IN_DAY;
         c.add(Calendar.DAY_OF_YEAR, -dayOverflow);
-        return c.getTime();
+        return new ServiceDate(c.getTime());
     }
 }

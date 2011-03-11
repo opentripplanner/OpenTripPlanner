@@ -14,9 +14,9 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
@@ -131,8 +131,8 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             }
         }
 
-        Date serviceDate = getServiceDate(current_time, true);
-        int secondsSinceMidnight = (int) ((current_time - serviceDate.getTime()) / 1000);
+        ServiceDate serviceDate = getServiceDate(current_time);
+        int secondsSinceMidnight = (int) ((current_time - serviceDate.getAsDate().getTime()) / 1000);
 
         CalendarService service = options.getCalendarService();
         if (!service.getServiceDatesForServiceId(hop.getServiceId()).contains(serviceDate))
@@ -161,9 +161,8 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         return new TraverseResult(wait + options.boardCost + transfer_penalty, state1, this);
     }
 
-    private Date getServiceDate(long currentTime, boolean useArrival) {
-        int scheduleTime = useArrival ? hop.getEndStopTime().getArrivalTime() : hop
-                .getStartStopTime().getDepartureTime();
+    private ServiceDate getServiceDate(long currentTime) {
+        int scheduleTime = hop.getEndStopTime().getArrivalTime();
         Calendar c = Calendar.getInstance();
         c.setTimeInMillis(currentTime);
         c.set(Calendar.HOUR_OF_DAY, 0);
@@ -173,6 +172,6 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
         int dayOverflow = scheduleTime / Board.SECS_IN_DAY;
         c.add(Calendar.DAY_OF_YEAR, -dayOverflow);
-        return c.getTime();
+        return new ServiceDate(c.getTime());
     }
 }
