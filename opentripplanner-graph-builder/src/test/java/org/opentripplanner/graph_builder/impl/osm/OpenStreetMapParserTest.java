@@ -39,6 +39,24 @@ import org.opentripplanner.graph_builder.model.osm.OSMWay;
 
 public class OpenStreetMapParserTest {
     @Test
+    public void testAFBinaryParser() throws Exception {
+        AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.pbf").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testAFXMLParser() throws Exception {
+        AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
     public void testBinaryParser() throws Exception {
         BinaryFileBasedOpenStreetMapProviderImpl pr = new BinaryFileBasedOpenStreetMapProviderImpl();
         OSMMap map = new OSMMap();
