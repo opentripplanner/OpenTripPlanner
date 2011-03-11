@@ -117,7 +117,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         }
         
         ServiceDate service_date = getServiceDate(current_time, options.calendar);
-        ServiceDate service_date_testerday = getServiceDate(current_time - MILLI_IN_DAY, options.calendar);
+        ServiceDate service_date_yesterday = getServiceDate(current_time - MILLI_IN_DAY, options.calendar);
         int secondsSinceMidnight = (int) ((current_time - service_date.getAsDate().getTime()) / 1000);
 
         int wait = 1;
@@ -130,7 +130,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 wait = pattern.getArrivalTime(stopIndex, patternIndex) - secondsSinceMidnight;
             }
         }
-        if (options.serviceOn(service, service_date_testerday)) {
+        if (options.serviceOn(service, service_date_yesterday)) {
             // now, try to get the departure time on yesterday's schedule -- assuming that
             // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
             // when we get to the pattern(s) which do contain yesterday.
