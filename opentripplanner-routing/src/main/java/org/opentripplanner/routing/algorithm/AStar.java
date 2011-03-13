@@ -104,6 +104,7 @@ public class AStar {
         ShortestPathTree spt;
         if (options.getModes().getTransit()) {
             spt = new MultiShortestPathTree();
+            options.setServiceDays(init.getTime());
         } else {
             spt = new BasicShortestPathTree();
         }
@@ -228,6 +229,7 @@ public class AStar {
         ShortestPathTree spt;
         if (options.getModes().getTransit()) {
             spt = new MultiShortestPathTree();
+            options.setServiceDays(init.getTime());
         } else {
             spt = new BasicShortestPathTree();
         }

@@ -25,12 +25,15 @@ import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.StateData.Editor;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -45,9 +48,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
-    private static final long MILLI_IN_DAY = 24 * 60 * 60 * 1000;
-
-    private static final int SEC_IN_DAY = 24 * 60 * 60;
+    private static final Logger _log = LoggerFactory.getLogger(PatternBoard.class);
 
     private int stopIndex;
 
@@ -119,42 +120,41 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             }
         }
         
-        ServiceDate service_date = getServiceDate(current_time, options.calendar);
-        ServiceDate service_date_yesterday = getServiceDate(current_time - MILLI_IN_DAY, options.calendar);
-        int seconds_since_midnight = (int) ((current_time - service_date.getAsDate().getTime()) / 1000);
-
-        int wait = -1;
-        int patternIndex = -1;
-        AgencyAndId service = getPattern().getExemplar().getServiceId();
-        if (options.serviceOn(service, service_date)) {
-            // try to get the departure time on today's schedule
-            patternIndex = getPattern().getNextTrip(stopIndex, seconds_since_midnight, options.wheelchairAccessible, true);
-            if (patternIndex >= 0) {
-                wait = getPattern().getDepartureTime(stopIndex, patternIndex) - seconds_since_midnight;
-            }
-        }
-        if (options.serviceOn(service, service_date_yesterday)) {
-            // now, try to get the departure time on yesterday's schedule -- assuming that
-            // yesterday's is on the same schedule as today. If it's not, then we'll worry about it
-            // when we get to the pattern(s) which do contain yesterday.
-            int yesterday_pattern_index = getPattern().getNextTrip(stopIndex, seconds_since_midnight
-                    + SEC_IN_DAY, options.wheelchairAccessible, true);
-            if (yesterday_pattern_index >= 0) {
-                int wait_yesterday = getPattern().getDepartureTime(stopIndex, yesterday_pattern_index)
-                        - seconds_since_midnight - SEC_IN_DAY;
-                if (wait < 0 || wait_yesterday < wait) {
-                    // choose the better time
-                    wait = wait_yesterday;
-                    patternIndex = yesterday_pattern_index;
+        /* find next boarding time */
+        /* 
+         * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to initial state)
+         * if this pattern's serviceId is running look for the next boarding time
+         * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
+         */
+        int bestWait = -1;
+        int bestPatternIndex = -1;
+        AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+        for (ServiceDay sd : options.serviceDays) {
+            int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+            // only check for service on days that are not in the future
+            // this avoids unnecessarily examining tomorrow's services
+            if (secondsSinceMidnight < 0) continue; 
+            if (sd.serviceIdRunning(serviceId)) {
+                int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, true);
+                if (patternIndex >= 0) {
+                    // a trip was found, index is valid, wait will be non-negative
+                    int wait = (int) ((sd.time(getPattern().getDepartureTime(stopIndex, patternIndex)) - current_time) / 1000);
+                    if (wait < 0) _log.error("negative wait time on board");
+                    if (bestWait < 0 || wait < bestWait) {
+                        // track the soonest departure over all relevant schedules
+                        bestWait = wait;
+                        bestPatternIndex = patternIndex;
+                    }
                 }
+                
             }
         }
 
-        if (wait < 0) {
+        if (bestWait < 0) {
             return null;
         }
         
-        Trip trip = getPattern().getTrip(patternIndex);
+        Trip trip = getPattern().getTrip(bestPatternIndex);
         
         /* check if route banned for this plan */
         if (options.bannedRoutes != null) {
@@ -166,8 +166,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         }
         
         Editor editor = state0.edit();
-        editor.setTrip(patternIndex);
-        editor.incrementTimeInSeconds(wait);
+        editor.setTrip(bestPatternIndex);
+        editor.incrementTimeInSeconds(bestWait);
         editor.incrementNumBoardings();
         editor.setTripId(trip.getId());
         editor.setZone(getPattern().getZone(stopIndex));
@@ -179,7 +179,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             //via a formal transfer or by walking.
             transfer_penalty = options.optimizeTransferPenalty;
         }
-        long wait_cost = wait;
+        long wait_cost = bestWait;
         if (state0.getData().getNumBoardings() == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }

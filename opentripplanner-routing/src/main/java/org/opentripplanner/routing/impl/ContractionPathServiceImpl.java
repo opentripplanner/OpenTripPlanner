@@ -32,6 +32,7 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.RouteSpec;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -109,10 +110,11 @@ public class ContractionPathServiceImpl implements PathService {
         }
 
         State state = new State(targetTime.getTime());
-
+        
         if (_calendarService != null)
             options.setCalendarService(_calendarService);
         options.setTransferTable(hierarchies.getGraph().getTransferTable());
+        options.setServiceDays(state.getTime());
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();

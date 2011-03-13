@@ -14,9 +14,11 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -29,10 +31,14 @@ import org.opentripplanner.routing.algorithm.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.RemainingWeightHeuristic;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TraverseOptions implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3836092451659658815L;
+    
+    private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
     /** max speed along streets, in meters per second */
     public double speed;
@@ -130,6 +136,14 @@ public class TraverseOptions implements Serializable, Cloneable {
     private TransferTable transferTable;
 
     public long baseTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+
+    /* 
+     * Cache lists of which transit services run on which midnight-to-midnight periods
+     * This ties a TraverseOptions to a particular start time for the duration of a search
+     * so the same options cannot be used for multiple searches concurrently.
+     * To do so this cache would need to be moved into StateData, with all that entails. 
+     */
+    public List<ServiceDay> serviceDays;
 
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
@@ -309,4 +323,21 @@ public class TraverseOptions implements Serializable, Cloneable {
     public void setTransferTable(TransferTable transferTable) {
         this.transferTable = transferTable;
     }
+
+    public void setServiceDays(long time) {
+        final long MSEC_IN_DAY = 1000*60*60*24;
+        this.serviceDays = new ArrayList<ServiceDay>(3);
+        CalendarService cs = this.getCalendarService();
+        if (cs == null) {
+            _log.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
+            return;
+        }
+        // This should be a valid way to find yesterday and tomorrow,
+        // since DST changes more than one hour after midnight in US/EU.
+        // But is this true everywhere?
+        this.serviceDays.add(new ServiceDay(time - MSEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time, cs));
+        this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));        
+    }
+
 }
