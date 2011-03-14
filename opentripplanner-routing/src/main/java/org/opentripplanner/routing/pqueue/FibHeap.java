@@ -20,16 +20,6 @@ import java.util.Random;
 
 import org.opentripplanner.routing.spt.SPTVertex;
 
-interface AbstractDirectoryPriorityQueue<T> {
-    void insert(T payload, double key);
-
-    void insert_or_dec_key(T payload, double key);
-
-    T extract_min();
-
-    int size();
-}
-
 class FibNode<T> {
     boolean mark;
 
@@ -61,7 +51,7 @@ class FibNode<T> {
     }
 }
 
-public class FibHeap<T> implements AbstractDirectoryPriorityQueue<T> {
+public class FibHeap<T> implements DirectoryPriorityQueue<T> {
 
     int n;
 
