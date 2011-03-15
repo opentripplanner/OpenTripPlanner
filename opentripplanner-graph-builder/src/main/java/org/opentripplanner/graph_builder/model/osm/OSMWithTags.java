@@ -18,26 +18,106 @@ package org.opentripplanner.graph_builder.model.osm;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A base class for OSM entities containing common methods.
+ */
+
 public class OSMWithTags {
 
-  private Map<String, String> _tags = new HashMap<String, String>();
+  /* To save memory this is only created when an entity actually has tags. */
+  private Map<String, String> _tags;
 
   protected long id;
 
+  /**
+   * Gets the id.
+   */
   public long getId() {
     return id;
   }
 
+  /**
+   * Sets the id.
+   */
   public void setId(long id) {
     this.id = id;
   }
 
+  /**
+   * Adds a tag.
+   */
   public void addTag(OSMTag tag) {
+    if(_tags == null)
+      _tags = new HashMap<String, String>();
+
     _tags.put(tag.getK(), tag.getV());
   }
+
+  /**
+   * Adds a tag.
+   */
+  public void addTag(String key, String value) {
+    if(key == null || value == null)
+      return;
+
+    if(_tags == null)
+      _tags = new HashMap<String, String>();
+
+    _tags.put(key, value);
+  }
   
+  /**
+   * The tags of an entity.
+   */
   public Map<String,String> getTags() {
     return _tags;
+  }
+
+  /**
+   * Is the tag defined?
+   */
+  public boolean hasTag(String tag) {
+    return _tags != null && _tags.containsKey(tag);
+  }
+
+  /**
+   * Determines if a tag contains a false value. 'no', 'false', and '0' are considered false.
+   */
+  public boolean isTagFalse(String tag) {
+    if(_tags == null)
+      return false;
+
+    return ("no".equals(getTag(tag)) || "0".equals(getTag(tag)) || "false".equals(getTag(tag)));
+  }
+
+  /**
+   * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
+   */
+  public boolean isTagTrue(String tag) {
+    if(_tags == null)
+      return false;
+
+    return ("yes".equals(getTag(tag)) || "1".equals(getTag(tag)) || "true".equals(getTag(tag)));
+  }
+
+  /**
+   * Gets a tag's value.
+   */
+  public String getTag(String tag) {
+    if(_tags != null && _tags.containsKey(tag))
+      return _tags.get(tag);
+
+    return null;
+  }
+
+  /**
+   * Checks is a tag contains the specified value.
+   */
+  public Boolean isTag(String tag, String value) {
+    if(_tags != null && _tags.containsKey(tag) && value != null)
+      return value.equals(_tags.get(tag));
+
+    return false;
   }
 
   /** Returns a name-like value for an entity (if one exists). The otp: namespaced

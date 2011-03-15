@@ -175,8 +175,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 String key = tag.substring(0, ch_eq), value = tag.substring(ch_eq + 1);
                 _slopeOverrideTags.add(new P2<String>(key, value));
             } 
-		}
-	}
+        }
+    }
 
     public void setCreativeNaming(LinkedHashMap<String, String> mappy) {
         for(String taglist : mappy.keySet()) {
@@ -466,8 +466,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_ways.containsKey(way.getId()))
                 return;
 
-            if (!(way.getTags().containsKey("highway") || "platform".equals(way.getTags().get(
-                    "railway")))) {
+            if (!(way.hasTag("highway") || "platform".equals(way.getTag("railway")))) {
+                return;
+            }
+
+            if ("conveyor".equals(way.getTag("highway")) || "proposed".equals(way.getTag(
+                    "highway"))) {
                 return;
             }
 
@@ -482,7 +486,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             /* Currently only type=route;route=road relations are handled */
-            if (!("route".equals(relation.getTags().get("type")) && "road".equals(relation.getTags().get("route")))) {
+            if (!("route".equals(relation.getTag("type")) && "road".equals(relation.getTag("route")))) {
                 return;
             }
 
@@ -496,23 +500,24 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /** Copies useful metadata from relations to the relavant ways/nodes.
          */
         private void processRelations() {
-			_log.debug("Processing relations...");
+            _log.debug("Processing relations...");
+
             for(OSMRelation relation : _relations.values()) {
                 for( OSMRelationMember member : relation.getMembers()) {
                     if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
                         OSMWay way = _ways.get(member.getRef());
-                        if(relation.getTags().containsKey("name")) {
-                            if(way.getTags().containsKey("otp:route_name")) {
-                                way.addTag(new OSMTag("otp:route_name", way.getTags().get("otp:route_name") + ", " + relation.getTags().get("name")));
+                        if(relation.hasTag("name")) {
+                            if(way.hasTag("otp:route_name")) {
+                                way.addTag(new OSMTag("otp:route_name", way.getTag("otp:route_name") + ", " + relation.getTag("name")));
                             } else {
-                                way.addTag(new OSMTag("otp:route_name", relation.getTags().get("name")));
+                                way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
                             }
                         }
-                        if(relation.getTags().containsKey("ref")) {
-                            if(way.getTags().containsKey("otp:route_ref")) {
-                                way.addTag(new OSMTag("otp:route_ref", way.getTags().get("otp:route_ref") + ", " + relation.getTags().get("ref")));
+                        if(relation.hasTag("ref")) {
+                            if(way.hasTag("otp:route_ref")) {
+                                way.addTag(new OSMTag("otp:route_ref", way.getTag("otp:route_ref") + ", " + relation.getTag("ref")));
                             } else {
-                                way.addTag(new OSMTag("otp:route_ref", relation.getTags().get("ref")));
+                                way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
                             }
                         }
                     }
@@ -530,7 +535,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Pattern p = Pattern.compile("\\{(.+?)\\}");
             Matcher m = p.matcher("");
 
-			_log.debug("Generating creative names...");
+            _log.debug("Generating creative names...");
 
             for(OSMWay way : _ways.values()) {
                 Map<String, String> tags = way.getTags();
@@ -582,10 +587,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if(kv.wildcard) {
                             if(key_map.containsKey(kv.key)) {
                                 hope.retainAll(key_map.get(kv.key));
+                            } else {
+                                hope.clear();
                             }
                         } else {
                             if(keyvalue_map.containsKey(kv)) {
                                 hope.retainAll(keyvalue_map.get(kv));
+                            } else {
+                                hope.clear();
                             }
                         }
                     }
@@ -601,10 +610,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     for(String key : replace.keySet()) {
                         Matcher nm = replace.get(key);
                         nm.reset(gen_name);
-                        gen_name = nm.replaceAll(way.getTags().get(key));
+                        gen_name = nm.replaceAll(way.getTag(key));
                     }
 
-                    way.getTags().put("otp:gen_name", gen_name);
+                    way.addTag(new OSMTag("otp:gen_name", gen_name));
                     processed_ways.add(way);
                     _log.debug("generated name: " + way + " >> " + gen_name);
                 }
@@ -647,16 +656,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * bidirectional for pedestrians only.
              */
 
-            if ("yes".equals(tags.get("oneway"))
-                    && ("no".equals(tags.get("oneway:bicycle"))
+            if (way.isTagTrue("oneway") && way.isTagFalse(tags.get("oneway:bicycle"))
                             || "opposite_lane".equals(tags.get("cycleway")) || "opposite"
-                            .equals(tags.get("cycleway")))) { // 2.
+                            .equals(tags.get("cycleway"))) { // 2.
                 street = getEdgeForStreet(start, end, way, startNode, d, permissions, geometry,
                         false);
                 if (permissions.remove(StreetTraversalPermission.CAR) != StreetTraversalPermission.NONE)
                     backStreet = getEdgeForStreet(end, start, way, startNode, d, permissions
                             .remove(StreetTraversalPermission.CAR), backGeometry, true);
-            } else if ("yes".equals(tags.get("oneway"))
+            } else if (way.isTagTrue("oneway")
                     || "roundabout".equals(tags.get("junction"))) { // 3
                 street = getEdgeForStreet(start, end, way, startNode, d, permissions, geometry,
                         false);
@@ -708,20 +716,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             PlainStreetEdge street = new PlainStreetEdge(start, end, geometry, name, length,
                     permissions, back);
             street.setId(id);
+
             /* TODO: This should probably generalized somehow? */
-            if ("no".equals(way.getTags().get("wheelchair"))
-                    || ("steps".equals(way.getTags().get("highway")) && !"yes".equals(way.getTags()
-                            .get("wheelchair")))) {
+            if (way.isTagFalse("wheelchair") || ("steps".equals(way.getTag("highway")) && !way.isTagTrue("wheelchair"))) {
                 street.setWheelchairAccessible(false);
             }
             
             Map<String, String> tags = way.getTags();
-            for (P2<String> kvp : _slopeOverrideTags) {
-                String key = kvp.getFirst();
-                String value = kvp.getSecond();
-                if (value.equals(tags.get(key))) {
-                    street.setSlopeOverride(true);
-                    break;
+            if(tags != null) {
+                for (P2<String> kvp : _slopeOverrideTags) {
+                    String key = kvp.getFirst();
+                    String value = kvp.getSecond();
+                    if (value.equals(tags.get(key))) {
+                        street.setSlopeOverride(true);
+                        break;
+                    }
                 }
             }
 
@@ -732,11 +741,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Map<String, String> tags = entity.getTags();
             StreetTraversalPermission def = null;
             StreetTraversalPermission permission = null;
-
-            String access = tags.get("access");
-            String motorcar = tags.get("motorcar");
-            String bicycle = tags.get("bicycle");
-            String foot = tags.get("foot");
 
             for (KeyValuePermission kvp : _tagPermissions.values()) {
                 if (tags.containsKey(kvp.key) && kvp.value.equals(tags.get(kvp.key))) {
@@ -762,6 +766,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     def = StreetTraversalPermission.ALL;
                 }
             }
+
+            String access = tags.get("access");
+            String motorcar = tags.get("motorcar");
+            String bicycle = tags.get("bicycle");
+            String foot = tags.get("foot");
 
             /*
              * Only access=*, motorcar=*, bicycle=*, and foot=* is examined, since those are the

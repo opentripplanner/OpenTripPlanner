@@ -14,6 +14,9 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import java.io.InputStream;
 import java.util.List;
@@ -54,6 +57,19 @@ public class OpenStreetMapParserTest {
         assertEquals("tram_stop", tags.get("railway"));
         assertEquals("survey", tags.get("source"));
         assertEquals("1", tags.get("layer"));
+
+        OSMNode nodeC = map.getNodeForId(299769943);
+        assertTrue(nodeC.hasTag("name"));
+        assertNull(nodeC.getTag("not-existing-tag"));
+        assertEquals("Apteka Junikowska", nodeC.getTag("name"));
+        assertTrue(nodeC.isTagTrue("dispensing"));
+        assertFalse(nodeC.isTagFalse("dispensing"));
+        assertFalse(nodeC.isTagTrue("not-existing-tag"));
+        assertFalse(nodeC.isTagFalse("not-existing-tag"));
+
+        OSMNode nodeD = map.getNodeForId(338912397);
+        assertTrue(nodeD.isTagFalse("dispensing"));
+        assertFalse(nodeD.isTagTrue("dispensing"));
 
         Map<Long, OSMWay> ways = map.getWays();
         assertEquals(1511, ways.size());
