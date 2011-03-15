@@ -24,32 +24,32 @@ import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandle
 
 public class OSMMap implements OpenStreetMapContentHandler {
 
-  private Map<Integer, OSMNode> _nodes = new HashMap<Integer, OSMNode>();
+  private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
-  private Map<Integer, OSMWay> _ways = new HashMap<Integer, OSMWay>();
+  private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
 
-  private Map<Integer, OSMRelation> _relations = new HashMap<Integer, OSMRelation>();
+  private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
 
-  public Map<Integer, OSMNode> getNodes() {
+  public Map<Long, OSMNode> getNodes() {
     return _nodes;
   }
 
-  public OSMNode getNodeForId(int nodeId) {
+  public OSMNode getNodeForId(long nodeId) {
     return _nodes.get(nodeId);
   }
 
-  public Map<Integer, OSMWay> getWays() {
+  public Map<Long, OSMWay> getWays() {
     return _ways;
   }
   
-  public OSMWay getWayForId(int wayId) {
+  public OSMWay getWayForId(long wayId) {
       return _ways.get(wayId);
   }
 
   public void pruneUnusedNodes() {
-    Set<Integer> nodes = new HashSet<Integer>();
+    Set<Long> nodes = new HashSet<Long>();
     for (OSMWay way : _ways.values()) {
-      for (int id : way.getNodeRefs())
+      for (long id : way.getNodeRefs())
         nodes.add(id);
     }
     _nodes.keySet().retainAll(nodes);

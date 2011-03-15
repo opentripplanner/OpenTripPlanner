@@ -18,19 +18,9 @@ package org.opentripplanner.graph_builder.model.osm;
 
 public class OSMNode extends OSMWithTags {
 
-  private int id;
-
   private double lat;
 
   private double lon;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
 
   public double getLat() {
     return lat;

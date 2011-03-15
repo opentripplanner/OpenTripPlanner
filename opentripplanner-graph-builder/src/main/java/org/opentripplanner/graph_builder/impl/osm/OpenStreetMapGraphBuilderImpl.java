@@ -251,19 +251,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private class Handler implements OpenStreetMapContentHandler {
 
-        private Map<Integer, OSMNode> _nodes = new HashMap<Integer, OSMNode>();
+        private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
-        private Map<Integer, OSMWay> _ways = new HashMap<Integer, OSMWay>();
+        private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
 
-        private Map<Integer, OSMRelation> _relations = new HashMap<Integer, OSMRelation>();
+        private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
 
         public void buildGraph(Graph graph) {
 
             // We want to prune nodes that don't have any edges
-            Set<Integer> nodesWithNeighbors = new HashSet<Integer>();
+            Set<Long> nodesWithNeighbors = new HashSet<Long>();
 
             for (OSMWay way : _ways.values()) {
-                List<Integer> nodes = way.getNodeRefs();
+                List<Long> nodes = way.getNodeRefs();
                 if (nodes.size() > 1)
                     nodesWithNeighbors.addAll(nodes);
             }
@@ -273,17 +273,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             pruneFloatingIslands();
 
-            int wayIndex = 0;
+            long wayIndex = 0;
 
             processRelations();
             createUsefulNames();
 
             // figure out which nodes that are actually intersections
-            Set<Integer> possibleIntersectionNodes = new HashSet<Integer>();
-            Set<Integer> intersectionNodes = new HashSet<Integer>();
+            Set<Long> possibleIntersectionNodes = new HashSet<Long>();
+            Set<Long> intersectionNodes = new HashSet<Long>();
             for (OSMWay way : _ways.values()) {
-                List<Integer> nodes = way.getNodeRefs();
-                for (int node : nodes) {
+                List<Long> nodes = way.getNodeRefs();
+                for (long node : nodes) {
                     if (possibleIntersectionNodes.contains(node)) {
                         intersectionNodes.add(node);
                     } else {
@@ -305,7 +305,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
 
-                List<Integer> nodes = way.getNodeRefs();
+                List<Long> nodes = way.getNodeRefs();
 
                 Vertex startEndpoint = null, endEndpoint = null;
 
@@ -317,10 +317,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                  * nodes which are shared, create endpoints and StreetVertex instances.
                  */
 
-                Integer startNode = null;
+                Long startNode = null;
                 OSMNode osmStartNode = null;
                 for (int i = 0; i < nodes.size() - 1; i++) {
-                    Integer endNode = nodes.get(i + 1);
+                    Long endNode = nodes.get(i + 1);
                     if (osmStartNode == null) {
                         startNode = nodes.get(i);
                         osmStartNode = _nodes.get(startNode);
@@ -403,45 +403,45 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private void pruneFloatingIslands() {
-            Map<Integer, HashSet<Integer>> subgraphs = new HashMap<Integer, HashSet<Integer>>();
-            Map<Integer, ArrayList<Integer>> neighborsForNode = new HashMap<Integer, ArrayList<Integer>>();
+            Map<Long, HashSet<Long>> subgraphs = new HashMap<Long, HashSet<Long>>();
+            Map<Long, ArrayList<Long>> neighborsForNode = new HashMap<Long, ArrayList<Long>>();
             for (OSMWay way : _ways.values()) {
-                List<Integer> nodes = way.getNodeRefs();
-                for (int node : nodes) {
-                    ArrayList<Integer> nodelist = neighborsForNode.get(node);
+                List<Long> nodes = way.getNodeRefs();
+                for (long node : nodes) {
+                    ArrayList<Long> nodelist = neighborsForNode.get(node);
                     if (nodelist == null) {
-                        nodelist = new ArrayList<Integer>();
+                        nodelist = new ArrayList<Long>();
                         neighborsForNode.put(node, nodelist);
                     }
                     nodelist.addAll(nodes);
                 }
             }
             /* associate each node with a subgraph */
-            for (int node : _nodes.keySet()) {
+            for (long node : _nodes.keySet()) {
                 if (subgraphs.containsKey(node)) {
                     continue;
                 }
-                HashSet<Integer> subgraph = computeConnectedSubgraph(neighborsForNode, node);
-                for (int subnode : subgraph) {
+                HashSet<Long> subgraph = computeConnectedSubgraph(neighborsForNode, node);
+                for (long subnode : subgraph) {
                     subgraphs.put(subnode, subgraph);
                 }
             }
             /* remove all tiny subgraphs */
-            for (HashSet<Integer> subgraph : subgraphs.values()) {
+            for (HashSet<Long> subgraph : subgraphs.values()) {
                 if (subgraph.size() < 20) {
                     _nodes.keySet().removeAll(subgraph);
                 }
             }
         }
 
-        private HashSet<Integer> computeConnectedSubgraph(
-                Map<Integer, ArrayList<Integer>> neighborsForNode, int startNode) {
-            HashSet<Integer> subgraph = new HashSet<Integer>();
-            Queue<Integer> q = new LinkedList<Integer>();
+        private HashSet<Long> computeConnectedSubgraph(
+                Map<Long, ArrayList<Long>> neighborsForNode, long startNode) {
+            HashSet<Long> subgraph = new HashSet<Long>();
+            Queue<Long> q = new LinkedList<Long>();
             q.add(startNode);
             while (!q.isEmpty()) {
-                int node = q.poll();
-                for (int neighbor : neighborsForNode.get(node)) {
+                long node = q.poll();
+                for (long neighbor : neighborsForNode.get(node)) {
                     if (!subgraph.contains(neighbor)) {
                         subgraph.add(neighbor);
                         q.add(neighbor);
@@ -611,7 +611,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        private String getVertexIdForNodeId(int nodeId) {
+        private String getVertexIdForNodeId(long nodeId) {
             return "osm node " + nodeId;
         }
 
@@ -624,7 +624,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<PlainStreetEdge> getEdgesForStreet(Vertex start, Vertex end, OSMWay way,
-                int startNode, StreetTraversalPermission permissions, LineString geometry) {
+                long startNode, StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length in meters, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
@@ -695,7 +695,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private PlainStreetEdge getEdgeForStreet(Vertex start, Vertex end, OSMWay way,
-                int startNode, double length, StreetTraversalPermission permissions,
+                long startNode, double length, StreetTraversalPermission permissions,
                 LineString geometry, boolean back) {
 
             String id = "way " + way.getId() + " from " + startNode;

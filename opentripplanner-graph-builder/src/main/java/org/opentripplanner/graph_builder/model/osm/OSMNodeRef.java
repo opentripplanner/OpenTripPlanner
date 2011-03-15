@@ -18,13 +18,13 @@ package org.opentripplanner.graph_builder.model.osm;
 
 public class OSMNodeRef {
 
-  private int ref;
+  private long ref;
 
-  public int getRef() {
+  public long getRef() {
     return ref;
   }
 
-  public void setRef(int ref) {
+  public void setRef(long ref) {
     this.ref = ref;
   }
 }

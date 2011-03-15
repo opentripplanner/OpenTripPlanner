@@ -34,7 +34,7 @@ public class OpenStreetMapParserTest {
         OSMMap map = new OSMMap();
         parser.parseMap(in, map);
 
-        Map<Integer, OSMNode> nodes = map.getNodes();
+        Map<Long, OSMNode> nodes = map.getNodes();
         assertEquals(7197, nodes.size());
 
         OSMNode nodeA = map.getNodeForId(27308461);
@@ -55,15 +55,15 @@ public class OpenStreetMapParserTest {
         assertEquals("survey", tags.get("source"));
         assertEquals("1", tags.get("layer"));
 
-        Map<Integer, OSMWay> ways = map.getWays();
+        Map<Long, OSMWay> ways = map.getWays();
         assertEquals(1511, ways.size());
 
         OSMWay wayA = map.getWayForId(13490353);
         assertEquals(13490353, wayA.getId());
-        List<Integer> nodeRefsA = wayA.getNodeRefs();
+        List<Long> nodeRefsA = wayA.getNodeRefs();
         assertEquals(2, nodeRefsA.size());
-        assertEquals(123978834, nodeRefsA.get(0).intValue());
-        assertEquals(123980465, nodeRefsA.get(1).intValue());
+        assertEquals(123978834, nodeRefsA.get(0).longValue());
+        assertEquals(123980465, nodeRefsA.get(1).longValue());
         tags = wayA.getTags();
         assertEquals("Potlatch 0.9a", tags.get("created_by"));
         assertEquals("secondary", tags.get("highway"));

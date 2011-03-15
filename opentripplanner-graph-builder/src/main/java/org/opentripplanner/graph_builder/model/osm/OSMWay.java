@@ -21,23 +21,17 @@ import java.util.List;
 
 public class OSMWay extends OSMWithTags {
 
-  private List<Integer> _nodes = new ArrayList<Integer>();
-
-  private int id;
-
-  public int getId() {
-    return id;
-  }
-
-  public void setId(int id) {
-    this.id = id;
-  }
+  private List<Long> _nodes = new ArrayList<Long>();
 
   public void addNodeRef(OSMNodeRef nodeRef) {
     _nodes.add(nodeRef.getRef());
   }
 
-  public List<Integer> getNodeRefs() {
+  public void addNodeRef(long nodeRef) {
+    _nodes.add(nodeRef);
+  }
+
+  public List<Long> getNodeRefs() {
     return _nodes;
   }
 

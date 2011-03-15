@@ -17,7 +17,7 @@ public class OSMRelationMember {
 
   private String type;
 
-  private int ref;
+  private long ref;
 
   private String role;
 
@@ -29,11 +29,11 @@ public class OSMRelationMember {
     this.type = type;
   }
 
-  public int getRef() {
+  public long getRef() {
     return ref;
   }
 
-  public void setRef(int ref) {
+  public void setRef(long ref) {
     this.ref = ref;
   }
 

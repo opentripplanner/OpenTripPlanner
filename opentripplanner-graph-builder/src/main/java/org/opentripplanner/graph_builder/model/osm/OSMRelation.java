@@ -20,17 +20,7 @@ import java.util.List;
 
 public class OSMRelation extends OSMWithTags {
 
-  private int _id;
-
   private List<OSMRelationMember> _members = new ArrayList<OSMRelationMember>();
-
-  public int getId() {
-    return _id;
-  }
-
-  public void setId(int id) {
-    _id = id;
-  }
 
   public void addMember(OSMRelationMember member) {
     _members.add(member);
@@ -41,6 +31,6 @@ public class OSMRelation extends OSMWithTags {
   }
 
   public String toString() {
-    return "osm relation " + _id;
+    return "osm relation " + id;
   }
 }

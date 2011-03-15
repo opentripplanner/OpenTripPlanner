@@ -59,7 +59,7 @@ public class OpenStreetMapParser {
                 if (element.getTagName().equals("node")) {
                     OSMNode osmNode = new OSMNode();
                     
-                    osmNode.setId(Integer.parseInt(element.getAttribute("id")));
+                    osmNode.setId(Long.parseLong(element.getAttribute("id")));
                     osmNode.setLat(Double.parseDouble(element.getAttribute("lat")));
                     osmNode.setLon(Double.parseDouble(element.getAttribute("lon")));
                     
@@ -67,7 +67,7 @@ public class OpenStreetMapParser {
                     map.addNode(osmNode);
                 } else if (element.getTagName().equals("way")) {
                     OSMWay osmWay = new OSMWay();
-                    osmWay.setId(Integer.parseInt(element.getAttribute("id")));
+                    osmWay.setId(Long.parseLong(element.getAttribute("id")));
                     processTags(osmWay, element);
                     
                     Node node2 = element.getFirstChild();
@@ -79,7 +79,7 @@ public class OpenStreetMapParser {
                         Element element2 = (Element) node2;
                         if (element2.getNodeName().equals("nd")) {
                             OSMNodeRef nodeRef = new OSMNodeRef();
-                            nodeRef.setRef(Integer.parseInt(element2.getAttribute("ref")));
+                            nodeRef.setRef(Long.parseLong(element2.getAttribute("ref")));
                             osmWay.addNodeRef(nodeRef);
                         }
                         node2 = node2.getNextSibling();

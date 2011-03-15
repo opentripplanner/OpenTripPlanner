@@ -74,28 +74,28 @@ public class StreamedOpenStreetMapParser {
                 StartElement element = xmlEvent.asStartElement();
                 if (element.getName().equals(qNode)) {
                     osmNode = new OSMNode();
-                    osmNode.setId(Integer.parseInt(element.getAttributeByName(qId).getValue()));
+                    osmNode.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
                     osmNode.setLat(Double.parseDouble(element.getAttributeByName(qLat).getValue()));
                     osmNode.setLon(Double.parseDouble(element.getAttributeByName(qLon).getValue()));
                     
                 } else if (element.getName().equals(qWay)) {
                     osmWay = new OSMWay();
-                    osmWay.setId(Integer.parseInt(element.getAttributeByName(qId).getValue()));
+                    osmWay.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
                     
                 } else if (element.getName().equals(qRelation)) {
                     osmRelation = new OSMRelation();
-                    osmRelation.setId(Integer.parseInt(element.getAttributeByName(qId).getValue()));
+                    osmRelation.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
 
                 } else if (element.getName().equals(qMember)) {
                     OSMRelationMember relMember = new OSMRelationMember();
                     relMember.setType(element.getAttributeByName(qType).getValue());
                     relMember.setRole(element.getAttributeByName(qRole).getValue());
-                    relMember.setRef(Integer.parseInt(element.getAttributeByName(qRef).getValue()));
+                    relMember.setRef(Long.parseLong(element.getAttributeByName(qRef).getValue()));
                     osmRelation.addMember(relMember);
 
                 } else if (element.getName().equals(qNd)) {
                     OSMNodeRef nodeRef = new OSMNodeRef();
-                    nodeRef.setRef(Integer.parseInt(element.getAttributeByName(qRef).getValue()));
+                    nodeRef.setRef(Long.parseLong(element.getAttributeByName(qRef).getValue()));
                     osmWay.addNodeRef(nodeRef);
                     
                 } else if (element.getName().equals(qTag)) {
