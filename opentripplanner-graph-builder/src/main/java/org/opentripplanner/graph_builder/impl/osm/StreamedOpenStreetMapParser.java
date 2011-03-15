@@ -55,10 +55,15 @@ public class StreamedOpenStreetMapParser {
     public static void parseMap(final File path, OpenStreetMapContentHandler map) throws IOException,
             XMLStreamException {
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
-        parseMap(in, map);
+        parseMap(in, map, false);
+
+        map.secondPhase();
+
+        in = new BufferedInputStream(new FileInputStream(path));
+        parseMap(in, map, true);
     }
 
-    public static void parseMap(final InputStream in, OpenStreetMapContentHandler map) throws IOException,
+    public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, boolean onlyNodes) throws IOException,
             XMLStreamException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -72,28 +77,28 @@ public class StreamedOpenStreetMapParser {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 StartElement element = xmlEvent.asStartElement();
-                if (element.getName().equals(qNode)) {
+                if (onlyNodes && element.getName().equals(qNode)) {
                     osmNode = new OSMNode();
                     osmNode.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
                     osmNode.setLat(Double.parseDouble(element.getAttributeByName(qLat).getValue()));
                     osmNode.setLon(Double.parseDouble(element.getAttributeByName(qLon).getValue()));
                     
-                } else if (element.getName().equals(qWay)) {
+                } else if (!onlyNodes && element.getName().equals(qWay)) {
                     osmWay = new OSMWay();
                     osmWay.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
                     
-                } else if (element.getName().equals(qRelation)) {
+                } else if (!onlyNodes && element.getName().equals(qRelation)) {
                     osmRelation = new OSMRelation();
                     osmRelation.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
 
-                } else if (element.getName().equals(qMember)) {
+                } else if (osmRelation != null && element.getName().equals(qMember)) {
                     OSMRelationMember relMember = new OSMRelationMember();
                     relMember.setType(element.getAttributeByName(qType).getValue());
                     relMember.setRole(element.getAttributeByName(qRole).getValue());
                     relMember.setRef(Long.parseLong(element.getAttributeByName(qRef).getValue()));
                     osmRelation.addMember(relMember);
 
-                } else if (element.getName().equals(qNd)) {
+                } else if (osmWay != null && element.getName().equals(qNd)) {
                     OSMNodeRef nodeRef = new OSMNodeRef();
                     nodeRef.setRef(Long.parseLong(element.getAttributeByName(qRef).getValue()));
                     osmWay.addNodeRef(nodeRef);
@@ -118,13 +123,13 @@ public class StreamedOpenStreetMapParser {
 
             } else if (xmlEvent.isEndElement()) {
                 EndElement element = xmlEvent.asEndElement();
-                if (element.getName().equals(qNode)) {
+                if (osmNode != null && element.getName().equals(qNode)) {
                     map.addNode(osmNode);
                     osmNode = null;
-                }  else if (element.getName().equals(qWay)) {
+                }  else if (osmWay != null && element.getName().equals(qWay)) {
                     map.addWay(osmWay);
                     osmWay = null;
-                }  else if (element.getName().equals(qRelation)) {
+                }  else if (osmRelation != null && element.getName().equals(qRelation)) {
                     map.addRelation(osmRelation);
                     osmRelation = null;
                 }

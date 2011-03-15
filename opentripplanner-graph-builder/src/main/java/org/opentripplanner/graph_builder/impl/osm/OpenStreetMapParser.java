@@ -17,6 +17,8 @@ import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMNodeRef;
 import org.opentripplanner.graph_builder.model.osm.OSMTag;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.OSMRelation;
+import org.opentripplanner.graph_builder.model.osm.OSMRelationMember;
 import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.w3c.dom.Document;
@@ -44,53 +46,82 @@ public class OpenStreetMapParser {
 
     public void parseMap(InputStream in, OpenStreetMapContentHandler map) throws IOException,
             SAXException {
-        /* todo: process relations */
+
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(in);
-            Node osm = doc.getFirstChild();
-            Node node = osm.getFirstChild();
-            while (node != null) {
-                if (!(node instanceof Element)) {
-                    node = node.getNextSibling();
-                    continue;
-                }
-                Element element = (Element) node;
-                if (element.getTagName().equals("node")) {
-                    OSMNode osmNode = new OSMNode();
-                    
-                    osmNode.setId(Long.parseLong(element.getAttribute("id")));
-                    osmNode.setLat(Double.parseDouble(element.getAttribute("lat")));
-                    osmNode.setLon(Double.parseDouble(element.getAttribute("lon")));
-                    
-                    processTags(osmNode, element);
-                    map.addNode(osmNode);
-                } else if (element.getTagName().equals("way")) {
-                    OSMWay osmWay = new OSMWay();
-                    osmWay.setId(Long.parseLong(element.getAttribute("id")));
-                    processTags(osmWay, element);
-                    
-                    Node node2 = element.getFirstChild();
-                    while (node2 != null) {
-                        if (!(node2 instanceof Element)) {
-                            node2 = node2.getNextSibling();
-                            continue;
-                        }
-                        Element element2 = (Element) node2;
-                        if (element2.getNodeName().equals("nd")) {
-                            OSMNodeRef nodeRef = new OSMNodeRef();
-                            nodeRef.setRef(Long.parseLong(element2.getAttribute("ref")));
-                            osmWay.addNodeRef(nodeRef);
-                        }
-                        node2 = node2.getNextSibling();
-                    }
-                    
-                    map.addWay(osmWay);
-                }
-                node = node.getNextSibling();
-            }
+            processDocument(doc, map, false);
+            map.secondPhase();
+            processDocument(doc, map, true);
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    private void processDocument(Document doc, OpenStreetMapContentHandler map, boolean nodesOnly) {
+        Node osm = doc.getFirstChild();
+        Node node = osm.getFirstChild();
+        while (node != null) {
+            if (!(node instanceof Element)) {
+                node = node.getNextSibling();
+                continue;
+            }
+            Element element = (Element) node;
+            if (nodesOnly && element.getTagName().equals("node")) {
+                OSMNode osmNode = new OSMNode();
+                
+                osmNode.setId(Long.parseLong(element.getAttribute("id")));
+                osmNode.setLat(Double.parseDouble(element.getAttribute("lat")));
+                osmNode.setLon(Double.parseDouble(element.getAttribute("lon")));
+                
+                processTags(osmNode, element);
+                map.addNode(osmNode);
+            } else if (!nodesOnly && element.getTagName().equals("way")) {
+                OSMWay osmWay = new OSMWay();
+                osmWay.setId(Long.parseLong(element.getAttribute("id")));
+                processTags(osmWay, element);
+                
+                Node node2 = element.getFirstChild();
+                while (node2 != null) {
+                    if (!(node2 instanceof Element)) {
+                        node2 = node2.getNextSibling();
+                        continue;
+                    }
+                    Element element2 = (Element) node2;
+                    if (element2.getNodeName().equals("nd")) {
+                        OSMNodeRef nodeRef = new OSMNodeRef();
+                        nodeRef.setRef(Long.parseLong(element2.getAttribute("ref")));
+                        osmWay.addNodeRef(nodeRef);
+                    }
+                    node2 = node2.getNextSibling();
+                }
+                
+                map.addWay(osmWay);
+            } else if (!nodesOnly && element.getTagName().equals("relation")) {
+                OSMRelation osmRelation = new OSMRelation();
+                osmRelation.setId(Long.parseLong(element.getAttribute("id")));
+                processTags(osmRelation, element);
+                
+                Node node2 = element.getFirstChild();
+                while (node2 != null) {
+                    if (!(node2 instanceof Element)) {
+                        node2 = node2.getNextSibling();
+                        continue;
+                    }
+                    Element element2 = (Element) node2;
+                    if (element2.getNodeName().equals("member")) {
+                        OSMRelationMember member = new OSMRelationMember();
+                        member.setRole(element2.getAttribute("role"));
+                        member.setType(element2.getAttribute("type"));
+                        member.setRef(Long.parseLong(element2.getAttribute("ref")));
+                        osmRelation.addMember(member);
+                    }
+                    node2 = node2.getNextSibling();
+                }
+                
+                map.addRelation(osmRelation);
+            }
+            node = node.getNextSibling();
         }
     }
 

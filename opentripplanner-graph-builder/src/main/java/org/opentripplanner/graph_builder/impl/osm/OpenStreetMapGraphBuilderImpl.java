@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Iterator;
 
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
@@ -257,25 +258,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
 
+        private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
+
         public void buildGraph(Graph graph) {
-
-            // We want to prune nodes that don't have any edges
-            Set<Long> nodesWithNeighbors = new HashSet<Long>();
-
-            for (OSMWay way : _ways.values()) {
-                List<Long> nodes = way.getNodeRefs();
-                if (nodes.size() > 1)
-                    nodesWithNeighbors.addAll(nodes);
-            }
-
             // Remove all simple islands
-            _nodes.keySet().retainAll(nodesWithNeighbors);
+            _nodes.keySet().retainAll(_nodesWithNeighbors);
 
             pruneFloatingIslands();
 
             long wayIndex = 0;
 
-            processRelations();
             createUsefulNames();
 
             // figure out which nodes that are actually intersections
@@ -452,6 +444,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addNode(OSMNode node) {
+            if(!_nodesWithNeighbors.contains(node.getId()))
+                return;
 
             if (_nodes.containsKey(node.getId()))
                 return;
@@ -466,15 +460,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_ways.containsKey(way.getId()))
                 return;
 
-            if (!(way.hasTag("highway") || "platform".equals(way.getTag("railway")))) {
-                return;
-            }
-
-            if ("conveyor".equals(way.getTag("highway")) || "proposed".equals(way.getTag(
-                    "highway"))) {
-                return;
-            }
-
             _ways.put(way.getId(), way);
 
             if (_ways.size() % 1000 == 0)
@@ -486,7 +471,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             /* Currently only type=route;route=road relations are handled */
-            if (!("route".equals(relation.getTag("type")) && "road".equals(relation.getTag("route")))) {
+            if(    !(relation.isTag("type", "route"       ) && relation.isTag("route", "road"))
+                && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
                 return;
             }
 
@@ -495,6 +481,29 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_relations.size() % 100 == 0)
                 _log.debug("relations=" + _relations.size());
 
+        }
+
+        public void secondPhase() {
+            int count = _ways.values().size();
+
+            processRelations();
+
+            for(Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext(); ) {
+                OSMWay way = it.next();
+                if (!(way.hasTag("highway") || way.isTag("railway", "platform"))) {
+                    it.remove();
+                } else if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed")) {
+                    it.remove();
+                } else {
+                    // Since the way is kept, update nodes-with-neighbots
+                    List<Long> nodes = way.getNodeRefs();
+                    if (nodes.size() > 1) {
+                        _nodesWithNeighbors.addAll(nodes);
+                    }
+                }
+            }
+
+            _log.debug("purged " + (count - _ways.values().size() ) + " ways out of " + count);
         }
         
         /** Copies useful metadata from relations to the relavant ways/nodes.
@@ -506,18 +515,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 for( OSMRelationMember member : relation.getMembers()) {
                     if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
                         OSMWay way = _ways.get(member.getRef());
-                        if(relation.hasTag("name")) {
-                            if(way.hasTag("otp:route_name")) {
-                                way.addTag(new OSMTag("otp:route_name", way.getTag("otp:route_name") + ", " + relation.getTag("name")));
-                            } else {
-                                way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
+                        if(way != null) {
+                            if(relation.hasTag("name")) {
+                                if(way.hasTag("otp:route_name")) {
+                                    way.addTag(new OSMTag("otp:route_name", way.getTag("otp:route_name") + ", " + relation.getTag("name")));
+                                } else {
+                                    way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
+                                }
                             }
-                        }
-                        if(relation.hasTag("ref")) {
-                            if(way.hasTag("otp:route_ref")) {
-                                way.addTag(new OSMTag("otp:route_ref", way.getTag("otp:route_ref") + ", " + relation.getTag("ref")));
-                            } else {
-                                way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
+                            if(relation.hasTag("ref")) {
+                                if(way.hasTag("otp:route_ref")) {
+                                    way.addTag(new OSMTag("otp:route_ref", way.getTag("otp:route_ref") + ", " + relation.getTag("ref")));
+                                } else {
+                                    way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
+                                }
+                            }
+                            if(relation.hasTag("highway") && relation.isTag("type", "multipolygon") && !way.hasTag("highway")) {
+                                way.addTag("highway", relation.getTag("highway"));
                             }
                         }
                     }
@@ -641,7 +655,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 d += DistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
             }
 
-            
             LineString backGeometry = (LineString) geometry.reverse();
 
             Map<String, String> tags = way.getTags();
@@ -721,7 +734,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (way.isTagFalse("wheelchair") || ("steps".equals(way.getTag("highway")) && !way.isTagTrue("wheelchair"))) {
                 street.setWheelchairAccessible(false);
             }
-            
+
             Map<String, String> tags = way.getTags();
             if(tags != null) {
                 for (P2<String> kvp : _slopeOverrideTags) {

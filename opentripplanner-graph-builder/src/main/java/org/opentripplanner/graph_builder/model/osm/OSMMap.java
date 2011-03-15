@@ -71,4 +71,6 @@ public class OSMMap implements OpenStreetMapContentHandler {
     _relations.put(relation.getId(), relation);
   }
 
+  public void secondPhase() {
+  }
 }

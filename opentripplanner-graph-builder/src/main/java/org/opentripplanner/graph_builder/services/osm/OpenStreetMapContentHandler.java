@@ -19,12 +19,31 @@ import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
 
+/**
+ * An interface to process/store parsed OpenStreetMap data.
+ *
+ * @see org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider
+ */
 
 public interface OpenStreetMapContentHandler {
 
+  /**
+   * Notifes the handler to expect the second stage of parsing (ie. nodes).
+   */
+  public void secondPhase();
+
+  /**
+   * Stores a node.
+   */
   public void addNode(OSMNode node);
 
+  /**
+   * Stores a way.
+   */
   public void addWay(OSMWay way);
 
+  /**
+   * Stores a relation.
+   */
   public void addRelation(OSMRelation relation);
 }
