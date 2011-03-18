@@ -25,6 +25,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,8 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
@@ -80,6 +83,15 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
+        /* check for dups */
+        HashSet<T2<File, URL>> bundles = new HashSet<T2<File, URL>>();
+        for (GtfsBundle bundle : gtfsBundles.getBundles()) {
+            T2<File, URL> key = new T2<File, URL>(bundle.getPath(), bundle.getUrl());
+            if (bundles.contains(key)) {
+                throw new RuntimeException("duplicate GTFS file " +  key.getFirst() + " - " + key.getSecond());
+            }
+            bundles.add(key);
+        }
     }
 
     public void setDao(GtfsMutableRelationalDao dao) {
