@@ -15,7 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.GenericVertex;
 
-/** in an edge-based graph, represents what would be a vertex in a normal graph */
+/** Represents an ordinary location in space, typically an intersection */
 
 public class EndpointVertex extends GenericVertex {
 
