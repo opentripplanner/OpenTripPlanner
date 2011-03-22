@@ -139,12 +139,12 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
         if (insertionPoint > 0) {
             if (stopDepartureTimes.get(insertionPoint - 1) > departureTime) {
-                throw new TripOvertakingException();
+                throw new TripOvertakingException(trip, trips.get(insertionPoint - 1), stopIndex);
             }
         }
         if (insertionPoint < stopDepartureTimes.size()) {
             if (stopDepartureTimes.get(insertionPoint) < departureTime) {
-                throw new TripOvertakingException();
+                throw new TripOvertakingException(trips.get(insertionPoint + 1), trip, stopIndex);
             }
         }
         if (stopIndex == 0) {
@@ -374,5 +374,18 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
     public int getPatternIndex(Trip trip) {
         return trips.indexOf(trip);
+    }
+    
+    public boolean stopTimesIdentical (List<StopTime> stopTimes, int insertionPoint) {
+        if (arrivalTimes.length != stopTimes.size() - 1) {
+            return false;
+        }
+        for (int i = 0; i<arrivalTimes.length; i++) {
+            if (stopTimes.get(i).getDepartureTime() != departureTimes[i].get(insertionPoint))
+                return false;
+            if (stopTimes.get(i+1).getArrivalTime() != arrivalTimes[i].get(insertionPoint))
+                return false;
+        }
+        return true;
     }
 }

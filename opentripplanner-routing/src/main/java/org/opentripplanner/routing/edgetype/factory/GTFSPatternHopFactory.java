@@ -342,20 +342,26 @@ public class GTFSPatternHopFactory {
                     int insertionPoint = tripPattern.getDepartureTimeInsertionPoint(stopTimes.get(0)
                             .getDepartureTime());
                     if (insertionPoint < 0) {
+                        insertionPoint = -(insertionPoint + 1);
                         // There's already a departure at this time on this trip pattern. This means
                         // that either (a) this will have all the same stop times as that one, and thus
                         // will be a duplicate of it, or (b) it will have different stops, and thus
                         // break the assumption that trips are non-overlapping.
-                        _log.warn("duplicate first departure time for trip " + trip.getId()
-                                + ".  This will be handled correctly but inefficiently.");
-
-                        simple = true;
-                        createSimpleHops(graph, trip, stopTimes);
-
+                        if (! tripPattern.stopTimesIdentical(stopTimes, insertionPoint)) {
+                            _log.warn("Possible GTFS feed error: Duplicate first departure time. New trip: " 
+                                    + trip.getId()
+                                    + " Existing trip: " + tripPattern.getTrip(insertionPoint) 
+                                    + " This will be handled correctly but inefficiently.");                       
+                            simple = true;
+                            createSimpleHops(graph, trip, stopTimes);   
+                        } else {
+                            _log.warn("Possible GTFS feed error: Duplicate trip (skipping). New: " 
+                                    + trip.getId()
+                                    + " Existing: " + tripPattern.getTrip(insertionPoint));
+                            break; // not continue - for frequency case
+                        }
                     } else {
-
                         // try to insert this trip at this location
-
                         StopTime st1 = null;
                         int i;
                         for (i = 0; i < stopTimes.size() - 1; i++) {
@@ -368,10 +374,7 @@ public class GTFSPatternHopFactory {
                                         runningTime, st1.getArrivalTime(), dwellTime,
                                         trip);
                             } catch (TripOvertakingException e) {
-                                _log
-                                        .warn("trip "
-                                                + trip.getId()
-                                                + " overtakes another trip with the same stops.  This will be handled correctly but inefficiently.");
+                                _log.warn(e.getMessage());
                                 // back out trips and revert to the simple method
                                 for (i = i - 1; i >= 0; --i) {
                                     tripPattern.removeHop(i, insertionPoint);
