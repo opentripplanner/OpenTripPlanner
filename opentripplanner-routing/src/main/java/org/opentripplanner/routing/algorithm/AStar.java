@@ -292,7 +292,7 @@ public class AStar {
                 while (wr != null) {
 
                     if (wr.weight < 0) {
-                        throw new NegativeWeightException(String.valueOf(wr.weight));
+                        throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge " + edge);
                     }
 
                     EdgeNarrative er = wr.getEdgeNarrative();
