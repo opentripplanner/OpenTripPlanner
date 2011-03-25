@@ -16,6 +16,7 @@ package org.opentripplanner.routing.spt;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -72,7 +73,7 @@ public class SPTVertex implements Vertex, Serializable {
         return this.mirror.getName();
     }
 
-    public String getStopId() {
+    public AgencyAndId getStopId() {
         return this.mirror.getStopId();
     }
 

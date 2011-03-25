@@ -128,7 +128,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
                 String id = GtfsLibrary.convertIdToString(stop.getId());
                 graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(),
-                        stop.getId().getId(), stop));
+                        stop.getId(), stop));
             }
 
             GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);

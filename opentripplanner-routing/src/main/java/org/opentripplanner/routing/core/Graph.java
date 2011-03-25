@@ -18,6 +18,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -58,7 +60,7 @@ public class Graph implements Serializable {
         return gv.vertex;
     }
 
-    public Vertex addVertex(String label, String name, String stopId, double x, double y) {
+    public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
         GraphVertex gv = vertices.get(label);
         if (gv == null) {
             Vertex vv = new GenericVertex(label, x, y, name, stopId);

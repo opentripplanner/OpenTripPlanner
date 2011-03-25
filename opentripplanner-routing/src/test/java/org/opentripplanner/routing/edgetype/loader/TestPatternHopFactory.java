@@ -376,9 +376,9 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testWheelchairAccessible() throws Exception {
-        Vertex near_a = graph.getVertex("near_A");
-        Vertex near_b = graph.getVertex("near_B");
-        Vertex near_c = graph.getVertex("near_C");
+        Vertex near_a = graph.getVertex("near_agency_A");
+        Vertex near_b = graph.getVertex("near_agency_B");
+        Vertex near_c = graph.getVertex("near_agency_C");
 
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex split_d = null;

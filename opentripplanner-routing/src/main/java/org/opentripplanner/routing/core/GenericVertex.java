@@ -20,6 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -32,7 +33,7 @@ public class GenericVertex implements Vertex, Serializable {
     
     protected String name;
 
-    private String stopId = null;
+    private AgencyAndId stopId = null;
 
     private double y;
 
@@ -60,7 +61,7 @@ public class GenericVertex implements Vertex, Serializable {
         this.name = name;
     }
     
-    public GenericVertex(String label, double x, double y, String name, String stopId) {
+    public GenericVertex(String label, double x, double y, String name, AgencyAndId stopId) {
         this(label, x, y);
         this.name = name;
         this.stopId = stopId;
@@ -110,7 +111,7 @@ public class GenericVertex implements Vertex, Serializable {
     }
 
     @Override
-    public String getStopId() {
+    public AgencyAndId getStopId() {
         return stopId;
     }
 

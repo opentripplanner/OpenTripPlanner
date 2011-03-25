@@ -13,6 +13,7 @@
 */
 package org.opentripplanner.routing.core;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 
 public class TransitStop extends GenericVertex {
@@ -27,7 +28,7 @@ public class TransitStop extends GenericVertex {
      */
     private boolean local = false;
 
-    public TransitStop(String id, double lon, double lat, String name, String stopId, Stop stop) {
+    public TransitStop(String id, double lon, double lat, String name, AgencyAndId stopId, Stop stop) {
         super(id, lon, lat, name, stopId);
         if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;

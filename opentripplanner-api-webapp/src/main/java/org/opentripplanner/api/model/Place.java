@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlElement; 
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.util.Constants; 
 
 /** 
@@ -34,7 +35,7 @@ public class Place {
      * The ID of the stop.  Depending on the transit agency, this may or may not be something that
      * users care about.
      */
-    public String stopId = "123";
+    public AgencyAndId stopId = null;
 
     /**
      * The longitude of the place.
@@ -65,7 +66,7 @@ public class Place {
         this.name = name;
     }
 
-    public Place(Double lon, Double lat, String name, String stopId) {
+    public Place(Double lon, Double lat, String name, AgencyAndId stopId) {
         this(lon, lat, name);
         this.stopId = stopId;
     }
