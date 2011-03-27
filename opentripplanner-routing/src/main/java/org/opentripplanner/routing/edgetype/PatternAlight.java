@@ -86,36 +86,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         if (!options.getModes().get(modeMask)) {
             return null;
         }
-        long current_time = state0.getTime();
-        long transfer_penalty = 0;
-        
-        StateData data = state0.getData();
-        
-        /* apply transfer rules */
-        /* look in the global transfer table for the rules from the previous stop to
-         * this stop. 
-         */
-        if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
-            TransferTable transferTable = options.getTransferTable();
-            
-            if (transferTable.hasPreferredTransfers()) {
-                transfer_penalty = options.baseTransferPenalty;
-            }
-            
-            int transfer_time = transferTable.getTransferTime(getToVertex(), data.getPreviousStop());
-            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
-                transfer_time = options.minTransferTime;
-            }
-            if (transfer_time > 0 && transfer_time > (current_time + data.getLastAlightedTime()) * 1000) {
-                /* minimum time transfers */
-                current_time += data.getLastAlightedTime() - transfer_time * 1000;
-            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
-                return null;
-            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
-                /* depenalize preferred transfers */
-                transfer_penalty = 0; 
-            }
-        }
         
         /* find closest alighting time for backward searches */
         /* 
@@ -123,6 +93,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
          * if this pattern's serviceId is running look for the closest alighting time at this stop.
          * choose the soonest alighting time among trips starting yesterday, today, or tomorrow
          */
+        long current_time = state0.getTime();
         int bestWait = -1;
         int bestPatternIndex = -1;
         AgencyAndId serviceId = getPattern().getExemplar().getServiceId();        
@@ -148,13 +119,11 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 
             }
         }
-        
         if (bestWait < 0) {
             return null;
         }
-        
         Trip trip = getPattern().getTrip(bestPatternIndex);
-        
+
         /* check if route banned for this plan */
         if (options.bannedRoutes != null) {
             Route route = trip.getRoute();
@@ -163,7 +132,35 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 return null;
             }
         }
-        
+
+        /* apply transfer rules */
+        /* look in the global transfer table for the rules from the previous stop to
+         * this stop. 
+         */
+        long transfer_penalty = 0;
+        StateData data = state0.getData();
+        if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
+            TransferTable transferTable = options.getTransferTable();
+            
+            if (transferTable.hasPreferredTransfers()) {
+                transfer_penalty = options.baseTransferPenalty;
+            }
+            
+            int transfer_time = transferTable.getTransferTime(getToVertex(), data.getPreviousStop());
+            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
+                transfer_time = options.minTransferTime;
+            }
+            if (transfer_time > 0 && transfer_time > (current_time + data.getLastAlightedTime()) * 1000) {
+                /* minimum time transfers */
+                current_time += data.getLastAlightedTime() - transfer_time * 1000;
+            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+                return null;
+            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
+                /* depenalize preferred transfers */
+                transfer_penalty = 0; 
+            }
+        }
+               
         Editor editor = state0.edit();
         editor.setTrip(bestPatternIndex);
         editor.incrementTimeInSeconds(-bestWait); // going backward
