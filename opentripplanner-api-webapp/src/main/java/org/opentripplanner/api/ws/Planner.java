@@ -378,7 +378,7 @@ public class Planner {
                             leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i));
                         }
                         leg.to = makePlace(edgeNarrative.getFromVertex()); 
-                        leg.endTime = new Date(previousSptEdge.fromv.state.getTime());
+                        leg.endTime = new Date(previousSptEdge.tov.state.getTime());
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         /* reset coordinates */
