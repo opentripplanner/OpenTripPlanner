@@ -13,14 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Calendar;
-
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TransferTable;
@@ -105,6 +103,25 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         long transfer_penalty = 0;
         StateData data = state0.getData();
         
+        /* check if this trip is running or not */
+        AgencyAndId serviceId = hop.getServiceId();
+        int wait = -1;
+        for (ServiceDay sd : options.serviceDays) {
+            int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+            // only check for service on days that are not in the future
+            // this avoids unnecessarily examining tomorrow's services
+            if (secondsSinceMidnight < 0) continue; 
+            if (sd.serviceIdRunning(serviceId)) {
+                int newWait = secondsSinceMidnight - hop.getEndStopTime().getArrivalTime();
+                if (wait < 0 || newWait < wait) {
+                    wait = newWait;
+                }
+            }
+        }
+        if (wait < 0) {
+            return null;
+        }
+        
         /* apply transfer rules */
         /* look in the global transfer table for the rules from the previous stop to
          * this stop. 
@@ -131,18 +148,6 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             }
         }
 
-        ServiceDate serviceDate = getServiceDate(current_time);
-        int secondsSinceMidnight = (int) ((current_time - serviceDate.getAsDate().getTime()) / 1000);
-
-        CalendarService service = options.getCalendarService();
-        if (!service.getServiceDatesForServiceId(hop.getServiceId()).contains(serviceDate))
-            return null;
-
-        int wait = secondsSinceMidnight - hop.getEndStopTime().getArrivalTime();
-        if (wait < 0) {
-            return null;
-        }
-
         if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getData().getTrip() != -1) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
@@ -150,28 +155,14 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         }
 
         Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(wait);
+        editor.incrementTimeInSeconds(-wait); 
         editor.incrementNumBoardings();
         editor.setTripId(trip.getId());
         editor.setZone(zone);
         editor.setRoute(trip.getRoute().getId());
         editor.setFareContext(fareContext);
-
-        State state1 = state0.incrementTimeInSeconds(-wait);
-        return new TraverseResult(wait + options.boardCost + transfer_penalty, state1, this);
+        
+        return new TraverseResult(wait + options.boardCost + transfer_penalty, editor.createState(), this);
     }
 
-    private ServiceDate getServiceDate(long currentTime) {
-        int scheduleTime = hop.getEndStopTime().getArrivalTime();
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(currentTime);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        int dayOverflow = scheduleTime / Board.SECS_IN_DAY;
-        c.add(Calendar.DAY_OF_YEAR, -dayOverflow);
-        return new ServiceDate(c.getTime());
-    }
 }

@@ -13,14 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Calendar;
-import java.util.Set;
-
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TransferTable;
@@ -101,8 +98,28 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	}
 
         long current_time = state0.getTime();
+        
+        /* check if this trip is running or not */
+        AgencyAndId serviceId = hop.getServiceId();
+        int wait = -1;
+        for (ServiceDay sd : options.serviceDays) {
+            int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+            // only check for service on days that are not in the future
+            // this avoids unnecessarily examining tomorrow's services
+            if (secondsSinceMidnight < 0) continue; 
+            if (sd.serviceIdRunning(serviceId)) {
+                int newWait = hop.getStartStopTime().getDepartureTime() - secondsSinceMidnight;
+                if (wait < 0 || newWait < wait) {
+                    wait = newWait;
+                }
+            }
+        }
+        if (wait < 0) {
+            return null;
+        }
+        
+        /* apply transfer rules */
         long transfer_penalty = 0;
-
         StateData data = state0.getData();
         if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
             TransferTable transferTable = options.getTransferTable();
@@ -126,19 +143,6 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             }
         }
 	
-	ServiceDate serviceDate = getServiceDate(current_time);
-        int secondsSinceMidnight = (int) ((current_time - serviceDate.getAsDate().getTime()) / 1000);
-
-        CalendarService service = options.getCalendarService();
-        Set<ServiceDate> serviceDates = service.getServiceDatesForServiceId(hop.getServiceId());
-        if (!serviceDates.contains(serviceDate))
-            return null;
-
-        int wait = hop.getStartStopTime().getDepartureTime() - secondsSinceMidnight;
-        if (wait < 0) {
-            return null;
-        }
-
         Editor editor = state0.edit();
         editor.incrementTimeInSeconds(wait);
         editor.incrementNumBoardings();
@@ -157,17 +161,4 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         return new TraverseResult(1, state0, this);
     }
 
-    private ServiceDate getServiceDate(long currentTime) {
-        int scheduleTime = hop.getStartStopTime().getDepartureTime();
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(currentTime);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-
-        int dayOverflow = scheduleTime / SECS_IN_DAY;
-        c.add(Calendar.DAY_OF_YEAR, -dayOverflow);
-        return new ServiceDate(c.getTime());
-    }
 }
