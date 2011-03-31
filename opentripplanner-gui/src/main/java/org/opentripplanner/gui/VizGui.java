@@ -14,7 +14,6 @@
 package org.opentripplanner.gui;
 
 import static org.opentripplanner.common.IterableLibrary.*;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -26,6 +25,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -45,6 +47,7 @@ import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -52,6 +55,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -62,6 +66,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
@@ -75,9 +80,11 @@ import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Exit on window close.
@@ -212,6 +219,24 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JList incomingEdges;
 
+    private JTextField sourceVertex;
+    
+    private JTextField sinkVertex;
+    
+    private JCheckBox walkCheckBox;
+
+    private JCheckBox bikeCheckBox;
+
+    private JCheckBox trainCheckBox;
+
+    private JCheckBox busCheckBox;
+
+    private JTextField searchDate;
+    
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+       
+    private JTextField boardingPenaltyField; 
+
     private JList departurePattern;
 
     private JLabel serviceIdLabel;
@@ -268,6 +293,86 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         pane.add(leftPanel, BorderLayout.LINE_START);
 
+        /* ROUTING SUBPANEL */
+        JPanel routingPanel = new JPanel();
+        routingPanel.setLayout(new GridLayout(0, 2));
+        leftPanel.add(routingPanel, BorderLayout.NORTH);
+
+        // row: source vertex
+        JButton setSourceVertexButton = new JButton("set source");
+        setSourceVertexButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	Object selected = nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                	sourceVertex.setText(selected.toString());
+                }
+            }
+        });
+        routingPanel.add(setSourceVertexButton);
+        sourceVertex = new JTextField();
+        routingPanel.add(sourceVertex);      
+        
+        // row: sink vertex
+        JButton setSinkVertexButton = new JButton("set sink");
+        setSinkVertexButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	Object selected = nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                	sinkVertex.setText(selected.toString());
+                }
+            }
+        });
+        routingPanel.add(setSinkVertexButton);
+        sinkVertex = new JTextField();
+        routingPanel.add(sinkVertex);        
+
+        // row: set date
+        JButton resetSearchDateButton = new JButton("now ->");
+        resetSearchDateButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                searchDate.setText(dateFormat.format(new Date()));
+            }
+        });
+        routingPanel.add(resetSearchDateButton);
+        searchDate = new JTextField();
+        searchDate.setText(dateFormat.format(new Date()));
+        routingPanel.add(searchDate);        
+
+        // 2 rows: transport mode options
+        walkCheckBox = new JCheckBox("walk");
+        routingPanel.add(walkCheckBox);
+        bikeCheckBox = new JCheckBox("bike");
+        routingPanel.add(bikeCheckBox);
+        trainCheckBox = new JCheckBox("train");
+        routingPanel.add(trainCheckBox);
+        busCheckBox  = new JCheckBox("bus");
+        routingPanel.add(busCheckBox);
+        
+        // row: boarding penalty
+        JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
+        routingPanel.add(boardPenaltyLabel);
+        boardingPenaltyField = new JTextField("5");
+        routingPanel.add(boardingPenaltyField);      
+        
+        // row: launch and clear path search
+        JButton routeButton = new JButton("path search");
+        routeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String from = sourceVertex.getText();
+                String to = sinkVertex.getText();
+                route(from, to);
+            }
+        });
+        routingPanel.add(routeButton);
+        JButton clearRouteButton = new JButton("clear path");
+        clearRouteButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                showGraph.highlightGraphPath(null);
+            }
+        });
+        routingPanel.add(clearRouteButton);
+                
+        /* VERTEX INFO SUBPANEL */
         JPanel vertexDataPanel = new JPanel();
         vertexDataPanel.setLayout(new BoxLayout(vertexDataPanel, BoxLayout.PAGE_AXIS));
         leftPanel.add(vertexDataPanel, BorderLayout.CENTER);
@@ -308,24 +413,26 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
                 /* for turns, highlight the outgoing street's ends */
                 if (selected instanceof TurnEdge || selected instanceof PlainStreetEdge) {
-                    HashSet<Vertex> vertices = new HashSet<Vertex>();
+                    List<Vertex> vertices = new ArrayList<Vertex>();
+                    List<DirectEdge> edges = new ArrayList<DirectEdge>();
                     Vertex tov = selected.getToVertex();
                     for (Edge og : graph.getOutgoing(tov)) {
-                        if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
-                            StreetEdge streetEdge = (StreetEdge) og;
-                            vertices.add (streetEdge.getToVertex());
+                    	if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
+                    		edges.add((DirectEdge)og);
+                            vertices.add (((StreetEdge)og).getToVertex());
                             break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : graph.getIncoming(fromv)) {
                         if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
-                            StreetEdge streetEdge = (StreetEdge) ic;
-                            vertices.add (streetEdge.getFromVertex());
+                    		edges.add((DirectEdge)ic);
+                            vertices.add (ic.getFromVertex());
                             break;
                         }
                     }
-                    showGraph.setHighlighted(vertices);
+                    //showGraph.setHighlightedVertices(vertices);
+                    showGraph.setHighlightedEdges(edges);
                 }
 
                 /* add the connected vertices to the list of vertices */
@@ -492,21 +599,21 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(zoomOutButton);
         
-        JButton routeButton = new JButton("Route");
-        routeButton.addActionListener(new ActionListener() {
+        JButton routeButton2 = new JButton("Route");
+        routeButton2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String initialFrom = "";
-                Object selected = nearbyVertices.getSelectedValue();
-                if (selected != null) {
-                    initialFrom = selected.toString();
-                }
-                RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
-                String from = dlg.from;
-                String to = dlg.to;
+//                String initialFrom = "";
+//                Object selected = nearbyVertices.getSelectedValue();
+//                if (selected != null) {
+//                    initialFrom = selected.toString();
+//                }
+//                RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
+                String from = sourceVertex.getText();
+                String to = sinkVertex.getText();
                 route(from, to);
             }
         });
-        buttonPanel.add(routeButton);
+        buttonPanel.add(routeButton2);
 
         JButton findButton = new JButton("Find node");
         findButton.addActionListener(new ActionListener() {
@@ -532,7 +639,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
                         JOptionPane.PLAIN_MESSAGE);
                 for (GraphVertex gv : getGraph().getVertices()) {
-                    for (DirectEdge edge: filter(gv.getOutgoing(),DirectEdge.class)) {
+                	for (DirectEdge edge : filter(gv.getOutgoing(),DirectEdge.class)) {
                         if (edge.getName() != null && edge.getName().contains(edgeName)) {
                             showGraph.highlightVertex(gv.vertex);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -616,8 +723,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         }
         seen.addAll(newOpen);
         open = newOpen;
-        showGraph.setHighlighted(seen);
+        showGraph.setHighlightedVertices(seen);
     }
+    
     protected void traceOld() {
         HashSet<Vertex> seenVertices = new HashSet<Vertex>();
         DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
@@ -640,8 +748,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 }
             }
         }
-        showGraph.setHighlighted(seenVertices);
-        
+        showGraph.setHighlightedVertices(seenVertices);   
     }
 
     protected void checkGraph() {
@@ -669,26 +776,45 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         /*now, let's find an unvisited vertex */
         for (GraphVertex u : allVertices) {
             if (!seenVertices.contains(u.vertex)) {
-                System.out.println ("unknown vertex" + u);
+                System.out.println ("unvisited vertex" + u);
                 break;
             }
         }
     }
 
     protected void route(String from, String to) {
-        TraverseOptions options = new TraverseOptions();
-        Date now = new Date(1260994200000L);
-        System.out.println("Path from " + from + " to " + to + " at " + now);
-        List<GraphPath> paths = pathservice.plan(from, to, now, options, 1);
-        if (paths.get(0) == null) {
+    	// TraverseOptions is initialized to reasonable values in constructor?
+    	Date when;
+    	// Year + 1900
+        try {
+        	 when = dateFormat.parse(searchDate.getText());
+        } catch (ParseException e) {
+        	searchDate.setText("Format: " + dateFormat.toPattern());
+        	return;
+        }
+        System.out.println("--------");
+        System.out.println("Path from " + from + " to " + to + " at " + when);
+        TraverseModeSet modeSet = new TraverseModeSet();
+        modeSet.setBicycle(bikeCheckBox.isSelected());
+        modeSet.setTrainish(trainCheckBox.isSelected());
+        modeSet.setBusish(busCheckBox.isSelected());
+        modeSet.setWalk(walkCheckBox.isSelected());
+    	TraverseOptions options = new TraverseOptions(modeSet);
+    	options.speed = 1; // override difference between bike and walk
+    	options.walkReluctance = 1; // walk etc are same cost
+    	options.maxSlope = 1; // even climb walls
+    	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
+    	List<GraphPath> paths = pathservice.plan(from, to, when, options, 1);
+        if (paths == null) {
             System.out.println("no path");
             return;
         }
-        Vector<SPTVertex> vertices = paths.get(0).vertices;
-
-        for (SPTVertex v : vertices) {
-            System.out.println(v);
+        GraphPath gp = paths.get(0);
+        for (SPTEdge e : gp.edges) {
+            System.out.print(e.tov.state.toString() + " <- ");
+            System.out.println(e.payload);
         }
+        showGraph.highlightGraphPath(gp);
     }
 
     public static void main(String args[]) {
@@ -721,6 +847,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingService.setHierarchies(chs);
         pathservice.setRoutingService(routingService);
     }
+    
     public Graph getGraph() {
         return graph;
     }

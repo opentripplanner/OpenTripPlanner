@@ -14,12 +14,19 @@
 package org.opentripplanner.gui;
 
 import java.awt.Point;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.event.MouseMotionAdapter;
+
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.DirectEdge;
@@ -28,11 +35,18 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.SPTEdge;
+import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.routing.edgetype.PatternAlight;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TransferEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -43,44 +57,62 @@ import processing.core.PApplet;
 import processing.core.PFont;
 
 /**
- * Show a map of the graph, intersections and TransitStops only. The user can drag to zoom. The user
- * can also click, and a list of nearby vertices will be sent to the associated
- * VertexSelectionListener
+ * Processing applet to show a map of the graph. 
+ * The user can:
+ * - Use mouse wheel to zoom (or right drag, or ctrl-drag) 
+ * - Left drag to pan around the map
+ * - Left click to send a list of nearby vertices to the associated
+ *   VertexSelectionListener.
  */
-public class ShowGraph extends PApplet {
+public class ShowGraph extends PApplet implements MouseWheelListener {
 
+	private static final int FRAME_RATE = 30;
     private static final long serialVersionUID = -8336165356756970127L;
-
     Graph graph;
-
     STRtree vertexIndex;
-
     STRtree edgeIndex;
-
-    /*
-     * static public void main(String args[]) { PApplet.main(new String[] {"ShowGraph"}); }
-     */
-
     Envelope modelOuterBounds;
-
     Envelope modelBounds = new Envelope();
-
     VertexSelectionListener selector;
-
     private ArrayList<VertexSelectionListener> selectors;
-
-    int startDragX, startDragY;
-
-    private DirectEdge highlightedEdge;
-
+	private List<Vertex> visibleVertices; 
+    private List<DirectEdge> visibleStreetEdges = new ArrayList<DirectEdge>(1000); 
+    private List<DirectEdge> visibleTransitEdges = new ArrayList<DirectEdge>(1000); 
+    private List<Vertex> highlightedVertices;
+    private List<DirectEdge> highlightedEdges;
     private Vertex highlightedVertex;
-
-    private Set<Vertex> highlightedVertices = new HashSet<Vertex>();
-
+    private DirectEdge highlightedEdge;
+    private GraphPath highlightedGraphPath;
     protected double mouseModelX;
-
     protected double mouseModelY;
+    private Point startDrag = null;
+    private int dragX, dragY;
+    private boolean ctrlPressed = false;
+    boolean drawFast = false;
+    boolean drawStreetEdges = true;
+    boolean drawTransitEdges= true;
+    boolean drawLinkEdges = true;
+    boolean drawStreetVertices = false;
+    boolean drawTransitStopVertices = true;
+    private static double lastLabelY;
+    private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
+    private static final DecimalFormat lonFormatter = new DecimalFormat("000.0000°E ; 000.0000°W");
+    private static final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
 
+    /* Layer constants */
+    static final int DRAW_MINIMAL  = 0; // XY coordinates    
+    static final int DRAW_VERTICES = 1;     
+    static final int DRAW_TRANSIT  = 2; 
+    static final int DRAW_STREETS  = 3; 
+    static final int DRAW_ALL      = 4; 
+    static final int DRAW_PARTIAL  = 6; 
+    private int drawLevel = DRAW_ALL;
+    private int drawOffset = 0;
+    
+    /*
+     * Constructor.
+     * Call processing constructor, and register the listener to notify when the user selects vertices.
+     */
     public ShowGraph(VertexSelectionListener selector, Graph graph) {
         super();
         this.graph = graph;
@@ -88,45 +120,25 @@ public class ShowGraph extends PApplet {
         this.selectors = new ArrayList<VertexSelectionListener>();
     }
 
-
+    /*
+     * Setup Processing applet
+     */
     public void setup() {
-        background(0);
         size(getSize().width, getSize().height, P2D);
-        addMouseMotionListener(new MouseMotionAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                super.mouseMoved(e);
-                Point p = e.getPoint();
-                mouseModelX = toModelX(p.x);
-                mouseModelY = toModelY(p.y);
-            }
-        });
-
-        indexVertices();
         
-        modelBounds.expandBy(0.02);
-        /* fix aspect ratio */
-        double yCenter = (modelBounds.getMaxY() + modelBounds.getMinY()) / 2;
-        float xScale = cos((float) (yCenter * Math.PI / 180));
-        double xSize = modelBounds.getMaxX() - modelBounds.getMinX();
-        double ySize = modelBounds.getMaxY() - modelBounds.getMinY();
-        double actualXSize = xSize * xScale;
-        System.out.println("xs, ys, axs: " + xSize + ", " + ySize + "," + actualXSize);
-        if (ySize > actualXSize) {
-            // too tall, stretch horizontally
-            System.out.println("stretching x by " + (ySize / xScale - actualXSize));
-            modelBounds.expandBy((ySize / xScale - actualXSize) / 2, 0);
-        } else {
-            // too wide, stretch vertically
-            System.out.println("stretching y by " + (actualXSize - ySize));
-            modelBounds.expandBy(0, (actualXSize - ySize) / 2);
-        }
+        /* Build spatial index of vertices and edges */
+        buildSpatialIndex();
 
+        /* Set model bounds to encompass all vertices in the index, and then some */
+        modelBounds = (Envelope)(vertexIndex.getRoot().getBounds());
+        modelBounds.expandBy(0.02);
+        matchAspect();
+        /* save this zoom level to allow returning to default later */
         modelOuterBounds = new Envelope(modelBounds);
 
         /* find and set up the appropriate font */
         String[] fonts = PFont.list();
-        String[] preferredFonts = { "Courier", "Mono" };
+        String[] preferredFonts = { "Mono", "Courier" };
         PFont font = null;
         for (String preferredFontName : preferredFonts) {
             for (String fontName : fonts) {
@@ -140,39 +152,61 @@ public class ShowGraph extends PApplet {
             }
         }
         textFont(font);
+        textMode(SCREEN);
+        addMouseWheelListener(this);
+        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                Point p = e.getPoint();
+                mouseModelX = toModelX(p.x);
+                mouseModelY = toModelY(p.y);
+            }
+        });
+        addComponentListener(new ComponentAdapter() {
+        	  public void componentResized(ComponentEvent e) {
+        		  matchAspect();
+        		  drawLevel = DRAW_PARTIAL; 
+        	  }
+        });
+        frameRate(FRAME_RATE);
     }
 
-    public synchronized void indexVertices() {
-        vertexIndex = new STRtree();
-        edgeIndex = new STRtree();
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
-            Envelope env = new Envelope(v.getCoordinate());
-            modelBounds.expandToInclude(env);
-            if (v instanceof TransitStop) {
-                vertexIndex.insert(env, v);
-            } else if (v instanceof StreetLocation) {
-                vertexIndex.insert(env, v);
-            } else if (v instanceof GenericVertex) {
-                vertexIndex.insert(env, v);
-            } else {
-                // a street-transit link, or a journey vertex. no need for them in the ui.
-            }
-
-            for (DirectEdge e : IterableLibrary.filter(gv.getOutgoing(),DirectEdge.class)) {
-                if (e.getGeometry() == null) {
-                    continue;
-                }
-                env = e.getGeometry().getEnvelopeInternal();
-                edgeIndex.insert(env, e);
-            }
-        }
-        vertexIndex.build();
-        edgeIndex.build();
+    /*
+     * Zoom in/out proportional to the number of clicks of the mouse wheel.
+     */
+    public void mouseWheelMoved(MouseWheelEvent e) {
+  		double f = e.getWheelRotation() * 0.2;
+  		zoom(f, e.getPoint());
+  	}
+    
+    /*
+     * Zoom in/out.
+     * Translate the viewing window such that the place under the mouse pointer is a fixed point.
+     * If p is null, zoom around the center of the viewport.
+     */
+    void zoom (double f, Point p) {
+    	double ex = modelBounds.getWidth()  * f;
+  		double ey = modelBounds.getHeight() * f;
+  		modelBounds.expandBy(ex/2, ey/2);
+  		if (p != null) {
+  	  		// Note: Graphics Y coordinates increase down the screen, hence the opposite signs.
+  	  		double tx = ex * -((p.getX()/this.width)  - 0.5);
+  	  		double ty = ey * +((p.getY()/this.height) - 0.5);
+  	  	    modelBounds.translate(tx, ty);  			
+  		}
+  	    // update the display
+  	    drawLevel = DRAW_PARTIAL;	
     }
 
     public void zoomToDefault() {
         modelBounds = new Envelope(modelOuterBounds);
+        drawLevel = DRAW_ALL;
+    }
+    
+    public void zoomOut() {
+        modelBounds.expandBy(modelBounds.getWidth(), modelBounds.getHeight());
+        drawLevel = DRAW_ALL;
     }
 
     public void zoomToLocation(Coordinate c) {
@@ -180,6 +214,7 @@ public class ShowGraph extends PApplet {
         e.expandToInclude(c);
         e.expandBy(0.002);
         modelBounds = e;
+        drawLevel = DRAW_ALL;
     }
 
     public void zoomToVertex(Vertex v) {
@@ -187,86 +222,290 @@ public class ShowGraph extends PApplet {
         e.expandToInclude(v.getCoordinate());
         e.expandBy(0.002);
         modelBounds = e;
+        drawLevel = DRAW_ALL;
     }
 
-    public void zoomOut() {
-        modelBounds.expandBy(modelBounds.getWidth(), modelBounds.getHeight());
+    void matchAspect() {
+        /* Basic sinusoidal projection of lat/lon data to square pixels */
+        double yCenter = modelBounds.centre().y;
+        float xScale = cos(radians((float)yCenter));
+        double newX = modelBounds.getHeight() * (1 / xScale) * ((float)this.getWidth() / this.getHeight());
+        modelBounds.expandBy((newX - modelBounds.getWidth()) / 2f, 0);
+    }
+
+    /*
+     * Iterate through all vertices and their (outgoing) edges.
+     * If they are of 'interesting' types, add them to the
+     * corresponding spatial index.
+     */
+    public synchronized void buildSpatialIndex() {
+        vertexIndex = new STRtree();
+        edgeIndex = new STRtree();
+        Envelope env;
+        // int xminx, xmax, ymin, ymax;
+        for (GraphVertex gv : graph.getVertices()) {
+        	Vertex v = gv.vertex;
+            if ((v instanceof TransitStop) ||
+            	(v instanceof StreetLocation) || 
+            	(v instanceof GenericVertex)) {
+            		Coordinate c = gv.vertex.getCoordinate();
+            		env = new Envelope(c);
+            		vertexIndex.insert(env, v);
+            }
+            for (DirectEdge e : IterableLibrary.filter(gv.getOutgoing(),DirectEdge.class)) {
+                if (e.getGeometry() == null) continue;
+                if (e instanceof PatternEdge ||
+                	e instanceof StreetTransitLink ||
+                	e instanceof StreetEdge) {
+                	env = e.getGeometry().getEnvelopeInternal();
+                	edgeIndex.insert(env, e);
+                }
+            }
+        }
+        vertexIndex.build();
+        edgeIndex.build();
     }
 
     @SuppressWarnings("unchecked")
-    public synchronized void draw() {
-        fill(0);
-        rect(0, 0, getSize().width - 1, getSize().height - 1);
-        List<Vertex> vertices = (List<Vertex>) vertexIndex.query(modelBounds);
-
-        List<Edge> edges = (List<Edge>) edgeIndex.query(modelBounds);
-        for (DirectEdge e : IterableLibrary.filter(edges,DirectEdge.class)) {
-            if (e == highlightedEdge)
-                continue;
-
-            if (e instanceof OutEdge || e instanceof TurnEdge) {
-                stroke(30, 255, 255); //teal
-            } else if (e instanceof StreetTransitLink) {
-                stroke(75, 150, 255); //wedgwood
-            } else if (e instanceof TransferEdge) {
-            	stroke(50, 50, 50); //dark gray
-            } else {
-                stroke(255, 255, 30); //gold
-            }
-
-            Coordinate[] coords = e.getGeometry().getCoordinates();
-            for (int i = 1; i < coords.length; i++) {
-                line((float) toScreenX(coords[i - 1].x), (float) toScreenY(coords[i - 1].y),
-                        (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
-            }
+    private synchronized void findVisibleElements() {
+    	visibleVertices = (List<Vertex>) vertexIndex.query(modelBounds);
+        visibleStreetEdges.clear();
+        visibleTransitEdges.clear();
+        for (DirectEdge de : (Iterable<DirectEdge>) edgeIndex.query(modelBounds)) {
+        	if (de instanceof PatternEdge ||
+        		de instanceof StreetTransitLink) {
+        		visibleTransitEdges.add(de);
+        	} else if (de instanceof TurnEdge) {
+        		visibleStreetEdges.add(de);
+        	} else if (de instanceof StreetEdge) {
+        		visibleStreetEdges.add(de);
+        	}
         }
-        if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
-            stroke(255, 70, 70);
-
-            Coordinate[] coords = highlightedEdge.getGeometry().getCoordinates();
-            for (int i = 1; i < coords.length; i++) {
-                line((float) toScreenX(coords[i - 1].x), (float) toScreenY(coords[i - 1].y),
-                        (float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
-            }
-            stroke(0,255,0); //green
-            ellipse(toScreenX(coords[0].x), toScreenY(coords[0].y), 5, 5);
-            stroke(255,0,0); //red
-            ellipse(toScreenX(coords[coords.length-1].x), toScreenY(coords[coords.length-1].y), 5, 5);
-        }
-
-        for (Vertex v : vertices) {
-            if (v == highlightedVertex)
-                continue;
-
-            double x = v.getX();
-            double y = v.getY();
-            x = toScreenX(x);
-            y = toScreenY(y);
-            if (v instanceof TransitStop) {
-                fill(0);
-                stroke(255, 30, 255); //purple
-                ellipse(x, y, 5.0, 5.0);
-            } else if (highlightedVertices.contains(v)) {
-                stroke(255, 127, 0);
-                fill(255, 127, 0); //orange fill
-                ellipse(x, y, 5.0, 5.0);
-            } else {
-                stroke(255);
-                fill(255, 0, 0);
-                ellipse(x, y, 3.0, 3.0);
-            }
-        }
-        if (highlightedVertex != null) {
-            stroke(255, 255, 30);
-            fill(255, 255, 30);
-            ellipse(toScreenX(highlightedVertex.getX()), toScreenY(highlightedVertex.getY()), 7.0,
-                    7.0);
-            noFill();
-        }
-        fill(255, 0, 0);
-        text(mouseModelX + ", " + mouseModelY, 0, 10);
+    }
+    
+    private int drawEdge(DirectEdge e) {
+    	if (e.getGeometry() == null) return 0; // do not attempt to draw geometry-less edges
+    	Coordinate[] coords = e.getGeometry().getCoordinates();
+	    beginShape();
+	    for (int i = 0; i < coords.length; i++)
+	        vertex((float) toScreenX(coords[i].x), (float) toScreenY(coords[i].y));
+	    endShape();
+	    return coords.length; // should be used to count segments, not edges drawn
     }
 
+    /* use endpoints instead of geometry for quick updating */
+    private void drawEdgeFast(DirectEdge e) { 
+	    Coordinate[] coords = e.getGeometry().getCoordinates();	    
+	    Coordinate c0 = coords[0];
+	    Coordinate c1 = coords[coords.length - 1]; 
+        line((float) toScreenX(c0.x), (float) toScreenY(c0.y),
+        		(float) toScreenX(c1.x), (float) toScreenY(c1.y));        		
+    }
+
+    private void drawGraphPath(GraphPath gp) {
+        // draw edges in different colors according to mode
+    	for (SPTEdge se : gp.edges) {
+        	Edge edge = se.payload;
+        	if (!(edge instanceof DirectEdge)) continue;
+        	DirectEdge e = (DirectEdge) edge;
+        	TraverseMode mode = se.getMode();
+        	if (mode.isTransit()) {
+            	stroke(200, 050, 000); 
+            	strokeWeight(6);   
+            	drawEdge(e);
+        	}
+        	if (e instanceof StreetEdge) {
+        		StreetTraversalPermission stp = ((StreetEdge)e).getPermission();
+            	if (stp == StreetTraversalPermission.PEDESTRIAN) {
+        			stroke(000, 200, 000);
+                	strokeWeight(6);   
+                	drawEdge(e);
+        		} else if (stp == StreetTraversalPermission.BICYCLE) {
+        			stroke(000, 000, 200);
+                	strokeWeight(6);   
+                	drawEdge(e);
+        		} else if (stp == StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE) {
+        			stroke(000, 200, 200);
+                	strokeWeight(6);   
+                	drawEdge(e);
+        		} else if (stp == StreetTraversalPermission.ALL) {
+        			stroke(200, 200, 200);
+                	strokeWeight(6);   
+                	drawEdge(e);
+        		} else {
+        			stroke(64, 64, 64);
+                	strokeWeight(6);   
+                	drawEdge(e);
+        		}
+        	}
+        }
+        // mark key vertices
+        SPTVertex fv = gp.vertices.firstElement();
+        lastLabelY = -999;
+    	labelVertex(fv, "begin");
+        for (SPTEdge se : gp.edges) {
+        	Edge e = se.payload;
+        	if (e instanceof PatternBoard) {
+        		labelVertex(se.tov, "board");
+        	} else if (e instanceof PatternAlight) {
+        		labelVertex(se.fromv, "alight");
+        	}
+        }
+    	SPTVertex lv = gp.vertices.lastElement();
+    	labelVertex(lv, "end");
+    }
+
+    private void labelVertex(SPTVertex v, String s) {
+    	fill(240, 240, 240);
+    	drawVertex(v, 8);
+    	s += " " + shortDateFormat.format(new Date(v.state.getTime()));
+    	s += " [" + (int)v.weightSum + "]";
+    	double x = toScreenX(v.getX()) + 10;
+    	double y = toScreenY(v.getY());
+    	double dy = y - lastLabelY;
+    	if (dy == 0) {
+    		y = lastLabelY + 20;
+    	} else if (Math.abs(dy) < 20) {
+    		y = lastLabelY + Math.signum(dy) * 20;
+    	}
+    	text(s, (float)x, (float)y);
+    	lastLabelY = y;
+    }
+
+    private void drawVertex(Vertex v, double r) {
+    	noStroke();
+        ellipse(toScreenX(v.getX()), toScreenY(v.getY()), r, r);
+    }
+
+    public synchronized void draw() {
+    	final int BLOCK_SIZE = 1000;
+    	final long DECIMATE = 100;
+    	final int FRAME_TIME = 800 / FRAME_RATE; 
+		int startMillis = millis();
+        if (drawLevel == DRAW_PARTIAL) { 
+          	background(15);
+        	stroke(30, 128, 30); 
+            strokeWeight(1);
+        	noFill();
+    		//noSmooth();
+        	int drawIndex = 0;
+        	int drawStart = 0;
+        	int drawCount = 0;
+        	while (drawStart < visibleStreetEdges.size()) {
+            	if (drawFast) 
+            		drawEdgeFast(visibleStreetEdges.get(drawIndex));
+            	else 
+            		drawEdge(visibleStreetEdges.get(drawIndex));
+            	drawIndex += DECIMATE;
+            	drawCount += 1;
+            	if (drawCount % BLOCK_SIZE == 0 && 
+            		millis() - startMillis > FRAME_TIME){
+            		drawFast = drawCount < visibleStreetEdges.size() / 4; 
+            		break; 
+            	}
+            	if (drawIndex >= visibleStreetEdges.size()) {
+                	drawStart += 1;
+                	drawIndex = drawStart;
+            	}
+            }                
+    	} else if (drawLevel == DRAW_ALL) {
+    	//} else if (drawLevel == DRAW_STREETS) {
+    		//smooth();
+    		if (drawOffset == 0) {
+    			findVisibleElements();
+    			background(15);
+    		}
+    		if (drawStreetEdges) {
+        	    stroke(30, 128, 30); // dark green
+                strokeWeight(1);   
+            	noFill();
+                //for (DirectEdge e : visibleStreetEdges) drawEdge(e);
+                while (drawOffset < visibleStreetEdges.size()) {
+                	drawEdge(visibleStreetEdges.get(drawOffset));
+                	drawOffset += 1;
+                	// if (drawOffset % FRAME_SIZE == 0) return; 
+                	if (drawOffset % BLOCK_SIZE == 0) {
+                		if (millis() - startMillis > FRAME_TIME) return; 
+                	}
+                }                
+	  	    }
+    	} else if (drawLevel == DRAW_TRANSIT) {
+    		if (drawTransitEdges) {
+				stroke(40, 40, 128, 30); // transparent blue
+				strokeWeight(4);
+            	noFill();
+    			//for (DirectEdge e : visibleTransitEdges) {
+    			while (drawOffset < visibleTransitEdges.size()) {
+    				DirectEdge e = visibleTransitEdges.get(drawOffset);
+    				drawEdge(e);
+    				drawOffset += 1;
+                	if (drawOffset % BLOCK_SIZE == 0) {
+                		if (millis() - startMillis > FRAME_TIME) return; 
+                	}
+    			}
+    		}
+    	} else if (drawLevel == DRAW_VERTICES) {    	        
+      	    /* turn off vertex display when zoomed out */
+        	final double METERS_PER_DEGREE_LAT = 111111.111111;
+      	    drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 10);
+	        /* Draw selected visible vertices */
+        	fill(60, 60, 200);
+	        for (Vertex v : visibleVertices) {
+	            if (drawTransitStopVertices && v instanceof TransitStop) {
+	                drawVertex(v, 5);   
+	            } 
+	        }
+            /* Draw highlighted edges in another color */
+            noFill();
+        	stroke(200, 200, 000, 128); // yellow transparent edge highlight
+            strokeWeight(8);   
+	  	    if (highlightedEdges != null) {
+		  	    for (DirectEdge e : highlightedEdges) {
+	                drawEdge(e);
+	            }
+	  	    }
+            /* Draw highlighted graph path in another color */
+	  	    if (highlightedGraphPath != null) {
+                drawGraphPath(highlightedGraphPath);
+	  	    }
+            /* Draw (single) highlighted edge in highlight color */
+	        if (highlightedEdge != null && highlightedEdge.getGeometry() != null) {
+	            stroke(200, 10, 10, 128);
+	            strokeWeight(8);   
+	            drawEdge(highlightedEdge);
+	        }
+	        /* Draw highlighted vertices */
+    		fill(255, 127, 0); //orange fill
+            noStroke();   
+	        if (highlightedVertices != null) {
+	        	for (Vertex v : highlightedVertices) {
+	                drawVertex(v, 8);
+	        	}
+            }
+            /* Draw (single) highlighed vertex in a different color */
+	        if (highlightedVertex != null) {
+	            fill(255, 255, 30);
+	            drawVertex(highlightedVertex, 7);
+	        }
+            noFill();
+  	    } else if (drawLevel==DRAW_MINIMAL) {
+  	        // Black background box
+  	    	fill(0, 0, 0);
+  	    	stroke(30, 128, 30);
+  	    	// noStroke();
+  	    	strokeWeight(1);
+  	        rect(3, 3, 303, textAscent() + textDescent() + 6);            
+  	        // Print lat & lon coordinates
+  	    	fill(128, 128, 256);
+  	        //noStroke();
+  	    	String output = lonFormatter.format(mouseModelX) + " " + latFormatter.format(mouseModelY);
+  	    	textAlign(LEFT, TOP);
+  	    	text(output, 6, 6);                
+  	    }
+  	    drawOffset = 0;
+  	    if (drawLevel > DRAW_MINIMAL) drawLevel -= 1; // move to next layer
+    }
+    
     private double toScreenY(double y) {
         return map(y, modelBounds.getMinY(), modelBounds.getMaxY(), getSize().height, 0);
     }
@@ -275,68 +514,51 @@ public class ShowGraph extends PApplet {
         return map(x, modelBounds.getMinX(), modelBounds.getMaxX(), 0, getSize().width);
     }
 
+    public void keyPressed() {
+    	if (key == CODED && keyCode == CONTROL) ctrlPressed = true;
+    }
+
+    public void keyReleased() {
+    	if (key == CODED && keyCode == CONTROL) ctrlPressed = false;
+    } 
+
     @SuppressWarnings("unchecked")
     public void mouseClicked() {
         Envelope screenEnv = new Envelope(new Coordinate(mouseX, mouseY));
-        screenEnv.expandBy(3, 3);
+        screenEnv.expandBy(4, 4);
         Envelope env = new Envelope(toModelX(screenEnv.getMinX()), toModelX(screenEnv.getMaxX()),
                 toModelY(screenEnv.getMinY()), toModelY(screenEnv.getMaxY()));
 
         List<Vertex> nearby = (List<Vertex>) vertexIndex.query(env);
         selector.verticesSelected(nearby);
+        drawLevel = DRAW_ALL;
     }
 
-    public void mousePressed() {
-        startDragX = mouseX;
-        startDragY = mouseY;
+    public void mouseReleased(MouseEvent e) {
+        startDrag = null;
     }
 
-    public void mouseReleased() {
-        if (startDragX == -1 || startDragY == -1 || Math.abs(mouseX - startDragX) < 5
-                || Math.abs(mouseY - startDragY) < 5) {
-            startDragX = startDragY = -1;
-            return;
-        }
-        // rescale
-        double x1 = toModelX(startDragX);
-        double x2 = toModelX(mouseX);
-        if (x1 > x2) {
-            double tmp = x1;
-            x1 = x2;
-            x2 = tmp;
-        }
-        double y1 = toModelY(startDragY);
-        double y2 = toModelY(mouseY);
-        if (y1 > y2) {
-            double tmp = y1;
-            y1 = y2;
-            y2 = tmp;
-        }
-
-        double yDist = y2 - y1;
-        double xDist = x2 - x1;
-
-        if (yDist < 0.00001 || xDist < 0.00001) {
-            startDragX = startDragY = -1;
-            return;
-        }
-
-        // fix ratio
-        double originalAspectRatio = modelOuterBounds.getWidth() / modelOuterBounds.getHeight();
-        double zoomBoxAspectRatio = xDist / yDist;
-        if (zoomBoxAspectRatio > originalAspectRatio) {
-            double desiredYDist = yDist * zoomBoxAspectRatio / originalAspectRatio;
-            y1 -= (desiredYDist - yDist) / 2;
-            y2 += (desiredYDist - yDist) / 2;
-        } else {
-            double desiredXDist = xDist * originalAspectRatio / zoomBoxAspectRatio;
-            x1 -= (desiredXDist - xDist) / 2;
-            x2 += (desiredXDist - xDist) / 2;
-        }
-
-        modelBounds = new Envelope(x1, x2, y1, y2);
+    public void mouseDragged(MouseEvent e) {
+    	Point c = e.getPoint();
+    	if (startDrag == null) {
+	        startDrag = c;
+	        dragX = c.x;
+	        dragY = c.y;
+    	}
+      	double dx = dragX - c.x;
+       	double dy = c.y - dragY;
+       	if (ctrlPressed || mouseButton == RIGHT) {
+       		zoom(dy * 0.01, startDrag);
+       	} else {
+	   		double tx = modelBounds.getWidth()  * dx / getWidth();
+	   		double ty = modelBounds.getHeight() * dy / getHeight();
+	   		modelBounds.translate(tx, ty);
+       	}
+        dragX = c.x;
+        dragY = c.y;
+        drawLevel = DRAW_PARTIAL;
     }
-
+    
     private double toModelY(double y) {
         return map(y, 0, getSize().height, modelBounds.getMaxY(), modelBounds.getMinY());
     }
@@ -386,13 +608,31 @@ public class ShowGraph extends PApplet {
         }
         modelBounds.expandBy(xd, yd);
         highlightedVertex = v;
-    }
-
-    public void setHighlighted(Set<Vertex> vertices) {
-        highlightedVertices = vertices;
+        drawLevel = DRAW_ALL;
     }
 
     public void highlightEdge(DirectEdge selected) {
         highlightedEdge = selected;
+        drawLevel = DRAW_ALL;
+    }
+
+    public void highlightGraphPath(GraphPath gp) {
+        highlightedGraphPath = gp;
+        drawLevel = DRAW_ALL;
+    }
+
+    public void setHighlightedVertices(Set<Vertex> vertices) {
+        highlightedVertices = new ArrayList<Vertex>(vertices);
+        drawLevel = DRAW_ALL;
+    }
+
+    public void setHighlightedVertices(List<Vertex> vertices) {
+        highlightedVertices = vertices;
+        drawLevel = DRAW_ALL;
+    }
+
+    public void setHighlightedEdges(List<DirectEdge> edges) {
+        highlightedEdges = edges;
+        drawLevel = DRAW_ALL;
     }
 }

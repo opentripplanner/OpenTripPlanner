@@ -18,10 +18,10 @@ import java.util.List;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
- * Some sort of vertices has been selected.
+ * An interface allowing a map UI element to report
+ * that the user has selected vertices.
  *
  */
 public interface VertexSelectionListener {
-
     public void verticesSelected(List<Vertex> selected);
 }
