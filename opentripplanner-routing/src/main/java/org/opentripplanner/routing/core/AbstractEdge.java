@@ -27,7 +27,7 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     protected Vertex tov;
 
     public String toString() {
-        return fromv + "-> " + tov;
+        return getClass().getName() + "(" + fromv + " -> " + tov + ")";
     }
 
     public AbstractEdge(Vertex v1, Vertex v2) {

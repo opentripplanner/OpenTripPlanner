@@ -78,6 +78,6 @@ public class FreeEdge extends AbstractEdge {
     }
     
     public String toString() {
-        return"FreeEdge(" + fromv + "-> " + tov + ")";
+        return "FreeEdge(" + fromv + " -> " + tov + ")";
     }
 }

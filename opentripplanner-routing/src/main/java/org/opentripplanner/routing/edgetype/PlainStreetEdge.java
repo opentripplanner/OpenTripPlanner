@@ -293,4 +293,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return roundabout;
     }
 
+    @Override
+    public String toString() {
+        return "PlainStreetEdge(" + fromv + " -> " + tov + ")";
+    }
 }

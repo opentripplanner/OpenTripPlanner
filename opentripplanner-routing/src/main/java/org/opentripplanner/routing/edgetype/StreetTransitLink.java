@@ -108,4 +108,9 @@ public class StreetTransitLink implements DirectEdge, Serializable {
     public boolean isRoundabout() {
         return false;
     }
+
+    @Override
+    public String toString() {
+        return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+    }
 }
