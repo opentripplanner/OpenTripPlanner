@@ -231,6 +231,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JCheckBox busCheckBox;
 
+    private JCheckBox ferryCheckBox;
+
+    private JCheckBox transitCheckBox;
+
     private JTextField searchDate;
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -343,10 +347,14 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingPanel.add(walkCheckBox);
         bikeCheckBox = new JCheckBox("bike");
         routingPanel.add(bikeCheckBox);
-        trainCheckBox = new JCheckBox("train");
+        trainCheckBox = new JCheckBox("trainish");
         routingPanel.add(trainCheckBox);
-        busCheckBox  = new JCheckBox("bus");
+        busCheckBox  = new JCheckBox("busish");
         routingPanel.add(busCheckBox);
+        ferryCheckBox = new JCheckBox("ferry");
+        routingPanel.add(ferryCheckBox);
+        transitCheckBox = new JCheckBox("transit");
+        routingPanel.add(transitCheckBox);
         
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
@@ -792,18 +800,24 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         	searchDate.setText("Format: " + dateFormat.toPattern());
         	return;
         }
-        System.out.println("--------");
-        System.out.println("Path from " + from + " to " + to + " at " + when);
         TraverseModeSet modeSet = new TraverseModeSet();
-        modeSet.setBicycle(bikeCheckBox.isSelected());
+        modeSet.setTransit(transitCheckBox.isSelected());
         modeSet.setTrainish(trainCheckBox.isSelected());
         modeSet.setBusish(busCheckBox.isSelected());
         modeSet.setWalk(walkCheckBox.isSelected());
+        modeSet.setBicycle(bikeCheckBox.isSelected());
+        modeSet.setFerry(ferryCheckBox.isSelected());
     	TraverseOptions options = new TraverseOptions(modeSet);
     	options.speed = 1; // override difference between bike and walk
     	options.walkReluctance = 1; // walk etc are same cost
     	options.maxSlope = 1; // even climb walls
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
+
+        System.out.println("--------");
+        System.out.println("Path from " + from + " to " + to + " at " + when);
+        System.out.println("\tModes: " + modeSet);
+        System.out.println("\tOptions: " + options);
+
     	List<GraphPath> paths = pathservice.plan(from, to, when, options, 1);
         if (paths == null) {
             System.out.println("no path");
