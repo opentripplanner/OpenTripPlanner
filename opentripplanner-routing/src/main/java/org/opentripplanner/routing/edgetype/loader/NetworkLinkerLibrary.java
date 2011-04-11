@@ -150,6 +150,7 @@ public class NetworkLinkerLibrary {
             graph.addVertex(linked);
             for (Vertex i : atIntersection) {
                 graph.addEdge(new FreeEdge(linked, i));
+                graph.addEdge(new FreeEdge(i, linked));
             }
             return linked;
         }
