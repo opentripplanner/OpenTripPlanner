@@ -504,8 +504,9 @@ public class Planner {
         leg.route = edge.getName();
         Trip trip = edge.getTrip();
         if (trip != null) {
-            leg.headsign = trip.getTripHeadsign();
-            leg.agencyId = trip.getId().getAgencyId();
+            leg.headsign      = trip.getTripHeadsign();
+            leg.agencyId      = trip.getId().getAgencyId();
+            leg.tripShortName = trip.getTripShortName();
         }
         leg.distance = 0.0;
         leg.from = makePlace(edge.narrative.getFromVertex());
