@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -178,7 +179,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         fareContexts = context.getFareRules();
     }
 
-    public void setCalendarService(CalendarService calendarService) {
+    public void setCalendarService(CalendarServiceImpl calendarService) {
         this.calendarService = calendarService;
     }
 

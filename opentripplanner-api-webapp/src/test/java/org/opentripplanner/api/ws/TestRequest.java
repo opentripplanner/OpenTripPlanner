@@ -39,7 +39,6 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.util.DateUtils;
@@ -112,12 +111,9 @@ public class TestRequest extends TestCase {
         builder.setSchema(schema );
         builder.buildGraph(graph);
         ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, null);
-        GraphServiceImpl graphService = new GraphServiceImpl();
-        graphService.setContractionHierarchySet(hierarchies);
-        
-        pathService.setGraphService(graphService);
+        pathService.setHierarchies(hierarchies);
         ContractionRoutingServiceImpl routingService = new ContractionRoutingServiceImpl();
-        routingService.setGraphService(graphService);
+        routingService.setHierarchies(hierarchies);
         pathService.setRoutingService(routingService);
         planner.setPathService(pathService);
 
