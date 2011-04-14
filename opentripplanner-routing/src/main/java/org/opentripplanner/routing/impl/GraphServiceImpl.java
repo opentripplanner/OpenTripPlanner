@@ -13,7 +13,9 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link GraphService} that loads the graph from a file.
@@ -32,105 +34,125 @@ import org.opentripplanner.routing.services.GraphService;
  */
 public class GraphServiceImpl implements GraphService {
 
-	private GraphBundle _bundle;
+  private GraphBundle _bundle;
 
-	private File _graphPath;
+  private File _graphPath;
 
-	private boolean _createEmptyGraphIfNotFound = false;
+  private boolean _createEmptyGraphIfNotFound = false;
 
-	private ContractionHierarchySet _contractionHierarchySet;
+  private ContractionHierarchySet _contractionHierarchySet;
 
-	private CalendarServiceImpl _calendarService;
+  private CalendarServiceImpl _calendarService;
 
-	public void setBundle(GraphBundle bundle) {
-		_bundle = bundle;
-	}
+  private List<GraphRefreshListener> _graphRefreshListeners;
 
-	public void setGraphPath(File graphPath) {
-		_graphPath = graphPath;
-	}
+  public void setBundle(GraphBundle bundle) {
+    _bundle = bundle;
+  }
 
-	/**
-	 * By default, we throw an exception if the graph path is not found. Set
-	 * this to true to indicate that a default empty graph should be creaetd
-	 * instead.
-	 * 
-	 * @param createEmptyGraphIfNotFound
-	 */
-	public void setCreateEmptyGraphIfNotFound(boolean createEmptyGraphIfNotFound) {
-		_createEmptyGraphIfNotFound = createEmptyGraphIfNotFound;
-	}
+  public void setGraphPath(File graphPath) {
+    _graphPath = graphPath;
+  }
 
-	public void setContractionHierarchySet(
-			ContractionHierarchySet contractionHierarchySet) {
-		_contractionHierarchySet = contractionHierarchySet;
+  /**
+   * By default, we throw an exception if the graph path is not found. Set this
+   * to true to indicate that a default empty graph should be creaetd instead.
+   * 
+   * @param createEmptyGraphIfNotFound
+   */
+  public void setCreateEmptyGraphIfNotFound(boolean createEmptyGraphIfNotFound) {
+    _createEmptyGraphIfNotFound = createEmptyGraphIfNotFound;
+  }
 
-		CalendarServiceData data = _contractionHierarchySet
-				.getService(CalendarServiceData.class);
-		if (data != null) {
-			CalendarServiceImpl calendarService = new CalendarServiceImpl();
-			calendarService.setData(data);
-			_calendarService = calendarService;
-		} else {
-			_calendarService = null;
-		}
-	}
+  public void setContractionHierarchySet(
+      ContractionHierarchySet contractionHierarchySet) {
+    _contractionHierarchySet = contractionHierarchySet;
 
-	/****
-	 * {@link GraphService} Interface
-	 ****/
+    CalendarServiceData data = _contractionHierarchySet.getService(CalendarServiceData.class);
+    if (data != null) {
+      CalendarServiceImpl calendarService = new CalendarServiceImpl();
+      calendarService.setData(data);
+      _calendarService = calendarService;
+    } else {
+      _calendarService = null;
+    }
+  }
 
-	@Override
-	@PostConstruct
-	// This means it will run on startup
-	public void refreshGraph() {
+  @Autowired
+  public void setGraphRefreshListeners(
+      List<GraphRefreshListener> graphRefreshListeners) {
+    _graphRefreshListeners = graphRefreshListeners;
+  }
 
-		File path = null;
+  /****
+   * {@link GraphService} Interface
+   ****/
 
-		if (_bundle != null)
-			path = _bundle.getGraphPath();
+  @Override
+  @PostConstruct
+  // This means it will run on startup
+  public void refreshGraph() {
+    readGraph();
+    notifyListeners();
+  }
 
-		if (_graphPath != null)
-			path = _graphPath;
+  @Override
+  public ContractionHierarchySet getContractionHierarchySet() {
+    return _contractionHierarchySet;
+  }
 
-		if (path == null || !path.exists()) {
-			if (!_createEmptyGraphIfNotFound)
-				throw new IllegalStateException("graph path not found: " + path);
+  @Override
+  public Graph getGraph() {
+    return _contractionHierarchySet.getGraph();
+  }
 
-			/****
-			 * Create an empty graph if not graph is found
-			 */
-			Graph graph = new Graph();
-			List<ModeAndOptimize> modeList = Collections.emptyList();
-			setContractionHierarchySet(new ContractionHierarchySet(graph,
-					modeList));
-			return;
-		}
+  @Override
+  public CalendarService getCalendarService() {
+    return _calendarService;
+  }
 
-		try {
+  /****
+   * Private Methods
+   ****/
 
-			ContractionHierarchySet chs = ContractionHierarchySerializationLibrary
-					.readGraph(_bundle.getGraphPath());
-			setContractionHierarchySet(chs);
+  private void readGraph() {
 
-		} catch (Exception ex) {
-			throw new IllegalStateException("error loading graph from " + path,
-					ex);
-		}
-	}
+    File path = null;
 
-	@Override
-	public ContractionHierarchySet getContractionHierarchySet() {
-		return _contractionHierarchySet;
-	}
+    if (_bundle != null)
+      path = _bundle.getGraphPath();
 
-	@Override
-	public Graph getGraph() {
-		return _contractionHierarchySet.getGraph();
-	}
+    if (_graphPath != null)
+      path = _graphPath;
 
-	@Override
-	public CalendarService getCalendarService() {
-		return _calendarService;
-	}
+    if (path == null || !path.exists()) {
+      if (!_createEmptyGraphIfNotFound)
+        throw new IllegalStateException("graph path not found: " + path);
+
+      /****
+       * Create an empty graph if not graph is found
+       */
+      Graph graph = new Graph();
+      List<ModeAndOptimize> modeList = Collections.emptyList();
+      setContractionHierarchySet(new ContractionHierarchySet(graph, modeList));
+      return;
+    }
+
+    try {
+
+      ContractionHierarchySet chs = ContractionHierarchySerializationLibrary.readGraph(path);
+      setContractionHierarchySet(chs);
+
+    } catch (Exception ex) {
+      throw new IllegalStateException("error loading graph from " + path, ex);
+    }
+  }
+
+  private void notifyListeners() {
+    if( _graphRefreshListeners == null)
+      return;
+    for( GraphRefreshListener listener : _graphRefreshListeners)
+      listener.handleGraphRefresh(this);
+  }
+
 }

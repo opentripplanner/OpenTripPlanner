@@ -22,8 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
-import javax.annotation.PostConstruct;
-
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -39,6 +37,8 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.GraphRefreshListener;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +65,9 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * spatial index of all of the intersections in the graph.
  */
 @Component
-public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
+public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, GraphRefreshListener {
 
-    private Graph graph;
+    private GraphService graphService;
 
     /**
      * Contains only instances of {@link StreetEdge}
@@ -85,21 +85,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private static final double DIRECTION_ERROR = 0.05;
 
     private static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
-    
+
     public StreetVertexIndexServiceImpl() {
     }
 
     public StreetVertexIndexServiceImpl(Graph graph) {
-        this.graph = graph;
+        this.graphService = new GraphServiceBeanImpl(graph);
     }
 
     @Autowired
-    public void setGraph(Graph graph) {
-        this.graph = graph;
-    }
-
-    public Graph getGraph() {
-        return graph;
+    public void setGraphService(GraphService graphService) {
+        this.graphService = graphService;
     }
 
     public void setup_modifiable() {
@@ -107,14 +103,21 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         postSetup();
     }
 
-    @PostConstruct
     public void setup() {
         edgeTree = new STRtree();
         postSetup();
         ((STRtree) edgeTree).build();
     }
 
+    @Override
+    public void handleGraphRefresh(GraphService graphService) {
+        setup();
+    }
+
     private void postSetup() {
+        
+        Graph graph = graphService.getGraph();
+        
         transitStopTree = new STRtree();
         intersectionTree = new STRtree();
         for (GraphVertex gv : graph.getVertices()) {
@@ -192,27 +195,28 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
             return closest;
         }
-       
+
         // then find closest transit stop
         // (we can return stops here because this method is not used when street-transit linking)
-        double closest_stop_distance = Double.POSITIVE_INFINITY;            
+        double closest_stop_distance = Double.POSITIVE_INFINITY;
         Vertex closest_stop = null;
-        // dummy vertex is not terribly elegant but geometry/distance methods are slated to be modified
+        // dummy vertex is not terribly elegant but geometry/distance methods are slated to be
+        // modified
         GenericVertex gv = new GenericVertex("x", coordinate, "x");
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
-        if (options != null && options.getModes().getTransit()) {            
+        if (options != null && options.getModes().getTransit()) {
             for (Vertex v : getLocalTransitStops(coordinate, 400)) {
                 double d = v.distance(coordinate);
                 _log.debug("stop " + v + " distance " + d);
-                if ( d < closest_stop_distance) {
+                if (d < closest_stop_distance) {
                     closest_stop_distance = d;
                     closest_stop = v;
                 }
             }
         }
         _log.debug("best stop: " + closest_stop + " distance " + closest_stop_distance);
-        
+
         // then find closest walkable street
         Collection<StreetEdge> edges = getClosestEdges(coordinate, options);
         if (edges != null) {
@@ -228,15 +232,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 _log.debug("returning split street");
                 return StreetLocation.createStreetLocation(
                         bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
-                        edges, nearestPoint);            
+                        edges, nearestPoint);
             }
-        } 
+        }
         // if no street was found nearby, or the transit stop was closer, return the stop
         _log.debug("returning transit stop (closer than street)");
-        return closest_stop;  // which will be null if none was found
+        return closest_stop; // which will be null if none was found
     }
 
     public void reified(StreetLocation vertex) {
+        Graph graph = graphService.getGraph();
         for (StreetEdge e : filter(graph.getIncoming(vertex), StreetEdge.class)) {
             if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
                 edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
@@ -396,4 +401,5 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return atIntersection;
     }
+
 }

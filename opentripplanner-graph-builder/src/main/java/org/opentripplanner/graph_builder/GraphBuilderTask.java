@@ -23,6 +23,7 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class GraphBuilderTask implements Runnable {
     
     private static Logger _log = LoggerFactory.getLogger(GraphBuilderTask.class); 
 
-    private Graph _graph;
+    private GraphService _graphService;
 
     private List<GraphBuilder> _graphBuilders = new ArrayList<GraphBuilder>();
 
@@ -44,8 +45,8 @@ public class GraphBuilderTask implements Runnable {
     private double _contractionFactor = 1.0;
 
     @Autowired
-    public void setGraph(Graph graph) {
-        _graph = graph;
+    public void setGraphService(GraphService graphService) {
+        _graphService = graphService;
     }
     
     public void addGraphBuilder(GraphBuilder loader) {
@@ -78,6 +79,8 @@ public class GraphBuilderTask implements Runnable {
 
     public void run() {
         
+        Graph graph = _graphService.getGraph();
+        
         File graphPath = _graphBundle.getGraphPath();
         
         if( graphPath.exists() && ! _alwaysRebuild) {
@@ -86,14 +89,16 @@ public class GraphBuilderTask implements Runnable {
         }
         
         for (GraphBuilder load : _graphBuilders)
-            load.buildGraph(_graph);
+            load.buildGraph(graph);
         
-        ContractionHierarchySet chs = new ContractionHierarchySet(_graph, _modeList, _contractionFactor);
+        ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
         chs.build();
         try {
             ContractionHierarchySerializationLibrary.writeGraph(chs, graphPath);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
+        
+        _graphService.refreshGraph();
     }
 }

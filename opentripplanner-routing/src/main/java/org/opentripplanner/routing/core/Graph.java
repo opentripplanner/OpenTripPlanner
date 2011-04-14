@@ -24,13 +24,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * This holds the edge list for every vertex.  
- *
+ * This holds the edge list for every vertex.
+ * 
  */
 public class Graph implements Serializable {
     private static final long serialVersionUID = -7583768730006630206L;
-    
-    private Map<Class<?>,Object> _services = new HashMap<Class<?>, Object>();
+
+    private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
     HashMap<String, GraphVertex> vertices;
 
@@ -81,7 +81,7 @@ public class Graph implements Serializable {
     public GraphVertex getGraphVertex(String label) {
         return vertices.get(label);
     }
-    
+
     public Collection<GraphVertex> getVertices() {
         return vertices.values();
     }
@@ -101,11 +101,11 @@ public class Graph implements Serializable {
         vertices.get(fromv.getLabel()).addOutgoing(ee);
         vertices.get(tov.getLabel()).addIncoming(ee);
     }
-    
+
     public void addEdge(String from_label, String to_label, Edge ee) {
         Vertex v1 = this.getVertex(from_label);
         Vertex v2 = this.getVertex(to_label);
-        
+
         addEdge(v1, v2, ee);
     }
 
@@ -122,16 +122,16 @@ public class Graph implements Serializable {
         }
         return ret;
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T putService(Class<T> serviceType, T service) {
         return (T) _services.put(serviceType, service);
     }
-    
+
     public boolean hasService(Class<?> serviceType) {
         return _services.containsKey(serviceType);
     }
-    
+
     @SuppressWarnings("unchecked")
     public <T> T getService(Class<T> serviceType) {
         return (T) _services.get(serviceType);
@@ -156,19 +156,20 @@ public class Graph implements Serializable {
                 }
             }
         }
-        for (Edge e: gv.getIncoming()) {
-            DirectEdge edge = (DirectEdge) e;
-            GraphVertex source = vertices.get(edge.getFromVertex().getLabel());
-            if (source != null) {
-                source.removeIncoming(e);
+        for (Edge e : gv.getIncoming()) {
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                GraphVertex source = vertices.get(edge.getFromVertex().getLabel());
+                if (source != null) {
+                    source.removeIncoming(e);
+                }
             }
         }
     }
-    
-    
+
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (GraphVertex v: this.getVertices()) {
+        for (GraphVertex v : this.getVertices()) {
             env.expandToInclude(v.vertex.getCoordinate());
         }
         return env;
@@ -177,7 +178,7 @@ public class Graph implements Serializable {
     public Collection<Edge> getOutgoing(Vertex v) {
         return vertices.get(v.getLabel()).outgoing;
     }
-    
+
     public Collection<Edge> getIncoming(Vertex v) {
         return vertices.get(v.getLabel()).incoming;
     }
@@ -185,7 +186,7 @@ public class Graph implements Serializable {
     public int getDegreeOut(Vertex v) {
         return vertices.get(v.getLabel()).outgoing.size();
     }
-    
+
     public int getDegreeIn(Vertex v) {
         return vertices.get(v.getLabel()).incoming.size();
     }
@@ -193,7 +194,7 @@ public class Graph implements Serializable {
     public Collection<Edge> getIncoming(String label) {
         return vertices.get(label).incoming;
     }
-    
+
     public Collection<Edge> getOutgoing(String label) {
         return vertices.get(label).outgoing;
     }

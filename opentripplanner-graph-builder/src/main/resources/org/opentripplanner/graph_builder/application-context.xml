@@ -11,7 +11,11 @@
     <!-- This turns on automatic annotation configuration -->
     <context:annotation-config />
 
-    <bean id="graph" class="org.opentripplanner.routing.core.Graph"/>
+    <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceBeanImpl">
+        <property name="graph">
+          <bean class="org.opentripplanner.routing.core.Graph"/>
+        </property>
+    </bean>
     
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
         <property name="graphBundle" ref="graphBundle" />
