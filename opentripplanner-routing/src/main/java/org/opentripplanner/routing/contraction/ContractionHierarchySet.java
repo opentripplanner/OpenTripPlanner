@@ -85,7 +85,7 @@ public class ContractionHierarchySet implements Serializable {
         return getGraph().hasService(serviceType);
     }
 
-    public CalendarServiceData getService(Class<CalendarServiceData> serviceType) {
+    public <T> T getService(Class<T> serviceType) {
         return getGraph().getService(serviceType);
     }
 

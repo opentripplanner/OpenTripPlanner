@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -34,15 +35,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractionRoutingServiceImpl implements RoutingService {
 
-    private ContractionHierarchySet hierarchies;
+    private GraphService _graphService;
 
     @Autowired
-    public void setHierarchies(ContractionHierarchySet hierarchies) {
-        this.hierarchies = hierarchies;
+    public void setGraphService(GraphService graphService) {
+        _graphService = graphService;
     }
 
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options) {
+        
+        ContractionHierarchySet hierarchies = _graphService.getContractionHierarchySet();
         
         ContractionHierarchy hierarchy = null;
         hierarchy = hierarchies.getHierarchy(options);

@@ -13,7 +13,8 @@
 
 package org.opentripplanner.gui;
 
-import static org.opentripplanner.common.IterableLibrary.*;
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.GridLayout;
@@ -22,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -37,9 +37,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import java.util.TimeZone;
-import java.util.Vector;
 
 import javassist.Modifier;
 
@@ -61,7 +59,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -75,16 +72,14 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Exit on window close.
@@ -255,8 +250,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private DefaultListModel metadataModel;
 
-    private ContractionHierarchySet hierarchies;
-
     private HashSet<Vertex> closed;
 
     private Vertex tracingVertex;
@@ -268,15 +261,13 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     public VizGui(String graphName) {
         super();
  
-        try {
-            setGraph(ContractionHierarchySerializationLibrary.readGraph(new File(graphName)));
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
+        GraphServiceImpl graphService = new GraphServiceImpl();
+        graphService.setGraphPath(new File(graphName));
+        graphService.refreshGraph();
+            
+        setGraph(graphService);
+        
         init();
     }
     
@@ -848,17 +839,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         nearbyVertices.setModel(data);
     }
     
-    public void setGraph(ContractionHierarchySet chs) {
-        hierarchies = chs;
-        graph = chs.getGraph();
+    public void setGraph(GraphServiceImpl graphService) {
+        
+        graph = graphService.getGraph();
 
         pathservice = new ContractionPathServiceImpl();
-        pathservice.setHierarchies(hierarchies);
+        pathservice.setGraphService(graphService);
         indexService = new StreetVertexIndexServiceImpl(getGraph());
         indexService.setup();
         pathservice.setIndexService(indexService);
         routingService = new ContractionRoutingServiceImpl();
-        routingService.setHierarchies(chs);
+        routingService.setGraphService(graphService);
         pathservice.setRoutingService(routingService);
     }
     
