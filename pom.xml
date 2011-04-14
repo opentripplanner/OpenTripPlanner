@@ -47,14 +47,14 @@
 
   <distributionManagement>
     <repository>
-      <id>opengeo</id>
-      <name>OpenGeo Maven Repository</name>
-      <url>dav:http://repo.opengeo.org</url>
+      <id>${distribution_id}</id>
+      <name>${distribution_name}</name>
+      <url>${distribution_url}</url>
     </repository>
     <snapshotRepository>
-      <id>opengeo</id>
-      <name>OpenGeo Maven Repository</name>
-      <url>dav:http://repo.opengeo.org</url>
+      <id>${snapshot_distribution_id}</id>
+      <name>${snapshot_distribution_name}</name>
+      <url>${snapshot_distribution_url}</url>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
   </distributionManagement>
@@ -225,5 +225,11 @@
   <properties>
   	<geotools.version>2.6.4</geotools.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <distribution_id>opengeo</distribution_id>
+    <distribution_name>OpenGeo Maven Repository</distribution_name>
+    <distribution_url>dav:http://repo.opengeo.org</distribution_url>
+    <snapshot_distribution_id>opengeo</snapshot_distribution_id>
+    <snapshot_distribution_name>OpenGeo Maven Repository</snapshot_distribution_name>
+    <snapshot_distribution_url>dav:http://repo.opengeo.org</snapshot_distribution_url>    
   </properties>
 </project>
