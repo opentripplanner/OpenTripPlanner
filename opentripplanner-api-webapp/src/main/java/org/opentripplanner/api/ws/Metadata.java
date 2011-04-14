@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -30,11 +30,11 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Metadata {
 
-    private Graph graph;
+    private GraphService graphService;
 
     @Autowired
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void setGraphService(GraphService graphService) {
+        this.graphService = graphService;
     }
 
     /**
@@ -49,6 +49,6 @@ public class Metadata {
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public GraphMetadata getMetadata() throws JSONException {
 
-        return new GraphMetadata(graph);
+        return new GraphMetadata(graphService);
     }
 }

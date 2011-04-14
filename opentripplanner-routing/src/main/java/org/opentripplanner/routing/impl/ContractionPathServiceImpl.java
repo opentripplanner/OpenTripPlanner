@@ -23,16 +23,12 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.RouteSpec;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -43,6 +39,7 @@ import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -60,25 +57,16 @@ public class ContractionPathServiceImpl implements PathService {
 
     private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
-
-    private ContractionHierarchySet hierarchies;
+    
+    private GraphService _graphService;
 
     private RoutingService _routingService;
 
     private StreetVertexIndexService _indexService;
 
-    private CalendarServiceImpl _calendarService = null;
-
     @Autowired
-    public void setHierarchies(ContractionHierarchySet hierarchies) {
-        this.hierarchies = hierarchies;
-
-        if (hierarchies.hasService(CalendarServiceData.class)) {
-            CalendarServiceData data = hierarchies.getService(CalendarServiceData.class);
-            CalendarServiceImpl calendarService = new CalendarServiceImpl();
-            calendarService.setData(data);
-            _calendarService = calendarService;
-        }
+    public void setGraphService(GraphService graphService){
+        _graphService = graphService;
     }
 
     @Autowired
@@ -111,9 +99,9 @@ public class ContractionPathServiceImpl implements PathService {
 
         State state = new State(targetTime.getTime());
         
-        if (_calendarService != null)
-            options.setCalendarService(_calendarService);
-        options.setTransferTable(hierarchies.getGraph().getTransferTable());
+        if (_graphService.getCalendarService() != null)
+            options.setCalendarService(_graphService.getCalendarService());
+        options.setTransferTable(_graphService.getGraph().getTransferTable());
         options.setServiceDays(state.getTime());
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
@@ -220,10 +208,10 @@ public class ContractionPathServiceImpl implements PathService {
 
         State state = new State(targetTime.getTime());
 
-        if (_calendarService != null)
-            options.setCalendarService(_calendarService);
+        if (_graphService.getCalendarService() != null)
+            options.setCalendarService(_graphService.getCalendarService());
 
-        options.setTransferTable(hierarchies.getGraph().getTransferTable());
+        options.setTransferTable(_graphService.getGraph().getTransferTable());
         GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state,
                 options);
 
@@ -241,7 +229,7 @@ public class ContractionPathServiceImpl implements PathService {
             return _indexService.getClosestVertex(location, options);
         }
 
-        return hierarchies.getVertex(place);
+        return _graphService.getContractionHierarchySet().getVertex(place);
     }
 
     @Override
@@ -259,7 +247,7 @@ public class ContractionPathServiceImpl implements PathService {
     }
 
     public boolean multipleOptionsBefore(Edge edge) {
-        Graph graph = hierarchies.getGraph();
+        Graph graph = _graphService.getGraph();
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();
         GraphVertex gv = graph.getGraphVertex(start);
