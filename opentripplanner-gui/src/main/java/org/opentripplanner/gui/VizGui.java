@@ -261,13 +261,14 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     public VizGui(String graphName) {
         super();
  
-
         GraphServiceImpl graphService = new GraphServiceImpl();
         graphService.setGraphPath(new File(graphName));
         graphService.refreshGraph();
             
         setGraph(graphService);
         
+        setTitle("VizGui: " + graphName);
+
         init();
     }
     
