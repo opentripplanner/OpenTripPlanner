@@ -37,6 +37,7 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
@@ -175,6 +176,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             if (_log.isDebugEnabled())
                 reader.addEntityHandler(counter);
+
+            if(gtfsBundle.getDefaultBikesAllowed())
+                reader.addEntityHandler(new EntityBikeability(true));
 
             readers.add(reader);
         }
@@ -360,5 +364,26 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             return value;
         }
 
+    }
+
+    private class EntityBikeability implements EntityHandler {
+
+        private Boolean _defaultBikesAllowed;
+
+        public EntityBikeability(Boolean defaultBikesAllowed) {
+            _defaultBikesAllowed = defaultBikesAllowed;
+        }
+
+        @Override
+        public void handleEntity(Object bean) {
+            if(!(bean instanceof Trip)) {
+                return;
+            }
+
+            Trip trip = (Trip) bean;
+            if(_defaultBikesAllowed && trip.getTripBikesAllowed() == 0 && trip.getRoute().getBikesAllowed() == 0) {
+                trip.setTripBikesAllowed(2);
+            }
+        }
     }
 }

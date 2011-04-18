@@ -92,10 +92,12 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         if (!options.getModes().contains(hop.getMode())) {
             return null;
         }
-
-	if (options.wheelchairAccessible && !wheelchairAccessible) {
-	    return null;
-	}
+        if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
+            return null;
+        }
+        if (options.wheelchairAccessible && !wheelchairAccessible) {
+           return null;
+        }
 
         long current_time = state0.getTime();
         

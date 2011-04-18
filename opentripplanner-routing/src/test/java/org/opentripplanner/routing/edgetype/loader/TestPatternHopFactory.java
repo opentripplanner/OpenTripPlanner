@@ -375,6 +375,40 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(new GregorianCalendar(2009, 8, 1, 11, 0, 0).getTimeInMillis(), endState.getTime());
     }
 
+    public void testTripBikesAllowed() throws Exception {
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+
+        TraverseOptions options = new TraverseOptions(context);
+        options.getModes().setBicycle(true);
+        options.getModes().setTransit(true);
+
+        ShortestPathTree spt;
+        GraphPath path;
+        // route: bikes allowed, trip: no value
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_b, new State(new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_b);
+        assertNotNull(path);
+
+        // route: bikes allowed, trip: bikes not allowed
+        spt = AStar.getShortestPathTree(graph, stop_d, stop_c, new State(new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_c);
+        assertNull(path);
+
+        // route: bikes not allowed, trip: bikes allowed
+        spt = AStar.getShortestPathTree(graph, stop_c, stop_d, new State(new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+
+        path = spt.getPath(stop_d);
+        assertNotNull(path);
+    }
+
     public void testWheelchairAccessible() throws Exception {
         Vertex near_a = graph.getVertex("near_agency_A");
         Vertex near_b = graph.getVertex("near_agency_B");

@@ -92,7 +92,7 @@
             <version>2.6.1</version>
             <configuration>
                 <links>
-                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.1.2/</link>
+                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.1/</link>
                 </links>
             </configuration>
           </plugin>
@@ -176,7 +176,7 @@
   	<dependency>
   		<groupId>org.onebusaway</groupId>
   		<artifactId>onebusaway-gtfs</artifactId>
-  		<version>1.2.0</version>
+  		<version>1.2.1</version>
   		<type>jar</type>
   		<scope>compile</scope>
   	</dependency>

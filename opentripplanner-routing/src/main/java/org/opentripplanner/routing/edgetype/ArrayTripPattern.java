@@ -152,7 +152,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     }
 
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
-            boolean pickup) {
+            boolean bikesAllowed, boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex] & flag) == 0) {
             return -1;
@@ -169,8 +169,9 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             index = -index - 1;
         }
 
-        if (wheelchairAccessible) {
-            while ((perTripFlags[index] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+        if (wheelchairAccessible || bikesAllowed) {
+            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            while ((perTripFlags[index] & flags) == 0) {
                 index++;
                 if (index == perTripFlags.length) {
                     return -1;
@@ -191,7 +192,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     }
 
     public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
-            boolean pickup) {
+            boolean bikesAllowed, boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex + 1] & flag) == 0) {
             return -1;
@@ -213,8 +214,9 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             index = -index - 2;
         }
 
-        if (wheelchairAccessible) {
-            while ((perTripFlags[index] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+        if (wheelchairAccessible || bikesAllowed) {
+            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            while ((perTripFlags[index] & flags) == 0) {
                 index--;
                 if (index == -1) {
                     return -1;
@@ -251,6 +253,10 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             return false;
         }
         return true;
+    }
+
+    public boolean getBikesAllowed(int trip) {
+        return (perTripFlags[trip] & FLAG_BIKES_ALLOWED) != 0;
     }
 
     public Trip getTrip(int tripIndex) {

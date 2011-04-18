@@ -95,6 +95,9 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         if (!options.getModes().contains(hop.getMode())) {
             return null;
         }
+        if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
+            return null;
+        }
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }

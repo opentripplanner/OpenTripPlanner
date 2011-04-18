@@ -389,7 +389,10 @@ public class GTFSPatternHopFactory {
                         if (blockId != null && !blockId.equals("")) {
                             addTripToInterliningMap(trip, stopTimes, tripPattern);
                         }
-                        tripPattern.setTripFlags(insertionPoint, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+                        tripPattern.setTripFlags(insertionPoint,
+                                ((trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+                                | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
+                                    || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
                     }
                 }
             }
@@ -676,7 +679,10 @@ public class GTFSPatternHopFactory {
             graph.addEdge(new PatternAlight(endJourneyArrive, endStation, tripPattern, i, mode));
         }
 
-        tripPattern.setTripFlags(0, (trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+        tripPattern.setTripFlags(0, 
+                                ((trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+                                | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
+                                    || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
 
         return tripPattern;
     }

@@ -157,7 +157,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         stopDwellTimes.add(insertionPoint, dwellTime);
     }
 
-    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible, boolean pickup) {
+    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
+            boolean bikesAllowed, boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex] & flag) == 0) {
             return -1;
@@ -174,15 +175,16 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             index = -index - 1;
         }
 
-	if (wheelchairAccessible) {
-	    while ((perTripFlags.get(index) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-		index ++;
-		if (index == perTripFlags.size()) {
-		    return -1;
-		}
-	    }
-	}
-	return index;
+        if (wheelchairAccessible || bikesAllowed) {
+            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            while ((perTripFlags.get(index) & flags) == 0) {
+                index ++;
+                if (index == perTripFlags.size()) {
+                    return -1;
+                }
+            }
+        }
+        return index;
     }
 
     public int getRunningTime(int stopIndex, int trip) {
@@ -201,7 +203,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         return -index - 1;
     }
 
-    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible, boolean pickup) {
+    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
+            boolean bikesAllowed, boolean pickup) {
         int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
         if ((perStopFlags[stopIndex + 1] & flag) == 0) {
             return -1;
@@ -223,15 +226,16 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             index = -index - 2;
         }
 
-	if (wheelchairAccessible) {
-	    while ((perTripFlags.get(index) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-		index --;
-		if (index == -1) {
-		    return -1;
-		}
-	    }
-	}
-	return index;
+        if (wheelchairAccessible || bikesAllowed) {
+            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            while ((perTripFlags.get(index) & flags) == 0) {
+                index --;
+                if (index == -1) {
+                    return -1;
+                }
+            }
+        }
+        return index;
     }
 
     public int getArrivalTime(int stopIndex, int trip) {
@@ -266,6 +270,10 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             return false;
         }
         return true;
+    }
+
+    public boolean getBikesAllowed(int trip) {
+        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
     }
 
     public Trip getTrip(int trip) {

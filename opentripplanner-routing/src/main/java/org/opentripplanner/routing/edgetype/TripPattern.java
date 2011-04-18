@@ -34,12 +34,14 @@ public interface TripPattern {
 
     public static final int FLAG_DROPOFF = 4;
 
+    public static final int FLAG_BIKES_ALLOWED = 8;
+
     /** Get the index of the next trip that has a stop after afterTime at the stop at stopIndex
      * 
      * @param pickup whether the stop must be one that picks up passengers 
      */
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
-            boolean pickup);
+            boolean bikesAllowed, boolean pickup);
 
     /** Gets the running time after a given stop on a given trip */
     public int getRunningTime(int stopIndex, int tripIndex);
@@ -52,7 +54,7 @@ public interface TripPattern {
      * @param pickup whether the stop must be one that picks up passengers
      */
     public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
-            boolean pickup);
+            boolean bikesAllowed, boolean pickup);
 
     /** Gets the arrival time for a given stop on a given trip */
     public int getArrivalTime(int stopIndex, int trip);
@@ -65,6 +67,9 @@ public interface TripPattern {
 
     /** Gets the accessibility of a given stop on a given trip */ 
     public boolean getWheelchairAccessible(int stopIndex, int trip);
+
+    /** Gets the bikability of a given trip */ 
+    public boolean getBikesAllowed(int trip);
 
     /** Gets the Trip object for a given trip index */
     public Trip getTrip(int trip);

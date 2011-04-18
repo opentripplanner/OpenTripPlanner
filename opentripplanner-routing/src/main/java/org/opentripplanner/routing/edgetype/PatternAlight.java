@@ -103,7 +103,8 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             // this avoids unnecessarily examining trips starting tomorrow
             if (secondsSinceMidnight < 0) continue; 
             if (sd.serviceIdRunning(serviceId)) {
-                int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible, false);
+                int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
+                                                           options.getModes().getBicycle(), false);
                 if (patternIndex >= 0) {
                     // a trip was found, index is valid, wait will be defined.
                     // even though we are going backward I tend to think waiting 

@@ -125,6 +125,11 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         return GtfsLibrary.getRouteName(start.getTrip().getRoute());
     }
 
+    public Boolean getBikesAllowed() {
+        return (start.getTrip().getRoute().getBikesAllowed() == 2 && start.getTrip().getTripBikesAllowed() != 1)
+            || start.getTrip().getTripBikesAllowed() == 2;
+    }
+
     public Geometry getGeometry() {
         if (geometry == null) {
 
