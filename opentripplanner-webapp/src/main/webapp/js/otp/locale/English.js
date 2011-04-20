@@ -19,6 +19,16 @@ otp.namespace("otp.locale");
   */
 otp.locale.English = {
 
+    config : 
+    {
+        metricsSystem : "english",
+        rightClickMsg : "Right-click on the map to designate the start and end of your trip.",
+        attribution   : {
+            title   : "License Attribution",
+            content : "Disclaimer goes here"
+        }
+    },
+
     contextMenu : 
     {
         fromHere         : "Start a trip here",
@@ -102,23 +112,23 @@ otp.locale.English = {
         to_continue:    "to continue on",
         becomes:        "becomes",
         at:             "at",
-        on:				"on",
+        on:             "on",
         circle_counterclockwise: "take roundabout counterclockwise",
         circle_clockwise:        "take roundabout clockwise"
     },
-    
+
     ordinal_exit:
     {
-    	1:  "to first exit",
-    	2:  "to second exit",
-    	3:  "to third exit",
-    	4:  "to fourth exit",
-		5:  "to fifth exit",
-		6:  "to sixth exit",
-		7:  "to seventh exit",
-		8:  "to eighth exit",
-		9:  "to ninth exit",
-		10: "to tenth exit"
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
@@ -129,7 +139,7 @@ otp.locale.English = {
         seconds_abbrev: "secs",
         months:         ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
-    
+
     systemmap :
     {
         labels :
@@ -140,6 +150,7 @@ otp.locale.English = {
 
     tripPlanner :
     {
+        // see otp/planner/*.js for where these values are used
         labels : 
         {
             panelTitle    : "Trip Planner",
@@ -162,7 +173,20 @@ otp.locale.English = {
             wheelchair    : "Wheelchair accessible trip", 
             go            : "Go",
             planTrip      : "Plan Your Trip",
-            newTrip       : "New Trip"
+            newTrip       : "Nuevo viaje"
+        },
+
+        // see otp/config.js for where these values are used
+        link : 
+        {
+            text           : "Link to this trip (OTP)",
+            trip_separator : "This trip on other transit planners",
+            bike_separator : "On other bike trip planners",
+            walk_separator : "On other walking direction planners",
+            google_transit : "Google Transit",
+            google_bikes   : "Google Bike Directions",
+            google_walk    : "Google Walking Directions",
+            google_domain  : "http://www.google.com"
         },
 
         error:

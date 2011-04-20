@@ -46,7 +46,7 @@ otp.application.Controller = {
 
         this.params  = new otp.util.ParseUrlParams();
         this.map  = new otp.core.Map(this.config.map);
-        this.ui   = new otp.core.UI({map:this.map});
+        this.ui   = new otp.core.UI({map:this.map, locale:this.config.locale});
 
         // create logo image, using a custom logo if specified
         var customLogo = this.config.logo;
@@ -67,7 +67,8 @@ otp.application.Controller = {
         pconfig.url = purl;
         pconfig.map = this.map;
         pconfig.poi = this.poi;
-        pconfig.ui  = this.ui;;
+        pconfig.ui  = this.ui;
+        pconfig.locale = this.config.locale;
         this.planner = new otp.planner.Planner(pconfig);
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());

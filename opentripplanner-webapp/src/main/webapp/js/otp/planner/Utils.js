@@ -309,29 +309,33 @@ otp.planner.Utils = {
      * TODO: Make this method depend upon an app-wide config option specifying the system of units to use.
      */
     prettyDistance : function(meters) {
+        var retVal = "";
+
         if (meters == null || typeof meters == 'undefined') {
-            return "";
+            retVal = "";
         }
-        if (otp.config.metricsSystem == 'english') {
+        else if (otp.config.metricsSystem == 'english') {
             var miles = metersToMiles(meters);
             // Display distances < 0.1 miles in feet
             if (miles < 0.1) {
-                return metersToFeet(meters) + " ft";
+                retVal = metersToFeet(meters) + " ft";
             } else {
-                return miles + " mi";
-            }
-        }        
-        // Meters / Km
-        if (otp.config.metricsSystem == 'international') {
-            var km = meters / 1000.0;
-            if (km < 1) {
-                return parseInt(meters) + " m";
-            } else {
-                return km.toFixed(2) + " km";
+                retVal = miles + " mi";
             }
         }
+        else // default is metric system
+        {
+            var km = meters / 1000.0;
+            if (km < 1) {
+                retVal = parseInt(meters) + " m";
+            } else {
+                retVal = km.toFixed(2) + " km";
+            }
+        }
+
+        return retVal;
     },
-    
+
     /*
      * Determines whether or not the browser supports the HTML5 Canvas element.
      * Includes check for ExplorerCanvas for IE support.

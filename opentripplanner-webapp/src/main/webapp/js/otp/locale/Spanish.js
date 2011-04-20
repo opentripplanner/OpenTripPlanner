@@ -17,24 +17,36 @@ otp.namespace("otp.locale");
 /**
   * @class
   */
+//Ã¡:\xE1, Ã©:\xE9, Ã­:\xED Ã³:\xF3, Ãº:\xFA, Ã�:\xC1, Ã‰:\xC9, Ã�:\xCD, Ã“:\xD3, Ãš:\xDA, Ã±:\xF1, Ã‘:\xD1
 otp.locale.Spanish = {
+
+    config : 
+    {
+        // Metrics system (e.g., 'english' == feet, miles, other value or null is metric system)
+        metricsSystem : "international",
+        rightClickMsg : "Haz click con el bot\xF3n derecho sobre el mapa para elegir los puntos de origen y destino.",
+        attribution   : {
+            title   : "License Attribution",
+            content : "Disclaimer goes here"
+        }
+    },
 
     contextMenu : 
     {
-        fromHere         : "Salir desde aquí",
-        toHere           : "Llegar hasta aquí",
+        fromHere         : "Salir desde aqu\xED",
+        toHere           : "Llegar hasta aqu\xED",
 
-        centerHere       : "Centrar mapa aquí",
+        centerHere       : "Centrar mapa aqu\xED",
         zoomInHere       : "Acercar",
         zoomOutHere      : "Alejar",
-        previous         : "Último encuadre",
+        previous         : "\xDAltimo encuadre",
         next             : "Siguiente encuadre"
     },
 
     service : 
     {
-        weekdays:  "días de la semana",
-        saturday:  "Sábado",
+        weekdays:  "d\xEDas de la semana",
+        saturday:  "S\xE1bado",
         sunday:    "Domingo",
         schedule:  "Horario"
     },
@@ -45,17 +57,20 @@ otp.locale.Spanish = {
         date       : "Fecha",
         loading    : "Cargando",
         searching  : "Buscando...",
-        qEmptyText : "Dirección, intersección,  punto de interés o Identificador de Parada..."
+        qEmptyText : "Direcci\xF3n, intersecci\xF3n,  punto de inter\xE9s o Identificador de Parada..."
     },
 
     buttons: 
     {
         reverse       : "Cambiar",
-        reverseTip    : "<b>Camibar orígen-destino</b><br/>Plan a return trip by reversing this trip's start and end points, and adjusting the time forward.",
-        reverseMiniTip: "Cambiar orígen-destino",
+        reverseTip    : "<b>Cambiar origen-destino</b><br/>Planifica el viaje de vuelta intercambiando origen y destino, y ajustando la hora de salida.",
+        reverseMiniTip: "Cambiar origen-destino",
 
-        clear         : "Inicializar",
-        clearTip      : "<b>Inicializar</b><br/>Inicializar el mapa y los botones activos.",
+        edit          : "Editar",
+        editTip       : "<b>Editar el viaje</b><br/>Vuelve a la pantalla principal para cambiar aspectos del viaje.",
+
+        clear         : "Borrar",
+        clearTip      : "<b>Clear</b><br/>Borra el mapa y todas las herramientas activas.",
 
         fullScreen    : "Pantalla completa",
         fullScreenTip : "<b>Pantalla completa</b><br/>Mostrar - ocultar paneles",
@@ -64,48 +79,69 @@ otp.locale.Spanish = {
         printTip      : "<b>Imprimir</b><br/>Imprimir este plan de viaje junto con las paradas.",
 
         link          : "Link",
-        linkTip      : "<b>(translate me) Link</b><br/>Show link url for this trip plan.",
+        linkTip      : "<b>Link</b><br/>Muestra distintas url para este viaje.",
 
         feedback      : "Feedback",
-        feedbackTip   : "<b>(translate me) Feedback</b><br/>Send your thoughts or experiences with the map",
+        feedbackTip   : "<b>Feedback</b><br/>Send your thoughts or experiences with the map",
 
         submit       : "Enviar",
         clearButton  : "Borrar",
         ok           : "OK",
         cancel       : "Cancelar",
-        yes          : "Sí",
+        yes          : "S\xED",
         no           : "No"
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "sureste",
-        southWest:      "sudoeste",
-        northEast:      "nordeste",
-        northWest:      "noroeste",
+        southeast:      "sureste",
+        southwest:      "sudoeste",
+        northeast:      "nordeste",
+        northwest:      "noroeste",
         north:          "norte",
         west:           "oeste",
         south:          "sur",
         east:           "este",
-        bound:          "límite",
-        left:           "izquierda",
-        right:          "derecha",
-        slightly_left:  "un poco izquierda",
-        slightly_right: "un poco derecha",
-        hard_left:      "muy izquierda",
-        hard_right:     "muy derecha",
-        'continue':     "sigue derecho", 
+        bound:          "l\xEDmite",
+        left:           "gira a la izquierda",
+        right:          "gira a la derecha",
+        slightly_left:  "gira ligeramente a la izquierda",
+        slightly_right: "gira ligeramente a la derecha",
+        hard_left:      "gira completamente a la izquierda",
+        hard_right:     "gira completamente a la derecha",
+        'continue':     "sigue recto por", 
         to_continue:    "para continuar en", 
         becomes:        "se hace", 
         at:             "en" 
+    },
+
+    modes : 
+    {
+        WALK:           "A PIE",
+        BICYCLE:        "BICICLETA",
+        CAR:            "COCHE",
+        TRAM:           "TRANV\xCDA",
+        SUBWAY:         "METRO",
+        RAIL:           "TREN",
+        BUS:            "AUTOB\xDAS",
+        FERRY:          "BOTE",
+        CABLE_CAR:      "PUENTE COLGANTE",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR",
+        TRANSIT:        "TRANSIT",
+        TRAINISH:       "TRAINISH",
+        BUSISH:         "BUSISH",
+        BOARDING:       "BOARDING",
+        ALIGHTING:      "ALIGHTING",
+        TRANSFER:       "TRANSFER"
     },
 
     time:
     {
         minute_abbrev:  "min",
         minutes_abbrev: "mins",
-        second_abbrev: "sec",
+        second_abbrev:  "sec",
         seconds_abbrev: "secs",
         months:         ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     },
@@ -122,38 +158,50 @@ otp.locale.Spanish = {
     {
         labels : 
         {
-            panelTitle    : "Planificador de viajes Autobuses Interurbanos",
-            tabTitle      : "Planificar un Viaje",
-            inputTitle    : "Detalles del Viaje",
+            panelTitle    : "Planificador multimodal",
+            tabTitle      : "Planificar un viaje",
+            inputTitle    : "Detalles del viaje",
             optTitle      : "Preferencias (opcional)",
-            submitMsg     : "Planificando su Viaje...",
+            submitMsg     : "Planificando su viaje...",
             optionalTitle : "",
             date          : "Fecha",
             time          : "Hora",
             when          : "Tiempo",
             from          : "Desde",
-            fromHere      : "Desde aquí",
+            fromHere      : "Desde aqu\xED",
             to            : "Hasta",
-            toHere        : "Hasta aquí",
+            toHere        : "Hasta aqu\xED",
             minimize      : "Mostrar el",
-            maxWalkDistance: "Máxima distancia hasta la parada",
+            maxWalkDistance: "M\xE1xima distancia hasta la parada",
             arriveDepart  : "Llegada/Salida a",
             mode          : "Modo de viaje",
+            wheelchair    : "Viaje con accesibilidad",
             go            : "Empezar",
-            planTrip      : "Planifique su Viaje",
-            newTrip       : "Nuevo Viaje"
+            planTrip      : "Planificar el viaje",
+            newTrip       : "Nuevo viaje"
+        },
+
+        link : 
+        {
+            text           : "Link a este viaje (OTP)",
+            trip_separator : "Este viaje en otros planificadores intermodales",
+            bike_separator : "En otros planificadores de bicicletas",
+            walk_separator : "En otros planificadores pedestres",
+            google_transit : "Google Transit",
+            google_bikes   : "Google Bike Directions",
+            google_walk    : "Google Walking Directions",
+            google_domain  : "http://www.google.es"
         },
 
         error:
         {
-            title        : 'Trip Planner Error',
-            deadMsg      : "Map Trip Planner is currently not responding. Please wait a few minutes to try again, or try the text trip planner (see link below).",
-            geoFromMsg   : "Por favor, seleccione la posición de salida de su Viaje: ",
-            geoToMsg     : "Por favor, seleccione la posición de llegada de su Viaje: "
+            title        : 'Error del planificador',
+            deadMsg      : "El planificador no responde. Por favor, int\xE9ntelo m\xE1s tarde",
+            geoFromMsg   : "Por favor, elija la direcci\xF3n de salida del viaje: ",
+            geoToMsg     : "Por favor, elija la direcci\xF3n de llegada del viaje: "
         },
         
         // default messages from server if a message was not returned
-        // TODO translate me
         msgcodes:
         {
             200: "Plan OK",
@@ -174,9 +222,9 @@ otp.locale.Spanish = {
 
         options: 
         [
-          ['TRANSFERS', 'Mínimo número de Transbordos'],
-          ['QUICK',     'Viaje más corto'],
-          ['SAFE',      'Viaje más seguro']
+          ['TRANSFERS', 'M\xEDnimo n\xFAmero de transbordos'],
+          ['QUICK',     'Viaje m\xE1s corto']//,
+          //['SAFE',      'Viaje m\xE1s seguro']
         ],
     
         arriveDepart: 
@@ -188,27 +236,28 @@ otp.locale.Spanish = {
         maxWalkDistance : 
         [
             ['500',   '500 metros'],
-            ['1000',   '1 Km'],
-            ['5000',   '5 Km'],
-            ['10000',  '10 Km'],
-            ['20000',  '20 Km']
+            ['1000',   '1 km'],
+            ['5000',   '5 km'],
+            ['10000',  '10 km'],
+            ['20000',  '20 km']
         ],
     
         mode : 
         [
-            ['TRANSIT,WALK', 'Tránsito'],
-            ['BUSISH,TRAINISH,WALK', 'Bus y Tren'],
-            ['BUSISH,WALK', 'Solo Bus'],
-            ['TRAINISH,WALK', 'Solo Tren'],
-            ['WALK', 'Solo a pié'],
+            ['TRANSIT,WALK', 'Transporte p\xFAblico'],
+            ['BUSISH,TRAINISH,WALK', 'Bus y tren'],
+            ['BUSISH,WALK', 'S\xF3lo bus'],
+            ['TRAINISH,WALK', 'S\xF3lo tren'],
+            ['WALK', 'S\xF3lo a pie'],
             ['BICYCLE', 'Bicicleta'],
-            ['TRANSIT,BICYCLE', 'Tránsito y Bicicleta']
+            ['TRANSIT,BICYCLE', 'Transporte p\xFAblico y bicicleta'],
+            ['CAR', 'Coche']
         ],
 
         wheelchair :
         [
             ['false', 'No se requiere un viaje con accesibilidad'],
-            ['true', 'Se requiere un viaje adaptado a Silla de Ruedas']
+            ['true', 'S\xED se requiere un viaje con accesibilidad']
         ]
     },
 
