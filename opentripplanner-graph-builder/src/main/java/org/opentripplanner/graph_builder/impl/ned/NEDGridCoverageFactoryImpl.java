@@ -22,7 +22,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
-    private Graph graph;
+    private GraphService graphService;
 
     UnifiedGridCoverage coverage = null;
 
@@ -38,11 +38,11 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     /**
      * Set the graph that will be used to determine the extent of the NED.
-     * @param graph
+     * @param graphService
      */
     @Autowired
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void setGraphService(GraphService graphService) {
+        this.graphService = graphService;
     }
 
     /**
@@ -56,7 +56,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
     public Coverage getGridCoverage() {
         if (coverage == null) {
             NEDDownloader downloader = new NEDDownloader();
-            downloader.setGraph(graph);
+            downloader.setGraph(graphService.getGraph());
             downloader.setCacheDirectory(cacheDirectory);
             List<File> paths = downloader.downloadNED();
             for (File path : paths) {
