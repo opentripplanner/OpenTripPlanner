@@ -25,7 +25,7 @@ otp.planner.StaticForms = {
     FIELD_ANCHOR     : '95%',
 
     // external (config) objects
-    locale           : otp.locale.English,
+    locale           : null,
     planner          : null,
     contextMenu      : null,
     poi              : null,

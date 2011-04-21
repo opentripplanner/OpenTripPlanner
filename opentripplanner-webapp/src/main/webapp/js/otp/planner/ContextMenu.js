@@ -24,6 +24,7 @@ otp.planner.ContextMenu = {
     renderTo : null,
     clickX   : null, // Store the pixel *on the map* the user clicked on
     clickY   : null,
+    locale   : null,
 
     /** */
     constructor : function(config) {

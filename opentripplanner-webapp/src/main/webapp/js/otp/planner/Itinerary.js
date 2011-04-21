@@ -26,7 +26,7 @@ otp.namespace("otp.planner");
 otp.planner.Itinerary = {
     // config
     map            : null,
-    locale         : otp.locale.English,
+    locale         : null,
     showStopIds    : false,
 
     // raw data

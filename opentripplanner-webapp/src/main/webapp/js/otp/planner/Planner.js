@@ -24,7 +24,7 @@ otp.namespace("otp.planner");
   */
 otp.planner.Planner = {
 
-    locale        : otp.locale.English,
+    locale        : null,
 
     // pointer to the map / components
     map           : null,

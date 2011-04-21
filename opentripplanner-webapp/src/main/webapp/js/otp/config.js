@@ -1,8 +1,14 @@
-
-// first: set the locale in the first otp.config instance (used in second instance)
-otp.config = {
-    locale : otp.locale.English
-};
+/**
+ * make sure that otp.config.locale is set to your default language
+ *
+ * NOTE:
+ *   - for apps that support a single language simply set your locale here (or in your .html file prior to including config.js)
+ *   - for apps that support multiple languages, you will need a scheme that determines the user's desired language,  
+ *     which assigns the proper otp.locale.<Language> to otp.config.locale prior to including config.js (this file)
+ */
+if(otp == null) otp = {};
+if(otp.config == null) otp.config = {};
+if(otp.config.locale == null) otp.config.locale = otp.locale.Spanish;
 
 // second: re-define otp.config with all the various option... 
 otp.config = {

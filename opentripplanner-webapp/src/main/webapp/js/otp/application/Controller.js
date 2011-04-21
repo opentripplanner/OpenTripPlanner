@@ -38,6 +38,7 @@ otp.application.Controller = {
         // set defaults on the config.map if things don't already exist
         otp.inherit(this.config.map, {
             cm               : this.cm, 
+            locale           : this.config.locale,
             attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
             options: {
                 controls: []
@@ -55,7 +56,7 @@ otp.application.Controller = {
         Ext.DomHelper.append(logoAnchorWrapper, {tag: 'img',
                                                  alt: "OpenTripPlanner home",
                                                  src: logoPath
-                                                 });
+                                                });
 
         // initialize utilities
         otp.util.imagePathManager.addCustomAgencies(this.config.useCustomIconsForAgencies);
@@ -83,7 +84,6 @@ otp.application.Controller = {
         }
 
         this.ui.doLayout();
-
         this.load();
 
         if(this.config.splashScreen && this.config.splashScreen.enabled) {
@@ -112,7 +112,7 @@ otp.application.Controller = {
      */
     makeContextMenu : function()
     {
-        var  cmConfig = {};
+        var cmConfig = {locale: this.config.locale};
         if(this.config.plannerContextMenu)
             cmConfig.forms = this.planner.getForms();
         if(this.config.mapContextMenu)

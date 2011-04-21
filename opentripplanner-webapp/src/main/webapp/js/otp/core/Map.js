@@ -25,11 +25,9 @@ otp.core.MapStatic = {
 
 //http://maps.opengeo.org/geowebcache/service/wms?LAYERS=openstreetmap&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&SRS=EPSG:4326&BBOX=-8240523.1442212,4972687.3114282,-8238077.1593164,4975133.296333&WIDTH=256&HEIGHT=256
 
-    locale            : otp.locale.English,
-
+    locale            : null,
     map               : null,
     baseLayer         : null,
-
     mapDiv            : "map",
     
     // list of functions that will be called before/after all features on the map are removed

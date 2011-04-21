@@ -19,6 +19,16 @@ otp.namespace("otp.locale");
   */
 otp.locale.French = {
 
+    config : 
+    {
+        metricsSystem : "international",
+        rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
+        attribution   : {
+            title   : "License Attribution",
+            content : "Disclaimer goes here"
+        }
+    },
+
     contextMenu : 
     {
         fromHere         : "Partir d'ici",

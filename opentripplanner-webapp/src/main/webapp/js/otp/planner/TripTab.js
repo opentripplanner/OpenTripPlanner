@@ -28,7 +28,7 @@ otp.planner.TripTab = {
     // config
     map           : null,
     ui            : null,
-    locale        : otp.locale.English,
+    locale        : null,
     linkTemplates : null,
 
     planner       : null,
@@ -340,6 +340,7 @@ otp.planner.TripTab = {
         if (retVal == null) {
             var itin = this.m_itinerariesStore.getAt(id - 1);
             retVal = new otp.planner.Itinerary( {
+                locale : this.locale,
                 map : this.planner.map,
                 xml : itin,
                 from : this.m_from,

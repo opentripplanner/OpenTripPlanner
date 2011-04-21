@@ -19,6 +19,16 @@ otp.namespace("otp.locale");
   */
 otp.locale.English = {
 
+    config : 
+    {
+        metricsSystem : "international",
+        rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
+        attribution   : {
+            title   : "License Attribution",
+            content : "Disclaimer goes here"
+        }
+    },
+
     contextMenu : 
     {
         fromHere         : "Tosaigh turas anseo",
@@ -146,6 +156,19 @@ otp.locale.English = {
             go            : "Imigh",
             planTrip      : "Pleanáil do thuras",
             newTrip       : "Turas nua"
+        },
+
+        // see otp/config.js for where these values are used
+        link : 
+        {
+            text           : "Link to this trip (OTP)",
+            trip_separator : "This trip on other transit planners",
+            bike_separator : "On other bike trip planners",
+            walk_separator : "On other walking direction planners",
+            google_transit : "Google Transit",
+            google_bikes   : "Google Bike Directions",
+            google_walk    : "Google Walking Directions",
+            google_domain  : "http://www.google.com"
         },
 
         error:
