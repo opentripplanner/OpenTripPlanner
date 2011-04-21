@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -35,11 +36,11 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
     private static final double METERS_PER_DEGREE_LAT = 111111;
     private double distance = 2000;
     
-    private Graph _graph;
+    private GraphService _graphService;
 
     @Autowired
-    public void setGraph(Graph graph) {
-        _graph = graph;
+    public void setGraphService(GraphService graphService) {
+        _graphService = graphService;
     }
 
 
@@ -50,9 +51,11 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
     @Override
     public Iterable<Envelope> getRegions() {
 
-        List<Envelope> regions = new ArrayList<Envelope>();
+    	Graph graph = _graphService.getGraph();
+        
+    	List<Envelope> regions = new ArrayList<Envelope>();
 
-        for (GraphVertex gv : _graph.getVertices()) {
+        for (GraphVertex gv : graph.getVertices()) {
             Vertex vertex = gv.vertex;
             if (vertex instanceof TransitStop) {
                 Coordinate c = vertex.getCoordinate();
