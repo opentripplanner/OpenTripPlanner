@@ -22,7 +22,6 @@ otp.locale.Spanish = {
 
     config : 
     {
-        // Metrics system (e.g., 'english' == feet, miles, other value or null is metric system)
         metricsSystem : "international",
         rightClickMsg : "Haz click con el bot\xF3n derecho sobre el mapa para elegir los puntos de origen y destino.",
         attribution   : {
@@ -113,7 +112,38 @@ otp.locale.Spanish = {
         'continue':     "sigue recto por", 
         to_continue:    "para continuar en", 
         becomes:        "se hace", 
-        at:             "en" 
+        at:             "en",
+        on:             "en",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+
+    // see otp.planner.Templates for use
+    instructions : 
+    {
+        walk         : "Andar",
+        walk_toward  : "Anda hacia el",
+        bike         : "Bicicleta",
+        bike_toward  : "Pedalea hacia el",
+        drive        : "Coche",
+        drive_toward : "Avanza hacia el",
+        move_toward  : "Avanza hacia el",
+        toward       : "hasta",
+        start_at     : "Origen:",
+        end_at       : "Destino:",
+
+        TRANSIT:        "TRANSIT",
+        BOARDING:       "BOARDING",
+        ALIGHTING:      "ALIGHTING",
+        BOARD:          "BOARD",
+        ALIGHT:         "ALIGHT",
+        TRANSFER:       "TRANSFER"
+    },
+
+    labels : 
+    {
+        about        : "Alrededor de ",
+        stop_id      : "Stop ID"
     },
 
     modes : 
@@ -128,22 +158,32 @@ otp.locale.Spanish = {
         FERRY:          "BOTE",
         CABLE_CAR:      "PUENTE COLGANTE",
         GONDOLA:        "GONDOLA",
-        FUNICULAR:      "FUNICULAR",
-        TRANSIT:        "TRANSIT",
-        TRAINISH:       "TRAINISH",
-        BUSISH:         "BUSISH",
-        BOARDING:       "BOARDING",
-        ALIGHTING:      "ALIGHTING",
-        TRANSFER:       "TRANSFER"
+        FUNICULAR:      "FUNICULAR"
+    },
+
+    ordinal_exit:
+    {
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
     {
-        minute_abbrev:  "min",
-        minutes_abbrev: "mins",
-        second_abbrev:  "sec",
-        seconds_abbrev: "secs",
-        months:         ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+        minute         : "minuto",
+        minutes        : "minutos",
+        minute_abbrev  : "min",
+        minutes_abbrev : "mins",
+        second_abbrev  : "sec",
+        seconds_abbrev : "secs",
+        months         : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     },
 
     systemmap :
@@ -156,6 +196,7 @@ otp.locale.Spanish = {
 
     tripPlanner :
     {
+        // see otp/planner/*.js for where these values are used
         labels : 
         {
             panelTitle    : "Planificador multimodal",
@@ -181,6 +222,7 @@ otp.locale.Spanish = {
             newTrip       : "Nuevo viaje"
         },
 
+        // see otp/config.js for where these values are used
         link : 
         {
             text           : "Link a este viaje (OTP)",
@@ -191,6 +233,15 @@ otp.locale.Spanish = {
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
             google_domain  : "http://www.google.es"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "Review trip plan",
+            msg_content  : "Please correct errors before planning your trip"
         },
 
         error:

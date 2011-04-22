@@ -17,6 +17,7 @@ otp.namespace("otp.locale");
 /**
   * @class
   */
+
 otp.locale.English = {
 
     config : 
@@ -117,6 +118,48 @@ otp.locale.English = {
         circle_clockwise:        "take roundabout clockwise"
     },
 
+    // see otp.planner.Templates for use
+    instructions :
+    {
+        walk         : "Walk",
+        walk_toward  : "Walk to",
+        bike         : "Bike",
+        bike_toward  : "Bike to",
+        drive        : "Drive",
+        drive_toward : "Drive to",
+        move_toward  : "Proceed to",
+        toward       : "to",
+
+        start_at     : "Start at",
+        end_at       : "End at",
+
+        BOARD:          "BOARD",
+        ALIGHT:         "ALIGHT",
+        TRANSFER:       "TRANSFER"
+    },
+
+    // see otp.planner.Templates for use
+    labels : 
+    {
+        about        : "About",
+        stop_id      : "Stop ID"
+    },
+
+    modes : 
+    {
+        WALK:           "WALK",
+        BICYCLE:        "BICYCLE",
+        CAR:            "CAR",
+        TRAM:           "TRAM",
+        SUBWAY:         "SUBWAY",
+        RAIL:           "RAIL",
+        BUS:            "BUS",
+        FERRY:          "FERRY",
+        CABLE_CAR:      "CABLE CAR",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR"
+    },
+
     ordinal_exit:
     {
         1:  "to first exit",
@@ -133,11 +176,13 @@ otp.locale.English = {
 
     time:
     {
-        minute_abbrev:  "min",
-        minutes_abbrev: "mins",
-        second_abbrev: "sec",
-        seconds_abbrev: "secs",
-        months:         ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        minute         : "minute",
+        minutes        : "minutes",
+        minute_abbrev  : "min",
+        minutes_abbrev : "mins",
+        second_abbrev  : "sec",
+        seconds_abbrev : "secs",
+        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 
     systemmap :
@@ -187,6 +232,15 @@ otp.locale.English = {
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
             google_domain  : "http://www.google.com"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "Review trip plan",
+            msg_content  : "Please correct errors before planning your trip"
         },
 
         error:

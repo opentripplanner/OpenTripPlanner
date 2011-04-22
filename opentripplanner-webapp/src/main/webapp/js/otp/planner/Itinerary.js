@@ -27,6 +27,7 @@ otp.planner.Itinerary = {
     // config
     map            : null,
     locale         : null,
+    templates      : null,
     showStopIds    : false,
 
     // raw data
@@ -455,8 +456,8 @@ otp.planner.Itinerary = {
     */
     makeTreeNodes : function(store, itin, from, to, clickCallback, scope)
     {
-        var fmTxt = otp.planner.Templates.TP_START.applyTemplate(from.data);
-        var toTxt = otp.planner.Templates.TP_END.applyTemplate(to.data);
+        var fmTxt = this.templates.TP_START.applyTemplate(from.data);
+        var toTxt = this.templates.TP_END.applyTemplate(to.data);
 
         var fmId  = this.id + '-' + otp.planner.Utils.FROM_ID;
         var toId  = this.id + '-' + otp.planner.Utils.TO_ID;
@@ -478,14 +479,18 @@ otp.planner.Itinerary = {
             var mode = leg.get('mode').toLowerCase();
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
-            if(mode === 'walk' || mode === 'bicycle') 
+            if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
             {
                 var verb;
                 if (mode === 'bicycle') {
-                    verb = 'Bike';
+                    verb = this.locale.instructions.bike_toward;
                     containsBikeMode = true;
+                } else if (mode === 'walk') {
+                    verb = this.locale.instructions.walk_toward;
+                } else if (mode === 'drive') {
+                    verb = this.locale.instructions.drive_toward;
                 } else {
-                    verb = 'Walk';
+                    verb = this.locale.instructions.move_toward;
                 }
                 hasKids = false;
                 if (!leg.data.formattedSteps)
@@ -494,7 +499,7 @@ otp.planner.Itinerary = {
                     var steps = leg.data.steps;
                     var stepText = "";
                     var noStepsYet = true;
-                    // TODO: Finish localizing, and move the rest of the markup into templates.
+
                     for (var j = 0; j < steps.length; j++)
                     {
                         step = steps[j];
@@ -505,9 +510,10 @@ otp.planner.Itinerary = {
                         }
                         stepText = "<li>";
                         var relativeDirection = step.relativeDirection;
+                        var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
                         if (relativeDirection == null || noStepsYet == true)
                         {
-                            stepText += verb + ' <strong>' + step.absoluteDirection.toLowerCase() + '</strong> on <strong>' + step.streetName + '</strong>';
+                            stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
                             noStepsYet = false;
                         }
                         else 
@@ -541,17 +547,17 @@ otp.planner.Itinerary = {
                     }
                 }
                 var template = mode == 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
-                text = otp.planner.Templates[template].applyTemplate(leg.data);
+                text = this.templates[template].applyTemplate(leg.data);
             }
             else
             {
                 var order = leg.get('order');
                 if (order == 'thru-route') {
-                    text = otp.planner.Templates.getInterlineLeg().applyTemplate(leg.data);
+                    text = this.templates.getInterlineLeg().applyTemplate(leg.data);
                 }
                 else 
                 {
-                    text  = otp.planner.Templates.getTransitLeg().applyTemplate(leg.data);
+                    text  = this.templates.getTransitLeg().applyTemplate(leg.data);
                 }
             }
             icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
@@ -560,7 +566,7 @@ otp.planner.Itinerary = {
 
         var tripDetailsDistanceVerb = containsBikeMode ? "Bike" : "Walk";
         var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
-        var tpTxt = otp.planner.Templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
+        var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));

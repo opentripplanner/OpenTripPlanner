@@ -127,17 +127,16 @@ otp.planner.StaticForms = {
             setTimeout(this.submit.createDelegate(this), 5);
             return;
         }
-        
+
         if (this.m_fromForm.getComboBox().activeError ||
             this.m_toForm.getComboBox().activeError) {
             Ext.Msg.show({
-                title: "Review trip plan",
-                msg: "Please correct errors before planning your trip"
+                title: this.locale.tripPlanner.geocoder.msg_title,
+                msg:   this.locale.tripPlanner.geocoder.msg_content
             });
             setTimeout(function() { Ext.Msg.hide(); }, 3000);
             return;
         }
-        
 
         // hide stuff that might be open
         this.collapseComboBoxes();
@@ -146,8 +145,8 @@ otp.planner.StaticForms = {
         otp.util.ExtUtils.setTripPlannerCookie();
 
         this.m_panel.form.submit( {
-            method : 'GET',
-            url : this.url,
+            method  : 'GET',
+            url     : this.url,
             waitMsg : this.locale.tripPlanner.labels.submitMsg
         });
 
@@ -940,7 +939,7 @@ otp.planner.StaticForms = {
         if (!address || address.length < 1) {
             return;
         }
-        var loadMask = new Ext.LoadMask(this.m_fromToFP.getEl(), {msg: "Looking up address ...."});
+        var loadMask = new Ext.LoadMask(this.m_fromToFP.getEl(), {msg: this.locale.tripPlanner.geocoder.working});
         loadMask.show();
         
         if (comboBoxIdentifier === "from") {
@@ -1036,7 +1035,7 @@ otp.planner.StaticForms = {
         var count = parseInt(countNode.firstChild.nodeValue);
         
         if (isNaN(count) || count < 1) {
-            var errMsg = "Did not receive any results";
+            var errMsg = this.locale.tripPlanner.geocoder.error;
             if (comboBoxIdentifier === "from") {
                 this.m_fromForm.getComboBox().markInvalid(errMsg);
             } else if (comboBoxIdentifier === "to") {

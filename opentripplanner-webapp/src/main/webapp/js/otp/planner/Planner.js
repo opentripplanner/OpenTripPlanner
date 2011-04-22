@@ -39,6 +39,7 @@ otp.planner.Planner = {
     linkTemplates           : null,
     geocoder                : null,
     useOptionDependencies   : null,
+    templates               : null,
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -56,6 +57,9 @@ otp.planner.Planner = {
     {
         this.planner = this;
         otp.configure(this, config);
+
+        if(this.templates == null)
+            this.templates = new otp.planner.Templates({locale : this.locale});
 
         // step 0: a bit of config (fixes up the controller, if it's missing anything)
         this.controller = otp.util.ObjUtils.defaultController(this.controller);
@@ -194,14 +198,12 @@ otp.planner.Planner = {
             txtURL = "http://text.opentripplanner.org";
         }
 
-        var info = this.getForms().getFormData(mapURL);
-        retVal.txt = otp.planner.Templates.tripFeedbackDetails
-                .applyTemplate(info);
-        retVal.url = otp.planner.Templates.tripPrintTemplate
-                .applyTemplate(info);
-        info.url = txtURL;
-        retVal.txtUrl = otp.planner.Templates.txtPlannerURL.applyTemplate(info);
-        retVal.valid = (
+        var info   = this.getForms().getFormData(mapURL);
+        retVal.txt = this.templates.tripFeedbackDetails.applyTemplate(info);
+        retVal.url = this.templates.tripPrintTemplate.applyTemplate(info);
+        info.url   = txtURL;
+        retVal.txtUrl = this.templates.txtPlannerURL.applyTemplate(info);
+        retVal.valid  = (
                 ((info.from != null && info.from.length > 0) || (info.fromPlace != null && info.fromPlace.length > 0)) 
                 && ((info.to != null && info.to.length > 0) || (info.toPlace != null && info.toPlace.length > 0)));
 
@@ -252,7 +254,7 @@ otp.planner.Planner = {
 
         try 
         {
-            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, linkTemplates:this.linkTemplates, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
+            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, templates:this.templates, linkTemplates:this.linkTemplates, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
             {

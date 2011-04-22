@@ -29,6 +29,7 @@ otp.planner.TripTab = {
     map           : null,
     ui            : null,
     locale        : null,
+    templates     : null,
     linkTemplates : null,
 
     planner       : null,
@@ -104,7 +105,7 @@ otp.planner.TripTab = {
             var id    = this.m_tripNodePrefix + (i + 1);
             var itin  = store.getAt(i);
             itin.set('id', (i+1)); // for template -- eg: the numerical hyperlink listing itinerary option
-            var text = otp.planner.Templates.TP_ITINERARY.applyTemplate(itin.data);
+            var text = this.templates.TP_ITINERARY.applyTemplate(itin.data);
             var treeNodeConfig = Ext.apply({}, {id: id, text: text}, treeNodeDefaults);
             z[i] = otp.util.ExtUtils.makeTreeNode(treeNodeConfig, this.itineraryClick, this);
         }
@@ -179,7 +180,7 @@ otp.planner.TripTab = {
 
         // link dialog has a message about the trip and is at least 120 pixels in height
         var win_y = 120;
-        var html = otp.planner.Templates.tripFeedbackDetails.apply(this.request) + "<br/>";
+        var html = this.templates.tripFeedbackDetails.apply(this.request) + "<br/>";
 
         // if there are link templates in the config, then process those templates and add their contents to the dialog (also increase the height of the window)
         for(var i = 0; i < this.linkTemplates.length; i++) {
@@ -219,7 +220,7 @@ otp.planner.TripTab = {
         if(this.m_activeItinerary && this.m_activeItinerary.id)
             req.itinID = this.m_activeItinerary.id;
 
-        var url    = otp.planner.Templates.tripPrintTemplate.apply(req);
+        var url    = this.templates.tripPrintTemplate.apply(req);
         console.log("TripTab.print: url " + req.url);
 
         console.log("TripTab.print: open window");
@@ -340,12 +341,13 @@ otp.planner.TripTab = {
         if (retVal == null) {
             var itin = this.m_itinerariesStore.getAt(id - 1);
             retVal = new otp.planner.Itinerary( {
-                locale : this.locale,
-                map : this.planner.map,
-                xml : itin,
+                locale    : this.locale,
+                templates : this.templates,
+                map  : this.planner.map,
+                xml  : itin,
                 from : this.m_from,
-                to : this.m_to,
-                id : id
+                to   : this.m_to,
+                id   : id
             });
             if (retVal != null && retVal.isValid()) {
                 this.m_itineraryCache[id] = retVal;
