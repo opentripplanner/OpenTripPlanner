@@ -72,7 +72,7 @@ otp.planner.Templates = {
         if(this.tripFeedbackDetails == null)
             // Trip Planner state messaging (eg: feedback emails, etc...).
             this.tripFeedbackDetails = new Ext.XTemplate( 
-                'Trip Details: {fromPlace} to {toPlace} {arr} {time} on {date}, {opt} with a walk of {walk} via {mode}.'
+                this.locale.labels.trip_details + ': {fromPlace} ' + this.locale.directions.to + ' {toPlace} {arr} {time} ' + this.locale.directions.on + ' {date}, {opt} ' + this.locale.labels.with_a_walk + ' {walk} ' + this.locale.directions.via + ' {mode}.'
             ).compile();
 
         if(this.tripPrintTemplate == null)
@@ -83,12 +83,12 @@ otp.planner.Templates = {
         if(this.TP_TRIPDETAILS == null)
             this.TP_TRIPDETAILS = new Ext.XTemplate(
                 '<div id="trip-details">',
-                '<h3>Trip Details:</h3>',
+                '<h1>' + this.locale.labels.trip_details + ':</h1>',
                 '<table cellpadding="3" cellspacing="0" border="0">',
-                    '<tpl if="regularFare != null"><tr><td>Fare</td><td>{regularFare}</td></tr></tpl>',
-                    '<tr><td>Travel</td><td>{startTimeDisplay}</td></tr>',
-                    '<tr><td>Valid</td><td>{[new Date().format("F jS, Y @ g:ia")]}</td></tr>',
-                    '<tr><td>Time</td><td>{duration} minute<tpl if="duration != 1">s</tpl></td></tr>',
+                    '<tpl if="regularFare != null"><tr><td>' + this.locale.labels.fare + '</td><td>{regularFare}</td></tr></tpl>',
+                      '<tr><td>' + this.locale.labels.travel      + '</td><td>{startTimeDisplay}</td></tr>',
+                      '<tr><td>' + this.locale.labels.valid       + '</td><td>{[new Date().format("' + this.locale.time.format + '")]}</td></tr>',
+                      '<tr><td>' + this.locale.labels.trip_length + '</td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
                     '<tpl if="walkDistance"><tr><td>{distanceVerb}</td><td>{walkDistance}</td></tr></tpl>',
                 '</table></div>'
             ).compile();
@@ -135,7 +135,7 @@ otp.planner.Templates = {
         return new Ext.XTemplate(
                   '<h4><a href="#">' + mode + ' </a>',
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
-                    this.locale.instructions.toward + ' {toName}',
+                    this.locale.directions.to + ' {toName}',
                   '</h4>',
                   '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds">',
                     '<p>' + this.locale.labels.stopID + ' {toStopId}</p>',

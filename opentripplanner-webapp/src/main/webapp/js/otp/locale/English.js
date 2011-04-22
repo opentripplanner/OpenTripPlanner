@@ -114,6 +114,8 @@ otp.locale.English = {
         becomes:        "becomes",
         at:             "at",
         on:             "on",
+        to:             "to",
+        via:            "via",
         circle_counterclockwise: "take roundabout counterclockwise",
         circle_clockwise:        "take roundabout clockwise"
     },
@@ -123,13 +125,15 @@ otp.locale.English = {
     {
         walk         : "Walk",
         walk_toward  : "Walk",
+        walk_verb    : "Walk",
         bike         : "Bike",
         bike_toward  : "Bike",
+        bike_verb    : "Bike",
         drive        : "Drive",
         drive_toward : "Drive",
+        drive_verb   : "Drive",
         move         : "Proceed",
         move_toward  : "Proceed",
-        toward       : "to",
 
         transfer     : "transfer",
         transfers    : "transfers",
@@ -149,6 +153,12 @@ otp.locale.English = {
     {
         about        : "About",
         stop_id      : "Stop ID",
+        trip_details : "Trip Details",
+        fare         : "Fare",
+        travel       : "Travel",
+        valid        : "Valid",
+        trip_length  : "Time",
+        with_a_walk  : "with a walk of",
         alert_for_rt : "Alert for route"
     },
 
@@ -189,6 +199,7 @@ otp.locale.English = {
         minutes_abbrev : "mins",
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
+        format         : "F jS, Y @ g:ia",
         months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 

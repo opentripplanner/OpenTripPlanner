@@ -112,8 +112,10 @@ otp.locale.Spanish = {
         'continue':     "sigue recto por", 
         to_continue:    "para continuar en", 
         becomes:        "se hace", 
-        at:             "en",
+        at:             "a",
         on:             "en",
+        to:             "hasta",
+        via:            "via",
         circle_counterclockwise: "take roundabout counterclockwise",
         circle_clockwise:        "take roundabout clockwise"
     },
@@ -123,13 +125,15 @@ otp.locale.Spanish = {
     {
         walk         : "Andar",
         walk_toward  : "Anda hacia el",
+        walk_verb    : "Andando",
         bike         : "Bicicleta",
         bike_toward  : "Pedalea hacia el",
+        bike_verb    : "En bicicleta",
         drive        : "Coche",
         drive_toward : "Avanza hacia el",
+        drive_verb   : "Coche",
         move         : "Avanza",
         move_toward  : "Avanza hacia el",
-        toward       : "hasta",
 
         transfer     : "transbordo",
         transfers    : "transbordos",
@@ -148,6 +152,12 @@ otp.locale.Spanish = {
     {
         about        : "Alrededor de ",
         stop_id      : "Stop ID",
+        trip_details : "Detalles del viaje",
+        fare         : "Tarifa",
+        travel       : "Hora de salida",
+        valid        : "Hora actual",
+        trip_length  : "Tiempo",
+        with_a_walk  : "with a walk of",
         alert_for_rt : "Alert for route"
     },
 
@@ -188,6 +198,7 @@ otp.locale.Spanish = {
         minutes_abbrev : "mins",
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
+        format         : "D, j M H:i",
         months         : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     },
 

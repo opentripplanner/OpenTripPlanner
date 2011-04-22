@@ -464,6 +464,7 @@ otp.planner.Itinerary = {
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
         
         var containsBikeMode = false;
+        var containsCarMode  = false;
 
         var retVal = new Array();
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true},
@@ -488,6 +489,7 @@ otp.planner.Itinerary = {
                 } else if (mode === 'walk') {
                     verb = this.locale.instructions.walk_toward;
                 } else if (mode === 'drive') {
+                    containsCarMode = true;
                     verb = this.locale.instructions.drive_toward;
                 } else {
                     verb = this.locale.instructions.move_toward;
@@ -564,7 +566,8 @@ otp.planner.Itinerary = {
             retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }
 
-        var tripDetailsDistanceVerb = containsBikeMode ? "Bike" : "Walk";
+        var tripDetailsDistanceVerb = containsBikeMode ? this.locale.instructions.bike_verb  : 
+                                         containsCarMode ? this.locale.instructions.car_verb : this.locale.instructions.walk_verb;
         var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
