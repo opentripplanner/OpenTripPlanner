@@ -8,7 +8,7 @@
  */
 if(otp == null) otp = {};
 if(otp.config == null) otp.config = {};
-if(otp.config.locale == null) otp.config.locale = otp.locale.Spanish;
+if(otp.config.locale == null) otp.config.locale = otp.locale.English;
 
 // second: re-define otp.config with all the various option... 
 otp.config = {

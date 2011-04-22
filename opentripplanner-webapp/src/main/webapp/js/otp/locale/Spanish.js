@@ -127,23 +127,28 @@ otp.locale.Spanish = {
         bike_toward  : "Pedalea hacia el",
         drive        : "Coche",
         drive_toward : "Avanza hacia el",
+        move         : "Avanza",
         move_toward  : "Avanza hacia el",
         toward       : "hasta",
-        start_at     : "Origen:",
-        end_at       : "Destino:",
 
-        TRANSIT:        "TRANSIT",
-        BOARDING:       "BOARDING",
-        ALIGHTING:      "ALIGHTING",
-        BOARD:          "BOARD",
-        ALIGHT:         "ALIGHT",
-        TRANSFER:       "TRANSFER"
+        transfer     : "transbordo",
+        transfers    : "transbordos",
+
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Salida desde",
+        arrive       : "Llegada a",
+
+        start_at     : "Origen:",
+        end_at       : "Destino:"
     },
 
     labels : 
     {
         about        : "Alrededor de ",
-        stop_id      : "Stop ID"
+        stop_id      : "Stop ID",
+        alert_for_rt : "Alert for route"
     },
 
     modes : 
@@ -240,8 +245,8 @@ otp.locale.Spanish = {
         {
             working      : "Looking up address ....",
             error        : "Did not receive any results",
-            msg_title    : "Review trip plan",
-            msg_content  : "Please correct errors before planning your trip"
+            msg_title    : "Donde es review trip plan",
+            msg_content  : "Donde es correct errors before planning your trip"
         },
 
         error:

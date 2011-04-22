@@ -25,6 +25,7 @@ otp.planner.ParamTemplate = 'fromPlace={[values.fromPlace.replace(/&/g,"@")]}'
 
 otp.planner.Templates = {
 
+    THIS                : null,
     locale              : null,
 
     TP_ITINERARY        : null,
@@ -44,20 +45,29 @@ otp.planner.Templates = {
     initialize : function(config) {
         otp.configure(this, config);
 
+        otp.planner.Templates.THIS   = this;
+        otp.planner.Templates.locale = this.locale;
+
         if(this.TP_LEG_MODE == null)
-            this.TP_LEG_MODE = '<h4><a href="#">{mode}</a> {routeName}</h4>';
+            this.TP_LEG_MODE = '<h4><a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a> {routeName}</h4>';
 
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
-                  '<p><a href="#">{id}</a>: '
-                  + ' {startTimeDisplay} - {endTimeDisplay} '
-                  + '<tpl if="numTransfers &gt; 0"><br/><span class="transfers">'
-                  + '({numTransfers} ' + 'transfer' + '<tpl if="numTransfers != 1">s</tpl>, '
-                  + '{duration} minute<tpl if="duration != 1.0">s</tpl>)</span></tpl></p>'
+                  '<p><a href="#">{id}</a>: ',
+                  ' {startTimeDisplay} - {endTimeDisplay} ',
+                  '<tpl if="numTransfers">',
+                    '<br/><span class="transfers">',
+                    '({numTransfers} ',
+                    '<tpl if="numTransfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
+                    '<tpl if="numTransfers != 1">' + this.locale.instructions.transfers + '</tpl>',
+                    ', {duration} ' + this.getDurationTemplateString(),
+                    ')</span>',
+                  '</tpl>',
+                  '</p>'
             ).compile();
 
         if(this.TP_LEG_CONTINUES == null)
-            this.TP_LEG_CONTINUES = '<h4><a href="#">Continues as</a> {routeName} <span class="transfers">(stay on board)</span></h4>';
+            this.TP_LEG_CONTINUES = '<h4><a href="#">' + this.locale.instructions.continue_as + '</a> {routeName} <span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span></h4>';
 
         if(this.tripFeedbackDetails == null)
             // Trip Planner state messaging (eg: feedback emails, etc...).
@@ -85,18 +95,18 @@ otp.planner.Templates = {
 
         if(this.TP_LEG_BASE_STR == null)
             this.TP_LEG_BASE_STR = ''
-                + '<p><b>{startTimeDisplayShort}</b> Depart {fromName}'
+                + '<p><b>{startTimeDisplayShort}</b> ' + this.locale.instructions.depart + ' {fromName}'
                 + '<tpl if="headsign != null && headsign.length &gt; 0"> ({headsign})</tpl>'
-                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds"><br />Stop ID {fromStopId}</tpl>'
+                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds"><br/>' + this.locale.labels.stop_id + ' {fromStopId}</tpl>'
                 + '</p>'
-                + '<tpl if="duration != null"><div class="duration">{duration} minute<tpl if="duration != 1.0">s</tpl></div></tpl>'
-                + '<p><b>{endTimeDisplayShort}</b> Arrive {toName}'
-                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds"><br/>Stop ID {toStopId}</tpl>'
+                + '<tpl if="duration != null"><div class="duration">{duration} ' + this.getDurationTemplateString() + '</div></tpl>'
+                + '<p><b>{endTimeDisplayShort}</b> ' + this.locale.instructions.arrive + ' {toName}'
+                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds"><br/>' + this.locale.labels.stop_id + ' {toStopId}</tpl>'
                 + '</p>'
                 + '<tpl if="alerts != null && alerts.length &gt; 0">'
                 + '<tpl for="alerts">'
                 +   '<p><br/><img src="images/ui/alert.gif" align="absmiddle"/> '
-                +   '<b>Alert for route {parent.routeNumber}: </b>{.}</p>'
+                +   '<b>' + this.locale.labels.alert_for_rt + ' {parent.routeNumber}: </b>{.}</p>'
                 + '</tpl>'
                 + '</tpl>';
 
@@ -131,15 +141,19 @@ otp.planner.Templates = {
                     '<p>' + this.locale.labels.stopID + ' {toStopId}</p>',
                   '</tpl>',
                   '<tpl if="duration != null && duration &gt; 0">',
-                    '<p class="transfers">' + this.locale.labels.about + ' {duration} ', 
-                    '<tpl if="duration == 1.0">' + this.locale.time.minute  + '</tpl>',
-                    '<tpl if="duration != 1.0">' + this.locale.time.minutes + '</tpl>',
-                    ' - {distance}</p>',
+                    '<p class="transfers">' + this.locale.labels.about + ' {duration} ' + this.getDurationTemplateString() + ' - {distance}</p>', 
                   '</tpl>',
                   '<ol class="steps"><tpl for="formattedSteps">',
                     '{.}',
                   '</tpl></ol>'
             ).compile();
+    },
+
+    getDurationTemplateString : function()
+    {
+        return '<tpl if="duration == 1.0">' + this.locale.time.minute  + '</tpl>' +
+               '<tpl if="duration != 1.0">' + this.locale.time.minutes + '</tpl>';
+    
     },
 
     m_transitLeg  : null,

@@ -122,27 +122,34 @@ otp.locale.English = {
     instructions :
     {
         walk         : "Walk",
-        walk_toward  : "Walk to",
+        walk_toward  : "Walk",
         bike         : "Bike",
-        bike_toward  : "Bike to",
+        bike_toward  : "Bike",
         drive        : "Drive",
-        drive_toward : "Drive to",
-        move_toward  : "Proceed to",
+        drive_toward : "Drive",
+        move         : "Proceed",
+        move_toward  : "Proceed",
         toward       : "to",
 
-        start_at     : "Start at",
-        end_at       : "End at",
+        transfer     : "transfer",
+        transfers    : "transfers",
 
-        BOARD:          "BOARD",
-        ALIGHT:         "ALIGHT",
-        TRANSFER:       "TRANSFER"
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Depart",
+        arrive       : "Arrive",
+
+        start_at     : "Start at",
+        end_at       : "End at"
     },
 
     // see otp.planner.Templates for use
     labels : 
     {
         about        : "About",
-        stop_id      : "Stop ID"
+        stop_id      : "Stop ID",
+        alert_for_rt : "Alert for route"
     },
 
     modes : 
