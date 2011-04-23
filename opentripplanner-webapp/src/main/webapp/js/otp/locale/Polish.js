@@ -176,7 +176,7 @@ otp.locale.Polish = {
             title        : 'B³ad planera podró¿y',
             deadMsg      : "Planer podró¿y nie odpowiada. Odczekaj kilka minut i spróbuj ponownie, lub spróbuj wersji tekstowej planera (zobacz link poni¿ej).",
             geoFromMsg   : "Wybierz lokalizacjê 'Z' dla Twojej podró¿y: ",
-            geoToMsg     : "Wybierz lokalizacjê "Do" dla Twojej podró¿y: "
+            geoToMsg     : "Wybierz lokalizacjê 'Do' dla Twojej podró¿y: "
         },
         
         // default messages from server if a message was not returned

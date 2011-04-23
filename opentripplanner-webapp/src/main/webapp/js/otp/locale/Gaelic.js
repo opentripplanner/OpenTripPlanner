@@ -17,7 +17,7 @@ otp.namespace("otp.locale");
 /**
   * @class
   */
-otp.locale.English = {
+otp.locale.Gaelic = {
 
     config : 
     {
