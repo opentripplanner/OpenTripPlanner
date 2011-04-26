@@ -21,6 +21,7 @@ otp.locale.French = {
 
     config : 
     {
+// TODO
         metricsSystem : "international",
         rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
         attribution   : {
@@ -111,16 +112,103 @@ otp.locale.French = {
         'continue':     "continuer sur",
         to_continue:    "pour continuer sur",
         becomes:        "devient",
-        at:             "à"
+        at:             "�",
+// TODO
+        on:             "on",
+        to:             "to",
+        via:            "via",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+
+    // see otp.planner.Templates for use ... these are used on the trip itinerary as well as forms and other places
+    instructions :
+    {
+// TODO
+        walk         : "Walk",
+        walk_toward  : "Walk",
+        walk_verb    : "Walk",
+        bike         : "Bike",
+        bike_toward  : "Bike",
+        bike_verb    : "Bike",
+        drive        : "Drive",
+        drive_toward : "Drive",
+        drive_verb   : "Drive",
+        move         : "Proceed",
+        move_toward  : "Proceed",
+
+        transfer     : "transfer",
+        transfers    : "transfers",
+
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Depart",
+        arrive       : "Arrive",
+
+        start_at     : "Start at",
+        end_at       : "End at"
+    },
+
+    // see otp.planner.Templates for use
+    labels : 
+    {
+// TODO
+        about        : "About",
+        stop_id      : "Stop ID",
+        trip_details : "Le Trip Details",
+        fare         : "Fare",
+        fare_symbol  : "\u20ac",
+        travel       : "Travel",
+        valid        : "Valid",
+        trip_length  : "Time",
+        with_a_walk  : "with a walk of",
+        alert_for_rt : "Alert for route"
+    },
+
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
+    modes : 
+    {
+// TODO
+        WALK:           "WALK",
+        BICYCLE:        "BICYCLE",
+        CAR:            "CAR",
+        TRAM:           "TRAM",
+        SUBWAY:         "SUBWAY",
+        RAIL:           "RAIL",
+        BUS:            "BUS",
+        FERRY:          "FERRY",
+        CABLE_CAR:      "CABLE CAR",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR"
+    },
+
+    ordinal_exit:
+    {
+// TODO
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
     {
-        minute_abbrev:  "min",
+// TODO
+        format        : "D, j M H:i",
+        minute        : "minute",
+        minutes       : "minutes",
+        minute_abbrev : "min",
         minutes_abbrev: "min",
-        second_abbrev: "sec",
+        second_abbrev : "sec",
         seconds_abbrev: "sec",
-        months:         ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Juil', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec']
+        months        :  ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Juil', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec']
     },
     
     systemmap :
@@ -158,6 +246,30 @@ otp.locale.French = {
             newTrip       : "Nouvel itinéraire"
         },
 
+        // see otp/config.js for where these values are used
+        link : 
+        {
+//TODO
+            text           : "Link to this trip (OTP)",
+            trip_separator : "This trip on other transit planners",
+            bike_separator : "On other bike trip planners",
+            walk_separator : "On other walking direction planners",
+            google_transit : "Google Transit",
+            google_bikes   : "Google Bike Directions",
+            google_walk    : "Google Walking Directions",
+            google_domain  : "http://www.google.fr"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+//TODO
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "Voudrais vous review trip plan",
+            msg_content  : "Les correct errors before planning your trip"
+        },
+
         error:
         {
             title        : "Erreur du planificateur d'itinéraire",
@@ -169,6 +281,7 @@ otp.locale.French = {
         // default messages from server if a message was not returned
         msgcodes:
         {
+// TODO
             200: "Plan OK",
             500: "Server error",
             400: "Trip out of bounds",
@@ -200,12 +313,12 @@ otp.locale.French = {
     
         maxWalkDistance : 
         [
-			['200',   '200 m'],
+            ['200',   '200 m'],
             ['500',   '500 m'],
-			['1000',   '1 km'],
-			['1500',  '1,5 km'],
-			['5000',  '5 km'],
-			['10000',  '10 km'], 
+            ['1000',   '1 km'],
+            ['1500',  '1,5 km'],
+            ['5000',  '5 km'],
+            ['10000',  '10 km'] 
         ],
     
         mode : 

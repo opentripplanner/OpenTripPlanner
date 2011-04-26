@@ -111,14 +111,102 @@ otp.locale.Marathi = {
         'continue':     "चालू ठेवा",
         to_continue:    "चालू ठेवा",
         becomes:        "becomes",
-        at:             "at"
+        at:             "at",
+
+// TODO
+        on:             "on",
+        to:             "to",
+        via:            "via",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+
+    // see otp.planner.Templates for use ... these are used on the trip itinerary as well as forms and other places
+    instructions :
+    {
+// TODO
+        walk         : "Walk",
+        walk_toward  : "Walk",
+        walk_verb    : "Walk",
+        bike         : "Bike",
+        bike_toward  : "Bike",
+        bike_verb    : "Bike",
+        drive        : "Drive",
+        drive_toward : "Drive",
+        drive_verb   : "Drive",
+        move         : "Proceed",
+        move_toward  : "Proceed",
+
+        transfer     : "transfer",
+        transfers    : "transfers",
+
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Depart",
+        arrive       : "Arrive",
+
+        start_at     : "Start at",
+        end_at       : "End at"
+    },
+
+    // see otp.planner.Templates for use
+    labels : 
+    {
+// TODO
+        about        : "About",
+        stop_id      : "Stop ID",
+        trip_details : "Le Trip Details",
+        fare         : "Fare",
+        fare_symbol  : "रुपया ",
+        travel       : "Travel",
+        valid        : "Valid",
+        trip_length  : "Time",
+        with_a_walk  : "with a walk of",
+        alert_for_rt : "Alert for route"
+    },
+
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
+    modes : 
+    {
+// TODO
+        WALK:           "WALK",
+        BICYCLE:        "BICYCLE",
+        CAR:            "CAR",
+        TRAM:           "TRAM",
+        SUBWAY:         "SUBWAY",
+        RAIL:           "RAIL",
+        BUS:            "BUS",
+        FERRY:          "FERRY",
+        CABLE_CAR:      "CABLE CAR",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR"
+    },
+
+    ordinal_exit:
+    {
+// TODO
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
     {
-        minute_abbrev:  "मिनिट",
+// TODO
+        format        : "D, j M H:i",
+        minute        : "मिनिट",
+        minutes       : "मिनिटस",
+        minute_abbrev : "मिनिट",
         minutes_abbrev: "मिनिटस",
-        second_abbrev: "सेकंद",
+        second_abbrev : "सेकंद",
         seconds_abbrev: "सेकंदस",
         months:         ['जानेवारी', 'फेब्रुवारी', 'मार्च', 'एप्रिल', 'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर']
     },
@@ -168,7 +256,17 @@ otp.locale.Marathi = {
             google_transit : "Google Transit",
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
-            google_domain  : "http://www.google.com"
+            google_domain  : "http://www.google.co.in"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+//TODO
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "नवी ट्रीप review trip plan",
+            msg_content  : "नवी ट्रीप correct errors before planning your trip"
         },
 
         error:

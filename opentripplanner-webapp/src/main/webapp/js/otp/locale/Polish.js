@@ -31,14 +31,14 @@ otp.locale.Polish = {
 
     contextMenu : 
     {
-        fromHere         : "Rozpocznij podró¿ tutaj",
-        toHere           : "Zakoñcz podró¿ tutaj",
+        fromHere         : "Rozpocznij podrÃ³Â¿ tutaj",
+        toHere           : "ZakoÃ±cz podrÃ³Â¿ tutaj",
 
-        centerHere       : "Centruj mapê tutaj",
-        zoomInHere       : "Przybli¿ tutaj",
-        zoomOutHere      : "Oddal st¹d",
+        centerHere       : "Centruj mapÃª tutaj",
+        zoomInHere       : "PrzybliÂ¿ tutaj",
+        zoomOutHere      : "Oddal stÂ¹d",
         previous         : "Poprzednia pozycja na mapie",
-        next             : "Nastêpna pozycja na mapie"
+        next             : "NastÃªpna pozycja na mapie"
     },
 
     service : 
@@ -46,44 +46,44 @@ otp.locale.Polish = {
         weekdays:  "Dni robocze",
         saturday:  "Sobota",
         sunday:    "Niedziela",
-        schedule:  "Rozk³ad"
+        schedule:  "RozkÂ³ad"
     },
 
     indicators : 
     {
         ok         : "OK",
         date       : "Data",
-        loading    : "£adowanie",
+        loading    : "Â£adowanie",
         searching  : "Szukanie...",
-        qEmptyText : "Adres, skrzy¿owanie, obiekt lub ID przystanku..."
+        qEmptyText : "Adres, skrzyÂ¿owanie, obiekt lub ID przystanku..."
     },
 
     buttons: 
     {
-        reverse       : "Odwróæ",
-        reverseTip    : "<b>Odwróæ kierunki</b><br/>Zaplanuj podró¿ powrotn¹ poprzez zamianê miejscami punktu startowego i koñcowego podró¿y i przeskok czasu do przodu.",
-        reverseMiniTip: "Odwróæ kierunki",
+        reverse       : "OdwrÃ³Ã¦",
+        reverseTip    : "<b>OdwrÃ³Ã¦ kierunki</b><br/>Zaplanuj podrÃ³Â¿ powrotnÂ¹ poprzez zamianÃª miejscami punktu startowego i koÃ±cowego podrÃ³Â¿y i przeskok czasu do przodu.",
+        reverseMiniTip: "OdwrÃ³Ã¦ kierunki",
 
         edit          : "Edytuj",
-        editTip       : "<b>Edytuj podró¿</b><br/>Powróæ do planowania podró¿y z detalami tej podró¿y.",
+        editTip       : "<b>Edytuj podrÃ³Â¿</b><br/>PowrÃ³Ã¦ do planowania podrÃ³Â¿y z detalami tej podrÃ³Â¿y.",
 
-        clear         : "Wyczyœæ",
-        clearTip      : "<b>Wyczyœæ</b><br/>Wyczyœæ mapê i wszystkie aktywne narzêdzia.",
+        clear         : "WyczyÅ“Ã¦",
+        clearTip      : "<b>WyczyÅ“Ã¦</b><br/>WyczyÅ“Ã¦ mapÃª i wszystkie aktywne narzÃªdzia.",
 
-        fullScreen    : "Pe³en ekran",
-        fullScreenTip : "<b>Pe³en ekran</b><br/>Poka¿ lub ukryj panele narzêdzi",
+        fullScreen    : "PeÂ³en ekran",
+        fullScreenTip : "<b>PeÂ³en ekran</b><br/>PokaÂ¿ lub ukryj panele narzÃªdzi",
 
         print         : "Drukuj",
-        printTip      : "<b>Drukuj</b><br/>Wydrukuj plan podró¿y (bez mapy).",
+        printTip      : "<b>Drukuj</b><br/>Wydrukuj plan podrÃ³Â¿y (bez mapy).",
 
         link          : "Link",
-        linkTip      : "<b>Link</b><br/>Poka¿ link do tego planu podró¿y.",
+        linkTip      : "<b>Link</b><br/>PokaÂ¿ link do tego planu podrÃ³Â¿y.",
 
         feedback      : "Opinie",
-        feedbackTip   : "<b>Opinie</b><br/>Wyœlij swoje uwagi i doœwiadczenia z narzêdzia",
+        feedbackTip   : "<b>Opinie</b><br/>WyÅ“lij swoje uwagi i doÅ“wiadczenia z narzÃªdzia",
 
-        submit       : "Wyœlij",
-        clearButton  : "Wyczyœæ",
+        submit       : "WyÅ“lij",
+        clearButton  : "WyczyÅ“Ã¦",
         ok           : "OK",
         cancel       : "Anuluj",
         yes          : "Tak",
@@ -93,14 +93,14 @@ otp.locale.Polish = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "po³udniowy wschód",
-        southWest:      "po³udniowy zachód",
-        northEast:      "pó³nocny wschód",
-        northWest:      "pó³nocny zachód",
-        north:          "pó³noc",
-        west:           "zachód",
-        south:          "po³udnie",
-        east:           "wschód",
+        southEast:      "poÂ³udniowy wschÃ³d",
+        southWest:      "poÂ³udniowy zachÃ³d",
+        northEast:      "pÃ³Â³nocny wschÃ³d",
+        northWest:      "pÃ³Â³nocny zachÃ³d",
+        north:          "pÃ³Â³noc",
+        west:           "zachÃ³d",
+        south:          "poÂ³udnie",
+        east:           "wschÃ³d",
         bound:          "w kierunku",
         left:           "lewo",
         right:          "prawo",
@@ -109,16 +109,103 @@ otp.locale.Polish = {
         hard_left:      "mocno w lewo",
         hard_right:     "mocno w prawo",
         'continue':     "kontynuuj",
-        to_continue:    "kontynuowaæ",
-        becomes:        "zmienia siê w",
-        at:             "o"
+        to_continue:    "kontynuowaÃ¦",
+        becomes:        "zmienia siÃª w",
+        at:             "o",
+// TODO
+        on:             "on",
+        to:             "to",
+        via:            "via",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+
+    // see otp.planner.Templates for use ... these are used on the trip itinerary as well as forms and other places
+    instructions :
+    {
+// TODO
+        walk         : "Walk",
+        walk_toward  : "Walk",
+        walk_verb    : "Walk",
+        bike         : "Bike",
+        bike_toward  : "Bike",
+        bike_verb    : "Bike",
+        drive        : "Drive",
+        drive_toward : "Drive",
+        drive_verb   : "Drive",
+        move         : "Proceed",
+        move_toward  : "Proceed",
+
+        transfer     : "transfer",
+        transfers    : "transfers",
+
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Depart",
+        arrive       : "Arrive",
+
+        start_at     : "Start at",
+        end_at       : "End at"
+    },
+
+    // see otp.planner.Templates for use
+    labels : 
+    {
+// TODO
+        about        : "About",
+        stop_id      : "Stop ID",
+        trip_details : "Trip Details",
+        fare         : "Fare",
+        fare_symbol  : "\u20ac",
+        travel       : "Travel",
+        valid        : "Valid",
+        trip_length  : "Czasowy",
+        with_a_walk  : "with a walk of",
+        alert_for_rt : "Alert for route"
+    },
+
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
+    modes : 
+    {
+// TODO
+        WALK:           "WALK",
+        BICYCLE:        "BICYCLE",
+        CAR:            "CAR",
+        TRAM:           "TRAM",
+        SUBWAY:         "SUBWAY",
+        RAIL:           "RAIL",
+        BUS:            "BUS",
+        FERRY:          "FERRY",
+        CABLE_CAR:      "CABLE CAR",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR"
+    },
+
+    ordinal_exit:
+    {
+// TODO
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
     {
-        minute_abbrev:  "min",
+// TODO
+        format        : "D, j M H:i",
+        minute        : "minute",
+        minutes       : "protokÃ³Å‚",
+        minute_abbrev : "min",
         minutes_abbrev: "minut",
-        second_abbrev: "sek",
+        second_abbrev : "sek",
         seconds_abbrev: "sekund",
         months:         ['Sty', 'Lut', 'Mar', 'Kwi', 'Maj', 'Cze', 'Lip', 'Sie', 'Wrz', 'Paz', 'Lis', 'Gru']
     },
@@ -135,32 +222,33 @@ otp.locale.Polish = {
     {
         labels : 
         {
-            panelTitle    : "Planer podró¿y",
-            tabTitle      : "Zaplanuj podró¿",
-            inputTitle    : "Szczegó³y podró¿y",
-            optTitle      : "Preferencje podró¿y (opcjonalne)",
-            submitMsg     : "Planuje Twoj¹ podró¿...",
+            panelTitle    : "Planer podrÃ³Â¿y",
+            tabTitle      : "Zaplanuj podrÃ³Â¿",
+            inputTitle    : "SzczegÃ³Â³y podrÃ³Â¿y",
+            optTitle      : "Preferencje podrÃ³Â¿y (opcjonalne)",
+            submitMsg     : "Planuje TwojÂ¹ podrÃ³Â¿...",
             optionalTitle : "",
             date          : "Data",
             time          : "Godzina",
             when          : "Kiedy",
             from          : "Z",
-            fromHere      : "Sk¹d",
+            fromHere      : "SkÂ¹d",
             to            : "Do",
-            toHere        : "Dok¹d",
-            minimize      : "Poka¿",
+            toHere        : "DokÂ¹d",
+            minimize      : "PokaÂ¿",
             maxWalkDistance: "Maksymalny spacer",
             arriveDepart  : "Dojazd/odjazd o",
-            mode          : "Podró¿uj",
-            wheelchair    : "Podró¿ dostêpna dla niepe³nosprawnych", 
-            go            : "IdŸ",
-            planTrip      : "Planuj swoj¹ podró¿",
-            newTrip       : "Nowa podró¿"
+            mode          : "PodrÃ³Â¿uj",
+            wheelchair    : "PodrÃ³Â¿ dostÃªpna dla niepeÂ³nosprawnych", 
+            go            : "IdÅ¸",
+            planTrip      : "Planuj swojÂ¹ podrÃ³Â¿",
+            newTrip       : "Nowa podrÃ³Â¿"
         },
 
         // see otp/config.js for where these values are used
         link : 
         {
+// TODO
             text           : "Link to this trip (OTP)",
             trip_separator : "This trip on other transit planners",
             bike_separator : "On other bike trip planners",
@@ -168,27 +256,37 @@ otp.locale.Polish = {
             google_transit : "Google Transit",
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
-            google_domain  : "http://www.google.com"
+            google_domain  : "http://www.google.pl"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+//TODO
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "Voudrais vous review trip plan",
+            msg_content  : "Les correct errors before planning your trip"
         },
 
         error:
         {
-            title        : 'B³ad planera podró¿y',
-            deadMsg      : "Planer podró¿y nie odpowiada. Odczekaj kilka minut i spróbuj ponownie, lub spróbuj wersji tekstowej planera (zobacz link poni¿ej).",
-            geoFromMsg   : "Wybierz lokalizacjê 'Z' dla Twojej podró¿y: ",
-            geoToMsg     : "Wybierz lokalizacjê 'Do' dla Twojej podró¿y: "
+            title        : 'BÂ³ad planera podrÃ³Â¿y',
+            deadMsg      : "Planer podrÃ³Â¿y nie odpowiada. Odczekaj kilka minut i sprÃ³buj ponownie, lub sprÃ³buj wersji tekstowej planera (zobacz link poniÂ¿ej).",
+            geoFromMsg   : "Wybierz lokalizacjÃª 'Z' dla Twojej podrÃ³Â¿y: ",
+            geoToMsg     : "Wybierz lokalizacjÃª 'Do' dla Twojej podrÃ³Â¿y: "
         },
         
         // default messages from server if a message was not returned
         msgcodes:
         {
             200: "Plan OK",
-            500: "B³¹d serwera",
-            400: "Podró¿ poza obs³ugiwanym obszarem",
+            500: "BÂ³Â¹d serwera",
+            400: "PodrÃ³Â¿ poza obsÂ³ugiwanym obszarem",
             404: "Trasa nieodnaleziona",
-            406: "Brak czasów w rozk³adzie",
-            408: "Limit czasu osi¹gniêty",
-            413: "Niew³aœciwy parametr",
+            406: "Brak czasÃ³w w rozkÂ³adzie",
+            408: "Limit czasu osiÂ¹gniÃªty",
+            413: "NiewÂ³aÅ“ciwy parametr",
             440: "Geokod Z nieodnaleziony",
             450: "Geokod Do nieodnaleziony",
             460: "Geokody Z i Do nieodnalezione",
@@ -200,9 +298,9 @@ otp.locale.Polish = {
 
         options: 
         [
-          ['TRANSFERS', 'Ma³o przesiadek'],
-          ['QUICK',     'Najszybsza podró¿'],
-          ['SAFE',      'Najbezpieczniejsza podró¿']
+          ['TRANSFERS', 'MaÂ³o przesiadek'],
+          ['QUICK',     'Najszybsza podrÃ³Â¿'],
+          ['SAFE',      'Najbezpieczniejsza podrÃ³Â¿']
         ],
     
         arriveDepart: 
@@ -218,7 +316,7 @@ otp.locale.Polish = {
             ['1000',   '1 km'],
             ['1500',  '1,5 km'],
             ['5000',  '5 km'],
-            ['10000',  '10 km'],
+            ['10000',  '10 km']
         ],
     
         mode : 

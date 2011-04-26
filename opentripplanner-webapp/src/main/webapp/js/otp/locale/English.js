@@ -155,6 +155,7 @@ otp.locale.English = {
         stop_id      : "Stop ID",
         trip_details : "Trip Details",
         fare         : "Fare",
+        fare_symbol  : "$",
         travel       : "Travel",
         valid        : "Valid",
         trip_length  : "Time",
@@ -162,7 +163,8 @@ otp.locale.English = {
         alert_for_rt : "Alert for route"
     },
 
-    modes : 
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
+    modes :
     {
         WALK:           "WALK",
         BICYCLE:        "BICYCLE",
@@ -236,7 +238,7 @@ otp.locale.English = {
             wheelchair    : "Wheelchair accessible trip", 
             go            : "Go",
             planTrip      : "Plan Your Trip",
-            newTrip       : "Nuevo viaje"
+            newTrip       : "New trip"
         },
 
         // see otp/config.js for where these values are used

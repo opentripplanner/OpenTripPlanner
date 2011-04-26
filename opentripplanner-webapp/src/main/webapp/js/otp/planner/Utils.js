@@ -184,7 +184,8 @@ otp.planner.Utils = {
      *            fareType type of fare to parse
      * 
      * @returns {String} formatted string representation of the fare (e.g.,
-     *          $2.25) or null if fare can't be parsed.
+     *          $2.25) or null if fare can't be parsed.  
+     *          
      * 
      */
     getFare : function(rec, fareType) {
@@ -194,12 +195,42 @@ otp.planner.Utils = {
             if (Ext.DomQuery.selectValue('key', rec) === fareType) {
                 var cents = parseInt(Ext.DomQuery.selectValue('value/cents', rec));
                 //TODO Use currency in value/currency once available
-                fare = Ext.util.Format.usMoney(cents/100);
+                fare = this.formatMoney(cents);
             }
         }
         return fare;
     },
-    
+
+    /** 
+     * TODO ... neeeds more work  ... trying to get € and रुपया to work...
+     * IMPORTANT: this routine depends on otp.config.locale having the proper value
+     * NOTE: this was borrowed from Extjs format library http://dev.sencha.com/deploy/dev/docs/source/Format.html#method-Ext.util.Format-usMoney
+     */
+    formatMoney : function(cents) {
+        var retVal = cents;
+
+        var v = cents / 100;
+        v = (Math.round((v-0)*100))/100;
+        v = (v == Math.floor(v)) ? v + ".00" : ((v*10 == Math.floor(v*10)) ? v + "0" : v);
+        v = String(v);
+        var ps = v.split('.'),
+            whole = ps[0],
+            sub = ps[1] ? '.'+ ps[1] : '.00',
+            r = /(\d+)(\d{3})/;
+        while (r.test(whole)) {
+            whole = whole.replace(r, '$1' + ',' + '$2');
+        }
+        v = whole + sub;
+        if(v.charAt(0) == '-') {
+            retVal = '-' + otp.config.locale.labels.fare_symbol + v.substr(1);
+        }
+        else {
+            retVal = otp.config.locale.labels.fare_symbol + v;
+        }
+
+        return retVal;
+    },
+
     /** */
     makeItinerariesTree : function(id, clickCallback, scope)
     {

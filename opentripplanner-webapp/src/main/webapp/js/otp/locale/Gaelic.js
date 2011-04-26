@@ -21,6 +21,7 @@ otp.locale.Gaelic = {
 
     config : 
     {
+// TODO
         metricsSystem : "international",
         rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
         attribution   : {
@@ -111,14 +112,102 @@ otp.locale.Gaelic = {
         'continue':     "lean ar aghaidh",
         to_continue:    "chun leanúint ar",
         becomes:        "go dti do n-aithríonn sé go",
-        at:             "ag"
+        at:             "ag",
+// TODO
+        on:             "on",
+        to:             "to",
+        via:            "via",
+        circle_counterclockwise: "take roundabout counterclockwise",
+        circle_clockwise:        "take roundabout clockwise"
+    },
+
+
+    // see otp.planner.Templates for use
+    instructions :
+    {
+// TODO
+        walk         : "Walk",
+        walk_toward  : "Walk",
+        walk_verb    : "Walk",
+        bike         : "Bike",
+        bike_toward  : "Bike",
+        bike_verb    : "Bike",
+        drive        : "Drive",
+        drive_toward : "Drive",
+        drive_verb   : "Drive",
+        move         : "Proceed",
+        move_toward  : "Proceed",
+
+        transfer     : "transfer",
+        transfers    : "transfers",
+
+        continue_as  : "Continues as",
+        stay_aboard  : "stay on board",
+
+        depart       : "Depart",
+        arrive       : "Arrive",
+
+        start_at     : "Start at",
+        end_at       : "End at"
+    },
+
+    // see otp.planner.Templates for use
+    labels : 
+    {
+// TODO
+        about        : "About",
+        stop_id      : "Stop ID",
+        trip_details : "Weee Trip Details",
+        fare         : "Fare",
+        fare_symbol  : "\u20ac",
+        travel       : "Travel",
+        valid        : "Valid",
+        trip_length  : "Time",
+        with_a_walk  : "with a walk of",
+        alert_for_rt : "Alert for route"
+    },
+
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
+    modes : 
+    {
+// TODO
+        WALK:           "WALK",
+        BICYCLE:        "BICYCLE",
+        CAR:            "CAR",
+        TRAM:           "TRAM",
+        SUBWAY:         "SUBWAY",
+        RAIL:           "RAIL",
+        BUS:            "BUS",
+        FERRY:          "FERRY",
+        CABLE_CAR:      "CABLE CAR",
+        GONDOLA:        "GONDOLA",
+        FUNICULAR:      "FUNICULAR"
+    },
+
+    ordinal_exit:
+    {
+// TODO
+        1:  "to first exit",
+        2:  "to second exit",
+        3:  "to third exit",
+        4:  "to fourth exit",
+        5:  "to fifth exit",
+        6:  "to sixth exit",
+        7:  "to seventh exit",
+        8:  "to eighth exit",
+        9:  "to ninth exit",
+        10: "to tenth exit"
     },
 
     time:
     {
-        minute_abbrev:  "nóiméad",
+// TODO
+        format        : "D, j M H:i",
+        minute        : "nóiméad",
+        minutes       : "nóiméid",
+        minute_abbrev : "nóiméad",
         minutes_abbrev: "nóiméid",
-        second_abbrev: "seacaind",
+        second_abbrev : "seacaind",
         seconds_abbrev: "seacaind",
         months:         ['Ean', 'Fea', 'Máirt', 'Aib', 'Beal', 'Meith', 'Iúil', 'Lún', 'M.Fr', 'D.Fr', 'Sam', 'Nollaig']
     },
@@ -161,6 +250,7 @@ otp.locale.Gaelic = {
         // see otp/config.js for where these values are used
         link : 
         {
+// TODO
             text           : "Link to this trip (OTP)",
             trip_separator : "This trip on other transit planners",
             bike_separator : "On other bike trip planners",
@@ -168,7 +258,17 @@ otp.locale.Gaelic = {
             google_transit : "Google Transit",
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
-            google_domain  : "http://www.google.com"
+            google_domain  : "http://www.google.ie"
+        },
+
+        // see otp.planner.Forms for use
+        geocoder:
+        {
+//TODO
+            working      : "Looking up address ....",
+            error        : "Did not receive any results",
+            msg_title    : "Wee review trip plan",
+            msg_content  : "Wee correct errors before planning your trip"
         },
 
         error:
@@ -218,7 +318,7 @@ otp.locale.Gaelic = {
             ['1000',  '1 ciliméadar'],
             ['1500',  '1.5 ciliméadar'],
             ['5000',  '5 chiliméadar'],
-            ['10000', '10 chiliméadar'],
+            ['10000', '10 chiliméadar']
         ],
     
         mode : 

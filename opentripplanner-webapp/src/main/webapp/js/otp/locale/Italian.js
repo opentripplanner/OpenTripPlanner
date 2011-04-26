@@ -155,6 +155,7 @@ otp.locale.Italian = {
         stop_id      : "ID Fermata",
         trip_details : "Dettagli viaggio",
         fare         : "Tariffa",
+        fare_symbol  : "\u20ac",
         travel       : "Viaggio",
         valid        : "Valido",
         trip_length  : "Tempo",

@@ -154,6 +154,7 @@ otp.locale.Spanish = {
         stop_id      : "Stop ID",
         trip_details : "Detalles del viaje",
         fare         : "Tarifa",
+        fare_symbol  : "\u20ac",
         travel       : "Hora de salida",
         valid        : "Hora actual",
         trip_length  : "Tiempo",
@@ -245,6 +246,7 @@ otp.locale.Spanish = {
             trip_separator : "Este viaje en otros planificadores intermodales",
             bike_separator : "En otros planificadores de bicicletas",
             walk_separator : "En otros planificadores pedestres",
+//TODO
             google_transit : "Google Transit",
             google_bikes   : "Google Bike Directions",
             google_walk    : "Google Walking Directions",
@@ -254,6 +256,7 @@ otp.locale.Spanish = {
         // see otp.planner.Forms for use
         geocoder:
         {
+//TODO
             working      : "Looking up address ....",
             error        : "Did not receive any results",
             msg_title    : "Donde es review trip plan",
