@@ -25,7 +25,6 @@
         </repository>
     </repositories>
 
-
     <dependencies>
         <dependency>
             <groupId>org.opentripplanner</groupId>
