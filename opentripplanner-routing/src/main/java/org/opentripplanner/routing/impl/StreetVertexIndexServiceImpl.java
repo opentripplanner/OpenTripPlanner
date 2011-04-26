@@ -111,6 +111,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     @Override
     public void handleGraphRefresh(GraphService graphService) {
+        this.graphService = graphService;
         setup();
     }
 
