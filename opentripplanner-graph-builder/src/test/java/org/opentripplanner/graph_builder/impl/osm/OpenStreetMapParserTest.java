@@ -29,7 +29,6 @@ import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
 
 public class OpenStreetMapParserTest {
-
     @Test
     public void testParser() throws Exception {
         InputStream in = new GZIPInputStream(getClass().getResourceAsStream("map.osm.gz"));
