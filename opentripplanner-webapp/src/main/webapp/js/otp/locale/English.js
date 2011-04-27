@@ -20,7 +20,7 @@ otp.namespace("otp.locale");
 
 otp.locale.English = {
 
-    config : 
+    config :
     {
         metricsSystem : "english",
         rightClickMsg : "Right-click on the map to designate the start and end of your trip.",

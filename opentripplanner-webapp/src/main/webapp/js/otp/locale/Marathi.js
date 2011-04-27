@@ -19,7 +19,7 @@ otp.namespace("otp.locale");
   */
 otp.locale.Marathi = {
 
-    config : 
+    config :
     {
         metricsSystem : "international",
         rightClickMsg : "प्रवास कुठून कुठपर्यंत करायचा आहे ते स्थान निवडण्याकरिता नकाशावर राईट क्लिक करा.",

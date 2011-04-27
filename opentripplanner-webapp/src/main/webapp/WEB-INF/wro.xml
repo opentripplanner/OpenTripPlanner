@@ -8,6 +8,17 @@
     <js>/js/otp/util/Constants.js</js>
     <js>/js/otp/util/Modes.js</js>
     <js>/js/otp/locale/English.js</js>
+    <js>/js/otp/locale/French.js</js>
+
+    <js>/js/otp/locale/Italian.js</js>
+    <js>/js/otp/locale/Marathi.js</js>
+<!--
+    <js>/js/otp/locale/Gaelic.js</js>
+    <js>/js/otp/locale/Hungarian.js</js>
+-->
+    <js>/js/otp/locale/Polish.js</js>
+    <js>/js/otp/locale/Spanish.js</js>
+
     <js>/js/otp/util/AnalyticsUtils.js</js>
     <js>/js/otp/util/DateUtils.js</js>
     <js>/js/otp/util/ObjUtils.js</js>
@@ -17,10 +28,6 @@
     <js>/js/otp/util/ImagePathManager.js</js>
     <js>/js/otp/util/ParseUrlParams.js</js>
     <js>/js/otp/planner/ContextMenu.js</js>
-    <js>/js/otp/core/ComboBox.js</js>
-    <js>/js/otp/core/Map.js</js>
-    <js>/js/otp/core/Measure.js</js>
-    <js>/js/otp/core/UI.js</js>
     <js>/js/otp/planner/Utils.js</js>
     <js>/js/otp/planner/FormsOptionsManager.js</js>
     <js>/js/otp/planner/GeocoderResultsSelector.js</js>
@@ -34,11 +41,26 @@
     <js>/js/otp/planner/poi/Control.js</js>
     <js>/js/otp/planner/poi/Popup.js</js>
     <js>/js/otp/planner/poi/Style.js</js>
+    <js>/js/otp/core/ComboBox.js</js>
+    <js>/js/otp/core/Map.js</js>
+    <js>/js/otp/core/Measure.js</js>
+    <js>/js/otp/core/UI.js</js>
     <js>/js/otp/systemmap/Systemmap.js</js>
     <js>/js/otp/systemmap/Popup.js</js>
     <js>/js/otp/application/Attribution.js</js>
     <js>/js/otp/application/Controller.js</js>
     <js>/js/otp/config.js</js>
+  </group>
+
+  <group name="lib-min">
+    <js>/js/lib/openlayers/OpenLayers.js</js>
+    <js>/js/lib/ext/adapter/ext/ext-base.js</js>
+    <js>/js/lib/ext/ext-all.js</js>
+    <js>/js/lib/ext/ComboHistory.js</js>
+    <js>/js/lib/ext/Spinner.js</js>
+    <js>/js/lib/ext/SpinnerStrategy.js</js>
+    <js>/js/lib/ext/TabCloseMenu.js</js>
+    <js>/js/lib/geoext/GeoExt.js</js>
   </group>
 
 </groups>

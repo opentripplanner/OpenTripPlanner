@@ -19,7 +19,7 @@ otp.namespace("otp.locale");
   */
 otp.locale.Hungarian = {
 
-    config : 
+    config :
     {
 // TODO
         metricsSystem : "international",

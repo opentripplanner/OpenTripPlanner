@@ -543,7 +543,7 @@ otp.util.OpenLayersUtils = {
         if(outText == null || outText.length < 1)
             outText = 'Zoom out';
 
-        return '<ul class=”links”>' +
+        return '<ul class=Â”linksÂ”>' +
              '<li>' +
              '<a href="#zoomIn" onclick="otp.core.MapSingleton.zoomIn();"   title="' + inText + '">' + inText + '</a>  ' +
              ' | ' +

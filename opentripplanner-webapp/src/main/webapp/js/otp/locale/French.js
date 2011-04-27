@@ -19,7 +19,7 @@ otp.namespace("otp.locale");
   */
 otp.locale.French = {
 
-    config : 
+    config :
     {
 // TODO
         metricsSystem : "international",
@@ -112,7 +112,7 @@ otp.locale.French = {
         'continue':     "continuer sur",
         to_continue:    "pour continuer sur",
         becomes:        "devient",
-        at:             "Ã",
+        at:             "ï¿½",
 // TODO
         on:             "on",
         to:             "to",

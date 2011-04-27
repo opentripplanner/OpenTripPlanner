@@ -202,7 +202,7 @@ otp.planner.Utils = {
     },
 
     /** 
-     * TODO ... neeeds more work  ... trying to get € and रुपया to work...
+     * TODO ... neeeds more work  ... trying to get â¬ and à¤°à¥à¤ªà¤¯à¤¾ to work...
      * IMPORTANT: this routine depends on otp.config.locale having the proper value
      * NOTE: this was borrowed from Extjs format library http://dev.sencha.com/deploy/dev/docs/source/Format.html#method-Ext.util.Format-usMoney
      */

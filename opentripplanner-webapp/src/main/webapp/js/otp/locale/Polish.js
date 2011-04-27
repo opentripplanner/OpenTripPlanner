@@ -31,11 +31,11 @@ otp.locale.Polish = {
 
     contextMenu : 
     {
-        fromHere         : "Rozpocznij podró¿ tutaj",
-        toHere           : "Zakoñcz podró¿ tutaj",
+        fromHere         : "Rozpocznij podróż tutaj",
+        toHere           : "Zakoñcz podróż tutaj",
 
         centerHere       : "Centruj mapê tutaj",
-        zoomInHere       : "Przybli¿ tutaj",
+        zoomInHere       : "Przybliż tutaj",
         zoomOutHere      : "Oddal st¹d",
         previous         : "Poprzednia pozycja na mapie",
         next             : "Nastêpna pozycja na mapie"
@@ -55,29 +55,29 @@ otp.locale.Polish = {
         date       : "Data",
         loading    : "£adowanie",
         searching  : "Szukanie...",
-        qEmptyText : "Adres, skrzy¿owanie, obiekt lub ID przystanku..."
+        qEmptyText : "Adres, skrzyżowanie, obiekt lub ID przystanku..."
     },
 
     buttons: 
     {
         reverse       : "Odwróæ",
-        reverseTip    : "<b>Odwróæ kierunki</b><br/>Zaplanuj podró¿ powrotn¹ poprzez zamianê miejscami punktu startowego i koñcowego podró¿y i przeskok czasu do przodu.",
+        reverseTip    : "<b>Odwróæ kierunki</b><br/>Zaplanuj podróż powrotn¹ poprzez zamianê miejscami punktu startowego i koñcowego podróży i przeskok czasu do przodu.",
         reverseMiniTip: "Odwróæ kierunki",
 
         edit          : "Edytuj",
-        editTip       : "<b>Edytuj podró¿</b><br/>Powróæ do planowania podró¿y z detalami tej podró¿y.",
+        editTip       : "<b>Edytuj podróż</b><br/>Powróæ do planowania podróży z detalami tej podróży.",
 
         clear         : "Wyczyœæ",
         clearTip      : "<b>Wyczyœæ</b><br/>Wyczyœæ mapê i wszystkie aktywne narzêdzia.",
 
         fullScreen    : "Pe³en ekran",
-        fullScreenTip : "<b>Pe³en ekran</b><br/>Poka¿ lub ukryj panele narzêdzi",
+        fullScreenTip : "<b>Pe³en ekran</b><br/>Pokaż lub ukryj panele narzêdzi",
 
         print         : "Drukuj",
-        printTip      : "<b>Drukuj</b><br/>Wydrukuj plan podró¿y (bez mapy).",
+        printTip      : "<b>Drukuj</b><br/>Wydrukuj plan podróży (bez mapy).",
 
         link          : "Link",
-        linkTip      : "<b>Link</b><br/>Poka¿ link do tego planu podró¿y.",
+        linkTip      : "<b>Link</b><br/>Pokaż link do tego planu podróży.",
 
         feedback      : "Opinie",
         feedbackTip   : "<b>Opinie</b><br/>Wyœlij swoje uwagi i doœwiadczenia z narzêdzia",
@@ -222,11 +222,11 @@ otp.locale.Polish = {
     {
         labels : 
         {
-            panelTitle    : "Planer podró¿y",
-            tabTitle      : "Zaplanuj podró¿",
-            inputTitle    : "Szczegó³y podró¿y",
-            optTitle      : "Preferencje podró¿y (opcjonalne)",
-            submitMsg     : "Planuje Twoj¹ podró¿...",
+            panelTitle    : "Planer podróży",
+            tabTitle      : "Zaplanuj podróż",
+            inputTitle    : "Szczegó³y podróży",
+            optTitle      : "Preferencje podróży (opcjonalne)",
+            submitMsg     : "Planuje Twoj¹ podróż...",
             optionalTitle : "",
             date          : "Data",
             time          : "Godzina",
@@ -235,14 +235,14 @@ otp.locale.Polish = {
             fromHere      : "Sk¹d",
             to            : "Do",
             toHere        : "Dok¹d",
-            minimize      : "Poka¿",
+            minimize      : "Pokaż",
             maxWalkDistance: "Maksymalny spacer",
             arriveDepart  : "Dojazd/odjazd o",
-            mode          : "Podró¿uj",
-            wheelchair    : "Podró¿ dostêpna dla niepe³nosprawnych", 
+            mode          : "Podróżuj",
+            wheelchair    : "Podróż dostêpna dla niepe³nosprawnych", 
             go            : "IdŸ",
-            planTrip      : "Planuj swoj¹ podró¿",
-            newTrip       : "Nowa podró¿"
+            planTrip      : "Planuj swoj¹ podróż",
+            newTrip       : "Nowa podróż"
         },
 
         // see otp/config.js for where these values are used
@@ -271,10 +271,10 @@ otp.locale.Polish = {
 
         error:
         {
-            title        : 'B³ad planera podró¿y',
-            deadMsg      : "Planer podró¿y nie odpowiada. Odczekaj kilka minut i spróbuj ponownie, lub spróbuj wersji tekstowej planera (zobacz link poni¿ej).",
-            geoFromMsg   : "Wybierz lokalizacjê 'Z' dla Twojej podró¿y: ",
-            geoToMsg     : "Wybierz lokalizacjê 'Do' dla Twojej podró¿y: "
+            title        : 'B³ad planera podróży',
+            deadMsg      : "Planer podróży nie odpowiada. Odczekaj kilka minut i spróbuj ponownie, lub spróbuj wersji tekstowej planera (zobacz link poniżej).",
+            geoFromMsg   : "Wybierz lokalizacjê 'Z' dla Twojej podróży: ",
+            geoToMsg     : "Wybierz lokalizacjê 'Do' dla Twojej podróży: "
         },
         
         // default messages from server if a message was not returned
@@ -282,7 +282,7 @@ otp.locale.Polish = {
         {
             200: "Plan OK",
             500: "B³¹d serwera",
-            400: "Podró¿ poza obs³ugiwanym obszarem",
+            400: "Podróż poza obs³ugiwanym obszarem",
             404: "Trasa nieodnaleziona",
             406: "Brak czasów w rozk³adzie",
             408: "Limit czasu osi¹gniêty",
@@ -299,8 +299,8 @@ otp.locale.Polish = {
         options: 
         [
           ['TRANSFERS', 'Ma³o przesiadek'],
-          ['QUICK',     'Najszybsza podró¿'],
-          ['SAFE',      'Najbezpieczniejsza podró¿']
+          ['QUICK',     'Najszybsza podróż'],
+          ['SAFE',      'Najbezpieczniejsza podróż']
         ],
     
         arriveDepart: 

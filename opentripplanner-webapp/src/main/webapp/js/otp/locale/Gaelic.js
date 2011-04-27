@@ -19,7 +19,7 @@ otp.namespace("otp.locale");
   */
 otp.locale.Gaelic = {
 
-    config : 
+    config :
     {
 // TODO
         metricsSystem : "international",

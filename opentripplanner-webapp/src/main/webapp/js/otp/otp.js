@@ -28,61 +28,58 @@ if(window.console == undefined || window.console.log == undefined)
         window.console[names[i]] = function(){};
 }
 
+// define otp, if not already done so...
+if(otp == null)
+    var otp = {};
+
+otp.CLASS_NAME = "otp";
+
 /**
- * Namespace: trimet (A place for all things otp.)
- * otp namespace controller / Class wrapper functionality
- * @class
+ * Function: namespace
+ * Create a namespace given a string, eg: otp.namespace("otp.widget.ui");
+ *
+ * Parameters:
+ * ns      - {String || Array} A string representing a namespace or an array of strings representing multiple namespaces.  E.g. "some.name.space".
+ * context - {Object} Optional object to which additional names will be added.  Default is the window object.
  */
-var otp = {
-
-    /**
-     * Function: namespace
-     * Create a namespace given a string, eg: otp.namespace("otp.widget.ui");
-     *
-     * Parameters:
-     * ns      - {String || Array} A string representing a namespace or an array of strings representing multiple namespaces.  E.g. "some.name.space".
-     * context - {Object} Optional object to which additional names will be added.  Default is the window object.
-     */
-    namespace : function(ns, context) 
+otp.namespace = function(ns, context) 
+{
+    ns = (typeof ns == 'string') ? [ns] : ns;
+    context = context || window;
+    var num   = ns.length;
+    for(var i=0; i<num; ++i)
     {
-        ns = (typeof ns == 'string') ? [ns] : ns;
-        context = context || window;
-        var num   = ns.length;
-        for(var i=0; i<num; ++i)
-        {
-            var parts = ns[i].split('.');
-            var base  = parts.shift();
-            if(typeof context[base] == 'undefined') {
-                context[base] = {};
-            }
-            if(parts.length > 0) {
-                otp.namespace([parts.join('.')], context[base]);
-            }
+        var parts = ns[i].split('.');
+        var base  = parts.shift();
+        if(typeof context[base] == 'undefined') {
+            context[base] = {};
         }
-    },
+        if(parts.length > 0) {
+            otp.namespace([parts.join('.')], context[base]);
+        }
+    }
+};
 
-    /** 
-     * a blank method (with a log warning).
-     * 
-     * idea is to use in classes where you intend to override a class...use defaultMethod as the initializer
-     * that way, you get a warning when you forget to override.  For example:
-     * 
-     * Class {
-     *   myFunction : otp.defaultMethod,
-     * }
-     * in the above...if this.myFucntion() is not overwritten by customer, I will tell you about it via the defaultMethod.
-     */
-    defaultMethod : function()
-    { 
-        console.log("NOTE: you're calling a otp.defaultMethod() - please make sure all logic is implemented.");
-    },
 
-    CLASS_NAME: "otp"
+/** 
+ * a blank method (with a log warning).
+ * 
+ * idea is to use in classes where you intend to override a class...use defaultMethod as the initializer
+ * that way, you get a warning when you forget to override.  For example:
+ * 
+ * Class {
+ *   myFunction : otp.defaultMethod,
+ * }
+ * in the above...if this.myFucntion() is not overwritten by customer, I will tell you about it via the defaultMethod.
+ */
+otp.defaultMethod = function()
+{ 
+    console.log("NOTE: you're calling a otp.defaultMethod() - please make sure all logic is implemented.");
 };
 
 
 // IMPORTANT: otp.Class & otp.extend was 'borrowed' from OpenLayers.Class & OpenLayers.Util.extend.  
-//            Including them here allows eAPI to run w/out dependence on OpenLayers 
+//            Including them here allows otp to run w/out dependence on OpenLayers 
 //
 
 /* Code below is Copyright (c) 2006-2008 MetaCarta, Inc., published under the Clear BSD
@@ -92,13 +89,7 @@ var otp = {
 
 /**
  * Constructor: otp.Class
- * Base class used to construct all other classes. Includes support for 
- *     multiple inheritance. 
- *     
- * This constructor is new in otp 2.5.  At otp 3.0, the old 
- *     syntax for creating classes and dealing with inheritance 
- *     will be removed.
- * 
+ * Base class used to construct all other classes. Includes support for multiple inheritance.  
  * To create a new otp-style class, use the following syntax:
  * > var MyClass = otp.Class(prototype);
  *

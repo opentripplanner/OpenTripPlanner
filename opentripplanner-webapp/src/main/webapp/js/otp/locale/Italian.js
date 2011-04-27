@@ -20,7 +20,7 @@ otp.namespace("otp.locale");
 
 otp.locale.Italian = {
 
-    config : 
+    config :
     {
         metricsSystem : "international",
         rightClickMsg : "Utilizza il tasto destro sulla mappa per selezionare la partenza e l'arrivo del tuo viaggio",
@@ -265,7 +265,7 @@ otp.locale.Italian = {
         error:
         {
             title        : 'Errore Pianificazione Viaggio',
-            deadMsg      : "Map Trip Planner non sta rispondendo. preghiamo di attendere qualche minuto e riprovare, oppure provare la funzionalità testuale (vedi link sottostante).",
+            deadMsg      : "Map Trip Planner non sta rispondendo. preghiamo di attendere qualche minuto e riprovare, oppure provare la funzionalitï¿½ testuale (vedi link sottostante).",
             geoFromMsg   : "Selezionare la partenza: ",
             geoToMsg     : "Selezionare l'arrivo: "
         },
