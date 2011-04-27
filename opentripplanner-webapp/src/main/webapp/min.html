@@ -16,68 +16,19 @@
     <link rel="stylesheet" type="text/css" href="planner.css" />
 
     <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
+    <script src="js/lib-min.js"></script>
 
-    <!-- Uncomment the line immediately below and then comment out the subsequent 3rd party JS files to use minimized 3rd party code -->
-    <!-- <script src="js/lib-min.js"></script> -->
-
-    <script src="js/lib/openlayers/OpenLayers.js"></script>
-    <script src="js/lib/ext/adapter/ext/ext-base.js"></script>
-
-    <script src="js/lib/ext/ext-all-debug.js"></script>
-    <script src="js/lib/ext/ComboHistory.js"></script>
-    <script src="js/lib/ext/Spinner.js"></script>
-    <script src="js/lib/ext/SpinnerStrategy.js"></script>
-    <script src="js/lib/ext/TabCloseMenu.js"></script>
-
-    <script src="js/lib/geoext/GeoExt.js"></script>
-    
-    <!-- Uncomment the line immediately below and then comment out all the subsequent JS files to use minimized OTP code -->
-    <!-- <script src="js/otp-min.js"></script> -->
-    <!-- see min.html for a full on example -->
-
-    <!-- IMPORTANT: if you add additional JS files here, make sure that otp-min.js works too (@see WEB-INF/wro.xml for the minimized include list) -->
+    <!--
+       NOTE: this is another way to override the default language ... espcially useful when using the minimized otp-min.js library
+       (just uncomment the "//otp.config = " line below...
+     -->
     <script src="js/otp/otp.js"></script>
-    <script src="js/otp/util/Constants.js"></script>
-    <script src="js/otp/util/Modes.js"></script>
-    <script src="js/otp/locale/English.js"></script>
-    <script src="js/otp/locale/French.js"></script>
-    <script src="js/otp/locale/Gaelic.js"></script>
-    <script src="js/otp/locale/Hungarian.js"></script>
-    <script src="js/otp/locale/Italian.js"></script>
     <script src="js/otp/locale/Marathi.js"></script>
-    <script src="js/otp/locale/Polish.js"></script>
-    <script src="js/otp/locale/Spanish.js"></script>    
-    <script src="js/otp/util/AnalyticsUtils.js"></script>
-    <script src="js/otp/util/DateUtils.js"></script>
-    <script src="js/otp/util/ObjUtils.js"></script>
-    <script src="js/otp/util/StringFormattingUtils.js"></script>
-    <script src="js/otp/util/OpenLayersUtils.js"></script>
-    <script src="js/otp/util/ExtUtils.js"></script>
-    <script src="js/otp/util/ImagePathManager.js"></script>
-    <script src="js/otp/util/ParseUrlParams.js"></script>
-    <script src="js/otp/planner/Utils.js"></script>
-    <script src="js/otp/planner/FormsOptionsManager.js"></script>
-    <script src="js/otp/planner/GeocoderResultsSelector.js"></script>
-    <script src="js/otp/planner/ContextMenu.js"></script>
-    <script src="js/otp/planner/Forms.js"></script>
-    <script src="js/otp/planner/Itinerary.js"></script>
-    <script src="js/otp/planner/Planner.js"></script>
-    <script src="js/otp/planner/Renderer.js"></script>
-    <script src="js/otp/planner/TopoRenderer.js"></script>
-    <script src="js/otp/planner/Templates.js"></script>
-    <script src="js/otp/planner/TripTab.js"></script>
-    <script src="js/otp/planner/poi/Control.js"></script>
-    <script src="js/otp/planner/poi/Popup.js"></script>
-    <script src="js/otp/planner/poi/Style.js"></script>
-    <script src="js/otp/core/ComboBox.js"></script>
-    <script src="js/otp/core/Map.js"></script>
-    <script src="js/otp/core/Measure.js"></script>
-    <script src="js/otp/core/UI.js"></script>
-    <script src="js/otp/systemmap/Systemmap.js"></script>
-    <script src="js/otp/systemmap/Popup.js"></script>
-    <script src="js/otp/application/Attribution.js"></script>
-    <script src="js/otp/application/Controller.js"></script>
-    <script src="js/otp/config.js"></script>
+    <script>
+    //otp.config = {locale : otp.locale.Marathi};
+    </script>
+
+    <script src="js/otp-min.js"></script>
 </head>
 
 <body>

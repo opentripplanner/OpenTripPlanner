@@ -7,48 +7,13 @@
     <js>/js/otp/otp.js</js>
     <js>/js/otp/util/Constants.js</js>
     <js>/js/otp/util/Modes.js</js>
-    <js>/js/otp/locale/English.js</js>
-    <js>/js/otp/locale/French.js</js>
-
-    <js>/js/otp/locale/Italian.js</js>
-    <js>/js/otp/locale/Marathi.js</js>
-<!--
-    <js>/js/otp/locale/Gaelic.js</js>
-    <js>/js/otp/locale/Hungarian.js</js>
--->
-    <js>/js/otp/locale/Polish.js</js>
-    <js>/js/otp/locale/Spanish.js</js>
-
-    <js>/js/otp/util/AnalyticsUtils.js</js>
-    <js>/js/otp/util/DateUtils.js</js>
-    <js>/js/otp/util/ObjUtils.js</js>
-    <js>/js/otp/util/StringFormattingUtils.js</js>
-    <js>/js/otp/util/OpenLayersUtils.js</js>
-    <js>/js/otp/util/ExtUtils.js</js>
-    <js>/js/otp/util/ImagePathManager.js</js>
-    <js>/js/otp/util/ParseUrlParams.js</js>
-    <js>/js/otp/planner/ContextMenu.js</js>
+    <js>/js/otp/locale/**.js</js>
+    <js>/js/otp/util/**.js</js>
     <js>/js/otp/planner/Utils.js</js>
-    <js>/js/otp/planner/FormsOptionsManager.js</js>
-    <js>/js/otp/planner/GeocoderResultsSelector.js</js>
-    <js>/js/otp/planner/Forms.js</js>
-    <js>/js/otp/planner/Itinerary.js</js>
-    <js>/js/otp/planner/Planner.js</js>
-    <js>/js/otp/planner/Renderer.js</js>
-    <js>/js/otp/planner/TopoRenderer.js</js>
-    <js>/js/otp/planner/Templates.js</js>
-    <js>/js/otp/planner/TripTab.js</js>
-    <js>/js/otp/planner/poi/Control.js</js>
-    <js>/js/otp/planner/poi/Popup.js</js>
-    <js>/js/otp/planner/poi/Style.js</js>
-    <js>/js/otp/core/ComboBox.js</js>
-    <js>/js/otp/core/Map.js</js>
-    <js>/js/otp/core/Measure.js</js>
-    <js>/js/otp/core/UI.js</js>
-    <js>/js/otp/systemmap/Systemmap.js</js>
-    <js>/js/otp/systemmap/Popup.js</js>
-    <js>/js/otp/application/Attribution.js</js>
-    <js>/js/otp/application/Controller.js</js>
+    <js>/js/otp/planner/**.js</js>
+    <js>/js/otp/core/**.js</js>
+    <js>/js/otp/systemmap/**.js</js>
+    <js>/js/otp/application/**.js</js>
     <js>/js/otp/config.js</js>
   </group>
 
