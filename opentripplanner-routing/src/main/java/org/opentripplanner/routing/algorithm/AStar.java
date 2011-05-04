@@ -118,6 +118,7 @@ public class AStar {
         /** max walk distance cannot be less than distances to nearest transit stops */
         options.maxWalkDistance += origin.getDistanceToNearestTransitStop()
                 + target.getDistanceToNearestTransitStop();
+        boolean limitWalkDistance = options.getModes().getTransit();
 
         /**
          * Populate any extra edges
@@ -151,7 +152,8 @@ public class AStar {
             // hard limit on walk distance. to be replaced with something more subtle later.
             State state_u = spt_u.state;
             StateData data_u = state_u.getData();
-            if (data_u.getWalkDistance() >= options.maxWalkDistance)
+            if (limitWalkDistance &&
+            	data_u.getWalkDistance() >= options.maxWalkDistance)
                 continue;
 
             Vertex tov = spt_u.mirror;
@@ -261,6 +263,7 @@ public class AStar {
         options.maxWalkDistance += origin.getDistanceToNearestTransitStop()
                 + target.getDistanceToNearestTransitStop();
 
+        boolean limitWalkDistance = options.getModes().getTransit();
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
             SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
@@ -268,7 +271,8 @@ public class AStar {
             // hard limit on walk distance. to be replaced with something more subtle later.
             State state_u = spt_u.state;
             StateData data_u = state_u.getData();
-            if (data_u.getWalkDistance() >= options.maxWalkDistance)
+            if (limitWalkDistance &&
+               	data_u.getWalkDistance() >= options.maxWalkDistance)
                 continue;
 
             Vertex fromv = spt_u.mirror;
