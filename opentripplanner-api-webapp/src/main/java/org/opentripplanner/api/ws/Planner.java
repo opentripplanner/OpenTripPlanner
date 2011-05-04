@@ -54,6 +54,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -210,19 +211,16 @@ public class Planner {
         } catch (LocationNotAccessible e) {
             PlannerError error = new PlannerError(Message.LOCATION_NOT_ACCESSIBLE);
             response.setError(error);
+        } catch (TransitTimesException e) {
+            // TODO: improve this to distinguish between days/places with no service
+            // and dates outside those covered by the feed
+            PlannerError error = new PlannerError(Message.NO_TRANSIT_TIMES);
+            response.setError(error);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "exception planning trip: ", e);
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }
-
-        // TODO: TRANSIT TRIP ERRORS
-        // If no paths are returned, and the trip is transit, look at the date & time parameters, to
-        // see if that was cause for an issue (eg: schedule calendar might be outside of service
-        // dates; service times; etc...)
-        // If planned trip is just walking, and a transit trip is requested, and the walk itself is
-        // greater than the max walk requested, look at date & time parameters)
-
         return response;
     }
 

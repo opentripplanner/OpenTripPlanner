@@ -14,11 +14,14 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -28,8 +31,13 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  */
 public class Graph implements Serializable {
-    private static final long serialVersionUID = -7583768730006630206L;
-
+	// update serialVersionId to the current date in format YYYYMMDDL
+	// whenever changes are made that could make existing graphs incompatible
+	private static final long serialVersionUID = 20110504L;
+	// transit feed validity information in seconds since epoch
+    private long transitServiceStarts = Long.MAX_VALUE;           
+    private long transitServiceEnds = 0;   
+    
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
     HashMap<String, GraphVertex> vertices;
@@ -209,5 +217,25 @@ public class Graph implements Serializable {
 
     public TransferTable getTransferTable() {
         return transferTable;
+    }
+    
+	// Infer the time period covered by the trasit feed
+    public void updateTransitFeedValidity(CalendarServiceData data) {
+    	final long SEC_IN_DAY = 24 * 60 * 60;
+    	for (AgencyAndId sid : data.getServiceIds()) {
+    		for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
+    			long t = sd.getAsDate().getTime();
+    			// assume feed is unreliable after midnight on last service day
+    	       	long u = t + SEC_IN_DAY; 
+    			if (t < this.transitServiceStarts) this.transitServiceStarts = t;
+    	       	if (u > this.transitServiceEnds) this.transitServiceEnds = u;	
+    		}
+    	}
+    }
+
+    // Check to see if we have transit information for a given date
+    public boolean transitFeedCovers(Date d) {
+    	long t = d.getTime();
+    	return t >= this.transitServiceStarts && t < this.transitServiceEnds; 
     }
 }

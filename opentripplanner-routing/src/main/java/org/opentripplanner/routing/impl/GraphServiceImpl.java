@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
+import java.io.InvalidClassException;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,11 +11,14 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -34,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class GraphServiceImpl implements GraphService {
 
+  private static final Logger _log = LoggerFactory.getLogger(GraphServiceImpl.class);
+	
   private GraphBundle _bundle;
 
   private File _graphPath;
@@ -126,8 +132,10 @@ public class GraphServiceImpl implements GraphService {
       path = _graphPath;
 
     if (path == null || !path.exists()) {
-      if (!_createEmptyGraphIfNotFound)
-        throw new IllegalStateException("graph path not found: " + path);
+      if (!_createEmptyGraphIfNotFound) {
+    	  _log.error("Graph not found. Verify path to stored graph: " + path);
+    	  throw new IllegalStateException("graph path not found: " + path);
+      }
 
       /****
        * Create an empty graph if not graph is found
@@ -139,10 +147,8 @@ public class GraphServiceImpl implements GraphService {
     }
 
     try {
-
       ContractionHierarchySet chs = ContractionHierarchySerializationLibrary.readGraph(path);
       setContractionHierarchySet(chs);
-
     } catch (Exception ex) {
       throw new IllegalStateException("error loading graph from " + path, ex);
     }

@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
@@ -103,6 +104,12 @@ public class ContractionPathServiceImpl implements PathService {
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
         options.setServiceDays(state.getTime());
+        if (options.getModes().getTransit() &&
+        	! _graphService.getGraph().transitFeedCovers(targetTime)) {
+        	// user wants a path through the transit network,
+        	// but the date provided is outside those covered by the transit feed.
+        	throw new TransitTimesException();
+        }
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
