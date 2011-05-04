@@ -89,7 +89,6 @@ public class StreetUtils {
         newv.setSlopeOverride(e.getSlopeOverride());
         newv.setElevationProfile(e.getElevationProfile());
         newv.setRoundabout(e.isRoundabout());
-        if (newv.isRoundabout()) _log.debug("Converted roundabout to street vertex.");
         graph.addVertex(newv);
         return newv;
     }
