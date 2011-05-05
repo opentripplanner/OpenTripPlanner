@@ -18,8 +18,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Random;
 
-import org.opentripplanner.routing.spt.SPTVertex;
-
 class FibNode<T> {
     boolean mark;
 
@@ -51,7 +49,9 @@ class FibNode<T> {
     }
 }
 
-public class FibHeap<T> implements DirectoryPriorityQueue<T> {
+public class FibHeap<T> implements OTPPriorityQueue<T> {
+    
+    public static final OTPPriorityQueueFactory FACTORY = new FibHeapFactory();
 
     int n;
 
@@ -151,6 +151,7 @@ public class FibHeap<T> implements DirectoryPriorityQueue<T> {
         }
     }
 
+    @Override
     public void insert(T payload, double key) {
         FibNode<T> x = new FibNode<T>(payload, key);
         this.directory.put(payload, x);
@@ -163,6 +164,7 @@ public class FibHeap<T> implements DirectoryPriorityQueue<T> {
         this.n = this.n + 1;
     }
 
+    @Override
     public void insert_or_dec_key(T payload, double key) {
         FibNode<T> exists = this.directory.get(payload);
         if (exists != null) {
@@ -172,6 +174,7 @@ public class FibHeap<T> implements DirectoryPriorityQueue<T> {
         }
     }
 
+    @Override
     public T extract_min() {
         FibNode<T> z = this.min;
 
@@ -255,10 +258,12 @@ public class FibHeap<T> implements DirectoryPriorityQueue<T> {
         }
     }
 
+    @Override
     public int size() {
         return this.n;
     }
 
+    @Override
     public boolean empty() {
         return this.n == 0;
     }
@@ -279,15 +284,23 @@ public class FibHeap<T> implements DirectoryPriorityQueue<T> {
         }
     }
 
-    public double min_priority() {
+    @Override
+    public double peek_min_key() {
         if (min == null) {
             return Double.NaN;
         }
         return min.key;
     }
 
-    public SPTVertex peek_min() {
-        return (SPTVertex) min.payload;
+    @Override
+    public T peek_min() {
+        return min.payload;
     }
-
+    
+    private static class FibHeapFactory implements OTPPriorityQueueFactory {
+        @Override
+        public <T> OTPPriorityQueue<T> create(int maxSize) {
+            return new FibHeap<T>(maxSize);
+        }
+    }
 }

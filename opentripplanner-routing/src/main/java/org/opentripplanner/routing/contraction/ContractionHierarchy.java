@@ -454,7 +454,7 @@ public class ContractionHierarchy implements Serializable {
                         deleted = deletedNeighbors.get(vertex);
                     }
                     double new_prio = getImportance(vertex, shortcutsAndSearchSpace, deleted);
-                    Double new_min = pq.min_priority();
+                    Double new_min = pq.peek_min_key();
                     if (new_prio <= new_min) {
                         break;
                     } else {

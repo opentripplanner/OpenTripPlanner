@@ -26,7 +26,7 @@ public class TestPQueues extends TestCase {
     private static final int N = 50000;
     private static final int ITER = 3;
     
-    public void doQueue(DirectoryPriorityQueue<Integer> q, 
+    public void doQueue(OTPPriorityQueue<Integer> q, 
                         List<Integer> input, List<Integer> expected) {
         List<Integer> result = new ArrayList<Integer>(N);
         long t0 = System.currentTimeMillis();

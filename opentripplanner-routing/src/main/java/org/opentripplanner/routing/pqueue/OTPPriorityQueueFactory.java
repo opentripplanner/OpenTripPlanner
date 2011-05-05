@@ -13,16 +13,7 @@
 
 package org.opentripplanner.routing.pqueue;
 
-public interface DirectoryPriorityQueue<T> {
+public interface OTPPriorityQueueFactory {
 
-    void insert(T payload, double key);
-
-    void insert_or_dec_key(T payload, double key);
-
-    T extract_min();
-
-    int size();
-    
-    boolean empty();
-
+    public <T> OTPPriorityQueue<T> create(int maxSize);
 }

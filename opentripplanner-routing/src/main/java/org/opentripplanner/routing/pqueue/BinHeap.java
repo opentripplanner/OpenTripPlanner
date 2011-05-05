@@ -13,7 +13,10 @@
 
 package org.opentripplanner.routing.pqueue;
 
-public class BinHeap<T> implements DirectoryPriorityQueue<T> {
+public class BinHeap<T> implements OTPPriorityQueue<T> {
+    
+    public static OTPPriorityQueueFactory FACTORY = new BinHeapFactory();
+    
     private double[] prio;
     private T[] elem;
     private int size; 
@@ -28,16 +31,24 @@ public class BinHeap<T> implements DirectoryPriorityQueue<T> {
         prio[0] = Double.NEGATIVE_INFINITY;   // set sentinel
     }
     
+    @Override
     public int size() {return size;}
     
+    @Override
     public boolean empty() {return size <= 0;}
 
-    public double peek_min() {return prio[1];} // user must check for empty
-
+    @Override
+    public double peek_min_key() {return prio[1];} // user must check for empty
+    
+    @Override
+    public T peek_min() {return elem[1];}
+    
+    @Override
     public void insert_or_dec_key(T e, double p) {insert(e, p);} // broken implementation
 
     public void reset() {size=0;} // empty the queue in one operation
 
+    @Override
     public void insert(T e, double p) {
         int i;
         size += 1;
@@ -49,6 +60,7 @@ public class BinHeap<T> implements DirectoryPriorityQueue<T> {
         prio[i] = p;
     }    
     
+    @Override
     public T extract_min() {
         int    i, child;
         T      minElem  = elem[1];
@@ -67,5 +79,13 @@ public class BinHeap<T> implements DirectoryPriorityQueue<T> {
         elem[i] = lastElem;
         prio[i] = lastPrio;
         return minElem;
+    }    
+    
+    private static class BinHeapFactory implements OTPPriorityQueueFactory {
+
+        @Override
+        public <T> OTPPriorityQueue<T> create(int maxSize) {
+            return new BinHeap<T>(maxSize);
+        }
     }
 }

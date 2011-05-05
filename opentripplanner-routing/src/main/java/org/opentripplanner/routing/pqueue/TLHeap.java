@@ -25,7 +25,10 @@ package org.opentripplanner.routing.pqueue;
  * 
  */
 
-public class TLHeap<T> implements DirectoryPriorityQueue<T> {
+public class TLHeap<T> implements OTPPriorityQueue<T> {
+    
+    public static OTPPriorityQueueFactory FACTORY = new TLHeapFactory();
+    
     private static final double loge2 = Math.log(2);
     private int nSubheaps;
     private int subheapSize;
@@ -64,7 +67,7 @@ public class TLHeap<T> implements DirectoryPriorityQueue<T> {
         for (int i=0; i<nSubheaps; i++) {
             BinHeap<T> h = subheaps[i];
             if (!h.empty()) {
-                double p = h.peek_min();
+                double p = h.peek_min_key();
                 if (p < bestPrio) {
                     bestPrio = p;
                     bestHeap = h;
@@ -94,4 +97,20 @@ public class TLHeap<T> implements DirectoryPriorityQueue<T> {
     @Override
     public boolean empty() { return size <= 0; }
     
+    @Override
+    public double peek_min_key() {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public T peek_min() {
+        throw new UnsupportedOperationException();
+    }
+
+    private static class TLHeapFactory implements OTPPriorityQueueFactory {
+        @Override
+        public <T> OTPPriorityQueue<T> create(int maxSize) {
+            return new TLHeap<T>(maxSize);
+        }
+    }
 }
