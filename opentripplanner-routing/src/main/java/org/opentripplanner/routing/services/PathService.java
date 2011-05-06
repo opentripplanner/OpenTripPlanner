@@ -17,11 +17,16 @@ import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
     public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
+            TraverseOptions options, int nItineraries);
+
+    public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, State initialState,
             TraverseOptions options, int nItineraries);
 
     public List<GraphPath> plan(String from, String to, List<String> intermediates, Date dateTime,

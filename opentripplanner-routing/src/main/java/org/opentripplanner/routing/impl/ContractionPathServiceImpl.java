@@ -58,7 +58,7 @@ public class ContractionPathServiceImpl implements PathService {
 
     private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
-    
+
     private GraphService _graphService;
 
     private RoutingService _routingService;
@@ -66,7 +66,7 @@ public class ContractionPathServiceImpl implements PathService {
     private StreetVertexIndexService _indexService;
 
     @Autowired
-    public void setGraphService(GraphService graphService){
+    public void setGraphService(GraphService graphService) {
         _graphService = graphService;
     }
 
@@ -99,16 +99,22 @@ public class ContractionPathServiceImpl implements PathService {
         }
 
         State state = new State(targetTime.getTime());
-        
+
+        return plan(fromVertex, toVertex, state, options, nItineraries);
+    }
+
+    public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, State state,
+            TraverseOptions options, int nItineraries) {
+
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
         options.setServiceDays(state.getTime());
-        if (options.getModes().getTransit() &&
-        	! _graphService.getGraph().transitFeedCovers(targetTime)) {
-        	// user wants a path through the transit network,
-        	// but the date provided is outside those covered by the transit feed.
-        	throw new TransitTimesException();
+        if (options.getModes().getTransit()
+                && !_graphService.getGraph().transitFeedCovers(new Date(state.getTime()))) {
+            // user wants a path through the transit network,
+            // but the date provided is outside those covered by the transit feed.
+            throw new TransitTimesException();
         }
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
@@ -122,7 +128,7 @@ public class ContractionPathServiceImpl implements PathService {
             busOnly.getModes().setTrainish(false);
         }
         optionQueue.add(options);
-        
+
         double maxWeight = Double.MAX_VALUE;
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
@@ -134,16 +140,16 @@ public class ContractionPathServiceImpl implements PathService {
             options.maxWeight = maxWeight;
             GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
             if (maxWeight == Double.MAX_VALUE) {
-                /* the worst trip we are willing to accept is at most twice
-                 * as bad or twice as long.
+                /*
+                 * the worst trip we are willing to accept is at most twice as bad or twice as long.
                  */
                 if (path == null) {
-                    //if there is no first path, there won't be any other paths
+                    // if there is no first path, there won't be any other paths
                     return null;
                 }
                 maxWeight = path.vertices.lastElement().weightSum * 2;
-                long tripTime = path.vertices.lastElement().state.getTime() - 
-                    path.vertices.firstElement().state.getTime();
+                long tripTime = path.vertices.lastElement().state.getTime()
+                        - path.vertices.firstElement().state.getTime();
                 if (options.isArriveBy()) {
                     maxTime = path.vertices.lastElement().state.getTime() - tripTime * 2;
                 } else {
@@ -153,7 +159,7 @@ public class ContractionPathServiceImpl implements PathService {
             if (path == null) {
                 continue;
             }
-            if (! paths.contains(path)) {
+            if (!paths.contains(path)) {
                 paths.add(path);
                 // now, create a list of options, one with each route in this trip banned.
                 // the HashSet banned is not strictly necessary as the optionsQueue will
@@ -164,7 +170,7 @@ public class ContractionPathServiceImpl implements PathService {
                     if (e instanceof PatternBoard) {
                         Trip trip = spte.getTrip();
                         String routeName = GtfsLibrary.getRouteName(trip.getRoute());
-                        
+
                         RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
                         TraverseOptions newOptions = options.clone();
                         newOptions.bannedRoutes.add(spec);
@@ -178,7 +184,8 @@ public class ContractionPathServiceImpl implements PathService {
         if (paths.size() == 0) {
             return null;
         }
-        // We order the list of returned routes by the time of arrival (not the duration of the trip)
+        // We order the list of returned routes by the time of arrival (not the duration of the
+        // trip)
         Collections.sort(paths, new PathComparator());
         return paths;
     }
