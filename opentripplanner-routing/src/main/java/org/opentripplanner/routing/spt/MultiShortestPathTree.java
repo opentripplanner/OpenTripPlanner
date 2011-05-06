@@ -62,44 +62,27 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             return ret;
         }
 
-        long time = state.getTime();
+        long duration = Math.abs(state.getTime() - state.getStartTime());
 
         Iterator<SPTVertex> it = vertices.iterator();
 
-        if (options.isArriveBy()) {
-            while (it.hasNext()) {
-                SPTVertex v = it.next();
-                double old_w = v.weightSum;
-                long old_t = v.state.getTime();
+        while (it.hasNext()) {
+            
+            SPTVertex v = it.next();
+            double old_w = v.weightSum;
+            long old_duration = Math.abs(v.state.getTime() - v.state.getStartTime());
 
-                if (old_w <= weightSum && old_t >= time) {
-                    /* an existing vertex strictly dominates the new vertex */
-                    return null;
-                }
-
-                if (old_w > weightSum && old_t < time) {
-                    /* the new vertex strictly dominates an existing vertex */
-                    it.remove();
-                }
+            if (old_w <= weightSum && old_duration <= duration) {
+                /* an existing vertex strictly dominates the new vertex */
+                return null;
             }
 
-        } else {
-            while (it.hasNext()) {
-                SPTVertex v = it.next();
-                double old_w = v.weightSum;
-                long old_t = v.state.getTime();
-
-                if (old_w <= weightSum && old_t <= time) {
-                    /* an existing vertex strictly dominates the new vertex */
-                    return null;
-                }
-
-                if (old_w > weightSum && old_t > time) {
-                    /* the new vertex strictly dominates an existing vertex */
-                    it.remove();
-                }
+            if (old_w > weightSum && old_duration > duration) {
+                /* the new vertex strictly dominates an existing vertex */
+                it.remove();
             }
         }
+
         SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
         vertices.add(ret);
         return ret;
