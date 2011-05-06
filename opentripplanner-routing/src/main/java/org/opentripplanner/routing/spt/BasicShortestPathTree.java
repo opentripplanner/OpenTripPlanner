@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
-public class BasicShortestPathTree implements ShortestPathTree {
+public class BasicShortestPathTree extends AbstractShortestPathTree {
     private static final long serialVersionUID = -3899613853043676031L;
 
     HashMap<Vertex, SPTVertex> vertices;
@@ -76,19 +76,7 @@ public class BasicShortestPathTree implements ShortestPathTree {
             return null;
         }
 
-        GraphPath ret = new GraphPath();
-        while (true) {
-            ret.vertices.add(0, end);
-            if (end.incoming == null) {
-                break;
-            }
-            ret.edges.add(0, end.incoming);
-            end = end.incoming.fromv;
-        }
-        if (optimize) {
-            ret.optimize();
-        }
-        return ret;
+        return createPathForVertex(end, optimize);
     }
 
     public String toString() {

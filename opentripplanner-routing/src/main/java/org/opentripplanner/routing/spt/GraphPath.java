@@ -104,9 +104,21 @@ public class GraphPath {
         this.edges = new Vector<SPTEdge>();
     }
 
+    public SPTVertex getFirstVertex() {
+        return vertices.get(0);
+    }
+
+    public SPTVertex getLastVertex() {
+        return vertices.get(vertices.size() - 1);
+    }
+
+    public long getDuration() {
+        SPTVertex first = getFirstVertex();
+        SPTVertex last = getLastVertex();
+        return Math.abs(last.state.getTime() - first.state.getTime());
+    }
+
     public void optimize() {
-        
-        State state0 = vertices.firstElement().state;
 
         State state = vertices.lastElement().state;
         StateData.Editor edit = state.edit();
@@ -118,10 +130,11 @@ public class GraphPath {
             /* nothing to optimize */
             return;
         }
-        if (state0.getTime() >= state.getTime()) {
+        
+        TraverseOptions options = vertices.lastElement().options;
+        
+        if (options.isArriveBy()) {
             /* arrive-by trip */
-
-            TraverseOptions options = vertices.lastElement().options;
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
@@ -134,7 +147,6 @@ public class GraphPath {
                 copyExistingNarrativeToNewNarrativeAsAppropriate(existingNarrative, edge.narrative);
             }
         } else {
-            TraverseOptions options = vertices.lastElement().options;
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
             while (iterator.hasPrevious()) {
                 SPTEdge edge = iterator.previous();
@@ -295,16 +307,16 @@ public class GraphPath {
 
     private void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
             EdgeNarrative to) {
-        
-        if( ! ( to instanceof MutableEdgeNarrative))
+
+        if (!(to instanceof MutableEdgeNarrative))
             return;
-        
+
         MutableEdgeNarrative m = (MutableEdgeNarrative) to;
-        
-        if( to.getFromVertex() == null)
+
+        if (to.getFromVertex() == null)
             m.setFromVertex(from.getFromVertex());
-        
-        if( to.getToVertex() == null)
+
+        if (to.getToVertex() == null)
             m.setToVertex(from.getToVertex());
     }
 }

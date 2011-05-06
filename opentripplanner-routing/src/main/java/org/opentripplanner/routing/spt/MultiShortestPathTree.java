@@ -17,24 +17,40 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
-public class MultiShortestPathTree implements ShortestPathTree {
+public class MultiShortestPathTree extends AbstractShortestPathTree {
     private static final long serialVersionUID = -3899613853043676031L;
 
-    HashMap<Vertex, Collection<SPTVertex>> vertexSets;
+    public static final ShortestPathTreeFactory FACTORY = new FactoryImpl();
+
+    private HashMap<Vertex, Collection<SPTVertex>> vertexSets;
 
     public MultiShortestPathTree() {
         vertexSets = new HashMap<Vertex, Collection<SPTVertex>>();
     }
 
-    public Collection<SPTVertex> getVertices() {
-        throw new UnsupportedOperationException();
+    public Set<Vertex> getVertices() {
+        return vertexSets.keySet();
     }
-    
+
+    public Collection<SPTVertex> getSPTVerticesForVertex(Vertex vertex) {
+        return vertexSets.get(vertex);
+    }
+
+    public GraphPath getPath(SPTVertex sptVertex) {
+        return createPathForVertex(sptVertex, false);
+    }
+
+    /****
+     * {@link ShortestPathTree} Interface
+     ****/
+
+    @Override
     public SPTVertex addVertex(Vertex vertex, State state, double weightSum, TraverseOptions options) {
 
         Collection<SPTVertex> vertices = vertexSets.get(vertex);
@@ -81,7 +97,7 @@ public class MultiShortestPathTree implements ShortestPathTree {
                 if (old_w > weightSum && old_t > time) {
                     /* the new vertex strictly dominates an existing vertex */
                     it.remove();
-                } 
+                }
             }
         }
         SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
@@ -89,10 +105,12 @@ public class MultiShortestPathTree implements ShortestPathTree {
         return ret;
     }
 
+    @Override
     public GraphPath getPath(Vertex dest) {
         return getPath(dest, true);
     }
 
+    @Override
     public GraphPath getPath(Vertex dest, boolean optimize) {
         SPTVertex end = null;
         Collection<SPTVertex> set = vertexSets.get(dest);
@@ -104,29 +122,23 @@ public class MultiShortestPathTree implements ShortestPathTree {
                 end = v;
             }
         }
+        return createPathForVertex(end, optimize);
+    }
 
-        GraphPath ret = new GraphPath();
-        while (true) {
-            ret.vertices.add(0, end);
-            if (end.incoming == null) {
-                break;
-            }
-            ret.edges.add(0, end.incoming);
-            end = end.incoming.fromv;
-        }
-        if (optimize) {
-            ret.optimize();
-        }
-        return ret;
+    @Override
+    public void removeVertex(SPTVertex vertex) {
+        Collection<SPTVertex> set = this.vertexSets.get(vertex.mirror);
+        set.remove(vertex);
     }
 
     public String toString() {
         return "SPT " + this.vertexSets.size();
     }
 
-    public void removeVertex(SPTVertex vertex) {
-        Collection<SPTVertex> set = this.vertexSets.get(vertex.mirror);
-        set.remove(vertex);
+    private static final class FactoryImpl implements ShortestPathTreeFactory {
+        @Override
+        public ShortestPathTree create() {
+            return new MultiShortestPathTree();
+        }
     }
-
 }

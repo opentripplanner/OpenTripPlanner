@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 /** A vertex in the ShortestPathTree */
 
 public class SPTVertex implements Vertex, Serializable {
-    
+
     private static final long serialVersionUID = -4422788581123655293L;
 
     public SPTEdge incoming;
@@ -36,7 +36,7 @@ public class SPTVertex implements Vertex, Serializable {
     public Vertex mirror;
 
     public State state;
-    
+
     public TraverseOptions options;
 
     /** Total cost to this vertex */
@@ -47,7 +47,7 @@ public class SPTVertex implements Vertex, Serializable {
     public SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options) {
         this(mirror, state, weightSum, options, 0);
     }
-    
+
     public SPTVertex(Vertex mirror, State state, double weightSum, TraverseOptions options, int hops) {
         this.mirror = mirror;
         this.state = state;
@@ -56,11 +56,20 @@ public class SPTVertex implements Vertex, Serializable {
         this.hops = hops;
     }
 
+    public SPTVertex(SPTVertex o) {
+        this.incoming = o.incoming;
+        this.mirror = o.mirror;
+        this.state = o.state;
+        this.options = o.options;
+        this.weightSum = o.weightSum;
+        this.hops = o.hops;
+    }
+
     public SPTEdge setParent(SPTVertex parent, Edge ep, EdgeNarrative edgeNarrative) {
         incoming = new SPTEdge(parent, this, ep, edgeNarrative);
         return incoming;
     }
-    
+
     public SPTEdge getParent() {
         return incoming;
     }

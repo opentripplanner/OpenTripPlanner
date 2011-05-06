@@ -40,7 +40,7 @@ public class SPTEdge {
     public SPTVertex tov;
 
     public Edge payload;
-    
+
     public EdgeNarrative narrative;
 
     public SPTEdge(SPTVertex fromv, SPTVertex tov, Edge ep, EdgeNarrative narrative) {
@@ -48,6 +48,13 @@ public class SPTEdge {
         this.tov = tov;
         this.payload = ep;
         this.narrative = narrative;
+    }
+
+    public SPTEdge(SPTEdge o) {
+        this.fromv = o.fromv;
+        this.tov = o.tov;
+        this.payload = o.payload;
+        this.narrative = o.narrative;
     }
 
     public double getDistance() {
@@ -80,7 +87,7 @@ public class SPTEdge {
             return null;
         }
 
-        TripPattern pattern = ((PatternEdge)payload).getPattern();
+        TripPattern pattern = ((PatternEdge) payload).getPattern();
         return pattern.getTrip(patternIndex);
     }
 
@@ -99,7 +106,7 @@ public class SPTEdge {
     public SPTVertex getToVertex() {
         return tov;
     }
-    
+
     public String toString() {
         return "SPTEdge(" + payload.toString() + ")";
     }
@@ -111,7 +118,7 @@ public class SPTEdge {
         }
         return false;
     }
-    
+
     public int hashCode() {
         return 37 * payload.hashCode();
     }
