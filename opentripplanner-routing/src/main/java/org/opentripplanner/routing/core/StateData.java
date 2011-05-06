@@ -31,7 +31,7 @@ public class StateData {
 
     private final Map<Object, Object> extensions;
 
-    private StateData(Editor editor) {
+    protected StateData(Editor editor) {
         this.trip = editor.trip;
         this.tripId = editor.tripId;
         this.walkDistance = editor.walkDistance;
@@ -127,9 +127,11 @@ public class StateData {
     public static class Editor {
 
         /**
-         * Time is not technically a member of StateData, but we add it as a convenience here for
+         * StartTime and Time are not technically members of StateData, but we add it as a convenience here for
          * easier state creation
          */
+        private long startTime;
+        
         private long time;
 
         private int trip = -1;
@@ -160,11 +162,11 @@ public class StateData {
 
         private boolean created = false;
 
-        private Editor() {
+        protected Editor() {
             extensions = new HashMap<Object, Object>();
         }
 
-        private Editor(StateData state) {
+        protected Editor(StateData state) {
             this.trip = state.trip;
             this.tripId = state.tripId;
             this.walkDistance = state.walkDistance;
@@ -197,11 +199,27 @@ public class StateData {
         }
 
         public State createState() {
-            return new State(time, createData());
+            return new State(startTime, time, createData());
+        }
+        
+        public void setStartTime(long startTime) {
+            this.startTime = startTime;
+        }
+        
+        public long getTime() {
+            return time;
         }
 
         public void setTime(long time) {
             this.time = time;
+        }
+        
+        public void incrementWithStateDelta(State from, State to) {
+            StateData dFrom = from.getData();
+            StateData dTo = to.getData();
+            this.numBoardings += (dTo.numBoardings - dFrom.numBoardings);
+            this.walkDistance = (dTo.walkDistance - dFrom.walkDistance);
+            this.time += (to.getTime() - from.getTime());
         }
 
         /**

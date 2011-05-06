@@ -18,6 +18,8 @@ import java.util.Date;
 import org.opentripplanner.routing.core.StateData.Editor;
 
 public class State {
+    
+    private final long startTime;
 
     private final long time;
 
@@ -28,13 +30,26 @@ public class State {
     }
 
     public State(long time) {
-        this(time, StateData.createDefault());
+        this(time, time, StateData.createDefault());
+    }
+    
+    public State(long time, StateData data) {
+        this(time,time,data);
     }
 
-    public State(long time, StateData data) {
+    public State(long startTime, long time, StateData data) {
+        this.startTime = startTime;
         this.time = time;
         this.data = data;
     }
+    
+    /**
+     * @return the start time in milliseconds since the epoch.
+     */
+    public long getStartTime() {
+        return startTime;
+    }
+
 
     /**
      * @return the time in milliseconds since the epoch.
@@ -52,6 +67,7 @@ public class State {
 
     public StateData.Editor edit() {
         Editor editor = data.edit();
+        editor.setStartTime(startTime);
         editor.setTime(time);
         return editor;
     }
@@ -69,7 +85,7 @@ public class State {
      */
     public State incrementTimeInSeconds(int numOfSeconds) {
         long t = this.time + numOfSeconds * 1000;
-        return new State(t, this.data);
+        return new State(this.startTime, t, this.data);
     }
 
     /**
@@ -80,7 +96,7 @@ public class State {
      * @return the new state
      */
     public State setTime(long time) {
-        return new State(time, this.data);
+        return new State(this.startTime, time, this.data);
     }
 
     /**
@@ -91,7 +107,7 @@ public class State {
      * @return the new state.
      */
     public State setData(StateData updatedData) {
-        return new State(this.time, updatedData);
+        return new State(this.startTime, this.time, updatedData);
     }
 
     public String toString() {
