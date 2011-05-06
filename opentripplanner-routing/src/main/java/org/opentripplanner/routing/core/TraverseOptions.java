@@ -26,10 +26,10 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.routing.algorithm.DefaultExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.DefaultRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.ExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
+import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

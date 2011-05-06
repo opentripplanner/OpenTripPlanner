@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.strategies;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;

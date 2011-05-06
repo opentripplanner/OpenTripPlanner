@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm;
+package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.ArrayList;
 import java.util.List;
