@@ -29,8 +29,19 @@ public interface PathService {
     public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, State initialState,
             TraverseOptions options, int nItineraries);
 
-    public List<GraphPath> plan(String from, String to, List<String> intermediates, Date dateTime,
-            TraverseOptions options);
+    /**
+     * Here we wish to plan a trip that starts at "fromPlace", travels through the intermediate
+     * places in some arbitrary but hopefully optimal order, and eventually end up at "toPlace".
+     * 
+     * @param fromPlace
+     * @param toPlace
+     * @param intermediatePlaces
+     * @param dateTime
+     * @param options
+     * @return
+     */
+    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediatePlaces,
+            Date dateTime, TraverseOptions options);
 
     public boolean isAccessible(String place, TraverseOptions options);
 

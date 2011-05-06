@@ -22,8 +22,20 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 public interface RoutingService {
 
-    public GraphPath route(Vertex fromVertex, Vertex toVertex, State state, TraverseOptions options);
+    public List<GraphPath> route(Vertex fromVertex, Vertex toVertex, State state,
+            TraverseOptions options);
 
-    public GraphPath route(Vertex fromVertex, Vertex toVertex,
-            List<Vertex> intermediateVertices, State state, TraverseOptions options);
+    /**
+     * Here we wish to plan a trip that starts at "fromVertex", travels through the intermediate
+     * vertices in some arbitrary but hopefully optimal order, and eventually end up at "toVertex".
+     * 
+     * @param fromPlace
+     * @param toPlace
+     * @param intermediatePlaces
+     * @param dateTime
+     * @param options
+     * @return
+     */
+    public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediateVertices,
+            State state, TraverseOptions options);
 }

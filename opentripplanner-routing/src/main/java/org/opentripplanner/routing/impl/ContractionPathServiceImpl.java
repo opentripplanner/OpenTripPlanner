@@ -138,15 +138,16 @@ public class ContractionPathServiceImpl implements PathService {
             }
             options.worstTime = maxTime;
             options.maxWeight = maxWeight;
-            GraphPath path = _routingService.route(fromVertex, toVertex, state, options);
+            List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, state, options);
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
                  */
-                if (path == null) {
+                if (somePaths.isEmpty()) {
                     // if there is no first path, there won't be any other paths
                     return null;
                 }
+                GraphPath path = somePaths.get(0);
                 maxWeight = path.vertices.lastElement().weightSum * 2;
                 long tripTime = path.vertices.lastElement().state.getTime()
                         - path.vertices.firstElement().state.getTime();
@@ -156,26 +157,28 @@ public class ContractionPathServiceImpl implements PathService {
                     maxTime = path.vertices.firstElement().state.getTime() + tripTime * 2;
                 }
             }
-            if (path == null) {
+            if (somePaths.isEmpty()) {
                 continue;
             }
-            if (!paths.contains(path)) {
-                paths.add(path);
-                // now, create a list of options, one with each route in this trip banned.
-                // the HashSet banned is not strictly necessary as the optionsQueue will
-                // already remove duplicate options, but it might be slightly faster as
-                // hashing TraverseOptions is slow.
-                for (SPTEdge spte : path.edges) {
-                    Edge e = spte.payload;
-                    if (e instanceof PatternBoard) {
-                        Trip trip = spte.getTrip();
-                        String routeName = GtfsLibrary.getRouteName(trip.getRoute());
+            for (GraphPath path : somePaths) {
+                if (!paths.contains(path)) {
+                    paths.add(path);
+                    // now, create a list of options, one with each route in this trip banned.
+                    // the HashSet banned is not strictly necessary as the optionsQueue will
+                    // already remove duplicate options, but it might be slightly faster as
+                    // hashing TraverseOptions is slow.
+                    for (SPTEdge spte : path.edges) {
+                        Edge e = spte.payload;
+                        if (e instanceof PatternBoard) {
+                            Trip trip = spte.getTrip();
+                            String routeName = GtfsLibrary.getRouteName(trip.getRoute());
 
-                        RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
-                        TraverseOptions newOptions = options.clone();
-                        newOptions.bannedRoutes.add(spec);
-                        if (!optionQueue.contains(newOptions)) {
-                            optionQueue.add(newOptions);
+                            RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
+                            TraverseOptions newOptions = options.clone();
+                            newOptions.bannedRoutes.add(spec);
+                            if (!optionQueue.contains(newOptions)) {
+                                optionQueue.add(newOptions);
+                            }
                         }
                     }
                 }
