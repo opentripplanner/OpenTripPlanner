@@ -70,11 +70,17 @@
 	<bean id="geocoderGoogle" class="org.opentripplanner.geocoder.google.GoogleGeocoder" />
 	
 	<bean id="geocoderYahoo" class="org.opentripplanner.geocoder.yahoo.YahooGeocoder">
-	    <property name="appId" value="yourappid" />
+	    <property name="appId" value="yourappId" />
+	</bean>
+	
+	<bean id="geocoderNominatim" class="org.opentripplanner.geocoder.nominatim.NominatimGeocoder">
+		<property name="nominatimUrl" value="http://open.mapquestapi.com/nominatim/v1/search" />
+		<!-- Optional parameters: viewBox and resultLimit, viewbox=left,top,right,bottom -->  
+		<!-- <property name="viewBox" value="-76.32,45.69,-75.07,45.01" />
+		<property name="resultLimit" value="50" /> -->
 	</bean>
 
 	<bean id="geocoderServer" class="org.opentripplanner.geocoder.ws.GeocoderServer">
-		<property name="geocoder" ref="geocoderYahoo" />
+		<property name="geocoder" ref="geocoderNominatim" />
 	</bean>
-
 </beans>
