@@ -127,11 +127,11 @@ public class StateData {
     public static class Editor {
 
         /**
-         * StartTime and Time are not technically members of StateData, but we add it as a convenience here for
-         * easier state creation
+         * StartTime and Time are not technically members of StateData, but we add it as a
+         * convenience here for easier state creation
          */
         private long startTime;
-        
+
         private long time;
 
         private int trip = -1;
@@ -201,11 +201,11 @@ public class StateData {
         public State createState() {
             return new State(startTime, time, createData());
         }
-        
+
         public void setStartTime(long startTime) {
             this.startTime = startTime;
         }
-        
+
         public long getTime() {
             return time;
         }
@@ -213,13 +213,20 @@ public class StateData {
         public void setTime(long time) {
             this.time = time;
         }
-        
+
         public void incrementWithStateDelta(State from, State to) {
             StateData dFrom = from.getData();
             StateData dTo = to.getData();
             this.numBoardings += (dTo.numBoardings - dFrom.numBoardings);
             this.walkDistance = (dTo.walkDistance - dFrom.walkDistance);
             this.time += (to.getTime() - from.getTime());
+        }
+
+        public void resetForReverseOptimization() {
+            setAlightedLocal(false);
+            setEverBoarded(false);
+            setWalkDistance(0.0);
+            setNumBoardings(0);
         }
 
         /**
@@ -241,6 +248,10 @@ public class StateData {
 
         public void setWalkDistance(double walkDistance) {
             this.walkDistance = walkDistance;
+        }
+
+        public double getWalkDistance() {
+            return this.walkDistance;
         }
 
         public void incrementWalkDistance(double walkDistance) {

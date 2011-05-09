@@ -56,6 +56,9 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public OptimizeType optimizeFor = OptimizeType.QUICK;
 
+    /**
+     * A maxWalkDistance of 0 or less indicates no limit
+     */
     public double maxWalkDistance = Double.MAX_VALUE;
 
     private HashMap<AgencyAndId, FareRuleSet> fareContexts;
@@ -118,6 +121,13 @@ public class TraverseOptions implements Serializable, Cloneable {
     public int minTransferTime = 0;
 
     public int maxTransfers = 2;
+    
+    /**
+     * Set a hard limit on computation time. Any positive value will be treated as a limit in the
+     * computation time for one search instance, in milliseconds. A zero or negative value implies
+     * no limit.
+     */
+    public long maxComputationTime = 0;
 
     private TraverseOptions walkingOptions;
 

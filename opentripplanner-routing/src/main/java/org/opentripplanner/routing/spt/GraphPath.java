@@ -122,17 +122,16 @@ public class GraphPath {
 
         State state = vertices.lastElement().state;
         StateData.Editor edit = state.edit();
-        edit.setAlightedLocal(false);
-        edit.setEverBoarded(false);
+        edit.resetForReverseOptimization();
         state = edit.createState();
 
         if (edges.isEmpty()) {
             /* nothing to optimize */
             return;
         }
-        
+
         TraverseOptions options = vertices.lastElement().options;
-        
+
         if (options.isArriveBy()) {
             /* arrive-by trip */
             ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);

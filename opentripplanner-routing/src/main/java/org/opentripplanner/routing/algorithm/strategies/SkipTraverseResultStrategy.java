@@ -38,6 +38,6 @@ public interface SkipTraverseResultStrategy {
      * @param traverseOptions the current traverse options
      * @return true if the given traverse result should not be considered further
      */
-    public boolean shouldSkipVertex(Vertex origin, Vertex target, SPTVertex parent,
+    public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, SPTVertex parent,
             TraverseResult traverseResult, ShortestPathTree spt, TraverseOptions traverseOptions);
 }

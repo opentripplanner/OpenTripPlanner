@@ -84,6 +84,10 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         editor.incrementWalkDistance(fromv.getLength());
         // time moves *backwards* when traversing an edge in the opposite direction
         editor.incrementTimeInSeconds((int) (back ? -time : time));
+        
+        if( EdgeLibrary.weHaveWalkedTooFar(editor, options))
+            return null;
+        
         return new TraverseResult(weight, editor.createState(), this);
     }
 

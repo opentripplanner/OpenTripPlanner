@@ -115,6 +115,10 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) (back ? -time : time));
+        
+        if( EdgeLibrary.weHaveWalkedTooFar(s1, options))
+            return null;
+        
         return new TraverseResult(weight, s1.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 

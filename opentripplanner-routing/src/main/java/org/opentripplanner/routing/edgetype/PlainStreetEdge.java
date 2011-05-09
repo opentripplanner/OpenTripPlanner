@@ -190,6 +190,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         Editor editor = s0.edit();
         editor.incrementWalkDistance(length);
         editor.incrementTimeInSeconds((int) (back ? -time : time));
+        
+        if( EdgeLibrary.weHaveWalkedTooFar(editor, options))
+            return null;
+        
         return new TraverseResult(weight, editor.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
     }
 

@@ -89,6 +89,13 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         if (!options.getModes().get(modeMask)) {
             return null;
         }
+        
+        /**
+         * If we've hit our transfer limit, we can't go any further
+         */
+        StateData data = state0.getData();
+        if( data.getNumBoardings() > options.maxTransfers )
+            return null;
 
         /* find next boarding time */
         /* 
@@ -140,7 +147,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
          * this stop. 
          */
         long transfer_penalty = 0;
-        StateData data = state0.getData();
         if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
             TransferTable transferTable = options.getTransferTable();
             

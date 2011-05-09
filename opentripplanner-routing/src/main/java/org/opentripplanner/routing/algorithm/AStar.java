@@ -79,7 +79,7 @@ public class AStar {
         if (!options.isArriveBy()) {
             throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
         }
-        return _instance.getShortestPathTreeBack(graph, origin, target, init, options);
+        return _instance.getShortestPathTree(graph, target, origin, init, options);
     }
 
     /**

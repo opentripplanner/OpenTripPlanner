@@ -87,6 +87,13 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             return null;
         }
         
+        /**
+         * If we've hit our transfer limit, we can't go any further
+         */
+        StateData data = state0.getData();
+        if( data.getNumBoardings() > options.maxTransfers )
+            return null;
+        
         /* find closest alighting time for backward searches */
         /* 
          * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to initial state)
@@ -139,7 +146,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
          * this stop. 
          */
         long transfer_penalty = 0;
-        StateData data = state0.getData();
         if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
             TransferTable transferTable = options.getTransferTable();
             
