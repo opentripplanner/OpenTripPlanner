@@ -42,7 +42,17 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         StateData fromData = fromState.getData();
 
         double euclidianDistance = tov.distance(target);
-
+        /*	On a non-transit trip, the remaining weight is simply distance / speed
+         *	On a transit trip, there are two cases:
+         *	(1) we're not on a transit vehicle.  In this case, there are two possible ways to 
+         *      compute the remaining distance, and we take whichever is smaller: 
+         *	    (a) walking distance / walking speed
+         *	    (b) boarding cost + transit distance / transit speed (this is complicated a 
+         *          bit when we know that there is some walking portion of the trip).
+         *	(2) we are on a transit vehicle, in which case the remaining weight is
+         *	    simply transit distance / transit speed (no need for boarding cost),
+         *	    again considering any mandatory walking.
+         */
         if (useTransit) {
             
             if (fromData.isAlightedLocal()) {
@@ -50,9 +60,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             } else {
                 int boardCost;
                 if (edge instanceof OnBoardForwardEdge) {
-                    boardCost = options.boardCost;
-                } else {
                     boardCost = 0;
+                } else {
+                    boardCost = options.boardCost;
                 }
 
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
@@ -92,9 +102,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             } else {
                 int boardCost;
                 if (edge instanceof OnBoardReverseEdge) {
-                    boardCost = options.boardCost;
-                } else {
                     boardCost = 0;
+                } else {
+                    boardCost = options.boardCost;
                 }
 
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
