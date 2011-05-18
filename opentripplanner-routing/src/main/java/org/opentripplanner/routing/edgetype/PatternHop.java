@@ -68,6 +68,12 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     public String getName() {
         return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
+    
+    public TraverseResult optimisticTraverse(State state0, TraverseOptions wo) {
+    	int runningTime = pattern.getBestRunningTime(stopIndex);
+    	State state1 = state0.incrementTimeInSeconds(runningTime);
+    	return new TraverseResult(runningTime, state1, this);
+    }
 
     public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
         int runningTime = pattern.getBestRunningTime(stopIndex);
