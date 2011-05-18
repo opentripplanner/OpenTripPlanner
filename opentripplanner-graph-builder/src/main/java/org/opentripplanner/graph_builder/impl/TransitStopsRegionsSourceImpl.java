@@ -22,6 +22,8 @@ import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.services.GraphService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -32,6 +34,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  */
 public class TransitStopsRegionsSourceImpl implements RegionsSource {
+    private static Logger _log = LoggerFactory.getLogger(TransitStopsRegionsSourceImpl.class);
 
     private static final double METERS_PER_DEGREE_LAT = 111111;
     private double distance = 2000;
@@ -68,6 +71,8 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
             }
         }
 
+        _log.debug("Total regions: " + regions.size());
+        
         return regions;
     }
 }
