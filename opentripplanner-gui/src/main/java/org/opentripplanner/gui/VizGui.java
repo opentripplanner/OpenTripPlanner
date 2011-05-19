@@ -17,6 +17,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -375,6 +376,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         /* VERTEX INFO SUBPANEL */
         JPanel vertexDataPanel = new JPanel();
         vertexDataPanel.setLayout(new BoxLayout(vertexDataPanel, BoxLayout.PAGE_AXIS));
+        vertexDataPanel.setPreferredSize(new Dimension(300, 600));
         leftPanel.add(vertexDataPanel, BorderLayout.CENTER);
 
         JLabel nvLabel = new JLabel("Vertices");
