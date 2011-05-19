@@ -217,6 +217,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     public String toString() {
-        return "PatternBoard(" + super.toString() + ")";
+        return "PatternBoard(" + getToVertex() + ", " + getFromVertex() + ")";
     }
 }

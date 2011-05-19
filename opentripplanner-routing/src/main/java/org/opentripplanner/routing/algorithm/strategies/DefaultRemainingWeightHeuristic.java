@@ -129,10 +129,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
     public static double getMaxSpeed(TraverseOptions options) {
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
-            // assume that the max average transit speed over a hop is 10 m/s, which is so far true
-            // for
-            // New York and Portland
-            return 10;
+            // assume that the max average transit speed over a hop is 30 m/s, which is roughly
+        	// the highway speed limit
+            return 30;
         } else {
             if (options.optimizeFor == OptimizeType.QUICK) {
                 return options.speed;

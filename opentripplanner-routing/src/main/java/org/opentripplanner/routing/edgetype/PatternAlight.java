@@ -220,6 +220,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     }
 
     public String toString() {
-        return "PatternAlight(" + super.toString() + ")";
+    	return "PatternAlight(" + getToVertex() + ", " + getFromVertex() + ")";
     }
 }
