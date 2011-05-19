@@ -6,19 +6,21 @@
  *   - for apps that support multiple languages, you will need a scheme that determines the user's desired language,  
  *     which assigns the proper otp.locale.<Language> to otp.config.locale prior to including config.js (this file)
  */
-if(otp == null) otp = {};
-if(otp.config == null) otp.config = {};
-if(otp.config.locale == null) otp.config.locale = otp.locale.English;
+// step 1: make sure we have some type of otp.config, and otp.config.local defined
+if(typeof(otp) == "undefined" || otp == null) otp = {};
+if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
+if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
 
-// second: re-define otp.config with all the various option... 
-otp.config = {
+
+// step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
+otp.config_defaults = {
     locale        : otp.config.locale,
     metricsSystem : otp.config.locale.config.metricsSystem,  // Metrics system (e.g., 'english' == feet, miles, other value or null is metric system)
 
     planner : {
         url            : null,
         linkTemplates  : [
-            {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate},
+           {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_transit, url: otp.config.locale.tripPlanner.link.google_domain + '/maps?<tpl if="arriveBy == \'Arrive\'">ttype=arr&</tpl>date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
 //            {name:'TriMet (Map Planner)',  url:'http://maps.trimet.org?<tpl if="opt == \'TRANSFERS\'">min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">walk=0.9999&</tpl>arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
@@ -135,3 +137,10 @@ otp.config = {
 
     CLASS_NAME : "otp.config"
 };
+try {
+    // step 3: apply our default to the existing (possibly empty) otp config
+    otp.inherit(otp.config, otp.config_defaults);
+    console.log("otp.config updated with default items from otp.config_static");
+} catch(e) {
+    console.log("ERROR: was unable to run otp.inherid override in config.js - got this exception: " + e);
+}

@@ -762,8 +762,8 @@ otp.planner.StaticForms = {
         var dateTime    = this.makeDateTime();
         var fromToArray = [fromToForms, dateTime];
 
-        // override will override the display of the from & to form
-        if(this.fromToOverride)
+        // fromToOverride will be shown atop the display of the from & to forms (thus turning the from & to forms off)
+        if(this.fromToOverride && (this.fromToOverride != "" || this.fromToOverride != " "))
         {
             fromToArray = [this.fromToOverride, dateTime];
         }

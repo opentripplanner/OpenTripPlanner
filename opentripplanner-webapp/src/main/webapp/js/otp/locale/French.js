@@ -10,333 +10,284 @@
    
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
-*/
+ */
 
 otp.namespace("otp.locale");
 
 /**
-  * @class
-  */
+ * @class
+ */
 otp.locale.French = {
 
-    config :
-    {
-// TODO
+    config : {
         metricsSystem : "international",
-        rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
-        attribution   : {
-            title   : "License Attribution",
+        rightClickMsg : "Cliquez avec le bouton droit de la souris sur la carte pour désigner le départ et l'arrivée de votre parcours.",
+        attribution : {
+            title : "License Attribution",
             content : "Disclaimer goes here"
         }
     },
 
-    contextMenu : 
-    {
-        fromHere         : "Partir d'ici",
-        toHere           : "Arriver ici",
+    contextMenu : {
+        fromHere : "Partir d'ici",
+        toHere : "Arriver ici",
 
-        centerHere       : "Centrer la carte ici",
-        zoomInHere       : "Zoomer ici",
-        zoomOutHere      : "Dézoomer ici",
-        previous         : "position précédente",
-        next             : "position suivante"
+        centerHere : "Centrer la carte ici",
+        zoomInHere : "Zoomer ici",
+        zoomOutHere : "Dézoomer ici",
+        previous : "position précédente",
+        next : "position suivante"
     },
 
-    service : 
-    {
-        weekdays:  "jours de semaine",
-        saturday:  "Samedi",
-        sunday:    "Dimanche",
-        schedule:  "Horaires"
+    service : {
+        weekdays : "jours de semaine",
+        saturday : "Samedi",
+        sunday : "Dimanche",
+        schedule : "Horaires"
     },
 
-    indicators : 
-    {
-        ok         : "OK",
-        date       : "Date",
-        loading    : "Chargement",
-        searching  : "Calcul...",
+    indicators : {
+        ok : "OK",
+        date : "Date",
+        loading : "Chargement",
+        searching : "Calcul...",
         qEmptyText : "Adresse, intersection, point de repère ou nom d'arrêt..."
     },
 
-    buttons: 
-    {
-        reverse       : "Inverser",
-        reverseTip    : "<b>Inverser l'itinéraire</b><br/>Planifier un itinéraire retour en inversant les points de départs et d'arriver, et ajuster l'heure de départ.",
-        reverseMiniTip: "Inverser l'itinéraire",
+    buttons : {
+        reverse : "Inverser",
+        reverseTip : "<b>Inverser l'itinéraire</b><br/>Planifier un itinéraire retour en inversant les points de départs et d'arrivée, et ajuster l'heure de départ.",
+        reverseMiniTip : "Inverser l'itinéraire",
 
-        edit          : "Modifier",
-        editTip       : "<b>Modifier l'itinéraire</b><br/>Retourner à la configuration de l'itinéraire pour en modifier des paramètres.",
+        edit : "Modifier",
+        editTip : "<b>Modifier l'itinéraire</b><br/>Retourner à la configuration de l'itinéraire pour en modifier des paramètres.",
 
-        clear         : "Effaçer",
-        clearTip      : "<b>Effaçer</b><br/>Effaçer la carte et les outils actifs.",
+        clear : "Effacer",
+        clearTip : "<b>Effacer</b><br/>Effacer la carte et les outils actifs.",
 
-        fullScreen    : "Plein écran",
+        fullScreen : "Plein écran",
         fullScreenTip : "<b>Plein écran</b><br/>Montrer ou cacher le panneau latéral",
 
-        print         : "Imprimer",
-        printTip      : "<b>Imprimer</b><br/>Imprimer l'itinéraire (sans carte).",
+        print : "Imprimer",
+        printTip : "<b>Imprimer</b><br/>Imprimer l'itinéraire (sans carte).",
 
-        link          : "Lien",
-        linkTip      : "<b>Lien</b><br/>Voir le lien direct vers cet itinéraire.",
+        link : "Lien",
+        linkTip : "<b>Lien</b><br/>Voir le lien direct vers cet itinéraire.",
 
-        feedback      : "Feedback",
-        feedbackTip   : "<b>Feedback</b><br/>Envoyez votre retour d'expérience avec la carte.",
+        feedback : "Commentaires",
+        feedbackTip : "<b>Commentaires</b><br/>Envoyez votre retour d'expérience avec la carte.",
 
-        submit       : "Valider",
-        clearButton  : "Effaçer",
-        ok           : "OK",
-        cancel       : "Annuler",
-        yes          : "Oui",
-        no           : "Non"
+        submit : "Valider",
+        clearButton : "Effacer",
+        ok : "OK",
+        cancel : "Annuler",
+        yes : "Oui",
+        no : "Non"
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
-    directions : 
-    {
-        southEast:      "sud-est",
-        southWest:      "sud-ouest",
-        northEast:      "nord-est",
-        northWest:      "nord-ouest",
-        north:          "nord",
-        west:           "ouest",
-        south:          "sud",
-        east:           "est",
-        bound:          "en direction",
-        left:           "gauche",
-        right:          "droite",
-        slightly_left:  "légèrement à gauche",
-        slightly_right: "légèrement à droite",
-        hard_left:      "complètement à gauche",
-        hard_right:     "complètement à droite",
-        'continue':     "continuer sur",
-        to_continue:    "pour continuer sur",
-        becomes:        "devient",
-        at:             "�",
-// TODO
-        on:             "on",
-        to:             "to",
-        via:            "via",
-        circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise"
+    directions : {
+        southEast : "le sud-est",
+        southWest : "le sud-ouest",
+        northEast : "le nord-est",
+        northWest : "le nord-ouest",
+        north : "le nord",
+        west : "l'ouest",
+        south : "le sud",
+        east : "l'est",
+        bound : "en direction",
+        left : "à gauche",
+        right : "à droite",
+        slightly_left : "légèrement à gauche",
+        slightly_right : "légèrement à droite",
+        hard_left : "complètement à gauche",
+        hard_right : "complètement à droite",
+        'continue' : "continuer sur",
+        to_continue : "pour continuer sur",
+        becomes : "devenant",
+        at : "à",
+        on : "sur",
+        to : "vers",
+        via : "via",
+        circle_counterclockwise : "prendre le rond-point",
+        circle_clockwise : "prendre le rond-point dans le sens horaire"
     },
 
-    // see otp.planner.Templates for use ... these are used on the trip itinerary as well as forms and other places
-    instructions :
-    {
-// TODO
-        walk         : "Walk",
-        walk_toward  : "Walk",
-        walk_verb    : "Walk",
-        bike         : "Bike",
-        bike_toward  : "Bike",
-        bike_verb    : "Bike",
-        drive        : "Drive",
-        drive_toward : "Drive",
-        drive_verb   : "Drive",
-        move         : "Proceed",
-        move_toward  : "Proceed",
+    // see otp.planner.Templates for use ... these are used on the trip
+    // itinerary as well as forms and other places
+    instructions : {
+        walk : "Marche à pied",
+        walk_toward : "Marcher vers",
+        walk_verb : "Marcher",
+        bike : "Trajet à vélo",
+        bike_toward : "Pédaler vers",
+        bike_verb : "Pédaler",
+        drive : "Conduite",
+        drive_toward : "Rouler vers",
+        drive_verb : "Rouler",
+        move : "Continuer",
+        move_toward : "Continuer vers",
 
-        transfer     : "transfer",
-        transfers    : "transfers",
+        transfer : "correspondance",
+        transfers : "correspondances",
 
-        continue_as  : "Continues as",
-        stay_aboard  : "stay on board",
+        continue_as : "Continuer comme",
+        stay_aboard : "rester à bord",
 
-        depart       : "Depart",
-        arrive       : "Arrive",
+        depart : "Départ",
+        arrive : "Arrivée",
 
-        start_at     : "Start at",
-        end_at       : "End at"
+        start_at : "Départ à",
+        end_at : "Arrivée à"
     },
 
     // see otp.planner.Templates for use
-    labels : 
-    {
-// TODO
-        about        : "About",
-        stop_id      : "Stop ID",
-        trip_details : "Le Trip Details",
-        fare         : "Fare",
-        fare_symbol  : "\u20ac",
-        travel       : "Travel",
-        valid        : "Valid",
-        trip_length  : "Time",
-        with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+    labels : {
+        about : "Environ",
+        stop_id : "Id arrêt",
+        trip_details : "Détails de l'itinéraire",
+        fare : "Tarif",
+        fare_symbol : "\u20ac",
+        travel : "Départ le",
+        valid : "Calculé le",
+        trip_length : "Durée",
+        with_a_walk : "avec une marche de",
+        alert_for_rt : "Alerte sur la ligne"
     },
 
-    // see otp.planner.Templates for use -- one output are the itinerary leg headers
-    modes : 
-    {
-// TODO
-        WALK:           "WALK",
-        BICYCLE:        "BICYCLE",
-        CAR:            "CAR",
-        TRAM:           "TRAM",
-        SUBWAY:         "SUBWAY",
-        RAIL:           "RAIL",
-        BUS:            "BUS",
-        FERRY:          "FERRY",
-        CABLE_CAR:      "CABLE CAR",
-        GONDOLA:        "GONDOLA",
-        FUNICULAR:      "FUNICULAR"
+    // see otp.planner.Templates for use -- one output are the itinerary leg
+    // headers
+    modes : {
+        WALK : "MARCHE À PIED",
+        BICYCLE : "VÉLO",
+        CAR : "VOITURE",
+        TRAM : "TRAMWAY",
+        SUBWAY : "MÉTRO",
+        RAIL : "TRAIN",
+        BUS : "BUS",
+        FERRY : "FERRY",
+        CABLE_CAR : "TRAMWAY FUNICULAIRE",
+        GONDOLA : "TÉLÉPHÉRIQUE",
+        FUNICULAR : "FUNICULAIRE"
     },
 
-    ordinal_exit:
-    {
-// TODO
-        1:  "to first exit",
-        2:  "to second exit",
-        3:  "to third exit",
-        4:  "to fourth exit",
-        5:  "to fifth exit",
-        6:  "to sixth exit",
-        7:  "to seventh exit",
-        8:  "to eighth exit",
-        9:  "to ninth exit",
-        10: "to tenth exit"
+    ordinal_exit : {
+        1 : "(première sortie)",
+        2 : "(deuxième sortie)",
+        3 : "(troisième sortie)",
+        4 : "(quatrième sortie)",
+        5 : "(cinquième sortie)",
+        6 : "(sixième sortie)",
+        7 : "(septième sortie)",
+        8 : "(huitième sortie)",
+        9 : "(neuvième sortie)",
+        10 : "(dixième sortie)"
     },
 
-    time:
-    {
-// TODO
-        format        : "D, j M H:i",
-        minute        : "minute",
-        minutes       : "minutes",
+    time : {
+        format : "d.m.Y \\à H:i",
+        minute : "minute",
+        minutes : "minutes",
         minute_abbrev : "min",
-        minutes_abbrev: "min",
+        minutes_abbrev : "min",
         second_abbrev : "sec",
-        seconds_abbrev: "sec",
-        months        :  ['Jan', 'Fev', 'Mar', 'Avr', 'Mai', 'Jui', 'Juil', 'Aou', 'Sep', 'Oct', 'Nov', 'Dec']
+        seconds_abbrev : "sec",
+        months : [ 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc' ]
     },
-    
-    systemmap :
-    {
-        labels :
-        {
+
+    systemmap : {
+        labels : {
             panelTitle : "System Map"
         }
     },
 
-    tripPlanner :
-    {
-        labels : 
-        {
-            panelTitle    : "Itinéraire",
-            tabTitle      : "Planifier un itinéraire",
-            inputTitle    : "Détails de l'itinéraire",
-            optTitle      : "Préférences de l'itinéraire (facultatif)",
-            submitMsg     : "Calcul de l'itinéraire...",
+    tripPlanner : {
+        labels : {
+            panelTitle : "Itinéraire",
+            tabTitle : "Planifier un itinéraire",
+            inputTitle : "Détails de l'itinéraire",
+            optTitle : "Préférences de l'itinéraire (facultatif)",
+            submitMsg : "Calcul de l'itinéraire...",
             optionalTitle : "",
-            date          : "Date",
-            time          : "Heure",
-            when          : "Quand",
-            from          : "Départ",
-            fromHere      : "Partir d'ici",
-            to            : "Arrivée",
-            toHere        : "Arriver ici",
-            minimize      : "Voir le",
-            maxWalkDistance: "Marche maximum",
-            arriveDepart  : "Arriver à/Partir de",
-            mode          : "Voyager par",
-            wheelchair    : "Accessible aux fauteuils roulants", 
-            go            : "Go",
-            planTrip      : "Calculer un itinéraire",
-            newTrip       : "Nouvel itinéraire"
+            date : "Date",
+            time : "Heure",
+            when : "Quand",
+            from : "Départ",
+            fromHere : "Partir d'ici",
+            to : "Arrivée",
+            toHere : "Arriver ici",
+            minimize : "Optimiser pour",
+            maxWalkDistance : "Marche maximum",
+            arriveDepart : "Arriver à/Partir de",
+            mode : "Voyager par",
+            wheelchair : "Accessible aux fauteuils roulants",
+            go : "Go",
+            planTrip : "Calculer un itinéraire",
+            newTrip : "Nouvel itinéraire"
         },
 
         // see otp/config.js for where these values are used
-        link : 
-        {
-//TODO
-            text           : "Link to this trip (OTP)",
-            trip_separator : "This trip on other transit planners",
-            bike_separator : "On other bike trip planners",
-            walk_separator : "On other walking direction planners",
-            google_transit : "Google Transit",
-            google_bikes   : "Google Bike Directions",
-            google_walk    : "Google Walking Directions",
-            google_domain  : "http://www.google.fr"
+        link : {
+            text : "Lien vers cet itinéraire (OTP)",
+            trip_separator : "Cet itinéraire sur d'autres calculateurs",
+            bike_separator : "Sur d'autres calculateurs 'vélo'",
+            walk_separator : "Sur d'autres calculateurs 'piéton'",
+            google_transit : "Google Maps (transport en commun)",
+            google_bikes : "Google Maps (vélo)",
+            google_walk : "Google Maps (piéton)",
+            google_domain : "http://www.google.fr"
         },
 
         // see otp.planner.Forms for use
-        geocoder:
-        {
-//TODO
-            working      : "Looking up address ....",
-            error        : "Did not receive any results",
-            msg_title    : "Voudrais vous review trip plan",
-            msg_content  : "Les correct errors before planning your trip"
+        geocoder : {
+            working : "Recherche de l'adresse...",
+            error : "Aucun résultat n'a été trouvé",
+            msg_title : "Recommencer avec une autre adresse",
+            msg_content : "Veuillez corriger les erreurs avant de planifier votre itinéraire"
         },
 
-        error:
-        {
-            title        : "Erreur du planificateur d'itinéraire",
-            deadMsg      : "Le planificateur d'itinéraire de répond pas actuellement. Merci de patienter quelques minutes et de réessayer, ou essayez le planificateur en mode texte (voir le lien ci-dessous).",
-            geoFromMsg   : "Merci de sélectionner le lieu de départ de votre itinéraire : ",
-            geoToMsg     : "Merci de sélectionner le lieu d'arrivée de votre itinéraire : "
+        error : {
+            title : "Erreur du planificateur d'itinéraire",
+            deadMsg : "Le planificateur d'itinéraire ne répond pas actuellement. Merci de patienter quelques minutes et de réessayer, ou essayez le planificateur en mode texte (voir le lien ci-dessous).",
+            geoFromMsg : "Merci de sélectionner le lieu de départ de votre itinéraire : ",
+            geoToMsg : "Merci de sélectionner le lieu d'arrivée de votre itinéraire : "
         },
-        
+
         // default messages from server if a message was not returned
-        msgcodes:
-        {
-// TODO
-            200: "Plan OK",
-            500: "Server error",
-            400: "Trip out of bounds",
-            404: "Path not found",
-            406: "No transit times",
-            408: "Request timed out",
-            413: "Invalid parameter",
-            440: "From geocode not found",
-            450: "To geocode not found",
-            460: "Geocode from and to not found",
-            409: "Too close",
-            340: "Geocode from ambiguous",
-            350: "Geocode to ambiguous",
-            360: "Geocode from and to ambiguous"
+        msgcodes : {
+            200 : "Calcul OK",
+            500 : "Erreur serveur",
+            400 : "Voyage en dehors de la zone",
+            404 : "Itinéraire non trouvé",
+            406 : "Pas d'horaires de transport en commun",
+            408 : "Temps d'attente de la demande dépassé",
+            413 : "Paramètre invalide",
+            440 : "Adresse de départ non trouvée",
+            450 : "Adresse de destination non trouvée",
+            460 : "Adresses de départ et destination non trouvées",
+            409 : "Départ trop proche de l'arrivée",
+            340 : "Adresse de départ ambigüe",
+            350 : "Adresse de destination ambigüe",
+            360 : "Adresses de départ et destination ambigües"
         },
 
-        options: 
-        [
-          ['TRANSFERS', 'Le plus direct'],
-          ['QUICK',     'Le plus rapide'],
-          ['SAFE',      'Le plus sûr']
-        ],
-    
-        arriveDepart: 
-        [
-          ['false', 'Départ'], 
-          ['true',  'Arriver']
-        ],
-    
-        maxWalkDistance : 
-        [
-            ['200',   '200 m'],
-            ['500',   '500 m'],
-            ['1000',   '1 km'],
-            ['1500',  '1,5 km'],
-            ['5000',  '5 km'],
-            ['10000',  '10 km'] 
-        ],
-    
-        mode : 
-        [
-            ['TRANSIT,WALK', 'Transports publics'],
-            ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
-            ['BUSISH,WALK', 'Bus seulement'],
-            ['TRAINISH,WALK', 'Train seulement'],
-            ['WALK', 'Marche seulement'],
-            ['BICYCLE', 'Vélo'],
-            ['TRANSIT,BICYCLE', 'Transports publics & Vélo']
-        ],
+        options : [ [ 'TRANSFERS', 'Le plus direct' ],
+                [ 'QUICK', 'Le plus rapide' ], [ 'SAFE', 'Le plus sûr' ] ],
 
-        wheelchair :
-        [
-            ['false', 'Non requis'],
-            ['true', 'Requis']
-        ]
+        arriveDepart : [ [ 'false', 'Départ' ], [ 'true', 'Arriver' ] ],
+
+        maxWalkDistance : [ [ '200', '200 m' ], [ '500', '500 m' ],
+                [ '1000', '1 km' ], [ '1500', '1,5 km' ], [ '5000', '5 km' ],
+                [ '10000', '10 km' ] ],
+
+        mode : [ [ 'TRANSIT,WALK', 'Transports publics' ],
+                [ 'BUSISH,TRAINISH,WALK', 'Bus & Train' ],
+                [ 'BUSISH,WALK', 'Bus seulement' ],
+                [ 'TRAINISH,WALK', 'Train seulement' ],
+                [ 'WALK', 'Marche seulement' ], [ 'BICYCLE', 'Vélo' ],
+                [ 'TRANSIT,BICYCLE', 'Transports publics & Vélo' ] ],
+
+        wheelchair : [ [ 'false', 'Non requis' ], [ 'true', 'Requis' ] ]
     },
 
     CLASS_NAME : "otp.locale.French"
