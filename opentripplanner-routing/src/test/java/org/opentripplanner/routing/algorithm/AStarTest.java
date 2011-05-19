@@ -238,7 +238,7 @@ public class AStarTest {
         public TraverseResult traverse(State s0, TraverseOptions options)
                 throws NegativeWeightException {
             double d = getDistance();
-            long t = (long) (d / options.speed);
+            long t = (long) (d  * 1000 / options.speed);
             return new TraverseResult(t, new State(s0.getTime() + t), this);
         }
 
@@ -246,7 +246,7 @@ public class AStarTest {
         public TraverseResult traverseBack(State s0, TraverseOptions options)
                 throws NegativeWeightException {
             double d = getDistance();
-            long t = (long) (d / options.speed);
+            long t = (long) (d  * 1000 / options.speed);
             return new TraverseResult(t, new State(s0.getTime() - t), this);
         }
 
