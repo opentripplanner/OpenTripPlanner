@@ -129,7 +129,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     }
 
     public String toString() {
-    	return "PatternHop(" + getToVertex() + ", " + getFromVertex() + ")";
+    	return "PatternHop(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 
     public void setFareContext(FareContext context) {
