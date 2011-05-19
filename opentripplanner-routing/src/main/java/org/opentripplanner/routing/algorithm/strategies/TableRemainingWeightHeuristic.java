@@ -128,56 +128,6 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
     	return defaultHeuristic.computeInitialWeight(origin, target, options);
     }
 
-	public double computeForwardWeightOld(SPTVertex from, Edge edge,
-		TraverseResult traverseResult, Vertex target) {
-	    final double BOARD_COST = 60 * 5;
-		Vertex tov = traverseResult.getEdgeNarrative().getToVertex();
-        State fromState = from.state;
-        StateData fromData = fromState.getData();
-		if (wt.includes(tov)) {
-			double w = Double.POSITIVE_INFINITY;
-			for (NearbyStop ns : targetStops) {
-				double nw = wt.getWeight(tov, ns.vertex) + ns.weight;
-				if (nw < w) w = nw;
-			}	
-			if (tov instanceof TransitStop) return w;
-			else return w - BOARD_COST;
-			//LOG.debug("Onboard: " + w);
-		} 
-//		if (! traverseResult.state.getData().isEverBoarded()) {
-//			//LOG.debug("Pre-board: " + w);
-//			return 0;
-//		}
-		// Call default heuristic here.
-        double euclidianDistance = tov.distance(target);
-		if (fromData.isAlightedLocal()) {
-			return options.walkReluctance * euclidianDistance / options.speed;
-        } else {
-            int boardCost;
-            if (edge instanceof OnBoardForwardEdge) {
-                boardCost = 0;
-            } else {
-                boardCost = options.boardCost;
-            }
-            if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
-                return options.walkReluctance * euclidianDistance / options.speed;
-            } else {
-                // assume that the max average transit speed over a hop is 10 m/s, which is so far true
-                // for
-                // New York and Portland
-                final double MAX_SPEED = 10D;
-
-                double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
-                        + tov.getDistanceToNearestTransitStop();
-                double distance = (euclidianDistance - mandatoryWalkDistance) / MAX_SPEED
-                        + mandatoryWalkDistance * options.walkReluctance / options.speed
-                        + boardCost;
-                return Math.min(distance, options.walkReluctance * euclidianDistance
-                        / options.speed);
-            }
-		}
-	}
-
 	@Override
 	public double computeForwardWeight(SPTVertex from, Edge edge,
 		TraverseResult traverseResult, Vertex target) {
