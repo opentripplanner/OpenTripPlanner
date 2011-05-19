@@ -931,12 +931,15 @@ public class ContractionHierarchy implements Serializable {
 
         path.edges = flatten(path.edges);
         // clean up edges & vertices
+        double savedMaxWalkDistance = options.maxWalkDistance;
+        options.maxWalkDistance = Double.MAX_VALUE; //CH doesn't support max walk
         if (options.isArriveBy()) {
             cleanPathEdgesBack(init, path, options);
         } else {
             cleanPathEdges(init, path, options);
         }
         path.optimize();
+        options.maxWalkDistance = savedMaxWalkDistance;
         return path;
     }
 
