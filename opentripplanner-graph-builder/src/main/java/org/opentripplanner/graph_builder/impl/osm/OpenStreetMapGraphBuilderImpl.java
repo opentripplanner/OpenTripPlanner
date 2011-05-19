@@ -518,14 +518,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if(way != null) {
                             if(relation.hasTag("name")) {
                                 if(way.hasTag("otp:route_name")) {
-                                    way.addTag(new OSMTag("otp:route_name", way.getTag("otp:route_name") + ", " + relation.getTag("name")));
+                                	way.addTag("otp:route_name", addUniqueName(way.getTag("otp:route_name"), relation.getTag("name")));
                                 } else {
                                     way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
                                 }
                             }
                             if(relation.hasTag("ref")) {
                                 if(way.hasTag("otp:route_ref")) {
-                                    way.addTag(new OSMTag("otp:route_ref", way.getTag("otp:route_ref") + ", " + relation.getTag("ref")));
+                                    way.addTag("otp:route_ref", addUniqueName(way.getTag("otp:route_ref"), relation.getTag("ref")));
                                 } else {
                                     way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
                                 }
@@ -539,8 +539,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        /**
-         */
+        private String addUniqueName(String routes, String name) {
+        	String[] names = routes.split(", ");
+        	for (String existing : names) {
+        		if (existing.equals(name)) {
+        			return routes;
+        		}
+        	}
+			return routes + ", " + name;
+		}
 
         private void createUsefulNames() {
             Map<String, Set<OSMWay>> key_map = new HashMap<String, Set<OSMWay>>();
