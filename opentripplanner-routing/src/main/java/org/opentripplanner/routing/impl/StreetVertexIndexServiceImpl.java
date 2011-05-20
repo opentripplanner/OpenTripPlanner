@@ -241,18 +241,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return closest_stop; // which will be null if none was found
     }
 
-    public void reified(StreetLocation vertex) {
-        Graph graph = graphService.getGraph();
-        for (StreetEdge e : filter(graph.getIncoming(vertex), StreetEdge.class)) {
-            if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
-                edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
-        }
-        for (StreetEdge e : filter(graph.getOutgoing(vertex), StreetEdge.class)) {
-            if ((e instanceof TurnEdge || e instanceof OutEdge) && e.getGeometry() != null)
-                edgeTree.insert(e.getGeometry().getEnvelopeInternal(), e);
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope) {
         return intersectionTree.query(envelope);
