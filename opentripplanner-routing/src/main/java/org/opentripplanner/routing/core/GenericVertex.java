@@ -39,7 +39,7 @@ public class GenericVertex implements Vertex, Serializable {
 
     private double x;
 
-    private transient int index;
+    private int index;
 
     private double distanceToNearestTransitStop = 0;
 
