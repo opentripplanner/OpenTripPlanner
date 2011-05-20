@@ -14,9 +14,15 @@
 package org.opentripplanner.graph_builder.model;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.zip.ZipFile;
+
+import org.onebusaway.csv_entities.CsvInputSource;
+import org.onebusaway.csv_entities.ZipFileCsvInputSource;
+import org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource;
 
 public class GtfsBundle {
 
@@ -26,24 +32,39 @@ public class GtfsBundle {
 
     private String defaultAgencyId;
 
+    private CsvInputSource csvInputSource;
+
     private Boolean defaultBikesAllowed = false;
 
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
-
-    public File getPath() {
-        return path;
-    }
 
     public void setPath(File path) {
         this.path = path;
     }
 
-    public URL getUrl() {
-        return url;
-    }
-
     public void setUrl(URL url) {
         this.url = url;
+    }
+
+    public void setCsvInputSource(CsvInputSource csvInputSource) {
+        this.csvInputSource = csvInputSource;
+    }
+    
+    public String getDataKey() {
+        return path + ";" + url + ";" + (csvInputSource != null ? csvInputSource.hashCode() : "");
+    }
+    
+    public CsvInputSource getCsvInputSource() throws IOException {
+        if (csvInputSource == null) {
+            if (path != null) {
+                csvInputSource = new ZipFileCsvInputSource(new ZipFile(path));
+            } else if (url != null) {
+            	DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
+            	isrc.setUrl(url);
+                csvInputSource = isrc;
+            }
+    	}
+        return csvInputSource;
     }
 
     /**

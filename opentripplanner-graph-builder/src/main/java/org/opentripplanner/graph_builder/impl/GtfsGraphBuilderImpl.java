@@ -13,15 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -38,12 +31,10 @@ import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
@@ -80,16 +71,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
 
-    private File _cacheDirectory;
-
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
         /* check for dups */
-        HashSet<T2<File, URL>> bundles = new HashSet<T2<File, URL>>();
+        HashSet<String> bundles = new HashSet<String>();
         for (GtfsBundle bundle : gtfsBundles.getBundles()) {
-            T2<File, URL> key = new T2<File, URL>(bundle.getPath(), bundle.getUrl());
+            String key = bundle.getDataKey();
             if (bundles.contains(key)) {
-                throw new RuntimeException("duplicate GTFS file " +  key.getFirst() + " - " + key.getSecond());
+                throw new RuntimeException("duplicate GTFS bundle " +  key);
             }
             bundles.add(key);
         }
@@ -101,10 +90,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     public void setEntityReplacementStrategy(EntityReplacementStrategy strategy) {
         _entityReplacementStrategy = strategy;
-    }
-
-    public void setCacheDirectory(File cacheDirectory) {
-        _cacheDirectory = cacheDirectory;
     }
 
     @Override
@@ -158,14 +143,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
 
-            File path = getPathForGtfsBundle(gtfsBundle);
-            if (!path.isFile()) {
-                throw new IOException(path + " is not a normal file");
-            }
-            _log.info("gtfs=" + path);
-
             GtfsReader reader = new GtfsReader();
-            reader.setInputLocation(path);
+            reader.setInputSource(gtfsBundle.getCsvInputSource());
             reader.setEntityStore(store);
             reader.setInternStrings(true);
             
@@ -215,62 +194,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         }
 
         store.close();
-    }
-
-    private File getPathForGtfsBundle(GtfsBundle gtfsBundle) throws IOException {
-
-        File path = gtfsBundle.getPath();
-        if (path != null)
-
-            return path;
-
-        URL url = gtfsBundle.getUrl();
-
-        if (url != null) {
-
-            File tmpDir = getTemporaryDirectory();
-            String fileName = gtfsBundle.getDefaultAgencyId() + "_gtfs.zip";
-            File gtfsFile = new File(tmpDir, fileName);
-
-            if (gtfsFile.exists()) {
-                _log.info("using already downloaded gtfs file: path=" + gtfsFile);
-                return gtfsFile;
-            }
-
-            _log.info("downloading gtfs: url=" + url + " path=" + gtfsFile);
-
-            BufferedInputStream in = new BufferedInputStream(url.openStream());
-            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
-
-            copyStreams(in, out);
-
-            return gtfsFile;
-        }
-
-        throw new IllegalStateException("GtfsBundle did not include a path or a url");
-    }
-
-    private void copyStreams(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        while (true) {
-            int rc = in.read(buffer);
-            if (rc == -1)
-                break;
-            out.write(buffer, 0, rc);
-        }
-        in.close();
-        out.close();
-    }
-
-    private File getTemporaryDirectory() {
-
-        if (_cacheDirectory != null) {
-            if (!_cacheDirectory.exists())
-                _cacheDirectory.mkdirs();
-            return _cacheDirectory;
-        }
-
-        return new File(System.getProperty("java.io.tmpdir"));
     }
 
     private class StoreImpl implements GenericMutableDao {
