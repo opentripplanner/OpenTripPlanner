@@ -111,15 +111,16 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testRouting() throws Exception {
 
-        Vertex stop_a = graph.getVertex("agency_A_depart");
-        Vertex stop_b = graph.getVertex("agency_B_arrive");
-        Vertex stop_c = graph.getVertex("agency_C_arrive");
-        Vertex stop_d = graph.getVertex("agency_D_arrive");
-        Vertex stop_e = graph.getVertex("agency_E_arrive");
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_b = graph.getVertex("agency_B");
+        Vertex stop_c = graph.getVertex("agency_C");
+        Vertex stop_d = graph.getVertex("agency_D");
+        Vertex stop_e = graph.getVertex("agency_E");
 
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
-
+        // test feed is designed for instantaneous transfers
+        options.minTransferTime = 0;
         ShortestPathTree spt;
         GraphPath path;
 
@@ -129,7 +130,7 @@ public class TestPatternHopFactory extends TestCase {
 
         path = spt.getPath(stop_b);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(6, path.vertices.size());
 
         // A to C
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
@@ -137,7 +138,7 @@ public class TestPatternHopFactory extends TestCase {
 
         path = spt.getPath(stop_c);
         assertNotNull(path);
-        assertEquals(6, path.vertices.size());
+        assertEquals(8, path.vertices.size());
 
         // A to D (change at C)
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
@@ -145,17 +146,18 @@ public class TestPatternHopFactory extends TestCase {
 
         path = spt.getPath(stop_d);
         assertNotNull(path);
-        assertTrue(path.vertices.size() == 11);
+        // there are two paths of different lengths 
+        // both arrive at 40 minutes after midnight
+        //assertTrue(path.vertices.size() == 13);
         long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
 
+        //A to E (change at C)
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
                 new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
-
-        //A to E (change at C)
         path = spt.getPath(stop_e);
         assertNotNull(path);
-        assertTrue(path.vertices.size() == 12);
+        assertTrue(path.vertices.size() == 14);
         endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
         assertEquals(endTime, path.vertices.lastElement().state.getTime());
     }
@@ -460,11 +462,13 @@ public class TestPatternHopFactory extends TestCase {
          *  the 8:50 and have to catch the 9:50.
          */
         
-        Vertex destination = graph.getVertex("agency_T_depart");
+        Vertex destination = graph.getVertex("agency_T");
         TraverseOptions wo = new TraverseOptions();
+        // test is designed such that transfers must be instantaneous
+        wo.minTransferTime = 0; 
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q_arrive", destination.getLabel(),
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q", destination.getLabel(),
                 new State(startTime.getTimeInMillis()), wo);
         GraphPath path = spt.getPath(destination);
 

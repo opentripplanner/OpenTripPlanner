@@ -125,38 +125,6 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             return null;
         }
         
-        /* apply transfer rules */
-        /* look in the global transfer table for the rules from the previous stop to
-         * this stop. 
-         */
-        if (data.getLastAlightedTime() != 0) { /* this is a transfer rather than an initial boarding */
-            TransferTable transferTable = options.getTransferTable();
-            
-            if (transferTable.hasPreferredTransfers()) {
-                transfer_penalty = options.baseTransferPenalty;
-            }
-            
-            int transfer_time = transferTable.getTransferTime(getToVertex(), data.getPreviousStop());
-            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
-                transfer_time = options.minTransferTime;
-            }
-            if (transfer_time > 0 && transfer_time > (current_time + data.getLastAlightedTime()) * 1000) {
-                /* minimum time transfers */
-                current_time += data.getLastAlightedTime() - transfer_time * 1000;
-            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
-                return null;
-            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
-                /* depenalize preferred transfers */
-                transfer_penalty = 0; 
-            }
-        }
-
-        if (options.optimizeFor == OptimizeType.TRANSFERS && state0.getData().getTrip() != -1) {
-            //this is not the first boarding, therefore we must have "transferred" -- whether
-            //via a formal transfer or by walking.
-            transfer_penalty += options.optimizeTransferPenalty;
-        }
-
         Editor editor = state0.edit();
         editor.incrementTimeInSeconds(-wait); 
         editor.incrementNumBoardings();
@@ -165,7 +133,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         editor.setRoute(trip.getRoute().getId());
         editor.setFareContext(fareContext);
         
-        return new TraverseResult(wait + options.boardCost + transfer_penalty, editor.createState(), this);
+        return new TraverseResult(wait, editor.createState(), this);
     }
 
 }
