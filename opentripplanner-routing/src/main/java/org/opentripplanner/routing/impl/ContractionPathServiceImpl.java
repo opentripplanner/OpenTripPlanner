@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.WeightTable;
+import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -46,6 +49,8 @@ import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.SPTEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -53,6 +58,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 @Component
 public class ContractionPathServiceImpl implements PathService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ContractionPathServiceImpl.class);
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
@@ -116,6 +123,16 @@ public class ContractionPathServiceImpl implements PathService {
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
         }
+        // decide which A* heuristic to use
+        if (_graphService.getGraph().hasService(WeightTable.class)
+        	&& options.getModes().getTransit()) {
+        	options.remainingWeightHeuristic = new TableRemainingWeightHeuristic(_graphService.getGraph());
+        	LOG.debug("Weight table present in graph and transit itinerary requested. Using table-driven A* heuristic.");
+        } else {
+        	LOG.debug("No weight table in graph or non-transit itinerary requested. Using default A* heuristic.");
+        }
+
+        
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();

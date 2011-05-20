@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
@@ -53,7 +54,9 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         ContractionHierarchy hierarchy = null;
         hierarchy = hierarchies.getHierarchy(options);
 
-        if (hierarchy == null) {
+        if (hierarchy == null
+        	|| (options.remainingWeightHeuristic instanceof TableRemainingWeightHeuristic 
+        	    && options.getModes().getTransit())) {
             Graph _graph = hierarchies.getGraph();
             if (options.isArriveBy()) {
 
