@@ -65,7 +65,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
                 if (spt == null) {
                     return null;
                 }
-                List<GraphPath> paths = spt.getPaths(toVertex, true);
+                List<GraphPath> paths = spt.getPaths(fromVertex, true);
                 for (GraphPath path : paths)
                     path.reverse();
                 return paths;
