@@ -747,10 +747,6 @@ public class ContractionHierarchy implements Serializable {
                     if (edge instanceof OutEdge) {
                         continue;
                     }
-                    //two transfers rule
-                    if (edge instanceof PatternBoard && stateData.getNumBoardings() > 2) {
-                        continue;
-                    }
 
                     TraverseResult wr = edge.traverse(state, options);
 
@@ -860,10 +856,6 @@ public class ContractionHierarchy implements Serializable {
 
                     if (edge instanceof OutEdge) {
                         continue; 
-                    }
-                    //two transfers rule
-                    if (edge instanceof PatternBoard && stateData.getNumBoardings() > 2) {
-                        continue;
                     }
 
                     TraverseResult wr = edge.traverseBack(state, options);
