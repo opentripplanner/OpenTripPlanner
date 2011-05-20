@@ -129,7 +129,7 @@ public class ContractionPathServiceImpl implements PathService {
         	options.remainingWeightHeuristic = new TableRemainingWeightHeuristic(_graphService.getGraph());
         	LOG.debug("Weight table present in graph and transit itinerary requested. Using table-driven A* heuristic.");
         } else {
-        	LOG.debug("No weight table in graph or non-transit itinerary requested. Using default A* heuristic.");
+        	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
         
@@ -149,6 +149,7 @@ public class ContractionPathServiceImpl implements PathService {
         double maxWeight = Double.MAX_VALUE;
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
+        	LOG.debug(paths.size() + " itineraries / " + nItineraries + " requested.");
             options = optionQueue.poll();
             if (options == null) {
                 break;
@@ -165,13 +166,15 @@ public class ContractionPathServiceImpl implements PathService {
                     return null;
                 }
                 GraphPath path = somePaths.get(0);
-                maxWeight = path.vertices.lastElement().weightSum * 2;
                 long tripTime = path.vertices.lastElement().state.getTime()
                         - path.vertices.firstElement().state.getTime();
                 if (options.isArriveBy()) {
                     maxTime = path.vertices.lastElement().state.getTime() - tripTime * 2;
+                	// on arriveBy trips weights increase toward the fromVertex
+                    maxWeight = path.vertices.firstElement().weightSum * 2;
                 } else {
                     maxTime = path.vertices.firstElement().state.getTime() + tripTime * 2;
+                    maxWeight = path.vertices.lastElement().weightSum * 2;
                 }
             }
             if (somePaths.isEmpty()) {
