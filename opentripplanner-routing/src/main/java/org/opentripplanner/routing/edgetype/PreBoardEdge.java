@@ -90,8 +90,10 @@ public class PreBoardEdge extends FreeEdge {
             }
         } else { 
         	/* this is a first boarding */
-        	board_after = t0 + options.minTransferTime * 500; 
         	// TODO: add a separate initial transfer slack option
+        	// board_after = t0 + options.minTransferTime * 500; 
+        	// ^ first boarding slack makes graphpath.optimize malfunction 
+        	board_after = t0; 
         }
 
         // penalize transfers more heavily if requested by the user
@@ -112,7 +114,6 @@ public class PreBoardEdge extends FreeEdge {
     @Override
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException {
-         
         State s1 = s0;
         TransitStop fromVertex = (TransitStop) getFromVertex();
         if (fromVertex.isLocal()) {

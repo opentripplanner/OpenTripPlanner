@@ -84,7 +84,7 @@ public class PreAlightEdge extends FreeEdge {
             	// only penalize transfers if there are some that will be depenalized
                 transfer_penalty = options.baseTransferPenalty;
             }
-            int transfer_time = transferTable.getTransferTime(data.getPreviousStop(), getFromVertex());
+            int transfer_time = transferTable.getTransferTime(getFromVertex(), data.getPreviousStop());
             if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
             	// use min transfer time relative to arrival time at this stop (initialized above)
             } else if (transfer_time >= 0) {
@@ -103,8 +103,10 @@ public class PreAlightEdge extends FreeEdge {
             }
         } else { 
         	/* this is a first boarding */
-        	alight_before = t0 - options.minTransferTime * 500; 
         	// TODO: add a separate initial transfer slack option
+        	// alight_before = t0 - options.minTransferTime * 500; 
+        	// ^ first boarding slack makes graphpath.optimize malfunction 
+        	alight_before = t0;
         }
 
         // penalize transfers more heavily if requested by the user

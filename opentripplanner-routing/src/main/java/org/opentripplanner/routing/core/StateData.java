@@ -227,6 +227,7 @@ public class StateData {
             setEverBoarded(false);
             setWalkDistance(0.0);
             setNumBoardings(0);
+            setLastAlightedTime(0);
         }
 
         /**

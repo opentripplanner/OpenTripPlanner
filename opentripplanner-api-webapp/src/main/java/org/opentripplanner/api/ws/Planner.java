@@ -150,7 +150,7 @@ public class Planner {
             @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @DefaultValue("60") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
+            @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
             @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
             throws JSONException {
