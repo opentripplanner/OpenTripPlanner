@@ -282,7 +282,7 @@ public class GTFSPatternHopFactory {
                 _log.debug("trips=" + index + "/" + trips.size());
             index++;
 
-            List<StopTime> originalStopTimes = _dao.getStopTimesForTrip(trip);
+            List<StopTime> originalStopTimes = getNonduplicateStopTimesForTrip(trip);
             interpolateStopTimes(originalStopTimes);
             if (originalStopTimes.size() < 2) {
                 _log
@@ -423,10 +423,10 @@ public class GTFSPatternHopFactory {
                 Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
                 Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
                 
-                List<StopTime> fromStopTimes = _dao.getStopTimesForTrip(fromExemplar);
+                List<StopTime> fromStopTimes = getNonduplicateStopTimesForTrip(fromExemplar);
                 int exemplarStopSequence0 = fromStopTimes.get(fromStopTimes.size() - 1).getStopSequence();
                 
-                List<StopTime> toStopTimes = _dao.getStopTimesForTrip(toExemplar);
+                List<StopTime> toStopTimes = getNonduplicateStopTimesForTrip(toExemplar);
                 int exemplarStopSequence1 = toStopTimes.get(0).getStopSequence();
                 
                 PatternInterlineDwell dwell;
@@ -926,5 +926,26 @@ public class GTFSPatternHopFactory {
             anew.setDepartureTime(original.getDepartureTime());
 
         return anew;
+    }
+    
+    private List<StopTime> getNonduplicateStopTimesForTrip(Trip trip) {
+    	List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
+    	ArrayList<StopTime> filtered = new ArrayList<StopTime>(unfiltered.size());
+    	for (StopTime st : unfiltered) {
+    		if (filtered.size() > 0) {
+    			StopTime lastStopTime = filtered.get(filtered.size() - 1);
+    			if (lastStopTime.getStop().equals(st.getStop())) {
+    				lastStopTime.setDepartureTime(st.getDepartureTime());
+    			} else {
+    				filtered.add(st);
+    			}
+    		} else {
+    			filtered.add(st);
+    		}
+    	}
+    	if (filtered.size() == unfiltered.size()) {
+    		return unfiltered;
+    	}
+    	return filtered;
     }
 }
