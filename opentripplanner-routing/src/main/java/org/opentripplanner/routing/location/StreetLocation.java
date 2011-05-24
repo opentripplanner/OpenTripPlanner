@@ -211,4 +211,9 @@ public class StreetLocation extends GenericVertex {
         }
         return false;
     }
+
+	public void addExtraEdgeTo(Vertex target) {
+		extra.add(new FreeEdge(this, target));
+		extra.add(new FreeEdge(target, this));
+	}
 }

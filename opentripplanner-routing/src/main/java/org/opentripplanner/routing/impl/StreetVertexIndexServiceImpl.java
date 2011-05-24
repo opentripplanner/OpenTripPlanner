@@ -201,9 +201,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         // (we can return stops here because this method is not used when street-transit linking)
         double closest_stop_distance = Double.POSITIVE_INFINITY;
         Vertex closest_stop = null;
-        // dummy vertex is not terribly elegant but geometry/distance methods are slated to be
-        // modified
-        GenericVertex gv = new GenericVertex("x", coordinate, "x");
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().getTransit()) {
@@ -217,7 +214,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             }
         }
         _log.debug("best stop: " + closest_stop + " distance " + closest_stop_distance);
-
+        StreetLocation closest_street = null;
+        
         // then find closest walkable street
         Collection<StreetEdge> edges = getClosestEdges(coordinate, options);
         if (edges != null) {
@@ -228,17 +226,23 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
             Coordinate nearestPoint = location.getCoordinate(g);
             // if street is closer than stop, return street (split as needed)
-            _log.debug("best street: " + bestStreet.toString() + gv.distance(nearestPoint));
-            if (gv.distance(nearestPoint) < closest_stop_distance) {
-                _log.debug("returning split street");
-                return StreetLocation.createStreetLocation(
-                        bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
-                        edges, nearestPoint);
-            }
+            _log.debug("best street: " + bestStreet.toString() + DistanceLibrary.distance(coordinate, nearestPoint));
+            _log.debug("returning split street");
+            closest_street = StreetLocation.createStreetLocation(
+            		bestStreet.getName() + "_" + coordinate.toString(), bestStreet.getName(),
+            		edges, nearestPoint);
+            
         }
         // if no street was found nearby, or the transit stop was closer, return the stop
         _log.debug("returning transit stop (closer than street)");
-        return closest_stop; // which will be null if none was found
+        if (closest_street == null) { 
+        	return closest_stop; // which will be null if none was found
+        } else {
+        	if (closest_stop != null) {
+        		closest_street.addExtraEdgeTo(closest_stop);
+        	}
+        	return closest_street;
+        }
     }
 
     @SuppressWarnings("unchecked")

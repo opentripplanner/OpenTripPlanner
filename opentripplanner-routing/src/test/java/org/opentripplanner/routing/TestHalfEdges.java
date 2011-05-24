@@ -16,16 +16,22 @@ package org.opentripplanner.routing;
 import static org.opentripplanner.common.IterableLibrary.*;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -260,21 +266,32 @@ public class TestHalfEdges extends TestCase {
     public void testStreetLocationFinder() {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
-
+        //test that the local stop finder finds stops
         assertTrue(finder.getLocalTransitStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
         
+        //test that the closest vertex finder correctly splits streets
         StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01, 40.004), null);
         assertNotNull(start);
 
-        List<DirectEdge> extra = start.getExtra();
-        assertEquals(10, extra.size());
+        List<DirectEdge> extras = start.getExtra();
+        assertEquals(10, extras.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), biking);
         assertNotNull(end);
         
-        extra = end.getExtra();
-        assertEquals(10, extra.size());
+        extras = end.getExtra();
+        assertEquals(10, extras.size());
+        
+		//test that the closest vertex finder also adds an edge to transit stops
+        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.01), new TraverseOptions());
+        boolean found = false;
+        for (Edge extra : location.getExtra()) {
+        	if (extra instanceof FreeEdge && ((FreeEdge)extra).getToVertex().equals(station1)) {
+        		found = true;
+        	}
+        }
+        assertTrue(found);
     }
     
     public void testNetworkLinker() {
