@@ -14,14 +14,18 @@
                 <property name="bundles">
                     <list>
                         <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
-                            <property name="url"
-                                value="http://opentripplanner.org/raw-attachment/ticket/267/google_transit.zip" />
+			    <property name="csvInputSource">
+			      <bean class="org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource">
+				<property name="cacheDirectory" value="/tmp/graph-builder/gtfs" />
+				<property name="url"
+					  value="http://opentripplanner.org/raw-attachment/ticket/267/google_transit.zip" />
+			      </bean>
+			    </property>
                         </bean>
                     </list>
                 </property>
             </bean>
         </property>
-        <property name="cacheDirectory" value="/tmp/graph-builder/gtfs" />
     </bean>
 
     <bean id="streetBuilder" class="org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl">
