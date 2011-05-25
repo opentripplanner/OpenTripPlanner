@@ -76,9 +76,13 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
             BufferedInputStream in = new BufferedInputStream(_url.openStream());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
-
-            copyStreams(in, out);
-
+	    try {
+		copyStreams(in, out);
+	    } catch (RuntimeException e) {
+		out.close();
+		gtfsFile.delete();
+		throw e;
+	    }
             return gtfsFile;
         }
 
