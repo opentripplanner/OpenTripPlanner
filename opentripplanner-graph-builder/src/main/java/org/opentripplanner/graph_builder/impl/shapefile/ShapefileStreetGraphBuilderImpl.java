@@ -239,6 +239,9 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     coordinateToStreets.put(rounded, streets);
                 }
                 String streetName = streetNameConverter.convert(feature);
+                if (streetName == null) {
+                	throw new IllegalStateException("Unexpectedly got null for a street name for feature at " + coord);
+                }
                 streets.add(streetName);
             }
         }
