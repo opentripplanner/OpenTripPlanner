@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 public class TraverseOptions implements Serializable, Cloneable {
 
     private static final long serialVersionUID = 3836092451659658815L;
-    
+
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
     /** max speed along streets, in meters per second */
@@ -121,7 +121,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     public int minTransferTime = 0;
 
     public int maxTransfers = 2;
-    
+
     /**
      * Set a hard limit on computation time. Any positive value will be treated as a limit in the
      * computation time for one search instance, in milliseconds. A zero or negative value implies
@@ -132,8 +132,8 @@ public class TraverseOptions implements Serializable, Cloneable {
     private TraverseOptions walkingOptions;
 
     public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
-    
-    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy(); 
+
+    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
 
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default
@@ -146,11 +146,11 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public long baseTransferPenalty = 120; /* penalty for using a non-preferred transfer */
 
-    /* 
-     * Cache lists of which transit services run on which midnight-to-midnight periods
-     * This ties a TraverseOptions to a particular start time for the duration of a search
-     * so the same options cannot be used for multiple searches concurrently.
-     * To do so this cache would need to be moved into StateData, with all that entails. 
+    /*
+     * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
+     * TraverseOptions to a particular start time for the duration of a search so the same options
+     * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
+     * into StateData, with all that entails.
      */
     public List<ServiceDay> serviceDays;
 
@@ -239,7 +239,8 @@ public class TraverseOptions implements Serializable, Cloneable {
                     && optimizeTransferPenalty == to.optimizeTransferPenalty
                     && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
                     && waitReluctance == to.waitReluctance && boardCost == to.boardCost
-                    && bannedRoutes.equals(to.bannedRoutes) && minTransferTime == to.minTransferTime
+                    && bannedRoutes.equals(to.bannedRoutes)
+                    && minTransferTime == to.minTransferTime
                     && baseTransferPenalty == to.baseTransferPenalty;
         }
         return false;
@@ -252,7 +253,8 @@ public class TraverseOptions implements Serializable, Cloneable {
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(optimizeTransferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode() + minTransferTime * 20996011 + (int)baseTransferPenalty;
+                + boardCost + bannedRoutes.hashCode() + minTransferTime * 20996011
+                + (int) baseTransferPenalty;
     }
 
     public void setArriveBy(boolean back) {
@@ -334,7 +336,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     }
 
     public void setServiceDays(long time) {
-        final long MSEC_IN_DAY = 1000*60*60*24;
+        final long MSEC_IN_DAY = 1000 * 60 * 60 * 24;
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
@@ -346,7 +348,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         // But is this true everywhere?
         this.serviceDays.add(new ServiceDay(time - MSEC_IN_DAY, cs));
         this.serviceDays.add(new ServiceDay(time, cs));
-        this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));        
+        this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));
     }
 
 }
