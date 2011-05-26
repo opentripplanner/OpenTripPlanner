@@ -25,6 +25,7 @@ public class VertexNotFoundException extends RuntimeException {
     List<String> notFound;
     
     public VertexNotFoundException(List<String> notFound) {
+        super("vertices not found: " + notFound.toString());
         this.notFound = notFound;
     }
 
