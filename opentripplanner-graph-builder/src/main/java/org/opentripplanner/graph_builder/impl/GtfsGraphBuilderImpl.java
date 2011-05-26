@@ -269,7 +269,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         @Override
         public void handleEntity(Object bean) {
             int count = incrementCount(bean.getClass());
-            if (count % 1000 == 0)
+            if (count % 10000 == 0)
                 if (_log.isDebugEnabled()) {
                     String name = bean.getClass().getName();
                     int index = name.lastIndexOf('.');
