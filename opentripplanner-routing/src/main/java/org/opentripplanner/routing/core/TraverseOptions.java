@@ -29,6 +29,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
+import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +131,9 @@ public class TraverseOptions implements Serializable, Cloneable {
     public long maxComputationTime = 0;
 
     private TraverseOptions walkingOptions;
-
+    
+    public GenericAStarFactory aStarSearchFactory = null;
+    
     public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
 
     public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();

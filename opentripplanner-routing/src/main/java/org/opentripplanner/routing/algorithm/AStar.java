@@ -26,6 +26,10 @@ public class AStar {
 
     private static final GenericAStar _instance = new GenericAStar();
     
+    public static GenericAStar getDefaultInstance() {
+        return _instance;
+    }
+    
     /**
      * Plots a path on graph from origin to target, departing at the time given in state and with
      * the options options.

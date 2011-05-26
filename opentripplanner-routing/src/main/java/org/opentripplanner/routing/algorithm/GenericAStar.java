@@ -65,6 +65,24 @@ public class GenericAStar {
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
         _searchTerminationStrategy = searchTerminationStrategy;
     }
+    
+    /**
+     * Convenience method that swaps the origin and target for the actual search
+     * @param graph
+     * @param origin
+     * @param target
+     * @param init
+     * @param options
+     * @return
+     */
+    public ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin,
+            Vertex target, State init, TraverseOptions options) {
+        
+        if (!options.isArriveBy()) {
+            throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
+        }
+        return getShortestPathTree(graph, target, origin, init, options);
+    }
 
     /**
      * Plots a path on graph from origin to target, DEPARTING at the time given in state and with

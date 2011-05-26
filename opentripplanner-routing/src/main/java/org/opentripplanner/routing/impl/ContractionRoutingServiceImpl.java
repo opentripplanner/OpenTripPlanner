@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
@@ -55,12 +57,15 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         hierarchy = hierarchies.getHierarchy(options);
 
         if (hierarchy == null
-        	|| (options.remainingWeightHeuristic instanceof TableRemainingWeightHeuristic 
-        	    && options.getModes().getTransit())) {
+                || (options.remainingWeightHeuristic instanceof TableRemainingWeightHeuristic && options
+                        .getModes().getTransit())) {
+
+            GenericAStar aStar = getAStarInstance(options);
+
             Graph _graph = hierarchies.getGraph();
             if (options.isArriveBy()) {
 
-                ShortestPathTree spt = AStar.getShortestPathTreeBack(_graph, fromVertex, toVertex,
+                ShortestPathTree spt = aStar.getShortestPathTreeBack(_graph, fromVertex, toVertex,
                         state, options);
                 if (spt == null) {
                     return null;
@@ -70,7 +75,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
                     path.reverse();
                 return paths;
             } else {
-                ShortestPathTree spt = AStar.getShortestPathTree(_graph, fromVertex, toVertex,
+                ShortestPathTree spt = aStar.getShortestPathTree(_graph, fromVertex, toVertex,
                         state, options);
                 if (spt == null) {
                     return null;
@@ -138,4 +143,15 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         return shortestPath;
     }
 
+    /****
+     * Private Methods
+     ****/
+
+    private GenericAStar getAStarInstance(TraverseOptions options) {
+        GenericAStar aStar = AStar.getDefaultInstance();
+        GenericAStarFactory factory = options.aStarSearchFactory;
+        if (factory != null)
+            aStar = factory.createAStarInstance();
+        return aStar;
+    }
 }
