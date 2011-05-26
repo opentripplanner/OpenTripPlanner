@@ -145,6 +145,13 @@ public class TraverseOptions implements Serializable, Cloneable {
     private TransferTable transferTable;
 
     public long baseTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+    
+
+    /**
+     * With this flag, you can selectively enable or disable the use of the {@link #serviceDays}
+     * cache. It is enabled by default, but you can disable it if you don't need this functionality.
+     */
+    public boolean useServiceDays = true;
 
     /*
      * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
@@ -336,6 +343,8 @@ public class TraverseOptions implements Serializable, Cloneable {
     }
 
     public void setServiceDays(long time) {
+        if( ! useServiceDays )
+            return;
         final long MSEC_IN_DAY = 1000 * 60 * 60 * 24;
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
