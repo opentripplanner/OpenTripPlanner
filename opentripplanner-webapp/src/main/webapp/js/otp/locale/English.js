@@ -284,6 +284,7 @@ otp.locale.English = {
             440: "From geocode not found",
             450: "To geocode not found",
             460: "Geocode from and to not found",
+            470: "From or to not wheelchair accessible",
             409: "Too close",
             340: "Geocode from ambiguous",
             350: "Geocode to ambiguous",
