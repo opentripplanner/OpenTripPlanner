@@ -23,6 +23,8 @@ otp.namespace("otp.planner");
   */
 otp.planner.GeocoderResultsSelector = {
 
+    locale: null,
+        
     // a callback function gets called after the user has made his selection
     // this function takes a lat, lng, description
     callback: null,
@@ -60,12 +62,16 @@ otp.planner.GeocoderResultsSelector = {
         var selectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
         this.grid = new Ext.grid.GridPanel({
             store: this.store,
-            columns: [{id: "address", header: "address", dataIndex: "address", width: 200}],
+            columns: [{
+                id: "address", 
+                header: this.locale.tripPlanner.geocoder.address_header,
+                dataIndex: "address",
+                width: 200}],
             stripeRows: true,
             autoExpandColumn: "address",
             height: 150,
             width: 300,
-            title: "Please select a result",
+            title: this.locale.tripPlanner.geocoder.select_result_title,
             selModel: selectionModel
         });
         this.grid.on({viewready: function() {

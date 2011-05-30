@@ -260,7 +260,9 @@ otp.locale.Spanish = {
             working      : "Looking up address ....",
             error        : "Did not receive any results",
             msg_title    : "Donde es review trip plan",
-            msg_content  : "Donde es correct errors before planning your trip"
+            msg_content  : "Donde es correct errors before planning your trip",
+            select_result_title : "Please select a result",
+            address_header : "Address"
         },
 
         error:

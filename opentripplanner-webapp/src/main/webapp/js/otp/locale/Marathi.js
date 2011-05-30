@@ -266,7 +266,9 @@ otp.locale.Marathi = {
             working      : "Looking up address ....",
             error        : "Did not receive any results",
             msg_title    : "नवी ट्रीप review trip plan",
-            msg_content  : "नवी ट्रीप correct errors before planning your trip"
+            msg_content  : "नवी ट्रीप correct errors before planning your trip",
+            select_result_title : "Please select a result",
+            address_header : "Address"
         },
 
         error:

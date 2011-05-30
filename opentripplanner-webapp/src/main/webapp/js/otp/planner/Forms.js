@@ -1050,6 +1050,7 @@ otp.planner.StaticForms = {
             var self = this;
             var xmlNodes = Ext.DomQuery.jsSelect("result", xml);
             var resultsSelector = new otp.planner.GeocoderResultsSelector({
+                locale: this.locale,
                 callback: function(lat, lng, description) {
                   if (comboBoxIdentifier === "from") {
                       self.setFrom(description, lat, lng, true, false);

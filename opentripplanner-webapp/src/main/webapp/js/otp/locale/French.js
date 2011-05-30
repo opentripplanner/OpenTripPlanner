@@ -243,7 +243,9 @@ otp.locale.French = {
             working : "Recherche de l'adresse...",
             error : "Aucun résultat n'a été trouvé",
             msg_title : "Recommencer avec une autre adresse",
-            msg_content : "Veuillez corriger les erreurs avant de planifier votre itinéraire"
+            msg_content : "Veuillez corriger les erreurs avant de planifier votre itinéraire",
+            select_result_title : "Veuillez sélectionner un résultat",
+            address_header : "Adresse"
         },
 
         error : {

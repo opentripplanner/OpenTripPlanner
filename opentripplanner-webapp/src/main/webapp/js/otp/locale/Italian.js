@@ -256,10 +256,14 @@ otp.locale.Italian = {
         // see otp.planner.Forms for use
         geocoder:
         {
+            // TODO
             working      : "Looking up address ....",
             error        : "Nessun risultato trovato",
             msg_title    : "Pianificazione del viaggio",
-            msg_content  : "Correggere gli errori prima di avviare la ricerca"
+            msg_content  : "Correggere gli errori prima di avviare la ricerca",
+            // TODO
+            select_result_title : "Please select a result",
+            address_header : "Address"
         },
 
         error:

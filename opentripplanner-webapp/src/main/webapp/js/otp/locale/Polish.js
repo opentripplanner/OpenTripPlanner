@@ -266,7 +266,9 @@ otp.locale.Polish = {
             working      : "Looking up address ....",
             error        : "Did not receive any results",
             msg_title    : "Voudrais vous review trip plan",
-            msg_content  : "Les correct errors before planning your trip"
+            msg_content  : "Les correct errors before planning your trip",
+            select_result_title : "Please select a result",
+            address_header : "Address"
         },
 
         error:

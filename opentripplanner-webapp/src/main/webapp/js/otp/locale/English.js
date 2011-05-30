@@ -260,7 +260,9 @@ otp.locale.English = {
             working      : "Looking up address ....",
             error        : "Did not receive any results",
             msg_title    : "Review trip plan",
-            msg_content  : "Please correct errors before planning your trip"
+            msg_content  : "Please correct errors before planning your trip",
+            select_result_title : "Please select a result",
+            address_header : "Address"
         },
 
         error:
