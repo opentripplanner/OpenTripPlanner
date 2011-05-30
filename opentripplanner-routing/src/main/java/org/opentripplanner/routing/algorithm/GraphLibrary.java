@@ -28,7 +28,7 @@ public class GraphLibrary {
                 incoming = extendEdges(incoming, gv.getIncoming());
         }
 
-        if (extraEdges.containsKey(tov))
+        if (extraEdges != null && extraEdges.containsKey(tov))
             incoming = extendEdges(incoming, extraEdges.get(tov));
 
         if (incoming == null)
@@ -50,7 +50,7 @@ public class GraphLibrary {
                 outgoing = extendEdges(outgoing, gv.getOutgoing());
         }
 
-        if (extraEdges.containsKey(fromv))
+        if (extraEdges != null && extraEdges.containsKey(fromv))
             outgoing = extendEdges(outgoing, extraEdges.get(fromv));
 
         if (fromv instanceof StreetLocation) {
