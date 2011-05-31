@@ -307,6 +307,7 @@ otp.util.OpenLayersUtils = {
 
     RTE_ICON_SIZE   : new OpenLayers.Size(105, 34),
     RTE_ICON_OFFSET : new OpenLayers.Pixel(0, -34),  
+    RTE_ICON_OFFSET_LEFT : new OpenLayers.Pixel(-105, -34),  
     ST_END_SIZE     : new OpenLayers.Size(21, 39),
     ST_END_OFFSET   : new OpenLayers.Pixel(-10, -39),
     DISK_SIZE       : new OpenLayers.Size(10, 10),
@@ -317,6 +318,7 @@ otp.util.OpenLayersUtils = {
 
     markerGraphicMapping  : {
         walkMarker: 'images/map/trip/mode/walk.png',
+        walkMarkerLeft: 'images/map/trip/mode/walk-left.png',
         bicycleMarker: 'images/map/trip/mode/bicycle.png',
         fromWalkMarker: 'images/map/trip/start-walk.png',
         fromBicycleMarker: 'images/map/trip/start-bicycle.png',
@@ -324,6 +326,10 @@ otp.util.OpenLayersUtils = {
         fromMarker: 'images/map/trip/start.png',
         diskMarker: 'images/map/trip/xferdisk.png',
         routeMarker: function(feature) {
+            var imagePathOptions = Ext.apply({}, {imageType: 'marker'}, feature.attributes);
+            return otp.util.imagePathManager.imagePath(imagePathOptions);
+        },
+        routeMarkerLeft: function(feature) {
             var imagePathOptions = Ext.apply({}, {imageType: 'marker'}, feature.attributes);
             return otp.util.imagePathManager.imagePath(imagePathOptions);
         }
@@ -355,6 +361,12 @@ otp.util.OpenLayersUtils = {
                 graphicHeight: this.RTE_ICON_SIZE.h,
                 graphicXOffset: this.RTE_ICON_OFFSET.x,
                 graphicYOffset: this.RTE_ICON_OFFSET.y
+            },
+            walkMarkerLeft: {
+                graphicWidth: this.RTE_ICON_SIZE.w,
+                graphicHeight: this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET_LEFT.x,
+                graphicYOffset: this.RTE_ICON_OFFSET_LEFT.y
             },
             fromWalkMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
@@ -391,6 +403,12 @@ otp.util.OpenLayersUtils = {
                 graphicHeight:  this.RTE_ICON_SIZE.h,
                 graphicXOffset: this.RTE_ICON_OFFSET.x,
                 graphicYOffset: this.RTE_ICON_OFFSET.y
+            },
+            routeMarkerLeft: {
+                graphicWidth:   this.RTE_ICON_SIZE.w,
+                graphicHeight:  this.RTE_ICON_SIZE.h,
+                graphicXOffset: this.RTE_ICON_OFFSET_LEFT.x,
+                graphicYOffset: this.RTE_ICON_OFFSET_LEFT.y
             }
         };
     },

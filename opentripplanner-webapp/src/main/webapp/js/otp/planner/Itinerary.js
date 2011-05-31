@@ -83,8 +83,9 @@ otp.planner.Itinerary = {
         if(this.m_legStore.getCount() > 0)
         {
             if(this.m_fromStore.getCount() == this.m_toStore.getCount() 
-            && this.m_fromStore.getCount() == this.m_legStore.getCount())
+               && this.m_fromStore.getCount() == this.m_legStore.getCount()) {
                 this.m_valid = true;
+            }
         }
 
         // get start & end time
@@ -318,16 +319,18 @@ otp.planner.Itinerary = {
         var startIndex = 0;
         var endIndex = this.m_fromStore.getCount() - 1;
 
+        var markersToAdd = [];
+
         // do the FROM marker
         var from = this.m_fromStore.getAt(startIndex);
         var fromP = from.get('geometry');
         var mode = from.get('mode');
         if (mode !== 'WALK' && mode !== 'BICYCLE') {
             // if the first leg isn't a walk or bike, then assume it's a transit
-            // leg or bike leg
+            // leg 
             // so paint the route icon (eg: fromStore.getAt(0))
             startIndex = 0;
-            this.createAndAddMarker(fromP.x, fromP.y, {
+            this.createAndAddMarker (fromP.x, fromP.y, {
                 type : 'fromMarker',
                 mode : mode
             });
@@ -360,10 +363,10 @@ otp.planner.Itinerary = {
             endIndex--;
             var markerType = (mode === 'BICYCLE') ? 'bicycleMarker'
                     : 'walkMarker';
-            this.createAndAddMarker(walkP.x, walkP.y, {
+            markersToAdd.push([walkP.x, walkP.y, {
                 type : markerType,
                 mode : mode
-            });
+            }]);
         }
 
         // save the list of routes for this itinerary the first time around
@@ -398,18 +401,18 @@ otp.planner.Itinerary = {
                 });
                 // TODO: How should street transit links be rendered?
                 if (route == "street transit link" || mode == "TRANSFER") {
-                    this.createAndAddMarker(fromP.x, fromP.y, {
+                    markersToAdd.push([fromP.x, fromP.y, {
                         type : 'walkMarker',
                         mode : mode
-                    });
+                    }]);
                 } else {
                     var agencyId = from.get('agencyId');
-                    this.createAndAddMarker(fromP.x, fromP.y, {
+                    markersToAdd.push([fromP.x, fromP.y, {
                         type : 'routeMarker',
                         mode : mode,
                         route : route,
                         agencyId : agencyId
-                    });
+                    }]);
                 }
             }
 
@@ -419,6 +422,19 @@ otp.planner.Itinerary = {
             });
         }
 
+        this.assignDirectionToMarkers(markersToAdd);
+        for (var i = 0; i < markersToAdd.length; ++i) {
+            var marker = markersToAdd[i];
+            if (marker[2].direction == 'left') {
+                if (marker[2].type === 'walkMarker') {
+                    marker[2].type = 'walkMarkerLeft';
+                } else if (marker[2].type === 'routeMarker') {
+                    marker[2].type = 'routeMarkerLeft';
+                }
+            }
+            this.createAndAddMarker(marker[0], marker[1], marker[2]);
+        }
+
         // do the TO (end) marker
         var to = this.m_toStore.getAt(this.m_toStore.getCount() - 1);
         var toP = to.get('geometry');
@@ -426,7 +442,96 @@ otp.planner.Itinerary = {
             type : 'toMarker'
         });
     },
-        
+
+    assignDirectionToMarkers : function(markers) 
+    {
+        bestDistance = 1000;
+        bestMarkerIdx = -1;
+        for (var i = 0; i < markers.length - 1; ++i) {
+            var x1 = markers[i][0];
+            var y1 = markers[i][1];
+            var mark1 = markers[i][2];
+            var x2 = markers[i+1][0];
+            var y2 = markers[i+1][1];
+            var mark2 = markers[i+1][2];
+            if (undefined === mark1.direction && undefined === mark2.direction) {
+                //this pair has not yet been assigned; are they the closest?
+                var distance = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestMarkerIdx = i;
+                }
+            }
+        }
+        if (bestMarkerIdx === -1) {
+            //we have applied direction to all nearest pairs
+            //now we want to apply to whatever's left
+
+            //the first marker
+            if (undefined === markers[0][2].direction) {
+                if (markers[0][1] > markers[1][1]) {
+                    //0th marker is right of 1st marker
+                    markers[0][2].direction = 'right';
+                } else {
+                    markers[0][2].direction = 'left';
+                }
+            }
+            //the last marker
+            var last = markers.length - 1;
+            if (undefined === markers[last][2].direction) {
+                if (markers[last][1] > markers[last - 1][1]) {
+                    //0th marker is right of 1st marker
+                    markers[last][2].direction = 'right';
+                } else {
+                    markers[last][2].direction = 'left';
+                }
+            }
+            for (var i = 1; i < last; ++i) {
+                if (undefined != markers[i].direction) {
+                    continue;
+                }
+                var x0 = markers[i-1][0];
+                var y0 = markers[i-1][1];
+                var mark0 = markers[i-1][2];
+                var x1 = markers[i][0];
+                var y1 = markers[i][1];
+                var mark1 = markers[i][2];
+                var x1 = markers[i][0];
+                var y1 = markers[i][1];
+                var mark1 = markers[i][2];
+                var x2 = markers[i+1][0];
+                var y2 = markers[i+1][1];
+                var mark2 = markers[i+1][2];
+
+                var distance0 = Math.sqrt((x1-x0)*(x1-x0)+(y1-y0)*(y1-y0));
+                var distance1 = Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));
+                if (distance0 > distance1) {
+                    if (x0 > x1) {
+                        markers[1][2].direction = 'right';
+                    } else {
+                        markers[1][2].direction = 'left';
+                    }
+                } else {
+                    if (x0 > x1) {
+                        markers[1][2].direction = 'right';
+                    } else {
+                        markers[1][2].direction = 'left';
+                    }
+                }
+            }
+        } else {
+            //we have a best pair, so we should make mark their directions
+            if (markers[bestMarkerIdx][0] > markers[bestMarkerIdx + 1][0]) {
+                markers[bestMarkerIdx][2].direction = "right";
+                markers[bestMarkerIdx + 1][2].direction = "left";
+            } else {
+                markers[bestMarkerIdx][2].direction = "left";
+                markers[bestMarkerIdx + 1][2].direction = "right";
+            }
+            //assign to rest
+            this.assignDirectionToMarkers(markers);
+        }
+    },
 //
 // TREE STUFF
 //

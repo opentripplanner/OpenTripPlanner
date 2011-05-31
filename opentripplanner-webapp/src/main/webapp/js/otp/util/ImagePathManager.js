@@ -68,7 +68,8 @@ otp.util.imagePathManager = (function() {
             } else {
                 var path = 'images/';
                 path += options.imageType === 'marker' ? 'map' : 'ui';
-                path += '/trip/mode/' + options.mode.toLowerCase() + '.png';
+                var left = options.direction === 'left' ? '-left' : '';
+                path += '/trip/mode/' + options.mode.toLowerCase() + left + '.png';
                 return path;
             }
         }
