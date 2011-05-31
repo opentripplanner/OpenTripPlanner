@@ -234,6 +234,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return permission;
     }
 
+    public void setPermission(StreetTraversalPermission permission) {
+        this.permission = permission;
+    }
+
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
         this.wheelchairAccessible = wheelchairAccessible;
     }

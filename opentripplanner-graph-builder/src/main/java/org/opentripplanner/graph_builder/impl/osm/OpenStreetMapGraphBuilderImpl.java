@@ -264,8 +264,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // Remove all simple islands
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
-            pruneFloatingIslands();
-
             long wayIndex = 0;
 
             createUsefulNames();
@@ -386,61 +384,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
+            StreetUtils.pruneFloatingIslands(graph);
             StreetUtils.makeEdgeBased(graph, endpoints);
             
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
             return new Coordinate(osmNode.getLon(), osmNode.getLat());
-        }
-
-        private void pruneFloatingIslands() {
-            Map<Long, HashSet<Long>> subgraphs = new HashMap<Long, HashSet<Long>>();
-            Map<Long, ArrayList<Long>> neighborsForNode = new HashMap<Long, ArrayList<Long>>();
-            for (OSMWay way : _ways.values()) {
-                List<Long> nodes = way.getNodeRefs();
-                for (long node : nodes) {
-                    ArrayList<Long> nodelist = neighborsForNode.get(node);
-                    if (nodelist == null) {
-                        nodelist = new ArrayList<Long>();
-                        neighborsForNode.put(node, nodelist);
-                    }
-                    nodelist.addAll(nodes);
-                }
-            }
-            /* associate each node with a subgraph */
-            for (long node : _nodes.keySet()) {
-                if (subgraphs.containsKey(node)) {
-                    continue;
-                }
-                HashSet<Long> subgraph = computeConnectedSubgraph(neighborsForNode, node);
-                for (long subnode : subgraph) {
-                    subgraphs.put(subnode, subgraph);
-                }
-            }
-            /* remove all tiny subgraphs */
-            for (HashSet<Long> subgraph : subgraphs.values()) {
-                if (subgraph.size() < 20) {
-                    _nodes.keySet().removeAll(subgraph);
-                }
-            }
-        }
-
-        private HashSet<Long> computeConnectedSubgraph(
-                Map<Long, ArrayList<Long>> neighborsForNode, long startNode) {
-            HashSet<Long> subgraph = new HashSet<Long>();
-            Queue<Long> q = new LinkedList<Long>();
-            q.add(startNode);
-            while (!q.isEmpty()) {
-                long node = q.poll();
-                for (long neighbor : neighborsForNode.get(node)) {
-                    if (!subgraph.contains(neighbor)) {
-                        subgraph.add(neighbor);
-                        q.add(neighbor);
-                    }
-                }
-            }
-            return subgraph;
         }
 
         public void addNode(OSMNode node) {
@@ -639,10 +589,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     _log.debug("generated name: " + way + " >> " + gen_name);
                 }
             }
-        }
-
-        private String getVertexIdForNodeId(long nodeId) {
-            return "osm node " + nodeId;
         }
 
         /**

@@ -238,4 +238,15 @@ public class Graph implements Serializable {
     	long t = d.getTime();
     	return t >= this.transitServiceStarts && t < this.transitServiceEnds; 
     }
+
+	public void removeEdge(AbstractEdge e) {
+		GraphVertex gv = vertices.get(e.getFromVertex().getLabel());
+		if (gv != null) {
+			gv.removeOutgoing(e);
+		}
+		gv = vertices.get(e.getToVertex().getLabel());
+		if (gv != null) {
+			gv.removeIncoming(e);
+		}
+	}
 }

@@ -57,7 +57,7 @@ public enum StreetTraversalPermission {
     }
 
     public StreetTraversalPermission remove(StreetTraversalPermission perm) {
-        return (this.getCode() & perm.getCode()) != 0 ?  get(this.getCode() ^ perm.getCode()) : this;
+        return get(this.getCode() & ~perm.getCode());
     }
 
     public StreetTraversalPermission modify(boolean permissive, StreetTraversalPermission perm) {
