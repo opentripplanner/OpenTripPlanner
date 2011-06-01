@@ -13,25 +13,19 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Calendar;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RouteSpec;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
-import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.StateData.Editor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -163,15 +157,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         s1.setLastAlightedTime(state0.getTime());
         s1.setPreviousStop(tov);
         return new TraverseResult(1, s1.createState(), this);
-    }
-
-    private ServiceDate getServiceDate(long currentTime, Calendar c) {
-        c.setTimeInMillis(currentTime);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return new ServiceDate(c.getTime());
     }
     
     public int getStopIndex() {

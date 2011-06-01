@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
@@ -35,7 +34,6 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;

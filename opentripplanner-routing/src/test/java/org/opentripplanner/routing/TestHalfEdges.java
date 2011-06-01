@@ -16,22 +16,16 @@ package org.opentripplanner.routing;
 import static org.opentripplanner.common.IterableLibrary.*;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;

@@ -27,7 +27,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
-import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;

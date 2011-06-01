@@ -21,22 +21,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.GraphLibrary;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TransitStop;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.pqueue.BinHeap;
@@ -59,7 +52,6 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	private Vertex target;
 	private List<NearbyStop> targetStops;
 	// private HashSet<Vertex> targetStopSet; // was used when there were transfer links, which were too slow. 
-	private TraverseOptions options;
 	private IdentityHashMap<Vertex, Double> weightCache;
 	
 	public TableRemainingWeightHeuristic (Graph g) {
@@ -88,7 +80,6 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 			return 0;
 		}
 		weightCache = new IdentityHashMap<Vertex, Double>(200000); 
-		this.options = options;
 		this.target = target;
 		targetStops = new ArrayList<NearbyStop>(50);
 		Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();

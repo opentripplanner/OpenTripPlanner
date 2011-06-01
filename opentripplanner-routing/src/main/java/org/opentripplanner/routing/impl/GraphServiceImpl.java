@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.io.InvalidClassException;
 import java.util.Collections;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;

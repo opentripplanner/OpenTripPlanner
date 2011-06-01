@@ -19,8 +19,6 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
