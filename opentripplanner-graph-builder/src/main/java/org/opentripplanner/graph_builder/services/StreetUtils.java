@@ -187,17 +187,14 @@ public class StreetUtils {
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
     	Collection<Edge> outgoing = new ArrayList<Edge>(graph.getOutgoing(v));
 		for (Edge e : outgoing) {
-			System.out.println("depedestrianizing " + e);
     		if (e instanceof PlainStreetEdge) {
     			PlainStreetEdge pse = (PlainStreetEdge) e;
     			StreetTraversalPermission permission = pse.getPermission();
     			permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
     			if (permission == StreetTraversalPermission.NONE) {
-    				System.out.println("removing");
     				graph.removeEdge(pse);
     			} else {
     				pse.setPermission(permission);
-    				System.out.println("cleaning to " + pse.getPermission());
     			}
     		}
     	}
