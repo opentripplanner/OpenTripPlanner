@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
@@ -73,17 +72,17 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * 
  * A StopPattern is an intermediate object used when processing GTFS files. It represents an ordered
  * list of stops and a service ID. Any two trips with the same stops in the same order, and that
- * operates on the same days, can be combined using a TripPattern to save memory.
+ * operate on the same days, can be combined using a TripPattern to save memory.
  */
 
-class StopPattern {
-    Vector<Stop> stops;
-    Vector<Boolean> pickups;
-    Vector<Boolean> dropoffs;
+class ScheduledStopPattern {
+    ArrayList<Stop> stops;
+    ArrayList<Boolean> pickups;
+    ArrayList<Boolean> dropoffs;
 
     AgencyAndId calendarId;
 
-    public StopPattern(Vector<Stop> stops, Vector<Boolean> pickups, Vector<Boolean> dropoffs, AgencyAndId calendarId) {
+    public ScheduledStopPattern(ArrayList<Stop> stops, ArrayList<Boolean> pickups, ArrayList<Boolean> dropoffs, AgencyAndId calendarId) {
         this.stops = stops;
         this.pickups = pickups;
         this.dropoffs = dropoffs;
@@ -91,8 +90,8 @@ class StopPattern {
     }
 
     public boolean equals(Object other) {
-        if (other instanceof StopPattern) {
-            StopPattern pattern = (StopPattern) other;
+        if (other instanceof ScheduledStopPattern) {
+            ScheduledStopPattern pattern = (ScheduledStopPattern) other;
             return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId) && pattern.pickups.equals(pickups) && pattern.dropoffs.equals(dropoffs);
         } else {
             return false;
@@ -223,16 +222,16 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    public static StopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
-        Vector<Stop> stops = new Vector<Stop>();
-        Vector<Boolean> pickups = new Vector<Boolean>();
-        Vector<Boolean> dropoffs = new Vector<Boolean>();
+    public static ScheduledStopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
+        ArrayList<Stop> stops = new ArrayList<Stop>();
+        ArrayList<Boolean> pickups = new ArrayList<Boolean>();
+        ArrayList<Boolean> dropoffs = new ArrayList<Boolean>();
         for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
             stops.add(stoptime.getStop());
             pickups.add(stoptime.getPickupType() != 1);
             dropoffs.add(stoptime.getDropOffType() != 1);
         }
-        StopPattern pattern = new StopPattern(stops, pickups, dropoffs, trip.getServiceId());
+        ScheduledStopPattern pattern = new ScheduledStopPattern(stops, pickups, dropoffs, trip.getServiceId());
         return pattern;
     }
 
@@ -262,7 +261,7 @@ public class GTFSPatternHopFactory {
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
 
-        HashMap<StopPattern, BasicTripPattern> patterns = new HashMap<StopPattern, BasicTripPattern>();
+        HashMap<ScheduledStopPattern, BasicTripPattern> patterns = new HashMap<ScheduledStopPattern, BasicTripPattern>();
 
         int index = 0;
 
@@ -295,7 +294,7 @@ public class GTFSPatternHopFactory {
             List<List<StopTime>> allStopTimes = new ArrayList<List<StopTime>>();
             List<Frequency>      frequencies  = tripFrequencies.get(trip);
 
-            StopPattern stopPattern = stopPatternfromTrip(trip, _dao);
+            ScheduledStopPattern stopPattern = stopPatternfromTrip(trip, _dao);
             BasicTripPattern tripPattern = patterns.get(stopPattern);
             String blockId = trip.getBlockId();
 

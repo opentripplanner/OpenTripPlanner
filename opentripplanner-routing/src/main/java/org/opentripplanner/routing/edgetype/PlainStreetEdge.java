@@ -73,6 +73,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     
     private boolean roundabout = false;
 
+    private String note;
+    
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
         super(v1, v2);
@@ -301,6 +303,14 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return roundabout;
     }
 
+    public String getNote() {
+    	return note;
+    }
+    
+    public void setNote(String note) {
+    	this.note = note;
+    }
+    
     @Override
     public String toString() {
         return "PlainStreetEdge(" + fromv + " -> " + tov + ")";

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -107,6 +108,9 @@ public class Leg {
     @XmlElementWrapper(name = "steps")
     public List<WalkStep> walkSteps;
 
+    @XmlElement
+	private List<Note> notes;
+
     /**
      * bogus walk legs are those that have 0.0 distance, and just one instruction 
      * @return boolean true if the leg is bogus 
@@ -128,4 +132,14 @@ public class Leg {
     public long getDuration() {
         return endTime.getTime() - startTime.getTime();
     }
+
+	public void addNote(String text) {
+		if (notes == null) {
+			notes = new ArrayList<Note>();
+		}
+		Note note = new Note(text);
+		if (!notes.contains(note)) {
+			notes.add(note);
+		}
+	}
 }

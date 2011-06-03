@@ -39,6 +39,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Graph;
@@ -70,6 +71,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private GtfsMutableRelationalDao _dao = new GtfsRelationalDaoImpl();
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
+
+	private List<GraphBuilderWithGtfsDao> gtfsGraphBuilders;
 
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
@@ -124,6 +127,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             graph.putService(CalendarServiceData.class, data);
             graph.updateTransitFeedValidity(data);
             
+            //run any additional graph builders that require the DAO
+            if (gtfsGraphBuilders != null) {
+            	for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
+            		builder.setDao(_dao);
+            		builder.buildGraph(graph);
+            		builder.setDao(null); //clean up
+            	}
+            }
             // if in-memory DAO is being used, replace it with an empty one
             // to free up some space for other graphbuilders
             if (_dao instanceof GtfsRelationalDaoImpl) 
@@ -196,7 +207,15 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         store.close();
     }
 
-    private class StoreImpl implements GenericMutableDao {
+    public void setGtfsGraphBuilders(List<GraphBuilderWithGtfsDao> gtfsGraphBuilders) {
+		this.gtfsGraphBuilders = gtfsGraphBuilders;
+	}
+
+	public List<GraphBuilderWithGtfsDao> getGtfsGraphBuilders() {
+		return gtfsGraphBuilders;
+	}
+
+	private class StoreImpl implements GenericMutableDao {
 
         @Override
         public void open() {

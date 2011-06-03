@@ -15,8 +15,11 @@ package org.opentripplanner.routing.core;
 
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.patch.Patch;
 
 public abstract class AbstractEdge implements DirectEdge, Serializable {
 
@@ -25,6 +28,8 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     protected Vertex fromv;
 
     protected Vertex tov;
+
+	private List<Patch> patches;
 
     public String toString() {
         return getClass().getName() + "(" + fromv + " -> " + tov + ")";
@@ -57,6 +62,10 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
         return null;
     }
     
+    public String getNote() {
+    	return null;
+    }
+    
     @Override
     public int hashCode() {
         return fromv.hashCode() * 31 + tov.hashCode();
@@ -66,4 +75,24 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     public boolean isRoundabout() {
         return false;
     }
+    
+    @Override
+    public void addPatch(Patch patch) {
+    	if (patches == null) {
+    		patches = new ArrayList<Patch>();
+    	}
+    	patches.add(patch);
+    }
+	public List<Patch> getPatches() {
+		return patches;
+	}
+	
+	@Override
+	public void removePatch(Patch patch) {
+		if (patches.size() == 1) {
+			patches = null;
+		} else {
+			patches.remove(patch);
+		}
+	}
 }

@@ -74,7 +74,9 @@ public class StreetVertex extends GenericVertex {
 
     private boolean roundabout = false;
 
-    public StreetVertex(String id, LineString geometry, String name, double length, boolean back) {
+	private String note;
+
+    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, String note) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
@@ -84,7 +86,8 @@ public class StreetVertex extends GenericVertex {
         this.slopeSpeedEffectiveLength = length;
         this.name = name;
         this.permission = StreetTraversalPermission.ALL;
-
+        this.note = note;
+        
         if (geometry != null) {
             double angleR = DirectionUtils.getLastAngle(geometry);
             outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
@@ -411,5 +414,9 @@ public class StreetVertex extends GenericVertex {
     public boolean isRoundabout() {
         return roundabout;
     }
+
+	public String getNote() {
+		return note;
+	}
 
 }

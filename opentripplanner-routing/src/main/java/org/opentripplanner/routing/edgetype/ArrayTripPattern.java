@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.FareContext;
@@ -261,6 +262,10 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     public Trip getTrip(int tripIndex) {
         return trips[tripIndex];
+    }
+    
+    public List<Trip> getTrips() {
+    	return Arrays.asList(trips);
     }
 
     public boolean canAlight(int stopIndex) {

@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.FareContext;
@@ -94,4 +95,6 @@ public interface TripPattern {
 
     /** Returns the shortest possible dwell time at this stop */
     int getBestDwellTime(int stopIndex);
+
+	public List<Trip> getTrips();
 }

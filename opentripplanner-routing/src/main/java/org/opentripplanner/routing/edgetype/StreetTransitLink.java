@@ -13,10 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
-
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -32,19 +30,16 @@ import com.vividsolutions.jts.geom.LineString;
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink implements DirectEdge, Serializable {
+public class StreetTransitLink extends AbstractEdge {
 
     private static final long serialVersionUID = -3311099256178798981L;
     private static final double STL_TRAVERSE_COST = 1;
 
     private static GeometryFactory _geometryFactory = new GeometryFactory();
     private boolean wheelchairAccessible;
-    private Vertex tov;
-    private Vertex fromv;
         
     public StreetTransitLink(Vertex fromv, Vertex tov, boolean wheelchairAccessible) {
-        this.fromv = fromv;
-        this.tov = tov;
+    	super(fromv, tov);
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -89,28 +84,25 @@ public class StreetTransitLink implements DirectEdge, Serializable {
         return new TraverseResult(STL_TRAVERSE_COST, s1, this);
     }
 
-    @Override
     public Vertex getFromVertex() {
         return fromv;
     }
 
-    @Override
     public Vertex getToVertex() {
         return tov;
     }
 
-    @Override
     public Trip getTrip() {
         return null;
     }
 
-    @Override
     public boolean isRoundabout() {
         return false;
     }
 
-    @Override
     public String toString() {
         return "StreetTransitLink(" + fromv + " -> " + tov + ")";
     }
+
+
 }

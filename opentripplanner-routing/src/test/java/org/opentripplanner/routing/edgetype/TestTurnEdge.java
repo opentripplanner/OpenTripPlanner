@@ -49,8 +49,8 @@ public class TestTurnEdge extends TestCase {
 
         double streetLength = 100;
         
-        StreetVertex start = new StreetVertex("start", GeometryUtils.makeLineString(-74.002, 40.5, -74.004, 40.5, -74.004, 40.5, -74.006, 41.0), "start", streetLength, false);
-        StreetVertex end = new StreetVertex("end", GeometryUtils.makeLineString(-74.004, 40.5, -74.006, 41.0), "end", streetLength, false);
+        StreetVertex start = new StreetVertex("start", GeometryUtils.makeLineString(-74.002, 40.5, -74.004, 40.5, -74.004, 40.5, -74.006, 41.0), "start", streetLength, false, null);
+        StreetVertex end = new StreetVertex("end", GeometryUtils.makeLineString(-74.004, 40.5, -74.006, 41.0), "end", streetLength, false, null);
         
         gg.addVertex(start);
         gg.addVertex(end);
@@ -89,15 +89,15 @@ public class TestTurnEdge extends TestCase {
 
         Graph graph = new Graph();
         // a 1 degree x 1 degree square, right edge missing
-        StreetVertex top = new StreetVertex("top", GeometryUtils.makeLineString(-74.1, 40.1, -74.0, 40.1), "top", 10000, false);
-        StreetVertex bottom = new StreetVertex("bottom", GeometryUtils.makeLineString(-74.1, 40.0, -74.0, 40.0), "bottom", 10000, false);
-        StreetVertex left = new StreetVertex("left", GeometryUtils.makeLineString(-74.1, 40.0, -74.1, 40.1), "left", 10000, false);
-        StreetVertex right = new StreetVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.1), "right", 10000, false);
+        StreetVertex top = new StreetVertex("top", GeometryUtils.makeLineString(-74.1, 40.1, -74.0, 40.1), "top", 10000, false, null);
+        StreetVertex bottom = new StreetVertex("bottom", GeometryUtils.makeLineString(-74.1, 40.0, -74.0, 40.0), "bottom", 10000, false, null);
+        StreetVertex left = new StreetVertex("left", GeometryUtils.makeLineString(-74.1, 40.0, -74.1, 40.1), "left", 10000, false, null);
+        StreetVertex right = new StreetVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.1), "right", 10000, false, null);
         
-        StreetVertex topBack = new StreetVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.1, 40.1), "topBack", 10000, true);
-        StreetVertex bottomBack = new StreetVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.1, 40.0), "bottomBack", 10000, true);
-        StreetVertex leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.1, 40.0), "leftBack", 10000, true);
-        StreetVertex rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.0, 40.0), "rightBack", 10000, true);
+        StreetVertex topBack = new StreetVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.1, 40.1), "topBack", 10000, true, null);
+        StreetVertex bottomBack = new StreetVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.1, 40.0), "bottomBack", 10000, true, null);
+        StreetVertex leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.1, 40.0), "leftBack", 10000, true, null);
+        StreetVertex rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.1, -74.0, 40.0), "rightBack", 10000, true, null);
         
         graph.addVertex(top);
         graph.addVertex(bottom);

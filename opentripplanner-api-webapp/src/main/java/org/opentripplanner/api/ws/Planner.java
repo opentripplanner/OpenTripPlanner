@@ -324,6 +324,7 @@ public class Planner {
         Itinerary itinerary = makeEmptyItinerary(path);
 
         Leg leg = null;
+		List<String> notesForNewLeg = new ArrayList<String>();
         Edge edge = null;
         EdgeNarrative edgeNarrative = null;
         TraverseMode mode = null;
@@ -341,6 +342,15 @@ public class Planner {
             /* grab base edge and associated narrative information from SPT edge */
             edge = sptEdge.payload;
             edgeNarrative = sptEdge.narrative;
+            String note = edgeNarrative.getNote();
+			if (note != null) {
+				if (leg == null) {
+					notesForNewLeg.add(note);
+				} else {
+					leg.addNote(note);
+				}
+			}
+            
             /* ignore freeEdges */ 
             if (edge instanceof FreeEdge && sptEdge != finalSptEdge) {
                 continue;
@@ -384,6 +394,10 @@ public class Planner {
                     }
                     /* initialize new leg */
                     leg = makeLeg(sptEdge);
+                    for (String noteForNewLeg : notesForNewLeg) {
+                    	leg.addNote(noteForNewLeg);
+                    }
+                    notesForNewLeg.clear();
                     leg.mode = mode.toString();
                     if (mode.isOnStreetNonTransit()) {
                         /* on-street (walk/bike) leg

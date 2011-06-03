@@ -11,27 +11,27 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.api.model;
 
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
+import javax.xml.bind.annotation.XmlElement;
 
-public class RouteNameNarrative extends DelegatingEdgeNarrative {
+public class Note {
+	@XmlElement
+	public String text;
 
-    private Trip trip;
-
-    public RouteNameNarrative(Trip trip, EdgeNarrative edge) {
-    	super(edge);
-        this.trip = trip;
-    }
-    @Override
-    public String getName() {
-        return GtfsLibrary.getRouteName(trip.getRoute());
-    }
-
-    @Override
-    public Trip getTrip() {
-        return trip;
-    }
+	public Note() {
+		/* Required by JAXB but unused */
+	}
+	
+	public Note(String note) {
+		text = note;
+	}
+	
+	public boolean equals(Object o) {
+		return (o instanceof Note) && ((Note) o).text.equals(text);
+	}
+	
+	public int hashCode() {
+		return text.hashCode();
+	}
 }

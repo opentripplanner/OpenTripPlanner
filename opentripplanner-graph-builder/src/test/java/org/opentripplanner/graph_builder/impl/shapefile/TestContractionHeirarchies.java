@@ -122,16 +122,16 @@ public class TestContractionHeirarchies extends TestCase {
                 double yc = y * 0.001 + 40;
                 LineString geometry = GeometryUtils.makeLineString(xc, yc, xc + 0.001, yc);
                 double d = DistanceLibrary.distance(yc, xc, yc, xc + 0.001);
-                StreetVertex left = new StreetVertex("a(" + x + ", " + y + ")", geometry, "", d, false);
-                StreetVertex right = new StreetVertex("a(" + x + ", " + y + ")", (LineString) geometry.reverse(), "", d, true);
+                StreetVertex left = new StreetVertex("a(" + x + ", " + y + ")", geometry, "", d, false, null);
+                StreetVertex right = new StreetVertex("a(" + x + ", " + y + ")", (LineString) geometry.reverse(), "", d, true, null);
                 
                 graph.addVertex(left);
                 graph.addVertex(right);
 
                 d = DistanceLibrary.distance(xc, yc, xc + 0.001, yc);
                 geometry = GeometryUtils.makeLineString(yc, xc, yc, xc + 0.001);
-                StreetVertex down = new StreetVertex("d(" + y + ", " + x + ")", geometry, "", d, false);
-                StreetVertex up = new StreetVertex("d(" + y + ", " + x + ")", (LineString) geometry.reverse(), "", d, true);
+                StreetVertex down = new StreetVertex("d(" + y + ", " + x + ")", geometry, "", d, false, null);
+                StreetVertex up = new StreetVertex("d(" + y + ", " + x + ")", (LineString) geometry.reverse(), "", d, true, null);
 
                 graph.addVertex(down);
                 graph.addVertex(up);

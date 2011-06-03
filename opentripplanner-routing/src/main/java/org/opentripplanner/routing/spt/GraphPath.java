@@ -36,6 +36,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.patch.Patch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -139,6 +140,12 @@ public class GraphPath {
                 SPTEdge edge = iterator.previous();
                 EdgeNarrative existingNarrative = edge.narrative;
                 TraverseResult result = edge.payload.traverse(state, options);
+                List<Patch> patches = edge.payload.getPatches();
+                if (patches != null) {
+                	for (Patch patch : patches) {
+                        result = patch.filterTraverseResults(result);
+                	}
+                }
                 assert (result != null);
                 state = result.state;
                 edge.fromv.state = state;
@@ -151,6 +158,12 @@ public class GraphPath {
                 SPTEdge edge = iterator.previous();
                 EdgeNarrative existingNarrative = edge.narrative;
                 TraverseResult result = edge.payload.traverseBack(state, options);
+                List<Patch> patches = edge.payload.getPatches();
+                if (patches != null) {
+                	for (Patch patch : patches) {
+                        result = patch.filterTraverseResults(result);
+                	}
+                }
                 state = result.state;
                 edge.fromv.state = state;
                 edge.narrative = result.getEdgeNarrative();

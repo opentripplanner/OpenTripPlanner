@@ -11,27 +11,20 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.services;
 
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
+import java.util.List;
 
-public class RouteNameNarrative extends DelegatingEdgeNarrative {
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.transit_index.RouteVariant;
 
-    private Trip trip;
+public interface TransitIndexService {
+	public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
+	
+	public RouteVariant getVariantForTrip(AgencyAndId trip);
 
-    public RouteNameNarrative(Trip trip, EdgeNarrative edge) {
-    	super(edge);
-        this.trip = trip;
-    }
-    @Override
-    public String getName() {
-        return GtfsLibrary.getRouteName(trip.getRoute());
-    }
+	public Edge getPreboardEdge(AgencyAndId stop);
 
-    @Override
-    public Trip getTrip() {
-        return trip;
-    }
+	public Edge getPrealightEdge(AgencyAndId stop);
 }

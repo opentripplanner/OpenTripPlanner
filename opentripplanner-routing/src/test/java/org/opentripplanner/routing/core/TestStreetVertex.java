@@ -32,14 +32,14 @@ public class TestStreetVertex extends TestCase {
                 new Coordinate(0, 0)
                 });
 
-        StreetVertex leftV = new StreetVertex("morx", geometry, "morx", 10.0, true);
+        StreetVertex leftV = new StreetVertex("morx", geometry, "morx", 10.0, true, null);
 
         LineString geometry2 = gf.createLineString(new Coordinate[] {
                 new Coordinate(0, 0),
                 new Coordinate(-10, 0)
                 });
 
-        StreetVertex rightV = new StreetVertex("fleem", geometry2, "fleem", 10.0, false);
+        StreetVertex rightV = new StreetVertex("fleem", geometry2, "fleem", 10.0, false, null);
 
         assertEquals(180, Math.abs(leftV.outAngle - rightV.outAngle));
 

@@ -11,27 +11,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.graph_builder.services;
 
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
+import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.routing.core.Graph;
 
-public class RouteNameNarrative extends DelegatingEdgeNarrative {
-
-    private Trip trip;
-
-    public RouteNameNarrative(Trip trip, EdgeNarrative edge) {
-    	super(edge);
-        this.trip = trip;
-    }
-    @Override
-    public String getName() {
-        return GtfsLibrary.getRouteName(trip.getRoute());
-    }
-
-    @Override
-    public Trip getTrip() {
-        return trip;
-    }
+/**
+ * This is a special type of graph builder that needs access to the GTFS data
+ * directly, rather than through the graph.  It is run at the end of GtfsGraphBuilderImpl
+ * @author novalis
+ *
+ */
+public interface GraphBuilderWithGtfsDao {
+	public void setDao(GtfsRelationalDao dao);
+	public void buildGraph(Graph graph);
 }

@@ -101,7 +101,7 @@ public class StreetUtils {
             return (StreetVertex) v;
         }
 
-        StreetVertex newv = new StreetVertex(id, e.getGeometry(), e.getName(), e.getLength(), back);
+        StreetVertex newv = new StreetVertex(id, e.getGeometry(), e.getName(), e.getLength(), back, e.getNote());
         newv.setWheelchairAccessible(e.isWheelchairAccessible());
         newv.setBicycleSafetyEffectiveLength(e.getBicycleSafetyEffectiveLength());
         newv.setCrossable(e.isCrossable());

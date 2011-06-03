@@ -70,8 +70,8 @@ public class TestPatternHopFactory extends TestCase {
         for (int i = 0; i < stops.length; ++i) {
             Vertex stop = graph.getVertex(stops[i]);
             
-            StreetVertex front = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false));
-            StreetVertex back = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true));
+            StreetVertex front = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false, null));
+            StreetVertex back = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true, null));
             
             TurnEdge street = new TurnEdge(front, back);
             graph.addEdge(street);

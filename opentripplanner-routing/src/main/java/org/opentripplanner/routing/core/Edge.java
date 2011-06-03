@@ -13,7 +13,10 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.List;
+
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.spt.GraphPath;
 
 /**
@@ -46,5 +49,9 @@ public interface Edge {
 
     public TraverseResult traverseBack(State s0, TraverseOptions options)
             throws NegativeWeightException;
+
+	public void addPatch(Patch patch);
+	public List<Patch> getPatches();
+	public void removePatch(Patch patch);
 
 }

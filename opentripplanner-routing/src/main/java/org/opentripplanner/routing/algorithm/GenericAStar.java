@@ -32,6 +32,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.pqueue.PriorityQueueImpl;
@@ -248,10 +249,53 @@ public class GenericAStar {
     }
 
     private TraverseResult traversEdge(Edge edge, State state, TraverseOptions options) {
-        if (options.isArriveBy())
-            return edge.traverseBack(state, options);
-        else
-            return edge.traverse(state, options);
+    	List<Patch> patches = edge.getPatches();
+        if (options.isArriveBy()) {
+
+            TraverseResult result = edge.traverseBack(state, options);
+            if (patches == null) {
+            	return result;
+            }
+            for (Patch patch : patches) {
+            	if (!patch.activeDuring(state.getStartTime(), state.getTime())) {
+            		continue;
+            	}
+                if (result != null) {
+                	result = patch.filterTraverseResults(result);
+                }
+            	TraverseResult patchResult = patch.addTraverseResultBack(edge, state, options);
+            	if (patchResult != null) {
+            		if (result != null) {
+            			patchResult.addToExistingResultChain(result);
+            		} else {
+            			result = patchResult;
+            		}
+            	}
+            }
+            return result;
+        } else {
+        	TraverseResult result = edge.traverse(state, options);
+            if (patches == null) {
+            	return result;
+            }
+        	for (Patch patch : patches) {
+        		if (!patch.activeDuring(state.getStartTime(), state.getTime())) {
+            		continue;
+            	}
+                if (result != null) {
+                	result = patch.filterTraverseResults(result);
+                }
+            	TraverseResult patchResult = patch.addTraverseResult(edge, state, options);
+            	if (patchResult != null) {
+            		if (result != null) {
+            			patchResult.addToExistingResultChain(result);
+            		} else {
+            			result = patchResult;
+            		}
+            	}
+            }
+        	return result;
+        }
     }
 
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic,

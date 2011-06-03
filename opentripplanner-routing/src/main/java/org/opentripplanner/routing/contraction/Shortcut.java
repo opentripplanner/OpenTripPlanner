@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.contraction;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -24,6 +25,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FixedModeEdge;
+import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -148,4 +150,23 @@ public class Shortcut implements DirectEdge, Serializable {
     public boolean isRoundabout() {
         return false;
     }
+
+    public String getNote() {
+    	return null;
+    }
+    
+	@Override
+	public void addPatch(Patch patch) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<Patch> getPatches() {
+		return null;
+	}
+
+	@Override
+	public void removePatch(Patch patch) {
+		throw new UnsupportedOperationException();		
+	}
 }

@@ -141,12 +141,12 @@ public class StreetLocation extends GenericVertex {
             double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
             newFrom = new StreetVertex(label + " (vertex going in to splitter)", geometries.getFirst(), name,
-                    lengthIn, false);
+                    lengthIn, false, street.getNote());
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn));
             newFrom.setPermission(street.getPermission());
 
             location = new StreetVertex(label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
-                    false);
+                    false, street.getNote());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut));
             location.setPermission(street.getPermission());
             

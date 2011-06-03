@@ -41,4 +41,6 @@ public interface EdgeNarrative {
 
     public boolean isRoundabout();
 
+	public String getNote();
+
 }

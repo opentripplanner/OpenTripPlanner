@@ -79,9 +79,9 @@ public class TraverseResult {
      * @return
      */
     public TraverseResult addToExistingResultChain(TraverseResult existingResultChain) {
-        if (this.nextResult != null)
+        if (this.getNextResult() != null)
             throw new IllegalStateException("this result already has a next result set");
-        this.nextResult = existingResultChain;
+        nextResult = existingResultChain;
         return this;
     }
 }

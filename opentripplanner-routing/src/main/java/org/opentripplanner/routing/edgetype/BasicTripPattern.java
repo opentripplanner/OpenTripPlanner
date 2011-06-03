@@ -279,6 +279,10 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     public Trip getTrip(int trip) {
         return trips.get(trip);
     }
+    
+    public List<Trip> getTrips() {
+    	return trips;
+    }
 
     public int getNumDwells() {
         return dwellTimes[0].size();

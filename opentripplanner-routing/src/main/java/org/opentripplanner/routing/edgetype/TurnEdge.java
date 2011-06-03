@@ -14,6 +14,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -24,6 +26,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -44,6 +47,8 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     StreetVertex fromv;
 
     StreetVertex tov;
+
+	private List<Patch> patches;
 
     public TurnEdge(StreetVertex fromv, StreetVertex tov) {
         this.fromv = fromv;
@@ -189,4 +194,31 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     public int hashCode() {
         return fromv.hashCode() * 31 + tov.hashCode();
     }
+    
+	@Override
+	public void addPatch(Patch patch) {
+		if (patches == null) {
+			patches = new ArrayList<Patch>();
+		}
+		patches.add(patch);
+	}
+
+	@Override
+	public List<Patch> getPatches() {
+		return patches;
+	}
+	
+	@Override
+	public void removePatch(Patch patch) {
+		if (patches.size() == 1) {
+			patches = null;
+		} else {
+			patches.remove(patch);
+		}
+	}
+
+	@Override
+	public String getNote() {
+		return fromv.getNote();
+	}
 }

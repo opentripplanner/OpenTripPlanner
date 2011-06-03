@@ -87,15 +87,15 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 0.1 degree x 0.1 degree square
-        top = new StreetVertex("top", GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500, false);
-        bottom = new StreetVertex("bottom", GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500, false);
-        left = new StreetVertex("left", GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500, false);
-        right = new StreetVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500, false);
+        top = new StreetVertex("top", GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500, false, null);
+        bottom = new StreetVertex("bottom", GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500, false, null);
+        left = new StreetVertex("left", GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500, false, null);
+        right = new StreetVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500, false, null);
         
-        StreetVertex topBack = new StreetVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.01, 40.01), "topBack", 1500, true);
-        StreetVertex bottomBack = new StreetVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.01, 40.0), "bottomBack", 1500, true);
-        leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.01, 40.01, -74.01, 40.0), "leftBack", 1500, true);
-        rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.0, 40.0), "rightBack", 1500, true);
+        StreetVertex topBack = new StreetVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.01, 40.01), "topBack", 1500, true, null);
+        StreetVertex bottomBack = new StreetVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.01, 40.0), "bottomBack", 1500, true, null);
+        leftBack = new StreetVertex("leftBack", GeometryUtils.makeLineString(-74.01, 40.01, -74.01, 40.0), "leftBack", 1500, true, null);
+        rightBack = new StreetVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.0, 40.0), "rightBack", 1500, true, null);
 
         right.setPermission(StreetTraversalPermission.PEDESTRIAN);
         

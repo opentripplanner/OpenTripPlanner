@@ -1,60 +1,37 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+public class FixedModeEdge extends DelegatingEdgeNarrative {
 
-public class FixedModeEdge implements EdgeNarrative {
-    EdgeNarrative base;
-    TraverseMode mode;
+	private TraverseMode mode;
 
-    public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
-	this.base = base;
-	this.mode = mode;
-    }
+	public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
+		super(base);
+		this.mode = mode;
+	}
 
-    @Override
-    public double getDistance() {
-        return base.getDistance();
-    }
+	@Override
+	public TraverseMode getMode() {
+		return mode;
+	}
+	
 
-    @Override
-    public Geometry getGeometry() {
-        return base.getGeometry();
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return mode;
-    }
-
-    @Override
-    public String getName() {
-        return base.getName();
-    }
-
-    @Override
-    public Trip getTrip() {
-        return base.getTrip();
-    }
-
-    public Vertex getFromVertex() {
-        return base.getFromVertex();
-    }
-
-    public Vertex getToVertex() {
-        return base.getToVertex();
-    }
-    
     public String toString() {
         return "FixedModeEdge(" + base + ", " + mode + ")";
-    }
-
-    @Override
-    public boolean isRoundabout() {
-        return base.isRoundabout();
     }
 }
