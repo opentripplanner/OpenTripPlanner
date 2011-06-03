@@ -445,6 +445,9 @@ otp.planner.Itinerary = {
 
     assignDirectionToMarkers : function(markers) 
     {
+        if (markers.length === 0) {
+	    return;
+        }
         bestDistance = 1000;
         bestMarkerIdx = -1;
         for (var i = 0; i < markers.length - 1; ++i) {
@@ -469,7 +472,7 @@ otp.planner.Itinerary = {
 
             //the first marker
             if (undefined === markers[0][2].direction) {
-                if (markers[0][1] > markers[1][1]) {
+                if (markers.length === 1 || markers[0][1] > markers[1][1]) {
                     //0th marker is right of 1st marker
                     markers[0][2].direction = 'right';
                 } else {
