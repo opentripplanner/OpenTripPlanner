@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.patch;
 
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -21,17 +24,15 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.services.TransitIndexService;
 
-public class StopNotePatch extends AbstractPatch {
+@XmlRootElement(name="StopNotePatch")
+public class StopNotePatch extends Patch {
 	private static final long serialVersionUID = -7947169269916558755L;
 	
 	private AgencyAndId stop;
 
-	public StopNotePatch(long startTime, long endTime, int startTimeOfDay,
-			int endTimeOfDay, String notes, AgencyAndId stop) {
-		super(startTime, endTime, startTimeOfDay, endTimeOfDay, notes);
-		this.stop = stop;
-	}
-	
+	public StopNotePatch() {
+	} 
+
 	@Override
 	public void remove(Graph graph) {
 		TransitIndexService index = graph.getService(TransitIndexService.class);
@@ -64,16 +65,23 @@ public class StopNotePatch extends AbstractPatch {
 
 	@Override
 	public TraverseResult filterTraverseResults(TraverseResult result) {
-		result = AbstractPatch.filterTraverseResultChain(result, new TraverseResultFilter() {
+		result = Patch.filterTraverseResultChain(result, new TraverseResultFilter() {
 			public TraverseResult filter(TraverseResult result) {
 				return new TraverseResult(result.weight, result.state, 
 					new NoteNarrative(result.getEdgeNarrative(), notes));
 			}
-		}); 
-			
+		});		
 			
 		return result;
 	}
 	
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+	public AgencyAndId getStop() {
+		return stop;
+	}
+	
+	public void setStop(AgencyAndId stop) {
+		this.stop = stop;
+	}
 	
 }
