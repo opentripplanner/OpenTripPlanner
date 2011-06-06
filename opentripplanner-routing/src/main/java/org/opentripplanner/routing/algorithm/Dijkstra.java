@@ -13,16 +13,25 @@
 
 package org.opentripplanner.routing.algorithm;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
-import org.opentripplanner.routing.contraction.ContractionHierarchy;
+import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.pqueue.BinHeap;
+import org.opentripplanner.routing.core.VertexIngress;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.spt.SPTVertex;
 
 /**
  * Find the shortest path between graph vertices using Dijkstra's algorithm. 
@@ -32,9 +41,9 @@ public class Dijkstra {
     Vertex taboo;
     private Vertex origin;
     private BasicShortestPathTree spt;
-    private BinHeap<State> queue;
+    private FibHeap<SPTVertex> queue;
     private TraverseOptions options;
-    private HashSet<Vertex> targets = null; // why was this a set of String not Vertex?
+    private HashSet<Vertex> closed;
     
     private int hopLimit;
     private Graph graph;
@@ -52,23 +61,13 @@ public class Dijkstra {
         this.options = options;
         this.taboo = taboo;
         this.hopLimit = hopLimit;
-
-        /* Knowing that these are hop- or weight-limited searches called
-         * in a tight loop, it is important not to set the initial size 
-         * too large, otherwise a ton of time is wasted at each iteration
-         * initializing unused queue/heap elements. This makes an immense 
-         * difference in contraction hierarchy construction time, more than 
-         * any other change or optimization I have tried. (AMB) 
-         * 
-         * A good guess would be: ceiling(graph.averageDegree) ** hoplimit
-         */
-        spt = new BasicShortestPathTree(50);
-        queue = new BinHeap<State>(50);
-        // Never init time to 0 since traverseBack will give times less than 0
-        // which in certain cases can trigger
-        State init = new State(origin);
-        spt.add(init);
-        queue.insert(init, init.getWeight());
+        spt = new BasicShortestPathTree();
+        
+        queue = new FibHeap<SPTVertex>(graph.getVertices().size());
+        State init = new State();
+        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
+        queue.insert(spt_origin, spt_origin.weightSum);
+        closed = new HashSet<Vertex> ();
     }
     
     /**
@@ -83,88 +82,162 @@ public class Dijkstra {
 
     public BasicShortestPathTree getShortestPathTree(Vertex target, double weightLimit) {
         
-        while (!queue.empty()) { 
-            
-        	State su = queue.extract_min(); 
-            if ( ! spt.visit(su)) 
-            	continue;
-            
-            if (su.exceedsWeightLimit(weightLimit))
-                return spt;
+        // Iteration Variables
+        SPTVertex spt_u, spt_v;
 
-            Vertex u = su.getVertex();
-            if (u == target)
+        closed.add(taboo);
+        
+        while (!queue.empty()) { // Until the priority queue is empty:
+            spt_u = queue.peek_min(); // get the lowest-weightSum Vertex 'u',
+            if (spt_u.weightSum > weightLimit) {
+                return spt;
+            }
+
+            Vertex fromv = spt_u.mirror;
+            if (fromv == target)
                 break;
 
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
+            queue.extract_min();
+            
+            closed.add(fromv);
+
+            Iterable<Edge> outgoing = graph.getOutgoing(spt_u.mirror);
+
             for (Edge edge : outgoing) {
-            	State sv = edge.traverse(su, options);
-                if (sv != null
-                	&& spt.add(sv) 
-                	&& ! sv.exceedsHopLimit(hopLimit))
-                        queue.insert(sv, sv.getWeight());
-            }
-            
-        }
-        return spt;
-    }
-    
+                State state = spt_u.state;
 
-    
-    @SuppressWarnings("unchecked")
-	public BasicShortestPathTree getShortestPathTree(double weightLimit, int nodeLimit) {
-        
-//        if (targets != null) {
-//            targets.remove(origin);
-//        }
-    	// clone targets since they will be checked off destructively
-    	HashSet<String> remainingTargets = null;
-    	if (targets != null)
-    		remainingTargets = (HashSet<String>) targets.clone();
-
-        while (!queue.empty()) {
-            
-            State su = queue.extract_min();
-
-            if ( ! spt.visit(su)) 
-            	continue;
-
-            Vertex u = su.getVertex();
-            
-            if (nodeLimit-- <= 0) 
-            	break;
-            
-            if (remainingTargets != null) {
-                remainingTargets.remove(u);
-                if (remainingTargets.isEmpty())
-                	break;
-            }
-            
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
-            for (Edge edge : outgoing) {
-//                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
-//                    //only consider street edges when contracting
-//                    // use isContractable() ?
-//                    continue;
-//                }
-            	if ( ! (ContractionHierarchy.isContractable(edge)))
-            		continue;
-            	
-                State sv = edge.traverse(su, options);
+                TraverseResult wr = edge.traverse(state, options);
+                // When an edge leads nowhere (as indicated by returning NULL), the iteration is
+                // over.
+                if (wr == null) {
+                    continue;
+                }
                 
-                if (sv != null
-                	&& sv.getVertex() != taboo
-                	&& spt.add(sv)
-                	&& !sv.exceedsHopLimit(hopLimit) 
-                	&& !sv.exceedsWeightLimit(weightLimit))
-                        queue.insert(sv, sv.getWeight());
-            }
+                if (wr.weight < 0) {
+                    throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge " + edge);
+                }
+                
+                EdgeNarrative er = wr.getEdgeNarrative();
+                Vertex toVertex = er.getToVertex();
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
+                
+                double new_w = spt_u.weightSum + wr.weight;
+             
+                spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
 
+                if (spt_v != null) {
+                    spt_v.setParent(spt_u, edge,er);
+
+                    if (spt_u.hops < hopLimit) {
+                        queue.insert_or_dec_key(spt_v, new_w);
+                    }
+                }
+            }
+        }
+        return spt;
+    }
+    
+    private HashMap<Vertex, List<VertexIngress>> neighbors;
+    private HashSet<String> targets = null;
+    
+    public BasicShortestPathTree getShortestPathTree(double weightLimit, int nodeLimit) {
+        
+        // Iteration Variables
+        SPTVertex spt_u, spt_v;
+
+        if (targets != null) {
+            targets.remove(origin);
+        }
+        
+        closed.add(taboo);
+
+        while (!queue.empty()) { // Until the priority queue is empty:
+            
+            spt_u = queue.peek_min(); // get the lowest-weightSum Vertex 'u',
+
+            Vertex fromv = spt_u.mirror;
+
+            if (nodeLimit-- <= 0) {
+                return spt;
+            }
+            queue.extract_min();
+            
+            closed.add(fromv);
+            if (targets != null) {
+                targets.remove(fromv);
+                if (targets.size() == 0) {
+                    // all targets reached
+                    return spt;
+                }
+            }
+            
+            Iterable<Edge> outgoing = graph.getOutgoing(fromv);
+            State state = spt_u.state;
+
+            for (Edge edge : outgoing) {
+                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
+                    //only consider street edges when contracting
+                    continue;
+                }
+
+                TraverseResult wr = edge.traverse(state, options);
+
+                // When an edge leads nowhere (as indicated by returning NULL), the iteration is
+                // over.
+                if (wr == null) {
+                    continue;
+                }
+                
+                if (wr.weight < 0) {
+                    throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge " + edge);
+                }
+                
+                EdgeNarrative er = wr.getEdgeNarrative();
+                Vertex toVertex = er.getToVertex();
+
+                if (closed.contains(toVertex)) {
+                    continue;
+                }
+                
+                double new_w = spt_u.weightSum + wr.weight;
+
+                spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
+
+                if (spt_v != null) {
+                    spt_v.setParent(spt_u, edge,er);
+                    
+                    if (spt_u.hops < hopLimit && new_w < weightLimit) {
+                        queue.insert_or_dec_key(spt_v, new_w);
+                    }
+                }
+
+                if (neighbors != null && neighbors.containsKey(toVertex)) {
+                    SPTVertex parent = spt.getVertex(toVertex);
+                    for (VertexIngress w : neighbors.get(toVertex)) {
+                        State newState = wr.state.incrementTimeInSeconds((int) w.time);
+                        double neighborWeight = w.weight + new_w;
+                        if (neighborWeight < weightLimit) {
+                            SPTVertex spt_w = spt.addVertex(w.vertex, newState, neighborWeight, options, spt_u.hops + 2);
+                            if (spt_w != null) {
+                                spt_w.setParent(parent, w.edge,w.edge);
+                                queue.insert_or_dec_key(spt_w, neighborWeight);
+                            }
+                        }
+                    }
+                }
+                
+            }
         }
         return spt;
     }
 
-    public void setTargets(HashSet<Vertex> targets) {
+    public void setNeighbors(HashMap<Vertex, List<VertexIngress>> neighbors2) {
+        this.neighbors = neighbors2;
+    }
+    
+    public void setTargets(HashSet<String> targets) {
         this.targets = targets;
     }
 }
