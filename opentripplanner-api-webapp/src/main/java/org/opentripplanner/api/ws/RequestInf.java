@@ -21,130 +21,136 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 
 public interface RequestInf {
 
-    public static String FROM = "fromPlace";
-    public static String TO = "toPlace";
-    public static String INTERMEDIATE_PLACES = "intermediatePlaces";
-    public static String DATE = "date";
-    public static String TIME = "time";
+	public static String FROM = "fromPlace";
+	public static String TO = "toPlace";
+	public static String INTERMEDIATE_PLACES = "intermediatePlaces";
+	public static String DATE = "date";
+	public static String TIME = "time";
 
-    public static String MAX_WALK_DISTANCE = "maxWalkDistance";
-    public static String OPTIMIZE = "optimize";
-    public static String MODE = "mode";
-    public static String NUMBER_ITINERARIES = "numItineraries";
-    public static String SHOW_INTERMEDIATE_STOPS = "showIntermediateStops";
+	public static String MAX_WALK_DISTANCE = "maxWalkDistance";
+	public static String OPTIMIZE = "optimize";
+	public static String MODE = "mode";
+	public static String NUMBER_ITINERARIES = "numItineraries";
+	public static String SHOW_INTERMEDIATE_STOPS = "showIntermediateStops";
 
-    public static String ARRIVE_BY = "arriveBy";
-    public static String WALK_SPEED = "walkSpeed";
-    public static String WHEELCHAIR = "wheelchair";
-    public static String MIN_TRANSFER_TIME = "minTransferTime";
+	public static String PREFERRED_ROUTES = "preferredRoutes";
+	public static String UNPREFERRED_ROUTES = "unpreferredRoutes";
 
-    /**
-     * @return the from
-     */
-    public String getFrom();
+	public static String ARRIVE_BY = "arriveBy";
+	public static String WALK_SPEED = "walkSpeed";
+	public static String WHEELCHAIR = "wheelchair";
+	public static String MIN_TRANSFER_TIME = "minTransferTime";
 
-    /**
-     * @param from
-     *            the from to set
-     */
-    public void setFrom(String from);
+	/**
+	 * @return the from
+	 */
+	public String getFrom();
 
-    /**
-     * @return the to
-     */
-    public String getTo();
+	/**
+	 * @param from
+	 *            the from to set
+	 */
+	public void setFrom(String from);
 
-    /**
-     * @param to
-     *            the to to set
-     */
-    public void setTo(String to);
+	/**
+	 * @return the to
+	 */
+	public String getTo();
 
-    /**
-     * @return the walk
-     */
-    public Double getMaxWalkDistance();
+	/**
+	 * @param to
+	 *            the to to set
+	 */
+	public void setTo(String to);
 
-    /**
-     * @param walk
-     *            the walk to set
-     */
-    public void setMaxWalkDistance(Double walk);
+	/**
+	 * @return the walk
+	 */
+	public Double getMaxWalkDistance();
 
-    /**
-     * @return the modes
-     */
-    public TraverseModeSet getModes();
-    
-    /**
-     * @param modes
-     *            the modes to set
-     */
-    public void addMode(TraverseMode mode);
+	/**
+	 * @param walk
+	 *            the walk to set
+	 */
+	public void setMaxWalkDistance(Double walk);
 
-    /** */
-    public void setModes(TraverseModeSet mode);
+	/**
+	 * @return the modes
+	 */
+	public TraverseModeSet getModes();
 
-    /**
-     * @return the optimize
-     */
-    public OptimizeType getOptimize();
+	/**
+	 * @param modes
+	 *            the modes to set
+	 */
+	public void addMode(TraverseMode mode);
 
-    /**
-     * @param optimize
-     *            the optimize to set
-     */
-    public void setOptimize(OptimizeType opt);
+	/** */
+	public void setModes(TraverseModeSet mode);
 
-    /**
-     * @return the dateTime
-     */
-    public Date getDateTime();
+	/**
+	 * @return the optimize
+	 */
+	public OptimizeType getOptimize();
 
-    /**
-     * @param dateTime
-     *            the dateTime to set
-     */
-    public void setDateTime(Date dateTime);
+	/**
+	 * @param optimize
+	 *            the optimize to set
+	 */
+	public void setOptimize(OptimizeType opt);
 
-    /**
-     * @param dateTime
-     *            the dateTime to set
-     */
-    public void setDateTime(String date, String time);
+	/**
+	 * @return the dateTime
+	 */
+	public Date getDateTime();
 
-    /**
-     * @return whether the trip is an arriveBy trip (true) or a departAfter trip (false)
-     */
-    public boolean isArriveBy();
+	/**
+	 * @param dateTime
+	 *            the dateTime to set
+	 */
+	public void setDateTime(Date dateTime);
 
-    /**
-     * Sets the trip to an arriveBy trip (true) or a departAfter trip (false)
-     */
-    public void setArriveBy(boolean arriveBy);
+	/**
+	 * @param dateTime
+	 *            the dateTime to set
+	 */
+	public void setDateTime(String date, String time);
 
-    /**
-     * @return the numItineraries
-     */
-    public Integer getNumItineraries();
+	/**
+	 * @return whether the trip is an arriveBy trip (true) or a departAfter trip
+	 *         (false)
+	 */
+	public boolean isArriveBy();
 
-    /**
-     * @param numItineraries
-     *            the numItineraries to set
-     */
-    public void setNumItineraries(Integer numItineraries);
+	/**
+	 * Sets the trip to an arriveBy trip (true) or a departAfter trip (false)
+	 */
+	public void setArriveBy(boolean arriveBy);
 
-    public void removeMode(TraverseMode car);
+	/**
+	 * @return the numItineraries
+	 */
+	public Integer getNumItineraries();
 
-    /** 
-     * @param showIntermediateStops
-     *          whether the planner should return intermediate stop lists for transit legs 
-     */
-    public void setShowIntermediateStops(boolean showIntermediateStops);
+	/**
+	 * @param numItineraries
+	 *            the numItineraries to set
+	 */
+	public void setNumItineraries(Integer numItineraries);
 
-    /** 
-     * @return whether the planner should return intermediate stop lists for transit legs 
-     */
-    public boolean getShowIntermediateStops();
+	public void removeMode(TraverseMode car);
+
+	/**
+	 * @param showIntermediateStops
+	 *            whether the planner should return intermediate stop lists for
+	 *            transit legs
+	 */
+	public void setShowIntermediateStops(boolean showIntermediateStops);
+
+	/**
+	 * @return whether the planner should return intermediate stop lists for
+	 *         transit legs
+	 */
+	public boolean getShowIntermediateStops();
 
 }

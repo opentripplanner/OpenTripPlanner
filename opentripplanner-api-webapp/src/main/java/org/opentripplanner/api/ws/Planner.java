@@ -46,6 +46,7 @@ import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -130,6 +131,12 @@ public class Planner {
      * 
      * @param numItineraries
      *            The maximum number of possible itineraries to return.
+     *            
+     * @param preferredRoutes
+     *            The list of preferred routes.
+     * 
+     * @param unpreferredRoutes
+     *            The list of unpreferred routes.
      * 
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
@@ -152,7 +159,9 @@ public class Planner {
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
             @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
-            @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops)
+            @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops,
+            @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
+            @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -190,6 +199,14 @@ public class Planner {
         if (intermediatePlaces != null && intermediatePlaces.size() > 0
                 && !intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
+        }
+        if (preferredRoutes != null && !preferredRoutes.equals("")) {
+            String[] table = preferredRoutes.split(",");
+            request.setPreferredRoutes(table);
+        }
+        if (unpreferredRoutes != null && !unpreferredRoutes.equals("")) {
+            String[] table = unpreferredRoutes.split(",");
+            request.setUnpreferredRoutes(table);
         }
 
         request.setOptimize(optimize);
@@ -595,6 +612,24 @@ public class Planner {
         }
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();
+        }
+        if (request.getPreferredRoutes()!= null){
+            for(String element : request.getPreferredRoutes()){
+            	String[] routeSpec = element.split("_", 2);
+            	if (routeSpec.length != 2) {
+                    throw new IllegalArgumentException("AgencyId or routeId not set in preferredRoutes list");
+                }
+                options.preferredRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
+            }
+        }
+        if (request.getUnpreferredRoutes()!= null){
+        	for(String element : request.getUnpreferredRoutes()){
+            	String[] routeSpec = element.split("_", 2);
+            	if (routeSpec.length != 2) {
+                    throw new IllegalArgumentException("AgencyId or routeId not set in unpreferredRoutes list");
+                }
+                options.unpreferredRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
+            }
         }
         return options;
     }

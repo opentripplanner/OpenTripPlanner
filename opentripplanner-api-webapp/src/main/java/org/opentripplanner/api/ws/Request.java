@@ -84,6 +84,16 @@ public class Request implements RequestInf {
      */
     private boolean showIntermediateStops = false;
     
+    /**
+     * List of preffered routes. 
+     */
+    private String[] preferredRoutes;
+    
+    /**
+     * List of unpreferred routes.
+     */
+    private String[] unpreferredRoutes;
+    
     /** 
      * The complete list of parameters.
      */
@@ -356,5 +366,21 @@ public class Request implements RequestInf {
     
     public Integer getMinTransferTime() {
         return minTransferTime;
+    }
+    
+    public void setPreferredRoutes(String[] preferredRoutes) {
+        this.preferredRoutes = preferredRoutes;
+    }
+
+    public String[] getPreferredRoutes() {
+        return preferredRoutes;
+    }
+
+    public void setUnpreferredRoutes(String[] unpreferredRoutes) {
+        this.unpreferredRoutes = unpreferredRoutes;
+    }
+
+    public String[] getUnpreferredRoutes() {
+        return unpreferredRoutes;
     }
 }

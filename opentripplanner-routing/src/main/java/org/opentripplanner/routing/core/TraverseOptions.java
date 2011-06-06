@@ -101,6 +101,29 @@ public class TraverseOptions implements Serializable, Cloneable {
      * Do not use certain named routes, probably because we're trying to find alternate itineraries.
      */
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
+    
+    /**
+     * Set of preferred routes by user.
+     */
+    public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
+    
+    /**
+     *  Penalty added for using every route that is not preferred if user set any route as preferred.
+     *  We return number of seconds that we are willing to wait for preferred route.
+     */
+    public long useAnotherThanPreferredRoutesPenalty = 300;
+    
+    /**
+     * Set of unpreferred routes for given user.
+     */
+    public HashSet<RouteSpec> unpreferredRoutes = new HashSet<RouteSpec>();
+
+    /**
+     *  Penalty added for using every unpreferred route. 
+     *  We return number of seconds that we are willing to wait for preferred route.
+     */
+    public long useUnpreferredRoutesPenalty = 300;
+    
 
     /**
      * The worst possible time (latest for depart-by and earliest for arrive-by) that we will accept

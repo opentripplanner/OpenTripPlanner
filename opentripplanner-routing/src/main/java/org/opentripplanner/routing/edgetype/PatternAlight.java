@@ -125,6 +125,25 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 return null;
             }
         }
+        
+        /* check if route is preferred for this plan */
+        long preferences_penalty = 0;
+        if (options.preferredRoutes != null && options.preferredRoutes.size()>0) {
+            Route route = trip.getRoute();
+            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+            if (!options.preferredRoutes.contains(spec)) {
+            	preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
+            }
+        }
+        
+        /* check if route is unpreferred for this plan*/
+        if (options.unpreferredRoutes != null && options.unpreferredRoutes.size()>0) {
+            Route route = trip.getRoute();
+            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+            if (options.unpreferredRoutes.contains(spec)) {
+            	preferences_penalty += options.useUnpreferredRoutesPenalty;
+            }
+        }
 
         Editor editor = state0.edit();
         editor.setTrip(bestPatternIndex);
@@ -144,7 +163,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             wait_cost *= options.waitReluctance;
         }
         
-        return new TraverseResult(wait_cost, editor.createState(), this);
+        return new TraverseResult(wait_cost + preferences_penalty, editor.createState(), this);
     }
 
     @Override
