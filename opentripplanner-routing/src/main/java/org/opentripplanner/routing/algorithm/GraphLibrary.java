@@ -21,15 +21,21 @@ public class GraphLibrary {
         Collection<Edge> incoming = null;
 
         if (tov instanceof HasEdges) {
+
+            /**
+             * As a performance tweak, note that we don't examine 'extraEdges' if the Vertex
+             * implements HasEdges, since the whole point is to avoid the HashMap lookup.
+             */
             incoming = extendEdges(incoming, ((HasEdges) tov).getIncoming());
+            
         } else {
             GraphVertex gv = graph.getGraphVertex(tov);
             if (gv != null)
                 incoming = extendEdges(incoming, gv.getIncoming());
-        }
 
-        if (extraEdges != null && extraEdges.containsKey(tov))
-            incoming = extendEdges(incoming, extraEdges.get(tov));
+            if (extraEdges != null && extraEdges.containsKey(tov))
+                incoming = extendEdges(incoming, extraEdges.get(tov));
+        }
 
         if (incoming == null)
             incoming = Collections.emptyList();
@@ -43,15 +49,21 @@ public class GraphLibrary {
         Collection<Edge> outgoing = null;
 
         if (fromv instanceof HasEdges) {
+            
+            /**
+             * As a performance tweak, note that we don't examine 'extraEdges' if the Vertex
+             * implements HasEdges, since the whole point is to avoid the HashMap lookup.
+             */
             outgoing = extendEdges(outgoing, ((HasEdges) fromv).getOutgoing());
+            
         } else {
             GraphVertex gv = graph.getGraphVertex(fromv);
             if (gv != null)
                 outgoing = extendEdges(outgoing, gv.getOutgoing());
-        }
 
-        if (extraEdges != null && extraEdges.containsKey(fromv))
-            outgoing = extendEdges(outgoing, extraEdges.get(fromv));
+            if (extraEdges != null && extraEdges.containsKey(fromv))
+                outgoing = extendEdges(outgoing, extraEdges.get(fromv));
+        }
 
         if (fromv instanceof StreetLocation) {
             StreetLocation sl = (StreetLocation) fromv;
