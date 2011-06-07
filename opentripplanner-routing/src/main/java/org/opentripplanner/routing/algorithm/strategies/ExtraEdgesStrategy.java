@@ -41,7 +41,7 @@ public interface ExtraEdgesStrategy {
     public void addOutgoingEdgesForOrigin(Map<Vertex, List<Edge>> extraEdges, Vertex origin);
 
     /**
-     * Add any outgoing eges from vertices in the graph to the target vertex in a forward search.
+     * Add any outgoing edges from vertices in the graph to the target vertex in a forward search.
      * 
      * @param extraEdges
      * @param target
