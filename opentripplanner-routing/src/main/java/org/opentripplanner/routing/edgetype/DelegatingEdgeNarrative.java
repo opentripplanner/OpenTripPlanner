@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
+
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -8,7 +10,7 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
-    EdgeNarrative base;
+    protected EdgeNarrative base;
 
     public DelegatingEdgeNarrative(EdgeNarrative base) {
 	this.base = base;
@@ -34,8 +36,8 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
         return base.getName();
     }
     
-    public String getNote() {
-    	return base.getNote();
+    public Set<String> getNotes() {
+    	return base.getNotes();
     }
 
     @Override

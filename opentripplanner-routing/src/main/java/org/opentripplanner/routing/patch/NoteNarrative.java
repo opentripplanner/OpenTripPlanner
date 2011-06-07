@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.patch;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 
@@ -26,7 +29,15 @@ public class NoteNarrative extends DelegatingEdgeNarrative {
 	}
 	
 	@Override
-	public String getNote() {
-		return note;
+	public Set<String> getNotes() {
+		Set<String> baseNotes = base.getNotes();
+		HashSet<String> notes;
+		if (baseNotes != null) {
+			 notes = new HashSet<String>(baseNotes);
+		} else {
+			notes = new HashSet<String>(1);
+		}
+		notes.add(note);
+		return notes;
 	}
 }

@@ -12,9 +12,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.ws;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -30,7 +31,6 @@ import org.opentripplanner.api.model.patch.PatchCreationResponse;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.patch.PatchSet;
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.patch.StopNotePatch;
 import org.opentripplanner.routing.services.PatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -71,25 +71,31 @@ public class Patcher {
 			@QueryParam("id") String id) throws JSONException {
 
 		PatchResponse response = new PatchResponse();
-		List<Patch> patches = patchservice.getStopPatches(new AgencyAndId(agency, id));
+		Collection<Patch> patches = patchservice.getStopPatches(new AgencyAndId(agency, id));
 		for (Patch patch : patches) {
 			response.addPatch(patch);
 		}
 		return response;
 	}
-/* This is commented out until we get some security in place.
+
+	@RolesAllowed("user")
 	@POST
 	@Path("/patch")
 	@Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 			MediaType.TEXT_XML })
-	@Consumes("application/xml")
+	@Consumes( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
 	public PatchCreationResponse createPatches(PatchSet patches) throws JSONException {
 		PatchCreationResponse response = new PatchCreationResponse();
 		for (Patch patch : patches.patches) {
-			patchservice.apply(patch);
-			response.id = patch.getId();
+			if (patch.getId() == null) {
+				response.status = "Every patch must have an id";
+				return response;
+			}
 		}
+		for (Patch patch : patches.patches) {
+			patchservice.apply(patch);
+		}
+		response.status = "OK";
 		return response;
 	}
-	*/
 }

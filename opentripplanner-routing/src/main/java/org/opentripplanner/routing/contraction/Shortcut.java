@@ -15,6 +15,7 @@ package org.opentripplanner.routing.contraction;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -151,7 +152,7 @@ public class Shortcut implements DirectEdge, Serializable {
         return false;
     }
 
-    public String getNote() {
+    public Set<String> getNotes() {
     	return null;
     }
     

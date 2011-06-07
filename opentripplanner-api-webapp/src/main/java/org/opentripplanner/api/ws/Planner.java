@@ -15,6 +15,7 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -359,12 +360,14 @@ public class Planner {
             /* grab base edge and associated narrative information from SPT edge */
             edge = sptEdge.payload;
             edgeNarrative = sptEdge.narrative;
-            String note = edgeNarrative.getNote();
-			if (note != null) {
+            Set<String> notes = edgeNarrative.getNotes();
+			if (notes != null) {
 				if (leg == null) {
-					notesForNewLeg.add(note);
+					notesForNewLeg.addAll(notes);
 				} else {
-					leg.addNote(note);
+					for (String note : notes) {
+						leg.addNote(note);
+					}
 				}
 			}
             

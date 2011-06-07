@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
@@ -73,7 +74,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     
     private boolean roundabout = false;
 
-    private String note;
+    private Set<String> notes;
     
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
@@ -303,12 +304,12 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return roundabout;
     }
 
-    public String getNote() {
-    	return note;
+    public Set<String> getNotes() {
+    	return notes;
     }
     
-    public void setNote(String note) {
-    	this.note = note;
+    public void setNote(Set<String> notes) {
+    	this.notes = notes;
     }
     
     @Override

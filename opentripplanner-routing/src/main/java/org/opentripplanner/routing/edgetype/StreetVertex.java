@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -74,9 +75,9 @@ public class StreetVertex extends GenericVertex {
 
     private boolean roundabout = false;
 
-	private String note;
+	private Set<String> note;
 
-    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, String note) {
+    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<String> note) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
@@ -415,7 +416,7 @@ public class StreetVertex extends GenericVertex {
         return roundabout;
     }
 
-	public String getNote() {
+	public Set<String> getNotes() {
 		return note;
 	}
 

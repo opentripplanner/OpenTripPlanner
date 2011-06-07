@@ -17,6 +17,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.patch.Patch;
@@ -62,7 +63,7 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
         return null;
     }
     
-    public String getNote() {
+    public Set<String> getNotes() {
     	return null;
     }
     

@@ -257,7 +257,7 @@ public class GenericAStar {
             	return result;
             }
             for (Patch patch : patches) {
-            	if (!patch.activeDuring(state.getStartTime(), state.getTime())) {
+            	if (!patch.activeDuring(options, state.getStartTime(), state.getTime())) {
             		continue;
             	}
                 if (result != null) {
@@ -279,7 +279,7 @@ public class GenericAStar {
             	return result;
             }
         	for (Patch patch : patches) {
-        		if (!patch.activeDuring(state.getStartTime(), state.getTime())) {
+        		if (!patch.activeDuring(options, state.getStartTime(), state.getTime())) {
             		continue;
             	}
                 if (result != null) {

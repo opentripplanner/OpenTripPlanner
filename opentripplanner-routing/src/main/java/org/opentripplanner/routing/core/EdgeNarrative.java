@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.Set;
+
 import org.onebusaway.gtfs.model.Trip;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,6 +43,6 @@ public interface EdgeNarrative {
 
     public boolean isRoundabout();
 
-	public String getNote();
+	public Set<String> getNotes();
 
 }

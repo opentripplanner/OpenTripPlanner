@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -218,7 +219,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	}
 
 	@Override
-	public String getNote() {
-		return fromv.getNote();
+	public Set<String> getNotes() {
+		return fromv.getNotes();
 	}
 }

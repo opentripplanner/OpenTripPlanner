@@ -68,7 +68,7 @@ public class StopNotePatch extends Patch {
 		result = Patch.filterTraverseResultChain(result, new TraverseResultFilter() {
 			public TraverseResult filter(TraverseResult result) {
 				return new TraverseResult(result.weight, result.state, 
-					new NoteNarrative(result.getEdgeNarrative(), notes));
+					new NoteNarrative(result.getEdgeNarrative(), notes ));
 			}
 		});		
 			

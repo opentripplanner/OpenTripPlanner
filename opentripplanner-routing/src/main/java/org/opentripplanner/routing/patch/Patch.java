@@ -16,13 +16,18 @@ package org.opentripplanner.routing.patch;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.TraverseResult;
 
+@XmlType
+@XmlTransient
 public abstract class Patch implements Serializable {
 	private static final long serialVersionUID = 778531395626383517L;
 
@@ -49,7 +54,7 @@ public abstract class Patch implements Serializable {
 	}
 
 	public void setEndTimeOfDay(int endTimeOfDay) {
-		this.endTime = endTimeOfDay;
+		this.endTimeOfDay = endTimeOfDay;
 	}
 
 	@XmlElement
@@ -79,18 +84,25 @@ public abstract class Patch implements Serializable {
 		this.startTimeOfDay = startTimeOfDay;
 	}
 
-	public boolean activeDuring(long start, long end) {
+	public boolean activeDuring(TraverseOptions options, long start, long end) {
 		if (end < startTime || start >= endTime) {
 			return false;
 		}
-		start /= 1000;
-		end /= 1000;
-		long eventStart = start % 86400;
-		long eventEnd = end % 86400;
+
+		int eventStart = -1;
+		int eventEnd = -1;
+		for (ServiceDay sd : options.serviceDays) {
+            eventStart = sd.secondsSinceMidnight(start);
+            eventEnd = sd.secondsSinceMidnight(end);
+            if (eventStart >= 0 && eventStart < 86400) {
+            	break;
+            }
+		}
 		return eventEnd >= startTimeOfDay && eventStart < endTimeOfDay;
 	}
 
-	public static TraverseResult filterTraverseResultChain(TraverseResult result, TraverseResultFilter traverseResultFilter) {
+	public static TraverseResult filterTraverseResultChain(TraverseResult result, 
+			TraverseResultFilter traverseResultFilter) {
 		TraverseResult out = null;
 		for (TraverseResult old = result; old != null; old = old.getNextResult()) {
 			TraverseResult filtered = traverseResultFilter.filter(old);
@@ -124,4 +136,11 @@ public abstract class Patch implements Serializable {
 
 	public abstract TraverseResult filterTraverseResults(TraverseResult result);
 
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	public boolean equals(Object o) {
+		return (o instanceof Patch && ((Patch) o).getId().equals(id));
+	}
 }

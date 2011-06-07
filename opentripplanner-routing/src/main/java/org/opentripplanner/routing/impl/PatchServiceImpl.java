@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
@@ -39,11 +39,11 @@ public class PatchServiceImpl implements PatchService {
     }
 
 	@Override
-	public List<Patch> getStopPatches(AgencyAndId stop) {
+	public Collection<Patch> getStopPatches(AgencyAndId stop) {
 		Graph graph = graphService.getGraph();
 		TransitIndexService index = graph.getService(TransitIndexService.class);
 		
-		List<Patch> patches = new ArrayList<Patch>();
+		HashSet<Patch> patches = new HashSet<Patch>();
 		
 		Edge edge = index.getPrealightEdge(stop);
 		addAllPatchesFromEdge(patches, edge);
@@ -54,7 +54,7 @@ public class PatchServiceImpl implements PatchService {
 		return patches;
 	}
 
-	private void addAllPatchesFromEdge(List<Patch> patches, Edge edge) {
+	private void addAllPatchesFromEdge(HashSet<Patch> patches, Edge edge) {
 		List<Patch> edgePatches = edge.getPatches();
 		if (edgePatches != null) {
 			patches.addAll(edgePatches);
