@@ -32,6 +32,7 @@ public class NominatimGeocoder implements Geocoder {
     private String nominatimUrl;
     private Integer resultLimit;
     private String viewBox;
+    private String emailAddress;
     
     private NominatimJsonDeserializer nominatimJsonDeserializer; 
     
@@ -62,7 +63,15 @@ public class NominatimGeocoder implements Geocoder {
     public void setViewBox(String viewBox) {
         this.viewBox = viewBox;
     }
-    
+
+    public String getEmailAddress() {
+        return emailAddress;
+    }
+
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
+    }
+
         
     @Override 
     public GeocoderResults geocode(String address) {
@@ -109,6 +118,9 @@ public class NominatimGeocoder implements Geocoder {
         }
         if (resultLimit != null) {
             uriBuilder.queryParam("limit", resultLimit);
+        }
+        if (emailAddress != null) {
+            uriBuilder.queryParam("email", emailAddress);
         }
         
         URI uri = uriBuilder.build();
