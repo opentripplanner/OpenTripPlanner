@@ -13,6 +13,7 @@
 
 package org.opentripplanner.geocoder;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -59,6 +60,8 @@ public class GeocoderResults {
     }
     
     public void addResult(GeocoderResult result) {
+        if (results == null)
+            results = new ArrayList<GeocoderResult>();
         results.add(result);
     }
 
