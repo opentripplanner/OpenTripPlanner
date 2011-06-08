@@ -18,15 +18,13 @@ import java.util.List;
 
 public class NominatimJsonDeserializer {
     
-    @SuppressWarnings("unchecked")
-    private JSONDeserializer jsonDeserializer;
+    private JSONDeserializer<List<NominatimGeocoderResult>> jsonDeserializer;
     
     public NominatimJsonDeserializer() {
             jsonDeserializer = new JSONDeserializer<List<NominatimGeocoderResult>>().use("values", NominatimGeocoderResult.class);
     }
     
-    @SuppressWarnings("unchecked")
     public List<NominatimGeocoderResult> parseResults(String content) {
-            return (List<NominatimGeocoderResult>) jsonDeserializer.deserialize(content);
+            return jsonDeserializer.deserialize(content);
     }
 }
