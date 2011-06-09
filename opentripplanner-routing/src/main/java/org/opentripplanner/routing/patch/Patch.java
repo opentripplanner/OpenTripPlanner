@@ -33,8 +33,8 @@ public abstract class Patch implements Serializable {
 
 	private long endTime;
 	private long startTime;
-	private int startTimeOfDay;
-	private int endTimeOfDay;
+	private int startTimeOfDay = 0; //by default, the whole day
+	private int endTimeOfDay = 86400;
 	protected String notes;
 
 	private String id;
