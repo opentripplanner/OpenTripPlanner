@@ -69,6 +69,6 @@ Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, e
 function Otp(username, password) {
     this.username = username;
     this.password = password;
-    this.baseUrl = 'http://localhost:7080/opentripplanner-api-webapp/ws/patch/';
+    this.baseUrl = Config.otpAPIBaseUrl + '/ws/patch/';
 
 }

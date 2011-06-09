@@ -76,15 +76,28 @@ Admin.prototype.initStopSearchForm = function() {
     otp.createStopNotePatch($('#stopNoteFormAgencyId').val(),
 			    $('#stopNoteFormStopId').val(),
 			    $('#note').val(),
-			    $('#startTime').val(),
-			    $('#endTime').val(),
-			    $('#startTimeOfDay').val(),
-			    $('#endTimeOfDay').val(),
+			    dateTimeToMillis($('#startTime').val()),
+			    dateTimeToMillis($('#endTime').val()),
+			    timeToSeconds($('#startTimeOfDay').val()),
+			    timeToSeconds($('#endTimeOfDay').val()),
 			    admin, admin.createdNote());
     return false;
   });
 
+  $('.datetimepicker').datetimepicker();
+  $('.timepicker').timepicker({});
 };
+
+function dateTimeToMillis(datetime) {
+  return Date.parse(datetime);
+}
+
+function timeToSeconds(time) {
+  var parts = time.split(":");
+  var hours = parts[0];
+  var minutes = parts[1];
+  return hours * 3600 + minutes * 60;
+}
 
 function Admin(oba) {
   this.oba = oba;

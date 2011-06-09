@@ -1,15 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-    <title>OpenTripPlanner Map</title>
+    <title>OpenTripPlanner Admin</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
     <script src="js/jquery.tmpl.min.js"></script>
+    <script src="js/jquery-ui-timepicker-addon.js"></script>
+    <script src="js/config.js"></script>
     <script src="js/oba.js"></script>
     <script src="js/otpapi.js"></script>
     <script src="js/admin.js"></script>
     <script src="js/sha1.js"></script>
     <script src="js/wsse.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/stylesheet.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.6/themes/smoothness/jquery-ui.css" media="screen"/>
+
 </head>
 
 <body>
@@ -55,13 +61,13 @@ Notes<br/>
 </textarea>
 <br/>
 Start Time<br/>
-<input name="startTime" type="text" id="startTime" /><br/>
+<input name="startTime" type="text" id="startTime" class="datetimepicker" /><br/>
 End Time<br/>
-<input name="endTime" type="text" id="endTime" /><br/>
+<input name="endTime" type="text" id="endTime" class="datetimepicker" /><br/>
 Start Time of Day<br/>
-<input name="startTimeOfDay" type="text" id="startTimeOfDay" /><br/>
+<input name="startTimeOfDay" type="text" id="startTimeOfDay" class="timepicker" /><br/>
 End Time of Day<br/>
-<input name="endTimeOfDay" type="text" id="endTimeOfDay" /><br/>
+<input name="endTimeOfDay" type="text" id="endTimeOfDay" class="timepicker" /><br/>
 
 <input type="submit" name="submit" value="Create" />
 </form>

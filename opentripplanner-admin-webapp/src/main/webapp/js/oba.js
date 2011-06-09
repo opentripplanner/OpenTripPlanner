@@ -40,5 +40,5 @@ Oba.prototype.failure = function(data) {
 };
 
 function Oba() {
-  this.baseUrl = "http://soak-api.onebusaway.org/api/where/";
+  this.baseUrl = Config.obaAPIBaseUrl;
 }
