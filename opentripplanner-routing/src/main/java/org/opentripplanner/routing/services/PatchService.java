@@ -9,6 +9,8 @@ public interface PatchService {
 
 	Collection<Patch> getStopPatches(AgencyAndId stop);
 
+	Collection<Patch> getRoutePatches(AgencyAndId route);
+	
 	void apply(Patch patch);
 	
 }

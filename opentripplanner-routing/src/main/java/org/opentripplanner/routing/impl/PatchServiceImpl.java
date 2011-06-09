@@ -24,6 +24,8 @@ import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.routing.transit_index.RouteSegment;
+import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -68,6 +70,35 @@ public class PatchServiceImpl implements PatchService {
 			patch.apply(graph);
 			patches.add(patch.getId());
 		}
+	}
+
+	@Override
+	public Collection<Patch> getRoutePatches(AgencyAndId route) {
+		Graph graph = graphService.getGraph();
+		TransitIndexService index = graph.getService(TransitIndexService.class);
+		HashSet<Patch> patches = new HashSet<Patch>();
+		
+		for (RouteVariant variant : index.getVariantsForRoute(route)) {
+			for (RouteSegment segment : variant.getSegments()) {
+				if (segment.board != null) {
+					patches.addAll(segment.board.getPatches());
+				}
+				if (segment.alight != null) {
+					patches.addAll(segment.alight.getPatches());
+				}
+				if (segment.hopIn != null) {
+					patches.addAll(segment.hopIn.getPatches());
+				}
+				if (segment.dwell != null) {
+					patches.addAll(segment.dwell.getPatches());
+				}
+				if (segment.hopOut != null) {
+					patches.addAll(segment.hopOut.getPatches());
+				}
+			}
+		}
+		
+		return patches;
 	}
 
 }
