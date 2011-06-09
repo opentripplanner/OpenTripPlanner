@@ -30,20 +30,30 @@ import org.onebusaway.gtfs.model.Trip;
  * the D line to Coney Island after 59th St (or from Coney Island to 59th).
  * 
  * This is needed because route names are intended for customer information, but
- * scheduling personnel need to know about where a particular trip actually goes.
+ * scheduling personnel need to know about where a particular trip actually
+ * goes.
  * 
  * @author novalis
  * 
  */
 public class RouteVariant implements Serializable {
 	private static final long serialVersionUID = -3110443015998033630L;
-	
+
+	/*
+	 * This indicates that trips with multipledirection_ids are part of this
+	 * variant. It should probably never be used, because generally trips making
+	 * the same stops in the same order will have the same direction
+	 */
+	private static final String MULTIDIRECTION = "[multidirection]";
+
 	private String name; // "N via Whitehall"
 	private ArrayList<AgencyAndId> trips;
 	private ArrayList<Stop> stops;
 
 	private ArrayList<RouteSegment> segments;
 	private Route route;
+
+	private String direction;
 
 	public RouteVariant(Route route, ArrayList<Stop> stops) {
 		this.route = route;
@@ -54,10 +64,21 @@ public class RouteVariant implements Serializable {
 
 	public void addTrip(Trip trip) {
 		trips.add(trip.getId());
+		if (direction == null) {
+			direction = trip.getDirectionId();
+		} else {
+			if (!direction.equals(trip.getDirectionId())) {
+				direction = MULTIDIRECTION;
+			}
+		}
 	}
 
 	public void addSegment(RouteSegment segment) {
 		segments.add(segment);
+	}
+
+	public List<RouteSegment> getSegments() {
+		return segments;
 	}
 
 	public void cleanup() {
@@ -88,5 +109,13 @@ public class RouteVariant implements Serializable {
 
 	public String toString() {
 		return "RouteVariant(" + name + ")";
+	}
+
+	public void setDirection(String direction) {
+		this.direction = direction;
+	}
+
+	public String getDirection() {
+		return direction;
 	}
 }
