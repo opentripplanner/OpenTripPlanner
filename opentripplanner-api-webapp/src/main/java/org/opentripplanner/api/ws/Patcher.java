@@ -53,9 +53,7 @@ public class Patcher {
 	}
 
 	/**
-	 * This is the primary entry point for the web service and is used for
-	 * patching the graph. All parameters are passed in the query string. To get
-	 * the necessary names for things, use the TransitIndex.
+	 * Return a list of all patches that apply to a given stop
 	 * 
 	 * @return Returns either an XML or a JSON document, depending on the HTTP
 	 *         Accept header of the client making the request.
@@ -72,6 +70,30 @@ public class Patcher {
 
 		PatchResponse response = new PatchResponse();
 		Collection<Patch> patches = patchservice.getStopPatches(new AgencyAndId(agency, id));
+		for (Patch patch : patches) {
+			response.addPatch(patch);
+		}
+		return response;
+	}
+
+	/**
+	 * Return a list of all patches that apply to a given route
+	 * 
+	 * @return Returns either an XML or a JSON document, depending on the HTTP
+	 *         Accept header of the client making the request.
+	 * 
+	 * @throws JSONException
+	 */
+	@GET
+	@Path("/routePatches")
+	@Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
+			MediaType.TEXT_XML })
+	public PatchResponse getRoutePatches(
+			@QueryParam("agency") String agency,
+			@QueryParam("id") String id) throws JSONException {
+
+		PatchResponse response = new PatchResponse();
+		Collection<Patch> patches = patchservice.getRoutePatches(new AgencyAndId(agency, id));
 		for (Patch patch : patches) {
 			response.addPatch(patch);
 		}
