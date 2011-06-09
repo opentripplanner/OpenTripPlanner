@@ -27,9 +27,7 @@
 		<bean class="org.opentripplanner.api.authentication.SimpleUserDetailsService">
 		<property name="users">
 		<list>
-		<!-- To add a user, do this:
-		<value>admin=theadminpassword</value>
-		-->
+			<value>admin=theadminpassword</value>
 		</list>
 		</property>
 		</bean>

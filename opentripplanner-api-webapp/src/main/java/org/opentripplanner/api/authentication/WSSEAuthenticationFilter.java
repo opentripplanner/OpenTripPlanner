@@ -99,7 +99,7 @@ public class WSSEAuthenticationFilter extends GenericFilterBean {
 
 		String[] tokenParts = wsseHeader.split(", ");
 		if (tokenParts.length != 4) {
-			throw new BadCredentialsException("Wrong number of parts");
+			throw new BadCredentialsException("Wrong number of parts (expected 4 got " + tokenParts.length + ")");
 		}
 
 		String[] method_username = tokenParts[0].split(" ");

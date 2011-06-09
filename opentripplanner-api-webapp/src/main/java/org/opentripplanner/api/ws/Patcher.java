@@ -31,6 +31,7 @@ import org.opentripplanner.api.model.patch.PatchCreationResponse;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.patch.PatchSet;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.patch.StopNotePatch;
 import org.opentripplanner.routing.services.PatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -75,6 +76,15 @@ public class Patcher {
 		for (Patch patch : patches) {
 			response.addPatch(patch);
 		}
+		StopNotePatch snp = new StopNotePatch();
+		snp.setNotes("notes");
+		snp.setId("id");
+		snp.setStartTime(100);
+		snp.setEndTime(1000);
+		snp.setStartTimeOfDay(0);
+		snp.setEndTime(86400);
+		response.addPatch(snp);
+
 		return response;
 	}
 
