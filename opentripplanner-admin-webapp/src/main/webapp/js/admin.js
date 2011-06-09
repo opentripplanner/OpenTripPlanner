@@ -17,8 +17,8 @@ Admin.prototype.success = function(data) {
   var stop_data = data.data;
 
   $('#stopResults').replaceWith($.tmpl("stop", stop_data));
-  $('#routeResults').empty();
-
+  $('#routes').empty();
+  $('#routesHeader').show();
   $.each(stop_data.routes,
     function(index, route) {
       $('#routes').append($.tmpl("route", route));
@@ -42,6 +42,7 @@ Admin.prototype.createdNote = function(data) {
 };
 
 Admin.prototype.initStopSearchForm = function() {
+  $('.hidden').hide();
 
   $.template( "stop", 'Stop Name: <span id="stop-name">${id}</span><br/>' +
 	      'Lat: <span id="stop-lat">${lat}</span><br/>' +
@@ -66,9 +67,11 @@ Admin.prototype.initStopSearchForm = function() {
   });
 
   var noteForm = $('#stopNoteForm');
-  noteForm.hide();
   noteForm.submit(function(event) {
     event.preventDefault();
+    if (!$("#stopNoteForm").validate().form()) {
+      return;
+    }
     var username = $('#username').val();
     var password = $('#password').val();
 
@@ -86,6 +89,46 @@ Admin.prototype.initStopSearchForm = function() {
 
   $('.datetimepicker').datetimepicker();
   $('.timepicker').timepicker({});
+  this.initValidator();
+
+};
+
+jQuery.validator.addMethod("date", function(value, element) {
+  return this.optional(element) || !isNaN(Date.parse(value));
+}, "Must be a valid date-time (2011-07-03 15:37)");
+
+jQuery.validator.addMethod("time", function(value, element) {
+  return this.optional(element) || /^[0-9]{1,2}:[0-9]{2}$/i.test(value);
+}, "Must be a valid time (15:37)");
+
+
+Admin.prototype.initValidator = function() {
+  $("#stopNoteForm").validate({
+    rules: {
+      username: "required",
+      password: "required",
+      startTime: {
+	required: true,
+	date: true
+      },
+      endTime: {
+	required: true,
+	date: true
+      },
+      startTimeOfDay: {
+	required: true,
+	time: true
+      },
+      endTimeOfDay: {
+	required: true,
+	time: true
+      },
+      notes: {
+	required: true,
+	minlength: 2
+      }
+    }
+  });
 };
 
 function dateTimeToMillis(datetime) {

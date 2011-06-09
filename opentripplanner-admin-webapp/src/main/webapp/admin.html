@@ -6,6 +6,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js"></script>
     <script src="js/jquery.tmpl.min.js"></script>
     <script src="js/jquery-ui-timepicker-addon.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/oba.js"></script>
     <script src="js/otpapi.js"></script>
@@ -49,7 +50,8 @@ Stop id<br/>
 
 </div>
 
-<form action="#" id="stopNoteForm">
+<form action="#" id="stopNoteForm" class="hidden">
+Add a note to this stop:<br/>
 <input name="agency" type="hidden" id="stopNoteFormAgencyId" />
 <input name="stop" type="hidden" id="stopNoteFormStopId" />
 Username<br/>
@@ -65,15 +67,18 @@ Start Time<br/>
 End Time<br/>
 <input name="endTime" type="text" id="endTime" class="datetimepicker" /><br/>
 Start Time of Day<br/>
-<input name="startTimeOfDay" type="text" id="startTimeOfDay" class="timepicker" /><br/>
+<input name="startTimeOfDay" type="text" id="startTimeOfDay" class="timepicker"  value="00:00"/><br/>
 End Time of Day<br/>
-<input name="endTimeOfDay" type="text" id="endTimeOfDay" class="timepicker" /><br/>
+<input name="endTimeOfDay" type="text" id="endTimeOfDay" class="timepicker" value="24:00" /><br/>
 
 <input type="submit" name="submit" value="Create" />
 </form>
 
+<div id="routesHeader" class="hidden">
+<h2>Notes for this route</h2>
+</div>
+<div id="routes" class="hidden">
 
-<div id="routes">
 
 </div>
 
