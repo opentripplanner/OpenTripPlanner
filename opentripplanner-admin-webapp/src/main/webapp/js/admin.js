@@ -19,12 +19,16 @@ Admin.prototype.gotObaStopResults = function(data) {
   var stop_data = data.data;
 
   $('#stopResults').html($.tmpl("stop", stop_data));
-  $('#routes').empty();
+  $('#stopResults').show();
+
+  $('#routes tr:not(.header)').remove();
   $('#routesHeader').show();
+
   $.each(stop_data.routes,
     function(index, route) {
       $('#routes').append($.tmpl("route", route));
     });
+  $('#routes').show();
 
   $('#stopNoteForm').show();
   $('#stopNoteFormAgencyId').val('TriMet'); //should be stop_data.agency.id, but this is not actually the agency id found in the GTFS
@@ -82,11 +86,11 @@ Admin.prototype.initStopSearchForm = function() {
 	      'Lon: <span id="stop-lon">${lon}</span><br/>' +
 	      'Code: <span id="stop-code">${code}</span>');
 
-  $.template( "route", '<div>' +
-	      'Route id: <span id="route-id">${id}</span><br/>' +
-	      'Route description: <span id="route-description">${description}</span><br/>' +
-	      'Route type: <span id="route-type">${type}</span>' +
-	      '</div>');
+  $.template( "route", '<tr>' +
+	      'Route id: <td>${id}</td>' +
+	      'Route description: <td>${description}</td>' +
+	      'Route type: <td>${type}</td>' +
+	      '</tr>');
 
 
   var admin = this;

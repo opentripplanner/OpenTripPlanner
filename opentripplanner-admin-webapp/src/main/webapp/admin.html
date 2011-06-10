@@ -43,9 +43,22 @@ Stop id<br/>
 </form>
 
 
-<div id="stopResults">
+<div id="stopResults" class="hidden">
 
 </div>
+
+<div id="routesHeader" class="hidden">
+<h2>Routes for this stop</h2>
+</div>
+<table id="routes" class="hidden">
+<tr class="header">
+  <th>Route id</th>
+  <th>Route description</th>
+  <th>Route type</th>
+</tr>
+
+</table>
+
 
 <table id="patches" class="hidden">
 <tbody>
@@ -89,16 +102,6 @@ End Time of Day<br/>
 
 <input type="submit" name="submit" value="Create" />
 </form>
-
-<div id="routesHeader" class="hidden">
-<h2>Notes for this route</h2>
-</div>
-<div id="routes" class="hidden">
-
-
-</div>
-
-</span>
 
 </div>
 
