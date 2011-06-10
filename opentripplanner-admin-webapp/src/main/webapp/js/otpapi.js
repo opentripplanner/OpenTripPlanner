@@ -48,6 +48,19 @@ Otp.prototype.createId = function() {
   return id;
 };
 
+Otp.prototype.getPatchesForStop = function(agency, stop_id, context, success) {
+  var url = this.baseUrl + "stopPatches?agency=" + agency + "&id=" + stop_id;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    dataType: 'json',
+    context: context,
+    success: success,
+    failure: this.failure
+  });
+
+};
+
 Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, endTime, startTimeOfDay, endTimeOfDay, context, success) {
   var id = this.createId();
   var patch = '<PatchSet>'
@@ -58,7 +71,7 @@ Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, e
     + '<endTime>' + endTime + '</endTime>'
     + '<startTimeOfDay>' + startTimeOfDay + '</startTimeOfDay>'
     + '<endTimeOfDay>' + endTimeOfDay + '</endTimeOfDay>'
-    + '<note>' + note + '</note>'
+    + '<notes>' + note + '</notes>'
     + '</StopNotePatch>'
     + '</PatchSet>';
 

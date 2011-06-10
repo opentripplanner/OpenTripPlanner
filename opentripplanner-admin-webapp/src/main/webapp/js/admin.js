@@ -13,7 +13,7 @@
 
 
 /* This is called when we get results back from an oba get stop api call */
-Admin.prototype.success = function(data) {
+Admin.prototype.gotObaStopResults = function(data) {
   /* fill in the results */
 
   var stop_data = data.data;
@@ -31,12 +31,41 @@ Admin.prototype.success = function(data) {
 
   //parse real stop id out of agency-and-id format
   var parts = stop_data.id.split("_", 2);
-  stop_id = parts[1];
+  var stop_id = parts[1];
   $('#stopNoteFormStopId').val(stop_id);
+
+  //get a list of patches for this stop
+  var otp = new Otp(undefined, undefined); //for queries, which don't need username/password
+  otp.getPatchesForStop('TriMet', stop_id, this, this.gotPatchesForStop);
 
 };
 
+Admin.prototype.gotPatchesForStop = function (data) {
+  var patchtable = $('#patches');
+  $('#patches tr:not(.header)').remove();
+  var stopNotePatches = data.patches.StopNotePatch;
+  $.each(stopNotePatches, function(index, patch) {
+    patchtable.append("<tr>"
+		      + "<td>" + patch.stop.@id + "</td>"
+		      + "<td>" + patch.notes + "</td>"
+		      + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toTimeString(patch.startTimeOfDay) + "</td>"
+		      + "<td>" + toTimeString(patch.endTimeOfDay) + "</td>"
+		      + "</tr>"
+		     );
+  });
+
+  patchtable.show();
+};
+
 Admin.prototype.createdNote = function(data) {
+  //refresh patch list
+  this.otp.getPatchesForStop($('#stopNoteFormAgencyId').val(),
+			$('#stopNoteFormStopId').val(),
+			this, this.gotPatchesForStop);
+
+  //show message
   $('#message').html("Created note!");
   $('#message').show();
   $('#stopNoteForm')[0].reset();
@@ -63,7 +92,7 @@ Admin.prototype.initStopSearchForm = function() {
     event.preventDefault();
     var id = $('#idInput').val();
     var agency = $('#agencyInput').val();
-    admin.oba.getStopById(agency, id, "Admin.prototype.success");
+    admin.oba.getStopById(agency, id, "Admin.prototype.gotObaStopResults");
     return false;
   });
 
@@ -79,15 +108,14 @@ Admin.prototype.initStopSearchForm = function() {
     var otp = new Otp(username, password);
     otp.createStopNotePatch($('#stopNoteFormAgencyId').val(),
 			    $('#stopNoteFormStopId').val(),
-			    $('#note').val(),
+			    $('#notes').val(),
 			    dateTimeToMillis($('#startTime').val()),
 			    dateTimeToMillis($('#endTime').val()),
 			    timeToSeconds($('#startTimeOfDay').val()),
 			    timeToSeconds($('#endTimeOfDay').val()),
 			    admin, admin.createdNote);
-    return false;
+    return false
   });
-
   $('.datetimepicker').datetimepicker();
   $('.timepicker').timepicker({});
   this.initValidator();
@@ -143,6 +171,29 @@ function timeToSeconds(time) {
   return hours * 3600 + minutes * 60;
 }
 
+function toDate(millisecondsStr) {
+  return new Date(parseInt(millisecondsStr));
+}
+
+function padWithZeros(number, length) {
+
+var str = '' + number;
+while (str.length < length) {
+  str = '0' + str;
+}
+
+  return str;
+}
+
+function toTimeString(secondsStr) {
+  var seconds = parseInt(secondsStr);
+  var hours = Math.floor(seconds / 3600);
+  seconds -= hours * 3600;
+  var minutes = Math.floor(hours / 3600);
+  return padWithZeros(hours, 2) + ":" + padWithZeros(minutes, 2);
+}
+
 function Admin(oba) {
   this.oba = oba;
+  this.otp = new Otp(undefined, undefined); //for queries, which don't need username/password
 };
