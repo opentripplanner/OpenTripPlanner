@@ -72,6 +72,9 @@ Admin.prototype.createdNote = function(data) {
 };
 
 Admin.prototype.initStopSearchForm = function() {
+  if (Config.defaultAgency != null) {
+    $('#agencyInput').val(Config.defaultAgency);
+  }
   $('.hidden').hide();
 
   $.template( "stop", 'Stop Name: <span id="stop-name">${id}</span><br/>' +
