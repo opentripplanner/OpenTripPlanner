@@ -32,15 +32,19 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 
 	private HashMap<AgencyAndId, Edge> preBoardEdges;
 
+	private HashMap<AgencyAndId, List<String>> directionsForRoute;
+
 	public TransitIndexServiceImpl(
 			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
 			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
 			HashMap<AgencyAndId, Edge> preBoardEdges,
-			HashMap<AgencyAndId, Edge> preAlightEdges) {
+			HashMap<AgencyAndId, Edge> preAlightEdges,
+			HashMap<AgencyAndId, List<String>> directionsForRoute) {
 		this.variantsByRoute = variantsByRoute;
 		this.variantsByTrip = variantsByTrip;
 		this.preBoardEdges = preBoardEdges;
 		this.preAlightEdges = preAlightEdges;
+		this.directionsForRoute = directionsForRoute;
 	}
 
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
@@ -59,6 +63,11 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 	@Override
 	public Edge getPreboardEdge(AgencyAndId stop) {
 		return preBoardEdges.get(stop);
+	}
+
+	@Override
+	public List<String> getDirectionsForRoute(AgencyAndId route) {
+		return directionsForRoute.get(route);
 	}
 
 }

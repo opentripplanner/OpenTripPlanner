@@ -31,7 +31,6 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -103,6 +102,11 @@ public class TestPatch extends TestCase {
 				ArrayList<RouteVariant> variants = new ArrayList<RouteVariant>();
 				variants.add(variant);
 				return variants;
+			}
+
+			@Override
+			public List<String> getDirectionsForRoute(AgencyAndId route) {
+				return null;
 			}
 		};
 		graph.putService(TransitIndexService.class, index);

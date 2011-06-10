@@ -27,4 +27,6 @@ public interface TransitIndexService {
 	public Edge getPreboardEdge(AgencyAndId stop);
 
 	public Edge getPrealightEdge(AgencyAndId stop);
+
+	public List<String> getDirectionsForRoute(AgencyAndId route);
 }

@@ -63,7 +63,14 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private static final Logger _log = LoggerFactory.getLogger(TransitIndexBuilder.class);
 
 	private GtfsRelationalDao dao;
-
+	
+	private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
+	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
+	private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
+	private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
+	private HashMap<AgencyAndId, List<String>> directionsByRoute = new HashMap<AgencyAndId, List<String>>();
+	
+	
 	@Override
 	public void setDao(GtfsRelationalDao dao) {
 		this.dao = dao;
@@ -72,10 +79,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 	@Override
 	public void buildGraph(Graph graph) {
 		_log.debug("Building transit index");
-		HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
-		HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
-		HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
-		HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
 		
 		// this is keyed by the arrival vertex
 		HashMap<Vertex, RouteSegment> segmentsByVertex = new HashMap<Vertex, RouteSegment>();
@@ -110,14 +113,12 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 				if (e instanceof Alight || e instanceof Hop
 						|| e instanceof Dwell) {
 					Trip trip = ((AbstractEdge) e).getTrip();
-					variant = addTripToVariant(variantsByTrip, variantsByRoute,
-							trip);
+					variant = addTripToVariant(trip);
 				} else if (e instanceof PatternAlight
 						|| e instanceof PatternHop || e instanceof PatternDwell) {
 					TripPattern pattern = ((PatternEdge) e).getPattern();
 					Trip exemplar = pattern.getExemplar();
-					variant = addTripToVariant(variantsByTrip, variantsByRoute,
-							exemplar);
+					variant = addTripToVariant(exemplar);
 					for (Trip trip : pattern.getTrips()) {
 						variantsByTrip.put(trip.getId(), variant);
 					}
@@ -145,13 +146,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
 				if (e instanceof Board || e instanceof Hop) {
 					Trip trip = ((AbstractEdge) e).getTrip();
-					variant = addTripToVariant(variantsByTrip, variantsByRoute,
-							trip);
+					variant = addTripToVariant(trip);
 				} else if (e instanceof PatternBoard || e instanceof PatternHop) {
 					TripPattern pattern = ((PatternEdge) e).getPattern();
 					Trip exemplar = pattern.getExemplar();
-					variant = addTripToVariant(variantsByTrip, variantsByRoute,
-							exemplar);
+					variant = addTripToVariant(exemplar);
 					for (Trip trip : pattern.getTrips()) {
 						variantsByTrip.put(trip.getId(), variant);
 					}
@@ -183,7 +182,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 		_log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
 		
 		TransitIndexService service = new TransitIndexServiceImpl(
-				variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges);
+				variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute);
 		graph.putService(TransitIndexService.class, service);
 	}
 
@@ -366,15 +365,18 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 		return segment;
 	}
 
-	private RouteVariant addTripToVariant(
-			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
-			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute, Trip trip) {
+	private RouteVariant addTripToVariant(Trip trip) {
 		// have we seen this trip before?
 		RouteVariant variant = variantsByTrip.get(trip.getId());
 		if (variant != null) {
 			variant.addTrip(trip);
 			return variant;
 		}
+		
+		if (trip.getDirectionId() != null) {
+			addToHashList(directionsByRoute, trip.getRoute().getId(), trip.getDirectionId());
+		}
+		
 		// build the list of stops for this trip
 		List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
 		ArrayList<Stop> stops = new ArrayList<Stop>();

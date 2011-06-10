@@ -64,9 +64,15 @@ public class TransitIndexBuilderTest extends TestCase {
 		//route 18 is the only bidirectional route in the test data
 		List<RouteVariant> variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "18"));
 		assertEquals(2, variantsForRoute.size());
+
+		List<String> directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "18"));
+		assertEquals(2, directionsForRoute.size());
 		
 		variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "2"));
 		assertEquals(1, variantsForRoute.size());
 		
+		directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "2"));
+		assertNull(directionsForRoute);
+
 	}
 }
