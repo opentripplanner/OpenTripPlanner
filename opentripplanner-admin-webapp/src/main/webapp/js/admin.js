@@ -12,6 +12,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 
+function Admin(oba) {
+  this.oba = oba;
+  this.otp = new Otp(undefined, undefined); //for queries, which don't need username/password
+};
+
 /* This is called when we get results back from an oba get stop api call */
 Admin.prototype.gotObaStopResults = function(data) {
   /* fill in the results */
@@ -26,6 +31,9 @@ Admin.prototype.gotObaStopResults = function(data) {
 
   $.each(stop_data.routes,
     function(index, route) {
+      var agencyAndId = parseAgencyAndId(route.id);
+      route.id = agencyAndId.id;
+      route.agency = agencyAndId.agency;
       $('#routes').append($.tmpl("route", route));
     });
   $('#routes').show();
@@ -34,14 +42,53 @@ Admin.prototype.gotObaStopResults = function(data) {
   $('#stopNoteFormAgencyId').val('TriMet'); //should be stop_data.agency.id, but this is not actually the agency id found in the GTFS
 
   //parse real stop id out of agency-and-id format
-  var parts = stop_data.id.split("_", 2);
-  var stop_id = parts[1];
-  $('#stopNoteFormStopId').val(stop_id);
+  var agencyAndId = parseAgencyAndId(stop_data.id);
+  $('#stopNoteFormStopId').val(agencyAndId.id);
 
   //get a list of patches for this stop
   var otp = new Otp(undefined, undefined); //for queries, which don't need username/password
-  otp.getPatchesForStop('TriMet', stop_id, this, this.gotPatchesForStop);
+  otp.getPatchesForStop('TriMet', agencyAndId.id, this, this.gotPatchesForStop);
 
+};
+
+Admin.prototype.gotRouteData = function(route_data) {
+
+  $('#variants tr:not(.header)').remove();
+  $('#variantsHeader').show();
+
+  $.each(route_data.variants,
+    function(index, variant) {
+      $('#variants').append($.tmpl("variant", variant));
+    });
+  $('#variants').show();
+
+  $('#routeNoteForm').show();
+  $('#routeNoteFormAgencyId').val(route_data.id.agency);
+  $('#routeNoteFormRouteId').val(route_data.id.id);
+
+  //get a list of patches for this route
+  this.otp.getPatchesForRoute(route_data.id.agency, route_data.id.id, this, this.gotPatchesForRoute);
+
+};
+
+
+Admin.prototype.gotPatchesForStop = function (data) {
+  var patchtable = $('#patches');
+  $('#patches tr:not(.header)').remove();
+  var stopNotePatches = data.patches.StopNotePatch;
+  $.each(stopNotePatches, function(index, patch) {
+    patchtable.append("<tr>"
+		      + "<td>" + patch.stop.@id + "</td>"
+		      + "<td>" + patch.notes + "</td>"
+		      + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toTimeString(patch.startTimeOfDay) + "</td>"
+		      + "<td>" + toTimeString(patch.endTimeOfDay) + "</td>"
+		      + "</tr>"
+		     );
+  });
+
+  patchtable.show();
 };
 
 Admin.prototype.gotPatchesForStop = function (data) {
@@ -51,6 +98,26 @@ Admin.prototype.gotPatchesForStop = function (data) {
   $.each(stopNotePatches, function(index, patch) {
     patchtable.append("<tr>"
 		      + "<td>" + patch.stop.@id + "</td>"
+		      + "<td>" + patch.notes + "</td>"
+		      + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
+		      + "<td>" + toTimeString(patch.startTimeOfDay) + "</td>"
+		      + "<td>" + toTimeString(patch.endTimeOfDay) + "</td>"
+		      + "</tr>"
+		     );
+  });
+
+  patchtable.show();
+};
+
+Admin.prototype.gotPatchesForRoute = function (data) {
+  var patchtable = $('#patches');
+  $('#patches tr:not(.header)').remove();
+  var stopNotePatches = data.patches.RouteNotePatch;
+  $.each(stopNotePatches, function(index, patch) {
+    patchtable.append("<tr>"
+		      + "<td>" + patch.route.@id + "</td>"
+		      + "<td>" + patch.direction + "</td>"
 		      + "<td>" + patch.notes + "</td>"
 		      + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
 		      + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
@@ -75,21 +142,35 @@ Admin.prototype.createdNote = function(data) {
   $('#stopNoteForm')[0].reset();
 };
 
-Admin.prototype.initStopSearchForm = function() {
-  if (Config.defaultAgency != null) {
-    $('#agencyInput').val(Config.defaultAgency);
-  }
-  $('.hidden').hide();
+Admin.prototype.init = function() {
 
+  if ($.url.param("agency")) {
+      $('#agencyInput').val($.url.param("agency"));
+  } else {
+    if (Config.defaultAgency != null) {
+      $('#agencyInput').val(Config.defaultAgency);
+    }
+  }
+  $('#idInput').val($.url.param("id"));
+
+  $('.hidden').hide();
+  $('.datetimepicker').datetimepicker();
+  $('.timepicker').timepicker({});
+  this.initValidator();
+
+};
+
+Admin.prototype.initStopSearchForm = function() {
+  this.init();
   $.template( "stop", 'Stop Name: <span id="stop-name">${id}</span><br/>' +
 	      'Lat: <span id="stop-lat">${lat}</span><br/>' +
 	      'Lon: <span id="stop-lon">${lon}</span><br/>' +
 	      'Code: <span id="stop-code">${code}</span>');
 
   $.template( "route", '<tr>' +
-	      'Route id: <td>${id}</td>' +
-	      'Route description: <td>${description}</td>' +
-	      'Route type: <td>${type}</td>' +
+	      '<td><a href="routes.html?agency=${agency}&id=${id}">${id}</td>' +
+	      '<td>${description}</td>' +
+	      '<td>${type}</td>' +
 	      '</tr>');
 
 
@@ -121,13 +202,50 @@ Admin.prototype.initStopSearchForm = function() {
 			    timeToSeconds($('#startTimeOfDay').val()),
 			    timeToSeconds($('#endTimeOfDay').val()),
 			    admin, admin.createdNote);
-    return false
+    return false;
   });
-  $('.datetimepicker').datetimepicker();
-  $('.timepicker').timepicker({});
-  this.initValidator();
 
 };
+
+Admin.prototype.initRouteSearchForm = function() {
+  this.init();
+  $.template( "variant", '<tr>' +
+	      '<td>${name}</td>' +
+	      '</tr>');
+
+  var admin = this;
+  var searchForm = $('#routeSearchForm');
+  searchForm.submit(function(event) {
+    event.preventDefault();
+    var id = $('#idInput').val();
+    var agency = $('#agencyInput').val();
+    admin.otp.getRouteData(agency, id, this, this.gotRouteData);
+    return false;
+  });
+
+  var noteForm = $('#routeNoteForm');
+  noteForm.submit(function(event) {
+    event.preventDefault();
+    if (!$("#routeNoteForm").validate().form()) {
+      return;
+    }
+    var username = $('#username').val();
+    var password = $('#password').val();
+
+    var otp = new Otp(username, password);
+    otp.createRouteNotePatch($('#routeNoteFormAgencyId').val(),
+			    $('#routeNoteFormRouteId').val(),
+			    $('#notes').val(),
+			    dateTimeToMillis($('#startTime').val()),
+			    dateTimeToMillis($('#endTime').val()),
+			    timeToSeconds($('#startTimeOfDay').val()),
+			    timeToSeconds($('#endTimeOfDay').val()),
+			    admin, admin.createdNote);
+    return false
+  });
+
+};
+
 
 jQuery.validator.addMethod("date", function(value, element) {
   return this.optional(element) || !isNaN(Date.parse(value));
@@ -140,6 +258,32 @@ jQuery.validator.addMethod("time", function(value, element) {
 
 Admin.prototype.initValidator = function() {
   $("#stopNoteForm").validate({
+    rules: {
+      username: "required",
+      password: "required",
+      startTime: {
+	required: true,
+	date: true
+      },
+      endTime: {
+	required: true,
+	date: true
+      },
+      startTimeOfDay: {
+	required: true,
+	time: true
+      },
+      endTimeOfDay: {
+	required: true,
+	time: true
+      },
+      notes: {
+	required: true,
+	minlength: 2
+      }
+    }
+  });
+  $("#routeNoteForm").validate({
     rules: {
       username: "required",
       password: "required",
@@ -200,7 +344,10 @@ function toTimeString(secondsStr) {
   return padWithZeros(hours, 2) + ":" + padWithZeros(minutes, 2);
 }
 
-function Admin(oba) {
-  this.oba = oba;
-  this.otp = new Otp(undefined, undefined); //for queries, which don't need username/password
-};
+function parseAgencyAndId(agencyAndId) {
+  var parts = agencyAndId.split("_", 2);
+  return {
+    'agency' : parts[0],
+    'id' : parts[1]
+  };
+}

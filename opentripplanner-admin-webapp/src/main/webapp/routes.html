@@ -29,42 +29,36 @@
     {
        var oba = new Oba();
        var admin = new Admin(oba);
-       admin.initStopSearchForm();
+       admin.initRouteSearchForm();
     });
 
 </script>
 
-Stop search form:
-<form action="#" id="stopSearchForm">
+Route search form:
+<form action="#" id="routeSearchForm">
 Agency<br/>
 <input name="agency" type="text" id="agencyInput" /><br/>
-Stop id<br/>
+Route id<br/>
 <input name="id" type="text" id="idInput" /><br/>
 <input type="submit" name="submit" value="Search" />
 </form>
 
 
-<div id="stopResults" class="hidden">
-
+<div id="variantsHeader" class="hidden">
+<h2>Route variants</h2>
 </div>
-
-<div id="routesHeader" class="hidden">
-<h2>Routes for this stop</h2>
-</div>
-<table id="routes" class="hidden">
+<table id="variants" class="hidden">
+<thead>
 <tr class="header">
-  <th>Route id</th>
-  <th>Route description</th>
-  <th>Route type</th>
+  <th>Variant name</th>
 </tr>
-
 </table>
-
 
 <table id="patches" class="hidden">
 <tbody>
 <tr class="header">
-  <th>Stop id</th>
+  <th>Route id</th>
+  <th>Direction</th>
   <th>Note</th>
   <th>Start time</th>
   <th>End time</th>
@@ -80,14 +74,18 @@ Stop id<br/>
 
 </div>
 
-<form action="#" id="stopNoteForm" class="hidden">
-Add a note to this stop:<br/>
-<input name="agency" type="hidden" id="stopNoteFormAgencyId" />
-<input name="stop" type="hidden" id="stopNoteFormStopId" />
+<form action="#" id="routeNoteForm" class="hidden">
+Add a note to this route:<br/>
+<input name="agency" type="hidden" id="routeNoteFormAgencyId" />
+<input name="route" type="hidden" id="routeNoteFormRouteId" />
 Username<br/>
 <input name="username" type="text" id="username" /><br/>
 Password<br/>
 <input name="password" type="password" id="password" /><br/>
+Direction<br/>
+<select name="direction" id="direction">
+<option value="">All</option>
+</select>
 Notes<br/>
 <textarea name="notes" id="notes" rows="10" cols="60">
 </textarea>
@@ -103,6 +101,8 @@ End Time of Day<br/>
 
 <input type="submit" name="submit" value="Create" />
 </form>
+
+</span>
 
 </div>
 

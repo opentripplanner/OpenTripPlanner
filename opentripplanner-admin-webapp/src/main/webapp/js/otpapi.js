@@ -13,7 +13,7 @@
 
 
 Otp.prototype.sendPatch = function(patch, context, success) {
-  var url = this.baseUrl + "patch";
+  var url = this.baseUrl + "patch/patch";
   $.ajax({
     url: url,
     headers: {
@@ -49,7 +49,7 @@ Otp.prototype.createId = function() {
 };
 
 Otp.prototype.getPatchesForStop = function(agency, stop_id, context, success) {
-  var url = this.baseUrl + "stopPatches?agency=" + agency + "&id=" + stop_id;
+  var url = this.baseUrl + "patch/stopPatches?agency=" + agency + "&id=" + stop_id;
   $.ajax({
     url: url,
     type: 'GET',
@@ -60,6 +60,34 @@ Otp.prototype.getPatchesForStop = function(agency, stop_id, context, success) {
   });
 
 };
+
+Otp.prototype.getPatchesForRoute = function(agency, route_id, context, success) {
+  var url = this.baseUrl + "patch/routePatches?agency=" + agency + "&id=" + route_id;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    dataType: 'json',
+    context: context,
+    success: success,
+    failure: this.failure
+  });
+
+};
+
+
+Otp.prototype.getRouteData = function(agency, route_id, context, success) {
+  var url = this.baseUrl + "transit/routeData?agency=" + agency + "&id=" + route_id;
+  $.ajax({
+    url: url,
+    type: 'GET',
+    dataType: 'json',
+    context: context,
+    success: success,
+    failure: this.failure
+  });
+
+};
+
 
 Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, endTime, startTimeOfDay, endTimeOfDay, context, success) {
   var id = this.createId();
@@ -82,6 +110,6 @@ Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, e
 function Otp(username, password) {
     this.username = username;
     this.password = password;
-    this.baseUrl = Config.otpAPIBaseUrl + '/ws/patch/';
+    this.baseUrl = Config.otpAPIBaseUrl + '/ws/';
 
 }

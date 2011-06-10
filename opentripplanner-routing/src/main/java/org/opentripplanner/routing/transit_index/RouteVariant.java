@@ -17,10 +17,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.patch.AgencyAndIdListAdapter;
 
 /**
  * This represents a particular stop pattern on a particular route. For example,
@@ -47,7 +52,11 @@ public class RouteVariant implements Serializable {
 	private static final String MULTIDIRECTION = "[multidirection]";
 
 	private String name; // "N via Whitehall"
+	
+	//@XmlElementWrapper
+	@XmlJavaTypeAdapter(AgencyAndIdListAdapter.class)
 	private ArrayList<AgencyAndId> trips;
+	
 	private ArrayList<Stop> stops;
 
 	private ArrayList<RouteSegment> segments;
@@ -55,6 +64,10 @@ public class RouteVariant implements Serializable {
 
 	private String direction;
 
+	public RouteVariant() {
+		//needed for JAXB but unused
+	}
+	
 	public RouteVariant(Route route, ArrayList<Stop> stops) {
 		this.route = route;
 		this.stops = stops;
@@ -115,6 +128,7 @@ public class RouteVariant implements Serializable {
 		this.direction = direction;
 	}
 
+	@XmlElement
 	public String getDirection() {
 		return direction;
 	}
