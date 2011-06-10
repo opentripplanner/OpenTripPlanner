@@ -36,6 +36,5 @@ function generateWSSEHeader(username, password) {
   var created = W3DTF(new Date());
   var password_digest = b64_sha1(nonce + created + password);
   var header = 'UsernameToken Username="' + username + '", PasswordDigest="' + password_digest + '", Nonce="' + nonce + '", Created="' + created + '"';
-  console.log(header);
   return header;
 }

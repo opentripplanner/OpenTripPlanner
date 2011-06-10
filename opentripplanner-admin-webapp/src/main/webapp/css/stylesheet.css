@@ -25,3 +25,7 @@
     vertical-align: middle;
 }
 
+#message {
+    background: #CCFFEE;
+    border: 1px solid black;
+}

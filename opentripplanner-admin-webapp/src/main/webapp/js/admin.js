@@ -11,12 +11,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+
+/* This is called when we get results back from an oba get stop api call */
 Admin.prototype.success = function(data) {
   /* fill in the results */
 
   var stop_data = data.data;
 
-  $('#stopResults').replaceWith($.tmpl("stop", stop_data));
+  $('#stopResults').html($.tmpl("stop", stop_data));
   $('#routes').empty();
   $('#routesHeader').show();
   $.each(stop_data.routes,
@@ -32,13 +34,12 @@ Admin.prototype.success = function(data) {
   stop_id = parts[1];
   $('#stopNoteFormStopId').val(stop_id);
 
-
-
 };
 
 Admin.prototype.createdNote = function(data) {
-  $('message').empty();
-  $('message').append("Created note!");
+  $('#message').html("Created note!");
+  $('#message').show();
+  $('#stopNoteForm')[0].reset();
 };
 
 Admin.prototype.initStopSearchForm = function() {
@@ -83,7 +84,7 @@ Admin.prototype.initStopSearchForm = function() {
 			    dateTimeToMillis($('#endTime').val()),
 			    timeToSeconds($('#startTimeOfDay').val()),
 			    timeToSeconds($('#endTimeOfDay').val()),
-			    admin, admin.createdNote());
+			    admin, admin.createdNote);
     return false;
   });
 
