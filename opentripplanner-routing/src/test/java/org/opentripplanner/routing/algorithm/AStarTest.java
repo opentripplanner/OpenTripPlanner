@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -115,15 +116,25 @@ public class AStarTest {
 
         List<State> states = path.states;
 
-        assertEquals(7, states.size());
+        assertTrue(states.size() == 6 || states.size() == 7);
 
         assertEquals("56th_24th", states.get(0).getVertex().getLabel());
-        assertEquals("market_24th", states.get(1).getVertex().getLabel());
-        assertEquals("market_ballard", states.get(2).getVertex().getLabel());
-        assertEquals("market_22nd", states.get(3).getVertex().getLabel());
-        assertEquals("market_leary", states.get(4).getVertex().getLabel());
-        assertEquals("leary_vernon", states.get(5).getVertex().getLabel());
-        assertEquals("leary_20th", states.get(6).getVertex().getLabel());
+        
+        int n;
+        //we could go either way around the block formed by 56th, 22nd, market, and 24th.
+		if (states.size() == 7) {
+        	assertEquals("market_24th", states.get(1).getVertex().getLabel());
+        	assertEquals("market_ballard", states.get(2).getVertex().getLabel());
+        	n = 0;
+        } else {
+        	assertEquals("56th_22nd", states.get(1).getVertex().getLabel());
+        	n = -1;
+        }
+        
+        assertEquals("market_22nd", states.get(n+3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(n+4).getVertex().getLabel());
+        assertEquals("leary_vernon", states.get(n+5).getVertex().getLabel());
+        assertEquals("leary_20th", states.get(n+6).getVertex().getLabel());
     }
 
     @Test
@@ -255,19 +266,16 @@ public class AStarTest {
 
         @Override
         public TraverseMode getMode() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public String getName() {
-            // TODO Auto-generated method stub
             return null;
         }
 
         @Override
         public Geometry getGeometry() {
-            // TODO Auto-generated method stub
             return null;
         }
 
