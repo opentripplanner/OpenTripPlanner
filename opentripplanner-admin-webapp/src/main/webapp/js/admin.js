@@ -38,16 +38,16 @@ Admin.prototype.gotObaStopResults = function(data) {
     });
   $('#routes').show();
 
-  $('#stopNoteForm').show();
-  $('#stopNoteFormAgencyId').val('TriMet'); //should be stop_data.agency.id, but this is not actually the agency id found in the GTFS
+  $('#noteForm').show();
 
   //parse real stop id out of agency-and-id format
   var agencyAndId = parseAgencyAndId(stop_data.id);
-  $('#stopNoteFormStopId').val(agencyAndId.id);
+  $('#noteFormStopId').val(agencyAndId.id);
+  $('#noteFormAgencyId').val(agencyAndId.agency);
 
   //get a list of patches for this stop
   var otp = new Otp(undefined, undefined); //for queries, which don't need username/password
-  otp.getPatchesForStop('TriMet', agencyAndId.id, this, this.gotPatchesForStop);
+  otp.getPatchesForStop(agencyAndId.agency, agencyAndId.id, this, this.gotPatchesForStop);
 
 };
 
@@ -62,12 +62,19 @@ Admin.prototype.gotRouteData = function(route_data) {
     });
   $('#variants').show();
 
-  $('#routeNoteForm').show();
-  $('#routeNoteFormAgencyId').val(route_data.id.agency);
-  $('#routeNoteFormRouteId').val(route_data.id.id);
+  $('#noteForm').show();
+  $('#noteFormAgencyId').val(route_data.id.@agency);
+  $('#noteFormRouteId').val(route_data.id.@id);
+
+  //populate direction select
+  options = '<option value="">All</option>';
+  $.each(route_data.directions.directions, function(index, direction) {
+      options += '<option value="'+ direction +'">' + direction + '</option>';
+  });
+  $('#direction').html(options);
 
   //get a list of patches for this route
-  this.otp.getPatchesForRoute(route_data.id.agency, route_data.id.id, this, this.gotPatchesForRoute);
+  this.otp.getPatchesForRoute(route_data.id.@agency, route_data.id.@id, this, this.gotPatchesForRoute);
 
 };
 
@@ -91,10 +98,31 @@ Admin.prototype.gotPatchesForStop = function (data) {
   patchtable.show();
 };
 
+function showNoPatches() {
+    var patchtable = $('#patches');
+    $('#patches tr:not(.header)').remove();
+    patchtable.append('<tr><td colspan="6"><b>no patches</b></td></tr>');
+    patchtable.show();
+}
+
+//fucking badgerfish is worthless shit
+//this function takes a single object or a list, and if a single object
+//wraps it in a list
+function makeList(objectOrList) {
+    if (!(objectOrList instanceof Array)) {
+        return [objectOrList];
+    }
+    return objectOrList;
+}
+
 Admin.prototype.gotPatchesForStop = function (data) {
+  if (data == null) {
+      showNoPatches();
+      return;
+  }
   var patchtable = $('#patches');
   $('#patches tr:not(.header)').remove();
-  var stopNotePatches = data.patches.StopNotePatch;
+  var stopNotePatches = makeList(data.patches.StopNotePatch);
   $.each(stopNotePatches, function(index, patch) {
     patchtable.append("<tr>"
 		      + "<td>" + patch.stop.@id + "</td>"
@@ -111,36 +139,54 @@ Admin.prototype.gotPatchesForStop = function (data) {
 };
 
 Admin.prototype.gotPatchesForRoute = function (data) {
+  if (data == null) {
+      showNoPatches();
+      return;
+  }
   var patchtable = $('#patches');
   $('#patches tr:not(.header)').remove();
-  var stopNotePatches = data.patches.RouteNotePatch;
-  $.each(stopNotePatches, function(index, patch) {
+  var patches = makeList(data.patches.RouteNotePatch);
+  $.each(patches, function(index, patch) {
     patchtable.append("<tr>"
-		      + "<td>" + patch.route.@id + "</td>"
-		      + "<td>" + patch.direction + "</td>"
-		      + "<td>" + patch.notes + "</td>"
-		      + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
-		      + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
-		      + "<td>" + toTimeString(patch.startTimeOfDay) + "</td>"
-		      + "<td>" + toTimeString(patch.endTimeOfDay) + "</td>"
-		      + "</tr>"
-		     );
+          + "<td>" + patch.route.@id + "</td>"
+          + "<td>" + (patch.direction || 'all') + "</td>"
+          + "<td>" + patch.notes + "</td>"
+          + "<td>" + toDate(patch.startTime).f("yyyy-NNN-d HH:mm") + "</td>"
+          + "<td>" + toDate(patch.endTime).f("yyyy-NNN-d HH:mm") + "</td>"
+          + "<td>" + toTimeString(patch.startTimeOfDay) + "</td>"
+          + "<td>" + toTimeString(patch.endTimeOfDay) + "</td>"
+          + "</tr>"
+         );
   });
 
   patchtable.show();
 };
 
-Admin.prototype.createdNote = function(data) {
+Admin.prototype.createdStopNote = function(data) {
   //refresh patch list
-  this.otp.getPatchesForStop($('#stopNoteFormAgencyId').val(),
-			$('#stopNoteFormStopId').val(),
+  this.otp.getPatchesForStop($('#noteFormAgencyId').val(),
+			$('#noteFormStopId').val(),
 			this, this.gotPatchesForStop);
 
   //show message
   $('#message').html("Created note!");
   $('#message').show();
-  $('#stopNoteForm')[0].reset();
+  $('#noteForm')[0].reset();
 };
+
+
+Admin.prototype.createdRouteNote = function(data) {
+  //refresh patch list
+  this.otp.getPatchesForRoute($('#noteFormAgencyId').val(),
+			$('#noteFormRouteId').val(),
+			this, this.gotPatchesForRoute);
+
+  //show message
+  $('#message').html("Created note!");
+  $('#message').show();
+  $('#noteForm')[0].reset();
+};
+
 
 Admin.prototype.init = function() {
 
@@ -184,24 +230,24 @@ Admin.prototype.initStopSearchForm = function() {
     return false;
   });
 
-  var noteForm = $('#stopNoteForm');
+  var noteForm = $('#noteForm');
   noteForm.submit(function(event) {
     event.preventDefault();
-    if (!$("#stopNoteForm").validate().form()) {
+    if (!$("#noteForm").validate().form()) {
       return;
     }
     var username = $('#username').val();
     var password = $('#password').val();
 
     var otp = new Otp(username, password);
-    otp.createStopNotePatch($('#stopNoteFormAgencyId').val(),
-			    $('#stopNoteFormStopId').val(),
+    otp.createStopNotePatch($('#noteFormAgencyId').val(),
+			    $('#noteFormStopId').val(),
 			    $('#notes').val(),
 			    dateTimeToMillis($('#startTime').val()),
 			    dateTimeToMillis($('#endTime').val()),
 			    timeToSeconds($('#startTimeOfDay').val()),
 			    timeToSeconds($('#endTimeOfDay').val()),
-			    admin, admin.createdNote);
+			    admin, admin.createdStopNote);
     return false;
   });
 
@@ -211,6 +257,7 @@ Admin.prototype.initRouteSearchForm = function() {
   this.init();
   $.template( "variant", '<tr>' +
 	      '<td>${name}</td>' +
+	      '<td>${direction}</td>' +
 	      '</tr>');
 
   var admin = this;
@@ -219,28 +266,29 @@ Admin.prototype.initRouteSearchForm = function() {
     event.preventDefault();
     var id = $('#idInput').val();
     var agency = $('#agencyInput').val();
-    admin.otp.getRouteData(agency, id, this, this.gotRouteData);
+    admin.otp.getRouteData(agency, id, admin, admin.gotRouteData);
     return false;
   });
 
-  var noteForm = $('#routeNoteForm');
+  var noteForm = $('#noteForm');
   noteForm.submit(function(event) {
     event.preventDefault();
-    if (!$("#routeNoteForm").validate().form()) {
+    if (!$("#noteForm").validate().form()) {
       return;
     }
     var username = $('#username').val();
     var password = $('#password').val();
 
     var otp = new Otp(username, password);
-    otp.createRouteNotePatch($('#routeNoteFormAgencyId').val(),
-			    $('#routeNoteFormRouteId').val(),
+    otp.createRouteNotePatch($('#noteFormAgencyId').val(),
+			    $('#noteFormRouteId').val(),
+			    $('#direction').val(),
 			    $('#notes').val(),
 			    dateTimeToMillis($('#startTime').val()),
 			    dateTimeToMillis($('#endTime').val()),
 			    timeToSeconds($('#startTimeOfDay').val()),
 			    timeToSeconds($('#endTimeOfDay').val()),
-			    admin, admin.createdNote);
+			    admin, admin.createdRouteNote);
     return false
   });
 
@@ -257,7 +305,7 @@ jQuery.validator.addMethod("time", function(value, element) {
 
 
 Admin.prototype.initValidator = function() {
-  $("#stopNoteForm").validate({
+  $(".stopNoteForm").validate({
     rules: {
       username: "required",
       password: "required",
@@ -283,7 +331,7 @@ Admin.prototype.initValidator = function() {
       }
     }
   });
-  $("#routeNoteForm").validate({
+  $(".routeNoteForm").validate({
     rules: {
       username: "required",
       password: "required",

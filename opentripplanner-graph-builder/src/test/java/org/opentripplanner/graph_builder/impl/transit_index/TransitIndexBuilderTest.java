@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -65,7 +66,7 @@ public class TransitIndexBuilderTest extends TestCase {
 		List<RouteVariant> variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "18"));
 		assertEquals(2, variantsForRoute.size());
 
-		List<String> directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "18"));
+		Collection<String> directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "18"));
 		assertEquals(2, directionsForRoute.size());
 		
 		variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "2"));

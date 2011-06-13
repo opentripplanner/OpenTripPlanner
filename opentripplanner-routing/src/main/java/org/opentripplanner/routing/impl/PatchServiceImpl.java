@@ -57,6 +57,9 @@ public class PatchServiceImpl implements PatchService {
 	}
 
 	private void addAllPatchesFromEdge(HashSet<Patch> patches, Edge edge) {
+		if (edge == null) {
+			return;
+		}
 		List<Patch> edgePatches = edge.getPatches();
 		if (edgePatches != null) {
 			patches.addAll(edgePatches);
@@ -80,25 +83,23 @@ public class PatchServiceImpl implements PatchService {
 		
 		for (RouteVariant variant : index.getVariantsForRoute(route)) {
 			for (RouteSegment segment : variant.getSegments()) {
-				if (segment.board != null) {
-					patches.addAll(segment.board.getPatches());
-				}
-				if (segment.alight != null) {
-					patches.addAll(segment.alight.getPatches());
-				}
-				if (segment.hopIn != null) {
-					patches.addAll(segment.hopIn.getPatches());
-				}
-				if (segment.dwell != null) {
-					patches.addAll(segment.dwell.getPatches());
-				}
-				if (segment.hopOut != null) {
-					patches.addAll(segment.hopOut.getPatches());
-				}
+				addAllPatchesFrom(patches, segment.board);
+				addAllPatchesFrom(patches, segment.alight);
+				addAllPatchesFrom(patches, segment.hopIn);
+				addAllPatchesFrom(patches, segment.dwell);
+				addAllPatchesFrom(patches, segment.hopOut);
 			}
 		}
 		
 		return patches;
+	}
+
+	private void addAllPatchesFrom(HashSet<Patch> patches, Edge edge) {
+		if (edge != null) {
+			if (edge.getPatches() != null) {
+				patches.addAll(edge.getPatches());
+			}
+		}
 	}
 
 }

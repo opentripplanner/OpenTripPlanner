@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -32,19 +34,19 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 
 	private HashMap<AgencyAndId, Edge> preBoardEdges;
 
-	private HashMap<AgencyAndId, List<String>> directionsForRoute;
+	private HashMap<AgencyAndId,HashSet<String>> directionsForRoute;
 
 	public TransitIndexServiceImpl(
 			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
 			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
 			HashMap<AgencyAndId, Edge> preBoardEdges,
 			HashMap<AgencyAndId, Edge> preAlightEdges,
-			HashMap<AgencyAndId, List<String>> directionsForRoute) {
+			HashMap<AgencyAndId, HashSet<String>> directionsByRoute) {
 		this.variantsByRoute = variantsByRoute;
 		this.variantsByTrip = variantsByTrip;
 		this.preBoardEdges = preBoardEdges;
 		this.preAlightEdges = preAlightEdges;
-		this.directionsForRoute = directionsForRoute;
+		this.directionsForRoute = directionsByRoute;
 	}
 
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
@@ -66,7 +68,7 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 	}
 
 	@Override
-	public List<String> getDirectionsForRoute(AgencyAndId route) {
+	public Collection<String> getDirectionsForRoute(AgencyAndId route) {
 		return directionsForRoute.get(route);
 	}
 

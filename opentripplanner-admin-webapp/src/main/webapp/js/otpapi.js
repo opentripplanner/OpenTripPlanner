@@ -85,7 +85,6 @@ Otp.prototype.getRouteData = function(agency, route_id, context, success) {
     success: success,
     failure: this.failure
   });
-
 };
 
 
@@ -106,6 +105,24 @@ Otp.prototype.createStopNotePatch = function(agency, stop_id, note, startTime, e
   this.sendPatch(patch, context, success);
 };
 
+
+Otp.prototype.createRouteNotePatch = function(agency, route_id, direction, note, startTime, endTime, startTimeOfDay, endTimeOfDay, context, success) {
+  var id = this.createId();
+  var patch = '<PatchSet>'
+    + '<RouteNotePatch>'
+    + '<id>' + id + '</id>'
+    + '<direction>' + direction + '</direction>'
+    + '<route agency= "' + agency + '" id = "' + route_id + '" />'
+    + '<startTime>' + startTime + '</startTime>'
+    + '<endTime>' + endTime + '</endTime>'
+    + '<startTimeOfDay>' + startTimeOfDay + '</startTimeOfDay>'
+    + '<endTimeOfDay>' + endTimeOfDay + '</endTimeOfDay>'
+    + '<notes>' + note + '</notes>'
+    + '</RouteNotePatch>'
+    + '</PatchSet>';
+
+  this.sendPatch(patch, context, success);
+}
 
 function Otp(username, password) {
     this.username = username;

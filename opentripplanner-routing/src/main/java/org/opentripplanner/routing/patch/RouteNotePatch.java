@@ -91,6 +91,9 @@ public class RouteNotePatch extends Patch {
 	}
 
 	public void setDirection(String direction) {
+		if (direction != null && direction.equals("")) {
+			direction = null;
+		}
 		this.direction = direction;
 	}
 

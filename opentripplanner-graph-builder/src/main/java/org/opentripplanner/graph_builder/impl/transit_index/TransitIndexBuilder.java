@@ -68,7 +68,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
 	private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
 	private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
-	private HashMap<AgencyAndId, List<String>> directionsByRoute = new HashMap<AgencyAndId, List<String>>();
+	private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
 	
 	
 	@Override
@@ -374,7 +374,14 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 		}
 		
 		if (trip.getDirectionId() != null) {
-			addToHashList(directionsByRoute, trip.getRoute().getId(), trip.getDirectionId());
+			AgencyAndId routeId = trip.getRoute().getId(); 
+			String directionId = trip.getDirectionId();
+			HashSet<String> directions = directionsByRoute.get(routeId);
+			if (directions == null) {
+				directions = new HashSet<String>();
+				directionsByRoute.put(routeId, directions);
+			}
+			directions.add(directionId);
 		}
 		
 		// build the list of stops for this trip

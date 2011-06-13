@@ -12,6 +12,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.ws;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -63,10 +64,11 @@ public class TransitIndex {
 		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
 		RouteData response = new RouteData();
 		AgencyAndId routeId = new AgencyAndId(agency, id);
+		response.id = routeId;
 		List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
 		
 		response.variants = variants;	
-		response.directions = transitIndexService.getDirectionsForRoute(routeId);
+		response.directions = new ArrayList<String>(transitIndexService.getDirectionsForRoute(routeId));
 		
 		return response;
 	}

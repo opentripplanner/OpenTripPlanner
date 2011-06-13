@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.services;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -28,5 +29,5 @@ public interface TransitIndexService {
 
 	public Edge getPrealightEdge(AgencyAndId stop);
 
-	public List<String> getDirectionsForRoute(AgencyAndId route);
+	public Collection<String> getDirectionsForRoute(AgencyAndId route);
 }

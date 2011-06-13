@@ -31,6 +31,7 @@ import org.opentripplanner.api.model.patch.PatchCreationResponse;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.patch.PatchSet;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.patch.RouteNotePatch;
 import org.opentripplanner.routing.services.PatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -111,6 +112,10 @@ public class Patcher {
 		for (Patch patch : patches.patches) {
 			if (patch.getId() == null) {
 				response.status = "Every patch must have an id";
+				return response;
+			}
+			if (patch instanceof RouteNotePatch && ((RouteNotePatch) patch).getRoute().getId().equals("")) {
+				response.status = "Every route note patch must have a route id";
 				return response;
 			}
 		}
