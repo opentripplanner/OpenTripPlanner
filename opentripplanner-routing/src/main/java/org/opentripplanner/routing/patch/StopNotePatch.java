@@ -20,8 +20,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.services.TransitIndexService;
 
 @XmlRootElement(name="StopNotePatch")
@@ -52,27 +52,8 @@ public class StopNotePatch extends Patch {
 	}
 
 	@Override
-	public TraverseResult addTraverseResult(Edge edge, State s0,
-			TraverseOptions wo) {
-		return null;
-	}
-
-	@Override
-	public TraverseResult addTraverseResultBack(Edge edge, State s0,
-			TraverseOptions wo) {
-		return null;
-	}
-
-	@Override
-	public TraverseResult filterTraverseResults(TraverseResult result) {
-		result = Patch.filterTraverseResultChain(result, new TraverseResultFilter() {
-			public TraverseResult filter(TraverseResult result) {
-				return new TraverseResult(result.weight, result.state, 
-					new NoteNarrative(result.getEdgeNarrative(), notes ));
-			}
-		});		
-			
-		return result;
+	public void filterTraverseResult(StateEditor result) {
+		result.addNote(notes);
 	}
 	
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)

@@ -63,6 +63,7 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
         return null;
     }
     
+
     public Set<String> getNotes() {
     	return null;
     }
@@ -77,6 +78,11 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
         return false;
     }
     
+    @Override
+    public State optimisticTraverse (State s0) {
+    	return this.traverse(s0);
+    }
+        
     @Override
     public void addPatch(Patch patch) {
     	if (patches == null) {

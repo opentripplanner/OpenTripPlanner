@@ -88,13 +88,13 @@ public class TestHopFactory extends TestCase {
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c
                 .getLabel(),
-                new State(new GregorianCalendar(2009, 8, 7, 8, 0, 0).getTimeInMillis()), options);
+                new GregorianCalendar(2009, 8, 7, 8, 0, 0).getTimeInMillis(), options);
 
-        GraphPath path = spt.getPath(stop_c);
+        GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        assertEquals(6, path.vertices.size());
+        assertEquals(6, path.states.size());
         long endTime = new GregorianCalendar(2009, 8, 7, 8, 30, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
     }
 
@@ -113,39 +113,39 @@ public class TestHopFactory extends TestCase {
         GraphPath path;
 
         // A to B
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), 
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
 
-        path = spt.getPath(stop_b);
+        path = spt.getPath(stop_b, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(4, path.states.size());
 
         // A to C
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), 
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
 
-        path = spt.getPath(stop_c);
+        path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        assertEquals(6, path.vertices.size());
+        assertEquals(6, path.states.size());
 
         // A to D
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), 
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
 
-        path = spt.getPath(stop_d);
+        path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 11);
+        assertTrue(path.states.size() <= 11);
         long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
         // A to E
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
 
-        path = spt.getPath(stop_e);
+        path = spt.getPath(stop_e, false);
         assertNotNull(path);
-        assertTrue(path.vertices.size() <= 12);
+        assertTrue(path.states.size() <= 12);
         endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
     }
 }

@@ -13,78 +13,79 @@
 
 package org.opentripplanner.routing.spt;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
+/**
+ * A ShortestPathTree implementation that corresponds to a basic Dijkstra
+ * search, where there is a single optimal state per vertex. It maintains
+ * a closed vertex list since decrease-key operations are not guaranteed 
+ * to be supported by the priority queue.
+ * 
+ * @author andrewbyrd
+ */
 public class BasicShortestPathTree extends AbstractShortestPathTree {
-    private static final long serialVersionUID = -3899613853043676031L;
+    private static final long serialVersionUID = 20110523L; //YYYYMMDD
 
-    HashMap<Vertex, SPTVertex> vertices;
+    private static final int DEFAULT_CAPACITY = 500;
+    Map<Vertex, State> states;
 
+    /**
+     * Parameterless constructor that uses a default capacity for internal
+     * vertex-keyed data structures.
+     */
     public BasicShortestPathTree() {
-        vertices = new HashMap<Vertex, SPTVertex>();
+    	this(DEFAULT_CAPACITY);
     }
 
-    public SPTVertex addVertex(Vertex vv, State ss, double weightSum, TraverseOptions options) {
-        return addVertex (vv, ss, weightSum, options, 1);
-    }
-    
-    public SPTVertex addVertex(Vertex vv, State ss, double weightSum, TraverseOptions options, int hops) {
-        SPTVertex ret = this.vertices.get(vv);
-        if (ret == null) {
-            ret = new SPTVertex(vv, ss, weightSum, options, hops);
-            this.vertices.put(vv, ret);
-        } else {
-            if (hops < ret.hops) {
-                ret.hops = hops;
-            }
-            if (weightSum < ret.weightSum) {
-                ret.weightSum = weightSum;
-                ret.state = ss;
-                ret.options = options;
-            } else {
-                return null;
-            }
-        }
-        return ret;
-    }
-
-    public Collection<SPTVertex> getVertices() {
-        return this.vertices.values();
-    }
-
-    public int size() {
-        return this.vertices.size();
-    }
-
-    
-    public SPTVertex getVertex(Vertex vv) {
-        return this.vertices.get(vv);
-    }
-
-    public GraphPath getPath(Vertex dest) {
-        return getPath(dest, true);
-    }
-    
-    public GraphPath getPath(Vertex dest, boolean optimize) {
-        SPTVertex end = this.getVertex(dest);
-        if (end == null) {
-            return null;
-        }
-
-        return createPathForVertex(end, optimize);
-    }
-
-    public String toString() {
-        return "SPT " + this.vertices.size();
+    /**
+     * Constructor with a parameter indicating the initial capacity of
+     * the data structures holding vertices. This can help avoid resizing
+     * and rehashing these objects during path searches.
+     *  
+     * @param n - the initial size of vertex-keyed maps 
+     */
+    public BasicShortestPathTree(int n) {
+        states = new IdentityHashMap<Vertex, State>(n);
     }
 
     @Override
-    public void removeVertex(SPTVertex vertex) {
-        vertices.remove(vertex.mirror);
+    public boolean add(State state) {
+    	Vertex here = state.getVertex();
+    	State existing = states.get(here);
+    	if (existing == null || state.betterThan(existing)) {
+    		states.put(here, state);
+    		return true;
+    	} else return false; 
     }
+
+	@Override
+	public List<State> getStates(Vertex dest) {
+		State s = states.get(dest);
+		return Arrays.asList(s); // single-element array-backed list
+	}
+
+	@Override
+	public State getState(Vertex dest) {
+		return states.get(dest);
+	}
+
+	@Override
+	public boolean visit(State s) {
+		return (s == states.get(s.getVertex()));
+	}
+
+	@Override
+	public int getVertexCount() {
+		return states.size();
+	}
+    
 }

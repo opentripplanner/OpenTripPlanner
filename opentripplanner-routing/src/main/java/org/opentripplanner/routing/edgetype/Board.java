@@ -19,11 +19,10 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.StateData.Editor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -86,7 +85,8 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         return hop.getTrip();
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions options) {
+    public State traverse(State state0) {
+    	TraverseOptions options = state0.getOptions();
         if (!options.getModes().contains(hop.getMode())) {
             return null;
         }
@@ -118,22 +118,24 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             return null;
         }
         
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(wait);
-        editor.incrementNumBoardings();
-        editor.setTripId(trip.getId());
-        editor.setZone(zone);
-        editor.setRoute(trip.getRoute().getId());
-        editor.setFareContext(fareContext);
-
-        return new TraverseResult(wait, editor.createState(), this);
+        StateEditor s1 = state0.edit(this);
+        s1.incrementTimeInSeconds(wait);
+        s1.incrementWeight(wait * options.waitReluctance);
+        s1.incrementNumBoardings();
+        s1.setTripId(trip.getId());
+        s1.setZone(zone);
+        s1.setRoute(trip.getRoute().getId());
+        s1.setFareContext(fareContext);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-	if (wo.wheelchairAccessible && !wheelchairAccessible) {
-	    return null;
-	}
-        return new TraverseResult(1, state0, this);
+    public State traverseBack(State state0) {
+    	TraverseOptions options = state0.getOptions();
+		if (options.wheelchairAccessible && !wheelchairAccessible) {
+		    return null;
+		}
+		StateEditor s1 = state0.edit(this);
+		return s1.makeState();
     }
 
 }

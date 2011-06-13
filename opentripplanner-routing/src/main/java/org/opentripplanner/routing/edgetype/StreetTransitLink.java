@@ -16,9 +16,9 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -65,23 +65,33 @@ public class StreetTransitLink extends AbstractEdge {
         return "street transit link";
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions wo) {
-        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+    public State traverse(State s0) {
+        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.incrementTimeInSeconds(1);
-        //technically, we only need to do this when we're going
-        //off the street onto transit, but it won't hurt 
-        //to do it unconditionally.
-        return new TraverseResult(STL_TRAVERSE_COST, s1, this);
+        // Do not check here whether transit modes are selected. A check for the presence of 
+        // transit modes will instead be done in the following PreBoard edge.
+        // This allows finding transit stops with walk-only options.
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(1);
+        s1.incrementWeight(STL_TRAVERSE_COST);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) {
-        if (wo.wheelchairAccessible && !wheelchairAccessible) {
+    public State traverseBack(State s0) {
+        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        State s1 = s0.incrementTimeInSeconds(-1);
-        return new TraverseResult(STL_TRAVERSE_COST, s1, this);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(-1);
+        s1.incrementWeight(STL_TRAVERSE_COST);
+        return s1.makeState();
+    }
+
+    public State optimisticTraverse(State s0, TraverseOptions opt) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementWeight(STL_TRAVERSE_COST);
+        return s1.makeState();
     }
 
     public Vertex getFromVertex() {

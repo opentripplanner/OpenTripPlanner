@@ -32,6 +32,7 @@ import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -41,7 +42,6 @@ import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.util.DateUtils;
 
 import junit.framework.TestCase;
@@ -192,8 +192,8 @@ public class TestRequest extends TestCase {
         assertTrue(paths.size() > 0);
         GraphPath path = paths.get(0);
         int curVertex = 0;
-        for (SPTVertex v: path.vertices) {
-            if (v.mirror.equals(vertices[curVertex])) {
+        for (State s: path.states) {
+            if (s.getVertex().equals(vertices[curVertex])) {
                 curVertex += 1;
             }
         }

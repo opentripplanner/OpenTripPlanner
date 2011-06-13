@@ -28,9 +28,9 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -40,10 +40,13 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.pqueue.BinHeap;
+import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,59 +98,53 @@ public class WeightTable implements Serializable {
 
 	    LOG.debug("Performing search at each transit stop.");        
 	    // make one heap and recycle it
-	    BinHeap<Vertex> heap = new BinHeap<Vertex>(g.getVertices().size());
+	    BinHeap<State> heap = new BinHeap<State>(g.getVertices().size());
+	    ShortestPathTree spt;
 	    TraverseOptions options = new TraverseOptions();
 	    final double MAX_WEIGHT = 60 * 60 * options.walkReluctance;
 	    final double OPTIMISTIC_BOARD_COST = options.boardCost;  
 	    for (float[] row : table)
 	    	Arrays.fill(row, Float.POSITIVE_INFINITY);
 
-	    List<DirectEdge> transferEdges = new ArrayList<DirectEdge>();
 	    int count = 0;
 	    // for each transit stop in the graph
 	    for (TransitStop origin : stopVertices) {
 	    	count += 1;
-	    	if (count % 100 == 0) LOG.debug("TransitStop " + count + "/" + nStops);
+	    	if (count % 1000 == 0) LOG.debug("TransitStop " + count + "/" + nStops);
     		//LOG.debug("ORIGIN " + origin);
 	    	int oi = stopIndices.get(origin); // origin index
 	    	// first check for walking transfers
 	    	//LOG.debug("    Walk");
 	    	heap.reset();
-		    HashSet<Vertex> closed = new HashSet<Vertex>();
-	    	heap.insert(origin, 0);
+	    	spt = new BasicShortestPathTree(500000);
+	    	State s0 = new State(origin, options);
+	    	spt.add(s0);
+	    	heap.insert(s0, s0.getWeight());
 	    	while (! heap.empty()) {
 	    		double w = heap.peek_min_key();
-	    		Vertex u = heap.extract_min();
+	    		State u = heap.extract_min();
+	    		if (!spt.visit(u)) continue;
+	    		Vertex uVertex = u.getVertex();
 	    		//LOG.debug("heap extract " + u + " weight " + w);
-	    		if (w > MAX_WEIGHT) break; // search FOR EVAR
-	    		if (closed.contains(u)) continue; 
-	    		closed.add(u);
-	    		if (u instanceof TransitStop) {
-	    			int di = stopIndices.get(u); // dest index
+	    		if (w > MAX_WEIGHT) break; 
+	    		if (uVertex instanceof TransitStop) {
+	    			int di = stopIndices.get(uVertex); // dest index
 	    			table[oi][di] = (float)w;
-	    			// add edge for transfer to graph
-	    			SimpleEdge se = new SimpleEdge(origin, u, w, (int)(w/options.speed));
-	    			transferEdges.add(se);
 	    			//LOG.debug("    Dest " + u + " w=" + w);        
 	    		}
-	    		GraphVertex gu = g.getGraphVertex(u.getLabel());
+	    		GraphVertex gu = g.getGraphVertex(uVertex.getLabel());
 	    		for (Edge e : gu.getOutgoing()) {
-	    			if (e instanceof TurnEdge ||
-    					e instanceof PlainStreetEdge ||
-    					e instanceof StreetTransitLink ||
-    					e instanceof FreeEdge ) {
-	    				State s0 = new State();
-	    				TraverseResult tr = e.traverse(s0, options);
-	    				if (tr == null) continue;
-	    				Vertex tov = tr.getEdgeNarrative().getToVertex();
-	    				if (! closed.contains(tov)) 
-	    					heap.insert(tov, w + tr.weight);
+	    			if (! (e instanceof PreBoardEdge)) {
+	    				State v = e.optimisticTraverse(u);
+	    				if (v != null && spt.add(v))  
+	    					heap.insert(v, v.getWeight());
 	    			}
 	    		}
 	    	}
 
 	    	// then check what is accessible in one transit trip
 	    	heap.reset(); // recycle heap
+	    	spt = new BasicShortestPathTree(50000);
 	    	// first handle preboard edges 
 	    	Queue<Vertex> q = new ArrayDeque<Vertex>(100);
 	    	q.add(origin);
@@ -156,21 +153,24 @@ public class WeightTable implements Serializable {
 	    		GraphVertex gu = g.getGraphVertex(u.getLabel());
 	    		for (Edge e : gu.getOutgoing()) {
 	    			if (e instanceof PatternBoard ) {
-	    				Vertex tov = ((PatternBoard)e).getToVertex();
+	    				Vertex v   = ((PatternBoard)e).getToVertex();
 	    				// give onboard vertices same index as their corresponding station
-	    				stopIndices.put((GenericVertex)tov, oi);
-	    				heap.insert(tov, OPTIMISTIC_BOARD_COST);
+	    				stopIndices.put((GenericVertex)v, oi);
+	    				StateEditor se = (new State(u, options)).edit(e);
+	    				se.incrementWeight(OPTIMISTIC_BOARD_COST);
+	    				s0 = se.makeState();
+	    				spt.add(s0);
+	    				heap.insert(s0, s0.getWeight());
 	    				//_log.debug("    board " + tov);
 	    			} else if (e instanceof FreeEdge) { // handle preboard
-	    				Vertex tov = ((FreeEdge)e).getToVertex();
+	    				Vertex v = ((FreeEdge)e).getToVertex();
 	    				// give onboard vertices same index as their corresponding station
-	    	    		stopIndices.put((GenericVertex)tov, oi);
-	    				q.add(tov);
+	    	    		stopIndices.put((GenericVertex)v, oi);
+	    				q.add(v);
 	    			}
 	    		}
 	    	}
 	    	// all boarding edges for this stop have now been traversed
-	    	closed.clear();
 	    	//LOG.debug("    Transit");
 	    	while (! heap.empty()) {
 	    		// check for transit stops when pulling off of heap 
@@ -178,50 +178,25 @@ public class WeightTable implements Serializable {
 	    		// this is enough to prevent reboarding
 	    		// need to mark closed vertices because otherwise cycles may appear (interlining...)
 	    		double w = heap.peek_min_key();
-	    		Vertex u = heap.extract_min();                
-	    		if (closed.contains(u)) continue;
+	    		State  u = heap.extract_min();                
+	    		if (! spt.visit(u)) continue;
 		    	//LOG.debug("    Extract " + u + " w=" + w);
-	    		closed.add(u);
-	    		if (u instanceof TransitStop) {
-	    			int di = stopIndices.get(u); // dest index
+	    		Vertex uVertex = u.getVertex();
+	    		if (uVertex instanceof TransitStop) {
+	    			int di = stopIndices.get(uVertex); // dest index
 	    			if (table[oi][di] > w) {
 	    				table[oi][di] = (float)w;                                
 	    				//LOG.debug("    Dest " + u + "w=" + w);
 	    			}
 	    			continue;
 	    		}
-	    		GraphVertex gu = g.getGraphVertex(u.getLabel());
+	    		GraphVertex gu = g.getGraphVertex(uVertex.getLabel());
 	    		for (Edge e : gu.getOutgoing()) {
 			    	//LOG.debug("        Edge " + e);
-	    			Vertex tov = null;
-	    			double tw = 0;
-	    			if (e instanceof PatternHop) {
-	    				State s0 = new State();
-	    				TraverseResult tr = ((PatternHop)e).optimisticTraverse(s0, options);
-	    				if (tr != null) {
-	    					tov = tr.getEdgeNarrative().getToVertex();
-	    					tw = tr.weight;
-	    				}
-	    			} else if (e instanceof PatternDwell) {
-	    				//State s0 = new State();
-	    				//TraverseResult tr = ((PatternDwell)e).traverse(s0, walkOptions);
-	    				//if (tr == null) continue;
-	    				tov = ((PatternDwell)e).getToVertex();
-	    				// optomisticTraverse not implemented
-	    				// and traverse does not work because we are on no particular trip 
-	    				// use 1
-	    				tw = 1;
-	    			} else if (e instanceof PatternInterlineDwell) {
-	    				// not coherent with other optimistic traverse
-	    				tov = ((PatternInterlineDwell)e).getToVertex();
-	    				tw = ((PatternInterlineDwell)e).optimisticTraverse(options);
-	    			} else if (e instanceof PatternAlight || e instanceof FreeEdge) {
-	    				tov = ((DirectEdge)e).getToVertex();
-	    				tw = 1;
-	    			}
-	    			if (tov != null && !closed.contains(tov)) heap.insert(tov, w + tw);
+	    			State v = e.optimisticTraverse(u);
+	    			if (v!=null && spt.add(v))
+	    				heap.insert(v, v.getWeight());
 	    			//else LOG.debug("        (skip)");
-
 	    		}
 	    	}
 	    }
@@ -235,16 +210,16 @@ public class WeightTable implements Serializable {
         for (int k=0; k<n; k++) {
             for (int i=0; i<n; i++) {
                 double ik = table[i][k];
-                if (ik == Double.POSITIVE_INFINITY) continue;
+                if (ik == Float.POSITIVE_INFINITY) continue;
                 for (int j=0; j<n; j++) {
                     double kj  = table[k][j];
-                    if (kj == Integer.MAX_VALUE) continue;
+                    if (kj == Float.POSITIVE_INFINITY) continue;
                     double ikj = ik + kj;
                     double ij  = table[i][j];
                     if (ikj < ij) table[i][j] = (float)ikj;
                 }
             }                    
-            if (k % 20 == 0) LOG.debug("k=" + k + "/" + n);
+            if (k % 50 == 0) LOG.debug("k=" + k + "/" + n);
         }
     }
 }

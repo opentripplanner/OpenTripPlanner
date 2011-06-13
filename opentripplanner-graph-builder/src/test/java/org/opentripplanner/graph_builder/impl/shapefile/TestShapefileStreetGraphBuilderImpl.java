@@ -168,7 +168,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertEquals(3, start.getDegreeIn());
 
         TraverseOptions wo = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(gg, start.vertex, end.vertex, new State(0), wo);
+        ShortestPathTree spt = AStar.getShortestPathTree(gg, start.vertex, end.vertex, 0, wo);
         assertNotNull(spt);
 
         //test that the option to walk bikes on the first or last segment works
@@ -180,7 +180,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         //force a change in preferences.
         wo.speed = 2; 
         
-        spt = AStar.getShortestPathTree(gg, start.vertex, carlton.vertex, new State(0), wo);
+        spt = AStar.getShortestPathTree(gg, start.vertex, carlton.vertex, 0, wo);
         assertNotNull(spt);
         /* commented out as bike walking is not supported */
         /*

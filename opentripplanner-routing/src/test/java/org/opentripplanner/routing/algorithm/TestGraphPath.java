@@ -55,16 +55,17 @@ public class TestGraphPath extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
-        assertTrue(path.vertices.size() == 12);
+        assertTrue(path.states.size() == 12);
 
         long bestStart = new GregorianCalendar(2009, 8, 7, 0, 20, 0).getTimeInMillis();
-        assertNotSame(bestStart, path.vertices.firstElement().state.getTime());
-        path.optimize();
-        assertEquals(bestStart, path.vertices.firstElement().state.getTime());
+        assertNotSame(bestStart, path.getStartTime());
+
+        path = spt.getPath(stop_e, true); /* optimize */
+        assertEquals(bestStart, path.getStartTime());
     }
 }

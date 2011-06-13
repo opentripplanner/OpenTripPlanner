@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,14 +10,13 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -85,21 +84,21 @@ public class AStarTest {
         options.speed = 1.0;
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-                new State(), options);
+        		System.currentTimeMillis(), options);
 
-        GraphPath path = tree.getPath(_graph.getVertex("leary_20th"));
+        GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
-        Vector<SPTVertex> vertices = path.vertices;
+        List<State> states = path.states;
 
-        assertEquals(7, vertices.size());
+        assertEquals(7, states.size());
 
-        assertEquals("56th_24th", vertices.get(0).getLabel());
-        assertEquals("market_24th", vertices.get(1).getLabel());
-        assertEquals("market_ballard", vertices.get(2).getLabel());
-        assertEquals("market_22nd", vertices.get(3).getLabel());
-        assertEquals("market_leary", vertices.get(4).getLabel());
-        assertEquals("leary_vernon", vertices.get(5).getLabel());
-        assertEquals("leary_20th", vertices.get(6).getLabel());
+        assertEquals("56th_24th", states.get(0).getVertex().getLabel());
+        assertEquals("market_24th", states.get(1).getVertex().getLabel());
+        assertEquals("market_ballard", states.get(2).getVertex().getLabel());
+        assertEquals("market_22nd", states.get(3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(4).getVertex().getLabel());
+        assertEquals("leary_vernon", states.get(5).getVertex().getLabel());
+        assertEquals("leary_20th", states.get(6).getVertex().getLabel());
     }
 
     @Test
@@ -109,22 +108,22 @@ public class AStarTest {
         options.speed = 1.0;
         options.setArriveBy(true);
 
-        ShortestPathTree tree = AStar.getShortestPathTreeBack(_graph, "56th_24th", "leary_20th",
-                new State(), options);
+        ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
+        		System.currentTimeMillis(), options);
 
-        GraphPath path = tree.getPath(_graph.getVertex("56th_24th"));
+        GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
 
-        Vector<SPTVertex> vertices = path.vertices;
+        List<State> states = path.states;
 
-        assertEquals(7, vertices.size());
+        assertEquals(7, states.size());
 
-        assertEquals("leary_20th", vertices.get(0).getLabel());
-        assertEquals("leary_vernon", vertices.get(1).getLabel());
-        assertEquals("market_leary", vertices.get(2).getLabel());
-        assertEquals("market_22nd", vertices.get(3).getLabel());
-        assertEquals("market_ballard", vertices.get(4).getLabel());
-        assertEquals("market_24th", vertices.get(5).getLabel());
-        assertEquals("56th_24th", vertices.get(6).getLabel());
+        assertEquals("56th_24th", states.get(0).getVertex().getLabel());
+        assertEquals("market_24th", states.get(1).getVertex().getLabel());
+        assertEquals("market_ballard", states.get(2).getVertex().getLabel());
+        assertEquals("market_22nd", states.get(3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(4).getVertex().getLabel());
+        assertEquals("leary_vernon", states.get(5).getVertex().getLabel());
+        assertEquals("leary_20th", states.get(6).getVertex().getLabel());
     }
 
     @Test
@@ -143,23 +142,23 @@ public class AStarTest {
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-                new State(), options);
+        		System.currentTimeMillis(), options);
 
-        GraphPath path = tree.getPath(toLocation);
+        GraphPath path = tree.getPath(toLocation, false);
 
-        Vector<SPTVertex> vertices = path.vertices;
+        List<State> states = path.states;
 
-        assertEquals(9, vertices.size());
+        assertEquals(9, states.size());
 
-        assertEquals("near_shilshole_22nd", vertices.get(0).getLabel());
-        assertEquals("shilshole_22nd", vertices.get(1).getLabel());
-        assertEquals("ballard_22nd", vertices.get(2).getLabel());
-        assertEquals("market_22nd", vertices.get(3).getLabel());
-        assertEquals("market_leary", vertices.get(4).getLabel());
-        assertEquals("market_russell", vertices.get(5).getLabel());
-        assertEquals("market_20th", vertices.get(6).getLabel());
-        assertEquals("56th_20th", vertices.get(7).getLabel());
-        assertEquals("near_56th_20th", vertices.get(8).getLabel());
+        assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel());
+        assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel());
+        assertEquals("ballard_22nd", states.get(2).getVertex().getLabel());
+        assertEquals("market_22nd", states.get(3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(4).getVertex().getLabel());
+        assertEquals("market_russell", states.get(5).getVertex().getLabel());
+        assertEquals("market_20th", states.get(6).getVertex().getLabel());
+        assertEquals("56th_20th", states.get(7).getVertex().getLabel());
+        assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
     }
 
     @Test
@@ -178,24 +177,24 @@ public class AStarTest {
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
-        ShortestPathTree tree = AStar.getShortestPathTreeBack(_graph, fromLocation, toLocation,
-                new State(), options);
+        ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
+        		System.currentTimeMillis(), options);
 
-        GraphPath path = tree.getPath(fromLocation);
+        GraphPath path = tree.getPath(fromLocation, false);
 
-        Vector<SPTVertex> vertices = path.vertices;
+        List<State> states = path.states;
 
-        assertEquals(9, vertices.size());
+        assertEquals(9, states.size());
 
-        assertEquals("near_56th_20th", vertices.get(0).getLabel());
-        assertEquals("56th_20th", vertices.get(1).getLabel());
-        assertEquals("market_20th", vertices.get(2).getLabel());
-        assertEquals("market_russell", vertices.get(3).getLabel());
-        assertEquals("market_leary", vertices.get(4).getLabel());
-        assertEquals("market_22nd", vertices.get(5).getLabel());
-        assertEquals("ballard_22nd", vertices.get(6).getLabel());
-        assertEquals("shilshole_22nd", vertices.get(7).getLabel());
-        assertEquals("near_shilshole_22nd", vertices.get(8).getLabel());
+        assertEquals("near_shilshole_22nd", states.get(0).getVertex().getLabel());
+        assertEquals("shilshole_22nd", states.get(1).getVertex().getLabel());
+        assertEquals("ballard_22nd", states.get(2).getVertex().getLabel());
+        assertEquals("market_22nd", states.get(3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(4).getVertex().getLabel());
+        assertEquals("market_russell", states.get(5).getVertex().getLabel());
+        assertEquals("market_20th", states.get(6).getVertex().getLabel());
+        assertEquals("56th_20th", states.get(7).getVertex().getLabel());
+        assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
     }
 
     /****
@@ -235,19 +234,23 @@ public class AStarTest {
         }
 
         @Override
-        public TraverseResult traverse(State s0, TraverseOptions options)
-                throws NegativeWeightException {
+        public State traverse(State s0) {
             double d = getDistance();
-            long t = (long) (d  * 1000 / options.speed);
-            return new TraverseResult(t, new State(s0.getTime() + t), this);
+            long t = (long) (d * 1000 / s0.getOptions().speed);
+            StateEditor s1 = s0.edit(this);
+            s1.incrementTimeMsec(t);
+            s1.incrementWeight(d);
+            return s1.makeState();
         }
 
         @Override
-        public TraverseResult traverseBack(State s0, TraverseOptions options)
-                throws NegativeWeightException {
+        public State traverseBack(State s0) {
             double d = getDistance();
-            long t = (long) (d  * 1000 / options.speed);
-            return new TraverseResult(t, new State(s0.getTime() - t), this);
+            long t = (long) (d * 1000 / s0.getOptions().speed);
+            StateEditor s1 = s0.edit(this);
+            s1.incrementTimeMsec(-t);
+            s1.incrementWeight(d);
+            return s1.makeState();
         }
 
         @Override

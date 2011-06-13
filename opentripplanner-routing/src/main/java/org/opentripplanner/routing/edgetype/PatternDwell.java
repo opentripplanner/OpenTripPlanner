@@ -15,9 +15,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -55,16 +54,20 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        int dwellTime = pattern.getDwellTime(stopIndex, state0.getData().getTrip());
-        State state1 = state0.incrementTimeInSeconds(dwellTime);
-        return new TraverseResult(dwellTime, state1, this);
+    public State traverse(State state0) {
+        int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
+        StateEditor s1 = state0.edit(this);
+        s1.incrementTimeInSeconds(dwellTime);
+        s1.incrementWeight(dwellTime);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        int dwellTime = pattern.getDwellTime(stopIndex, state0.getData().getTrip());
-        State state1 = state0.incrementTimeInSeconds(-dwellTime);
-        return new TraverseResult(dwellTime, state1, this);
+    public State traverseBack(State state0) {
+        int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
+        StateEditor s1 = state0.edit(this);
+        s1.incrementTimeInSeconds(-dwellTime);
+        s1.incrementWeight(dwellTime);
+        return s1.makeState();
     }
 
     public Geometry getGeometry() {

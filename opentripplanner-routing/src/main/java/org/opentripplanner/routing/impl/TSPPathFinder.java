@@ -21,15 +21,17 @@ import java.util.Map;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
+/**
+ * The Traveling Salesman Problem
+ * Used in searches with 'intermediates'
+ */
 public class TSPPathFinder {
+	
     static class TSPPath {
         List<Vertex> vertices;
         double cost;
@@ -39,13 +41,14 @@ public class TSPPathFinder {
             this.cost = cost;
         }
     }
+    
     public TSPPathFinder() {}
     
     private static TSPPath findShortestPathInternal(Vertex toVertex, Vertex fromVertex,
             Map<Vertex, HashMap<Vertex, GraphPath>> paths, HashSet<Vertex> vertices) {
         
         if (vertices.size() == 0) {
-            TSPPath path = new TSPPath(toVertex, getCost(paths.get(fromVertex).get(toVertex)));
+            TSPPath path = new TSPPath(toVertex, (paths.get(fromVertex).get(toVertex)).getWeight());
             return path;
         }
         
@@ -55,7 +58,7 @@ public class TSPPathFinder {
         for (Vertex vertex : vertexCopy) {
             vertices.remove(vertex);
             TSPPath path = findShortestPathInternal(toVertex, vertex, paths, vertices);
-            path.cost += getCost(paths.get(fromVertex).get(vertex));
+            path.cost += (paths.get(fromVertex).get(vertex)).getWeight();
             if (shortest == null || shortest.cost > path.cost) {
                 shortest = path;
                 path.vertices.add(0, vertex);
@@ -67,34 +70,34 @@ public class TSPPathFinder {
 
     public static GraphPath findShortestPath(Vertex toVertex, Vertex fromVertex,
             Map<Vertex, HashMap<Vertex, GraphPath>> paths, HashSet<Vertex> vertices, State state, TraverseOptions options) {
-        TSPPath shortestPath = findShortestPathInternal(toVertex, fromVertex, paths, vertices);
-        
-        ShortestPathTree spt = new BasicShortestPathTree();
-        GraphPath newPath = new GraphPath();
-        Vertex lastVertex = fromVertex;
-        GraphPath subPath;
-        SPTVertex fromv = spt.addVertex(fromVertex, state, 0, options);
-        
-        for (Vertex v : shortestPath.vertices) {
-            subPath = paths.get(lastVertex).get(v);
-            lastVertex = v;
-            for (int i = 0; i < subPath.edges.size(); ++i) {
-                SPTEdge edge = subPath.edges.get(i);
-                TraverseResult result = edge.traverse(state, options);
-                state = result.state;
-                SPTVertex tov = spt.addVertex(edge.narrative.getToVertex(), state, result.weight, options);
-                SPTEdge newEdge = tov.setParent(fromv, edge.payload,edge.narrative);
-                newPath.vertices.add(fromv);
-                newPath.edges.add(newEdge);
-                fromv = tov;
-            }   
-        }
-        newPath.vertices.add(fromv);
-        
-        return newPath;
-    }
-    private static double getCost(GraphPath graphPath) {
-        return graphPath.vertices.lastElement().weightSum;
+   
+// TODO: re-implement
+//        TSPPath shortestPath = findShortestPathInternal(toVertex, fromVertex, paths, vertices);
+//        
+//        ShortestPathTree spt = new BasicShortestPathTree();
+//        GraphPath newPath = new GraphPath();
+//        Vertex lastVertex = fromVertex;
+//        GraphPath subPath;
+//        SPTVertex fromv = spt.addVertex(fromVertex, state, 0, options);
+//        
+//        for (Vertex v : shortestPath.vertices) {
+//            subPath = paths.get(lastVertex).get(v);
+//            lastVertex = v;
+//            for (int i = 0; i < subPath.edges.size(); ++i) {
+//                SPTEdge edge = subPath.edges.get(i);
+//                TraverseResult result = edge.traverse(state, options);
+//                state = result.state;
+//                SPTVertex tov = spt.addVertex(edge.narrative.getToVertex(), state, result.weight, options);
+//                SPTEdge newEdge = tov.setParent(fromv, edge.payload,edge.narrative);
+//                newPath.vertices.add(fromv);
+//                newPath.edges.add(newEdge);
+//                fromv = tov;
+//            }   
+//        }
+//        newPath.vertices.add(fromv);
+//        
+//        return newPath;
+    	return null;
     }
 
 }

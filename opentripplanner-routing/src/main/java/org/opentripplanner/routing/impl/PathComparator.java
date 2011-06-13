@@ -22,9 +22,8 @@ public class PathComparator implements Comparator<GraphPath> {
 
     @Override
     public int compare(GraphPath o1, GraphPath o2) {
-        State state1 = o1.vertices.lastElement().state;
-        State state2 = o2.vertices.lastElement().state;
-        return (int) (state1.getTime() - state2.getTime());
+    	// compares durations, not end times...
+        return (int) (o1.getDuration() - o2.getDuration());
     }
 
 }

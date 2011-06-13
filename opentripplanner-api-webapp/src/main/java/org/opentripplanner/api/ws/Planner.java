@@ -15,6 +15,7 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -42,8 +43,6 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -301,9 +300,9 @@ public class Planner {
      */
     public TripPlan generatePlan(List<GraphPath> paths, Request request) {
 
-        Vector<SPTVertex> vertices = paths.get(0).vertices;
-        SPTVertex tripStartVertex = vertices.firstElement();
-        SPTVertex tripEndVertex = vertices.lastElement();
+        GraphPath exemplar = paths.get(0);
+        Vertex tripStartVertex = exemplar.getStartVertex();
+        Vertex tripEndVertex = exemplar.getEndVertex();
         String startName = tripStartVertex.getName();
         String endName = tripEndVertex.getName();
 
@@ -347,19 +346,21 @@ public class Planner {
         EdgeNarrative edgeNarrative = null;
         TraverseMode mode = null;
         TraverseMode previousMode = null;
-        SPTEdge previousSptEdge = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
-        SPTEdge finalSptEdge = path.edges.lastElement();
+        State finalState = path.states.getLast();
         double previousElevation = Double.MAX_VALUE;
         double edgeElapsedTime;
         GeometryFactory geometryFactory = new GeometryFactory();
         int startWalk = -1;
         int i = -1;
-        for (SPTEdge sptEdge : path.edges) {
+//      for (SPTEdge sptEdge : path.edges) {
+        for (State currState : path.states) { 
             i++;
             /* grab base edge and associated narrative information from SPT edge */
-            edge = sptEdge.payload;
-            edgeNarrative = sptEdge.narrative;
+            edge = currState.getBackEdge();
+            edgeNarrative = currState.getBackEdgeNarrative();
+            /* skip initial state, which has no back edges */
+            if (edge == null) continue;
             Set<String> notes = edgeNarrative.getNotes();
 			if (notes != null) {
 				if (leg == null) {
@@ -372,11 +373,11 @@ public class Planner {
 			}
             
             /* ignore freeEdges */ 
-            if (edge instanceof FreeEdge && sptEdge != finalSptEdge) {
+            if (edge instanceof FreeEdge && currState != finalState) {
                 continue;
             }
             mode = edgeNarrative.getMode();
-            edgeElapsedTime = sptEdge.tov.state.getTime() - sptEdge.fromv.state.getTime();
+            edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
             if (mode != previousMode) {
                 /* change in mode. make a new leg if we are entering walk or transit,
                  * otherwise just update the general itinerary info and move to next edge.
@@ -403,17 +404,17 @@ public class Planner {
                     if (leg != null) {
                         /* finalize prior leg if it exists */
                         if (startWalk != -1) {
-                            leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i));
+                            leg.walkSteps = getWalkSteps(path.states.subList(startWalk, i));
                         }
                         leg.to = makePlace(edgeNarrative.getFromVertex()); 
-                        leg.endTime = new Date(previousSptEdge.tov.state.getTime());
+                        leg.endTime = new Date(currState.getBackState().getTime());
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         /* reset coordinates */
                         coordinates = new CoordinateArrayListSequence();
                     }
                     /* initialize new leg */
-                    leg = makeLeg(sptEdge);
+                    leg = makeLeg(currState);
                     for (String noteForNewLeg : notesForNewLeg) {
                     	leg.addNote(noteForNewLeg);
                     }
@@ -438,7 +439,7 @@ public class Planner {
              * if you fall through to here, a leg necessarily exists and leg != null.
              * accumulate current edge's distance onto this existing leg.
              */
-            leg.distance += sptEdge.getDistance(); 
+            leg.distance += edgeNarrative.getDistance(); 
             /* for all edges with geometry, append their coordinates to the leg's. */
             Geometry edgeGeometry = edgeNarrative.getGeometry();
             if (edgeGeometry != null) {
@@ -475,23 +476,21 @@ public class Planner {
                         leg.stop = new ArrayList<Place>();
                     } else {
                         /* any further transit edge, add "from" vertex to intermediate stops */
-                        Place stop = makePlace(sptEdge.fromv.mirror);
+                        Place stop = makePlace(currState.getBackState().getVertex());
                         leg.stop.add(stop);
                     }
                 }
             } 
-            /* remember the last graphPath sptEdge */
-            previousSptEdge = sptEdge; 
         } /* end loop over graphPath edge list */
 
         if (leg != null) {
             /* finalize leg */ 
             leg.to = makePlace(edgeNarrative.getToVertex());
-            leg.endTime = new Date(previousSptEdge.tov.state.getTime());
+            leg.endTime = new Date(finalState.getTime());
             Geometry geometry = geometryFactory.createLineString(coordinates);
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
             if (startWalk != -1) {
-                leg.walkSteps = getWalkSteps(path.edges.subList(startWalk, i + 1));
+                leg.walkSteps = getWalkSteps(path.states.subList(startWalk, i + 1));
             }
         }
         if (itinerary.transfers == -1) {
@@ -529,19 +528,20 @@ public class Planner {
     /**
      * Makes a new empty leg from a starting edge
      */
-    private Leg makeLeg(SPTEdge edge) {
+    private Leg makeLeg(State s) {
         Leg leg = new Leg();
 
-        leg.startTime = new Date(edge.fromv.state.getTime());
-        leg.route = edge.getName();
-        Trip trip = edge.getTrip();
+        leg.startTime = new Date(s.getBackState().getTime());
+        EdgeNarrative en = s.getBackEdgeNarrative();
+        leg.route = en.getName();
+        Trip trip = en.getTrip();
         if (trip != null) {
             leg.headsign      = trip.getTripHeadsign();
             leg.agencyId      = trip.getId().getAgencyId();
             leg.tripShortName = trip.getTripShortName();
         }
         leg.distance = 0.0;
-        leg.from = makePlace(edge.narrative.getFromVertex());
+        leg.from = makePlace(en.getFromVertex());
         return leg;
     }
 
@@ -553,10 +553,8 @@ public class Planner {
     private Itinerary makeEmptyItinerary(GraphPath path) {
         Itinerary itinerary = new Itinerary();
 
-        SPTVertex startVertex = path.vertices.firstElement();
-        State startState = startVertex.state;
-        SPTVertex endVertex = path.vertices.lastElement();
-        State endState = endVertex.state;
+        State startState = path.states.getFirst();
+        State endState = path.states.getLast();
 
         itinerary.startTime = new Date(startState.getTime());
         itinerary.endTime = new Date(endState.getTime());
@@ -644,15 +642,15 @@ public class Planner {
      *            : A list of street edges
      * @return
      */
-    private List<WalkStep> getWalkSteps(List<SPTEdge> edges) {
+    private List<WalkStep> getWalkSteps(List<State> states) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
         
-        for (SPTEdge sptEdge : edges) {
-            Edge edge = sptEdge.payload;
-            EdgeNarrative edgeResult = sptEdge.narrative;
+        for (State currState : states) {
+            Edge edge = currState.getBackEdge();
+            EdgeNarrative edgeResult = currState.getBackEdgeNarrative();
             if (edge instanceof FreeEdge) {
                 continue;
             }
@@ -663,7 +661,7 @@ public class Planner {
             String streetName = edgeResult.getName();
             if (step == null) {
                 // first step
-                step = createWalkStep(sptEdge);
+                step = createWalkStep(currState);
                 steps.add(step);
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
@@ -679,7 +677,7 @@ public class Planner {
                     roundaboutExit = 0;
                 }
                 /* start a new step */
-                step = createWalkStep(sptEdge);
+                step = createWalkStep(currState);
                 steps.add(step);
                 if (edgeResult.isRoundabout()) {
                     // indicate that we are now on a roundabout
@@ -719,7 +717,7 @@ public class Planner {
                     // figure out if there were turn options at the last intersection.
                     if (optionsBefore) {
                         // turn to stay on same-named street
-                        step = createWalkStep(sptEdge);
+                        step = createWalkStep(currState);
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
@@ -735,13 +733,14 @@ public class Planner {
         return steps;
     }
 
-    private WalkStep createWalkStep(SPTEdge edge) {
+    private WalkStep createWalkStep(State s) {
+    	EdgeNarrative en = s.getBackEdgeNarrative();
         WalkStep step;
         step = new WalkStep();
-        step.streetName = edge.getName();
-        step.lon = edge.getFromVertex().getX();
-        step.lat = edge.getFromVertex().getY();
-        step.elevation = encodeElevationProfile(edge.payload, 0);
+        step.streetName = en.getName();
+        step.lon = en.getFromVertex().getX();
+        step.lat = en.getFromVertex().getY();
+        step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
         return step;
     }
 

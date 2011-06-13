@@ -198,9 +198,6 @@ public class StateData {
             return new StateData(this);
         }
 
-        public State createState() {
-            return new State(startTime, time, createData());
-        }
 
         public void setStartTime(long startTime) {
             this.startTime = startTime;
@@ -214,13 +211,6 @@ public class StateData {
             this.time = time;
         }
 
-        public void incrementWithStateDelta(State from, State to) {
-            StateData dFrom = from.getData();
-            StateData dTo = to.getData();
-            this.numBoardings += (dTo.numBoardings - dFrom.numBoardings);
-            this.walkDistance = (dTo.walkDistance - dFrom.walkDistance);
-            this.time += (to.getTime() - from.getTime());
-        }
 
         public void resetForReverseOptimization() {
             setAlightedLocal(false);

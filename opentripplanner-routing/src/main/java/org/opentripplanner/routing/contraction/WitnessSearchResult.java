@@ -24,10 +24,18 @@ public class WitnessSearchResult {
     public BasicShortestPathTree spt;
     public Vertex vertex;
     
+    /**
+     * Result of a local witness search during CH building.
+     * 
+     * @param shortcuts - the new shortcuts suggested by this search
+     * @param spt - an spt containing all states produced during the search
+     * @param vertex - the start point of this search V (not U, the taboo vertex)
+     * @param searchSpace - number of nodes visited
+     */
     public WitnessSearchResult(List<Shortcut> shortcuts, BasicShortestPathTree spt, Vertex vertex, int searchSpace) {
         this.shortcuts = shortcuts;
         this.spt = spt;
-        this.vertex = vertex;
+        this.vertex = vertex; 
         this.searchSpace = searchSpace;
     }
 }

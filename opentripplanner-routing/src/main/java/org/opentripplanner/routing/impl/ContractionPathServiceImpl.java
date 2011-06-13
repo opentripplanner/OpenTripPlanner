@@ -23,8 +23,6 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
@@ -37,7 +35,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -47,7 +44,6 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,20 +100,18 @@ public class ContractionPathServiceImpl implements PathService {
             throw new VertexNotFoundException(notFound);
         }
 
-        State state = new State(targetTime.getTime());
-
-        return plan(fromVertex, toVertex, state, options, nItineraries);
+        return plan(fromVertex, toVertex, targetTime, options, nItineraries);
     }
 
-    public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, State state,
+    public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, Date targetTime,
             TraverseOptions options, int nItineraries) {
 
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        options.setServiceDays(state.getTime());
+        options.setServiceDays(targetTime.getTime());
         if (options.getModes().getTransit()
-                && !_graphService.getGraph().transitFeedCovers(new Date(state.getTime()))) {
+                && !_graphService.getGraph().transitFeedCovers(targetTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
@@ -131,7 +125,6 @@ public class ContractionPathServiceImpl implements PathService {
         	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
-        
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
@@ -155,7 +148,8 @@ public class ContractionPathServiceImpl implements PathService {
             }
             options.worstTime = maxTime;
             options.maxWeight = maxWeight;
-            List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, state, options);
+            List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, 
+            		targetTime.getTime(), options);
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
@@ -165,16 +159,10 @@ public class ContractionPathServiceImpl implements PathService {
                     return null;
                 }
                 GraphPath path = somePaths.get(0);
-                long tripTime = path.vertices.lastElement().state.getTime()
-                        - path.vertices.firstElement().state.getTime();
-                if (options.isArriveBy()) {
-                    maxTime = path.vertices.lastElement().state.getTime() - tripTime * 2;
-                	// on arriveBy trips weights increase toward the fromVertex
-                    maxWeight = path.vertices.firstElement().weightSum * 2;
-                } else {
-                    maxTime = path.vertices.firstElement().state.getTime() + tripTime * 2;
-                    maxWeight = path.vertices.lastElement().weightSum * 2;
-                }
+                long duration = path.getDuration();
+                maxTime = path.getEndTime() + 
+                		  2 * (options.isArriveBy() ? -duration : duration);
+                maxWeight = path.getWeight() * 2;
             }
             if (somePaths.isEmpty()) {
                 continue;
@@ -186,18 +174,11 @@ public class ContractionPathServiceImpl implements PathService {
                     // the HashSet banned is not strictly necessary as the optionsQueue will
                     // already remove duplicate options, but it might be slightly faster as
                     // hashing TraverseOptions is slow.
-                    for (SPTEdge spte : path.edges) {
-                        Edge e = spte.payload;
-                        if (e instanceof PatternBoard) {
-                            Trip trip = spte.getTrip();
-                            String routeName = GtfsLibrary.getRouteName(trip.getRoute());
-
-                            RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
-                            TraverseOptions newOptions = options.clone();
-                            newOptions.bannedRoutes.add(spec);
-                            if (!optionQueue.contains(newOptions)) {
-                                optionQueue.add(newOptions);
-                            }
+                    for (RouteSpec spec : path.getRouteSpecs()) {
+                        TraverseOptions newOptions = options.clone();
+                        newOptions.bannedRoutes.add(spec);
+                        if (!optionQueue.contains(newOptions)) {
+                            optionQueue.add(newOptions);
                         }
                     }
                 }
@@ -242,14 +223,12 @@ public class ContractionPathServiceImpl implements PathService {
             throw new VertexNotFoundException(notFound);
         }
 
-        State state = new State(targetTime.getTime());
-
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
 
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, state,
-                options);
+        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, 
+        		targetTime.getTime(), options);
 
         return Arrays.asList(path);
     }

@@ -7,11 +7,9 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.OnBoardReverseEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
@@ -22,26 +20,18 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double maxSpeed;
 
     @Override
-    public double computeInitialWeight(Vertex origin, Vertex target, TraverseOptions traverseOptions) {
-        
+    public double computeInitialWeight(State s, Vertex target, TraverseOptions traverseOptions) {
         this.options = traverseOptions;
         this.useTransit = traverseOptions.getModes().getTransit();
         this.maxSpeed = getMaxSpeed(options);
-        
-        return origin.distance(target) / maxSpeed;
+        return s.getVertex().distance(target) / maxSpeed;
     }
 
     @Override
-    public double computeForwardWeight(SPTVertex from, Edge edge, TraverseResult traverseResult,
-            Vertex target) {
+    public double computeForwardWeight(State s, Vertex target) {
 
-        EdgeNarrative narrative = traverseResult.getEdgeNarrative();
-        Vertex tov = narrative.getToVertex();
-        
-        State fromState = from.state;
-        StateData fromData = fromState.getData();
-
-        double euclidianDistance = tov.distance(target);
+    	Vertex sv = s.getVertex();
+        double euclidianDistance = sv.distance(target);
         /*	On a non-transit trip, the remaining weight is simply distance / speed
          *	On a transit trip, there are two cases:
          *	(1) we're not on a transit vehicle.  In this case, there are two possible ways to 
@@ -54,12 +44,11 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
          *	    again considering any mandatory walking.
          */
         if (useTransit) {
-            
-            if (fromData.isAlightedLocal()) {
+            if (s.isAlightedLocal()) {
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;
-                if (edge instanceof OnBoardForwardEdge) {
+                if (s.isOnboard()) {
                     boardCost = 0;
                 } else {
                     boardCost = options.boardCost;
@@ -69,7 +58,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     return options.walkReluctance * euclidianDistance / options.speed;
                 } else {
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
-                            + tov.getDistanceToNearestTransitStop();
+                            + sv.getDistanceToNearestTransitStop();
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance / options.speed
                             + boardCost;
@@ -85,23 +74,20 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     }
 
     @Override
-    public double computeReverseWeight(SPTVertex from, Edge edge, TraverseResult traverseResult,
-            Vertex target) {
-        
-        EdgeNarrative narrative = traverseResult.getEdgeNarrative();
-        Vertex fromv = narrative.getFromVertex();
-        
-        State fromState = from.state;
-        StateData fromData = fromState.getData();
+    public double computeReverseWeight(State s, Vertex target) {
+    	// from and to are interpreted in the direction of traversal
+    	// so the edge actually leads from
 
-        double euclidianDistance = fromv.distance(target);
+    	Vertex sv = s.getVertex();
+        
+        double euclidianDistance = sv.distance(target);
         
         if (useTransit) {
-            if (fromData.isAlightedLocal()) {
+            if (s.isAlightedLocal()) {
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;
-                if (edge instanceof OnBoardReverseEdge) {
+                if (s.isOnboard()) {
                     boardCost = 0;
                 } else {
                     boardCost = options.boardCost;
@@ -113,7 +99,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 } else {
                     double mandatoryWalkDistance = target
                             .getDistanceToNearestTransitStop()
-                            + fromv.getDistanceToNearestTransitStop();
+                            + sv.getDistanceToNearestTransitStop();
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance
                             / options.speed + boardCost;

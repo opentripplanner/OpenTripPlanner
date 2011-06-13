@@ -19,12 +19,10 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.StateData.Editor;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -82,27 +80,23 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         return hop.getTrip();
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions wo) {
-	if (wo.wheelchairAccessible && !wheelchairAccessible) {
-	    return null;
-	}
-        return new TraverseResult(1, s0,this);
+    public State traverse(State s0) {
+    	if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) 
+    		return null;
+    	StateEditor s1 = s0.edit(this);
+    	return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions options) {
-        if (!options.getModes().contains(hop.getMode())) {
+    public State traverseBack(State s0) {
+    	TraverseOptions options = s0.getOptions();
+        if (!options.getModes().contains(hop.getMode()))
             return null;
-        }
-        if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
+        if (options.getModes().getBicycle() && !hop.getBikesAllowed())
             return null;
-        }
-        if (options.wheelchairAccessible && !wheelchairAccessible) {
+        if (options.wheelchairAccessible && !wheelchairAccessible)
             return null;
-        }
         
-        long current_time = state0.getTime();
-        long transfer_penalty = 0;
-        StateData data = state0.getData();
+        long current_time = s0.getTime();
         
         /* check if this trip is running or not */
         AgencyAndId serviceId = hop.getServiceId();
@@ -123,15 +117,15 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             return null;
         }
         
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(-wait); 
-        editor.incrementNumBoardings();
-        editor.setTripId(trip.getId());
-        editor.setZone(zone);
-        editor.setRoute(trip.getRoute().getId());
-        editor.setFareContext(fareContext);
-        
-        return new TraverseResult(wait, editor.createState(), this);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(-wait); 
+        s1.incrementWeight(wait * options.waitReluctance);
+        s1.incrementNumBoardings();
+        s1.setTripId(trip.getId());
+        s1.setZone(zone);
+        s1.setRoute(trip.getRoute().getId());
+        s1.setFareContext(fareContext);
+        return s1.makeState();
     }
 
 }

@@ -31,16 +31,16 @@ import java.text.SimpleDateFormat;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -304,11 +304,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     private void drawGraphPath(GraphPath gp) {
         // draw edges in different colors according to mode
-    	for (SPTEdge se : gp.edges) {
-        	Edge edge = se.payload;
-        	if (!(edge instanceof DirectEdge)) continue;
-        	DirectEdge e = (DirectEdge) edge;
-        	TraverseMode mode = se.getMode();
+    	for (State s : gp.states) {
+        	EdgeNarrative en = s.getBackEdgeNarrative();
+        	if (!(en instanceof DirectEdge)) continue;
+        	DirectEdge e = (DirectEdge) en;
+        	TraverseMode mode = e.getMode();
         	if (mode.isTransit()) {
             	stroke(200, 050, 000); 
             	strokeWeight(6);   
@@ -340,26 +340,25 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         	}
         }
         // mark key vertices
-        SPTVertex fv = gp.vertices.firstElement();
         lastLabelY = -999;
-    	labelVertex(fv, "begin");
-        for (SPTEdge se : gp.edges) {
-        	Edge e = se.payload;
+    	labelState(gp.states.getFirst(), "begin");
+        for (State s : gp.states) {
+        	Edge e = s.getBackEdge();
         	if (e instanceof PatternBoard) {
-        		labelVertex(se.tov, "board");
+        		labelState(s, "board");
         	} else if (e instanceof PatternAlight) {
-        		labelVertex(se.fromv, "alight");
+        		labelState(s, "alight");
         	}
         }
-    	SPTVertex lv = gp.vertices.lastElement();
-    	labelVertex(lv, "end");
+    	labelState(gp.states.getLast(), "end");
     }
 
-    private void labelVertex(SPTVertex v, String s) {
+    private void labelState(State s, String str) {
     	fill(240, 240, 240);
+    	Vertex v = s.getVertex();
     	drawVertex(v, 8);
-    	s += " " + shortDateFormat.format(new Date(v.state.getTime()));
-    	s += " [" + (int)v.weightSum + "]";
+    	str += " " + shortDateFormat.format(new Date(s.getTime()));
+    	str += " [" + (int)s.getWeight() + "]";
     	double x = toScreenX(v.getX()) + 10;
     	double y = toScreenY(v.getY());
     	double dy = y - lastLabelY;
@@ -368,7 +367,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     	} else if (Math.abs(dy) < 20) {
     		y = lastLabelY + Math.signum(dy) * 20;
     	}
-    	text(s, (float)x, (float)y);
+    	text(str, (float)x, (float)y);
     	lastLabelY = y;
     }
 

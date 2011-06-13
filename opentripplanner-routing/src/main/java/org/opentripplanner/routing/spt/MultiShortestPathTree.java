@@ -16,7 +16,10 @@ package org.opentripplanner.routing.spt;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
@@ -24,26 +27,14 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
-    private static final long serialVersionUID = -3899613853043676031L;
+    private static final long serialVersionUID = 20110608L; //YYYYMMDDL
 
     public static final ShortestPathTreeFactory FACTORY = new FactoryImpl();
 
-    private HashMap<Vertex, Collection<SPTVertex>> vertexSets;
+    private Map<Vertex, List<State>> stateSets;
 
     public MultiShortestPathTree() {
-        vertexSets = new HashMap<Vertex, Collection<SPTVertex>>();
-    }
-
-    public Set<Vertex> getVertices() {
-        return vertexSets.keySet();
-    }
-
-    public Collection<SPTVertex> getSPTVerticesForVertex(Vertex vertex) {
-        return vertexSets.get(vertex);
-    }
-
-    public GraphPath getPath(SPTVertex sptVertex) {
-        return createPathForVertex(sptVertex, false);
+        stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
 
     /****
@@ -51,71 +42,67 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
      ****/
 
     @Override
-    public SPTVertex addVertex(Vertex vertex, State state, double weightSum, TraverseOptions options) {
-
-        Collection<SPTVertex> vertices = vertexSets.get(vertex);
-        if (vertices == null) {
-            vertices = new ArrayList<SPTVertex>();
-            vertexSets.put(vertex, vertices);
-            SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
-            vertices.add(ret);
-            return ret;
+    public boolean add(State newState) {
+    	Vertex vertex = newState.getVertex();
+        List<State> states = stateSets.get(vertex);
+        if (states == null) {
+            states = new ArrayList<State>();
+            stateSets.put(vertex, states);
+            states.add(newState);
+            return true;
         }
-
-        long duration = Math.abs(state.getTime() - state.getStartTime());
-
-        Iterator<SPTVertex> it = vertices.iterator();
-
+        Iterator<State> it = states.iterator();
         while (it.hasNext()) {
-            
-            SPTVertex v = it.next();
-            double old_w = v.weightSum;
-            long old_duration = Math.abs(v.state.getTime() - v.state.getStartTime());
-
-            if (old_w <= weightSum && old_duration <= duration) {
-                /* an existing vertex strictly dominates the new vertex */
-                return null;
-            }
-
-            if (old_w > weightSum && old_duration > duration) {
-                /* the new vertex strictly dominates an existing vertex */
-                it.remove();
-            }
+            State oldState = it.next();
+            // order is important, because in the case of a tie
+            // we want to reject the new state
+            if (oldState.dominates(newState))
+            	return false;
+            if (newState.dominates(oldState))
+            	it.remove();
         }
-
-        SPTVertex ret = new SPTVertex(vertex, state, weightSum, options);
-        vertices.add(ret);
-        return ret;
+        states.add(newState);
+        return true;
     }
 
-    @Override
-    public GraphPath getPath(Vertex dest) {
-        return getPath(dest, true);
-    }
+	@Override
+	public State getState(Vertex dest) {
+		Collection<State> states = stateSets.get(dest);
+		if (states == null)
+			return null;
+		State ret = null;
+		for (State s : states) {
+			if (ret == null || s.betterThan(ret)) {
+				ret = s;
+			}
+		}
+		return ret;
+	}
 
-    @Override
-    public GraphPath getPath(Vertex dest, boolean optimize) {
-        SPTVertex end = null;
-        Collection<SPTVertex> set = vertexSets.get(dest);
-        if (set == null) {
-            return null;
-        }
-        for (SPTVertex v : set) {
-            if (end == null || v.weightSum < end.weightSum) {
-                end = v;
-            }
-        }
-        return createPathForVertex(end, optimize);
-    }
+	@Override
+	public List<State> getStates(Vertex dest) {
+		return stateSets.get(dest);
+	}
 
-    @Override
-    public void removeVertex(SPTVertex vertex) {
-        Collection<SPTVertex> set = this.vertexSets.get(vertex.mirror);
-        set.remove(vertex);
-    }
+	@Override
+	public int getVertexCount() {
+		return stateSets.keySet().size();
+	}
 
-    public String toString() {
-        return "SPT " + this.vertexSets.size();
+	@Override
+	public boolean visit(State state) {
+		boolean ret = false;
+		for (State s : stateSets.get(state.getVertex())) {
+			if (s == state) {
+				ret = true;
+				break;
+			}
+		}
+		return ret;
+	}
+
+	public String toString() {
+        return "MultiSPT(" + this.stateSets.size() + " vertices)";
     }
 
     private static final class FactoryImpl implements ShortestPathTreeFactory {
@@ -124,4 +111,5 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             return new MultiShortestPathTree();
         }
     }
+
 }

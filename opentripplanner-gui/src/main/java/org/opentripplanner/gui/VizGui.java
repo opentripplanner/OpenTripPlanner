@@ -64,6 +64,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -78,7 +79,6 @@ import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -818,9 +818,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             return;
         }
         GraphPath gp = paths.get(0);
-        for (SPTEdge e : gp.edges) {
-            System.out.print(e.tov.state.toString() + " <- ");
-            System.out.println(e.payload);
+        for (State s : gp.states) {
+            System.out.print(s.toString() + " <- ");
+            System.out.println(s.getBackEdgeNarrative());
         }
         showGraph.highlightGraphPath(gp);
     }

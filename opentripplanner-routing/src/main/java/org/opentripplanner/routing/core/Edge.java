@@ -44,11 +44,14 @@ public interface Edge {
 
     public Vertex getFromVertex();
 
-    public TraverseResult traverse(State s0, TraverseOptions options)
+    public State traverse(State s0)
             throws NegativeWeightException;
 
-    public TraverseResult traverseBack(State s0, TraverseOptions options)
+    public State traverseBack(State s0)
             throws NegativeWeightException;
+
+    public State optimisticTraverse(State s0)
+    		throws NegativeWeightException;
 
 	public void addPatch(Patch patch);
 	public List<Patch> getPatches();

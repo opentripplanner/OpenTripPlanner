@@ -48,9 +48,9 @@ public class TestFares extends TestCase {
         GraphPath path = null;
         long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
         spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
-                "Caltrain_Mountain View Caltrain", new State(startTime), options);
+                "Caltrain_Mountain View Caltrain", startTime, options);
 
-        path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"));
+        path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
 
         Fare cost = path.getCost();
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
@@ -68,10 +68,10 @@ public class TestFares extends TestCase {
         long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();
 
         // from zone 3 to zone 2
-        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", new State(startTime),
+        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", startTime,
                 options);
 
-        path = spt.getPath(gg.getVertex("TriMet_8371"));
+        path = spt.getPath(gg.getVertex("TriMet_8371"), true);
         assertNotNull(path);
         Fare cost = path.getCost();
         assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
@@ -79,10 +79,10 @@ public class TestFares extends TestCase {
         // long trip
 
         startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
-        spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", new State(startTime),
+        spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", startTime,
                 options);
 
-        path = spt.getPath(gg.getVertex("TriMet_1252"));
+        path = spt.getPath(gg.getVertex("TriMet_1252"), true);
         assertNotNull(path);
         cost = path.getCost();
         
@@ -91,10 +91,10 @@ public class TestFares extends TestCase {
         // complex trip
         options.maxTransfers = 5;
         startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
-        spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", new State(startTime),
+        spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", startTime,
                 options);
 
-        path = spt.getPath(gg.getVertex("TriMet_4231"));
+        path = spt.getPath(gg.getVertex("TriMet_4231"), true);
         assertNotNull(path);
         cost = path.getCost();
         //

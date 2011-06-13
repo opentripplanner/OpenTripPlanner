@@ -46,7 +46,6 @@ import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.core.TransitStop;
 
@@ -125,41 +124,41 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path;
 
         // A to B
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_b);
+        path = spt.getPath(stop_b, false);
         assertNotNull(path);
-        assertEquals(6, path.vertices.size());
+        assertEquals(6, path.states.size());
 
         // A to C
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_c);
+        path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        assertEquals(8, path.vertices.size());
+        assertEquals(8, path.states.size());
 
         // A to D (change at C)
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_d);
+        path = spt.getPath(stop_d, false);
         assertNotNull(path);
         // there are two paths of different lengths 
         // both arrive at 40 minutes after midnight
-        //assertTrue(path.vertices.size() == 13);
+        //assertTrue(path.states.size() == 13);
         long endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 40 * 60 * 1000;
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
         //A to E (change at C)
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
-        path = spt.getPath(stop_e);
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0). getTimeInMillis(), options);
+        path = spt.getPath(stop_e, false);
         assertNotNull(path);
-        assertTrue(path.vertices.size() == 14);
+        assertTrue(path.states.size() == 14);
         endTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis() + 70 * 60 * 1000;
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
     }
 
     /**
@@ -175,12 +174,12 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        spt = AStar.getShortestPathTree(graph, stop_f, stop_h, new State(
-                new GregorianCalendar(2009, 8, 18, 5, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_f, stop_h,  
+                new GregorianCalendar(2009, 8, 18, 5, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_h);
+        path = spt.getPath(stop_h, false);
         assertNotNull(path);
-        assertEquals(5, path.vertices.size());
+        assertEquals(5, path.states.size());
     }
 
     public void testRoutingOverMidnight() throws Exception {
@@ -195,23 +194,23 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path;
 
         // Friday evening
-        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 18, 23, 20, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(),  
+                new GregorianCalendar(2009, 8, 18, 23, 20, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_h);
+        path = spt.getPath(stop_h, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(4, path.states.size());
 
         // Saturday morning
         long startTime = new GregorianCalendar(2009, 8, 19, 0, 5, 0).getTimeInMillis();
 
-        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(), new State(
-                startTime), options);
+        spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(),  
+                startTime, options);
 
-        path = spt.getPath(stop_h);
+        path = spt.getPath(stop_h, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
-        long endTime = path.vertices.lastElement().state.getTime();
+        assertEquals(4, path.states.size());
+        long endTime = path.getEndTime();
         assertTrue(endTime < startTime + 1000 * 60 * 60);
     }
 
@@ -257,18 +256,18 @@ public class TestPatternHopFactory extends TestCase {
 
         long startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 0).getTimeInMillis();
         TraverseOptions options = new TraverseOptions(context);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_o, stop_p, new State(startTime), options );
-        GraphPath path = spt.getPath(stop_p);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_o, stop_p,  startTime, options );
+        GraphPath path = spt.getPath(stop_p, false);
         assertNotNull(path);
         long endTime = new GregorianCalendar(2009, 8, 19, 12, 10, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
         startTime = new GregorianCalendar(2009, 8, 19, 12, 0, 1).getTimeInMillis();
-        spt = AStar.getShortestPathTree(graph, stop_o, stop_p, new State(startTime), options );
-        path = spt.getPath(stop_p);
+        spt = AStar.getShortestPathTree(graph, stop_o, stop_p,  startTime, options );
+        path = spt.getPath(stop_p, false);
         assertNotNull(path);
         endTime = new GregorianCalendar(2009, 8, 19, 15, 10, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
     }
 
     public void testTransfers() throws Exception {
@@ -288,12 +287,12 @@ public class TestPatternHopFactory extends TestCase {
         TraverseOptions options = new TraverseOptions(context);
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_b, stop_g, 
-                new State(startTime), options);
+                 startTime, options);
         
-        GraphPath path = spt.getPath(stop_g);
+        GraphPath path = spt.getPath(stop_g, false);
         assertNotNull(path);
         
-        assertTrue("expected to use much later trip due to min transfer time", path.vertices.lastElement().state.getTime() - startTime > 4.5 * 60 * 60 * 1000);
+        assertTrue("expected to use much later trip due to min transfer time", path.getEndTime() - startTime > 4.5 * 60 * 60 * 1000);
         
         /* cleanup */
         graph.getGraphVertex(e_arrive).removeOutgoing(edge);
@@ -308,35 +307,31 @@ public class TestPatternHopFactory extends TestCase {
         TraverseOptions options = new TraverseOptions(context);
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_i, stop_k, 
-                new State(startTime), options);
-        GraphPath path = spt.getPath(stop_k);
+                 startTime, options);
+        GraphPath path = spt.getPath(stop_k, false);
         int num_alights = 0;
-        for (SPTEdge e : path.edges) {
-            if (e.payload instanceof PatternAlight || e.payload instanceof Alight) {
+        for (State s : path.states) {
+            if (s.getBackEdge() instanceof PatternAlight || s.getBackEdge() instanceof Alight) {
                 num_alights += 1;
             }
-            if (e.payload instanceof PatternDwell) {
-                State state0 = e.fromv.state;
-                State state1 = e.tov.state;
-                assertEquals(10 * 60 * 1000, state1.getTime() - state0.getTime());
+            if (s.getBackEdge() instanceof PatternDwell) {
+                assertEquals(10 * 60 * 1000, s.getTimeDeltaMsec());
             }
         }
         assertEquals(1, num_alights);
         
         options.setArriveBy(true);
-        spt = AStar.getShortestPathTreeBack(graph, stop_i, stop_k, 
-                new State(startTime), options);
-        path = spt.getPath(stop_i);
-        path.reverse();
+        spt = AStar.getShortestPathTree(graph, stop_i, stop_k, 
+                 startTime, options);
+        path = spt.getPath(stop_i, false);
+//        path.reverse();
         num_alights = 0;
-        for (SPTEdge e : path.edges) {
-            if (e.payload instanceof PatternAlight || e.payload instanceof Alight) {
+        for (State s : path.states) {
+            if (s.getBackEdge()instanceof PatternAlight || s.getBackEdge() instanceof Alight) {
                 num_alights += 1;
             }
-            if (e.payload instanceof PatternDwell) {
-                State state0 = e.fromv.state;
-                State state1 = e.tov.state;
-                assertEquals(10 * 60 * 1000, state1.getTime() - state0.getTime());
+            if (s.getBackEdge() instanceof PatternDwell) {
+                assertEquals(10 * 60 * 1000, s.getTimeDeltaMsec());
             }
         }
         assertEquals(1, num_alights);
@@ -351,30 +346,29 @@ public class TestPatternHopFactory extends TestCase {
         TraverseOptions options = new TraverseOptions(context);
         options.setModes(new TraverseModeSet("TRAINISH"));
 
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
+                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis(), options );
 
         //a to b is bus only
-        assertNull(spt.getPath(stop_b));
+        assertNull(spt.getPath(stop_b, false));
         
         options.setModes(new TraverseModeSet("TRAINISH,BUSISH"));
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis()), options );
+        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
+                new GregorianCalendar(2009, 8, 0, 0, 0, 0).getTimeInMillis(), options );
 
-        assertNotNull(spt.getPath(stop_b));
+        assertNotNull(spt.getPath(stop_b, false));
     }
     
     public void testTimelessStops() throws Exception {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_c = graph.getVertex("agency_C");
         TraverseOptions options = new TraverseOptions(context);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(),stop_c.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 1, 10, 0, 0).getTimeInMillis()), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(),stop_c.getLabel(),  
+                new GregorianCalendar(2009, 8, 1, 10, 0, 0). getTimeInMillis(), options);
 
-        GraphPath path = spt.getPath(stop_c);
+        GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        State endState = path.vertices.lastElement().state;
-        assertEquals(new GregorianCalendar(2009, 8, 1, 11, 0, 0).getTimeInMillis(), endState.getTime());
+        assertEquals(new GregorianCalendar(2009, 8, 1, 11, 0, 0).getTimeInMillis(), path.getEndTime());
     }
 
     public void testTripBikesAllowed() throws Exception {
@@ -390,24 +384,24 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
         // route: bikes allowed, trip: no value
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_b, new State(new GregorianCalendar(
-                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_b,  new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_b);
+        path = spt.getPath(stop_b, false);
         assertNotNull(path);
 
         // route: bikes allowed, trip: bikes not allowed
-        spt = AStar.getShortestPathTree(graph, stop_d, stop_c, new State(new GregorianCalendar(
-                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_d, stop_c,  new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_c);
+        path = spt.getPath(stop_c, false);
         assertNull(path);
 
         // route: bikes not allowed, trip: bikes allowed
-        spt = AStar.getShortestPathTree(graph, stop_c, stop_d, new State(new GregorianCalendar(
-                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_c, stop_d,  new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_d);
+        path = spt.getPath(stop_d, false);
         assertNotNull(path);
     }
 
@@ -428,30 +422,30 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
         // stop B is accessible, so there should be a path.
-        spt = AStar.getShortestPathTree(graph, near_a, near_b, new State(new GregorianCalendar(
-                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, near_a, near_b,  new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(near_b);
+        path = spt.getPath(near_b, false);
         assertNotNull(path);
 
         // stop C is not accessible, so there should be no path.
-        spt = AStar.getShortestPathTree(graph, near_a, near_c, new State(new GregorianCalendar(
-                2009, 8, 18, 0, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, near_a, near_c,  new GregorianCalendar(
+                2009, 8, 18, 0, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(near_c);
+        path = spt.getPath(near_c, false);
         assertNull(path);
 
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
-        spt = AStar.getShortestPathTree(graph, near_a, split_d, new State(time
-               .getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, near_a, split_d,  time
+               . getTimeInMillis(), options);
         
         time.add(Calendar.HOUR, 1);
         time.add(Calendar.SECOND, 1); //for the StreetTransitLink
-        path = spt.getPath(split_d);
+        path = spt.getPath(split_d, false);
         assertNotNull(path);
-        assertEquals(time.getTimeInMillis(), path.vertices.lastElement().state.getTime());
+        assertEquals(time.getTimeInMillis(), path.getEndTime());
     }
 
     public void testRunForTrain() {
@@ -469,10 +463,10 @@ public class TestPatternHopFactory extends TestCase {
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
         ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q", destination.getLabel(),
-                new State(startTime.getTimeInMillis()), wo);
-        GraphPath path = spt.getPath(destination);
+                 startTime.getTimeInMillis(), wo);
+        GraphPath path = spt.getPath(destination, false);
 
-        long endTime = path.vertices.lastElement().state.getTime();
+        long endTime = path.getEndTime();
         Calendar c = new GregorianCalendar();
         c.setTimeInMillis(endTime);
         assertTrue((endTime - startTime.getTimeInMillis()) / 1000 < 7200);
@@ -489,31 +483,31 @@ public class TestPatternHopFactory extends TestCase {
         options.setModes(new TraverseModeSet("TRANSIT"));
 
         // U to V - original stop times - shouldn't be used
-        spt = AStar.getShortestPathTree(graph, stop_u, stop_v, new State(
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis()), options);
-        path = spt.getPath(stop_v);
+        spt = AStar.getShortestPathTree(graph, stop_u, stop_v,  
+                new GregorianCalendar(2009, 8, 7, 0, 0, 0). getTimeInMillis(), options);
+        path = spt.getPath(stop_v, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(4, path.states.size());
         long endTime = new GregorianCalendar(2009, 8, 7, 6, 40, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
         // U to V - first frequency
-        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 7, 0, 0).getTimeInMillis()), options);
-        path = spt.getPath(stop_v);
+        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 7, 0, 0). getTimeInMillis(), options);
+        path = spt.getPath(stop_v, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(4, path.states.size());
         endTime = new GregorianCalendar(2009, 8, 7, 7, 40, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
 
         // U to V - second frequency
-        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 7, 14, 0, 0).getTimeInMillis()), options);
-        path = spt.getPath(stop_v);
+        spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(),  
+                new GregorianCalendar(2009, 8, 7, 14, 0, 0). getTimeInMillis(), options);
+        path = spt.getPath(stop_v, false);
         assertNotNull(path);
-        assertEquals(4, path.vertices.size());
+        assertEquals(4, path.states.size());
         endTime = new GregorianCalendar(2009, 8, 7, 14, 40, 0).getTimeInMillis();
-        assertEquals(endTime, path.vertices.lastElement().state.getTime());
+        assertEquals(endTime, path.getEndTime());
     }
     
     public void testFewestTransfers() {
@@ -521,24 +515,22 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
         TraverseOptions options = new TraverseOptions(context);
         options.optimizeFor = OptimizeType.QUICK;
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0). getTimeInMillis(), options);
 
         //when optimizing for speed, take the fast two-bus path
-        GraphPath path = spt.getPath(stop_d);
+        GraphPath path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        State endState = path.vertices.lastElement().state;
-        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 20, 0).getTimeInMillis(), endState.getTime());
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 20, 0).getTimeInMillis(), path.getEndTime());
         
         //when optimizing for fewest transfers, take the slow one-bus path
         options.optimizeFor = OptimizeType.TRANSFERS;
-        spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(), new State(
-                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0). getTimeInMillis(), options);
 
-        path = spt.getPath(stop_d);
+        path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        endState = path.vertices.lastElement().state;
-        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 50, 0).getTimeInMillis(), endState.getTime());
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 50, 0).getTimeInMillis(), path.getEndTime());
 
     }
 
@@ -550,12 +542,11 @@ public class TestPatternHopFactory extends TestCase {
         assertNotNull(stop);
 
         TraverseOptions options = new TraverseOptions(context);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, entrance, stop, new State(
-                new GregorianCalendar(2009, 8, 1, 16, 0, 0).getTimeInMillis()), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, entrance, stop,  
+                new GregorianCalendar(2009, 8, 1, 16, 0, 0). getTimeInMillis(), options);
         
-        GraphPath path = spt.getPath(stop);
+        GraphPath path = spt.getPath(stop, false);
         assertNotNull(path);
-        State endState = path.vertices.lastElement().state;
-        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 0, 34).getTimeInMillis(), endState.getTime());
+        assertEquals(new GregorianCalendar(2009, 8, 1, 16, 0, 34).getTimeInMillis(), path.getEndTime());
     }
 }

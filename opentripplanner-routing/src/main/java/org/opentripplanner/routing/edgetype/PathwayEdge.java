@@ -2,9 +2,8 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -70,27 +69,31 @@ public class PathwayEdge extends AbstractEdge {
         return "pathway";
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions wo) {
+    public State traverse(State s0) {
         int time = traversalTime;
-        if (wo.wheelchairAccessible) {
+        if (s0.getOptions().wheelchairAccessible) {
             if (wheelchairTraversalTime < 0) {
                 return null;
             }
             time = wheelchairTraversalTime;
         }
-        State s1 = s0.incrementTimeInSeconds(time);
-        return new TraverseResult(time, s1, this);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(time);
+        s1.incrementWeight(time);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) {
+    public State traverseBack(State s0) {
         int time = traversalTime;
-        if (wo.wheelchairAccessible) {
+        if (s0.getOptions().wheelchairAccessible) {
             if (wheelchairTraversalTime < 0) {
                 return null;
             }
             time = wheelchairTraversalTime;            
         }
-        State s1 = s0.incrementTimeInSeconds(-time);
-        return new TraverseResult(time, s1, this);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(-time);
+        s1.incrementWeight(time);
+        return s1.makeState();
     }
 }

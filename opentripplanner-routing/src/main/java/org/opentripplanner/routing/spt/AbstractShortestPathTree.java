@@ -13,10 +13,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
@@ -27,51 +29,24 @@ import org.opentripplanner.routing.core.Vertex;
 public abstract class AbstractShortestPathTree implements ShortestPathTree {
 
     @Override
-    public GraphPath getPath(Vertex dest) {
-        return getPath(dest, true);
-    }
-
-    @Override
     public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
-        GraphPath path = getPath(dest, optimize);
-        if (path == null)
-            return Collections.emptyList();
-        return Arrays.asList(path);
-    }
-
-    /****
-     * Protected Methods
-     ****/
-
-    protected GraphPath createPathForVertex(SPTVertex end, boolean optimize) {
-
-        GraphPath ret = new GraphPath();
-
-        SPTEdge prevEdge = null;
-
-        while (true) {
-            end = new SPTVertex(end);
-
-            if (prevEdge != null)
-                prevEdge.fromv = end;
-
-            ret.vertices.add(0, end);
-            if (end.incoming == null) {
-                break;
-            }
-            SPTEdge edge = new SPTEdge(end.incoming);
-            end.incoming = edge;
-            edge.tov = end;
-            ret.edges.add(0, edge);
-
-            end = edge.fromv;
-            prevEdge = edge;
-        }
-
-        if (optimize) {
-            ret.optimize();
+    	List<State> stateList = getStates(dest);
+    	if (stateList == null)
+    		return Collections.emptyList();
+    	List<GraphPath> ret = new LinkedList<GraphPath>();
+        for (State s : stateList) {
+        	ret.add(new GraphPath(s, optimize));
         }
         return ret;
     }
+    
+	@Override
+	public GraphPath getPath(Vertex dest, boolean optimize) {
+		State s = getState(dest);
+		if (s==null)
+			return null;
+		else
+			return new GraphPath(s, optimize);
+	}
 
 }

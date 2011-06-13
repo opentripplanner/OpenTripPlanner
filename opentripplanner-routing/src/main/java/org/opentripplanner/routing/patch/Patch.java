@@ -23,8 +23,8 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 
 @XmlType
 @XmlTransient
@@ -101,11 +101,11 @@ public abstract class Patch implements Serializable {
 		return eventEnd >= startTimeOfDay && eventStart < endTimeOfDay;
 	}
 
-	public static TraverseResult filterTraverseResultChain(TraverseResult result, 
+	public static State filterTraverseResultChain(State result, 
 			TraverseResultFilter traverseResultFilter) {
-		TraverseResult out = null;
-		for (TraverseResult old = result; old != null; old = old.getNextResult()) {
-			TraverseResult filtered = traverseResultFilter.filter(old);
+		State out = null;
+		for (State old = result; old != null; old = old.getNextResult()) {
+			State filtered = traverseResultFilter.filter(old);
 			if (out == null) {
 				out = filtered;
 			} else {
@@ -128,13 +128,7 @@ public abstract class Patch implements Serializable {
 
 	public abstract void remove(Graph graph);
 
-	public abstract TraverseResult addTraverseResult(Edge edge, State state,
-			TraverseOptions options);
-
-	public abstract TraverseResult addTraverseResultBack(Edge edge,
-			State state, TraverseOptions options);
-
-	public abstract TraverseResult filterTraverseResults(TraverseResult result);
+	public abstract void filterTraverseResult(StateEditor result);
 
 	public int hashCode() {
 		return id.hashCode();

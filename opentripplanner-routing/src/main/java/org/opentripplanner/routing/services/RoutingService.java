@@ -22,7 +22,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 public interface RoutingService {
 
-    public List<GraphPath> route(Vertex fromVertex, Vertex toVertex, State state,
+    public List<GraphPath> route(Vertex fromVertex, Vertex toVertex, long time,
             TraverseOptions options);
 
     /**
@@ -37,5 +37,5 @@ public interface RoutingService {
      * @return
      */
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediateVertices,
-            State state, TraverseOptions options);
+            long time, TraverseOptions options);
 }

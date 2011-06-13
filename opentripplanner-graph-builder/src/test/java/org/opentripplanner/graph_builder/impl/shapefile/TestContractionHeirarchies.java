@@ -50,7 +50,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -63,8 +62,6 @@ import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTEdge;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -80,12 +77,12 @@ class ForbiddenEdge extends FreeEdge {
     }
 
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions options) {
+    public State traverse(State s0) {
         return null;
     }
     
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options) {
+    public State traverseBack(State s0) {
         return null;
     }
 }
@@ -185,34 +182,35 @@ public class TestContractionHeirarchies extends TestCase {
         // test hop limit
         Dijkstra dijkstra = new Dijkstra(graph, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(verticesIn[0][2], 4);
-        SPTVertex v03 = spt.getVertex(verticesIn[0][3]);
+        State v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
         dijkstra = new Dijkstra(graph, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 500);
-        v03 = spt.getVertex(verticesIn[0][3]);
+        v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
 
         // test distance limit
         dijkstra = new Dijkstra(graph, verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 20);
-        v03 = spt.getVertex(verticesIn[0][3]);
+        v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
+        dijkstra = new Dijkstra(graph, verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 130);
-        v03 = spt.getVertex(verticesIn[0][3]);
+        v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
         
         // test getShortcuts
         
         ContractionHierarchy testch = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
-        List<Shortcut> shortcuts = testch.getShortcuts(v, 5, true).shortcuts;
+        List<Shortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
         assertEquals(16, shortcuts.size());
         
         v = graph.getVertex("(0, 0) in");
-        shortcuts = testch.getShortcuts(v, 5, true).shortcuts;
+        shortcuts = testch.getShortcuts(v, true).shortcuts;
         assertEquals(0, shortcuts.size());
 
         // test hierarchy construction
@@ -224,27 +222,25 @@ public class TestContractionHeirarchies extends TestCase {
 
         System.out.println("Contracted");
 
-        State init = new State(1000000000);
 
         // test query
-        GraphPath path = hierarchy.getShortestPath(verticesOut[0][0], verticesIn[N - 1][N - 1], init,
+        GraphPath path = hierarchy.getShortestPath(verticesOut[0][0], verticesIn[N - 1][N - 1], 1000000000,
                 options);
         assertNotNull(path);
 
-        assertEquals((N - 1) * 2 + 1, path.edges.size());
-        assertEquals(path.edges.size() + 1, path.vertices.size());
+        assertEquals((N - 1) * 2 + 2, path.states.size());
 
-        SPTVertex lastVertex = path.vertices.get(0);
-        for (int i = 0; i < path.edges.size(); ++i) {
-            SPTEdge e = path.edges.get(i);
-            assertSame(e.getFromVertex(), lastVertex);
-            assertSame(lastVertex, path.vertices.get(i));
-            lastVertex = e.getToVertex();
-        }
+//        Vertex v = path.getStartVertex();
+//        for (int i = 0; i < path.states.size(); ++i) {
+//            State s = path.states.get(i);
+//            assertSame(s.getVertex(), v);
+//            assertSame(lastVertex, path.vertices.get(i));
+//            Verte lastVertex = v;
+//        }
 
-        path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], init, options);
-        if (path == null || path.edges.size() != 4) {
-            path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], init, options);
+        path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], 1000000000, options);
+        if (path == null || path.states.size() != 5) {
+            path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], 1000000000, options);
         }
         
         options = new TraverseOptions();
@@ -258,18 +254,18 @@ public class TestContractionHeirarchies extends TestCase {
                             continue;
                         }
                         options.setArriveBy(false);
-                        path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], init,
+                        path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], 1000000000,
                                 options);
 
                         assertNotNull(path);
-                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.edges.size());
+                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.states.size());
                         
                         options.setArriveBy(true);
-                        path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], init,
+                        path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], 1000000000,
                                 options);
 
                         assertNotNull(path);
-                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.edges.size());
+                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.states.size());
                     }
                 }
             }
@@ -347,14 +343,13 @@ public class TestContractionHeirarchies extends TestCase {
 
         ContractionHierarchy hierarchy = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 1.0);
 
-        State init = new State(0);
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
-        GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), init, options);
+        GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
         assertNotNull(path);
-        assertTrue(path.edges.size() != 0);
+        assertTrue(path.states.size() > 1);
         
         long now = System.currentTimeMillis();
         for (Vertex start : vertices) {
@@ -363,7 +358,7 @@ public class TestContractionHeirarchies extends TestCase {
             if (start == end) {
                 continue;
             }
-            GraphPath path2 = hierarchy.getShortestPath(start, end, init, options);
+            GraphPath path2 = hierarchy.getShortestPath(start, end, 0, options);
             assertNotNull(path2);
         }
         System.out.println("time per query: " + (System.currentTimeMillis() - now) / 1000.0 / N);
@@ -372,9 +367,8 @@ public class TestContractionHeirarchies extends TestCase {
     @SuppressWarnings("unchecked")
     @Test
     public void testNYC() throws Exception {
-
-        long startTime = new GregorianCalendar(2010, 10, 11, 12, 0, 0).getTimeInMillis();
-        State init = new State(startTime);
+    	// be sure this date matches your subway gtfs validity period
+        long startTime = new GregorianCalendar(2009, 10, 11, 12, 0, 0).getTimeInMillis();
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;
@@ -461,6 +455,7 @@ public class TestContractionHeirarchies extends TestCase {
         CalendarServiceImpl calendarService = new CalendarServiceImpl();
         calendarService.setData(data);
         options.setCalendarService(calendarService);
+        options.setServiceDays(startTime);
         options.setTransferTable(graph.getTransferTable());
         
         Vertex start1 = graph.getVertex("0072480");
@@ -469,13 +464,16 @@ public class TestContractionHeirarchies extends TestCase {
         assertNotNull(end1);
         assertNotNull(start1);
         
-        ShortestPathTree shortestPathTree = AStar.getShortestPathTree(graph, start1, end1, init, options);
-        path = shortestPathTree.getPath(end1);
+        ShortestPathTree shortestPathTree = AStar.getShortestPathTree(graph, start1, end1, startTime, options);
+        path = shortestPathTree.getPath(end1, true);
         assertNotNull(path);
 
         boolean subway1 = false;
-        for (SPTEdge edge : path.edges) {
-            if (TraverseMode.SUBWAY.equals(edge.getMode())) {
+        for (State state : path.states) {
+        	if (state.getBackEdge() == null) 
+        		continue;
+        	System.out.println(state.getBackEdgeNarrative().getMode());
+            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
                 subway1 = true;
                 break;
             }
@@ -508,16 +506,16 @@ public class TestContractionHeirarchies extends TestCase {
         assertNotNull(start);
         assertNotNull(end);
         
-        init = new State(0);
-        path = hierarchy.getShortestPath(start, end, init, options);
+        path = hierarchy.getShortestPath(start, end, 0, options);
         assertNotNull(path);
 
-        init = new State(startTime);
-        GraphPath pathWithSubways = hierarchy.getShortestPath(start, end, init, options);
+        GraphPath pathWithSubways = hierarchy.getShortestPath(start, end, startTime, options);
         assertNotNull(pathWithSubways);
         boolean subway = false;
-        for (SPTEdge edge : pathWithSubways.edges) {
-            if (TraverseMode.SUBWAY.equals(edge.getMode())) {
+        for (State state : pathWithSubways.states) {
+        	if (state.getBackEdge() == null) 
+        		continue;
+            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
                 subway = true;
                 break;
             }
@@ -527,11 +525,11 @@ public class TestContractionHeirarchies extends TestCase {
         
         //try reverse routing
         options.setArriveBy(true);
-        pathWithSubways = hierarchy.getShortestPath(start, end, init, options);
+        pathWithSubways = hierarchy.getShortestPath(start, end, startTime, options);
         assertNotNull("Reverse path must be found", pathWithSubways);
         subway = false;
-        for (SPTEdge edge : pathWithSubways.edges) {
-            if (TraverseMode.SUBWAY.equals(edge.getMode())) {
+        for (State state : pathWithSubways.states) {
+            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
                 subway = true;
                 break;
             }
@@ -543,13 +541,13 @@ public class TestContractionHeirarchies extends TestCase {
         // test max time 
         options.worstTime = startTime + 1000 * 60 * 90; //an hour and a half is too much time
 
-        path = hierarchy.getShortestPath(start, end, new State(startTime),
+        path = hierarchy.getShortestPath(start, end, startTime,
                 options);
         assertNotNull(path);
             
         options.worstTime = startTime + 1000 * 60; //but one minute is not enough
 
-        path = hierarchy.getShortestPath(start, end, new State(startTime),
+        path = hierarchy.getShortestPath(start, end, startTime,
                 options);
         assertNull(path);        
         
@@ -616,7 +614,7 @@ public class TestContractionHeirarchies extends TestCase {
             options.setArriveBy(i % 2 == 0); //half of all trips will be reverse trips just for fun
             assertNotNull(v1);
             assertNotNull(v2);
-            GraphPath path2 = hierarchy.getShortestPath(v1, v2, init, options);
+            GraphPath path2 = hierarchy.getShortestPath(v1, v2, startTime, options);
             //assertNotNull(path2);
             if (path2 != null) {
                 notNull += 1;

@@ -13,12 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,15 +37,19 @@ public class FreeEdge extends AbstractEdge {
     }
     
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions options)
-            throws NegativeWeightException {
-        return new TraverseResult(0.000001, s0, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+    public State traverse(State s0) {
+    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+    	StateEditor s1 = s0.edit(this, en);
+    	s1.incrementWeight(1);
+        return s1.makeState();
     }
 
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options)
-            throws NegativeWeightException {
-        return new TraverseResult(0.000001, s0, new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+    public State traverseBack(State s0) {
+    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+    	StateEditor s1 = s0.edit(this, en);
+    	s1.incrementWeight(1);
+        return s1.makeState();
     }
 
     @Override

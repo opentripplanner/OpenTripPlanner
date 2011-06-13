@@ -15,12 +15,11 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData.Editor;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
@@ -69,38 +68,46 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
     }
     
-    public TraverseResult optimisticTraverse(State state0, TraverseOptions wo) {
+    public State optimisticTraverse(State state0) {
     	int runningTime = pattern.getBestRunningTime(stopIndex);
-    	State state1 = state0.incrementTimeInSeconds(runningTime);
-    	return new TraverseResult(runningTime, state1, this);
+    	StateEditor s1 = state0.edit(this);
+    	s1.incrementTimeInSeconds(runningTime);
+    	s1.incrementWeight(runningTime);
+    	return s1.makeState();
     }
 
-    public TraverseResult optimisticTraverseBack(State state0, TraverseOptions wo) {
+    public State optimisticTraverseBack(State state0) {
         int runningTime = pattern.getBestRunningTime(stopIndex);
-        State state1 = state0.incrementTimeInSeconds(-runningTime);
-        return new TraverseResult(runningTime, state1, this);
+        StateEditor s1 = state0.edit(this);
+        s1.incrementTimeInSeconds(-runningTime);
+        s1.incrementWeight(runningTime);
+        return s1.makeState();
     }
     
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        int trip = state0.getData().getTrip();
+    public State traverse(State state0) {
+        int trip = state0.getTrip();
         int runningTime = pattern.getRunningTime(stopIndex, trip);
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(runningTime);
-        editor.setZone(getEndStop().getZoneId());
-        editor.setRoute(pattern.getExemplar().getRoute().getId());
-        editor.setFareContext(context);
-        return new TraverseResult(runningTime, editor.createState(), new RouteNameNarrative(getPattern().getTrip(trip), this));
+        EdgeNarrative en = new RouteNameNarrative(getPattern().getTrip(trip), this);
+        StateEditor s1 = state0.edit(this, en);
+        s1.incrementTimeInSeconds(runningTime);
+        s1.setZone(getEndStop().getZoneId());
+        s1.setRoute(pattern.getExemplar().getRoute().getId());
+        s1.setFareContext(context);
+        s1.incrementWeight(runningTime);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        int trip = state0.getData().getTrip();
+    public State traverseBack(State state0) {
+        int trip = state0.getTrip();
         int runningTime = pattern.getRunningTime(stopIndex, trip);
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(-runningTime);
-        editor.setZone(getStartStop().getZoneId());
-        editor.setRoute(pattern.getExemplar().getRoute().getId());
-        editor.setFareContext(context);
-        return new TraverseResult(runningTime, editor.createState(), new RouteNameNarrative(getPattern().getTrip(trip), this));
+        EdgeNarrative en = new RouteNameNarrative(getPattern().getTrip(trip), this);
+        StateEditor s1 = state0.edit(this, en);
+        s1.incrementTimeInSeconds(-runningTime);
+        s1.setZone(getStartStop().getZoneId());
+        s1.setRoute(pattern.getExemplar().getRoute().getId());
+        s1.setFareContext(context);
+        s1.incrementWeight(runningTime);
+        return s1.makeState();
     }
 
     public void setGeometry(Geometry geometry) {

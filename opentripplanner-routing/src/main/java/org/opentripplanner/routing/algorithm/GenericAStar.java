@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,16 +30,15 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.pqueue.PriorityQueueImpl;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
@@ -66,24 +66,6 @@ public class GenericAStar {
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
         _searchTerminationStrategy = searchTerminationStrategy;
     }
-    
-    /**
-     * Convenience method that swaps the origin and target for the actual search
-     * @param graph
-     * @param origin
-     * @param target
-     * @param init
-     * @param options
-     * @return
-     */
-    public ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin,
-            Vertex target, State init, TraverseOptions options) {
-        
-        if (!options.isArriveBy()) {
-            throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
-        }
-        return getShortestPathTree(graph, target, origin, init, options);
-    }
 
     /**
      * Plots a path on graph from origin to target, DEPARTING at the time given in state and with
@@ -92,18 +74,28 @@ public class GenericAStar {
      * @param graph
      * @param origin
      * @param target
-     * @param init
+     * @param time 
      * @param options
      * @return the shortest path, or null if none is found
      */
-    public ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
-            State init, TraverseOptions options) {
+    public ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target, long time, TraverseOptions options) {
 
         if (origin == null || target == null) {
             return null;
         }
 
-        ShortestPathTree spt = createShortestPathTree(init, options);
+        State s0;
+        if (options.isArriveBy()) {
+            s0 = new State(time, target, options);
+        	target = origin;
+        	origin = s0.getVertex();
+        } else {
+            s0 = new State(time, origin, options);
+        }
+        // from now on, target means "where this search will terminate"
+        // not "the end of the trip from the user's perspective".
+        
+        ShortestPathTree spt = createShortestPathTree(s0, options);
 
         options.setTransferTable(graph.getTransferTable());
 
@@ -112,6 +104,7 @@ public class GenericAStar {
          */
         final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
         Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
+        // conditional could be eliminated by placing this before the o/d swap above
         if (options.isArriveBy()) {
             extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin);
             extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
@@ -125,34 +118,35 @@ public class GenericAStar {
 
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
 
-        double initialWeight = heuristic.computeInitialWeight(origin, target, options);
-        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
+        double initialWeight = heuristic.computeInitialWeight(s0, target, options);
+        spt.add(s0);
 
         // Priority Queue
-        OTPPriorityQueueFactory factory = PriorityQueueImpl.FACTORY;
-        OTPPriorityQueue<SPTVertex> pq = factory.create(graph.getVertices().size()
-                + extraEdges.size());
-        pq.insert(spt_origin, spt_origin.weightSum + initialWeight);
+        OTPPriorityQueueFactory factory = BinHeap.FACTORY;
+        OTPPriorityQueue<State> pq = factory.create(graph.getVertices().size() + extraEdges.size());
+        // this would allow continuing a search from an existing state
+        pq.insert(s0, s0.getWeight() + initialWeight); 
 
         options = options.clone();
         /** max walk distance cannot be less than distances to nearest transit stops */
-        options.maxWalkDistance += origin.getDistanceToNearestTransitStop()
-                + target.getDistanceToNearestTransitStop();
+        double minWalkDistance = origin.getDistanceToNearestTransitStop() + 
+        						 target.getDistanceToNearestTransitStop();
+        options.maxWalkDistance = Math.max(options.maxWalkDistance, minWalkDistance); 
 
         long computationStartTime = System.currentTimeMillis();
         long maxComputationTime = options.maxComputationTime;
 
-        boolean exit = false;
+        boolean exit = false; // Unused?
 
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
 
             if (exit)
-                break;
+                break;  // unused?
 
             if (_verbose) {
                 double w = pq.peek_min_key();
-                System.out.println("min," + w);
+                System.out.println("pq min key = " + w);
             }
 
             /**
@@ -164,78 +158,74 @@ public class GenericAStar {
                 }
             }
 
-            SPTVertex spt_u = pq.extract_min(); // get the lowest-weightSum Vertex 'u',
-
-            // hard limit on walk distance. to be replaced with something more subtle later.
-            State state_u = spt_u.state;
-            StateData data_u = state_u.getData();
-
-            Vertex fromv = spt_u.mirror;
-
+            // get the lowest-weight state in the queue
+            State u = pq.extract_min(); 
+            // check that this state has not been dominated
+            // and mark vertex as visited 
+            if (! spt.visit(u)) 
+            	continue; 
+            Vertex u_vertex = u.getVertex();
+            // Uncomment the following statement
+            // to print out a CSV (actually semicolon-separated) 
+            // list of visited nodes for display in  a GIS
+            //System.out.println(u_vertex + ";" + u_vertex.getX() + ";" + u_vertex.getY() + ";" + u.getWeight());
+            
             if (_verbose)
-                System.out.println(fromv);
+                System.out.println("   vertex " + u_vertex);
 
             /**
              * Should we terminate the search?
              */
             if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(origin, target, spt_u, spt,
+                if (!_searchTerminationStrategy.shouldSearchContinue(origin, target, u, spt,
                         options))
                     break;
-            } else if (fromv == target) {
-                break;
+            } else if (u_vertex == target) {
+                return spt;
             }
 
-            Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, fromv, options);
+            Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, u_vertex, options);
 
             for (Edge edge : edges) {
 
-                State state = spt_u.state;
-
-                if (edge instanceof PatternBoard && data_u.getNumBoardings() > options.maxTransfers) {
+            	if (edge instanceof PatternBoard && u.getNumBoardings() > options.maxTransfers)
                     continue;
-                }
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
-                for (TraverseResult wr = traversEdge(edge, state, options); wr != null; wr = wr
-                        .getNextResult()) {
+                for (State v = traverseEdge(edge, u, options); v != null; v = v.getNextResult()) {
+                	// Could be: for (State v : traverseEdge...)
 
-                    if (wr.weight < 0) {
-                        throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge "
-                                + edge);
-                    }
+// now handled in state editor                	
+//                	double delta_w = v.getWeight() - u.getWeight(); 
+//                    if (delta_w < 0) { // <0
+//                        throw new NegativeWeightException(String.valueOf(delta_w)
+//                        								  + " on edge " + edge);
+//                    }
                     
-                    if( _skipTraversalResultStrategy != null && _skipTraversalResultStrategy.shouldSkipTraversalResult(origin, target, spt_u, wr, spt, options))
+                    if( _skipTraversalResultStrategy != null 
+                        && _skipTraversalResultStrategy.shouldSkipTraversalResult(origin, target, u, v, spt, options))
                         continue;
 
-                    EdgeNarrative er = wr.getEdgeNarrative();
-
-                    Vertex tov = options.isArriveBy() ? er.getFromVertex() : er.getToVertex();
-
-                    double new_w = spt_u.weightSum + wr.weight;
-                    double remaining_w = computeRemainingWeight(heuristic, spt_u, edge, wr, target,
-                            options);
-                    double heuristic_distance = new_w + remaining_w;
+                    double remaining_w = computeRemainingWeight(heuristic, v, target, options);
+                    double estimate = v.getWeight() + remaining_w;
 
                     if (_verbose) {
-                        System.out.println("  w=" + spt_u.weightSum + "+" + wr.weight + "+"
-                                + remaining_w + "=" + heuristic_distance + " " + tov);
+                    	System.out.println("      edge " + edge);
+                        System.out.println("      " + u.getWeight() + " -> " + v.getWeight() + "(w) + "
+                                + remaining_w + "(heur) = " + estimate + " vert = " + v.getVertex());
                     }
 
-                    if (heuristic_distance > options.maxWeight || isWorstTimeExceeded(wr, options)) {
+                    if (estimate > options.maxWeight || isWorstTimeExceeded(v, options)) {
                         // too expensive to get here
                     } else {
-                        SPTVertex spt_v = spt.addVertex(tov, wr.state, new_w, options);
-                        if (spt_v != null) {
-                            spt_v.setParent(spt_u, edge, er);
-                            pq.insert_or_dec_key(spt_v, heuristic_distance);
+                        if (spt.add(v)) {
+                            pq.insert(v, estimate);
                         }
                     }
                 }
             }
         }
-
         return spt;
     }
 
@@ -248,69 +238,31 @@ public class GenericAStar {
             return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
     }
 
-    private TraverseResult traversEdge(Edge edge, State state, TraverseOptions options) {
-    	List<Patch> patches = edge.getPatches();
+    private State traverseEdge(Edge edge, State state, TraverseOptions options) {
         if (options.isArriveBy()) {
-
-            TraverseResult result = edge.traverseBack(state, options);
-            if (patches == null) {
-            	return result;
-            }
-            for (Patch patch : patches) {
-            	if (!patch.activeDuring(options, state.getStartTime(), state.getTime())) {
-            		continue;
-            	}
-                if (result != null) {
-                	result = patch.filterTraverseResults(result);
-                }
-            	TraverseResult patchResult = patch.addTraverseResultBack(edge, state, options);
-            	if (patchResult != null) {
-            		if (result != null) {
-            			patchResult.addToExistingResultChain(result);
-            		} else {
-            			result = patchResult;
-            		}
-            	}
-            }
+            State result = edge.traverseBack(state);
             return result;
         } else {
-        	TraverseResult result = edge.traverse(state, options);
-            if (patches == null) {
-            	return result;
-            }
-        	for (Patch patch : patches) {
-        		if (!patch.activeDuring(options, state.getStartTime(), state.getTime())) {
-            		continue;
-            	}
-                if (result != null) {
-                	result = patch.filterTraverseResults(result);
-                }
-            	TraverseResult patchResult = patch.addTraverseResult(edge, state, options);
-            	if (patchResult != null) {
-            		if (result != null) {
-            			patchResult.addToExistingResultChain(result);
-            		} else {
-            			result = patchResult;
-            		}
-            	}
-            }
+        	State result = edge.traverse(state);
         	return result;
         }
     }
 
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic,
-            SPTVertex spt_u, Edge edge, TraverseResult wr, Vertex target, TraverseOptions options) {
+            State v, Vertex target, TraverseOptions options) {
+    	// actually, the heuristic could figure this out from the TraverseOptions.
+    	// set private member back=options.isArriveBy() on initial weight computation.
         if (options.isArriveBy())
-            return heuristic.computeReverseWeight(spt_u, edge, wr, target);
+            return heuristic.computeReverseWeight(v, target);
         else
-            return heuristic.computeForwardWeight(spt_u, edge, wr, target);
+            return heuristic.computeForwardWeight(v, target);
     }
 
-    private boolean isWorstTimeExceeded(TraverseResult wr, TraverseOptions options) {
+    private boolean isWorstTimeExceeded(State v, TraverseOptions options) {
         if (options.isArriveBy())
-            return wr.state.getTime() < options.worstTime;
+            return v.getTime() < options.worstTime;
         else
-            return wr.state.getTime() > options.worstTime;
+            return v.getTime() > options.worstTime;
     }
 
     private ShortestPathTree createShortestPathTree(State init, TraverseOptions options) {
@@ -324,7 +276,7 @@ public class GenericAStar {
         if (spt == null) {
             if (options.getModes().getTransit()) {
                 spt = new MultiShortestPathTree();
-                //if (options.useServiceDays)
+            	//if (options.useServiceDays)
                     options.setServiceDays(init.getTime());
             } else {
                 spt = new BasicShortestPathTree();

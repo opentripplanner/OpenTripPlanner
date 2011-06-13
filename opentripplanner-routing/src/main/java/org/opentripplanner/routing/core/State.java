@@ -14,103 +14,301 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Date;
+import java.util.HashMap;
 
-import org.opentripplanner.routing.core.StateData.Editor;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 
-public class State {
+public class State implements Cloneable {
     
-    private final long startTime;
+	/*
+	 * should fields be package private (default)?
+	 */
 
-    private final long time;
+	// the time at which the search started
+    protected long startTime;
+    // the current time at this state
+    protected long time;
+    // accumulated weight up to this state 
+    protected double weight;
+    // associate this state with a vertex in the graph 
+    protected Vertex vertex;
+    // allow path reconstruction from states
+    protected State backState;
+    protected Edge backEdge;
+    protected EdgeNarrative backEdgeNarrative;
+    // the traverseOptions that were used to reach this state
+    protected TraverseOptions options;
+    // which trip index inside a pattern
+    protected int trip;
+    protected AgencyAndId tripId;
+    // how far have we walked
+    protected double walkDistance;
+    protected String zone;
+    protected AgencyAndId route;
+    protected FareContext fareContext;
+    protected int numBoardings;
+    protected boolean alightedLocal;
+    protected boolean everBoarded;
+    protected Vertex previousStop;
+    protected long lastAlightedTime;
+    protected int hops;
+    protected HashMap<Object, Object> extensions;
 
-    private final StateData data;
-
-    public State() {
-        this(System.currentTimeMillis());
-    }
-
-    public State(long time) {
-        this(time, time, StateData.createDefault());
-    }
+    private State next;
     
-    public State(long time, StateData data) {
-        this(time,time,data);
+    /* CONSTRUCTORS */
+    
+    /** 
+     * Create a state representing the beginning of a trip
+     * at the given vertex, at the current system time.
+     * @param v the origin vertex of a search 
+     */
+//    public State(Vertex v) {
+//        this(System.currentTimeMillis(), v, new TraverseOptions());
+//    }
+
+    public State(Vertex v, TraverseOptions opt) {
+        this(System.currentTimeMillis(), v, opt);
     }
 
-    public State(long startTime, long time, StateData data) {
-        this.startTime = startTime;
+    /** 
+     * Create a state representing the beginning of a search
+     * at the given vertex, at the given time.
+     * @param time - The time at which the search will start
+     * @param v - The origin vertex of the search
+     */
+    public State(long time, Vertex vertex, TraverseOptions opt) {
+        // parent-less states can only be created at the beginning of a trip. 
+        // elsewhere, all states must be created from a parent 
+    	// and associated with an edge.
+        this.startTime = time;
         this.time = time;
-        this.data = data;
+        this.options = opt;
+        this.weight = 0;
+        this.vertex = vertex;
+        this.backState = null;
+        this.backEdge = null;
+        this.backEdgeNarrative = null;
+        this.hops = 0;
     }
     
     /**
-     * @return the start time in milliseconds since the epoch.
+     * Create a state editor to produce a child of this state,
+     * which will be the result of traversing the given edge.
+     * 
+     * @param e
+     * @return
      */
-    public long getStartTime() {
-        return startTime;
+    public StateEditor edit(Edge e) {
+    	return new StateEditor(this, e);
     }
 
+    public StateEditor edit(Edge e, EdgeNarrative en) {
+    	return new StateEditor(this, e, en);
+    }
 
-    /**
-     * @return the time in milliseconds since the epoch.
+    protected State clone() {
+    	State ret;
+    	try {
+			ret = (State) super.clone();
+		} catch (CloneNotSupportedException e1) {
+			throw new IllegalStateException("This is not happening");
+		}
+		return ret;
+	}
+    
+    /*
+     *  FIELD ACCESSOR METHODS
+     *  States are immutable, so they have only get methods.
+     *  The corresponding set methods are in StateEditor. 
      */
+
+    /** 
+     * Retrieve a State extension based on its key.
+     * @param key - An Object that is a key in this State's extension map
+     * @return - The extension value for the given key, or null if not present
+     */
+    public Object getExtension (Object key) { 
+    	return extensions.get(key); 
+    }
+    
+	public String toString() {
+        return "<State " + new Date(time) + " " + vertex + ">";
+    }
+    
     public long getTime() {
-        return time;
+    	return this.time;
+    }
+    
+    public long getElapsedTime() {
+    	return Math.abs(this.time - this.startTime);
     }
 
-    /**
-     * @return all data associated with this state
-     */
-    public StateData getData() {
-        return data;
+    public int getTrip() {
+        return trip;
     }
 
-    public StateData.Editor edit() {
-        Editor editor = data.edit();
-        editor.setStartTime(startTime);
-        editor.setTime(time);
-        return editor;
+    public AgencyAndId getTripId() {
+        return tripId;
     }
 
-    /****
-     * State Transition Methods
-     ****/
+    public String getZone() {
+        return zone;
+    }
 
-    /**
-     * Create a new state whose time has been incremented the specified number of seconds and whose
-     * data remains the same. The current state object is not modified.
+    public AgencyAndId getRoute() {
+        return route;
+    }
+
+    public FareContext getFareContext() {
+        return fareContext;
+    }
+
+    public int getNumBoardings() {
+        return numBoardings;
+    }
+
+    public boolean isAlightedLocal() {
+        return alightedLocal;
+    }
+
+    public boolean isEverBoarded() {
+        return everBoarded;
+    }
+
+    public Vertex getPreviousStop() {
+        return previousStop;
+    }
+
+    public long getLastAlightedTime() {
+        return lastAlightedTime;
+    }
+
+    public double getWalkDistance() {
+        return this.walkDistance;
+    }
+    
+	public Vertex getVertex() {
+		return this.vertex;
+	}
+
+	/**
+	 * Multicriteria comparison. Returns true if this state is better than the other one
+	 * (or equal) both in terms of time and weight.
+	 */
+	public boolean dominates(State other) {
+        // in the name of efficiency, these should probably be quantized
+        // before comparison (AMB)
+		return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime(); 
+	}
+
+	/**
+	 * Returns true if this state's weight is lower than the other one.
+	 * Considers only weight and not time or other criteria. 
+	 */
+	public boolean betterThan(State other) {
+		return this.weight < other.weight; 
+	}
+
+	public double getWeight() {
+		return this.weight;
+	}
+
+	public long getTimeDeltaMsec() {
+		return this.time - backState.time;
+	}
+
+	public long getAbsTimeDeltaMsec() {
+		return Math.abs( this.time - backState.time );
+	}
+
+	public double getWeightDelta() {
+		return this.weight - backState.weight;
+	}
+
+	public void checkNegativeWeight () {
+		double dw = this.weight - backState.weight; 
+        if (dw < 0) {
+            throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
+        }
+	}
+	
+	public boolean isOnboard() {
+		return this.backEdge instanceof OnBoardForwardEdge;
+	}
+
+	public EdgeNarrative getBackEdgeNarrative() {
+		return this.backEdgeNarrative;
+	}
+
+	public State getBackState() {
+		return this.backState;
+	}
+
+	public Edge getBackEdge() {
+		return this.backEdge;
+	}
+	
+	public boolean exceedsHopLimit(int maxHops) {
+		return hops > maxHops;
+	}
+
+	public boolean exceedsWeightLimit(double maxWeight) {
+		return weight > maxWeight;
+	}
+
+	public long getStartTime() {
+		return startTime;
+	}
+	
+	/**
+     * Optional next result that allows {@link Edge} to return multiple results from
+     * {@link Edge#traverse(State, TraverseOptions)} or
+     * {@link Edge#traverseBack(State, TraverseOptions)}
      * 
-     * @param numOfSeconds
-     * @return the new state
+     * @return the next additional result from an edge traversal, or null if no more results
      */
-    public State incrementTimeInSeconds(int numOfSeconds) {
-        long t = this.time + numOfSeconds * 1000;
-        return new State(this.startTime, t, this.data);
+    public State getNextResult() {
+        return next;
     }
 
     /**
-     * Create a new state with the specified time and the current state's data. The current state
-     * object is not modified.
+     * Extend an exiting result chain by appending this result to the existing chain. The usage
+     * model looks like this:
      * 
-     * @param time
-     * @return the new state
-     */
-    public State setTime(long time) {
-        return new State(this.startTime, time, this.data);
-    }
-
-    /**
-     * Create a new state whose data has been updated as specified and whose time remains the same.
-     * The current state object is not modified.
+     * <code>
+     * TraverseResult result = null;
      * 
-     * @param updatedData
-     * @return the new state.
+     * for( ... ) {
+     *   TraverseResult individualResult = ...;
+     *   result = individualResult.addToExistingResultChain(result);
+     * }
+     * 
+     * return result;
+     * </code>
+     * 
+     * @param existingResultChain
+     *            the tail of an existing result chain, or null if the chain has not been started
+     * @return
      */
-    public State setData(StateData updatedData) {
-        return new State(this.startTime, this.time, updatedData);
+    public State addToExistingResultChain(State existingResultChain) {
+        if (this.getNextResult() != null)
+            throw new IllegalStateException("this result already has a next result set");
+        next = existingResultChain;
+        return this;
     }
+    
+	public State detachNextResult() {
+		State ret = this.next;
+		this.next = null;
+		return ret;
+	}
 
-    public String toString() {
-        return "<State " + new Date(time) + ">";
-    }
+	public TraverseOptions getOptions() {
+		return this.options;
+	}
+
 }
+    

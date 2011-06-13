@@ -31,8 +31,8 @@ public class AStar {
     }
     
     /**
-     * Plots a path on graph from origin to target, departing at the time given in state and with
-     * the options options.
+     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the 
+     * given time depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
      * @param graph
      * @param origin
@@ -41,54 +41,19 @@ public class AStar {
      * @param options
      * @return the shortest path, or null if none is found
      */
-    public static ShortestPathTree getShortestPathTree(Graph gg, String from_label,
-            String to_label, State init, TraverseOptions options) {
-        // Goal Variables
-        String origin_label = from_label;
-        String target_label = to_label;
+    public static ShortestPathTree getShortestPathTree(Graph graph, String from_label,
+            String to_label, long time, TraverseOptions options) {
 
-        // Get origin vertex to make sure it exists
-        Vertex origin = gg.getVertex(origin_label);
-        Vertex target = gg.getVertex(target_label);
+    	// Get origin vertex to make sure it exists
+        Vertex origin = graph.getVertex(from_label);
+        Vertex target = graph.getVertex(to_label);
 
-        return getShortestPathTree(gg, origin, target, init, options);
-    }
-
-    public static ShortestPathTree getShortestPathTreeBack(Graph gg, String from_label,
-            String to_label, State init, TraverseOptions options) {
-        // Goal Variables
-        String origin_label = from_label;
-        String target_label = to_label;
-
-        // Get origin vertex to make sure it exists
-        Vertex origin = gg.getVertex(origin_label);
-        Vertex target = gg.getVertex(target_label);
-
-        return getShortestPathTreeBack(gg, origin, target, init, options);
+        return getShortestPathTree(graph, origin, target, time, options);
     }
 
     /**
-     * Plots a path on graph from origin to target, ARRIVING at the time given in state and with the
-     * options options.
-     * 
-     * @param graph
-     * @param origin
-     * @param target
-     * @param init
-     * @param options
-     * @return the shortest path, or null if none is found
-     */
-    public static ShortestPathTree getShortestPathTreeBack(Graph graph, Vertex origin,
-            Vertex target, State init, TraverseOptions options) {
-        if (!options.isArriveBy()) {
-            throw new RuntimeException("Reverse paths must call options.setArriveBy(true)");
-        }
-        return _instance.getShortestPathTree(graph, target, origin, init, options);
-    }
-
-    /**
-     * Plots a path on graph from origin to target, DEPARTING at the time given in state and with
-     * the options options.
+     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the 
+     * given time depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
      * @param graph
      * @param origin
@@ -98,8 +63,8 @@ public class AStar {
      * @return the shortest path, or null if none is found
      */
     public static ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
-            State init, TraverseOptions options) {
+            long time, TraverseOptions options) {
         
-        return _instance.getShortestPathTree(graph, origin, target, init, options);
+        return _instance.getShortestPathTree(graph, origin, target, time, options);
     }
 }

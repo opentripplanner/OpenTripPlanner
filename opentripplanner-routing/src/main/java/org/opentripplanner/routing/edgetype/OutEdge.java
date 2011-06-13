@@ -17,10 +17,9 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData.Editor;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -63,35 +62,37 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         return null;
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions options) {
-        return doTraverse(s0, options, false);
+    public State traverse(State s0) {
+    	return doTraverse(s0, s0.getOptions(), false);
     }
 
-    public TraverseResult traverseBack(State s0, TraverseOptions options) {
-        return doTraverse(s0, options, true);
+    public State traverseBack(State s0) {
+    	return doTraverse(s0, s0.getOptions(), true);
     }
 
-    private TraverseResult doTraverse(State s0, TraverseOptions options, boolean back) {
+    private State doTraverse(State s0, TraverseOptions options, boolean back) {
         StreetVertex fromv = ((StreetVertex)this.fromv);
         
         if (!fromv.canTraverse(options)) {
             return tryWalkBike(s0, options, back);
         }
 
-        Editor editor = s0.edit();
+        StateEditor s1 = s0.edit(this);
+
         double time = fromv.getLength() / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
-        editor.incrementWalkDistance(fromv.getLength());
+        s1.incrementWalkDistance(fromv.getLength());
         // time moves *backwards* when traversing an edge in the opposite direction
-        editor.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementWeight(weight);
         
-        if( EdgeLibrary.weHaveWalkedTooFar(editor, options))
+        if (s1.weHaveWalkedTooFar(options))
             return null;
         
-        return new TraverseResult(weight, editor.createState(), this);
+        return s1.makeState();
     }
 
-    private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
+    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
         if (options.getModes().contains(TraverseMode.BICYCLE)) {
             return doTraverse(s0, options.getWalkingOptions(), back);
         }

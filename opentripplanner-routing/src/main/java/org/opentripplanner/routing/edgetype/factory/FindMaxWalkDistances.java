@@ -17,7 +17,6 @@ import java.util.HashSet;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
@@ -25,12 +24,10 @@ import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetVertex;
-import org.opentripplanner.routing.pqueue.FibHeap;
+import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,51 +64,45 @@ public class FindMaxWalkDistances {
         options.speed = 1.0;
         
         // Iteration Variables
-        SPTVertex spt_u, spt_v;
+        State u, v;
         HashSet<Vertex> closed = new HashSet<Vertex>();
-        FibHeap<SPTVertex> queue = new FibHeap<SPTVertex>(graph.getVertices().size());
+        BinHeap<State> queue = new BinHeap<State>(50);
         BasicShortestPathTree spt = new BasicShortestPathTree();
-        State init = new State();
-        SPTVertex spt_origin = spt.addVertex(origin, init, 0, options);
-        queue.insert(spt_origin, spt_origin.weightSum);
+        State init = new State(origin, options);
+        spt.add(init);
+        queue.insert(init, init.getWeight());
 
         while (!queue.empty()) { // Until the priority queue is empty:
 
-            spt_u = queue.peek_min(); // get the lowest-weightSum Vertex 'u',
+            u = queue.extract_min(); // get the lowest-weightSum Vertex 'u',
 
-            Vertex fromv = spt_u.mirror;
-
-            queue.extract_min();
+            Vertex fromv = u.getVertex();
 
             closed.add(fromv);
 
             Iterable<Edge> outgoing = graph.getOutgoing(fromv);
-            State state = spt_u.state;
 
             for (Edge edge : outgoing) {
 
-                TraverseResult wr = edge.traverse(state, options);
+                v = edge.traverse(u);
 
                 // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                 // over.
-                if (wr == null) {
+                if (v == null)
                     continue;
-                }
 
-                if (wr.weight < 0) {
-                    throw new NegativeWeightException(String.valueOf(wr.weight));
+                double dw = v.getWeight() - u.getWeight();
+                if (dw < 0) {
+                    throw new NegativeWeightException(String.valueOf(dw));
                 }
                 
-                
-                EdgeNarrative en = wr.getEdgeNarrative();
-                Vertex toVertex = en.getToVertex();
+                Vertex toVertex = v.getVertex();
 
                 if (closed.contains(toVertex)) {
                     continue;
                 }
 
-
-                double new_w = spt_u.weightSum + wr.weight;
+                double new_w = v.getWeight();
 
                 if (toVertex instanceof StreetVertex) {
                     StreetVertex sv = (StreetVertex) toVertex;
@@ -121,12 +112,8 @@ public class FindMaxWalkDistances {
                     sv.setDistanceToNearestTransitStop(new_w);
                 }
                 
-                spt_v = spt.addVertex(toVertex, wr.state, new_w, options, spt_u.hops + 1);
-
-                if (spt_v != null) {
-                    spt_v.setParent(spt_u, edge,en);
-                    queue.insert_or_dec_key(spt_v, new_w);
-                }
+                if (spt.add(v))
+                    queue.insert(v, new_w);
             }
         }
     }

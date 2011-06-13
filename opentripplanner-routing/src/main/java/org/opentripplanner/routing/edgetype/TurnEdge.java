@@ -21,11 +21,11 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.patch.Patch;
 
@@ -101,34 +101,40 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return null;
     }
 
-    public TraverseResult traverse(State s0, TraverseOptions options) {
-        return doTraverse(s0, options, false);
+    public State traverse(State s0) {
+        return doTraverse(s0, s0.getOptions(), false);
     }
 
-    public TraverseResult traverseBack(State s0, TraverseOptions options) {
-        return doTraverse(s0, options, true);
+    public State traverseBack(State s0) {
+        return doTraverse(s0, s0.getOptions(), true);
     }
 
-    private TraverseResult doTraverse(State s0, TraverseOptions options, boolean back) {
+    public State optimisticTraverse(State s0) {
+        return doTraverse(s0, s0.getOptions(), false);
+    }
+
+    private State doTraverse(State s0, TraverseOptions options, boolean back) {
         if (!fromv.canTraverse(options)) {
             return tryWalkBike(s0, options, back);
         }
         
         double angleLength = fromv.getLength() + turnCost / 20;
 
-        StateData.Editor s1 = s0.edit();
+        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        StateEditor s1 = s0.edit(this, en);
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementWeight(weight);
         
-        if( EdgeLibrary.weHaveWalkedTooFar(s1, options))
+        if(s1.weHaveWalkedTooFar(options))
             return null;
         
-        return new TraverseResult(weight, s1.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        return s1.makeState();
     }
 
-    private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
+    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
         if (options.getModes().contains(TraverseMode.BICYCLE)) {
             return doTraverse(s0, options.getWalkingOptions(), back);
         }

@@ -13,18 +13,18 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData.Editor;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.StateData;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
-/** Applies the local stop rules (see TransitStop.java and LocalStopFinder.java) 
+/** PreBoard edges connect a TransitStop to its agency_stop_depart vertices;
+ *  PreAlight edges connect agency_stop_arrive vertices to a TransitStop.
+ *  
+ *  Applies the local stop rules (see TransitStop.java and LocalStopFinder.java) 
  *  as well as transfer limits, timed and preferred transfer rules, 
  *  transfer penalties, and boarding costs.
  *  This avoids applying these costs/rules repeatedly in (Pattern)Board edges.
@@ -40,34 +40,36 @@ public class PreAlightEdge extends FreeEdge {
     }
 
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions options)
-            throws NegativeWeightException {
-        State s1 = s0;
+    public State traverse(State s0){
+        StateEditor s1 = s0.edit(this);
         TransitStop toVertex = (TransitStop) getToVertex();
         if (toVertex.isLocal()) {
-            Editor editor = s0.edit();
-            editor.setAlightedLocal(true);
-            s1 = editor.createState();
+            s1.setAlightedLocal(true);
         }
-        return new TraverseResult(0, s1, this);
+        return s1.makeState();
     }
 
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options)
-            throws NegativeWeightException {
+    public State traverseBack(State s0) {
+    	
+    	// Do not pre-board if transit modes are not selected.
+    	// Return null here rather than in StreetTransitLink so that walk-only
+    	// options can be used to find transit stops without boarding vehicles.
+    	TraverseOptions options = s0.getOptions();
+    	if ( ! options.getModes().getTransit())
+    		return null;
         
-        StateData data = s0.getData();
         // Do not board if passenger has alighted from a local stop
-        if (data.isAlightedLocal()) {
+        if (s0.isAlightedLocal()) {
             return null;
         }
         TransitStop toVertex = (TransitStop) getToVertex();
         // Do not board once one has alighted from a local stop
-        if (toVertex.isLocal() && data.isEverBoarded()) {
+        if (toVertex.isLocal() && s0.isEverBoarded()) {
             return null;
         }
         // If we've hit our transfer limit, don't go any further
-        if (data.getNumBoardings() > options.maxTransfers)
+        if (s0.getNumBoardings() > options.maxTransfers)
             return null;
         
         /* apply transfer rules */
@@ -77,20 +79,20 @@ public class PreAlightEdge extends FreeEdge {
         long t0 = s0.getTime();
         long alight_before = t0 - options.minTransferTime * 1000;
         long transfer_penalty = 0;
-        if (data.getLastAlightedTime() != 0) { 
+        if (s0.getLastAlightedTime() != 0) { 
         	/* this is a transfer rather than an initial boarding */
             TransferTable transferTable = options.getTransferTable();
             if (transferTable.hasPreferredTransfers()) {
             	// only penalize transfers if there are some that will be depenalized
                 transfer_penalty = options.baseTransferPenalty;
             }
-            int transfer_time = transferTable.getTransferTime(getFromVertex(), data.getPreviousStop());
+            int transfer_time = transferTable.getTransferTime(getFromVertex(), s0.getPreviousStop());
             if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
             	// use min transfer time relative to arrival time at this stop (initialized above)
             } else if (transfer_time >= 0) {
                 // handle minimum time transfers (>0) and timed transfers (0)
             	// relative to alight time at last stop
-            	alight_before = data.getLastAlightedTime() - transfer_time * 1000;
+            	alight_before = s0.getLastAlightedTime() - transfer_time * 1000;
             	if (alight_before > t0) alight_before = t0; 
             } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
                 return null;
@@ -110,17 +112,17 @@ public class PreAlightEdge extends FreeEdge {
         }
 
         // penalize transfers more heavily if requested by the user
-        if (options.optimizeFor == OptimizeType.TRANSFERS && data.isEverBoarded()) {
+        if (options.optimizeFor == OptimizeType.TRANSFERS && s0.isEverBoarded()) {
             //this is not the first boarding, therefore we must have "transferred" -- whether
             //via a formal transfer or by walking.
             transfer_penalty += options.optimizeTransferPenalty;
         }
 
-        Editor edit = s0.edit();
-        edit.setTime(alight_before);
-        edit.setEverBoarded(true);
-        State s1 = edit.createState();
+        StateEditor s1 = s0.edit(this);
+        s1.setTime(alight_before);
+        s1.setEverBoarded(true);
         long wait_cost = (t0 - alight_before) / 1000;
-        return new TraverseResult(wait_cost + options.boardCost + transfer_penalty, s1, this);
+        s1.incrementWeight(wait_cost + options.boardCost + transfer_penalty);
+        return s1.makeState();
     }
 }

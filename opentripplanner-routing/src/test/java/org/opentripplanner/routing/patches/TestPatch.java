@@ -143,22 +143,22 @@ public class TestPatch extends TestCase {
 
 		long startTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis();
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
-				new State(startTime), options);
+				startTime, options);
 
 		path = spt.getPath(stop_e, false); // do not optimize because we want
 		// the first trip out of A
 		assertNotNull(path);
 		HashSet<String> expectedNotes = new HashSet<String>();
 		expectedNotes.add(note1);
-		assertEquals(expectedNotes, path.edges.get(0).narrative.getNotes());
+		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
 
 		startTime = new GregorianCalendar(2009, 8, 7, 0, 9, 0).getTimeInMillis();
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
-				new State(startTime), options);
+				startTime, options);
 
 		path = spt.getPath(stop_e, false);
 		expectedNotes.add(note2);
-		assertEquals(expectedNotes, path.edges.get(0).narrative.getNotes());
+		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
 	}
 
 	public void testRouteNotePatch() {
@@ -181,12 +181,12 @@ public class TestPatch extends TestCase {
 
 		long startTime = new GregorianCalendar(2009, 8, 7, 7, 0, 0).getTimeInMillis();
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e,
-				new State(startTime), options);
+				startTime, options);
 
 		path = spt.getPath(stop_e, false); 
 		assertNotNull(path);
 		HashSet<String> expectedNotes = new HashSet<String>();
 		expectedNotes.add(note1);
-		assertEquals(expectedNotes, path.edges.get(1).narrative.getNotes());
+		assertEquals(expectedNotes, path.states.get(2).getBackEdgeNarrative().getNotes());
 	}
 }

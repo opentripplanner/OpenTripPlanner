@@ -13,10 +13,9 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
@@ -38,6 +37,6 @@ public interface SkipTraverseResultStrategy {
      * @param traverseOptions the current traverse options
      * @return true if the given traverse result should not be considered further
      */
-    public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, SPTVertex parent,
-            TraverseResult traverseResult, ShortestPathTree spt, TraverseOptions traverseOptions);
+    public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
+            State current, ShortestPathTree spt, TraverseOptions traverseOptions);
 }

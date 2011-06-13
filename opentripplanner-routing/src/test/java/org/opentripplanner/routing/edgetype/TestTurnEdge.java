@@ -26,12 +26,11 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -55,8 +54,8 @@ public class TestTurnEdge extends TestCase {
         gg.addVertex(start);
         gg.addVertex(end);
 
-        TraverseOptions wo = new TraverseOptions();
-        wo.speed = ConstantsForTests.WALKING_SPEED;
+        TraverseOptions options = new TraverseOptions();
+        options.speed = ConstantsForTests.WALKING_SPEED;
         
         TurnEdge ee = new TurnEdge(start, end);
         gg.addEdge(ee);
@@ -64,24 +63,23 @@ public class TestTurnEdge extends TestCase {
         // Start at October 21, 2009 at 1:00:00pm
         GregorianCalendar startTime = new GregorianCalendar(2009, 9, 21, 13, 0, 0);
         GregorianCalendar endTime = (GregorianCalendar) startTime.clone();
-        int expectedSecElapsed = (int) (streetLength / wo.speed);
+        int expectedSecElapsed = (int) (streetLength / options.speed);
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
-        State s0 = new State(startTime.getTimeInMillis());
-        TraverseResult wr = ee.traverse(s0, wo);
+        State s0 = new State(startTime.getTimeInMillis(), start, options);
+        State s1 = ee.traverse(s0);
 
-        assertNotNull(wr);
-        assertTrue(Math.abs(wr.weight -  wo.walkReluctance * streetLength / wo.speed) < 10); //they're not identical because of the turn cost
+        assertNotNull(s1);
+        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10); //they're not identical because of the turn cost
         // Has the time elapsed as expected?
-        assertTrue(Math.abs(wr.state.getTime() - endTime.getTimeInMillis()) < 10000);
+        assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis()) < 10000);
 
-        wr = null;
-        s0 = new State(endTime.getTimeInMillis());
-        wr = ee.traverseBack(s0, wo);
+        s0 = new State(endTime.getTimeInMillis(), end, options);
+        s1 = ee.traverseBack(s0);
 
-        assertNotNull(wr);
-        assertTrue(Math.abs(wr.weight -  wo.walkReluctance * streetLength / wo.speed) < 10);
-        assertTrue(Math.abs(wr.state.getTime() - startTime.getTimeInMillis()) < 10000);
+        assertNotNull(s1);
+        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10);
+        assertTrue(Math.abs(s1.getTime() - startTime.getTimeInMillis()) < 10000);
     }
 
     public void testMaxWalkDistance() {
@@ -166,14 +164,14 @@ public class TestTurnEdge extends TestCase {
         // with no maxWalkDistance, the transfer will not be taken
 
         TraverseOptions options = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, blOut, trIn, new State(0), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
 
-        GraphPath path = spt.getPath(trIn);
+        GraphPath path = spt.getPath(trIn, false);
         assertNotNull(path);
 
         boolean found = false;
-        for (SPTVertex v : path.vertices) {
-            if (v.mirror == bottom || v.mirror == bottomBack) {
+        for (State s : path.states) {
+            if (s.getVertex() == bottom || s.getVertex() == bottomBack) {
                 found = true;
             }
         }
@@ -181,14 +179,14 @@ public class TestTurnEdge extends TestCase {
 
         // with a maxWalkDistance, the transfer will be taken.
         options.maxWalkDistance = 10000;
-        spt = AStar.getShortestPathTree(graph, blOut, trIn, new State(0), options);
+        spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
 
-        path = spt.getPath(trIn);
+        path = spt.getPath(trIn, false);
         assertNotNull(path);
 
         found = false;
-        for (SPTVertex v : path.vertices) {
-            if (v.mirror == bottom || v.mirror == bottomBack) {
+        for (State s : path.states) {
+            if (s.getVertex() == bottom || s.getVertex() == bottomBack) {
                 found = true;
             }
         }
@@ -228,14 +226,18 @@ class MockTransfer extends AbstractEdge {
     }
 
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.incrementTimeInSeconds(cost);
-        return new TraverseResult(cost, s1, this);
+    public State traverse(State s0) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(cost);
+        s1.incrementWeight(cost);
+        return s1.makeState();
     }
 
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
-        State s1 = s0.incrementTimeInSeconds(-cost);
-        return new TraverseResult(cost, s1, this);
+    public State traverseBack(State s0) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(cost);
+        s1.incrementWeight(cost);
+        return s1.makeState();
     }
 }

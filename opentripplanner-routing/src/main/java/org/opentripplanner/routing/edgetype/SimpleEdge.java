@@ -1,8 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.Vertex;
 
 public class SimpleEdge extends FreeEdge {
@@ -17,14 +16,18 @@ public class SimpleEdge extends FreeEdge {
     }
     
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions options) {
-        State s1 = s0.incrementTimeInSeconds(seconds);
-        return new TraverseResult(weight, s1,this);
+    public State traverse(State s0) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(seconds);
+        s1.incrementWeight(weight);
+        return s1.makeState();
     }
     
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options) {
-        State s1 = s0.incrementTimeInSeconds(-seconds);
-        return new TraverseResult(weight, s1,this);
+    public State traverseBack(State s0) {
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(-seconds);
+        s1.incrementWeight(weight);
+        return s1.makeState();
     }
 }

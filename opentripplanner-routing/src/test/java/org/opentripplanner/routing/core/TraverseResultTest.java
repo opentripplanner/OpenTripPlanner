@@ -23,23 +23,23 @@ public class TraverseResultTest {
     @Test
     public void testAddToExistingResultChain() {
 
-        TraverseResult resultChain = null;
+        State resultChain = null;
 
         for (int i = 0; i < 4; i++) {
-            TraverseResult r = new TraverseResult(i, null, null);
+            State r = new State(i, null, null);
             resultChain = r.addToExistingResultChain(resultChain);
         }
 
-        assertEquals(3.0, resultChain.weight, 0.0);
+        assertEquals(3.0, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(2.0, resultChain.weight, 0.0);
+        assertEquals(2.0, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(1.0, resultChain.weight, 0.0);
+        assertEquals(1.0, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(0.0, resultChain.weight, 0.0);
+        assertEquals(0.0, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
         assertNull(resultChain);

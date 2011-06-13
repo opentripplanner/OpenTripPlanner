@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.patch;
 
-import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.State;
 
 public interface TraverseResultFilter {
-	TraverseResult filter(TraverseResult result);
+	State filter(State result);
 }

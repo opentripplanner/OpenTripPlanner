@@ -13,9 +13,9 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
@@ -35,6 +35,6 @@ public interface SearchTerminationStrategy {
      * @param traverseOptions the traverse options
      * @return true if the specified search should be terminated
      */
-    public boolean shouldSearchContinue(Vertex origin, Vertex target, SPTVertex current,
+    public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
             ShortestPathTree spt, TraverseOptions traverseOptions);
 }

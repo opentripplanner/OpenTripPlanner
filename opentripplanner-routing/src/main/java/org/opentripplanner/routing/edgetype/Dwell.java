@@ -18,9 +18,8 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -55,14 +54,18 @@ public class Dwell extends AbstractEdge {
         this.elapsed = stopTime.getDepartureTime() - stopTime.getArrivalTime();
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        State state1 = state0.incrementTimeInSeconds(elapsed);
-        return new TraverseResult(elapsed, state1, this);
+    public State traverse(State state0) {
+    	StateEditor state1 = state0.edit(this);
+        state1.incrementTimeInSeconds(elapsed);
+        state1.incrementWeight(elapsed);
+        return state1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        State state1 = state0.incrementTimeInSeconds(-elapsed);
-        return new TraverseResult(elapsed, state1, this);
+    public State traverseBack(State state0) {
+        StateEditor state1 = state0.edit(this);
+        state1.incrementTimeInSeconds(-elapsed);
+        state1.incrementWeight(elapsed);
+        return state1.makeState();
     }
 
     public String toString() {

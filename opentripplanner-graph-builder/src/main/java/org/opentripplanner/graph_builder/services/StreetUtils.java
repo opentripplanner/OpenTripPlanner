@@ -30,7 +30,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -119,23 +118,23 @@ public class StreetUtils {
     	Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
     	Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
     	
-    	State state = new State();
     	TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
     	
     	for (GraphVertex gv : graph.getVertices()) {
     		if (!(gv.vertex instanceof EndpointVertex)) {
     			continue;
     		}
+        	State s0 = new State(gv.vertex, options);
     		for (Edge e: gv.getOutgoing()) {
     			GenericVertex in = (GenericVertex) gv.vertex;
     			if (!(e instanceof StreetEdge)) {
         			continue;
         		}
-    			TraverseResult tr =  e.traverse(state, options);
-    			if (tr == null) {
+    			State s1 = e.traverse(s0);
+    			if (s1 == null) {
     				continue;
     			}
-    			GenericVertex out = (GenericVertex) tr.getEdgeNarrative().getToVertex();
+    			GenericVertex out = (GenericVertex) s1.getVertex();
     			
     			ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
     			if (vertexList == null) {

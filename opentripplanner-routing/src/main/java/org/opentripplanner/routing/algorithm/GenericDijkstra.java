@@ -27,13 +27,12 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.spt.SPTVertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
@@ -91,92 +90,73 @@ public class GenericDijkstra {
         _extraEdgesStrategy = extraEdgesStrategy;
     }
 
-    public ShortestPathTree getShortestPathTree(Vertex origin, State initialState) {
+    public ShortestPathTree getShortestPathTree(State initialState) {
 
         ShortestPathTree spt = createShortestPathTree();
-        OTPPriorityQueue<SPTVertex> queue = createPriorityQueue();
+        OTPPriorityQueue<State> queue = createPriorityQueue();
 
-        SPTVertex spt_origin = spt.addVertex(origin, initialState, 0, options);
-        queue.insert(spt_origin, spt_origin.weightSum);
+        spt.add(initialState);
+        queue.insert(initialState, initialState.getWeight());
 
         Map<Vertex, List<Edge>> extraEdges = null;
         if (_extraEdgesStrategy != null) {
             extraEdges = new HashMap<Vertex, List<Edge>>();
-            _extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin);
+            _extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, initialState.getVertex());
         }
 
         while (!queue.empty()) { // Until the priority queue is empty:
 
+            State u = queue.extract_min();
+            Vertex fromv = u.getVertex();
+
             if (_verbose) {
-                double v = queue.peek_min_key();
-                System.out.println("min," + v);
+                System.out.println("min," + u.getWeight());
+                System.out.println(fromv);
             }
 
-            SPTVertex spt_u = queue.extract_min();
-            Vertex fromv = spt_u.mirror;
-            State state = spt_u.state;
-
-            if (_verbose)
-                System.out.println(fromv);
-
             if (_searchTerminationStrategy != null
-                    && !_searchTerminationStrategy.shouldSearchContinue(origin, null, spt_u, spt,
-                            options))
-                break;
+                    && !_searchTerminationStrategy.shouldSearchContinue(initialState.getVertex(), 
+                    null, u, spt, options))
+                        break;
 
             Collection<Edge> outgoing = GraphLibrary.getOutgoingEdges(graph, fromv, extraEdges);
 
             for (Edge edge : outgoing) {
 
                 if (_skipEdgeStrategy != null
-                        && _skipEdgeStrategy.shouldSkipEdge(spt_origin, null, spt_u, edge, spt,
+                        && _skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
                                 options))
                     continue;
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
-                for (TraverseResult wr = edge.traverse(state, options); wr != null; wr = wr
-                        .getNextResult()) {
-
-                    if (wr.weight < 0) {
-                        throw new NegativeWeightException(String.valueOf(wr.weight) + " on edge "
-                                + edge);
-                    }
+                for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
 
                     if (_skipTraverseResultStrategy != null
-                            && _skipTraverseResultStrategy.shouldSkipTraversalResult(spt_origin,
-                                    null, spt_u, wr, spt, options))
+                            && _skipTraverseResultStrategy.shouldSkipTraversalResult(initialState.getVertex(),
+                                    null, u, v, spt, options))
                         continue;
-
-                    EdgeNarrative er = wr.getEdgeNarrative();
-                    Vertex toVertex = er.getToVertex();
-
-                    double new_w = spt_u.weightSum + wr.weight;
 
                     if (_verbose)
-                        System.out.println("  w=" + spt_u.weightSum + "+" + wr.weight + "=" + new_w
-                                + " " + toVertex);
+                        System.out.printf("  w = %d + %d = %d %s", u.getWeight(), v.getWeightDelta(), 
+                        		v.getWeight(),  v.getVertex());
                     
-                    if( new_w > options.maxWeight)
+                    if (v.exceedsWeightLimit(options.maxWeight))
                         continue;
 
-                    SPTVertex spt_v = spt.addVertex(toVertex, wr.state, new_w, options);
+                    if (spt.add(v))
+                        queue.insert(v, v.getWeight());
 
-                    if (spt_v != null) {
-                        spt_v.setParent(spt_u, edge, er);
-                        queue.insert_or_dec_key(spt_v, new_w);
-                    }
                 }
             }
         }
-
         return spt;
     }
 
-    protected OTPPriorityQueue<SPTVertex> createPriorityQueue() {
+    protected OTPPriorityQueue<State> createPriorityQueue() {
         if (_priorityQueueFactory != null)
             return _priorityQueueFactory.create(graph.getVertices().size());
-        return new FibHeap<SPTVertex>(graph.getVertices().size());
+        return new BinHeap<State>(graph.getVertices().size() / 2);
     }
 
     protected ShortestPathTree createShortestPathTree() {

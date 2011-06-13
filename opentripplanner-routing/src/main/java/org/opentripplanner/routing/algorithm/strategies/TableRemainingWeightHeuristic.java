@@ -26,14 +26,14 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.spt.SPTVertex;
+import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,6 +53,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	private List<NearbyStop> targetStops;
 	// private HashSet<Vertex> targetStopSet; // was used when there were transfer links, which were too slow. 
 	private IdentityHashMap<Vertex, Double> weightCache;
+	private TraverseOptions options;
 	
 	public TableRemainingWeightHeuristic (Graph g) {
 		this.g = g;
@@ -71,89 +72,97 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	 * On subsequent calls, if the target is the same, this information will be reused.
 	 */
 	@Override
-	public double computeInitialWeight(Vertex origin, Vertex target,
-		TraverseOptions options) {
+	public double computeInitialWeight(State s0, Vertex target,	TraverseOptions options) {
 		// do not check for identical options, since pathservice changes them from one call to the next
 		if (target == this.target) { 
 			// no need to search again
     		LOG.debug("Reusing target stop list.");
 			return 0;
 		}
-		weightCache = new IdentityHashMap<Vertex, Double>(200000); 
+		weightCache = new IdentityHashMap<Vertex, Double>(5000); 
 		this.target = target;
+		this.options = options;
 		targetStops = new ArrayList<NearbyStop>(50);
 		Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
         options.extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
-	    final double MAX_WEIGHT = 60 * 15;
+        options.extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
 	    // heap does not really need to be this big, verify initialization time
-	    BinHeap<Vertex> heap = new BinHeap<Vertex>(g.getVertices().size()); 
-		HashSet<Vertex> closed = new HashSet<Vertex>();
-    	heap.insert(target, 0);
+		ShortestPathTree spt = new BasicShortestPathTree(5000);
+	    BinHeap<State> heap = new BinHeap<State>(100); 
+		State targetState = new State(target, options);
+		spt.add(targetState);
+    	heap.insert(targetState, 0);
     	while (! heap.empty()) {
-    		double w = heap.peek_min_key();
-    		Vertex u = heap.extract_min();
-    		//LOG.debug("heap extract " + u + " weight " + w);
-    		if (w > MAX_WEIGHT) break;
-    		if (closed.contains(u)) continue; 
-    		closed.add(u);
-    		weightCache.put(u, w);
-    		if (u instanceof TransitStop) {
-    			targetStops.add(new NearbyStop(u, w));
-    			//LOG.debug("Target stop: " + u + " w=" + w);
+    		State u = heap.extract_min();
+    		if (! spt.visit(u)) continue;
+    		
+    		// DEBUG since CH graphs are missing edges, and shortcuts have no walk distance
+    		if (u.exceedsWeightLimit(60 * 15))
+    			break;
+
+    		Vertex uVertex = u.getVertex();
+    		//LOG.debug("heap extract " + uVertex + " weight " + u.getWeight());
+    		weightCache.put(uVertex, u.getWeight());
+    		if (uVertex instanceof TransitStop) {
+    			targetStops.add(new NearbyStop(uVertex, u.getWalkDistance(), u.getWeight()));
+    			//LOG.debug("Target stop: " + uVertex + " w=" + u.getWeight());
+    			continue;
     		}
-    		for (Edge e : GraphLibrary.getIncomingEdges(g, u, extraEdges)) {
-    			if (e instanceof TurnEdge ||
-					e instanceof PlainStreetEdge ||
-					e instanceof StreetTransitLink ||
-					e instanceof FreeEdge ) {
-    				State s0 = new State();
-    				TraverseResult tr = e.traverseBack(s0, options);
-    				if (tr == null) continue;
-    				Vertex fromv = tr.getEdgeNarrative().getFromVertex();
-    				if (! closed.contains(fromv)) 
-    					heap.insert(fromv, w + tr.weight);
-    			}
-    		}
+			if (options.isArriveBy()) {
+	    		for (Edge e : GraphLibrary.getOutgoingEdges(g, uVertex, extraEdges)) {
+	    			State v = e.traverse(u);
+	    			if (v != null && spt.add(v))
+						heap.insert(v, v.getWeight());
+	    		}
+			} else {
+	    		for (Edge e : GraphLibrary.getIncomingEdges(g, uVertex, extraEdges)) {
+					State v = e.traverseBack(u);
+	    			if (v != null && spt.add(v))
+						heap.insert(v, v.getWeight());
+	    		}
+			}
     	}
 		LOG.debug("Found " + targetStops.size() + " stops near destination.");
-    	return defaultHeuristic.computeInitialWeight(origin, target, options);
+    	return defaultHeuristic.computeInitialWeight(s0, target, options);
     }
 
 	@Override
-	public double computeForwardWeight(SPTVertex from, Edge edge,
-		TraverseResult traverseResult, Vertex target) {
-	    final double BOARD_COST = 60 * 5;
-		Vertex tov = traverseResult.getEdgeNarrative().getToVertex();
+	public double computeForwardWeight(State s0, Vertex target) {
+	    final double BOARD_COST = options.boardCost;
+		Vertex v = s0.getVertex();
         // keep a cache (vertex->weight) here for multi-itinerary searches
-        if (weightCache.containsKey(tov)) return weightCache.get(tov);
+        if (weightCache.containsKey(v)) return weightCache.get(v);
         double w; // return value
-        if (wt.includes(tov)) {
+        if (wt.includes(v)) {
+	        double remainingWalk = options.maxWalkDistance - s0.getWalkDistance();
 			w = Double.POSITIVE_INFINITY;
 			for (NearbyStop ns : targetStops) {
-				double nw = wt.getWeight(tov, ns.vertex) + ns.weight;
+				if (ns.distance > remainingWalk) continue;
+				double nw = wt.getWeight(v, ns.vertex) + ns.weight;
 				if (nw < w) w = nw;
 			}	
-			if (! (tov instanceof TransitStop)) w -= BOARD_COST;
+			if (! (v instanceof TransitStop)) w -= BOARD_COST;
 		} else {
-			w = defaultHeuristic.computeForwardWeight(from, edge, traverseResult, target); 
+			w = defaultHeuristic.computeForwardWeight(s0, target); 
 		}
-        weightCache.put(tov, w);
+        weightCache.put(v, w);
         return w;
 	}
 
 	@Override
-	public double computeReverseWeight(SPTVertex from, Edge edge, 
-			TraverseResult traverseResult, Vertex target) {
-		// will be implemented when computeForwardWeight is stable
+	public double computeReverseWeight(State s0, Vertex target) {
+		// TODO: Implement when computeForwardWeight is stable (AMB)
 		return 0D;
 	}
 	
 	// could just be a hashmap... but Entry<Vertex, Double> does not use primitive type
 	private static class NearbyStop {
         protected double weight;
+        protected double distance;
         protected Vertex vertex;
-        protected NearbyStop (Vertex vertex, double weight) {
+        protected NearbyStop (Vertex vertex, double distance, double weight) {
             this.vertex = vertex;
+            this.distance = distance;
             this.weight = weight;
         }
         public String toString() {

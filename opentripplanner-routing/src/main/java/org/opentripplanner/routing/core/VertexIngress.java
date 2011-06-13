@@ -13,6 +13,11 @@
 
 package org.opentripplanner.routing.core;
 
+/**
+ * Used in building contraction hierarchies.
+ * Represents the vertex/edge pairs that make up the neighborhood one hop away 
+ * from a vertex to be contracted.
+ */
 public class VertexIngress {
     public Vertex vertex;
 

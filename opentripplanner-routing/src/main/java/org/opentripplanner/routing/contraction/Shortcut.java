@@ -20,10 +20,12 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FixedModeEdge;
 import org.opentripplanner.routing.patch.Patch;
@@ -41,16 +43,16 @@ public class Shortcut implements DirectEdge, Serializable {
     DirectEdge edge2;
     int time;
     double weight = -1;
-
-    private transient TraverseMode mode;
+    private TraverseMode mode;
    
-    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight) {
+    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight, TraverseMode mode) {
         this.startVertex = edge1.getFromVertex();
         this.endVertex = edge2.getToVertex();
         this.edge1 = edge1;
         this.edge2 = edge2;
         this.time = time;
         this.weight = weight;
+        this.mode = mode;
     }
 
     @Override
@@ -80,57 +82,43 @@ public class Shortcut implements DirectEdge, Serializable {
     }
 
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions wo) throws NegativeWeightException {
-        if (weight != -1) {
-            State s1 = s0.incrementTimeInSeconds(time);
-            return new TraverseResult(weight, s1, this);
-        }
-        State state = s0;
-        long startTime = state.getTime();
-        TraverseResult wr = edge1.traverse(state, wo);
-        if (wr == null) {
-            return null;
-        }
-        state = wr.state;
-        double aweight = wr.weight;
-        wr = edge2.traverse(state, wo);
-        if (wr == null) {
-            return null;
-        }
-        state = wr.state;
-        weight = aweight + wr.weight;
-        
-        time = (int) ((state.getTime() - startTime) / 1000);
-        mode =  wr.getEdgeNarrative().getMode();
-        return new TraverseResult(weight, state, new FixedModeEdge(this, mode));
+    public State traverse(State s0) {
+    	if (weight == -1) {
+            State s1 = edge1.traverse(s0);
+            if (s1 == null)
+                return null;
+            State s2 = edge2.traverse(s1);
+            if (s2 == null)
+                return null;
+            time = (int) ((s2.getTime() - s0.getTime()) / 1000);
+            weight = s2.getWeight() - s0.getWeight();
+            mode = s2.getBackEdgeNarrative().getMode();
+    	}
+        //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));
+        StateEditor ret = s0.edit(this);
+        ret.incrementTimeInSeconds(time);
+        ret.incrementWeight(weight);
+        return ret.makeState();
     }
 
     @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions wo) throws NegativeWeightException {
-        if (weight != -1) {
-            State s1 = s0.incrementTimeInSeconds(-time);
-            return new TraverseResult(weight, s1,this);
-        }
-        State state = s0;
-        long startTime = state.getTime();
-
-        TraverseResult wr = edge2.traverseBack(state, wo);
-        if (wr == null) {
-            return null;
-        }
-        state = wr.state;
-        double bweight = wr.weight;
-
-        wr = edge1.traverseBack(state, wo);
-        if (wr == null) {
-            return null;
-        }
-        state = wr.state;
-        weight = bweight + wr.weight;
-        
-        
-        time = (int) ((startTime - state.getTime()) / 1000);
-        return new TraverseResult(weight, state,this);
+    public State traverseBack(State s0) {
+    	if (weight == -1) {
+            State s1 = edge2.traverseBack(s0);
+            if (s1 == null)
+                return null;
+            State s2 = edge1.traverseBack(s1);
+            if (s2 == null)
+                return null;
+            time = (int) ((s0.getTime() - s2.getTime()) / 1000);
+            weight = s2.getWeight() - s0.getWeight();
+            mode = s2.getBackEdgeNarrative().getMode();
+    	}
+        //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));
+        StateEditor ret = s0.edit(this);
+        ret.incrementTimeInSeconds(-time);
+        ret.incrementWeight(weight);
+        return ret.makeState();
     }
     
     public String toString() {
@@ -152,6 +140,13 @@ public class Shortcut implements DirectEdge, Serializable {
         return false;
     }
 
+
+
+	@Override
+	public State optimisticTraverse(State s0) {
+		return traverse(s0);
+	}
+
     public Set<String> getNotes() {
     	return null;
     }
@@ -169,5 +164,23 @@ public class Shortcut implements DirectEdge, Serializable {
 	@Override
 	public void removePatch(Patch patch) {
 		throw new UnsupportedOperationException();		
+	}
+
+	/*
+	 * recursive shortcut unpack
+	 */
+	public State unpackTraverse(State s0) {
+		State s1;
+		if (edge1 instanceof Shortcut) 
+			s1 = ((Shortcut)edge1).unpackTraverse(s0);
+		else
+			s1 = edge1.traverse(s0);
+
+		if (edge2 instanceof Shortcut) 
+			s1 = ((Shortcut)edge2).unpackTraverse(s1);
+		else
+			s1 = edge2.traverse(s1);
+		
+		return s1;
 	}
 }

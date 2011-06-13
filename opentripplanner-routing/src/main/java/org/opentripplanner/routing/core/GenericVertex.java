@@ -39,11 +39,11 @@ public class GenericVertex implements Vertex, Serializable {
 
     private double x;
 
-    private int index;
+    int index;
 
     private double distanceToNearestTransitStop = 0;
 
-    private static int maxIndex = 0;
+    static int maxIndex = 0;
 
     public GenericVertex(String label, Coordinate coord, String name) {
         this(label, coord.x, coord.y, name);

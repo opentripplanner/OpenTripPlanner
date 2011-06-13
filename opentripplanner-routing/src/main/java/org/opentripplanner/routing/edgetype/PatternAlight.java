@@ -20,12 +20,11 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.StateData.Editor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +75,21 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     }
 
     @Override
-    public TraverseResult traverseBack(State state0, TraverseOptions options) {
+    public State traverse(State state0) {
+	if (!pattern.canAlight(stopIndex + 1)) {
+	    return null;
+	}
+        StateEditor s1 = state0.edit(this);
+        s1.setTripId(null);
+        s1.setLastAlightedTime(state0.getTime());
+        s1.setPreviousStop(tov);
+        s1.incrementWeight(1);
+        return s1.makeState();
+    }
+
+    @Override
+    public State traverseBack(State state0) {
+    	TraverseOptions options = state0.getOptions();
         if (!options.getModes().get(modeMask)) {
             return null;
         }
@@ -145,39 +158,33 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             }
         }
 
-        Editor editor = state0.edit();
-        editor.setTrip(bestPatternIndex);
-        editor.incrementTimeInSeconds(-bestWait); // going backward
-        editor.incrementNumBoardings();
-        editor.setTripId(trip.getId());
-        editor.setZone(pattern.getZone(stopIndex));
-        editor.setRoute(pattern.getExemplar().getRoute().getId());
-        editor.setFareContext(pattern.getFareContext());
-        
+        StateEditor s1 = state0.edit(this);
+        s1.setTrip(bestPatternIndex);
+        s1.incrementTimeInSeconds(-bestWait); // going backward
+        s1.incrementNumBoardings();
+        s1.setTripId(trip.getId());
+        s1.setZone(pattern.getZone(stopIndex));
+        s1.setRoute(pattern.getExemplar().getRoute().getId());
+        s1.setFareContext(pattern.getFareContext());
 
         long wait_cost = bestWait;
-        if (state0.getData().getNumBoardings() == 0) {
+        if (state0.getNumBoardings() == 0) {
             wait_cost *= options.waitAtBeginningFactor;
         }
         else {
             wait_cost *= options.waitReluctance;
         }
-        
-        return new TraverseResult(wait_cost + preferences_penalty, editor.createState(), this);
+        s1.incrementWeight(preferences_penalty);
+        s1.incrementWeight(wait_cost);
+        return s1.makeState();
     }
 
-    @Override
-    public TraverseResult traverse(State state0, TraverseOptions options) {
-	if (!pattern.canAlight(stopIndex + 1)) {
-	    return null;
-	}
-        Editor s1 = state0.edit();
-        s1.setTripId(null);
-        s1.setLastAlightedTime(state0.getTime());
-        s1.setPreviousStop(tov);
-        return new TraverseResult(1, s1.createState(), this);
+    public State optimisticTraverse(State state0, TraverseOptions options) {
+        StateEditor s1 = state0.edit(this);
+        s1.incrementWeight(1);
+        return s1.makeState();
     }
-    
+
     public int getStopIndex() {
         return stopIndex;
     }

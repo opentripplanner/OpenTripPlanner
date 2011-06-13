@@ -23,10 +23,8 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData.Editor;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
@@ -77,22 +75,24 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         return end;
     }
 
-    public TraverseResult traverse(State state0, TraverseOptions wo) {
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(elapsed);
-        editor.setZone(getEndStop().getZoneId());
-        editor.setRoute(start.getTrip().getRoute().getId());
-        editor.setFareContext(fareContext);
-        return new TraverseResult(elapsed, editor.createState(), this);
+    public State traverse(State s0) {
+    	StateEditor s1 = s0.edit(this);
+    	s1.incrementTimeInSeconds(elapsed);
+    	s1.incrementWeight(elapsed);
+        s1.setZone(getEndStop().getZoneId());
+        s1.setRoute(start.getTrip().getRoute().getId());
+        s1.setFareContext(fareContext);
+        return s1.makeState();
     }
 
-    public TraverseResult traverseBack(State state0, TraverseOptions wo) {
-        Editor editor = state0.edit();
-        editor.incrementTimeInSeconds(-elapsed);
-        editor.setZone(getStartStop().getZoneId());
-        editor.setRoute(start.getTrip().getRoute().getId());
-        editor.setFareContext(fareContext);
-        return new TraverseResult(elapsed, editor.createState(), this);
+    public State traverseBack(State s0) {
+    	StateEditor s1 = s0.edit(this);
+    	s1.incrementTimeInSeconds(-elapsed);
+    	s1.incrementWeight(elapsed);
+        s1.setZone(getEndStop().getZoneId());
+        s1.setRoute(start.getTrip().getRoute().getId());
+        s1.setFareContext(fareContext);
+        return s1.makeState();
     }
 
     public int compareTo(Hop arg0) {

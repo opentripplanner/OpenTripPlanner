@@ -13,7 +13,8 @@
 
 package org.opentripplanner.routing;
 
-import static org.opentripplanner.common.IterableLibrary.*;
+import static org.opentripplanner.common.IterableLibrary.cast;
+
 import java.util.Collection;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
@@ -28,16 +29,11 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.SPTVertex;
-import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -46,6 +42,10 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -162,6 +162,8 @@ public class TestHalfEdges extends TestCase {
     public void testHalfEdges() {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
+    	
+    	TraverseOptions options = new TraverseOptions();
 
         HashSet<Edge> turns = new HashSet<Edge>(graph.getOutgoing(left));
         turns.addAll(graph.getOutgoing(leftBack));
@@ -182,45 +184,44 @@ public class TestHalfEdges extends TestCase {
         
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
-        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, new State(startTime
-                .getTimeInMillis()), new TraverseOptions());
+        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, startTime
+                .getTimeInMillis(), options);
 
-        GraphPath pathBr = spt1.getPath(end);
+        GraphPath pathBr = spt1.getPath(end, false);
         assertNotNull("There must be a path from br to end", pathBr);
         
-        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, new State(startTime
-                .getTimeInMillis()), new TraverseOptions());
+        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, startTime
+                .getTimeInMillis(), options);
 
-        GraphPath pathTr = spt2.getPath(end);
+        GraphPath pathTr = spt2.getPath(end, false);
         assertNotNull("There must be a path from tr to end", pathTr);
-        assertTrue("path from bottom to end must be longer than path from top to end", pathBr.vertices.lastElement().weightSum > pathTr.vertices.lastElement().weightSum);
+        assertTrue("path from bottom to end must be longer than path from top to end", pathBr.getWeight() > pathTr.getWeight());
         
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
-                .getTimeInMillis()), new TraverseOptions());
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, startTime
+                .getTimeInMillis(), options);
 
-        GraphPath path = spt.getPath(end);
+        GraphPath path = spt.getPath(end, false);
         assertNotNull("There must be a path from start to end", path);
 
         // the bottom is not part of the shortest path
-        for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("bottom"));
-            assertNotSame(v.mirror, graph.getVertex("bottomBack"));
+        for (State s : path.states) {
+            assertNotSame(s.getVertex(), graph.getVertex("bottom"));
+            assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
         }
 
         startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
-        TraverseOptions options = new TraverseOptions();
         options.setArriveBy(true);
-        spt = AStar.getShortestPathTreeBack(graph, start, end, new State(startTime
-                .getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, start, end, startTime
+                .getTimeInMillis(), options);
 
-        path = spt.getPath(start);
+        path = spt.getPath(start, false);
         assertNotNull("There must be a path from start to end (looking back)", path);
 
         // the bottom edge is not part of the shortest path
-        for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("bottom"));
-            assertNotSame(v.mirror, graph.getVertex("bottomBack"));
+        for (State s : path.states) {
+            assertNotSame(s.getVertex(), graph.getVertex("bottom"));
+            assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
         }
 
         /* Now, the right edge is not bikeable.  But the user can walk their bike.  So here are some tests
@@ -230,30 +231,30 @@ public class TestHalfEdges extends TestCase {
         options = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
-                .getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, start, end, startTime
+                .getTimeInMillis(), options);
 
-        path = spt.getPath(start);
+        path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom along the right", path);
 
         // the left edge is not part of the shortest path (even though the bike must be walked along the right)
-        for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("left"));
-            assertNotSame(v.mirror, graph.getVertex("leftBack"));
+        for (State s : path.states) {
+            assertNotSame(s.getVertex(), graph.getVertex("left"));
+            assertNotSame(s.getVertex(), graph.getVertex("leftBack"));
         }
         
         start = StreetLocation.createStreetLocation("start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, new State(startTime
-                .getTimeInMillis()), options);
+        spt = AStar.getShortestPathTree(graph, start, end, startTime
+                .getTimeInMillis(), options);
 
-        path = spt.getPath(start);
+        path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom", path);
 
         // the right edge is not part of the shortest path, e
-        for (SPTVertex v : path.vertices) {
-            assertNotSame(v.mirror, graph.getVertex("right"));
-            assertNotSame(v.mirror, graph.getVertex("rightBack"));
+        for (State s : path.states) {
+            assertNotSame(s.getVertex(), graph.getVertex("right"));
+            assertNotSame(s.getVertex(), graph.getVertex("rightBack"));
         }
     }
 

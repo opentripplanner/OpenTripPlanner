@@ -14,28 +14,32 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
-import java.util.Vector;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.contraction.Shortcut;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.MutableEdgeNarrative;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.patch.Patch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,89 +99,104 @@ class Ride {
  */
 public class GraphPath {
     private static final Logger _log = LoggerFactory.getLogger(GraphPath.class);
-
-    public Vector<SPTVertex> vertices;
-
-    public Vector<SPTEdge> edges;
-
-    public GraphPath() {
-        this.vertices = new Vector<SPTVertex>();
-        this.edges = new Vector<SPTEdge>();
+    public LinkedList<State> states;
+    public LinkedList<Edge> edges;
+    // needed to track repeat invocations of path-reversing methods
+    private boolean back; 
+    private TraverseOptions options; 
+    
+    /**
+     * Construct a GraphPath based on the given state by following 
+     * back-edge fields all the way back to the origin of the search. 
+     * This constructs a proper Java list of states (allowing random access 
+     * etc.) from the predecessor information left in states by the 
+     * search algorithm.
+     * 
+     * Optionally re-traverses all edges backward in order to remove excess 
+     * waiting time from the final itinerary presented to the user.
+     * 
+     * @param s - the state for which a path is requested
+     * @param optimize - whether excess waiting time should be removed
+     * @param options - the traverse options used to reach this state
+     */
+    public GraphPath(State s, boolean optimize) {
+    	this.options = s.getOptions();
+    	this.back = options.isArriveBy();
+    	
+        /* Put path in chronological order, and optimize as necessary */
+        State lastState;
+        if (back) {
+        	lastState = optimize ? optimize(s) : reverse(s);
+        } else {
+        	lastState = optimize ? reverse(optimize(s)) : s;
+        }
+        //DEBUG
+        //lastState = s;
+        
+        /* Starting from latest (time-wise) state, copy states to the head
+         * of a list in reverse chronological order. List indices will thus
+         * increase forward in time, and backEdges will be chronologically 
+         * 'back' relative to their state.
+         */
+        this.states = new LinkedList<State>();
+        this.edges = new LinkedList<Edge>();
+        for (State cur = lastState; cur != null; cur = cur.getBackState()) {
+        	states.addFirst(cur);
+        	if (cur.getBackEdge() != null)
+        		edges.addFirst(cur.getBackEdge());
+        }
     }
 
-    public SPTVertex getFirstVertex() {
-        return vertices.get(0);
+    public long getStartTime() {
+        return states.getFirst().getTime();
     }
 
-    public SPTVertex getLastVertex() {
-        return vertices.get(vertices.size() - 1);
+    public long getEndTime() {
+        return states.getLast().getTime();
     }
 
     public long getDuration() {
-        SPTVertex first = getFirstVertex();
-        SPTVertex last = getLastVertex();
-        return Math.abs(last.state.getTime() - first.state.getTime());
+    	// test to see if it is the same as getStartTime - getEndTime;
+        return states.getLast().getElapsedTime();
     }
 
-    public void optimize() {
-
-        State state = vertices.lastElement().state;
-        StateData.Editor edit = state.edit();
-        edit.resetForReverseOptimization();
-        state = edit.createState();
-
-        if (edges.isEmpty()) {
-            /* nothing to optimize */
-            return;
-        }
-
-        TraverseOptions options = vertices.lastElement().options;
-
-        if (options.isArriveBy()) {
-            /* arrive-by trip */
-            ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-            while (iterator.hasPrevious()) {
-                SPTEdge edge = iterator.previous();
-                EdgeNarrative existingNarrative = edge.narrative;
-                TraverseResult result = edge.payload.traverse(state, options);
-                List<Patch> patches = edge.payload.getPatches();
-                if (patches != null) {
-                	for (Patch patch : patches) {
-                        result = patch.filterTraverseResults(result);
-                	}
-                }
-                assert (result != null);
-                state = result.state;
-                edge.fromv.state = state;
-                edge.narrative = result.getEdgeNarrative();
-                copyExistingNarrativeToNewNarrativeAsAppropriate(existingNarrative, edge.narrative);
-            }
-        } else {
-            ListIterator<SPTEdge> iterator = edges.listIterator(vertices.size() - 1);
-            while (iterator.hasPrevious()) {
-                SPTEdge edge = iterator.previous();
-                EdgeNarrative existingNarrative = edge.narrative;
-                TraverseResult result = edge.payload.traverseBack(state, options);
-                List<Patch> patches = edge.payload.getPatches();
-                if (patches != null) {
-                	for (Patch patch : patches) {
-                        result = patch.filterTraverseResults(result);
-                	}
-                }
-                state = result.state;
-                edge.fromv.state = state;
-                edge.narrative = result.getEdgeNarrative();
-                copyExistingNarrativeToNewNarrativeAsAppropriate(existingNarrative, edge.narrative);
-            }
-        }
+    public double getWeight() {
+        return states.getLast().getWeight();
     }
 
+    public Vertex getStartVertex() {
+        return states.getFirst().getVertex();
+    }
+    
+    public Vertex getEndVertex() {
+        return states.getLast().getVertex();
+    }
+
+    /**
+     * Get a list containing one RouteSpec object for each vehicle boarded in this path. 
+     * @return a list of RouteSpec objects for this path
+     */
+    public List<RouteSpec> getRouteSpecs() {
+    	List<RouteSpec> ret = new LinkedList<RouteSpec>();
+    	for (State s : states) {
+    		Edge e = s.getBackEdge();
+            if (e instanceof PatternBoard) {
+            	Trip trip = ((PatternBoard)e).getPattern().getTrip(s.getTrip());
+                String routeName = GtfsLibrary.getRouteName(trip.getRoute());
+                RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
+                ret.add(spec);
+                // TODO: Check implementation, use edge list in graphpath
+            }
+    	}
+    	return ret;
+    }
+    
     /** See the thread on gtfs-changes explaining the proper interpretation of fares.txt */
 
     public Fare getCost() {
-        State state = vertices.lastElement().state;
-        StateData data = state.getData();
-        FareContext fareContext = data.getFareContext();
+    	
+        State state = states.getLast();
+        FareContext fareContext = state.getFareContext();
         if (fareContext == null) {
             // we have never actually visited any zones, so there's no fare data.
             // perhaps we're planning a biking-only trip.
@@ -191,11 +210,9 @@ public class GraphPath {
         // create rides
         List<Ride> rides = new ArrayList<Ride>();
         Ride newRide = null;
-        for (SPTVertex vertex : vertices) {
-            State vState = vertex.state;
-            StateData vData = vState.getData();
-            String zone = vData.getZone();
-            AgencyAndId route = vData.getRoute();
+        for (State curr : states) {
+            String zone = curr.getZone();
+            AgencyAndId route = curr.getRoute();
             if (zone == null) {
                 newRide = null;
             } else {
@@ -204,7 +221,7 @@ public class GraphPath {
                     rides.add(newRide);
                     newRide.startZone = zone;
                     newRide.route = route;
-                    newRide.startTime = vState.getTime();
+                    newRide.startTime = curr.getTime();
                 }
                 newRide.zones.add(zone);
                 newRide.endZone = zone;
@@ -289,36 +306,69 @@ public class GraphPath {
     }
 
     public String toString() {
-        return vertices.toString();
-    }
-
-    public void reverse() {
-        Collections.reverse(vertices);
-        Collections.reverse(edges);
-        for (SPTEdge e : edges) {
-            SPTVertex tmp = e.fromv;
-            e.fromv = e.tov;
-            e.tov = tmp;
-        }
+        return "GraphPath(" + states.toString() + ")";
     }
 
     public boolean equals(Object o) {
         if (o instanceof GraphPath) {
-            return this.edges.equals(((GraphPath) o).edges);
+            return this.states.equals(((GraphPath) o).states);
         }
         return false;
     }
 
     public int hashCode() {
-        return this.edges.hashCode();
+        return this.states.hashCode();
     }
 
     /****
      * Private Methods
      ****/
 
-    private void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
-            EdgeNarrative to) {
+    /** 
+     * Reverse the path implicit in the given state, i.e. produce a new
+     * chain of states that leads from this state to the other end of the
+     * implicit path.
+     */
+    private State reverse(State s) {
+    	// not implemented yet;
+    	// use reverse-optimize method for now.
+    	return optimize(s);    	
+    }
+
+    /** 
+     * Reverse the path implicit in the given state, re-traversing all edges
+     * in the opposite direction so as to remove any unnecessary waiting in 
+     * the resulting itinerary. This produces a path that passes through all the
+     * same edges, but which may have a shorter overall duration due to different
+     * weights on time-dependent (e.g. transit boarding) edges.
+     * 
+     * @param s - a state resulting from a path search
+     * @return a state at the other end of a reversed, optimized path 
+     */
+    // not static because direction of search is tracked in instance
+    private State optimize(State s) {
+
+    	// this should be sufficient, do we need a special reverse reset method?
+    	State ret = new State(s.getTime(), s.getVertex(), s.getOptions());
+
+    	// reverse the search direction 
+    	// for now, traverse and makeChild do not look at the direction 
+    	// indicated in the options, so we can force a reverse traverse.
+    	back = !back;
+    	
+    	for (State orig = s; orig != null; orig = orig.getBackState()) {
+    		Edge e = orig.getBackEdge();
+    		if (e==null) continue; //break
+    		ret = back ? e.traverseBack(ret) : e.traverse(ret);
+            copyExistingNarrativeToNewNarrativeAsAppropriate(
+            		orig.getBackEdgeNarrative(), ret.getBackEdgeNarrative());
+    	}
+    	
+        return ret;
+    }
+
+    private static void copyExistingNarrativeToNewNarrativeAsAppropriate(
+    		EdgeNarrative from, EdgeNarrative to) {
 
         if (!(to instanceof MutableEdgeNarrative))
             return;
@@ -331,4 +381,5 @@ public class GraphPath {
         if (to.getToVertex() == null)
             m.setToVertex(from.getToVertex());
     }
+
 }

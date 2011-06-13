@@ -21,13 +21,12 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData.Editor;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.TraverseResult;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -155,17 +154,19 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     }
 
     @Override
-    public TraverseResult traverse(State s0, TraverseOptions options)
-            throws NegativeWeightException {
-
-        return doTraverse(s0, options, false);
+    public State traverse(State s0) {
+        return doTraverse(s0, s0.getOptions(), false);
     }
 
-    private TraverseResult doTraverse(State s0, TraverseOptions options, boolean back) {
+    @Override
+    public State traverseBack(State s0) {
+        return doTraverse(s0, s0.getOptions(), true);
+    }
+
+    private State doTraverse(State s0, TraverseOptions options, boolean back) {
         if (!canTraverse(options)) {
             return tryWalkBike(s0, options, back);
         }
-
         
         double time = length / options.speed;
         double weight;
@@ -190,27 +191,23 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             weight = time;
         }
         weight *= options.walkReluctance;
-        Editor editor = s0.edit();
-        editor.incrementWalkDistance(length);
-        editor.incrementTimeInSeconds((int) (back ? -time : time));
-        
-        if( EdgeLibrary.weHaveWalkedTooFar(editor, options))
+        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        StateEditor s1 = s0.edit(this, en);
+        s1.incrementWalkDistance(length);
+        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementWeight(weight);
+
+        if (s1.weHaveWalkedTooFar(options))
             return null;
         
-        return new TraverseResult(weight, editor.createState(), new FixedModeEdge(this, options.getModes().getNonTransitMode()));
+        return s1.makeState();
     }
 
-    private TraverseResult tryWalkBike(State s0, TraverseOptions options, boolean back) {
+    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
         if (options.getModes().contains(TraverseMode.BICYCLE)) {
             return doTraverse(s0, options.getWalkingOptions(), back);
         }
         return null;
-    }
-
-    @Override
-    public TraverseResult traverseBack(State s0, TraverseOptions options)
-            throws NegativeWeightException {
-        return doTraverse(s0, options, true);
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
