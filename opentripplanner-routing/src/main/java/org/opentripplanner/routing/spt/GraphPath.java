@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Fare;
@@ -40,7 +38,6 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.patch.Patch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

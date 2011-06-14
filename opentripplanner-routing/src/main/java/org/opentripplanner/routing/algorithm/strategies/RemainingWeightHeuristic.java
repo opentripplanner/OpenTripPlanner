@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;

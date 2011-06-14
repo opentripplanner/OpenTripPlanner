@@ -127,10 +127,9 @@ public class StateData {
     public static class Editor {
 
         /**
-         * StartTime and Time are not technically members of StateData, but we add it as a
+         * Time is not technically a member of StateData, but we add it as a
          * convenience here for easier state creation
          */
-        private long startTime;
 
         private long time;
 
@@ -196,11 +195,6 @@ public class StateData {
                 throw new IllegalStateException("a state builder can only be used once");
             created = true;
             return new StateData(this);
-        }
-
-
-        public void setStartTime(long startTime) {
-            this.startTime = startTime;
         }
 
         public long getTime() {
