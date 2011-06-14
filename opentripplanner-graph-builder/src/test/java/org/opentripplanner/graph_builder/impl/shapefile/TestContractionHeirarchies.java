@@ -38,11 +38,13 @@ import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.DisjointSet;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -91,6 +93,14 @@ public class TestContractionHeirarchies extends TestCase {
 
     @Test
     public void testBasic() {
+        /* Somewhere in the Arabian sea.
+         * Low latitude avoids potential weirdness from the earth's curvature.
+         * Positive latitude and longitude for clarity.  
+         */
+        final double LAT0 = 10.0;
+        final double LON0 = 65.0;
+        final double STEP = 0.001;
+        // number of rows and columns in grid
         final int N = 10;
 
         Graph graph = new Graph();
@@ -101,8 +111,8 @@ public class TestContractionHeirarchies extends TestCase {
             verticesIn[y] = new Vertex[N];
             verticesOut[y] = new Vertex[N];
             for (int x = 0; x < N; ++x) {
-                double xc = x * 0.001 - 71;
-                double yc = y * 0.001 + 40;
+                double xc = x * STEP + LON0;
+                double yc = y * STEP + LAT0;
                 Vertex in = new EndpointVertex("(" + x + ", " + y + ") in", xc, yc);
                 graph.addVertex(in);
                 verticesIn[y][x] = in;
@@ -113,42 +123,54 @@ public class TestContractionHeirarchies extends TestCase {
             }
         }
 
-        for (int y = 0; y < N; ++y) {
-            for (int x = 0; x < N - 1; ++x) {
-                double xc = x * 0.001 - 71;
-                double yc = y * 0.001 + 40;
-                LineString geometry = GeometryUtils.makeLineString(xc, yc, xc + 0.001, yc);
-                double d = DistanceLibrary.distance(yc, xc, yc, xc + 0.001);
-                StreetVertex left = new StreetVertex("a(" + x + ", " + y + ")", geometry, "", d, false, null);
-                StreetVertex right = new StreetVertex("a(" + x + ", " + y + ")", (LineString) geometry.reverse(), "", d, true, null);
-                
-                graph.addVertex(left);
-                graph.addVertex(right);
 
-                d = DistanceLibrary.distance(xc, yc, xc + 0.001, yc);
-                geometry = GeometryUtils.makeLineString(yc, xc, yc, xc + 0.001);
-                StreetVertex down = new StreetVertex("d(" + y + ", " + x + ")", geometry, "", d, false, null);
-                StreetVertex up = new StreetVertex("d(" + y + ", " + x + ")", (LineString) geometry.reverse(), "", d, true, null);
+        /*
+         * (i, j) iteration variables are used for: 
+         * (y, x) and (lat, lon) respectively when making west-east streets
+         * (x, y) and (lon, lat) respectively when making south-north streets
+         * 
+         * verticesOut are connected to all StreetVertex leading away from the given grid point
+         * verticesIn are connected to all StreetVertex leading toward the given grid point
+         * Note: this means that in a search, the last TurnEdge at the destination will not be traversed 
+         */
+        for (int i = 0; i < N; ++i) {
+            for (int j = 0; j < N - 1; ++j) {
+                double lon = j * STEP + LON0;
+                double lat = i * STEP + LAT0;
+                double d = DistanceLibrary.distance(lat, lon, lat, lon + STEP);
+                LineString geometry = GeometryUtils.makeLineString(lon, lat, lon + STEP, lat);
+                StreetVertex we = new StreetVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
+                StreetVertex ew = new StreetVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
+                
+                graph.addVertex(we);
+                graph.addVertex(ew);
 
-                graph.addVertex(down);
-                graph.addVertex(up);
+                lon = i * STEP + LON0;
+                lat = j * STEP + LAT0;
+                d = DistanceLibrary.distance(lat, lon, lat + STEP, lon);
+                geometry = GeometryUtils.makeLineString(lon, lat, lon, lat + STEP);
+                StreetVertex sn = new StreetVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
+                StreetVertex ns = new StreetVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
+
+                graph.addVertex(sn);
+                graph.addVertex(ns);
                 
-                graph.addEdge(new FreeEdge(verticesOut[y][x], left));
-                graph.addEdge(new FreeEdge(verticesOut[x][y], down));
+                graph.addEdge(new FreeEdge(verticesOut[i][j], we));
+                graph.addEdge(new FreeEdge(verticesOut[j][i], sn));
                 
-                graph.addEdge(new FreeEdge(verticesOut[y][x + 1], right));
-                graph.addEdge(new FreeEdge(verticesOut[x + 1][y], up));
+                graph.addEdge(new FreeEdge(verticesOut[i][j + 1], ew));
+                graph.addEdge(new FreeEdge(verticesOut[j + 1][i], ns));
                 
-                graph.addEdge(new FreeEdge(right, verticesIn[y][x]));
-                graph.addEdge(new FreeEdge(up, verticesIn[x][y]));
+                graph.addEdge(new FreeEdge(ew, verticesIn[i][j]));
+                graph.addEdge(new FreeEdge(ns, verticesIn[j][i]));
             
-                graph.addEdge(new FreeEdge(left, verticesIn[y][x + 1]));
-                graph.addEdge(new FreeEdge(down, verticesIn[x + 1][y]));
+                graph.addEdge(new FreeEdge(we, verticesIn[i][j + 1]));
+                graph.addEdge(new FreeEdge(sn, verticesIn[j + 1][i]));
                 
-                assertEquals(left, graph.addVertex(left));
-                assertEquals(right, graph.addVertex(right));
-                assertEquals(down, graph.addVertex(down));
-                assertEquals(up, graph.addVertex(up));
+                assertEquals(we, graph.addVertex(we));
+                assertEquals(ew, graph.addVertex(ew));
+                assertEquals(sn, graph.addVertex(sn));
+                assertEquals(ns, graph.addVertex(ns));
             }
         }
 
@@ -230,22 +252,20 @@ public class TestContractionHeirarchies extends TestCase {
 
         assertEquals((N - 1) * 2 + 2, path.states.size());
 
-//        Vertex v = path.getStartVertex();
-//        for (int i = 0; i < path.states.size(); ++i) {
-//            State s = path.states.get(i);
-//            assertSame(s.getVertex(), v);
-//            assertSame(lastVertex, path.vertices.get(i));
-//            Verte lastVertex = v;
-//        }
 
-        path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], 1000000000, options);
-        if (path == null || path.states.size() != 5) {
-            path = hierarchy.getShortestPath(verticesIn[1][1], verticesOut[2][2], 1000000000, options);
+        // test that path is coherent
+        for (int i = 0; i < path.states.size() - 1; ++i) {
+        	State s = path.states.get(i);
+            Vertex sv = s.getVertex();
+            Edge e = path.edges.get(i);
+            assertSame(e.getFromVertex(), sv);
         }
-        
+
+
         options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.speed = 1;
+        //options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         for (int x1 = 0; x1 < N; ++x1) {
             for (int y1 = 0; y1 < N; ++y1) {
                 for (int x2 = 0; x2 < N; ++x2) {
@@ -258,14 +278,14 @@ public class TestContractionHeirarchies extends TestCase {
                                 options);
 
                         assertNotNull(path);
-                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.states.size());
+                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 2, path.states.size());
                         
                         options.setArriveBy(true);
                         path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], 1000000000,
                                 options);
 
                         assertNotNull(path);
-                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 1, path.states.size());
+                        assertEquals(Math.abs(x1 - x2) + Math.abs(y1 - y2) + 2, path.states.size());
                     }
                 }
             }
@@ -529,6 +549,8 @@ public class TestContractionHeirarchies extends TestCase {
         assertNotNull("Reverse path must be found", pathWithSubways);
         subway = false;
         for (State state : pathWithSubways.states) {
+        	if (state.getBackEdge() == null) 
+        		continue;
             if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
                 subway = true;
                 break;
