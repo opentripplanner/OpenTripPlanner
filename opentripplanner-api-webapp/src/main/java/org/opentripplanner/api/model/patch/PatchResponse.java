@@ -18,7 +18,7 @@ public class PatchResponse {
 	@XmlElementWrapper
 	@XmlElements({
 	    @XmlElement(name = "StopNotePatch", type = StopNotePatch.class),
-	    @XmlElement(name = "RouteNotePatch", type = RouteNotePatch.class),
+	    @XmlElement(name = "RouteNotePatch", type = RouteNotePatch.class)
 	    })
 	public List<Patch> patches;
 	
