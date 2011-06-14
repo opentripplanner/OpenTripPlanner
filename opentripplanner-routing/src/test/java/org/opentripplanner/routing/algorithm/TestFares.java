@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;

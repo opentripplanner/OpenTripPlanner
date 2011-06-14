@@ -15,7 +15,6 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +26,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;

@@ -1,15 +1,10 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
-import org.opentripplanner.routing.edgetype.OnBoardReverseEdge;
 
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
 

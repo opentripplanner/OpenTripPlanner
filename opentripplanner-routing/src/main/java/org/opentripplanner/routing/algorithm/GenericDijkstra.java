@@ -23,13 +23,11 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.pqueue.FibHeap;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;

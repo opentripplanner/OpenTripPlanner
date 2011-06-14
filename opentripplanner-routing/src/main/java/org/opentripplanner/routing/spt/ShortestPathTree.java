@@ -13,11 +13,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.spt;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 /**

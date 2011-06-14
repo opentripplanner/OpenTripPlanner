@@ -14,12 +14,9 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;

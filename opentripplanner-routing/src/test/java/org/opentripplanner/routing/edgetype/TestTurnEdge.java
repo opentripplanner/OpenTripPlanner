@@ -21,7 +21,6 @@ import junit.framework.TestCase;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;

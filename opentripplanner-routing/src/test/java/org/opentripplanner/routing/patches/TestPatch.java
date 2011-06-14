@@ -30,7 +30,6 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;

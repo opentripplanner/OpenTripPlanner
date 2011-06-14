@@ -18,16 +18,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.FixedModeEdge;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;

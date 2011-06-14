@@ -19,9 +19,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.TransitIndexService;
 
 @XmlRootElement(name="StopNotePatch")

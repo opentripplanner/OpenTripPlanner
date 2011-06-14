@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,18 +24,14 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
-import org.opentripplanner.routing.pqueue.PriorityQueueImpl;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;

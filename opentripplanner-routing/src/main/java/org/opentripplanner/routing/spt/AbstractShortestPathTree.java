@@ -18,7 +18,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
