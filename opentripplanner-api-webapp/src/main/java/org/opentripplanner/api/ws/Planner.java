@@ -352,7 +352,7 @@ public class Planner {
         GeometryFactory geometryFactory = new GeometryFactory();
         int startWalk = -1;
         int i = -1;
-//      for (SPTEdge sptEdge : path.edges) {
+
         for (State currState : path.states) { 
             i++;
             /* grab base edge and associated narrative information from SPT edge */
@@ -360,6 +360,8 @@ public class Planner {
             edgeNarrative = currState.getBackEdgeNarrative();
             /* skip initial state, which has no back edges */
             if (edge == null) continue;
+            
+            /* Add in notes */
             Set<String> notes = edgeNarrative.getNotes();
 			if (notes != null) {
 				if (leg == null) {
@@ -370,7 +372,7 @@ public class Planner {
 					}
 				}
 			}
-            
+			
             /* ignore freeEdges */ 
             if (edge instanceof FreeEdge && currState != finalState) {
                 continue;
@@ -418,7 +420,12 @@ public class Planner {
                     	leg.addNote(noteForNewLeg);
                     }
                     notesForNewLeg.clear();
+                    if (mode == null) {
+                    	mode = currState.getBackState().getBackEdgeNarrative().getMode();
+                    	previousMode = mode;
+                    }
                     leg.mode = mode.toString();
+                    
                     if (mode.isOnStreetNonTransit()) {
                         /* on-street (walk/bike) leg
                          * mark where in edge list on-street legs begin,

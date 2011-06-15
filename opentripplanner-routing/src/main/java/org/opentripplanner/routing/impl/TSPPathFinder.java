@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +24,7 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * The Traveling Salesman Problem
@@ -99,11 +96,18 @@ public class TSPPathFinder {
         Vertex firstIntermediate = shortestPath.vertices.get(0);
         
         HashMap<Vertex, GraphPath> pathsFromFV = paths.get(fromVertex);
+        //get the path from the end of the first subpath
 		GraphPath newPath = new GraphPath(pathsFromFV.get(firstIntermediate).states.getLast(), false);
         Vertex lastVertex = firstIntermediate;
         for (Vertex v : shortestPath.vertices.subList(1, shortestPath.vertices.size())) {
                State lastState = newPath.states.getLast();
                GraphPath subPath = paths.get(lastVertex).get(v);
+               //add a leg-switching state
+               LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex, lastState.getBackEdgeNarrative().getMode());
+               lastState = legSwitchingEdge.traverse(lastState);
+               newPath.edges.add(legSwitchingEdge);
+        	   newPath.states.add(lastState);
+               //add the next subpath
                for (Edge e : subPath.edges) {
             	   lastState = e.traverse(lastState);
             	   newPath.edges.add(e);
