@@ -103,7 +103,7 @@ public class TSPPathFinder {
                State lastState = newPath.states.getLast();
                GraphPath subPath = paths.get(lastVertex).get(v);
                //add a leg-switching state
-               LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex, lastState.getBackEdgeNarrative().getMode());
+               LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
                lastState = legSwitchingEdge.traverse(lastState);
                newPath.edges.add(legSwitchingEdge);
         	   newPath.states.add(lastState);

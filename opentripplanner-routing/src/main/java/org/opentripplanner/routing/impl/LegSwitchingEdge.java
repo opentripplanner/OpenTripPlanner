@@ -13,11 +13,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public class LegSwitchingEdge extends AbstractEdge {
 
 	private static final long serialVersionUID = 1L;
-	private TraverseMode mode;
 
-	public LegSwitchingEdge(Vertex v1, Vertex v2, TraverseMode mode) {
+	public LegSwitchingEdge(Vertex v1, Vertex v2) {
 		super(v1, v2);
-		this.mode = mode;
 	}
 
 	@Override
