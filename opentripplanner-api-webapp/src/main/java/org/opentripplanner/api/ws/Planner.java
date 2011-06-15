@@ -29,6 +29,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 
 import org.opentripplanner.api.model.Itinerary;
@@ -482,7 +483,7 @@ public class Planner {
                         leg.stop = new ArrayList<Place>();
                     } else {
                         /* any further transit edge, add "from" vertex to intermediate stops */
-                        Place stop = makePlace(currState.getBackState().getVertex());
+                        Place stop = makePlace(currState);
                         leg.stop.add(stop);
                     }
                 }
@@ -506,6 +507,10 @@ public class Planner {
         return itinerary;
     }
 
+    
+  
+    
+    
     /**
      * Adjusts an Itinerary's elevation fields from an elevation profile
      * 
@@ -570,6 +575,20 @@ public class Planner {
         return itinerary;
     }
 
+    /**
+     * Makes a new Place from a state. Contains information about time.
+     * 
+     * @return
+     */
+    private Place makePlace(State state) {
+        Coordinate endCoord = state.getVertex().getCoordinate();
+		String name = state.getVertex().getName();        
+        AgencyAndId stopId = state.getVertex().getStopId();
+		Date timeAtState = new Date(state.getBackState().getTime());
+		Place place = new Place(endCoord.x, endCoord.y, name, stopId,  timeAtState);
+        return place;
+    }
+    
     /**
      * Makes a new Place from a vertex.
      * 

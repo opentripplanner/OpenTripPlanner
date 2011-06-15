@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.model; 
 
+import java.util.Date;
 import java.util.logging.Logger; 
 
 import javax.xml.bind.annotation.XmlElement; 
@@ -48,6 +49,11 @@ public class Place {
     public Double lat = null;
 
     /**
+     * The time the rider will be at the place.
+     */
+    public Date time = null;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */
@@ -69,6 +75,11 @@ public class Place {
     public Place(Double lon, Double lat, String name, AgencyAndId stopId) {
         this(lon, lat, name);
         this.stopId = stopId;
-    }
+	}
 
+	public Place(Double lon, Double lat, String name, AgencyAndId stopId,
+			Date time) {
+		this(lon, lat, name, stopId);
+		this.time = time;
+	}
 }
