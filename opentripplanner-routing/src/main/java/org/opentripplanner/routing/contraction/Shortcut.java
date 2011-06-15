@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -78,40 +79,28 @@ public class Shortcut implements DirectEdge, Serializable {
 
     @Override
     public State traverse(State s0) {
-    	if (weight == -1) {
-            State s1 = edge1.traverse(s0);
+        if (weight == -1) {
+        	Edge first, second;
+        	if (s0.getOptions().isArriveBy()) {
+        		first = edge2;
+        		second = edge1;
+        	} else {
+        		first = edge1;
+        		second = edge2;
+        	}
+            State s1 = first.traverse(s0);
             if (s1 == null)
                 return null;
-            State s2 = edge2.traverse(s1);
+            State s2 = second.traverse(s1);
             if (s2 == null)
                 return null;
-            time = (int) ((s2.getTime() - s0.getTime()) / 1000);
+            time = (int) (Math.abs(s0.getTime() - s2.getTime()) / 1000);
             weight = s2.getWeight() - s0.getWeight();
             mode = s2.getBackEdgeNarrative().getMode();
-    	}
+        }
         //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));
         StateEditor ret = s0.edit(this);
         ret.incrementTimeInSeconds(time);
-        ret.incrementWeight(weight);
-        return ret.makeState();
-    }
-
-    @Override
-    public State traverseBack(State s0) {
-    	if (weight == -1) {
-            State s1 = edge2.traverseBack(s0);
-            if (s1 == null)
-                return null;
-            State s2 = edge1.traverseBack(s1);
-            if (s2 == null)
-                return null;
-            time = (int) ((s0.getTime() - s2.getTime()) / 1000);
-            weight = s2.getWeight() - s0.getWeight();
-            mode = s2.getBackEdgeNarrative().getMode();
-    	}
-        //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));
-        StateEditor ret = s0.edit(this);
-        ret.incrementTimeInSeconds(-time);
         ret.incrementWeight(weight);
         return ret.makeState();
     }
@@ -134,8 +123,6 @@ public class Shortcut implements DirectEdge, Serializable {
     public boolean isRoundabout() {
         return false;
     }
-
-
 
 	@Override
 	public State optimisticTraverse(State s0) {
@@ -165,17 +152,25 @@ public class Shortcut implements DirectEdge, Serializable {
 	 * recursive shortcut unpack
 	 */
 	public State unpackTraverse(State s0) {
+		Edge first, second;
+		if (s0.getOptions().isArriveBy()) {
+			first  = edge2;
+			second = edge1;
+		} else {
+			first  = edge1;
+			second = edge2;
+		}
 		State s1;
-		if (edge1 instanceof Shortcut) 
-			s1 = ((Shortcut)edge1).unpackTraverse(s0);
+		if (first instanceof Shortcut) 
+			s1 = ((Shortcut)first).unpackTraverse(s0);
 		else
-			s1 = edge1.traverse(s0);
+			s1 = first.traverse(s0);
 
-		if (edge2 instanceof Shortcut) 
-			s1 = ((Shortcut)edge2).unpackTraverse(s1);
+		if (second instanceof Shortcut) 
+			s1 = ((Shortcut)second).unpackTraverse(s1);
 		else
-			s1 = edge2.traverse(s1);
-		
+			s1 = second.traverse(s1);
+
 		return s1;
 	}
 }

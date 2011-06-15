@@ -345,22 +345,15 @@ public class GraphPath {
     // not static because direction of search is tracked in instance
     private State optimize(State s) {
 
-    	// this should be sufficient, do we need a special reverse reset method?
-    	State ret = new State(s.getTime(), s.getVertex(), s.getOptions());
-
     	// reverse the search direction 
-    	// for now, traverse and makeChild do not look at the direction 
-    	// indicated in the options, so we can force a reverse traverse.
-    	back = !back;
-    	
+    	State ret = s.reversedClone();
     	for (State orig = s; orig != null; orig = orig.getBackState()) {
     		Edge e = orig.getBackEdge();
     		if (e==null) continue; //break
-    		ret = back ? e.traverseBack(ret) : e.traverse(ret);
+    		ret = e.traverse(ret);
             copyExistingNarrativeToNewNarrativeAsAppropriate(
             		orig.getBackEdgeNarrative(), ret.getBackEdgeNarrative());
     	}
-    	
         return ret;
     }
 
@@ -378,5 +371,10 @@ public class GraphPath {
         if (to.getToVertex() == null)
             m.setToVertex(from.getToVertex());
     }
+
+	public void dump() {
+		for (State s : states)
+			System.out.println(s.getBackEdge() + " --> " + s);
+	}
 
 }

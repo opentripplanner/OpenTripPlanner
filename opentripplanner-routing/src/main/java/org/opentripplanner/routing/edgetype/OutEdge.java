@@ -63,18 +63,19 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     }
 
     public State traverse(State s0) {
-    	return doTraverse(s0, s0.getOptions(), false);
+    	return doTraverse(s0, s0.getOptions());
     }
 
-    public State traverseBack(State s0) {
-    	return doTraverse(s0, s0.getOptions(), true);
-    }
-
-    private State doTraverse(State s0, TraverseOptions options, boolean back) {
+    private State doTraverse(State s0, TraverseOptions options) {
         StreetVertex fromv = ((StreetVertex)this.fromv);
         
         if (!fromv.canTraverse(options)) {
-            return tryWalkBike(s0, options, back);
+        	// try walking bike since you can't ride it here
+        	if (options.getModes().contains(TraverseMode.BICYCLE)) {
+        		return doTraverse(s0, options.getWalkingOptions());
+        	} else {
+        		return null;
+        	}
         }
 
         StateEditor s1 = s0.edit(this);
@@ -82,22 +83,14 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         double time = fromv.getLength() / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
-        // time moves *backwards* when traversing an edge in the opposite direction
-        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
-        
         if (s1.weHaveWalkedTooFar(options))
             return null;
-        
+
         return s1.makeState();
     }
 
-    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
-        if (options.getModes().contains(TraverseMode.BICYCLE)) {
-            return doTraverse(s0, options.getWalkingOptions(), back);
-        }
-        return null;
-    }
     public String toString() {
         return "OutEdge( " + fromv + ", " + tov + ")";
     }

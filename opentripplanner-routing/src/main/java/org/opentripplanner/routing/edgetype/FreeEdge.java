@@ -45,14 +45,6 @@ public class FreeEdge extends AbstractEdge {
     }
 
     @Override
-    public State traverseBack(State s0) {
-    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
-    	StateEditor s1 = s0.edit(this, en);
-    	s1.incrementWeight(1);
-        return s1.makeState();
-    }
-
-    @Override
     public double getDistance() {
         return 0;
     }

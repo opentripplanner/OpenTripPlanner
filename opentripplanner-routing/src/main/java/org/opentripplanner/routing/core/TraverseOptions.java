@@ -199,16 +199,6 @@ public class TraverseOptions implements Serializable, Cloneable {
     public TraverseOptions(TraverseModeSet modes) {
         this();
         this.setModes(modes);
-        if (modes.getBicycle()) {
-            speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
-            boardCost = 240; // cyclists hate loading their bike a second time
-            walkingOptions = new TraverseOptions();
-            walkingOptions.getModes().setTransit(false);
-        } else if (modes.getCar()) {
-            speed = 15; // 15 m/s, ~35 mph, a random driving speed
-            walkingOptions = new TraverseOptions();
-            walkingOptions.getModes().setTransit(false);
-        }
     }
 
     public TraverseOptions(GtfsContext context) {
@@ -255,6 +245,10 @@ public class TraverseOptions implements Serializable, Cloneable {
         try {
             TraverseOptions clone = (TraverseOptions) super.clone();
             clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
+            if (this.walkingOptions != this)
+            	clone.walkingOptions = this.walkingOptions.clone();
+            else
+            	clone.walkingOptions = clone;
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
@@ -262,6 +256,12 @@ public class TraverseOptions implements Serializable, Cloneable {
         }
     }
 
+    public TraverseOptions reversedClone() {
+    	TraverseOptions ret = this.clone();
+    	ret.setArriveBy( ! ret.isArriveBy());
+    	return ret;
+    }
+    
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions to = (TraverseOptions) o;
@@ -292,6 +292,7 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public void setArriveBy(boolean back) {
         this.back = back;
+        walkingOptions.back = back;
         if (back) {
             this.worstTime = 0;
         } else {
@@ -309,8 +310,17 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
-        if (modes.getBicycle() || modes.getCar()) {
+        if (modes.getBicycle()) {
+            speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
+            boardCost = 240; // cyclists hate loading their bike a second time
             walkingOptions = new TraverseOptions();
+            walkingOptions.getModes().setTransit(false);
+            walkingOptions.setArriveBy(this.isArriveBy());
+        } else if (modes.getCar()) {
+            speed = 15; // 15 m/s, ~35 mph, a random driving speed
+            walkingOptions = new TraverseOptions();
+            walkingOptions.getModes().setTransit(false);
+            walkingOptions.setArriveBy(this.isArriveBy());
         }
     }
 

@@ -255,16 +255,6 @@ public class AStarTest {
         }
 
         @Override
-        public State traverseBack(State s0) {
-            double d = getDistance();
-            long t = (long) (d * 1000 / s0.getOptions().speed);
-            StateEditor s1 = s0.edit(this);
-            s1.incrementTimeMsec(-t);
-            s1.incrementWeight(d);
-            return s1.makeState();
-        }
-
-        @Override
         public TraverseMode getMode() {
             return null;
         }

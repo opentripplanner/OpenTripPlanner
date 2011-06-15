@@ -13,7 +13,7 @@ import org.opentripplanner.routing.core.Vertex;
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     @Override
-    public double computeInitialWeight(State s, Vertex target, TraverseOptions traverseOptions) {
+    public double computeInitialWeight(State s, Vertex target) {
         return 0;
     }
 

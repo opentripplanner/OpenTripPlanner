@@ -15,9 +15,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double maxSpeed;
 
     @Override
-    public double computeInitialWeight(State s, Vertex target, TraverseOptions traverseOptions) {
-        this.options = traverseOptions;
-        this.useTransit = traverseOptions.getModes().getTransit();
+    public double computeInitialWeight(State s, Vertex target) {
+        this.options = s.getOptions();
+        this.useTransit = options.getModes().getTransit();
         this.maxSpeed = getMaxSpeed(options);
         return s.getVertex().distance(target) / maxSpeed;
     }

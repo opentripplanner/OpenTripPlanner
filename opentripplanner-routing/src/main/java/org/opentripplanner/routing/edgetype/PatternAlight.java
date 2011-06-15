@@ -76,108 +76,111 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     @Override
     public State traverse(State state0) {
-	if (!pattern.canAlight(stopIndex + 1)) {
-	    return null;
-	}
-        StateEditor s1 = state0.edit(this);
-        s1.setTripId(null);
-        s1.setLastAlightedTime(state0.getTime());
-        s1.setPreviousStop(tov);
-        s1.incrementWeight(1);
-        return s1.makeState();
-    }
-
-    @Override
-    public State traverseBack(State state0) {
     	TraverseOptions options = state0.getOptions();
-        if (!options.getModes().get(modeMask)) {
-            return null;
-        }
-        /* find closest alighting time for backward searches */
-        /* 
-         * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to initial state)
-         * if this pattern's serviceId is running look for the closest alighting time at this stop.
-         * choose the soonest alighting time among trips starting yesterday, today, or tomorrow
-         */
-        long current_time = state0.getTime();
-        int bestWait = -1;
-        int bestPatternIndex = -1;
-        AgencyAndId serviceId = getPattern().getExemplar().getServiceId();        
-        for (ServiceDay sd : options.serviceDays) {
-            int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
-            // only check for service on days that are not in the future
-            // this avoids unnecessarily examining trips starting tomorrow
-            if (secondsSinceMidnight < 0) continue; 
-            if (sd.serviceIdRunning(serviceId)) {
-                int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
-                                                           options.getModes().getBicycle(), false);
-                if (patternIndex >= 0) {
-                    // a trip was found, index is valid, wait will be defined.
-                    // even though we are going backward I tend to think waiting 
-                    // should be expressed as non-negative.
-                    int wait = (int) ((current_time - sd.time(pattern.getArrivalTime(stopIndex, patternIndex))) / 1000);
-                    if (wait < 0) _log.error("negative wait time on alight");
-                    if (bestWait < 0 || wait < bestWait) {
-                        // track the soonest arrival over all relevant schedules
-                        bestWait = wait;
-                        bestPatternIndex = patternIndex;
+    	if (options.isArriveBy()) {
+    		/* backward traversal: find a transit trip on this pattern */
+            if (!options.getModes().get(modeMask)) {
+                return null;
+            }
+            /* find closest alighting time for backward searches */
+            /* 
+             * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to initial state)
+             * if this pattern's serviceId is running look for the closest alighting time at this stop.
+             * choose the soonest alighting time among trips starting yesterday, today, or tomorrow
+             */
+            long current_time = state0.getTime();
+            int bestWait = -1;
+            int bestPatternIndex = -1;
+            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();        
+            for (ServiceDay sd : options.serviceDays) {
+                int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+                // only check for service on days that are not in the future
+                // this avoids unnecessarily examining trips starting tomorrow
+                if (secondsSinceMidnight < 0) continue; 
+                if (sd.serviceIdRunning(serviceId)) {
+                    int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
+                                                               options.getModes().getBicycle(), false);
+                    if (patternIndex >= 0) {
+                        // a trip was found, index is valid, wait will be defined.
+                        // even though we are going backward I tend to think waiting 
+                        // should be expressed as non-negative.
+                        int wait = (int) ((current_time - sd.time(pattern.getArrivalTime(stopIndex, patternIndex))) / 1000);
+                        if (wait < 0) _log.error("negative wait time on alight");
+                        if (bestWait < 0 || wait < bestWait) {
+                            // track the soonest arrival over all relevant schedules
+                            bestWait = wait;
+                            bestPatternIndex = patternIndex;
+                        }
                     }
                 }
             }
-        }
-        if (bestWait < 0) {
-            return null;
-        }
-        Trip trip = getPattern().getTrip(bestPatternIndex);
-
-        /* check if route banned for this plan */
-        if (options.bannedRoutes != null) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
-            if (options.bannedRoutes.contains(spec)) {
+            if (bestWait < 0) {
                 return null;
             }
-        }
-        
-        /* check if route is preferred for this plan */
-        long preferences_penalty = 0;
-        if (options.preferredRoutes != null && options.preferredRoutes.size()>0) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
-            if (!options.preferredRoutes.contains(spec)) {
-            	preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
-            }
-        }
-        
-        /* check if route is unpreferred for this plan*/
-        if (options.unpreferredRoutes != null && options.unpreferredRoutes.size()>0) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
-            if (options.unpreferredRoutes.contains(spec)) {
-            	preferences_penalty += options.useUnpreferredRoutesPenalty;
-            }
-        }
+            Trip trip = getPattern().getTrip(bestPatternIndex);
 
-        StateEditor s1 = state0.edit(this);
-        s1.setTrip(bestPatternIndex);
-        s1.incrementTimeInSeconds(-bestWait); // going backward
-        s1.incrementNumBoardings();
-        s1.setTripId(trip.getId());
-        s1.setZone(pattern.getZone(stopIndex));
-        s1.setRoute(pattern.getExemplar().getRoute().getId());
-        s1.setFareContext(pattern.getFareContext());
+            /* check if route banned for this plan */
+            if (options.bannedRoutes != null) {
+                Route route = trip.getRoute();
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                if (options.bannedRoutes.contains(spec)) {
+                    return null;
+                }
+            }
+            
+            /* check if route is preferred for this plan */
+            long preferences_penalty = 0;
+            if (options.preferredRoutes != null && options.preferredRoutes.size()>0) {
+                Route route = trip.getRoute();
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                if (!options.preferredRoutes.contains(spec)) {
+                	preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
+                }
+            }
+            
+            /* check if route is unpreferred for this plan*/
+            if (options.unpreferredRoutes != null && options.unpreferredRoutes.size()>0) {
+                Route route = trip.getRoute();
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                if (options.unpreferredRoutes.contains(spec)) {
+                	preferences_penalty += options.useUnpreferredRoutesPenalty;
+                }
+            }
 
-        long wait_cost = bestWait;
-        if (state0.getNumBoardings() == 0) {
-            wait_cost *= options.waitAtBeginningFactor;
-        }
-        else {
-            wait_cost *= options.waitReluctance;
-        }
-        s1.incrementWeight(preferences_penalty);
-        s1.incrementWeight(wait_cost);
-        return s1.makeState();
-    }
+            StateEditor s1 = state0.edit(this);
+            s1.setTrip(bestPatternIndex);
+            s1.incrementTimeInSeconds(bestWait); 
+            s1.incrementNumBoardings();
+            s1.setTripId(trip.getId());
+            s1.setZone(pattern.getZone(stopIndex));
+            s1.setRoute(pattern.getExemplar().getRoute().getId());
+            s1.setFareContext(pattern.getFareContext());
+
+            long wait_cost = bestWait;
+            if (state0.getNumBoardings() == 0) {
+                wait_cost *= options.waitAtBeginningFactor;
+            }
+            else {
+                wait_cost *= options.waitReluctance;
+            }
+            s1.incrementWeight(preferences_penalty);
+            s1.incrementWeight(wait_cost);
+
+            return s1.makeState();
+            
+    	} else {
+    		/* forward traversal: not so much to do */
+    		if (!pattern.canAlight(stopIndex + 1)) {
+    		    return null;
+    		}
+	        StateEditor s1 = state0.edit(this);
+	        s1.setTripId(null);
+	        s1.setLastAlightedTime(state0.getTime());
+	        s1.setPreviousStop(tov);
+	        s1.incrementWeight(1);
+	        return s1.makeState();
+    	}
+	}
 
     public State optimisticTraverse(State state0, TraverseOptions options) {
         StateEditor s1 = state0.edit(this);

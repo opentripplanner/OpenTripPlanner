@@ -83,17 +83,4 @@ public class PathwayEdge extends AbstractEdge {
         return s1.makeState();
     }
 
-    public State traverseBack(State s0) {
-        int time = traversalTime;
-        if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0) {
-                return null;
-            }
-            time = wheelchairTraversalTime;            
-        }
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(-time);
-        s1.incrementWeight(time);
-        return s1.makeState();
-    }
 }

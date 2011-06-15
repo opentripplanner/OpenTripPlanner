@@ -85,16 +85,6 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         return s1.makeState();
     }
 
-    public State traverseBack(State s0) {
-    	StateEditor s1 = s0.edit(this);
-    	s1.incrementTimeInSeconds(-elapsed);
-    	s1.incrementWeight(elapsed);
-        s1.setZone(getEndStop().getZoneId());
-        s1.setRoute(start.getTrip().getRoute().getId());
-        s1.setFareContext(fareContext);
-        return s1.makeState();
-    }
-
     public int compareTo(Hop arg0) {
         return this.end.compareTo(arg0.end);
     }

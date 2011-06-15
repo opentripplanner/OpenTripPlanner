@@ -83,10 +83,6 @@ class ForbiddenEdge extends FreeEdge {
         return null;
     }
     
-    @Override
-    public State traverseBack(State s0) {
-        return null;
-    }
 }
 
 public class TestContractionHeirarchies extends TestCase {
@@ -388,6 +384,7 @@ public class TestContractionHeirarchies extends TestCase {
     @Test
     public void testNYC() throws Exception {
     	// be sure this date matches your subway gtfs validity period
+    	// it could be derived from the Graph's validity dates
         long startTime = new GregorianCalendar(2009, 10, 11, 12, 0, 0).getTimeInMillis();
         GraphPath path;
         Graph graph = new Graph();

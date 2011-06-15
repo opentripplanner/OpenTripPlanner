@@ -103,35 +103,24 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     }
     
     public State traverse(State state0) {
-
         AgencyAndId tripId = state0.getTripId();
-        InterlineDwellData dwellData = tripIdToInterlineDwellData.get(tripId);
+        InterlineDwellData dwellData;
+        if (state0.getOptions().isArriveBy()) {
+        	// traversing backward
+        	dwellData = reverseTripIdToInterlineDwellData.get(tripId);
+        } else {
+        	// traversing forward
+        	dwellData = tripIdToInterlineDwellData.get(tripId);
+        }
         if (dwellData == null) {
             return null;
         }
-        
         StateEditor s1 = state0.edit(this);
         s1.incrementTimeInSeconds(dwellData.dwellTime);
         s1.setTripId(targetTrip.getId());
         s1.setTrip(dwellData.patternIndex);
         s1.incrementWeight(dwellData.dwellTime);
         return s1.makeState();
-    }
-
-    public State traverseBack(State state0) {
-
-        AgencyAndId tripId = state0.getTripId();
-        InterlineDwellData dwellData = reverseTripIdToInterlineDwellData.get(tripId);
-        if (dwellData == null) {
-            return null;
-        }
-        
-        StateEditor s1 = state0.edit(this);
-        s1.incrementTimeInSeconds(-dwellData.dwellTime);
-        s1.setTripId(targetTrip.getId());
-        s1.setTrip(dwellData.patternIndex);
-        s1.incrementWeight(dwellData.dwellTime);
-        return s1.makeState(); 
     }
 
     public Geometry getGeometry() {

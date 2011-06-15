@@ -97,19 +97,6 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return s1.makeState();
     }
 
-    public State traverseBack(State state0) {
-        int trip = state0.getTrip();
-        int runningTime = pattern.getRunningTime(stopIndex, trip);
-        EdgeNarrative en = new RouteNameNarrative(getPattern().getTrip(trip), this);
-        StateEditor s1 = state0.edit(this, en);
-        s1.incrementTimeInSeconds(-runningTime);
-        s1.setZone(getStartStop().getZoneId());
-        s1.setRoute(pattern.getExemplar().getRoute().getId());
-        s1.setFareContext(context);
-        s1.incrementWeight(runningTime);
-        return s1.makeState();
-    }
-
     public void setGeometry(Geometry geometry) {
         this.geometry = geometry;
     }

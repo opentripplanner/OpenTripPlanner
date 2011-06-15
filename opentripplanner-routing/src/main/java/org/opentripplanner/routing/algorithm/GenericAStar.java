@@ -113,7 +113,7 @@ public class GenericAStar {
 
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
 
-        double initialWeight = heuristic.computeInitialWeight(s0, target, options);
+        double initialWeight = heuristic.computeInitialWeight(s0, target);
         spt.add(s0);
 
         // Priority Queue
@@ -188,7 +188,7 @@ public class GenericAStar {
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
-                for (State v = traverseEdge(edge, u, options); v != null; v = v.getNextResult()) {
+                for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                 	// Could be: for (State v : traverseEdge...)
 
 // now handled in state editor                	
@@ -231,16 +231,6 @@ public class GenericAStar {
             return GraphLibrary.getIncomingEdges(graph, vertex, extraEdges);
         else
             return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
-    }
-
-    private State traverseEdge(Edge edge, State state, TraverseOptions options) {
-        if (options.isArriveBy()) {
-            State result = edge.traverseBack(state);
-            return result;
-        } else {
-        	State result = edge.traverse(state);
-        	return result;
-        }
     }
 
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic,

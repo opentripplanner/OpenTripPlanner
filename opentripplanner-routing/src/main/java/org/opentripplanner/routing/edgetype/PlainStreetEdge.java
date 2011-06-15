@@ -155,19 +155,17 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     @Override
     public State traverse(State s0) {
-        return doTraverse(s0, s0.getOptions(), false);
+        return doTraverse(s0, s0.getOptions());
     }
 
-    @Override
-    public State traverseBack(State s0) {
-        return doTraverse(s0, s0.getOptions(), true);
-    }
-
-    private State doTraverse(State s0, TraverseOptions options, boolean back) {
+    private State doTraverse(State s0, TraverseOptions options) {
         if (!canTraverse(options)) {
-            return tryWalkBike(s0, options, back);
+            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            	// try walking bike since you can't ride here
+                return doTraverse(s0, options.getWalkingOptions());
+            }
+            return null;
         }
-        
         double time = length / options.speed;
         double weight;
         if (options.wheelchairAccessible) {
@@ -194,20 +192,12 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
         s1.incrementWalkDistance(length);
-        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
-
         if (s1.weHaveWalkedTooFar(options))
             return null;
         
         return s1.makeState();
-    }
-
-    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
-        if (options.getModes().contains(TraverseMode.BICYCLE)) {
-            return doTraverse(s0, options.getWalkingOptions(), back);
-        }
-        return null;
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {

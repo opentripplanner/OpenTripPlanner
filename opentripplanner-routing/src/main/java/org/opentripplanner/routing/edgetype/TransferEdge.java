@@ -91,16 +91,6 @@ public class TransferEdge extends AbstractEdge {
         return s1.makeState();
     }
 
-    public State traverseBack(State s0) {
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(-time);
-        s1.incrementWeight(time);
-        return s1.makeState();
-    }
-    
     public boolean equals(Object o) {
         if (!(o instanceof TransferEdge)) {
             return false;

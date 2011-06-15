@@ -61,13 +61,6 @@ public class Dwell extends AbstractEdge {
         return state1.makeState();
     }
 
-    public State traverseBack(State state0) {
-        StateEditor state1 = state0.edit(this);
-        state1.incrementTimeInSeconds(-elapsed);
-        state1.incrementWeight(elapsed);
-        return state1.makeState();
-    }
-
     public String toString() {
         return "Dwell(" + this.stopTime + ")";
     }

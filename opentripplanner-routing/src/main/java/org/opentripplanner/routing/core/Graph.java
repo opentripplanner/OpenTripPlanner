@@ -33,7 +33,8 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Graph implements Serializable {
 	// update serialVersionId to the current date in format YYYYMMDDL
 	// whenever changes are made that could make existing graphs incompatible
-	private static final long serialVersionUID = 20110504L;
+	private static final long serialVersionUID = 20110614L;
+
 	// transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;           
     private long transitServiceEnds = 0;   

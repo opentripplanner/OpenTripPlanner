@@ -23,11 +23,4 @@ public class SimpleEdge extends FreeEdge {
         return s1.makeState();
     }
     
-    @Override
-    public State traverseBack(State s0) {
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(-seconds);
-        s1.incrementWeight(weight);
-        return s1.makeState();
-    }
 }

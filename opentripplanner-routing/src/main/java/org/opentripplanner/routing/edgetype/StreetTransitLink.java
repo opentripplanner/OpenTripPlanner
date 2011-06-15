@@ -78,16 +78,6 @@ public class StreetTransitLink extends AbstractEdge {
         return s1.makeState();
     }
 
-    public State traverseBack(State s0) {
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(-1);
-        s1.incrementWeight(STL_TRAVERSE_COST);
-        return s1.makeState();
-    }
-
     public State optimisticTraverse(State s0, TraverseOptions opt) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STL_TRAVERSE_COST);

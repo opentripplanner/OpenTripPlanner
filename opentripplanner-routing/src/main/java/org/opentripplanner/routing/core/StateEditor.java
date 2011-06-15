@@ -55,17 +55,22 @@ public class StateEditor {
 			_log.warn("   parent vertex: {}", parent.vertex);
 			defectiveTraversal = true;
         }
+        if (traversingBackward != parent.getOptions().isArriveBy()) {
+        	_log.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
+        	defectiveTraversal = true;
+        }
 	}
 	
 	/* PUBLIC METHODS */
 	
 	public State makeState() {
+		// check that this editor has not been used already
 		if (spawned) 
 			throw new IllegalStateException("A StateEditor can only be used once.");
 		
-		// if something insane was flagged, let's not make a new state
+		// if something was flagged incorrect, do not make a new state
 		if (defectiveTraversal) {
-			_log.warn("New state failed a sanity check. Traversal ignored.");
+        	_log.error("Defective traversal flagged on edge " + child.backEdge);
 			return null;
 		}
 		
@@ -168,14 +173,38 @@ public class StateEditor {
 	/* Incrementors */
 	
 	public void incrementWeight(double weight) {
+		if (weight < 0) {
+			_log.warn("A state's weight is being incremented by a negative amount while traversing edge " + child.backEdge);
+			defectiveTraversal = true;
+			return;
+		}
 		child.weight += weight;
 	}
 	
 	public void incrementTimeInSeconds(int seconds) {
-		child.time += seconds * 1000;
+		incrementTimeMsec(1000L * seconds);
 	}
 	
+	/**
+	 * Advance or rewind the time of the new state by the given non-negative amount. 
+	 * Direction of time is inferred from the direction of traversal.
+	 * This is the only element of state that runs backward when traversing backward.
+	 */
+	public void incrementTimeMsec(long msec) {
+		if (msec < 0) {
+			_log.warn("A state's time is being incremented by a negative amount while traversing edge " + child.getBackEdge());
+			defectiveTraversal = true;
+			return;
+		}
+		child.time += (traversingBackward ? - msec : msec);		
+	}
+
 	public void incrementWalkDistance(double length) {
+		if (length < 0) {
+			_log.warn("A state's walk distance is being incremented by a negative amount.");
+			defectiveTraversal = true;
+			return;
+		}
 		child.walkDistance += length;
 	}
 
@@ -231,10 +260,6 @@ public class StateEditor {
 
 	public void setTime(long t) {
 		child.time = t;
-	}
-
-	public void incrementTimeMsec(long t) {
-		child.time += t;		
 	}
 
 	/* PUBLIC GETTER METHODS */

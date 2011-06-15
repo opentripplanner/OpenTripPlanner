@@ -37,93 +37,101 @@ public class PreBoardEdge extends FreeEdge {
 
     public PreBoardEdge(Vertex from, Vertex to) {
         super(from, to);
+    	if (! (from instanceof TransitStop))
+    		throw new IllegalStateException("Preboard edges must lead out of a transit stop.");
     }
 
     @Override
     public State traverse(State s0) {
-
-    	// Do not pre-board if transit modes are not selected.
-    	// Return null here rather than in StreetTransitLink so that walk-only
-    	// options can be used to find transit stops without boarding vehicles.
     	TraverseOptions options = s0.getOptions();
-    	if ( ! options.getModes().getTransit())
-    		return null;
-    	
-        // Do not board if passenger has alighted from a local stop
-        if (s0.isAlightedLocal()) {
-            return null;
-        }
-        TransitStop fromVertex = (TransitStop) getFromVertex();
-        // Do not board once one has alighted from a local stop
-        if (fromVertex.isLocal() && s0.isEverBoarded()) {
-            return null;
-        }
-        // If we've hit our transfer limit, don't go any further
-        if (s0.getNumBoardings() > options.maxTransfers)
-            return null;
-
-        /* apply transfer rules */
-        /* look in the global transfer table for the rules from the previous stop to
-         * this stop. 
-         */
-        long t0 = s0.getTime();
-        long board_after = t0 + options.minTransferTime * 1000;
-        long transfer_penalty = 0;
-        if (s0.getLastAlightedTime() != 0) { 
-        	/* this is a transfer rather than an initial boarding */
-            TransferTable transferTable = options.getTransferTable();
-            if (transferTable.hasPreferredTransfers()) {
-            	// only penalize transfers if there are some that will be depenalized
-                transfer_penalty = options.baseTransferPenalty;
-            }
-            int transfer_time = transferTable.getTransferTime(s0.getPreviousStop(), getToVertex());
-            if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
-            	// use min transfer time relative to arrival time at this stop (initialized above)
-            } else if (transfer_time >= 0) {
-                // handle minimum time transfers (>0) and timed transfers (0)
-            	// relative to alight time at last stop
-            	board_after = s0.getLastAlightedTime() + transfer_time * 1000;
-            	if (board_after < t0) board_after = t0; 
-            } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+    	if (options.isArriveBy()) {
+    		/* Traverse backward: not much to do */
+	        StateEditor s1 = s0.edit(this);
+	        TransitStop fromVertex = (TransitStop) getFromVertex();
+	        if (fromVertex.isLocal()) {
+	            s1.setAlightedLocal(true);
+	        }
+	        return s1.makeState();
+    	} else {
+    		/* Traverse forward: apply stop(pair)-specific costs */
+    		
+        	// Do not pre-board if transit modes are not selected.
+        	// Return null here rather than in StreetTransitLink so that walk-only
+        	// options can be used to find transit stops without boarding vehicles.
+        	if ( ! options.getModes().getTransit())
+        		return null;
+        	
+            // Do not board if the passenger has alighted from a local stop
+            if (s0.isAlightedLocal()) {
                 return null;
-            } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
-                // depenalize preferred transfers
-            	// TODO: verify correctness of this method (AMB)
-                transfer_penalty = 0; 
-            } else {
-            	throw new IllegalStateException("Undefined value in transfer table.");
             }
-        } else { 
-        	/* this is a first boarding */
-        	// TODO: add a separate initial transfer slack option
-        	// board_after = t0 + options.minTransferTime * 500; 
-        	// ^ first boarding slack makes graphpath.optimize malfunction 
-        	board_after = t0; 
-        }
+            TransitStop fromVertex = (TransitStop) getFromVertex();
+            // Do not board once one has alighted from a local stop
+            if (fromVertex.isLocal() && s0.isEverBoarded()) {
+                return null;
+            }
+            // If we've hit our transfer limit, don't go any further
+            if (s0.getNumBoardings() > options.maxTransfers)
+                return null;
 
-        // penalize transfers more heavily if requested by the user
-        if (options.optimizeFor == OptimizeType.TRANSFERS && s0.isEverBoarded()) {
-            //this is not the first boarding, therefore we must have "transferred" -- whether
-            //via a formal transfer or by walking.
-            transfer_penalty += options.optimizeTransferPenalty;
-        }
+            /* apply transfer rules */
+            /* look in the global transfer table for the rules from the previous stop to
+             * this stop. 
+             */
+            long t0 = s0.getTime();
+            long board_after = t0 + options.minTransferTime * 1000;
+            long transfer_penalty = 0;
+            if (s0.getLastAlightedTime() != 0) { 
+            	/* this is a transfer rather than an initial boarding */
+                TransferTable transferTable = options.getTransferTable();
+                if (transferTable.hasPreferredTransfers()) {
+                	// only penalize transfers if there are some that will be depenalized
+                    transfer_penalty = options.baseTransferPenalty;
+                }
+                int transfer_time = transferTable.getTransferTime(s0.getPreviousStop(), getToVertex());
+                if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
+                	// use min transfer time relative to arrival time at this stop (initialized above)
+                } else if (transfer_time >= 0) {
+                    // handle minimum time transfers (>0) and timed transfers (0)
+                	// relative to alight time at last stop
+                	board_after = s0.getLastAlightedTime() + transfer_time * 1000;
+                	if (board_after < t0) board_after = t0; 
+                } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+                    return null;
+                } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
+                    // depenalize preferred transfers
+                	// TODO: verify correctness of this method (AMB)
+                    transfer_penalty = 0; 
+                } else {
+                	throw new IllegalStateException("Undefined value in transfer table.");
+                }
+            } else { 
+            	/* this is a first boarding */
+            	// TODO: add a separate initial transfer slack option
+            	// board_after = t0 + options.minTransferTime * 500; 
+            	// ^ first boarding slack makes graphpath.optimize malfunction 
+            	board_after = t0; 
+            }
 
-        StateEditor s1 = s0.edit(this);
-        s1.setTime(board_after);
-        s1.setEverBoarded(true); // eliminate this with state.wait() and state.board()
-        long wait_cost = (board_after - t0) / 1000;
-        s1.incrementWeight(wait_cost + options.boardCost + transfer_penalty);
-        return s1.makeState();
+            // penalize transfers more heavily if requested by the user
+            if (options.optimizeFor == OptimizeType.TRANSFERS && s0.isEverBoarded()) {
+                //this is not the first boarding, therefore we must have "transferred" -- whether
+                //via a formal transfer or by walking.
+                transfer_penalty += options.optimizeTransferPenalty;
+            }
+
+            StateEditor s1 = s0.edit(this);
+            s1.setTime(board_after);
+            s1.setEverBoarded(true); // eliminate this with state.wait() and state.board()
+            long wait_cost = (board_after - t0) / 1000;
+            s1.incrementWeight(wait_cost + options.boardCost + transfer_penalty);
+
+            return s1.makeState();
+    	}
     }
-
-    @Override
-    public State traverseBack(State s0) {
-        StateEditor s1 = s0.edit(this);
-        TransitStop fromVertex = (TransitStop) getFromVertex();
-        if (fromVertex.isLocal()) {
-            s1.setAlightedLocal(true);
-        }
-        return s1.makeState();
+    
+    public String toString() {
+    	return "preboard edge at stop " + fromv; 
     }
 
 }

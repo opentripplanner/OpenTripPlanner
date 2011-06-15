@@ -102,20 +102,20 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     }
 
     public State traverse(State s0) {
-        return doTraverse(s0, s0.getOptions(), false);
-    }
-
-    public State traverseBack(State s0) {
-        return doTraverse(s0, s0.getOptions(), true);
+        return doTraverse(s0, s0.getOptions());
     }
 
     public State optimisticTraverse(State s0) {
-        return doTraverse(s0, s0.getOptions(), false);
+        return doTraverse(s0, s0.getOptions());
     }
 
-    private State doTraverse(State s0, TraverseOptions options, boolean back) {
+    private State doTraverse(State s0, TraverseOptions options) {
         if (!fromv.canTraverse(options)) {
-            return tryWalkBike(s0, options, back);
+            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            	// try walking bicycle, since you can't ride it here
+                return doTraverse(s0, options.getWalkingOptions());
+            }
+            return null;
         }
         
         double angleLength = fromv.getLength() + turnCost / 20;
@@ -125,20 +125,12 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
-        s1.incrementTimeInSeconds((int) (back ? -time : time));
+        s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
-        
         if(s1.weHaveWalkedTooFar(options))
             return null;
         
         return s1.makeState();
-    }
-
-    private State tryWalkBike(State s0, TraverseOptions options, boolean back) {
-        if (options.getModes().contains(TraverseMode.BICYCLE)) {
-            return doTraverse(s0, options.getWalkingOptions(), back);
-        }
-        return null;
     }
 
     public Object clone() throws CloneNotSupportedException {

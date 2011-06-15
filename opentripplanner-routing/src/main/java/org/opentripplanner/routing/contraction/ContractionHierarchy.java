@@ -83,7 +83,7 @@ public class ContractionHierarchy implements Serializable {
 
     private double contractionFactor;
 
-    private transient TraverseOptions options;
+    private transient TraverseOptions options, backOptions;
 
     private transient TraverseMode mode;
 
@@ -102,7 +102,7 @@ public class ContractionHierarchy implements Serializable {
      */
     public WitnessSearchResult getShortcuts(Vertex u, boolean simulate) {
 
-        State su = new State(u, options);
+        State su = new State(u, backOptions); // search backward
 
         /* Compute the cost from each vertex with an incoming edge to the target */
         int searchSpace = 0;
@@ -111,7 +111,7 @@ public class ContractionHierarchy implements Serializable {
             if (!isContractable(e)) {
                 continue;
             }
-            State sv = e.traverseBack(su);
+            State sv = e.traverse(su);
             if (sv == null) {
                 continue;
             }
@@ -119,10 +119,8 @@ public class ContractionHierarchy implements Serializable {
             vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaMsec()));
         }
 
-        /*
-         * Compute the cost to each vertex with an outgoing edge to the target, and from each of
-         * their incoming vertices ("neighbors")
-         */
+        /* Compute the cost to each vertex with an outgoing edge from the target */
+        su = new State(u, options); // search forward
         double maxWWeight = 0;
 
         HashSet<Vertex> wSet = new HashSet<Vertex>();
@@ -365,6 +363,8 @@ public class ContractionHierarchy implements Serializable {
         options.optimizeFor = optimize;
         options.maxWalkDistance = Double.MAX_VALUE;
         options.freezeTraverseMode();
+        backOptions = options.clone();
+        backOptions.setArriveBy(true);
         this.contractionFactor = contractionFactor;
 
         init();
@@ -646,12 +646,17 @@ public class ContractionHierarchy implements Serializable {
      * 
      */
     public GraphPath getShortestPath(Vertex origin, Vertex target, long time,
-            TraverseOptions options) {
+            TraverseOptions opt) {
 
+    	TraverseOptions upOptions = opt.clone();
+    	TraverseOptions downOptions = opt.clone();
+    	upOptions.setArriveBy(false);
+    	downOptions.setArriveBy(true);
+    	
     	final boolean VERBOSE = false;
     	
     	// DEBUG no walk limit
-    	options.maxWalkDistance = Double.MAX_VALUE;
+    	//options.maxWalkDistance = Double.MAX_VALUE;
     	
     	final int INITIAL_SIZE = 1000; 
     	
@@ -674,16 +679,16 @@ public class ContractionHierarchy implements Serializable {
         HashSet<Vertex> upclosed = new HashSet<Vertex>(INITIAL_SIZE);
         HashSet<Vertex> downclosed = new HashSet<Vertex>(INITIAL_SIZE);
 
-        State upInit = new State(time, origin, options);
+        State upInit = new State(time, origin, upOptions);
         // try goal-directed CH
-        RemainingWeightHeuristic h = options.remainingWeightHeuristic;
-        double estimate = h.computeInitialWeight(upInit, target, options);
+        RemainingWeightHeuristic h = opt.remainingWeightHeuristic;
+        double estimate = h.computeInitialWeight(upInit, target);
         upspt.add(upInit);
         upqueue.insert(upInit, upInit.getWeight() + estimate);
 
         /* FIXME: insert extra bike walking targets */
 
-        State downInit = new State(time, target, options);
+        State downInit = new State(time, target, downOptions);
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
         
@@ -734,7 +739,7 @@ public class ContractionHierarchy implements Serializable {
                 GraphVertex gu = graph.getGraphVertex(u);
                 if (VERBOSE)
                 	_log.debug("    up main graph vertex {}", gu);
-                if (options.isArriveBy() && gu != null) {
+                if (opt.isArriveBy() && gu != null) {
                     // up path can only explore until core vertices on reverse paths
                     continue;
                 }
@@ -788,11 +793,11 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
 
-                    if (up_sv.exceedsWeightLimit(options.maxWeight)) {
+                    if (up_sv.exceedsWeightLimit(opt.maxWeight)) {
                         //too expensive to get here
                         continue;
                     }
-                    if (!options.isArriveBy() && up_sv.getTime() > options.worstTime) {
+                    if (!opt.isArriveBy() && up_sv.getTime() > opt.worstTime) {
                         continue;
                     }
                     if (upspt.add(up_sv)) {
@@ -837,7 +842,7 @@ public class ContractionHierarchy implements Serializable {
 
                 downclosed.add(down_u);
                 GraphVertex maingu = graph.getGraphVertex(down_u);
-                if (!options.isArriveBy() && maingu != null) {
+                if (!opt.isArriveBy() && maingu != null) {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
@@ -882,23 +887,34 @@ public class ContractionHierarchy implements Serializable {
                         continue; 
                     }
 
-                    State down_sv = edge.traverseBack(down_su);
+                    // traverse will be backward because ArriveBy was set in the initial down state
+                    State down_sv = edge.traverse(down_su);
+                    if (VERBOSE)
+                    	_log.debug("        result down {}", down_sv);
+//                    if (downspt.add(down_sv))
+//                        downqueue.insert(down_sv, down_sv.getWeight());
 
                     // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                     // over.
                     if (down_sv == null) {
                         continue;
                     }
-
-                    if (down_sv.exceedsWeightLimit(options.maxWeight)) {
+                    if (down_sv.exceedsWeightLimit(opt.maxWeight)) {
+                        if (VERBOSE)
+                        	_log.debug("        down result too heavy {}", down_sv);
                         //too expensive to get here
                         continue;
                     }
-                    if (options.isArriveBy() && down_sv.getTime() < options.worstTime) {
+                    if (opt.isArriveBy() && down_sv.getTime() < opt.worstTime) {
+                        if (VERBOSE)
+                        	_log.debug("        down result exceeds worst time {} {}", opt.worstTime, down_sv);
                         continue;
                     }
-                    if (downspt.add(down_sv)) 
+                    if (downspt.add(down_sv)) {
+                        if (VERBOSE)
+                        	_log.debug("        enqueueing result down {}", down_sv);
                         downqueue.insert(down_sv, down_sv.getWeight());
+                    }
                 }
             }
         }
@@ -906,32 +922,33 @@ public class ContractionHierarchy implements Serializable {
         if (meeting == null) {
             return null;
         } else {
-        	_log.debug("meeting point is {}", meeting);
+        	if (VERBOSE)
+        		_log.debug("meeting point is {}", meeting);
         }
 
         /* Splice paths */
-        State r = downspt.getState(meeting);
-        State s = upspt.getState(meeting);
+        State upMeet = upspt.getState(meeting); 
+        State downMeet = downspt.getState(meeting); 
+        State r = opt.isArriveBy() ? downMeet : upMeet;
+        State s = opt.isArriveBy() ? upMeet : downMeet;
         while (s.getBackEdge() != null) {
-        	Edge e = s.getBackEdge();
-        	r = e.traverseBack(r);
+        	r = s.getBackEdge().traverse(r);
         	s = s.getBackState();
         }
 
         /* Unpack shortcuts */
-        TraverseOptions forwardOptions = r.getOptions();
-        forwardOptions.setArriveBy(false);
-        s = new State(r.getTime(), r.getVertex(), forwardOptions);
+        s = r.reversedClone();
         while (r.getBackEdge() != null) {
-        	Edge e = r.getBackEdge();
-	      	if (e instanceof Shortcut)
+            Edge e = r.getBackEdge(); 
+        	if (e instanceof Shortcut)
 	      		s = ((Shortcut)e).unpackTraverse(s); 
 	      	else
 	      		s = e.traverse(s);
         	r = r.getBackState();
         }
 
-    	GraphPath ret = new GraphPath(s, true);
+        // no need to request optimization, we just unpacked the path backward
+        GraphPath ret = new GraphPath(s, false);
        	return ret;
 
     }

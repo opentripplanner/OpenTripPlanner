@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -125,6 +126,10 @@ public class ContractionPathServiceImpl implements PathService {
         	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
+        if ( ! options.getModes().getTransit()) {
+        	nItineraries = 1;
+        }
+
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
@@ -141,7 +146,7 @@ public class ContractionPathServiceImpl implements PathService {
         double maxWeight = Double.MAX_VALUE;
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
-        	LOG.debug(paths.size() + " itineraries / " + nItineraries + " requested.");
+        	LOG.debug("BEGIN SEARCH");
             options = optionQueue.poll();
             if (options == null) {
                 break;
@@ -150,6 +155,7 @@ public class ContractionPathServiceImpl implements PathService {
             options.maxWeight = maxWeight;
             List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, 
             		targetTime.getTime(), options);
+        	LOG.debug("END SEARCH");
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
@@ -165,6 +171,7 @@ public class ContractionPathServiceImpl implements PathService {
                 maxWeight = path.getWeight() * 2;
             }
             if (somePaths.isEmpty()) {
+            	LOG.debug("NO PATHS FOUND");
                 continue;
             }
             for (GraphPath path : somePaths) {
@@ -183,6 +190,7 @@ public class ContractionPathServiceImpl implements PathService {
                     }
                 }
             }
+        	LOG.debug("{} / {} itineraries", paths.size(), nItineraries);
         }
         if (paths.size() == 0) {
             return null;

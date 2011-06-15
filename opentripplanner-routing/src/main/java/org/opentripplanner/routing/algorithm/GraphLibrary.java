@@ -65,10 +65,12 @@ public class GraphLibrary {
                 outgoing = extendEdges(outgoing, extraEdges.get(fromv));
         }
 
-        if (fromv instanceof StreetLocation) {
-            StreetLocation sl = (StreetLocation) fromv;
-            outgoing = extendEdges(outgoing, sl.getExtra());
-        }
+// Is this necessary? It includes both incoming and outgoing extra edges in the result, 
+// which causes a lot of defective traversals. (AMB)
+//        if (fromv instanceof StreetLocation) {
+//            StreetLocation sl = (StreetLocation) fromv;
+//            outgoing = extendEdges(outgoing, sl.getExtra());
+//        }
 
         if (outgoing == null)
             outgoing = Collections.emptyList();

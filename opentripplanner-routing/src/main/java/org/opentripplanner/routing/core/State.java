@@ -310,5 +310,9 @@ public class State implements Cloneable {
 		return this.options;
 	}
 
+	public State reversedClone() {
+        return new State(this.time, this.vertex, this.options.reversedClone());
+	}
+
 }
     

@@ -67,7 +67,8 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	 * On subsequent calls, if the target is the same, this information will be reused.
 	 */
 	@Override
-	public double computeInitialWeight(State s0, Vertex target,	TraverseOptions options) {
+	public double computeInitialWeight(State s0, Vertex target) {
+		options = s0.getOptions();
 		// do not check for identical options, since pathservice changes them from one call to the next
 		if (target == this.target) { 
 			// no need to search again
@@ -76,7 +77,6 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 		}
 		weightCache = new IdentityHashMap<Vertex, Double>(5000); 
 		this.target = target;
-		this.options = options;
 		targetStops = new ArrayList<NearbyStop>(50);
 		Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
         options.extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
@@ -84,7 +84,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	    // heap does not really need to be this big, verify initialization time
 		ShortestPathTree spt = new BasicShortestPathTree(5000);
 	    BinHeap<State> heap = new BinHeap<State>(100); 
-		State targetState = new State(target, options);
+		State targetState = new State(target, s0.getOptions().reversedClone());
 		spt.add(targetState);
     	heap.insert(targetState, 0);
     	while (! heap.empty()) {
@@ -92,8 +92,8 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
     		if (! spt.visit(u)) continue;
     		
     		// DEBUG since CH graphs are missing edges, and shortcuts have no walk distance
-    		if (u.exceedsWeightLimit(60 * 15))
-    			break;
+    		//if (u.exceedsWeightLimit(60 * 15))
+    		//	break;
 
     		Vertex uVertex = u.getVertex();
     		//LOG.debug("heap extract " + uVertex + " weight " + u.getWeight());
@@ -111,14 +111,14 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	    		}
 			} else {
 	    		for (Edge e : GraphLibrary.getIncomingEdges(g, uVertex, extraEdges)) {
-					State v = e.traverseBack(u);
+					State v = e.traverse(u);
 	    			if (v != null && spt.add(v))
 						heap.insert(v, v.getWeight());
 	    		}
 			}
     	}
 		LOG.debug("Found " + targetStops.size() + " stops near destination.");
-    	return defaultHeuristic.computeInitialWeight(s0, target, options);
+    	return defaultHeuristic.computeInitialWeight(s0, target);
     }
 
 	@Override

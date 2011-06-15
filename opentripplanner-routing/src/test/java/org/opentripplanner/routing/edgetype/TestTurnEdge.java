@@ -73,8 +73,9 @@ public class TestTurnEdge extends TestCase {
         // Has the time elapsed as expected?
         assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis()) < 10000);
 
+        options.setArriveBy(true);
         s0 = new State(endTime.getTimeInMillis(), end, options);
-        s1 = ee.traverseBack(s0);
+        s1 = ee.traverse(s0);
 
         assertNotNull(s1);
         assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10);
@@ -232,11 +233,4 @@ class MockTransfer extends AbstractEdge {
         return s1.makeState();
     }
 
-    @Override
-    public State traverseBack(State s0) {
-        StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(cost);
-        s1.incrementWeight(cost);
-        return s1.makeState();
-    }
 }
