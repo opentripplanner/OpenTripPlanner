@@ -185,7 +185,7 @@ public class TestRequest extends TestCase {
         intermediates.add(v3.getLabel());
         intermediates.add(v2.getLabel());
         Date dateTime = DateUtils.toDate("2009-01-01", "10:00:00");
-        TraverseOptions options = new TraverseOptions();
+        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         List<GraphPath> paths = pathService.plan(v1.getLabel(), v4.getLabel(),
                 intermediates, dateTime, options);
         

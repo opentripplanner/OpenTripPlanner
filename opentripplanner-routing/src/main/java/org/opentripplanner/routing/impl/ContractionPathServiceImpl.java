@@ -30,7 +30,6 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.RouteSpec;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -205,6 +204,10 @@ public class ContractionPathServiceImpl implements PathService {
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
             Date targetTime, TraverseOptions options) {
 
+    	if (options.getModes().contains(TraverseMode.TRANSIT)) {
+    		throw new UnsupportedOperationException("TSP is not supported for transit trips");
+    	}
+    	
         ArrayList<String> notFound = new ArrayList<String>();
         Vertex fromVertex = getVertexForPlace(fromPlace, options);
         if (fromVertex == null) {
