@@ -166,6 +166,10 @@ public class Shortcut implements DirectEdge, Serializable {
 		else
 			s1 = first.traverse(s0);
 
+		// traversals might fail during unpacking, even if they didn't during search
+		if (s1 == null)
+			return null;
+
 		if (second instanceof Shortcut) 
 			s1 = ((Shortcut)second).unpackTraverse(s1);
 		else
