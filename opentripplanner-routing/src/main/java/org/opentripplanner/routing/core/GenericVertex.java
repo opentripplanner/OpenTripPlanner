@@ -178,4 +178,8 @@ public class GenericVertex implements Vertex, Serializable {
         return distanceToNearestTransitStop;
     }
 
+    public int getIndex() {
+    	return index;
+    }
+    
 }
