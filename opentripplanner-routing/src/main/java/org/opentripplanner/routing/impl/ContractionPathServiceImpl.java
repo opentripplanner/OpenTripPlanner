@@ -130,6 +130,7 @@ public class ContractionPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
+        // The list of options specifying various modes, banned routes, etc to try for multiple itineraries 
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
         optionQueue.add(options);
 
@@ -138,19 +139,20 @@ public class ContractionPathServiceImpl implements PathService {
             TraverseOptions busOnly = options.clone();
             busOnly.setModes(options.getModes().clone());
             busOnly.getModes().setTrainish(false);
+            // Moved inside block to avoid double insertion in list ? (AMB)
+            // optionQueue.add(busOnly);
         }
-        optionQueue.add(options);
 
         double maxWeight = Double.MAX_VALUE;
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
-        	LOG.debug("BEGIN SEARCH");
             options = optionQueue.poll();
             if (options == null) {
                 break;
             }
             options.worstTime = maxTime;
             options.maxWeight = maxWeight;
+        	LOG.debug("BEGIN SEARCH");
             List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, 
             		targetTime.getTime(), options);
         	LOG.debug("END SEARCH");
@@ -179,6 +181,7 @@ public class ContractionPathServiceImpl implements PathService {
                     // the HashSet banned is not strictly necessary as the optionsQueue will
                     // already remove duplicate options, but it might be slightly faster as
                     // hashing TraverseOptions is slow.
+                    LOG.debug("New routespecs: {}", path.getRouteSpecs());
                     for (RouteSpec spec : path.getRouteSpecs()) {
                         TraverseOptions newOptions = options.clone();
                         newOptions.bannedRoutes.add(spec);
