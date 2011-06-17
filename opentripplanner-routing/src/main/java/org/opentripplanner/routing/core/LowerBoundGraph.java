@@ -6,7 +6,6 @@ import java.util.Arrays;
 
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.pqueue.IntBinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
@@ -131,7 +130,7 @@ public class LowerBoundGraph {
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		double[] heuristic = sssp(destIndex);
-		IntBinHeap q = new IntBinHeap();
+		BinHeap<Integer> q = new BinHeap<Integer>();
 		//boolean[] closed = new boolean[nVertices];
 		q.insert(originIndex, 0);
     	long t0 = System.currentTimeMillis();
