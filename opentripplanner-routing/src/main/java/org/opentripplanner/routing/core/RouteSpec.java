@@ -45,6 +45,11 @@ public class RouteSpec implements Cloneable {
         return agency.hashCode() ^ routeName.hashCode();
     }
     
+    @Override
+    public String toString() {
+    	return String.format("RouteSpec<agency=%s name=%s>", agency, routeName);
+    }
+    
     public RouteSpec clone() {
         try {
             return (RouteSpec) super.clone();
