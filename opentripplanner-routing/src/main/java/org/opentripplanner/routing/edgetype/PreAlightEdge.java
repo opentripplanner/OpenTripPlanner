@@ -120,14 +120,26 @@ public class PreAlightEdge extends FreeEdge {
             s1.incrementWeight(wait_cost + options.boardCost + transfer_penalty);
             return s1.makeState();
     	} else {
-    		/* Forward traversal: not so much to do, just track alight event */
+    		/* Forward traversal: not so much to do */
             StateEditor s1 = s0.edit(this);
             TransitStop toVertex = (TransitStop) getToVertex();
             if (toVertex.isLocal()) {
                 s1.setAlightedLocal(true);
             }
+	        // apply scedule slack both boarding and alighting (forward/backward)
+	        // this makes slack proportional to the number of vehicles involved
+	        // and makes things work more smoothly when back-optimizing a path
+	        s1.incrementTimeInSeconds(options.minTransferTime);
             return s1.makeState();
     	}
+    }
+    
+    public State optimisticTraverse(State s0) {
+    	TraverseOptions opt = s0.getOptions();
+    	StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(opt.minTransferTime);
+        s1.incrementWeight(opt.minTransferTime + opt.boardCost / 2); // half here, half when alighting
+    	return s1.makeState();
     }
 
     public String toString() {

@@ -51,6 +51,10 @@ public class PreBoardEdge extends FreeEdge {
 	        if (fromVertex.isLocal()) {
 	            s1.setAlightedLocal(true);
 	        }
+	        // apply scedule slack both boarding and alighting (forward/backward)
+	        // this makes slack proportional to the number of vehicles involved
+	        // and makes things work more smoothly when back-optimizing a path
+	        s1.incrementTimeInSeconds(options.minTransferTime);
 	        return s1.makeState();
     	} else {
     		/* Traverse forward: apply stop(pair)-specific costs */
@@ -95,7 +99,8 @@ public class PreBoardEdge extends FreeEdge {
                     // handle minimum time transfers (>0) and timed transfers (0)
                 	// relative to alight time at last stop
                 	board_after = s0.getLastAlightedTime() + transfer_time * 1000;
-                	if (board_after < t0) board_after = t0; 
+                	if (board_after < t0) 
+                		board_after = t0; 
                 } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
                     return null;
                 } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
@@ -130,6 +135,14 @@ public class PreBoardEdge extends FreeEdge {
     	}
     }
     
+    public State optimisticTraverse(State s0) {
+    	TraverseOptions opt = s0.getOptions();
+    	StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(opt.minTransferTime);
+        s1.incrementWeight(opt.minTransferTime + opt.boardCost / 2); // half here, half when alighting
+    	return s1.makeState();
+    }
+
     public String toString() {
     	return "preboard edge at stop " + fromv; 
     }
