@@ -680,17 +680,22 @@ public class ContractionHierarchy implements Serializable {
         HashSet<Vertex> downclosed = new HashSet<Vertex>(INITIAL_SIZE);
 
         State upInit = new State(time, origin, upOptions);
-        // try goal-directed CH
-        RemainingWeightHeuristic h = opt.remainingWeightHeuristic;
-        double estimate = h.computeInitialWeight(upInit, target);
         upspt.add(upInit);
-        upqueue.insert(upInit, upInit.getWeight() + estimate);
+        upqueue.insert(upInit, upInit.getWeight());
 
         /* FIXME: insert extra bike walking targets */
 
         State downInit = new State(time, target, downOptions);
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
+        
+        // try goal-directed CH
+        RemainingWeightHeuristic h = opt.remainingWeightHeuristic;
+        if (opt.isArriveBy())
+        	h.computeInitialWeight(downInit, origin);
+        else
+        	h.computeInitialWeight(upInit, target);
+
         
         Vertex meeting = null;
         double bestMeetingCost = Double.POSITIVE_INFINITY;
@@ -801,10 +806,11 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
                     if (upspt.add(up_sv)) {
-                    	double totalWeightEstimate = 
-                    		up_sv.getWeight() + h.computeForwardWeight(up_sv, target);
-                    	if (totalWeightEstimate < bestMeetingCost)
-                    		upqueue.insert(up_sv, totalWeightEstimate);
+                    	double weightEstimate = up_sv.getWeight();
+                    	if ( ! opt.isArriveBy())
+                    		weightEstimate += h.computeForwardWeight(up_sv, target);
+                    	if (weightEstimate < bestMeetingCost)
+                    		upqueue.insert(up_sv, weightEstimate);
                     }
                 }
             }
@@ -891,8 +897,6 @@ public class ContractionHierarchy implements Serializable {
                     State down_sv = edge.traverse(down_su);
                     if (VERBOSE)
                     	_log.debug("        result down {}", down_sv);
-//                    if (downspt.add(down_sv))
-//                        downqueue.insert(down_sv, down_sv.getWeight());
 
                     // When an edge leads nowhere (as indicated by returning NULL), the iteration is
                     // over.
@@ -911,9 +915,11 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
                     if (downspt.add(down_sv)) {
-                        if (VERBOSE)
-                        	_log.debug("        enqueueing result down {}", down_sv);
-                        downqueue.insert(down_sv, down_sv.getWeight());
+                    	double weightEstimate = down_sv.getWeight();
+                    	if (opt.isArriveBy())
+                    		weightEstimate += h.computeReverseWeight(down_sv, origin);
+                    	if (weightEstimate < bestMeetingCost)
+                    		downqueue.insert(down_sv, weightEstimate);
                     }
                 }
             }
@@ -933,6 +939,9 @@ public class ContractionHierarchy implements Serializable {
         State s = opt.isArriveBy() ? upMeet : downMeet;
         while (s.getBackEdge() != null) {
         	r = s.getBackEdge().traverse(r);
+        	// traversals might exceed limits here, even if they didn't during search
+        	if (r == null)
+        		return null; 
         	s = s.getBackState();
         }
 
@@ -944,6 +953,9 @@ public class ContractionHierarchy implements Serializable {
 	      		s = ((Shortcut)e).unpackTraverse(s); 
 	      	else
 	      		s = e.traverse(s);
+        	// traversals might exceed limits and fail during unpacking, even if they didn't during search
+        	if (s == null)
+        		return null; 
         	r = r.getBackState();
         }
 
