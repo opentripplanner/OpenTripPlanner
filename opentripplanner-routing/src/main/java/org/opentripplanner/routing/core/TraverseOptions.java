@@ -86,6 +86,10 @@ public class TraverseOptions implements Serializable, Cloneable {
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
+     * 
+     * It may be tempting to set this as high as or higher than walkReluctance (as studies 
+     * often find this kind of preferences among riders) but the planner will take this literally 
+     * and walk down a transit line to avoid waiting at a stop.
      */
     public double waitReluctance = 1.0;
 
@@ -95,7 +99,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     public double waitAtBeginningFactor = 0.1;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    public int boardCost = 120;
+    public int boardCost = 60 * 2;
 
     /**
      * Do not use certain named routes, probably because we're trying to find alternate itineraries.
