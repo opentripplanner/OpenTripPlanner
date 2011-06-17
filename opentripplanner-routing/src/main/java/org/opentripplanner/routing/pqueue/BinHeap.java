@@ -30,6 +30,10 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     private int capacity;
     private int[] dir; // TODO: track element index by GenericVertex.index 
     
+    public BinHeap() {
+    	this(1000);
+    }
+    
     @SuppressWarnings("unchecked")
     public BinHeap(int capacity) {
         if (capacity < 10) capacity = 10;
