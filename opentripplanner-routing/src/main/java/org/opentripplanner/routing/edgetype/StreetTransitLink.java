@@ -78,7 +78,7 @@ public class StreetTransitLink extends AbstractEdge {
         return s1.makeState();
     }
 
-    public State optimisticTraverse(State s0, TraverseOptions opt) {
+    public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STL_TRAVERSE_COST);
         return s1.makeState();

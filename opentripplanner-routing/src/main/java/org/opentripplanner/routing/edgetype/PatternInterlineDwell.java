@@ -98,8 +98,10 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         return GtfsLibrary.getRouteName(targetTrip.getRoute());
     }
 
-    public double optimisticTraverse(TraverseOptions options) {
-        return bestDwellTime;
+    public State optimisticTraverse(State s0) {
+    	StateEditor s1 = s0.edit(this);
+    	s1.incrementTimeInSeconds(bestDwellTime);
+        return s1.makeState();
     }
     
     public State traverse(State state0) {

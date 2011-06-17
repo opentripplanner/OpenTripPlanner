@@ -126,4 +126,10 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         	return s1.makeState();
     	}
     }
+
+	@Override
+	public State optimisticTraverse(State s0) {
+		StateEditor s1 = s0.edit(this);
+		return s1.makeState();
+	}
 }

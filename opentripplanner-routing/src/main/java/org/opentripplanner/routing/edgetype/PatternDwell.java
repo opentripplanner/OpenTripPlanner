@@ -62,7 +62,16 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return s1.makeState();
     }
 
-    public Geometry getGeometry() {
+	@Override
+	public State optimisticTraverse(State s0) {
+        int dwellTime = pattern.getBestDwellTime(stopIndex);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(dwellTime);
+        s1.incrementWeight(dwellTime);
+        return s1.makeState();
+	}
+
+	public Geometry getGeometry() {
         return null;
     }
 
@@ -85,4 +94,5 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     public int getStopIndex() {
         return stopIndex;
     }
+
 }

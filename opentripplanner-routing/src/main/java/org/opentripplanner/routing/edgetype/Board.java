@@ -138,4 +138,10 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	        return s1.makeState();
 		}
     }
+
+	@Override
+	public State optimisticTraverse(State s0) {
+		StateEditor s1 = s0.edit(this);
+		return s1.makeState();
+	}
 }

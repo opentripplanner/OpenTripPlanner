@@ -176,7 +176,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     	}
 	}
 
-    public State optimisticTraverse(State state0, TraverseOptions options) {
+    public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         s1.incrementWeight(1);
         return s1.makeState();
