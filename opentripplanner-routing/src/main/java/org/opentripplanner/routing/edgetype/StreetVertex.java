@@ -41,6 +41,12 @@ public class StreetVertex extends GenericVertex {
 
     private static final long serialVersionUID = -385126804908021091L;
 
+    /**
+     * This declares that greenways are streets that are more than 10x as safe as
+     * ordinary streets.
+     */
+	public static final double GREENWAY_SAFETY_FACTOR = 0.1;
+
     public LineString geometry;
 
     protected boolean wheelchairAccessible = true;
@@ -337,7 +343,14 @@ public class StreetVertex extends GenericVertex {
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
+            	weight = bicycleSafetyEffectiveLength / options.speed;
+            	break;
+            case GREENWAYS:
                 weight = bicycleSafetyEffectiveLength / options.speed;
+                if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
+                	//greenways are treated as even safer than they really are
+                	weight *= 0.66;
+                }
                 break;
             case FLAT:
                 weight = slopeCostEffectiveLength;

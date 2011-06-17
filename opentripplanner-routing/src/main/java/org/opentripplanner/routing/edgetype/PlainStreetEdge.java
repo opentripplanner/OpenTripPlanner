@@ -173,7 +173,14 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
-                weight = getBicycleSafetyEffectiveLength() / options.speed;
+            	weight = bicycleSafetyEffectiveLength / options.speed;
+            	break;
+            case GREENWAYS:            	
+                weight = bicycleSafetyEffectiveLength / options.speed;
+                if (bicycleSafetyEffectiveLength / length <= StreetVertex.GREENWAY_SAFETY_FACTOR) {
+                	//greenways are treated as even safer than they really are
+                	weight *= 0.66;
+                }
                 break;
             case FLAT:
                 weight = slopeCostEffectiveLength;
