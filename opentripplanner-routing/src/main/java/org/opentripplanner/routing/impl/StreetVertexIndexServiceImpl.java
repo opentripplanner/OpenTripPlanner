@@ -241,14 +241,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         	// street found
         	if (closest_stop != null) {
             	// both street and stop found
-        		double relativeStopDistance = closest_stop_distance / closest_street_distance;
-        		if (relativeStopDistance < 0.5) {
-            		_log.debug("returning only transit stop (stop much closer than street)");
-        			return closest_stop;
-        		}
-        		if (relativeStopDistance < 1.5) {
-            		_log.debug("linking transit stop to street (distances are comparable)");
+        		if (closest_stop_distance < 100 && closest_street_distance < 100) {
+            		_log.debug("linking transit stop to street (they are both close)");
         			closest_street.addExtraEdgeTo(closest_stop);
+        		} else {
+	        		double relativeStopDistance = closest_stop_distance / closest_street_distance;
+	        		if (relativeStopDistance < 0.5) {
+	            		_log.debug("returning only transit stop (stop much closer than street)");
+	        			return closest_stop;
+	        		}
+	        		if (relativeStopDistance < 1.5) {
+	            		_log.debug("linking transit stop to street (distances are comparable)");
+	        			closest_street.addExtraEdgeTo(closest_stop);
+	        		}
         		}
         	}
             _log.debug("returning split street");
