@@ -373,8 +373,11 @@ public class GraphPath {
     }
 
 	public void dump() {
+		System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
+		System.out.println(this.toString());
 		for (State s : states)
-			System.out.println(s.getBackEdge() + " --> " + s);
+			System.out.println(s + " via " + s.getBackEdge());
+		System.out.println(" --- END GRAPHPATH DUMP ---");
 	}
 
 }
