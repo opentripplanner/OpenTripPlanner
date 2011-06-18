@@ -308,13 +308,14 @@ public class GraphPath {
 
     public boolean equals(Object o) {
         if (o instanceof GraphPath) {
-            return this.states.equals(((GraphPath) o).states);
+            return this.edges.equals(((GraphPath) o).edges);
         }
         return false;
     }
 
+    // must compare edges, not states, since states are different at each search
     public int hashCode() {
-        return this.states.hashCode();
+        return this.edges.hashCode();
     }
 
     /****
