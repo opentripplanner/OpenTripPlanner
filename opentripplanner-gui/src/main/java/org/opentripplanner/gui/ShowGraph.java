@@ -41,6 +41,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -306,9 +307,15 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         // draw edges in different colors according to mode
     	for (State s : gp.states) {
         	EdgeNarrative en = s.getBackEdgeNarrative();
+            if(en == null) continue;
+
+        	TraverseMode mode = en.getMode();
+            if(en instanceof DelegatingEdgeNarrative) {
+                en = (DirectEdge) ((DelegatingEdgeNarrative)en).getBase();
+            }
+
         	if (!(en instanceof DirectEdge)) continue;
         	DirectEdge e = (DirectEdge) en;
-        	TraverseMode mode = e.getMode();
         	if (mode.isTransit()) {
             	stroke(200, 050, 000); 
             	strokeWeight(6);   

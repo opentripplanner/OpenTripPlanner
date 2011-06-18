@@ -815,6 +815,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	List<GraphPath> paths = pathservice.plan(from, to, when, options, 1);
         if (paths == null) {
             System.out.println("no path");
+            showGraph.highlightGraphPath(null);
             return;
         }
         GraphPath gp = paths.get(0);

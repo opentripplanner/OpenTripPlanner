@@ -26,7 +26,11 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
     protected EdgeNarrative base;
 
     public DelegatingEdgeNarrative(EdgeNarrative base) {
-	this.base = base;
+	    this.base = base;
+    }
+
+    public EdgeNarrative getBase() {
+        return base;
     }
 
     @Override
