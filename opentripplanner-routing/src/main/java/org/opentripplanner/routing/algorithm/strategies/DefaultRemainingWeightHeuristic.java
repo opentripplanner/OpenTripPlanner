@@ -6,6 +6,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
+/**
+ * A euclidian remaining weight strategy that takes into account transit 
+ * boarding costs where applicable.
+ *
+ */
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private TraverseOptions options;
