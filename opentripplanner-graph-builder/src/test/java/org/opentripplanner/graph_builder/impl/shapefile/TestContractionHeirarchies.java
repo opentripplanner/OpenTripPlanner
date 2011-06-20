@@ -93,7 +93,7 @@ public class TestContractionHeirarchies extends TestCase {
          * Low latitude avoids potential weirdness from the earth's curvature.
          * Positive latitude and longitude for clarity.  
          */
-        final double LAT0 = 10.0;
+        final double LAT0 = 01.0;
         final double LON0 = 65.0;
         final double STEP = 0.001;
         // number of rows and columns in grid
@@ -261,7 +261,9 @@ public class TestContractionHeirarchies extends TestCase {
         options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.speed = 1;
-        //options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        // Turn off remainging weight heuristic: Unless latitude is very low, heuristic will sometimes 
+        // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
+        options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         for (int x1 = 0; x1 < N; ++x1) {
             for (int y1 = 0; y1 < N; ++y1) {
                 for (int x2 = 0; x2 < N; ++x2) {
