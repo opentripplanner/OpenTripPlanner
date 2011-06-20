@@ -90,7 +90,8 @@ public class TestContractionHeirarchies extends TestCase {
     @Test
     public void testBasic() {
         /* Somewhere in the Arabian sea.
-         * Low latitude avoids potential weirdness from the earth's curvature.
+         * Low latitude avoids potential weirdness from the earth's curvature:
+         * the tests assume a perfectly square grid.
          * Positive latitude and longitude for clarity.  
          */
         final double LAT0 = 01.0;
