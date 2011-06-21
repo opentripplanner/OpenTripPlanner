@@ -58,7 +58,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     public OptimizeType optimizeFor = OptimizeType.QUICK;
 
     /**
-     * A maxWalkDistance of 0 or less indicates no limit
+     * A maxWalkDistance of Double.MAX_VALUE indicates no limit
      */
     public double maxWalkDistance = Double.MAX_VALUE;
 

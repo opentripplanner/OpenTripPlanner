@@ -27,10 +27,13 @@ public class VertexIngress {
 
     public long time;
 
-    public VertexIngress(Vertex vertex, DirectEdge edge, double weight, long time) {
+	public double walkDistance;
+
+    public VertexIngress(Vertex vertex, DirectEdge edge, double weight, long time, double walkDistance) {
         this.vertex = vertex;
         this.edge = edge;
         this.weight = weight;
         this.time = time;
+        this.walkDistance = walkDistance;
     }
 }

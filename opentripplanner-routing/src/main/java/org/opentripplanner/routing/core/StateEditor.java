@@ -93,9 +93,6 @@ public class StateEditor {
         if (!options.getModes().getTransit())
             return false;
 
-        // A maxWalkDistance of 0 or less indicates no limit
-        if (options.maxWalkDistance <= 0)
-            return false;
 
         return child.walkDistance >= options.maxWalkDistance;
     }

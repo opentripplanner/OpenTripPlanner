@@ -116,7 +116,7 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
             // could just use keep states instead of making vertexIngress
-            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaMsec()));
+            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaMsec(), sv.getWalkDistance()));
         }
 
         /* Compute the cost to each vertex with an outgoing edge from the target */
@@ -135,7 +135,7 @@ public class ContractionHierarchy implements Serializable {
             }
             Vertex w = sw.getVertex();
             wSet.add(w);
-            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaMsec()));
+            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaMsec(), sw.getWalkDistance()));
             if (sw.exceedsWeightLimit(maxWWeight)) {
                 maxWWeight = sw.getWeight();
             }
@@ -258,7 +258,8 @@ public class ContractionHierarchy implements Serializable {
             // add the path through to the shortcuts
             if (pathAroundU == null || pathAroundU.exceedsWeightLimit(weightThroughU + .01)) {
                 int timeThroughU = (int) ((w.time + v.time) / 1000);
-                Shortcut vuw = new Shortcut(v.edge, w.edge, timeThroughU, weightThroughU, mode);
+                double walkDistance = v.walkDistance + w.walkDistance;
+                Shortcut vuw = new Shortcut(v.edge, w.edge, timeThroughU, weightThroughU, walkDistance, mode);
                 shortcuts.add(vuw);
             }
         }
@@ -730,7 +731,7 @@ public class ContractionHierarchy implements Serializable {
                 if (VERBOSE)
                 	_log.debug("    extract up {}", u);
 
-                if (downclosed.contains(u)) {
+                if (downclosed.contains(u) && downspt.getState(u).getWalkDistance() + up_su.getWalkDistance() <= up_su.getOptions().maxWalkDistance) {
                     double thisMeetingCost = up_su.getWeight() + downspt.getState(u).getWeight();
                     if (VERBOSE)
                     	_log.debug("    meeting at {}", u);
@@ -836,7 +837,7 @@ public class ContractionHierarchy implements Serializable {
                 if (VERBOSE)
                 	_log.debug("    extract down {}", down_u);
 
-                if (upclosed.contains(down_u)) {
+                if (upclosed.contains(down_u) && upspt.getState(down_u).getWalkDistance() + down_su.getWalkDistance() <= down_su.getOptions().maxWalkDistance) {
                     double thisMeetingCost = down_su.getWeight() + upspt.getState(down_u).getWeight();
                     if (VERBOSE)
                     	_log.debug("    meeting at {}", down_u);

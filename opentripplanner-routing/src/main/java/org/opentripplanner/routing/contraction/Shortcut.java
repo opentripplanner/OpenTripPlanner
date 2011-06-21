@@ -40,14 +40,16 @@ public class Shortcut implements DirectEdge, Serializable {
     int time;
     double weight = -1;
     private TraverseMode mode;
+	private double walkDistance;
    
-    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight, TraverseMode mode) {
+    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight, double walkDistance, TraverseMode mode) {
         this.startVertex = edge1.getFromVertex();
         this.endVertex = edge2.getToVertex();
         this.edge1 = edge1;
         this.edge2 = edge2;
         this.time = time;
         this.weight = weight;
+        this.walkDistance = walkDistance;
         this.mode = mode;
     }
 
@@ -97,11 +99,13 @@ public class Shortcut implements DirectEdge, Serializable {
             time = (int) (Math.abs(s0.getTime() - s2.getTime()) / 1000);
             weight = s2.getWeight() - s0.getWeight();
             mode = s2.getBackEdgeNarrative().getMode();
+            walkDistance = s2.getWalkDistance() - s0.getWalkDistance();
         }
         //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));
         StateEditor ret = s0.edit(this);
         ret.incrementTimeInSeconds(time);
         ret.incrementWeight(weight);
+        ret.incrementWalkDistance(walkDistance);
         return ret.makeState();
     }
     
