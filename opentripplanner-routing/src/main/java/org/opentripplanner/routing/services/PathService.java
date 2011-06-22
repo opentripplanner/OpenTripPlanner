@@ -37,6 +37,10 @@ public interface PathService {
      */
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediatePlaces,
             Date dateTime, TraverseOptions options);
+    
+    public void setGraphService(GraphService graphService);
+    
+    public GraphService getGraphService();
 
     public boolean isAccessible(String place, TraverseOptions options);
 

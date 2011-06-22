@@ -41,6 +41,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.DateUtils;
 
@@ -119,7 +120,9 @@ public class TestRequest extends TestCase {
         ContractionRoutingServiceImpl routingService = new ContractionRoutingServiceImpl();
         routingService.setGraphService(graphService);
         pathService.setRoutingService(routingService);
-        planner.setPathService(pathService);
+        SingletonPathServiceFactoryImpl pathServiceFactory = new SingletonPathServiceFactoryImpl();
+        pathServiceFactory.setPathService(pathService);
+        planner.setPathServiceFactory(pathServiceFactory);
 
         holder.graph = graph;
         holder.planner = planner;
@@ -139,6 +142,7 @@ public class TestRequest extends TestCase {
                 null,
                 "2009-01-01", 
                 "11:11:11",
+                null,
                 false,
                 false,
                 840.0,

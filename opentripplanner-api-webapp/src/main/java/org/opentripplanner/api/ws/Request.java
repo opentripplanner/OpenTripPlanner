@@ -31,6 +31,10 @@ import org.opentripplanner.util.DateUtils;
 public class Request implements RequestInf {
 
     /**
+     * The router ID -- internal ID to switch between router implementation (or graphs)
+     */
+    private String routerId;
+    /**
      * The start location -- either a Vertex name or latitude, longitude in degrees
      */
     private String from;
@@ -113,6 +117,22 @@ public class Request implements RequestInf {
     private void paramPush(String param, Object o) {
         if (o != null)
             parameters.put(param, o.toString());
+    }
+
+    /**
+     * @return router ID
+     */
+    public String getRouterId() {
+        return routerId;
+    }
+
+    /**
+     * @param routerId
+     *            the router ID, used to switch between router instances.
+     */
+    public void setRouterId(String routerId) {
+        paramPush(ROUTER_ID, routerId);
+        this.routerId = routerId;
     }
 
     /**

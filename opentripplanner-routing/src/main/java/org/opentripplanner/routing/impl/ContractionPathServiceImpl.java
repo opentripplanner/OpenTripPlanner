@@ -53,6 +53,10 @@ import com.vividsolutions.jts.geom.Coordinate;
 @Component
 public class ContractionPathServiceImpl implements PathService {
 
+    private static final int MAX_TIME_FACTOR = 2;
+	
+    private static final int MAX_WEIGHT_FACTOR = 2;
+	
     private static final Logger LOG = LoggerFactory.getLogger(ContractionPathServiceImpl.class);
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
@@ -66,6 +70,10 @@ public class ContractionPathServiceImpl implements PathService {
 
     private StreetVertexIndexService _indexService;
 
+    public GraphService getGraphService() {
+        return _graphService;
+    }
+    
     @Autowired
     public void setGraphService(GraphService graphService) {
         _graphService = graphService;
@@ -167,8 +175,8 @@ public class ContractionPathServiceImpl implements PathService {
                 GraphPath path = somePaths.get(0);
                 long duration = path.getDuration();
                 maxTime = path.getEndTime() + 
-                		  2 * (options.isArriveBy() ? -duration : duration);
-                maxWeight = path.getWeight() * 2;
+                		  MAX_TIME_FACTOR * (options.isArriveBy() ? -duration : duration);
+                maxWeight = path.getWeight() * MAX_WEIGHT_FACTOR;
             }
             if (somePaths.isEmpty()) {
             	LOG.debug("NO PATHS FOUND");

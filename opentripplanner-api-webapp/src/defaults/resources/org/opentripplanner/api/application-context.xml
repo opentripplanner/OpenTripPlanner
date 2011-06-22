@@ -13,4 +13,11 @@
 	<bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
 		<property name="bundle" ref="graphBundle" />
 	</bean>
+	
+	<bean id="pathService" class="org.opentripplanner.routing.impl.ContractionPathServiceImpl">
+	</bean>
+	
+	<bean id="patchService" class="org.opentripplanner.routing.impl.PatchServiceImpl">
+	</bean>
+	
 </beans>

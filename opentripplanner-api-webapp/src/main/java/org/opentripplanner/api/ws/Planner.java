@@ -42,6 +42,7 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
@@ -58,7 +59,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.util.PolylineEncoder;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -76,11 +77,11 @@ public class Planner {
 
     private static final int MAX_ITINERARIES = 3;
 
-    private PathService pathservice;
+    private PathServiceFactory pathServiceFactory;
 
-    @Autowired
-    public void setPathService(PathService pathService) {
-        this.pathservice = pathService;
+    @Required
+    public void setPathServiceFactory(PathServiceFactory pathServiceFactory) {
+        this.pathServiceFactory = pathServiceFactory;
     }
 
     /**
@@ -151,6 +152,7 @@ public class Planner {
             @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
+            @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId,
             @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
@@ -174,6 +176,7 @@ public class Planner {
 
         /* create request */
         Request request = new Request();
+        request.setRouterId(routerId);
         request.setFrom(fromPlace);
         request.setTo(toPlace);
         request.setDateTime(date, time);
@@ -258,20 +261,21 @@ public class Planner {
         boolean tooSloped = false;
         try {
             List<String> intermediates = request.getIntermediatePlaces();
+            PathService pathService = pathServiceFactory.getPathService(request.getRouterId());
             if (intermediates.size() == 0) {
-                paths = pathservice.plan(request.getFrom(), request.getTo(), request.getDateTime(),
+                paths = pathService.plan(request.getFrom(), request.getTo(), request.getDateTime(),
                         options, request.getNumItineraries());
                 if (paths == null && request.getWheelchair()) {
                     // There are no paths that meet the user's slope restrictions.
                     // Try again without slope restrictions (and warn user).
                     options.maxSlope = Double.MAX_VALUE;
-                    paths = pathservice.plan(request.getFrom(), request.getTo(), request
-                            .getDateTime(), options, request.getNumItineraries());
+                    paths = pathService.plan(request.getFrom(), request.getTo(),
+                            request.getDateTime(), options, request.getNumItineraries());
                     tooSloped = true;
                 }
             } else {
-                paths = pathservice.plan(request.getFrom(), request.getTo(), intermediates, request
-                        .getDateTime(), options);
+                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates,
+                        request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
             LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
@@ -305,6 +309,7 @@ public class Planner {
         Vertex tripEndVertex = exemplar.getEndVertex();
         String startName = tripStartVertex.getName();
         String endName = tripEndVertex.getName();
+        PathService pathService = pathServiceFactory.getPathService(request.getRouterId());
 
         // Use vertex labels if they don't have names
         if (startName == null) {
@@ -319,7 +324,7 @@ public class Planner {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.getShowIntermediateStops());
+            Itinerary itinerary = generateItinerary(pathService, path, request.getShowIntermediateStops());
             plan.addItinerary(itinerary);
         }
         return plan;
@@ -336,7 +341,7 @@ public class Planner {
      *            whether intermediate stops are included in the generated itinerary
      * @return itinerary
      */
-    private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+    private Itinerary generateItinerary(PathService pathService, GraphPath path, boolean showIntermediateStops) {
 
         Itinerary itinerary = makeEmptyItinerary(path);
 
@@ -406,7 +411,7 @@ public class Planner {
                     if (leg != null) {
                         /* finalize prior leg if it exists */
                         if (startWalk != -1) {
-                            leg.walkSteps = getWalkSteps(path.states.subList(startWalk, i));
+                            leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i));
                         }
                         leg.to = makePlace(edgeNarrative.getFromVertex()); 
                         leg.endTime = new Date(currState.getBackState().getTime());
@@ -497,7 +502,7 @@ public class Planner {
             Geometry geometry = geometryFactory.createLineString(coordinates);
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
             if (startWalk != -1) {
-                leg.walkSteps = getWalkSteps(path.states.subList(startWalk, i + 1));
+                leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i + 1));
             }
         }
         if (itinerary.transfers == -1) {
@@ -607,9 +612,10 @@ public class Planner {
      */
     private void checkLocationsAccessible(Request request, TraverseOptions options) {
         if (request.getWheelchair()) {
+            PathService pathService = pathServiceFactory.getPathService(request.getRouterId());
             // check if the start and end locations are accessible
-            if (!pathservice.isAccessible(request.getFrom(), options)
-                    || !pathservice.isAccessible(request.getTo(), options)) {
+            if (!pathService.isAccessible(request.getFrom(), options)
+                    || !pathService.isAccessible(request.getTo(), options)) {
                 throw new LocationNotAccessible();
             }
 
@@ -667,7 +673,7 @@ public class Planner {
      *            : A list of street edges
      * @return
      */
-    private List<WalkStep> getWalkSteps(List<State> states) {
+    private List<WalkStep> getWalkSteps(PathService pathService, List<State> states) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
@@ -711,14 +717,14 @@ public class Planner {
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle, edgeResult.isRoundabout());
-                step.becomes = !pathservice.multipleOptionsBefore(edge);
+                step.becomes = !pathService.multipleOptionsBefore(edge);
                 // new step, set distance to length of first edge
                 distance = edgeResult.getDistance();
             } else {
                 /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle, edgeResult.isRoundabout());
-                boolean optionsBefore = pathservice.multipleOptionsBefore(edge);
+                boolean optionsBefore = pathService.multipleOptionsBefore(edge);
                 if (edgeResult.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {

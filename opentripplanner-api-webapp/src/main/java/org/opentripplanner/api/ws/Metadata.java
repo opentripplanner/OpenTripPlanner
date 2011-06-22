@@ -13,15 +13,17 @@
 
 package org.opentripplanner.api.ws;
 
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.routing.services.GraphService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.opentripplanner.routing.services.PathServiceFactory;
+import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
 
@@ -30,11 +32,11 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Metadata {
 
-    private GraphService graphService;
+    private PathServiceFactory pathServiceFactory;
 
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
+    @Required
+    public void setPathServiceFactory(PathServiceFactory pathServiceFactory) {
+        this.pathServiceFactory = pathServiceFactory;
     }
 
     /**
@@ -46,9 +48,10 @@ public class Metadata {
      * @throws JSONException
      */
     @GET
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public GraphMetadata getMetadata() throws JSONException {
-
-        return new GraphMetadata(graphService);
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public GraphMetadata getMetadata(
+            @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId)
+            throws JSONException {
+        return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
     }
 }

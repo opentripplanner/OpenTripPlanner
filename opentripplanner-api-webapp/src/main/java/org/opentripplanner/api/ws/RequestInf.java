@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 
 public interface RequestInf {
 
+    public static String ROUTER_ID = "routerId";
 	public static String FROM = "fromPlace";
 	public static String TO = "toPlace";
 	public static String INTERMEDIATE_PLACES = "intermediatePlaces";
