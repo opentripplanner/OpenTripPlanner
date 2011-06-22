@@ -36,7 +36,8 @@ public interface RequestInf {
 
 	public static String PREFERRED_ROUTES = "preferredRoutes";
 	public static String UNPREFERRED_ROUTES = "unpreferredRoutes";
-
+	public static String BANNED_ROUTES = "bannedRoutes";
+	
 	public static String ARRIVE_BY = "arriveBy";
 	public static String WALK_SPEED = "walkSpeed";
 	public static String WHEELCHAIR = "wheelchair";

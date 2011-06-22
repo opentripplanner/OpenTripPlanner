@@ -103,6 +103,7 @@ public class Request implements RequestInf {
      */
     private final HashMap<String, String> parameters = new HashMap<String, String>();
     private Integer minTransferTime;
+	private String[] bannedRoutes;
 
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
@@ -403,4 +404,12 @@ public class Request implements RequestInf {
     public String[] getUnpreferredRoutes() {
         return unpreferredRoutes;
     }
+
+	public void setBannedRoutes(String[] bannedRoutes) {
+		this.bannedRoutes = bannedRoutes;
+	}
+	
+	public String[] getBannedRoutes() {
+		return bannedRoutes;
+	}
 }

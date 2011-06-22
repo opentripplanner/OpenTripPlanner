@@ -176,6 +176,7 @@ public class StreetUtils {
 
     	for (HashSet<Vertex> island : islands) {
     		if (island.size() < 20) {
+    			_log.warn("Depedestrianizing or deleting floating island at " + island.iterator().next());
     			for (Vertex vertex : island) {
     				depedestrianizeOrRemove(graph, vertex);
     			}

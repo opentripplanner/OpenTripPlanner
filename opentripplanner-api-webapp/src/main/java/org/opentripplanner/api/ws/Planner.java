@@ -163,7 +163,8 @@ public class Planner {
             @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops,
             @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
-            @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes)
+            @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
+            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -211,7 +212,11 @@ public class Planner {
             String[] table = unpreferredRoutes.split(",");
             request.setUnpreferredRoutes(table);
         }
-
+        if (bannedRoutes != null && !bannedRoutes.equals("")) {
+            String[] table = bannedRoutes.split(",");
+            request.setBannedRoutes(table);
+        }
+        
         request.setOptimize(optimize);
         request.setModes(modes);
         request.setMinTransferTime(minTransferTime);
@@ -661,6 +666,15 @@ public class Planner {
                     throw new IllegalArgumentException("AgencyId or routeId not set in unpreferredRoutes list");
                 }
                 options.unpreferredRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
+            }
+        }
+        if (request.getBannedRoutes()!= null){
+        	for(String element : request.getBannedRoutes()){
+            	String[] routeSpec = element.split("_", 2);
+            	if (routeSpec.length != 2) {
+                    throw new IllegalArgumentException("AgencyId or routeId not set in bannedRoutes list");
+                }
+                options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
             }
         }
         return options;
