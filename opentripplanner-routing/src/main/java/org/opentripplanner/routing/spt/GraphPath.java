@@ -210,7 +210,7 @@ public class GraphPath {
         for (State curr : states) {
             String zone = curr.getZone();
             AgencyAndId route = curr.getRoute();
-            if (zone == null) {
+            if (zone == null && route == null) {
                 newRide = null;
             } else {
                 if (newRide == null || !route.equals(newRide.route)) {
