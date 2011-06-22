@@ -31,6 +31,7 @@ import org.opentripplanner.geocoder.GeocoderResults;
 public class YahooGeocoder implements Geocoder {
 
 	private String appId;
+	private String locale;
 	private YahooJsonDeserializer yahooJsonDeserializer;
 
 	public YahooGeocoder() {
@@ -43,6 +44,14 @@ public class YahooGeocoder implements Geocoder {
 
 	public void setAppId(String appId) {
 		this.appId = appId;
+	}
+	
+	public String getLocale() {
+		return locale;
+	}
+	
+	public void setLocale(String locale) {
+		this.locale = locale;
 	}
 
 	@Override
@@ -96,6 +105,10 @@ public class YahooGeocoder implements Geocoder {
 		uriBuilder.queryParam("location", address);
 		uriBuilder.queryParam("flags", "J");
 		uriBuilder.queryParam("appid", appId);
+		if (locale != null) {
+			uriBuilder.queryParam("locale", locale);
+			uriBuilder.queryParam("gflags", "L");
+		}
 		URI uri = uriBuilder.build();
 		return new URL(uri.toString());
 	}
