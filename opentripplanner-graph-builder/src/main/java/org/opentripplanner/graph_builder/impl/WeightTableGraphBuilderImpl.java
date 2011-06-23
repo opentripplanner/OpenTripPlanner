@@ -11,9 +11,28 @@ import org.opentripplanner.routing.core.Graph;
  * as well as transit-street links are in place.
  */
 public class WeightTableGraphBuilderImpl implements GraphBuilder {
+	private Double maxWalkSpeed = null;
+
 	@Override
 	public void buildGraph(Graph graph) {
 		WeightTable wt = new WeightTable(graph);
+		if (maxWalkSpeed != null) {
+			wt.setMaxWalkSpeed(maxWalkSpeed);
+		}
+		wt.buildTable();
 		graph.putService(WeightTable.class, wt);
+	}
+
+	/**
+	 * The maximum walk speed that the weight table can support.  Using higher values
+	 * than this during trip planning will lead to slower planning.
+	 * @param maxWalkSpeed
+	 */
+	public void setMaxWalkSpeed(double maxWalkSpeed) {
+		this.maxWalkSpeed = maxWalkSpeed;
+	}
+
+	public double getMaxWalkSpeed() {
+		return maxWalkSpeed;
 	}
 }

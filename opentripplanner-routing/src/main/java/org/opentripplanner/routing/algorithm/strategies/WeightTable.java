@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.GenericVertex;
@@ -49,10 +50,11 @@ public class WeightTable implements Serializable {
     private float[][] table;
     private Graph g;
     Map<GenericVertex,Integer> stopIndices;
+	private double maxWalkSpeed;
     
 	public WeightTable(Graph g) {
 		this.g = g;
-		buildTable();
+		maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed; //default max walk speed is biking speed 
 	}
 	
 	public double getWeight(Vertex from, Vertex to) {
@@ -90,6 +92,7 @@ public class WeightTable implements Serializable {
 	    BinHeap<State> heap = new BinHeap<State>(g.getVertices().size());
 	    ShortestPathTree spt;
 	    TraverseOptions options = new TraverseOptions();
+	    options.speed = maxWalkSpeed;
 	    final double MAX_WEIGHT = 60 * 60 * options.walkReluctance;
 	    final double OPTIMISTIC_BOARD_COST = options.boardCost;  
 	    for (float[] row : table)
@@ -211,4 +214,12 @@ public class WeightTable implements Serializable {
             if (k % 50 == 0) LOG.debug("k=" + k + "/" + n);
         }
     }
+
+	public void setMaxWalkSpeed(double maxWalkSpeed) {
+		this.maxWalkSpeed = maxWalkSpeed;
+	}
+
+	public double getMaxWalkSpeed() {
+		return maxWalkSpeed;
+	}
 }

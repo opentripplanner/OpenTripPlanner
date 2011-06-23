@@ -210,7 +210,12 @@ public class TraverseOptions implements Serializable, Cloneable {
         setGtfsContext(context);
     }
 
-    public void setGtfsContext(GtfsContext context) {
+    public TraverseOptions(TraverseMode mode) {
+    	this();
+    	this.setModes(new TraverseModeSet(mode));
+	}
+
+	public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
         fareContexts = context.getFareRules();
     }

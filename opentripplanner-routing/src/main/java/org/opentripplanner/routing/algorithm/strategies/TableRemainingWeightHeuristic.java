@@ -127,6 +127,14 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
 		Vertex v = s0.getVertex();
         // keep a cache (vertex->weight) here for multi-itinerary searches
         if (weightCache.containsKey(v)) return weightCache.get(v);
+        
+		if (s0.getOptions().speed > wt.getMaxWalkSpeed()) {
+			// fall back to slower heuristic if this heuristic would be inadmissible
+			double w = defaultHeuristic.computeForwardWeight(s0, target); 
+			weightCache.put(s0.getVertex(), w);
+			return w;
+		}
+        
         double w; // return value
         if (wt.includes(v)) {
 	        double remainingWalk = options.maxWalkDistance - s0.getWalkDistance();
