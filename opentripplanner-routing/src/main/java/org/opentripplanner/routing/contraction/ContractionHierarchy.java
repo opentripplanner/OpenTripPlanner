@@ -651,6 +651,13 @@ public class ContractionHierarchy implements Serializable {
 
     	TraverseOptions upOptions = opt.clone();
     	TraverseOptions downOptions = opt.clone();
+
+        /** max walk distance cannot be less than distances to nearest transit stops */
+        double minWalkDistance = origin.getDistanceToNearestTransitStop() + 
+        						 target.getDistanceToNearestTransitStop();
+        upOptions.maxWalkDistance = Math.max(upOptions.maxWalkDistance, minWalkDistance);
+        downOptions.maxWalkDistance = Math.max(downOptions.maxWalkDistance, minWalkDistance);
+
     	upOptions.setArriveBy(false);
     	downOptions.setArriveBy(true);
     	
