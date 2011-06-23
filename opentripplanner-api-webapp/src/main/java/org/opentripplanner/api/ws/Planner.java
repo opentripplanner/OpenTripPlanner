@@ -364,7 +364,7 @@ public class Planner {
         int startWalk = -1;
         int i = -1;
 
-        for (State currState : path.states) { 
+        for (State currState : path.states) {
             i++;
             /* grab base edge and associated narrative information from SPT edge */
             edge = currState.getBackEdge();
@@ -408,6 +408,8 @@ public class Planner {
                 } else if (mode == TraverseMode.ALIGHTING) {
                     /* alighting mode */
                     itinerary.waitingTime += edgeElapsedTime;
+                    leg.to = makePlace(edgeNarrative.getToVertex()); 
+                    leg.endTime = new Date(currState.getBackState().getTime());
                     continue;
                 } else {
                     /* entering transit or onStreet mode leg because traverseMode can only be: 
@@ -418,8 +420,11 @@ public class Planner {
                         if (startWalk != -1) {
                             leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i));
                         }
-                        leg.to = makePlace(edgeNarrative.getFromVertex()); 
-                        leg.endTime = new Date(currState.getBackState().getTime());
+                        if (leg.to == null) {
+                        	/* this stuff is filled in in the alight case, but not in the walk case */
+                        	leg.to = makePlace(edgeNarrative.getToVertex()); 
+                        	leg.endTime = new Date(currState.getBackState().getTime());
+                        }
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         /* reset coordinates */
