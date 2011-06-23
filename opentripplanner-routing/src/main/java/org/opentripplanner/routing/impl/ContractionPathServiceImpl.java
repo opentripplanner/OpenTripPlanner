@@ -132,8 +132,10 @@ public class ContractionPathServiceImpl implements PathService {
         	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
+        // If transit is not to be used, disable walk limit and only search for one itinerary.
         if ( ! options.getModes().getTransit()) {
         	nItineraries = 1;
+        	options.maxWalkDistance = Double.MAX_VALUE;
         }
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
