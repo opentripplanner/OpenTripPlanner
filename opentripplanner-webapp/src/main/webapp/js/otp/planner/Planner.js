@@ -56,6 +56,7 @@ otp.planner.Planner = {
     initialize : function(config)
     {
         this.planner = this;
+        this.routerId = config.routerId;
         otp.configure(this, config);
 
         if(this.templates == null)

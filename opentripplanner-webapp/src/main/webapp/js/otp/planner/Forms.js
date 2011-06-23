@@ -25,6 +25,7 @@ otp.planner.StaticForms = {
     FIELD_ANCHOR     : '95%',
 
     // external (config) objects
+    routerId         : null,
     locale           : null,
     planner          : null,
     contextMenu      : null,
@@ -39,6 +40,8 @@ otp.planner.StaticForms = {
     m_toErrorStore   : null,
     m_geoErrorPopup  : null,
 
+    m_routerIdForm   : null,
+    
     m_fromForm       : null,
     m_toForm         : null,
     m_toPlace        : null,
@@ -91,6 +94,7 @@ otp.planner.StaticForms = {
     {
         // step 1: bit of init (before configure override happens)
         otp.configure(this, config);
+        this.routerId = config.routerId;
 
         // step 2: setup
         if(this.m_xmlRespRecord == null)
@@ -781,12 +785,18 @@ otp.planner.StaticForms = {
             border:      false,
             items:       optForms
         });
+        
+        this.m_routerIdForm = new Ext.form.Hidden({
+            id:             'trip-routerid-form',
+            name:           'routerId',
+            value:          this.routerId
+        });
 
         this.m_submitButton = new Ext.Button({
             text:    this.locale.tripPlanner.labels.planTrip,
             id:      'trip-submit',
             scope:   this,
-            style:'background-color:FF0000;',
+            style:   'background-color:FF0000;',
             handler: this.submit
         });
 
@@ -802,6 +812,7 @@ otp.planner.StaticForms = {
             keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
+                            this.m_routerIdForm,
                             this.m_toPlace,
                             this.m_fromPlace,
                             this.m_intermediatePlaces,
@@ -950,7 +961,8 @@ otp.planner.StaticForms = {
 
         var params = {};
         params[this.geocoder.addressParamName] = address;
-        
+        if (this.routerId)
+            params["routerId"] = this.routerId;
         var self = this;
         Ext.Ajax.request( {
             url: this.geocoder.url,

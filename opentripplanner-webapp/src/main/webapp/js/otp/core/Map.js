@@ -25,6 +25,7 @@ otp.core.MapStatic = {
 
 //http://maps.opengeo.org/geowebcache/service/wms?LAYERS=openstreetmap&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&SRS=EPSG:4326&BBOX=-8240523.1442212,4972687.3114282,-8238077.1593164,4975133.296333&WIDTH=256&HEIGHT=256
 
+	routerId          : null,
     locale            : null,
     map               : null,
     baseLayer         : null,
@@ -104,10 +105,13 @@ otp.core.MapStatic = {
             // all the way out when the default extent was specified
             var layerLoaded = false;
             var extentRetrieved = false;
-
+            var _params = {};
+            if (this.routerId)
+                _params = { routerId : this.routerId };
             OpenLayers.Request.GET({
                     // TODO: store the base /ws URL someplace else
                     url: '/opentripplanner-api-webapp/ws/metadata',
+                    params: _params,
                     // TODO: switch other ajax requests from XML to JSON?
                     headers: {Accept: 'application/json'},
                     success : function(xhr) 

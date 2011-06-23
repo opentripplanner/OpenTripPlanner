@@ -39,6 +39,7 @@ otp.application.Controller = {
         otp.inherit(this.config.map, {
             cm               : this.cm, 
             locale           : this.config.locale,
+            routerId         : this.config.routerId,
             attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
             options: {
                 controls: []
@@ -70,6 +71,7 @@ otp.application.Controller = {
         pconfig.poi = this.poi;
         pconfig.ui  = this.ui;
         pconfig.locale = this.config.locale;
+        pconfig.routerId = this.config.routerId;
         this.planner = new otp.planner.Planner(pconfig);
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
