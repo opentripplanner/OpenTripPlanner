@@ -20,18 +20,18 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
     private static final Logger _log = LoggerFactory.getLogger(DownloadableGtfsInputSource.class);
 
     private URL _url;
-   
+
     private File _cacheDirectory;
-    
+
     private String _defaultAgencyId;
-    
+
     // Pattern: Decorator
-    private ZipFileCsvInputSource _zip;  
+    private ZipFileCsvInputSource _zip;
 
     public void setUrl(URL url) {
         _url = url;
     }
-  
+
     public void setCacheDirectory(File cacheDirectory) {
         _cacheDirectory = cacheDirectory;
     }
@@ -64,7 +64,12 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
         if (_url != null) {
 
             File tmpDir = getTemporaryDirectory();
-            String fileName = _defaultAgencyId + "_gtfs.zip";
+            String cacheFile = _defaultAgencyId;
+            if (cacheFile == null) {
+                // Build a cache file based on URL
+                cacheFile = (_url.getHost() + _url.getFile()).replace("/", "_");
+            }
+            String fileName = cacheFile + "_gtfs.zip";
             File gtfsFile = new File(tmpDir, fileName);
 
             if (gtfsFile.exists()) {
@@ -76,40 +81,40 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
             BufferedInputStream in = new BufferedInputStream(_url.openStream());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
-	    try {
-		copyStreams(in, out);
-	    } catch (RuntimeException e) {
-		out.close();
-		gtfsFile.delete();
-		throw e;
-	    }
+            try {
+                copyStreams(in, out);
+            } catch (RuntimeException e) {
+                out.close();
+                gtfsFile.delete();
+                throw e;
+            }
             return gtfsFile;
         }
 
         throw new IllegalStateException("DownloadableGtfsInputSource did not include an url");
     }
-    
+
     private synchronized void checkIfDownloaded() throws IOException {
         if (_zip == null) {
             _zip = new ZipFileCsvInputSource(new ZipFile(getPathForGtfsBundle()));
         }
     }
-    
-	@Override
-	public boolean hasResource(String name) throws IOException {
+
+    @Override
+    public boolean hasResource(String name) throws IOException {
         checkIfDownloaded();
         return _zip.hasResource(name);
-	}
+    }
 
-	@Override
-	public InputStream getResource(String name) throws IOException {
+    @Override
+    public InputStream getResource(String name) throws IOException {
         checkIfDownloaded();
         return _zip.getResource(name);
-	}
+    }
 
-	@Override
-	public void close() throws IOException {
+    @Override
+    public void close() throws IOException {
         checkIfDownloaded();
         _zip.close();
-	}
+    }
 }
