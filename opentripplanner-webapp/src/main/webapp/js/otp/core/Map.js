@@ -94,7 +94,11 @@ otp.core.MapStatic = {
         {
             this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
         }
-
+        var pageParameters = Ext.urlDecode(window.location.search.substring(1));
+        if (pageParameters["fromPlace"] !== undefined) {
+	  console.log(pageParameters.properties);
+            return;
+        }
         if (this.defaultExtent === 'automatic') {
             // ask the server for the extent
 
