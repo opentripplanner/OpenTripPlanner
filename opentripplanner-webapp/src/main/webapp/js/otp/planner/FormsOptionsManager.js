@@ -31,7 +31,8 @@ otp.planner.FormsOptionsManager = {
     optimize:    null,
     maxWalk:     null,
     wheelchair:  null,
-    
+    locale:      null,
+
     // the optimize store is used to control the optimize options
     optimizeStore: null,
         
@@ -68,12 +69,17 @@ otp.planner.FormsOptionsManager = {
         if (this.optimize.hidden) {
             this.showComboBox(this.optimize);
         }
-        
+
         // and we want to reset the optimize option too
         // because it's possible that it's no longer valid
         this.optimize.reset();
 
         if (this.isTransitOrBus(mode)) {
+            if (this.isBike(mode)) {
+                this.maxWalk.label.update(this.locale.tripPlanner.labels.maxBikeDistance);
+            } else {
+                this.maxWalk.label.update(this.locale.tripPlanner.labels.maxWalkDistance);
+            }
             this.showComboBox(this.maxWalk);
             showFewestTransfersOption = true;
             this.showComboBox(this.wheelchair);

@@ -233,6 +233,7 @@ otp.locale.English = {
             toHere        : "To here",
             minimize      : "Show me the",
             maxWalkDistance: "Maximum walk",
+            maxBikeDistance: "Maximum bike",
             arriveDepart  : "Arrive by/Depart at",
             mode          : "Travel by",
             wheelchair    : "Wheelchair accessible trip", 

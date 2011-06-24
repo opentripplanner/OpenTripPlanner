@@ -1291,7 +1291,8 @@ otp.planner.StaticForms = {
                 mode:        this.m_modeForm,
                 optimize:    this.m_optimizeForm,
                 maxWalk:     this.m_maxWalkDistanceForm,
-                wheelchair:  this.m_wheelchairForm
+                wheelchair:  this.m_wheelchairForm,
+                locale:      this.locale
             });
         }
 
