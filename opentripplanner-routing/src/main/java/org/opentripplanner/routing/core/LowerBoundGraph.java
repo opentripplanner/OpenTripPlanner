@@ -3,8 +3,11 @@ package org.opentripplanner.routing.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
+import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -17,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * @author andrewbyrd
  */
 public class LowerBoundGraph {
-    private static Logger LOG = LoggerFactory.getLogger(LowerBoundGraph.class);
+    private static final GenericVertex StreetVertex = null;
+	private static Logger LOG = LoggerFactory.getLogger(LowerBoundGraph.class);
 	Graph originalGraph;
 	int   [][] vertex;
 	double[][] weight;
@@ -27,6 +31,7 @@ public class LowerBoundGraph {
 	public LowerBoundGraph(Graph original) {
 		originalGraph = original;
 		nVertices = GenericVertex.maxIndex;
+		LOG.info("Table size is: {}", nVertices);
 		vertex = new int   [nVertices][];
 		weight = new double[nVertices][];
 		vertexByIndex = new Vertex[nVertices];
@@ -40,8 +45,10 @@ public class LowerBoundGraph {
 			// avoid empty edgelist entries by traversing all edges first 
 			for (Edge e : original.getOutgoing(u)) {
 				State sv = e.optimisticTraverse(su);
-				if (sv != null) 
+				if (sv != null) {
 					svs.add(sv);
+					//System.out.println(sv.getWeight() + " " + e);
+				}
 			}
 			int ui = u.index;
 			int ne = svs.size(); 
@@ -57,20 +64,28 @@ public class LowerBoundGraph {
 		}
 	}
 	
+	
 	// turn discrete normed (quasi-metric) space 
 	// into a discrete metric space 
 	// while maintaining lower bound property
-	private void symmetricize() {
+	public void symmetricize() {
 		LOG.info("Making distance metric commutative");
 		for (int ui = 0; ui < nVertices; ui++) {
+			//System.out.println("A " + ui);
 			int[]    u_vs = vertex[ui];
 			double[] u_ws = weight[ui];
+			if (u_vs == null) continue;
 			int      u_ne = u_vs.length;
+			//System.out.println(Arrays.toString(u_vs));
+			//System.out.println(Arrays.toString(u_ws));
 			for (int u_ei = 0; u_ei < u_ne; u_ei++) {
 				int    vi = u_vs[u_ei]; 
 				double vw = u_ws[u_ei];
+				//System.out.println("B pre" + vi);
 				int[]    v_vs = vertex[vi];
 				double[] v_ws = weight[vi];
+				//System.out.println(Arrays.toString(v_vs));
+				//System.out.println(Arrays.toString(v_ws));
 				int      v_ne = v_vs.length;
 				boolean found = false;
 				for (int v_ei = 0; v_ei < v_ne; ++v_ei) {
@@ -89,12 +104,15 @@ public class LowerBoundGraph {
 					vertex[vi][v_ne] = ui;
 					weight[vi][v_ne] = vw;
 				}
+				//System.out.println("B post" + vi);
+				//System.out.println(Arrays.toString(vertex[vi]));
+				//System.out.println(Arrays.toString(weight[vi]));
 			}			
 		}
 	}
-	
+
 	// single-source shortest path (weight to all reachable destinations)
-	private double[] sssp(int originIndex) {
+	public double[] sssp(int originIndex) {
 		LOG.info("Initializing SSSP");
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
@@ -125,6 +143,44 @@ public class LowerBoundGraph {
 		return result;
 	}
 	
+	// single-source shortest path (weight to all reachable destinations)
+	public double[] sssp(StreetLocation origin) {
+		LOG.info("Initializing SSSP");
+		double[] result = new double[nVertices];
+		Arrays.fill(result, Double.POSITIVE_INFINITY);
+		BinHeap<Integer> q = new BinHeap<Integer>();
+		for (DirectEdge de : origin.getExtra()) {
+			GenericVertex toVertex = (GenericVertex)(de.getToVertex());  
+			int toIndex = toVertex.getIndex();
+			if (toVertex == origin) continue;
+			if (toIndex >= nVertices) continue;
+			result[toIndex] = 0;
+			q.insert(toIndex, 0);
+		}
+		LOG.info("Performing SSSP");
+		while ( ! q.empty()) {
+			double   uw = q.peek_min_key();
+			int      ui = q.extract_min();
+			int[]    vs = vertex[ui];
+			double[] ws = weight[ui];
+			if (vs == null) continue;
+			int      ne = vs.length;
+			//closed[ui]  = true;
+			for (int ei = 0; ei < ne; ei++) {
+				int    vi = vs[ei]; 
+				double vw = ws[ei] + uw;
+				//if (closed[vi])
+				//	continue;
+				if (result[vi] > vw) {
+					result[vi] = vw;
+					q.insert(vi, vw);
+				}
+			}
+		}
+		LOG.info("End SSSP");
+		return result;
+	}
+	
 	private double[] astar(int originIndex, int destIndex) {
 		LOG.info("Performing Astar");
 		double[] result = new double[nVertices];
@@ -135,7 +191,10 @@ public class LowerBoundGraph {
 		q.insert(originIndex, 0);
     	long t0 = System.currentTimeMillis();
 		while ( ! q.empty()) {
-			if (q.peek_min() == destIndex) break;
+			if (q.peek_min() == destIndex) { 
+				LOG.debug("reached destination, w = {}", q.peek_min_key());
+				break;
+			}
 			double   uw = q.peek_min_key();
 			int      ui = q.extract_min();
 			int[]    vs = vertex[ui];
@@ -166,7 +225,7 @@ public class LowerBoundGraph {
         graphService.refreshGraph();
         Graph g = graphService.getGraph();
         LowerBoundGraph lbg = new LowerBoundGraph(g);
-        for (int i = 1000; i < 4000; i += 500) {
+        for (int i = 1000; i < 9000; i += 500) {
         	long t0 = System.currentTimeMillis();
         	double[] result1 = lbg.sssp(i);
         	long t1 = System.currentTimeMillis();
@@ -197,15 +256,20 @@ public class LowerBoundGraph {
         	}
     		LOG.debug("Matches {} mismatches {}", nMatch, nWrong);
         }
+        
+        // test that lower bound graph really is a lower bound on travel time
 
-        lbg.symmetricize();
-        for (int i = 1000; i < 4000; i += 500) {
-        	double[] result = lbg.astar(i, i+10000);
+        // test potential search speed in compact graph
+        
+        for (int i = 1000; i < lbg.nVertices; i += 500) {
+        	double[] result1 = lbg.astar(i, lbg.nVertices - i);
+        	double[] result2 = lbg.astar(i, lbg.nVertices - i - 10000);
+        	double[] result3 = lbg.astar(i, lbg.nVertices - i - 20000);
         }        
 	}
 
 	// testing search function that does an optimistic search in the original graph
-	private ShortestPathTree originalSSSP(Vertex o){
+	private BasicShortestPathTree originalSSSP(Vertex o){
 		LOG.info("Initializing original SSSP");
 		BasicShortestPathTree spt = new BasicShortestPathTree();
 		BinHeap<State> q = new BinHeap<State>();
