@@ -62,7 +62,6 @@ otp.planner.StaticForms = {
     m_modeStore      : null,
     m_modeForm       : null,
     m_wheelchairForm : null,
-    m_wheelchairStore: null,
 
     // buttons
     m_submitButton   : null,
@@ -1202,7 +1201,6 @@ otp.planner.StaticForms = {
         this.m_maxWalkDistanceStore  = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
-        this.m_wheelchairStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.wheelchair);
 
         this.m_optimizeForm = new Ext.form.ComboBox({
             id:             'trip-optimize-form',
@@ -1266,13 +1264,12 @@ otp.planner.StaticForms = {
             selectOnFocus:  true
         });
 
-        this.m_wheelchairForm = new Ext.form.ComboBox({
+        this.m_wheelchairForm = new Ext.form.Checkbox({
             id:             'trip-wheelchair-form',
             name:           'wheelchair',
             hiddenName:     'wheelchair',
             fieldLabel:     this.locale.tripPlanner.labels.wheelchair,
-            store:          this.m_wheelchairStore,
-            value:          this.m_wheelchairStore.getAt(0).get('opt'),
+            inputValue:     'true',
             displayField:   'text',
             valueField:     'opt',
             anchor:         this.FIELD_ANCHOR,
