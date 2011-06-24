@@ -36,11 +36,15 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Find the shortest path between graph vertices using A*.
  */
 public class GenericAStar {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
 
     private boolean _verbose = false;
     
@@ -133,6 +137,8 @@ public class GenericAStar {
 
         boolean exit = false; // Unused?
 
+        int nVisited = 0;
+        
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
 
@@ -176,29 +182,31 @@ public class GenericAStar {
                         options))
                     break;
             } else if (u_vertex == target) {
+            	System.out.println(" total vertices visited " + nVisited);
                 return spt;
             }
 
             Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, u_vertex, options);
 
+            nVisited += 1;
+            
             for (Edge edge : edges) {
 
             	if (edge instanceof PatternBoard && u.getNumBoardings() > options.maxTransfers)
                     continue;
 
-                // Iterate over traversal results. When an edge leads nowhere (as indicated by
+            	// Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                 	// Could be: for (State v : traverseEdge...)
 
-// now handled in state editor                	
-//                	double delta_w = v.getWeight() - u.getWeight(); 
-//                    if (delta_w < 0) { // <0
-//                        throw new NegativeWeightException(String.valueOf(delta_w)
-//                        								  + " on edge " + edge);
-//                    }
-                    
-                    if( _skipTraversalResultStrategy != null 
+                	// TEST: uncomment to verify that all optimisticTraverse functions are actually admissible
+                	//State lbs = edge.optimisticTraverse(u);                    
+                    //if ( ! (lbs.getWeight() <= v.getWeight())) {
+                	//    System.out.printf("inadmissible lower bound %f vs %f on edge %s\n", lbs.getWeightDelta(), v.getWeightDelta(), edge);
+                	//}
+
+                	if( _skipTraversalResultStrategy != null 
                         && _skipTraversalResultStrategy.shouldSkipTraversalResult(origin, target, u, v, spt, options))
                         continue;
 
