@@ -343,8 +343,7 @@ public class GraphPath {
      * @param s - a state resulting from a path search
      * @return a state at the other end of a reversed, optimized path 
      */
-    // not static because direction of search is tracked in instance
-    private State optimize(State s) {
+    private static State optimize(State s) {
 
     	// reverse the search direction 
     	State ret = s.reversedClone();
