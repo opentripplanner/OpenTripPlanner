@@ -164,8 +164,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost);
-
+            s1.incrementWeight(wait_cost + options.boardCost);
             return s1.makeState();
             
     	} else {
@@ -177,14 +176,14 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 	        s1.setTripId(null);
 	        s1.setLastAlightedTime(state0.getTime());
 	        s1.setPreviousStop(tov);
-	        s1.incrementWeight(1);
 	        return s1.makeState();
     	}
 	}
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
-        s1.incrementWeight(1);
+        // will work only for arriveby searches
+        s1.incrementWeight(state0.getOptions().boardCost); 
         return s1.makeState();
     }
 

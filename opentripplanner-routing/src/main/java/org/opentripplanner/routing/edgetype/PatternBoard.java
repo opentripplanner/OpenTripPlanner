@@ -82,7 +82,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             }
             StateEditor s1 = state0.edit(this);
             s1.setTripId(null);
-            s1.incrementWeight(1);
             return s1.makeState();
     	} else {
     		/* forward traversal: look for a transit trip on this pattern */
@@ -170,15 +169,14 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost);
-            
+            s1.incrementWeight(wait_cost + options.boardCost);
             return s1.makeState();
     	}
 	}
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
-        s1.incrementWeight(1);
+        // no cost (see patternalight)
         return s1.makeState();
     }
 
