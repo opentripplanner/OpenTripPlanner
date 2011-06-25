@@ -311,7 +311,14 @@ public class State implements Cloneable {
 	}
 
 	public State reversedClone() {
-        return new State(this.time, this.vertex, this.options.reversedClone());
+		long timeAdjustment = 0;
+		// introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
+		if (this.everBoarded) {
+			timeAdjustment = this.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
+			if (this.options.isArriveBy())
+				timeAdjustment *= -1;
+		}
+        return new State(this.time + timeAdjustment, this.vertex, this.options.reversedClone());
 	}
 
 }
