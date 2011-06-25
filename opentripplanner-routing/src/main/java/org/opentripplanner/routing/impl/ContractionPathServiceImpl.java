@@ -23,6 +23,7 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
@@ -132,6 +133,9 @@ public class ContractionPathServiceImpl implements PathService {
         	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
+        // EXPERIMENTAL
+        // options.remainingWeightHeuristic = new LBGRemainingWeightHeuristic(_graphService.getGraph());
+        
         // If transit is not to be used, disable walk limit and only search for one itinerary.
         if ( ! options.getModes().getTransit()) {
         	nItineraries = 1;
@@ -162,10 +166,11 @@ public class ContractionPathServiceImpl implements PathService {
             }
             options.worstTime = maxTime;
             options.maxWeight = maxWeight;
+            long searchBeginTime = System.currentTimeMillis();
         	LOG.debug("BEGIN SEARCH");
             List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, 
             		targetTime.getTime(), options);
-        	LOG.debug("END SEARCH");
+        	LOG.debug("END SEARCH {} msec", System.currentTimeMillis() - searchBeginTime);
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
@@ -186,6 +191,8 @@ public class ContractionPathServiceImpl implements PathService {
             }
             for (GraphPath path : somePaths) {
                 if (!paths.contains(path)) {
+                	// DEBUG 
+                	// path.dump();
                     paths.add(path);
                     // now, create a list of options, one with each route in this trip banned.
                     // the HashSet banned is not strictly necessary as the optionsQueue will
