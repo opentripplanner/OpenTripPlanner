@@ -16,6 +16,7 @@
   <url>http://maven.apache.org</url>
 
   <build>
+    <finalName>opentripplanner-geocoder</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
