@@ -129,7 +129,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	        
 	        StateEditor s1 = state0.edit(this);
 	        s1.incrementTimeInSeconds(wait);
-	        s1.incrementWeight(wait * options.waitReluctance);
+	        s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
 	        s1.incrementNumBoardings();
 	        s1.setTripId(trip.getId());
 	        s1.setZone(zone);
