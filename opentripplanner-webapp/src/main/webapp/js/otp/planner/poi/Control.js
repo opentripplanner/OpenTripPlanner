@@ -44,7 +44,7 @@ otp.planner.poi.Control = {
         otp.configure(this, config);
 
         // step 2: make layer
-        this.layer = new OpenLayers.Layer.Vector(this.name, {projection: otp.core.MapStatic.dataProjection});
+        this.layer = new OpenLayers.Layer.Vector(this.name, {projection: otp.core.MapStatic.dataProjection, displayInLayerSwitcher: false});
         this.drag  = new OpenLayers.Control.DragFeature(this.layer);
 
         this.map.addLayer(this.layer);

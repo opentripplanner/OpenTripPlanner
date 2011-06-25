@@ -65,7 +65,8 @@ otp.planner.Renderer = {
                     isBaseLayer: false,
                     isFixed: false,
                     visibility: true,
-                    projection: this.map.dataProjection
+                    projection: this.map.dataProjection,
+                    displayInLayerSwitcher: false
             };
             this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
             this.map.getMap().addLayer(this.m_vectorLayer);
@@ -80,7 +81,8 @@ otp.planner.Renderer = {
                     isBaseLayer: false,
                     rendererOptions: {yOrdering: true},
                     projection: this.map.dataProjection,
-                    styleMap: styleMap
+                    styleMap: styleMap,
+                    displayInLayerSwitcher: false
             };
             this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', markerLayerOptions);
             this.map.getMap().addLayer(this.m_markerLayer);
