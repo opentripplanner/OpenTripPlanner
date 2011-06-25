@@ -182,7 +182,7 @@ public class GenericAStar {
                         options))
                     break;
             } else if (u_vertex == target) {
-            	System.out.println(" total vertices visited " + nVisited);
+            	LOG.debug("total vertices visited {}", nVisited);
                 return spt;
             }
 
