@@ -19,4 +19,9 @@ public interface RemainingWeightHeuristic {
     public double computeForwardWeight(State s, Vertex target);
 
     public double computeReverseWeight(State s, Vertex target);
+    
+    /** 
+     * Reset any cached data in the heuristic 
+     */
+    public void reset();
 }

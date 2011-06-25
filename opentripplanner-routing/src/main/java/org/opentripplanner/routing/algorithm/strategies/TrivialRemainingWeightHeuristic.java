@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
@@ -26,5 +25,9 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     public double computeReverseWeight(State s, Vertex target) {
     	return 0;
     }
+
+	@Override
+	public void reset() {		
+	}
 
 }

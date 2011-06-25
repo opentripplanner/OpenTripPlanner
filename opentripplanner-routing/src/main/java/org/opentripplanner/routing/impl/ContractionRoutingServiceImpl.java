@@ -38,7 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ContractionRoutingServiceImpl implements RoutingService {
 
-    private GraphService _graphService;
+    private static final int MAX_TRIES = 4;
+	private GraphService _graphService;
 
     @Autowired
     public void setGraphService(GraphService graphService) {
@@ -53,27 +54,47 @@ public class ContractionRoutingServiceImpl implements RoutingService {
 
         ContractionHierarchy hierarchy = null;
         hierarchy = hierarchies.getHierarchy(options);
+        
+        int tries = 0;
+        
+        while (tries < MAX_TRIES) {
+        	if (options.remainingWeightHeuristic != null) {
+        		options.remainingWeightHeuristic.reset();
+        	}
+        	tries += 1;
+        	if (hierarchy == null) {
 
-        if (hierarchy == null) {
+        		GenericAStar aStar = getAStarInstance(options);
 
-            GenericAStar aStar = getAStarInstance(options);
+        		Graph _graph = hierarchies.getGraph();
+        		ShortestPathTree spt = aStar.getShortestPathTree(_graph, fromVertex, toVertex,
+        				time, options);
+        		if (spt == null) {
+        	        return Collections.emptyList();
+        		}
+        		List<GraphPath> paths = null;
+        		
+        		if (options.isArriveBy())
+        			paths = spt.getPaths(fromVertex, true);
+        		else
+        			paths = spt.getPaths(toVertex, true);
+        		if (paths == null || paths.isEmpty()) {
+        			options.maxWalkDistance *= 2;
+        			continue; // retry
+        		} else {
+        			return paths;
+        		}
+        	}
 
-            Graph _graph = hierarchies.getGraph();
-            ShortestPathTree spt = aStar.getShortestPathTree(_graph, fromVertex, toVertex,
-                        time, options);
-            if (spt == null)
-            	return Collections.emptyList();
-            
-            if (options.isArriveBy())
-            	return spt.getPaths(fromVertex, true);
-            else
-            	return spt.getPaths(toVertex, true);
+        	GraphPath path = hierarchy.getShortestPath(fromVertex, toVertex, time, options);
+        	if (path == null) {
+        		options.maxWalkDistance *= 2;
+        		continue;
+        	} else {
+        		return Arrays.asList(path);
+        	}
         }
-
-        GraphPath path = hierarchy.getShortestPath(fromVertex, toVertex, time, options);
-        if (path == null)
-            return Collections.emptyList();
-        return Arrays.asList(path);
+        return Collections.emptyList();
     }
 
     @Override

@@ -61,4 +61,8 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
     		this.weights = lbg.sssp((StreetLocation)target);
     	}
     }
+
+	@Override
+	public void reset() {		
+	}
 }

@@ -128,4 +128,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             }
         }
     }
+
+	@Override
+	public void reset() {
+	}
 }

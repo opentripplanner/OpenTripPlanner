@@ -172,5 +172,10 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
             return "NearbyStop: " + vertex + " " + weight;
         }
     }
+
+	@Override
+	public void reset() {
+		target = null;
+	}
 	
 }

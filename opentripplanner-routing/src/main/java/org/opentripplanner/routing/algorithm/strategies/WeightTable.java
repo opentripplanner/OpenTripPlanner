@@ -63,13 +63,8 @@ public class WeightTable implements Serializable {
 
 	public WeightTable(Graph g) {
 		this.g = g;
-		maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed; // default
-																		// max
-																		// walk
-																		// speed
-																		// is
-																		// biking
-																		// speed
+		// default max walk speed is biking speed
+		maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed; 
 	}
 
 	public double getWeight(Vertex from, Vertex to) {
