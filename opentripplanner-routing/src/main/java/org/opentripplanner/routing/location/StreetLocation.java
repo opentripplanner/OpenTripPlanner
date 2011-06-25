@@ -116,10 +116,6 @@ public class StreetLocation extends GenericVertex {
 
     }
 
-    private void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
     private static StreetVertex createHalfLocation(StreetLocation base, String label,
             String name, Coordinate nearestPoint, Edge edge, HashMap<Geometry, P2<StreetVertex>> cache) {
 
@@ -198,6 +194,10 @@ public class StreetLocation extends GenericVertex {
 
     public List<DirectEdge> getExtra() {
         return extra;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     public boolean isWheelchairAccessible() {

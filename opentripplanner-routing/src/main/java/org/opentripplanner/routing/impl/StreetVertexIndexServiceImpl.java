@@ -193,6 +193,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 closest.getExtra().add(e);
                 e = new FreeEdge(v, closest);
                 closest.getExtra().add(e);
+                if(v instanceof StreetVertex && ((StreetVertex)v).isWheelchairAccessible()) {
+                    closest.setWheelchairAccessible(true);
+                }
             }
             return closest;
         }

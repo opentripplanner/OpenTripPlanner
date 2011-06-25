@@ -263,10 +263,16 @@ public class TestHalfEdges extends TestCase {
         finder.setup();
         //test that the local stop finder finds stops
         assertTrue(finder.getLocalTransitStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
+
+        //test that the closest vertex finder returns the closest vertex
+        StreetLocation some = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.00, 40.00), null);
+        assertNotNull(some);
+        assertTrue("wheelchair accessibility is correctly set (vertices)", some.isWheelchairAccessible());
         
         //test that the closest vertex finder correctly splits streets
         StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01, 40.004), null);
         assertNotNull(start);
+        assertTrue("wheelchair accessibility is correctly set (splitting)", start.isWheelchairAccessible());
 
         List<DirectEdge> extras = start.getExtra();
         assertEquals(10, extras.size());
@@ -280,6 +286,7 @@ public class TestHalfEdges extends TestCase {
         
 		//test that the closest vertex finder also adds an edge to transit stops
         StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.01), new TraverseOptions());
+        assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
         	if (extra instanceof FreeEdge && ((FreeEdge)extra).getToVertex().equals(station1)) {
