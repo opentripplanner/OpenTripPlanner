@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,10 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
 	@Override
 	public List<State> getStates(Vertex dest) {
 		State s = states.get(dest);
-		return Arrays.asList(s); // single-element array-backed list
+		if (s == null)
+			return Collections.emptyList(); 
+		else 
+			return Arrays.asList(s); // single-element array-backed list
 	}
 
 	@Override
