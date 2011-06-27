@@ -31,6 +31,8 @@ public class ShapefileStreetSchema {
 
     private SimpleFeatureConverter<Boolean> featureSelector = null;
 
+    private SimpleFeatureConverter<String> noteConverter = null;
+
     public SimpleFeatureConverter<String> getIdConverter() {
         return idConverter;
     }
@@ -134,4 +136,12 @@ public class ShapefileStreetSchema {
     public SimpleFeatureConverter<Boolean> getFeatureSelector() {
         return featureSelector;
     }
+
+	public void setNoteConverter(SimpleFeatureConverter<String> noteConverter) {
+		this.noteConverter = noteConverter;
+	}
+
+	public SimpleFeatureConverter<String> getNoteConverter() {
+		return noteConverter;
+	}
 }
