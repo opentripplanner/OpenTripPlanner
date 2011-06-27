@@ -183,11 +183,13 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
                 PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
                 street.setId(id);
-                String note = noteConverter.convert(feature);
-                if (note != null && note.length() > 0) {
-                	HashSet<String> notes = new HashSet<String>();
-                	notes.add(note);
-                	street.setNote(notes);
+                if (noteConverter != null) {
+                	String note = noteConverter.convert(feature);
+                	if (note != null && note.length() > 0) {
+                		HashSet<String> notes = new HashSet<String>();
+                		notes.add(note);
+                		street.setNote(notes);
+                	}
                 }
                 graph.addEdge(street);
                 
