@@ -231,10 +231,6 @@ public class StateEditor {
         child.route = route;
     }
 
-    public void setFareContext(FareContext fareContext) {
-        child.fareContext = fareContext;
-    }
-
     public void setNumBoardings(int numBoardings) {
         child.numBoardings = numBoardings;
     }
@@ -291,10 +287,6 @@ public class StateEditor {
 
     public AgencyAndId getRoute() {
         return child.getRoute();
-    }
-
-    public FareContext getFareContext() {
-        return child.getFareContext();
     }
 
     public int getNumBoardings() {

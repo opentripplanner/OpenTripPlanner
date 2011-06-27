@@ -62,8 +62,6 @@ public class TraverseOptions implements Serializable, Cloneable {
      */
     public double maxWalkDistance = Double.MAX_VALUE;
 
-    private HashMap<AgencyAndId, FareRuleSet> fareContexts;
-
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
      * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
@@ -217,7 +215,6 @@ public class TraverseOptions implements Serializable, Cloneable {
 
 	public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
-        fareContexts = context.getFareRules();
     }
 
     public void setCalendarService(CalendarService calendarService) {
@@ -239,13 +236,6 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     public boolean transitAllowed() {
         return getModes().getTransit();
-    }
-
-    /**
-     * @return the fareContexts
-     */
-    public HashMap<AgencyAndId, FareRuleSet> getFareContexts() {
-        return fareContexts;
     }
 
     @SuppressWarnings("unchecked")

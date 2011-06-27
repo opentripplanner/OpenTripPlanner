@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
 /**
@@ -55,16 +54,13 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
     private ArrayList<Trip> trips;
 
-    public FareContext fareContext;
-
     public ArrayTripPattern arrayPattern = null;
 
     public ArrayList<Stop> stops;
     
     @SuppressWarnings("unchecked")
-    public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes, FareContext fareContext) {
+    public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
-        this.fareContext = fareContext;
         int hops = stopTimes.size() - 1;
         departureTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         runningTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
@@ -333,7 +329,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
      */
     public ArrayTripPattern convertToArrayTripPattern() {
         if (arrayPattern == null) {
-            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, zones, perTripFlags, perStopFlags, trips, fareContext);
+            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, zones, perTripFlags, perStopFlags, trips);
             departureTimes = runningTimes = arrivalTimes = dwellTimes = null;
             zones = null;
             perTripFlags = null;
@@ -341,11 +337,6 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             trips = null;
         }
         return arrayPattern;
-    }
-
-    @Override
-    public FareContext getFareContext() {
-        return fareContext;
     }
 
     @Override

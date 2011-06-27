@@ -47,7 +47,6 @@ public class State implements Cloneable {
     protected double walkDistance;
     protected String zone;
     protected AgencyAndId route;
-    protected FareContext fareContext;
     protected int numBoardings;
     protected boolean alightedLocal;
     protected boolean everBoarded;
@@ -160,10 +159,6 @@ public class State implements Cloneable {
 
     public AgencyAndId getRoute() {
         return route;
-    }
-
-    public FareContext getFareContext() {
-        return fareContext;
     }
 
     public int getNumBoardings() {

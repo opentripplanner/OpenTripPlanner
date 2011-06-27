@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -51,7 +52,9 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
 
-        Fare cost = path.getCost();
+        FareService fareService = gg.getService(FareService.class);
+        
+        Fare cost = fareService.getCost(path);
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
 
@@ -72,7 +75,9 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("TriMet_8371"), true);
         assertNotNull(path);
-        Fare cost = path.getCost();
+
+        FareService fareService = gg.getService(FareService.class);
+        Fare cost = fareService.getCost(path);
         assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
 
         // long trip
@@ -83,7 +88,7 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("TriMet_1252"), true);
         assertNotNull(path);
-        cost = path.getCost();
+        cost = fareService.getCost(path);
         
         //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
         
@@ -95,7 +100,7 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex("TriMet_4231"), true);
         assertNotNull(path);
-        cost = path.getCost();
+        cost = fareService.getCost(path);
         //
         // this is commented out because portland's fares are, I think, broken in the gtfs. see
         // thread on gtfs-changes.

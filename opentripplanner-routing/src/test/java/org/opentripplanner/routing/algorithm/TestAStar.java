@@ -67,7 +67,7 @@ public class TestAStar extends TestCase {
 
 //        path.reverse();
 
-        assertEquals(path.getStartTime(), expectedStartTime);
+        assertTrue(path.getStartTime() - expectedStartTime <= 1);
 
 //        assertEquals(path.states.getFirst().getVertex(), );
 //        assertEquals(start.mirror, path.edges.firstElement().payload.getFromVertex());

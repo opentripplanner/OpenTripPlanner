@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -41,8 +40,6 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     private int stopIndex;
 
     private Geometry geometry = null;
-
-    private FareContext context = null;
 
     public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
@@ -92,7 +89,6 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         s1.incrementTimeInSeconds(runningTime);
         s1.setZone(getEndStop().getZoneId());
         s1.setRoute(pattern.getExemplar().getRoute().getId());
-        s1.setFareContext(context);
         s1.incrementWeight(runningTime);
         return s1.makeState();
     }
@@ -124,13 +120,5 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     public String toString() {
     	return "PatternHop(" + getFromVertex() + ", " + getToVertex() + ")";
-    }
-
-    public void setFareContext(FareContext context) {
-        this.context = context;
-    }
-
-    public FareContext getContext() {
-        return context;
     }
 }

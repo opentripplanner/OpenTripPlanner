@@ -17,8 +17,6 @@ public class StateData {
 
     private final AgencyAndId route;
 
-    private final FareContext fareContext;
-
     private final int numBoardings;
 
     private final boolean alightedLocal;
@@ -37,7 +35,6 @@ public class StateData {
         this.walkDistance = editor.walkDistance;
         this.zone = editor.zone;
         this.route = editor.route;
-        this.fareContext = editor.fareContext;
         this.numBoardings = editor.numBoardings;
         this.alightedLocal = editor.alightedLocal;
         this.everBoarded = editor.everBoarded;
@@ -76,10 +73,6 @@ public class StateData {
 
     public AgencyAndId getRoute() {
         return route;
-    }
-
-    public FareContext getFareContext() {
-        return fareContext;
     }
 
     public int getNumBoardings() {
@@ -143,8 +136,6 @@ public class StateData {
 
         private AgencyAndId route = null;
 
-        private FareContext fareContext;
-
         private int numBoardings = 0;
 
         private boolean alightedLocal = false;
@@ -171,7 +162,6 @@ public class StateData {
             this.walkDistance = state.walkDistance;
             this.zone = state.zone;
             this.route = state.route;
-            this.fareContext = state.fareContext;
             this.numBoardings = state.numBoardings;
             this.alightedLocal = state.alightedLocal;
             this.everBoarded = state.everBoarded;
@@ -251,9 +241,6 @@ public class StateData {
             this.route = route;
         }
 
-        public void setFareContext(FareContext fareContext) {
-            this.fareContext = fareContext;
-        }
 
         public void setNumBoardings(int numBoardings) {
             this.numBoardings = numBoardings;

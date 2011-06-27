@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Pathway;
 import org.onebusaway.gtfs.model.ShapePoint;
@@ -35,8 +34,6 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.FareContext;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TransferTable;
@@ -57,6 +54,9 @@ import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,7 +202,7 @@ public class GTFSPatternHopFactory {
 
     private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
-    private FareContext fareContext = null;
+    private FareServiceFactory fareServiceFactory;
 
     private HashMap<BlockIdAndServiceId, List<InterliningTrip>> tripsForBlock = new HashMap<BlockIdAndServiceId, List<InterliningTrip>>();
 
@@ -210,16 +210,6 @@ public class GTFSPatternHopFactory {
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
-       
-        HashMap<AgencyAndId, FareRuleSet> fareRules = context.getFareRules();
-        HashMap<AgencyAndId, FareAttribute> fareAttributes = new HashMap<AgencyAndId, FareAttribute>(); 
-        for (AgencyAndId fareId: fareRules.keySet()) {
-            FareAttribute attribute = context.getFareAttribute(fareId);
-            fareAttributes.put(fareId, attribute);
-        }
-        if (fareRules.size () > 0 && fareAttributes.size() > 0) { 
-            fareContext = new FareContext(fareRules, fareAttributes);
-        }
     }
 
     public static ScheduledStopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
@@ -243,6 +233,10 @@ public class GTFSPatternHopFactory {
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      */
     public void run(Graph graph) {
+    	if (fareServiceFactory == null) {
+    		fareServiceFactory = new DefaultFareServiceFactory();
+    	}
+        fareServiceFactory.setDao(_dao);
 
         // Load stops
         loadStops(graph);
@@ -331,7 +325,7 @@ public class GTFSPatternHopFactory {
                 boolean simple = false;
 
                 if (tripPattern == null) {
-                    tripPattern = makeTripPattern(graph, trip, stopTimes, fareContext);
+                    tripPattern = makeTripPattern(graph, trip, stopTimes);
 
                     patterns.put(stopPattern, tripPattern);
                     if (blockId != null && !blockId.equals("")) {
@@ -453,6 +447,7 @@ public class GTFSPatternHopFactory {
         loadTransfers(graph);
         deleteUselessDwells(graph);
         clearCachedData();
+        graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
 
     private void putInterlineDwell(InterlineSwitchoverKey key, PatternInterlineDwell dwell) {
@@ -616,8 +611,8 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private BasicTripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes, FareContext fareContext) {
-        BasicTripPattern tripPattern = new BasicTripPattern(trip, stopTimes, fareContext);
+    private BasicTripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
+        BasicTripPattern tripPattern = new BasicTripPattern(trip, stopTimes);
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
@@ -655,7 +650,6 @@ public class GTFSPatternHopFactory {
 
             PatternHop hop = new PatternHop(startJourneyDepart, endJourneyArrive, s0, s1, i,
                     tripPattern);
-            hop.setFareContext(fareContext);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourneyArrive));
 
@@ -758,7 +752,6 @@ public class GTFSPatternHopFactory {
             Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);
             graph.addEdge(dwell);
             Hop hop = new Hop(startJourneyDepart, endJourneyArrive, st0, st1);
-            hop.setFareContext(fareContext);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourneyArrive));
             hops.add(hop);
@@ -766,13 +759,13 @@ public class GTFSPatternHopFactory {
             if (st0.getPickupType() != 1) {
                 Board boarding = new Board(startStation, startJourneyDepart, hop,
                         tripWheelchairAccessible && s0.getWheelchairBoarding() != 0,
-                        st0.getStop().getZoneId(), trip, fareContext);
+                        st0.getStop().getZoneId(), trip);
                 graph.addEdge(boarding);
             }
             if (st0.getDropOffType() != 1) {
                 graph.addEdge(new Alight(endJourneyArrive, endStation, hop, tripWheelchairAccessible
                         && s1.getWheelchairBoarding() != 0,
-                        st0.getStop().getZoneId(), trip, fareContext));
+                        st0.getStop().getZoneId(), trip));
             }
         }
     }
@@ -947,4 +940,8 @@ public class GTFSPatternHopFactory {
     	}
     	return filtered;
     }
+
+	public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
+		this.fareServiceFactory = fareServiceFactory;
+	}
 }

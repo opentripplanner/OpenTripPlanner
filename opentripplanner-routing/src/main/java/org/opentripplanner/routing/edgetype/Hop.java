@@ -21,7 +21,6 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -81,7 +80,6 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
     	s1.incrementWeight(elapsed);
         s1.setZone(getEndStop().getZoneId());
         s1.setRoute(start.getTrip().getRoute().getId());
-        s1.setFareContext(fareContext);
         return s1.makeState();
     }
 
@@ -94,8 +92,6 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
     }
 
     private Geometry geometry = null;
-
-    private FareContext fareContext;
 
     public String getDirection() {
         return start.getTrip().getTripHeadsign();
@@ -152,7 +148,4 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         return start.getTrip();
     }
 
-    public void setFareContext(FareContext context) {
-        fareContext = context;
-    }
 }

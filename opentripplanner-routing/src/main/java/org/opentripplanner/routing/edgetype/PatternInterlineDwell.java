@@ -24,7 +24,6 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -42,17 +41,14 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
     private String zone;
 
-    private FareContext fareContext;
-
     private static final long serialVersionUID = 1L;
 
-    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone, Trip trip, FareContext fareContext) {
+    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone, Trip trip) {
         super(fromv, tov);
         this.hop = hop;
 	this.wheelchairAccessible = wheelchairAccessible;
 	this.zone = zone;
 	this.trip = trip;
-	this.fareContext = fareContext;
     }
 
     public String getDirection() {
@@ -118,7 +114,6 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
-            s1.setFareContext(fareContext);
             return s1.makeState();
     	} else {
     		// forward traversal: just make an unmodified child state

@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.FareContext;
 
 /**
  * Represents a class of trips distinguished by service id and list of stops. For each stop, there
@@ -83,9 +82,6 @@ public interface TripPattern {
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex);
-
-    /** Returns the fare context of a given stop */
-    FareContext getFareContext();
 
     /** Returns an arbitrary trip that uses this pattern */
     public Trip getExemplar();

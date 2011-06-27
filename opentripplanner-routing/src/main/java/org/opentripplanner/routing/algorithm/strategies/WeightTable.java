@@ -27,8 +27,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
-import org.hibernate.id.enhanced.OptimizerFactory.PooledOptimizer;
-import org.opentripplanner.routing.contraction.WitnessSearchResult;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;

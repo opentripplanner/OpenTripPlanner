@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.FareContext;
 
 /**
  * Consider the following code: 
@@ -85,8 +84,6 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     private Trip[] trips;
 
-    private FareContext fareContext;
-
     int bestRunningTimes[];
 
     int bestDwellTimes[];
@@ -94,7 +91,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     public ArrayTripPattern(Trip exemplar, ArrayList<Integer>[] departureTimes,
             ArrayList<Integer>[] runningTimes, ArrayList<Integer>[] arrivalTimes,
             ArrayList<Integer>[] dwellTimes, String[] zones, ArrayList<Integer> perTripFlags,
-            int[] perStopFlags, ArrayList<Trip> trips, FareContext fareContext) {
+            int[] perStopFlags, ArrayList<Trip> trips) {
         this.exemplar = exemplar;
         this.departureTimes = new int[departureTimes.length][departureTimes[0].size()];
         this.runningTimes = new int[runningTimes.length][runningTimes[0].size()];
@@ -112,7 +109,6 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         this.perStopFlags = perStopFlags;
         this.bestRunningTimes = new int[perStopFlags.length];
         this.trips = new Trip[trips.size()];
-        this.fareContext = fareContext;
 
         for (int i = 0; i < departureTimes.length; ++i) {
             for (int j = 0; j < departureTimes[i].size(); ++j) {
@@ -278,10 +274,6 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     public String getZone(int stopIndex) {
         return zones[stopIndex];
-    }
-
-    public FareContext getFareContext() {
-        return fareContext;
     }
 
     @Override

@@ -154,7 +154,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setTripId(trip.getId());
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
-            s1.setFareContext(pattern.getFareContext());
 
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {

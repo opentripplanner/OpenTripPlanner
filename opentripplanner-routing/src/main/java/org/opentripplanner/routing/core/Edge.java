@@ -15,7 +15,6 @@ package org.opentripplanner.routing.core;
 
 import java.util.List;
 
-import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.spt.GraphPath;
 

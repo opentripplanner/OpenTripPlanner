@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.FareContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -44,21 +43,18 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
     private String zone;
 
-    private FareContext fareContext;
-
     private Trip trip;
 
     public static final int SECS_IN_DAY = 86400;
 
     private static final long serialVersionUID = 2L;
 
-    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible, String zone, Trip trip, FareContext fareContext) {
+    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible, String zone, Trip trip) {
         super(startStation, startJourney);
         this.hop = hop;
 	this.wheelchairAccessible = wheelchairAccessible;
 	this.zone = zone;
 	this.trip = trip;
-	this.fareContext = fareContext;
     }
 
     public String getDirection() {
@@ -134,7 +130,6 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 	        s1.setTripId(trip.getId());
 	        s1.setZone(zone);
 	        s1.setRoute(trip.getRoute().getId());
-	        s1.setFareContext(fareContext);
 	        return s1.makeState();
 		}
     }
