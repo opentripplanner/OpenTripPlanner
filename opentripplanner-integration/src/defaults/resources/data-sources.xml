@@ -6,6 +6,8 @@
         <property name="path" value="opentripplanner-integration/target/graph-bundle" />
     </bean>
 
+    <!-- Single graph -->
+    <import resource="classpath:org/opentripplanner/api/application-context.xml" />
     <bean class="org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl" id="pathServiceFactory"> 
         <property name="pathService" ref="pathService"/>
     </bean> 
