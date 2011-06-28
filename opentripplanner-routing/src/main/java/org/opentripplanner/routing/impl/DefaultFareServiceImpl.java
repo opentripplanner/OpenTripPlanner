@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.State;
@@ -48,6 +49,11 @@ class Ride {
     String endZone;
 
     long startTime;
+
+    //generic classifier and start/end stops, unused in DefaultFareServiceImpl but maybe useful elsewhere 
+	public Object classifier;
+	public Stop firstStop; 
+	public Stop lastStop;
 
     public Ride() {
         zones = new HashSet<String>();
@@ -80,6 +86,10 @@ class Ride {
         }
         builder.append(" at ");
         builder.append(startTime);
+        if (classifier != null) {
+        	builder.append(", classified by ");
+        	builder.append(classifier.toString());
+        }
         builder.append(")");
         return builder.toString();
     }
@@ -95,7 +105,7 @@ class Ride {
 public class DefaultFareServiceImpl implements FareService, Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger _log = LoggerFactory.getLogger(GraphPath.class);
+	private static final Logger _log = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
 	private HashMap<AgencyAndId, FareRuleSet> fareRules;
 	private HashMap<AgencyAndId, FareAttribute> fareAttributes;
