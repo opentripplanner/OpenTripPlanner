@@ -185,17 +185,22 @@ public class PlanGenerator {
 				}
 			}
 			
+			edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
+			
+            if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING) {
+            	itinerary.waitingTime += edgeElapsedTime;
+            }
+            
             /* ignore freeEdges */ 
             if (edge instanceof FreeEdge && currState != finalState) {
                 continue;
             }
             mode = edgeNarrative.getMode();
-            edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
             
             boolean changingToInterlinedTrip = leg != null && leg.route != null && 
             	!leg.route.equals(edgeNarrative.getName()) && mode.isTransit() && 
             	previousMode != null && previousMode.isTransit(); 
-            
+
             if (mode != previousMode || changingToInterlinedTrip) {
                 /* change in mode. make a new leg if we are entering walk or transit,
                  * otherwise just update the general itinerary info and move to next edge.
@@ -208,12 +213,10 @@ public class PlanGenerator {
                     continue;
                 } else if (mode == TraverseMode.BOARDING) {
                     /* boarding mode */
-                    itinerary.transfers++;
-                    itinerary.waitingTime += edgeElapsedTime;
+                	itinerary.transfers++;
                     continue;
                 } else if (mode == TraverseMode.ALIGHTING) {
                     /* alighting mode */
-                    itinerary.waitingTime += edgeElapsedTime;
                     leg.to = makePlace(edgeNarrative.getToVertex()); 
                     leg.endTime = new Date(currState.getBackState().getTime());
                     continue;

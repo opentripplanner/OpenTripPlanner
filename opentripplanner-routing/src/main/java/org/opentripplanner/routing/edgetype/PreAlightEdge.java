@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -131,6 +132,10 @@ public class PreAlightEdge extends FreeEdge {
             }
 	        return s1.makeState();
     	}
+    }
+    
+    public TraverseMode getMode() {
+    	return TraverseMode.ALIGHTING;
     }
     
     public State optimisticTraverse(State s0) {

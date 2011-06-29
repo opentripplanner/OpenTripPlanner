@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -130,6 +131,10 @@ public class PreBoardEdge extends FreeEdge {
             s1.incrementWeight(wait_cost + transfer_penalty);
             return s1.makeState();
     	}
+    }
+    
+    public TraverseMode getMode() {
+    	return TraverseMode.BOARDING;
     }
     
     public State optimisticTraverse(State s0) {
