@@ -192,7 +192,9 @@ public class PlanGenerator {
             mode = edgeNarrative.getMode();
             edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
             
-            boolean changingToInterlinedTrip = leg != null && leg.route != null && !leg.route.equals(edgeNarrative.getName()) && mode.isTransit(); 
+            boolean changingToInterlinedTrip = leg != null && leg.route != null && 
+            	!leg.route.equals(edgeNarrative.getName()) && mode.isTransit() && 
+            	previousMode != null && previousMode.isTransit(); 
             
             if (mode != previousMode || changingToInterlinedTrip) {
                 /* change in mode. make a new leg if we are entering walk or transit,
