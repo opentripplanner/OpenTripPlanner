@@ -251,7 +251,7 @@ public class PlanGenerator {
                         }
                         if (leg.to == null) {
                         	/* this stuff is filled in in the alight case, but not in the walk case */
-                        	leg.to = makePlace(edgeNarrative.getToVertex()); 
+                        	leg.to = makePlace(edgeNarrative.getFromVertex()); 
                         	leg.endTime = new Date(currState.getBackState().getTime());
                         }
                         Geometry geometry = geometryFactory.createLineString(coordinates);
