@@ -191,7 +191,10 @@ public class PlanGenerator {
             }
             mode = edgeNarrative.getMode();
             edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
-            if (mode != previousMode) {
+            
+            boolean changingToInterlinedTrip = leg != null && leg.route != null && !leg.route.equals(edgeNarrative.getName()) && mode.isTransit(); 
+            
+            if (mode != previousMode || changingToInterlinedTrip) {
                 /* change in mode. make a new leg if we are entering walk or transit,
                  * otherwise just update the general itinerary info and move to next edge.
                  */
@@ -212,6 +215,29 @@ public class PlanGenerator {
                     leg.to = makePlace(edgeNarrative.getToVertex()); 
                     leg.endTime = new Date(currState.getBackState().getTime());
                     continue;
+                } else if (changingToInterlinedTrip) {
+                	/* finalize leg */
+                	leg.to = makePlace(edgeNarrative.getToVertex()); 
+                	leg.endTime = new Date(currState.getBackState().getTime());
+                	Geometry geometry = geometryFactory.createLineString(coordinates);
+                    leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+                    leg.interlineWithPreviousLeg = true;
+                    /* reset coordinates */
+                    coordinates = new CoordinateArrayListSequence();
+
+                	/* initialize new leg */
+                    leg = makeLeg(currState);
+                    for (String noteForNewLeg : notesForNewLeg) {
+                    	leg.addNote(noteForNewLeg);
+                    }
+                    notesForNewLeg.clear();
+                    leg.mode = mode.toString();
+                    
+                    startWalk = -1;
+                    leg.route = edgeNarrative.getName();
+
+                    itinerary.addLeg(leg);
+                
                 } else {
                     /* entering transit or onStreet mode leg because traverseMode can only be: 
                      * transit, onStreetNonTransit, board, alight, or transfer.
