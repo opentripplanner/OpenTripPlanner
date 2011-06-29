@@ -112,6 +112,10 @@ public class PreBoardEdge extends FreeEdge {
                 } else {
                 	throw new IllegalStateException("Undefined value in transfer table.");
                 }
+                if (transfer_time == 0) {
+                	//timed transfers are assumed to be preferred
+                	transfer_penalty = 0;
+                }
             } else { 
             	/* this is a first boarding, not a transfer - divide minTransferTime in half */
             	board_after = t0 + options.minTransferTime * 500; 
