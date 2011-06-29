@@ -217,7 +217,7 @@ public class PlanGenerator {
                     continue;
                 } else if (changingToInterlinedTrip) {
                 	/* finalize leg */
-                	leg.to = makePlace(edgeNarrative.getToVertex()); 
+                	leg.to = makePlace(edgeNarrative.getFromVertex()); 
                 	leg.endTime = new Date(currState.getBackState().getTime());
                 	Geometry geometry = geometryFactory.createLineString(coordinates);
                     leg.legGeometry = PolylineEncoder.createEncodings(geometry);
@@ -323,11 +323,10 @@ public class PlanGenerator {
                          * "from" vertex)
                          */
                         leg.stop = new ArrayList<Place>();
-                    } else {
-                        /* any further transit edge, add "from" vertex to intermediate stops */
-                        Place stop = makePlace(currState);
-                        leg.stop.add(stop);
-                    }
+                    } 
+                    /* any further transit edge, add "from" vertex to intermediate stops */
+                    Place stop = makePlace(currState);
+                    leg.stop.add(stop);
                 }
             } 
         } /* end loop over graphPath edge list */
@@ -428,7 +427,7 @@ public class PlanGenerator {
         Coordinate endCoord = state.getVertex().getCoordinate();
 		String name = state.getVertex().getName();        
         AgencyAndId stopId = state.getVertex().getStopId();
-		Date timeAtState = new Date(state.getBackState().getTime());
+		Date timeAtState = new Date(state.getTime());
 		Place place = new Place(endCoord.x, endCoord.y, name, stopId,  timeAtState);
         return place;
     }
