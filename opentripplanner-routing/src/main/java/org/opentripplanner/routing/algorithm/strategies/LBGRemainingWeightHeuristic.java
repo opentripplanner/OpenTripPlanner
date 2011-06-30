@@ -28,9 +28,8 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	
 	public LBGRemainingWeightHeuristic (Graph g) {
 		LOG.debug("BEGIN Making lower bound graph");
-		this.lbg = new LowerBoundGraph(g);
+		this.lbg = new LowerBoundGraph(g, LowerBoundGraph.OUTGOING);
 		LOG.debug("END   Making lower bound graph");
-		lbg.symmetricize();
 	}
 	
     @Override

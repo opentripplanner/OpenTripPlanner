@@ -1,16 +1,12 @@
 package org.opentripplanner.routing.core;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
-import org.opentripplanner.routing.algorithm.Dijkstra;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,15 +16,20 @@ import org.slf4j.LoggerFactory;
  * @author andrewbyrd
  */
 public class LowerBoundGraph {
-    private static final GenericVertex StreetVertex = null;
-	private static Logger LOG = LoggerFactory.getLogger(LowerBoundGraph.class);
+	
+    private static Logger LOG = LoggerFactory.getLogger(LowerBoundGraph.class);
+    public static final int OUTGOING = 1;
+    public static final int UNDIRECTED = 0;
+    public static final int INCOMING = -1;
+	
 	Graph originalGraph;
 	int   [][] vertex;
 	double[][] weight;
 	int nVertices = 0;
     Vertex[] vertexByIndex;
+	private int heaviest; // the last vertex that was pulled from the queue at the last search
 
-	public LowerBoundGraph(Graph original) {
+	public LowerBoundGraph(Graph original, int kind) {
 		originalGraph = original;
 		nVertices = GenericVertex.maxIndex;
 		LOG.info("Table size is: {}", nVertices);
@@ -36,14 +37,21 @@ public class LowerBoundGraph {
 		weight = new double[nVertices][];
 		vertexByIndex = new Vertex[nVertices];
 		TraverseOptions opt = new TraverseOptions();
+		if (kind == INCOMING)
+			opt.setArriveBy(true);
 		LOG.info("Loading origial graph into compact representation...");
 		ArrayList<State> svs = new ArrayList<State>();
 		for (GraphVertex gv : original.getVertices()) {
 			GenericVertex u = (GenericVertex) (gv.vertex); 
 			State su = new State(u, opt);
 			svs.clear();
-			// avoid empty edgelist entries by traversing all edges first 
-			for (Edge e : original.getOutgoing(u)) {
+			Iterable<Edge> edges;
+			if (kind == INCOMING)
+				edges = original.getIncoming(u);
+			else 
+				edges = original.getOutgoing(u);
+			// avoid empty edgelist entries by traversing all edges first
+			for (Edge e : edges) {
 				State sv = e.optimisticTraverse(su);
 				if (sv != null) {
 					svs.add(sv);
@@ -62,13 +70,15 @@ public class LowerBoundGraph {
 			}
 			vertexByIndex[ui] = u;
 		}
+		if (kind == UNDIRECTED)
+			this.symmetricize();
 	}
 	
 	
 	// turn discrete normed (quasi-metric) space 
 	// into a discrete metric space 
 	// while maintaining lower bound property
-	public void symmetricize() {
+	private void symmetricize() {
 		LOG.info("Making distance metric commutative");
 		for (int ui = 0; ui < nVertices; ui++) {
 			//System.out.println("A " + ui);
@@ -111,35 +121,43 @@ public class LowerBoundGraph {
 		}
 	}
 
+	
 	// single-source shortest path (weight to all reachable destinations)
-	public double[] sssp(int originIndex) {
-		LOG.info("Initializing SSSP");
+	// single-origin version
+	public double[] sssp(Vertex origin) {
+		return sssp(Arrays.asList(origin));
+	}
+	
+	// single-source shortest path (weight to all reachable destinations)
+	// allows several origins
+	public double[] sssp(Iterable<Vertex> origins) {
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
-		result[originIndex] = 0;
 		BinHeap<Integer> q = new BinHeap<Integer>();
-		//boolean[] closed = new boolean[nVertices];
-		q.insert(originIndex, 0);
-		LOG.info("Performing SSSP");
+		for (Vertex origin : origins) {
+			int originIndex = ((GenericVertex)origin).index;
+			result[originIndex] = 0;
+			q.insert(originIndex, 0);
+		}
+		long t0 = System.currentTimeMillis();
 		while ( ! q.empty()) {
 			double   uw = q.peek_min_key();
 			int      ui = q.extract_min();
 			int[]    vs = vertex[ui];
 			double[] ws = weight[ui];
 			int      ne = vs.length;
-			//closed[ui]  = true;
+			if (ne > 0) // track last extracted node with outgoing edges
+				heaviest = ui;
 			for (int ei = 0; ei < ne; ei++) {
 				int    vi = vs[ei]; 
 				double vw = ws[ei] + uw;
-				//if (closed[vi])
-				//	continue;
 				if (result[vi] > vw) {
 					result[vi] = vw;
 					q.insert(vi, vw);
 				}
 			}
 		}
-		LOG.info("End SSSP");
+		LOG.info("End SSSP ({} msec)", System.currentTimeMillis() - t0);
 		return result;
 	}
 	
@@ -181,91 +199,54 @@ public class LowerBoundGraph {
 		return result;
 	}
 	
-	private double[] astar(int originIndex, int destIndex) {
-		LOG.info("Performing Astar");
-		double[] result = new double[nVertices];
-		Arrays.fill(result, Double.POSITIVE_INFINITY);
-		double[] heuristic = sssp(destIndex);
-		BinHeap<Integer> q = new BinHeap<Integer>();
-		//boolean[] closed = new boolean[nVertices];
-		q.insert(originIndex, 0);
-    	long t0 = System.currentTimeMillis();
-		while ( ! q.empty()) {
-			if (q.peek_min() == destIndex) { 
-				LOG.debug("reached destination, w = {}", q.peek_min_key());
-				break;
-			}
-			double   uw = q.peek_min_key();
-			int      ui = q.extract_min();
-			int[]    vs = vertex[ui];
-			double[] ws = weight[ui];
-			int      ne = vs.length;
-			//closed[ui]  = true;
-			for (int ei = 0; ei < ne; ++ei) {
-				int    vi = vs[ei]; 
-				double vw = ws[ei] + uw;
-				//if (closed[vi])
-				//	continue;
-				if (result[vi] > vw) {
-					result[vi] = vw;
-					q.insert(vi, vw + heuristic[vi]);
-				}
-			}
-		}
-    	long t1 = System.currentTimeMillis();
-    	LOG.info("search time was {} msec", (t1 - t0));
-		LOG.info("End Astar");
-		return result;
-	}
-	
 	public static void main(String args[]) {
-		File f = new File("/home/syncopate/otp_data/pdx/Graph.obj");
-        GraphServiceImpl graphService = new GraphServiceImpl();
-        graphService.setGraphPath(f);
-        graphService.refreshGraph();
-        Graph g = graphService.getGraph();
-        LowerBoundGraph lbg = new LowerBoundGraph(g);
-        for (int i = 1000; i < 9000; i += 500) {
-        	long t0 = System.currentTimeMillis();
-        	double[] result1 = lbg.sssp(i);
-        	long t1 = System.currentTimeMillis();
-        	LOG.info("search time was {} msec", (t1 - t0));
-        	int nFound = 0;
-        	int nFails = 0;
-        	for (double w : result1)
-        		if (w == Double.POSITIVE_INFINITY ) nFails++;
-        		else nFound++;
-        	LOG.info("number of unreached destinations {}/{}", nFails, result1.length);
-        	
-        	// also good for checking that optimisticTraverse is not path-dependent
-        	ShortestPathTree result2 = lbg.originalSSSP(lbg.vertexByIndex[i]);
-        	int nMatch = 0;
-        	int nWrong = 0;
-        	for (int vi = 0; vi < lbg.nVertices; vi++) {
-        		double w1 = result1[vi];
-        		double w2 = Double.POSITIVE_INFINITY;
-        		State  s2 = result2.getState(lbg.vertexByIndex[vi]);
-        		if (s2 != null)
-        			w2 = s2.getWeight();
-        		if (w1 != w2) {
-        			LOG.trace("Mismatch : {} vs {}", w1, w2);
-        			nWrong++;
-        		} else {
-        			nMatch++;
-        		}
-        	}
-    		LOG.debug("Matches {} mismatches {}", nMatch, nWrong);
-        }
-        
-        // test that lower bound graph really is a lower bound on travel time
-
-        // test potential search speed in compact graph
-        
-        for (int i = 1000; i < lbg.nVertices; i += 500) {
-        	double[] result1 = lbg.astar(i, lbg.nVertices - i);
-        	double[] result2 = lbg.astar(i, lbg.nVertices - i - 10000);
-        	double[] result3 = lbg.astar(i, lbg.nVertices - i - 20000);
-        }        
+//		File f = new File("/home/syncopate/otp_data/pdx/Graph.obj");
+//        GraphServiceImpl graphService = new GraphServiceImpl();
+//        graphService.setGraphPath(f);
+//        graphService.refreshGraph();
+//        Graph g = graphService.getGraph();
+//        LowerBoundGraph lbg = new LowerBoundGraph(g);
+//        for (int i = 1000; i < 9000; i += 500) {
+//        	long t0 = System.currentTimeMillis();
+//        	double[] result1 = lbg.sssp(i);
+//        	long t1 = System.currentTimeMillis();
+//        	LOG.info("search time was {} msec", (t1 - t0));
+//        	int nFound = 0;
+//        	int nFails = 0;
+//        	for (double w : result1)
+//        		if (w == Double.POSITIVE_INFINITY ) nFails++;
+//        		else nFound++;
+//        	LOG.info("number of unreached destinations {}/{}", nFails, result1.length);
+//        	
+//        	// also good for checking that optimisticTraverse is not path-dependent
+//        	ShortestPathTree result2 = lbg.originalSSSP(lbg.vertexByIndex[i]);
+//        	int nMatch = 0;
+//        	int nWrong = 0;
+//        	for (int vi = 0; vi < lbg.nVertices; vi++) {
+//        		double w1 = result1[vi];
+//        		double w2 = Double.POSITIVE_INFINITY;
+//        		State  s2 = result2.getState(lbg.vertexByIndex[vi]);
+//        		if (s2 != null)
+//        			w2 = s2.getWeight();
+//        		if (w1 != w2) {
+//        			LOG.trace("Mismatch : {} vs {}", w1, w2);
+//        			nWrong++;
+//        		} else {
+//        			nMatch++;
+//        		}
+//        	}
+//    		LOG.debug("Matches {} mismatches {}", nMatch, nWrong);
+//        }
+//        
+//        // test that lower bound graph really is a lower bound on travel time
+//
+//        // test potential search speed in compact graph
+//        
+//        for (int i = 1000; i < lbg.nVertices; i += 500) {
+//        	double[] result1 = lbg.astar(i, lbg.nVertices - i);
+//        	double[] result2 = lbg.astar(i, lbg.nVertices - i - 10000);
+//        	double[] result3 = lbg.astar(i, lbg.nVertices - i - 20000);
+//        }        
 	}
 
 	// testing search function that does an optimistic search in the original graph
@@ -293,6 +274,27 @@ public class LowerBoundGraph {
     	long t1 = System.currentTimeMillis();
     	LOG.info("search time was {} msec", (t1 - t0));
 		return spt;
+	}
+
+	public Vertex randomVertex() {
+		return vertexByIndex[(int)(Math.random() * nVertices)];
+	}
+
+	
+	/** 
+	 * Return the vertex farthest (in terms of weight) from the given list of origins.
+	 * If the list of origins is empty, return a random vertex that is 'on the edge' of the graph.
+	 */
+	public Vertex farthestFrom(List<Vertex> origins) {
+		if (origins.size() == 0) {
+			sssp(vertexByIndex[(int)(Math.random() * nVertices)]);
+			LOG.debug("random farthest vertex is {}", vertexByIndex[heaviest]);
+			sssp(vertexByIndex[heaviest]);
+		} else {
+			sssp(origins);
+		}
+		LOG.debug("farthest vertex from {} is {}", origins, vertexByIndex[heaviest]);
+		return vertexByIndex[heaviest];
 	}
 	
 

@@ -316,5 +316,15 @@ public class State implements Cloneable {
         return new State(this.time + timeAdjustment, this.vertex, this.options.reversedClone());
 	}
 
+	public void dumpPath() {
+		System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
+		State s = this;
+		while (s != null) {
+			System.out.printf("%s via %s \n", s, s.backEdgeNarrative);
+			s = s.backState;
+		}
+		System.out.printf("---- END CHAIN OF STATES ----\n");
+	}
+
 }
     
