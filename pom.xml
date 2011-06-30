@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
@@ -15,15 +16,15 @@
   </scm>
 
   <modules>
-      <module>opentripplanner-api-webapp</module>
-      <module>opentripplanner-gui</module>
-      <module>opentripplanner-graph-builder</module>
-      <module>opentripplanner-integration</module>
-      <module>opentripplanner-routing</module>
-      <module>opentripplanner-webapp</module>
-      <module>opentripplanner-api-extended</module>
-      <module>opentripplanner-utils</module>
-      <module>opentripplanner-geocoder</module>
+    <module>opentripplanner-api-webapp</module>
+    <module>opentripplanner-gui</module>
+    <module>opentripplanner-graph-builder</module>
+    <module>opentripplanner-integration</module>
+    <module>opentripplanner-routing</module>
+    <module>opentripplanner-webapp</module>
+    <module>opentripplanner-api-extended</module>
+    <module>opentripplanner-utils</module>
+    <module>opentripplanner-geocoder</module>
   </modules>
 
   <build>
@@ -31,7 +32,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>        
+        <version>2.3.2</version>
         <configuration>
           <source>1.6</source>
           <target>1.6</target>
@@ -64,38 +65,38 @@
   <profiles>
     <!-- Hudson by default defines a property BUILD_NUMBER which is used to enable the profile. -->
     <profile>
-       <id>hudson</id>
-       <activation>
-         <property>
-           <name>BUILD_NUMBER</name>
-         </property>
-       </activation>
-        
+      <id>hudson</id>
+      <activation>
+        <property>
+          <name>BUILD_NUMBER</name>
+        </property>
+      </activation>
+
       <distributionManagement>
         <site>
-            <id>opentripplanner-docs</id> 
-            <name>OpenTripPlanner Docs</name>
-            <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
+          <id>opentripplanner-docs</id>
+          <name>OpenTripPlanner Docs</name>
+          <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
       </distributionManagement>
 
       <reporting>
         <plugins>
           <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-project-info-reports-plugin</artifactId>
-              <reportSets>
-                  <reportSet />
-              </reportSets>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-project-info-reports-plugin</artifactId>
+            <reportSets>
+              <reportSet />
+            </reportSets>
           </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <version>2.6.1</version>
             <configuration>
-                <links>
-                    <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.1/</link>
-                </links>
+              <links>
+                <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.1/</link>
+              </links>
             </configuration>
           </plugin>
         </plugins>
@@ -106,16 +107,16 @@
   <repositories>
     <repository>
       <id>releases.developer.onebusaway.org</id>
-        <url>http://developer.onebusaway.org/maven/repository/</url>
-        <releases>
-          <enabled>true</enabled>
-        </releases>
-        <snapshots>
-          <enabled>false</enabled>
-        </snapshots>
-      </repository>
+      <url>http://developer.onebusaway.org/maven/repository/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
     <repository>
-    	<id>osgeo</id>
+      <id>osgeo</id>
       <name>Open Source Geospatial Foundation Repository</name>
       <url>http://download.osgeo.org/webdav/geotools/</url>
     </repository>
@@ -130,62 +131,62 @@
       <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
     </repository>
     <repository>
-  <id>opengeo</id>
-  <name>OpenGeo Maven Repository</name>
-  <snapshots>
-    <enabled>true</enabled>
-  </snapshots>
-  <url>http://repo.opengeo.org/</url>
-</repository>
+      <id>opengeo</id>
+      <name>OpenGeo Maven Repository</name>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <url>http://repo.opengeo.org/</url>
+    </repository>
   </repositories>
+
   <dependencies>
-  	<dependency>
-  		<groupId>org.geotools</groupId>
-  		<artifactId>gt-coverage</artifactId>
-  		<version>${geotools.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.geotools</groupId>
-  		<artifactId>gt-geotiff</artifactId>
-  		<version>${geotools.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.geotools</groupId>
-  		<artifactId>gt-main</artifactId>
-  		<version>${geotools.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.geotools</groupId>
-  		<artifactId>gt-shapefile</artifactId>
-  		<version>${geotools.version}</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.geotools</groupId>
-  		<artifactId>gt-epsg-hsql</artifactId>
-  		<version>${geotools.version}</version>
-  		      <exclusions>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-coverage</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-geotiff</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-main</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-shapefile</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-epsg-hsql</artifactId>
+      <version>${geotools.version}</version>
+      <exclusions>
         <exclusion>
           <groupId>org.hsqlsdb</groupId>
           <artifactId>hsqldb</artifactId>
         </exclusion>
-      </exclusions> 
-  	</dependency>
-  	<dependency>
-  		<groupId>org.hsqldb</groupId>
-  		<artifactId>hsqldb</artifactId>
-  		<version>2.0.0</version>
-  	</dependency>
-  	<dependency>
-  		<groupId>org.onebusaway</groupId>
-  		<artifactId>onebusaway-gtfs</artifactId>
-  		<version>1.2.1</version>
-  		<type>jar</type>
-  		<scope>compile</scope>
-  	</dependency>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>2.0.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.onebusaway</groupId>
+      <artifactId>onebusaway-gtfs</artifactId>
+      <version>1.2.1</version>
+      <type>jar</type>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
 
   <dependencyManagement>
-
     <dependencies>
       <dependency>
         <groupId>org.springframework</groupId>
@@ -219,14 +220,15 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
   <properties>
-  	<geotools.version>2.6.4</geotools.version>
+    <geotools.version>2.6.4</geotools.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <distribution_id>opengeo</distribution_id>
     <distribution_name>OpenGeo Maven Repository</distribution_name>
     <distribution_url>dav:http://repo.opengeo.org</distribution_url>
     <snapshot_distribution_id>opengeo</snapshot_distribution_id>
     <snapshot_distribution_name>OpenGeo Maven Repository</snapshot_distribution_name>
-    <snapshot_distribution_url>dav:http://repo.opengeo.org</snapshot_distribution_url>    
+    <snapshot_distribution_url>dav:http://repo.opengeo.org</snapshot_distribution_url>
   </properties>
 </project>
