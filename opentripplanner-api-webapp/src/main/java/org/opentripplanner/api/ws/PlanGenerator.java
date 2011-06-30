@@ -226,12 +226,12 @@ public class PlanGenerator {
                 	leg.endTime = new Date(currState.getBackState().getTime());
                 	Geometry geometry = geometryFactory.createLineString(coordinates);
                     leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-                    leg.interlineWithPreviousLeg = true;
                     /* reset coordinates */
                     coordinates = new CoordinateArrayListSequence();
 
                 	/* initialize new leg */
                     leg = makeLeg(currState);
+                    leg.interlineWithPreviousLeg = true;
                     for (String noteForNewLeg : notesForNewLeg) {
                     	leg.addNote(noteForNewLeg);
                     }
