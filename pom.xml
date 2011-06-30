@@ -8,9 +8,10 @@
 
   <name>OpenTripPlanner</name>
   <url>http://opentripplanner.org/</url>
+
   <scm>
-    <connection>scm:svn:http://svn.opentripplanner.org/</connection>
-    <developerConnection>scm:svn:https://svn.opentripplanner.org/</developerConnection>
+    <connection>scm:svn:http://svn.opentripplanner.org/trunk</connection>
+    <developerConnection>scm:svn:https://svn.opentripplanner.org/trunk</developerConnection>
   </scm>
 
   <modules>
