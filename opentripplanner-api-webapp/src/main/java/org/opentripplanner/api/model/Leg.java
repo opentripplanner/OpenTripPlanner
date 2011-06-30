@@ -65,7 +65,7 @@ public class Leg {
      * the street being traversed.
      */
     @XmlAttribute
-    public boolean interlineWithPreviousLeg = false;
+    public Boolean interlineWithPreviousLeg;
 
     
     /**
