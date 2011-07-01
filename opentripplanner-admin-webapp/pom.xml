@@ -33,7 +33,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                  <targetGroups>otp-min,lib-min</targetGroups>
+                  <targetGroups>otp-min</targetGroups>
                   <destinationFolder>${basedir}/src/main/webapp/js/</destinationFolder>
                   <contextFolder>${basedir}/src/main/webapp/</contextFolder>
                 </configuration>
