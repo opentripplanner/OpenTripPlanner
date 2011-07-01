@@ -119,6 +119,12 @@ public class Leg {
     @XmlElement
 	private List<Note> notes;
 
+    @XmlAttribute
+	public String routeShortName;
+
+    @XmlAttribute
+	public String routeLongName;
+
     /**
      * bogus walk legs are those that have 0.0 distance, and just one instruction 
      * @return boolean true if the leg is bogus 

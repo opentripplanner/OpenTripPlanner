@@ -396,6 +396,8 @@ public class PlanGenerator {
             leg.headsign      = trip.getTripHeadsign();
             leg.agencyId      = trip.getId().getAgencyId();
             leg.tripShortName = trip.getTripShortName();
+            leg.routeShortName = trip.getRoute().getShortName();
+            leg.routeLongName = trip.getRoute().getLongName();
         }
         leg.distance = 0.0;
         leg.from = makePlace(en.getFromVertex());
