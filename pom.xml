@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.4.0</version>
   <packaging>pom</packaging>
 
   <name>OpenTripPlanner</name>
   <url>http://opentripplanner.org/</url>
 
   <scm>
-    <connection>scm:svn:http://svn.opentripplanner.org/trunk</connection>
-    <developerConnection>scm:svn:https://svn.opentripplanner.org/trunk</developerConnection>
+    <connection>scm:svn:http://svn.opentripplanner.org/tags/opentripplanner-0.4.0</connection>
+    <developerConnection>scm:svn:https://svn.opentripplanner.org/tags/opentripplanner-0.4.0</developerConnection>
   </scm>
 
   <modules>
