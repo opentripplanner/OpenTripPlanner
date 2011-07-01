@@ -22,12 +22,7 @@ import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 
 public class State implements Cloneable {
     
-	/*
-	 * should fields be package private (default)?
-	 */
-
-	// the time at which the search started
-    protected long startTime;
+	/* Data which is likely to change at most traversals */
     // the current time at this state
     protected long time;
     // accumulated weight up to this state 
@@ -38,36 +33,20 @@ public class State implements Cloneable {
     protected State backState;
     protected Edge backEdge;
     protected EdgeNarrative backEdgeNarrative;
-    // the traverseOptions that were used to reach this state
-    protected TraverseOptions options;
-    // which trip index inside a pattern
-    protected int trip;
-    protected AgencyAndId tripId;
-    // how far have we walked
-    protected double walkDistance;
-    protected String zone;
-    protected AgencyAndId route;
-    protected int numBoardings;
-    protected boolean alightedLocal;
-    protected boolean everBoarded;
-    protected Vertex previousStop;
-    protected long lastAlightedTime;
+    // how many edges away from the initial state
     protected int hops;
-    protected HashMap<Object, Object> extensions;
-
+    // allow traverse result chaining (multiple results)
     private State next;
+	/* StateData contains data which is unlikely to change as often */
+    protected StateData stateData;
+    
     
     /* CONSTRUCTORS */
     
     /** 
      * Create a state representing the beginning of a trip
      * at the given vertex, at the current system time.
-     * @param v the origin vertex of a search 
      */
-//    public State(Vertex v) {
-//        this(System.currentTimeMillis(), v, new TraverseOptions());
-//    }
-
     public State(Vertex v, TraverseOptions opt) {
         this(System.currentTimeMillis(), v, opt);
     }
@@ -82,15 +61,16 @@ public class State implements Cloneable {
         // parent-less states can only be created at the beginning of a trip. 
         // elsewhere, all states must be created from a parent 
     	// and associated with an edge.
-        this.startTime = time;
         this.time = time;
-        this.options = opt;
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
         this.backEdge = null;
         this.backEdgeNarrative = null;
         this.hops = 0;
+        this.stateData = new StateData();
+        stateData.options = opt;
+        stateData.startTime = time;
     }
     
     /**
@@ -130,7 +110,7 @@ public class State implements Cloneable {
      * @return - The extension value for the given key, or null if not present
      */
     public Object getExtension (Object key) { 
-    	return extensions.get(key); 
+    	return stateData.extensions.get(key); 
     }
     
 	public String toString() {
@@ -142,47 +122,47 @@ public class State implements Cloneable {
     }
     
     public long getElapsedTime() {
-    	return Math.abs(this.time - this.startTime);
+    	return Math.abs(this.time - stateData.startTime);
     }
 
     public int getTrip() {
-        return trip;
+        return stateData.trip;
     }
 
     public AgencyAndId getTripId() {
-        return tripId;
+        return stateData.tripId;
     }
 
     public String getZone() {
-        return zone;
+        return stateData.zone;
     }
 
     public AgencyAndId getRoute() {
-        return route;
+        return stateData.route;
     }
 
     public int getNumBoardings() {
-        return numBoardings;
+        return stateData.numBoardings;
     }
 
     public boolean isAlightedLocal() {
-        return alightedLocal;
+        return stateData.alightedLocal;
     }
 
     public boolean isEverBoarded() {
-        return everBoarded;
+        return stateData.everBoarded;
     }
 
     public Vertex getPreviousStop() {
-        return previousStop;
+        return stateData.previousStop;
     }
 
     public long getLastAlightedTime() {
-        return lastAlightedTime;
+        return stateData.lastAlightedTime;
     }
 
     public double getWalkDistance() {
-        return this.walkDistance;
+        return stateData.walkDistance;
     }
     
 	public Vertex getVertex() {
@@ -255,7 +235,7 @@ public class State implements Cloneable {
 	}
 
 	public long getStartTime() {
-		return startTime;
+		return stateData.startTime;
 	}
 	
 	/**
@@ -302,18 +282,18 @@ public class State implements Cloneable {
 	}
 
 	public TraverseOptions getOptions() {
-		return this.options;
+		return stateData.options;
 	}
 
 	public State reversedClone() {
 		long timeAdjustment = 0;
 		// introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
-		if (this.everBoarded) {
-			timeAdjustment = this.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
-			if (this.options.isArriveBy())
+		if (stateData.everBoarded) {
+			timeAdjustment = stateData.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
+			if (stateData.options.isArriveBy())
 				timeAdjustment *= -1;
 		}
-        return new State(this.time + timeAdjustment, this.vertex, this.options.reversedClone());
+        return new State(this.time + timeAdjustment, this.vertex, stateData.options.reversedClone());
 	}
 
 	public void dumpPath() {

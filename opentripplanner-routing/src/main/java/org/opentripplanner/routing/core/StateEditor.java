@@ -63,6 +63,13 @@ public class StateEditor {
 	
 	/* PUBLIC METHODS */
 	
+    /**
+     * Why can a state editor only be used once? If you modify some component of state with
+     * and editor, use the editor to create a new state, and then make more modifications, 
+     * these modifications will be applied to the previously created state. Reusing the state 
+     * editor to make several states would modify an existing state somewhere earlier in 
+     * the search, messing up the shortest path tree.
+     */
 	public State makeState() {
 		// check that this editor has not been used already
 		if (spawned) 
@@ -93,8 +100,7 @@ public class StateEditor {
         if (!options.getModes().getTransit())
             return false;
 
-
-        return child.walkDistance >= options.maxWalkDistance;
+        return child.stateData.walkDistance >= options.maxWalkDistance;
     }
 	
 	public String toString() {
@@ -110,20 +116,18 @@ public class StateEditor {
      * This will always clone the extensions map before it is modified the
      * first time, making sure that other references to the map in 
      * earlier States are unaffected.
-     * 
-     * @param key
-     * @param value
      */
 	@SuppressWarnings("unchecked")
 	public void setExtension (Object key, Object value) {
+		cloneStateDataAsNeeded();
     	if (!extensionsModified) {
         	HashMap<Object, Object> newExtensions;
-	    	if (child.extensions == null) newExtensions = new HashMap(4);
-	    	else newExtensions = (HashMap<Object, Object>) child.extensions.clone();
-	    	child.extensions = newExtensions;
+	    	if (child.stateData.extensions == null) newExtensions = new HashMap(4);
+	    	else newExtensions = (HashMap<Object, Object>) child.stateData.extensions.clone();
+	    	child.stateData.extensions = newExtensions;
 	    	extensionsModified = true;
     	}
-    	child.extensions.put(key, value);
+    	child.stateData.extensions.put(key, value);
     }
 
 	/**
@@ -141,32 +145,7 @@ public class StateEditor {
 		child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, note);
 	}
 	
-	/* Convenience methods to modify several fields at once */
 
-	public void walk(double distance, TraverseOptions options) {
-		double walkTime = distance / options.speed; // meters per second
-		child.walkDistance += distance;
-		child.time += walkTime;
-		child.weight += walkTime * options.walkReluctance;
-	}
-	
-	public void wait(int seconds, TraverseOptions options) {
-		child.time += seconds * 1000;
-		child.weight += seconds * options.waitReluctance;
-	}
-
-	public void ride(int seconds, TraverseOptions options) {
-		child.time += seconds * 1000;
-		child.weight += seconds; // by definition 1 second IVT is unity
-	}
-
-	public void board(TraverseOptions options) {
-        // Handle zone, route, farecontext, trip, tripid here?
-		child.numBoardings += 1;
-        child.everBoarded = true; // isn't this the same as numBoardings > 0 ?
-        child.weight += options.boardCost;
-	}
-	
 	/* Incrementors */
 	
 	public void incrementWeight(double weight) {
@@ -197,58 +176,70 @@ public class StateEditor {
 	}
 
 	public void incrementWalkDistance(double length) {
-		if (length < 0) {
+		cloneStateDataAsNeeded();
+    	if (length < 0) {
 			_log.warn("A state's walk distance is being incremented by a negative amount.");
 			defectiveTraversal = true;
 			return;
 		}
-		child.walkDistance += length;
+		child.stateData.walkDistance += length;
 	}
 
     public void incrementNumBoardings() {
-        child.numBoardings++;
+    	cloneStateDataAsNeeded();
+    	child.stateData.numBoardings++;
     }
 
     /* Basic Setters */
     
     public void setTrip(int trip) {
-        child.trip = trip;
+    	cloneStateDataAsNeeded();
+    	child.stateData.trip = trip;
     }
 
     public void setTripId(AgencyAndId tripId) {
-        child.tripId = tripId;
+    	cloneStateDataAsNeeded();
+    	child.stateData.tripId = tripId;
     }
 
     public void setWalkDistance(double walkDistance) {
-        child.walkDistance = walkDistance;
+    	cloneStateDataAsNeeded();
+    	child.stateData.walkDistance = walkDistance;
     }
 
     public void setZone(String zone) {
-        child.zone = zone;
+    	cloneStateDataAsNeeded();
+    	child.stateData.zone = zone;
     }
 
     public void setRoute(AgencyAndId route) {
-        child.route = route;
+    	cloneStateDataAsNeeded();
+    	child.stateData.route = route;
     }
 
     public void setNumBoardings(int numBoardings) {
-        child.numBoardings = numBoardings;
+    	cloneStateDataAsNeeded();
+    	child.stateData.numBoardings = numBoardings;
     }
 
     public void setAlightedLocal(boolean alightedLocal) {
-        child.alightedLocal = alightedLocal;
+    	cloneStateDataAsNeeded();
+    	child.stateData.alightedLocal = alightedLocal;
     }
 
     public void setEverBoarded(boolean everBoarded) {
-        child.everBoarded = everBoarded;
+    	cloneStateDataAsNeeded();
+    	child.stateData.everBoarded = everBoarded;
     }
 
     public void setPreviousStop(Vertex previousStop) {
-        child.previousStop = previousStop;
+    	cloneStateDataAsNeeded();
+    	child.stateData.previousStop = previousStop;
     }
 
     public void setLastAlightedTime(long lastAlightedTime) {
-        child.lastAlightedTime = lastAlightedTime;
+    	cloneStateDataAsNeeded();
+    	child.stateData.lastAlightedTime = lastAlightedTime;
     }
 
 	public void setTime(long t) {
@@ -331,7 +322,7 @@ public class StateEditor {
         List<Patch> patches = child.backEdge.getPatches();
         if (patches != null) {
         	for (Patch patch : patches) {
-            	if (!patch.activeDuring(child.options, child.getStartTime(), child.getTime())) {
+            	if (!patch.activeDuring(child.stateData.options, child.getStartTime(), child.getTime())) {
             		continue;
             	}
                	patch.filterTraverseResult(this);
@@ -340,5 +331,14 @@ public class StateEditor {
         }
         return filtered;
 	}
-
+	
+	/**
+	 * To be called before modifying anything in the child's StateData.
+	 * Makes sure that changes are applied to a copy of StateData rather than
+	 * the same one that is still referenced in existing, older states.
+	 */
+	private void cloneStateDataAsNeeded() {
+		if (child.stateData == child.backState.stateData)
+			child.stateData = child.stateData.clone();
+	}
 }
