@@ -93,4 +93,7 @@ public interface TripPattern {
     int getBestDwellTime(int stopIndex);
 
 	public List<Trip> getTrips();
+
+	/** Gets the current headsign as-of this stop, if it differs from the trip headsign */
+	public String getHeadsign(int stopIndex, int trip);
 }

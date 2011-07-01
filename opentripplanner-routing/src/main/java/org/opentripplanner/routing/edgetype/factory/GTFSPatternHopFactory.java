@@ -364,7 +364,7 @@ public class GTFSPatternHopFactory {
                             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
                             try {
                                 tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-                                        runningTime, st1.getArrivalTime(), dwellTime,
+                                        runningTime, st1.getArrivalTime(), dwellTime, st0.getStopHeadsign(),
                                         trip);
                             } catch (TripOvertakingException e) {
                                 _log.warn(e.getMessage());
@@ -660,7 +660,7 @@ public class GTFSPatternHopFactory {
             int runningTime = arrivalTime - departureTime ;
 
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
-                    trip);
+                    st0.getStopHeadsign(), trip);
             graph.addEdge(hop);
 
             Vertex startStation = graph.getVertex(departureVertexId(id(s0.getId())));
@@ -751,7 +751,7 @@ public class GTFSPatternHopFactory {
 
             Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);
             graph.addEdge(dwell);
-            Hop hop = new Hop(startJourneyDepart, endJourneyArrive, st0, st1);
+            Hop hop = new Hop(startJourneyDepart, endJourneyArrive, st0, st1, trip);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, startJourneyDepart,
                     endJourneyArrive));
             hops.add(hop);

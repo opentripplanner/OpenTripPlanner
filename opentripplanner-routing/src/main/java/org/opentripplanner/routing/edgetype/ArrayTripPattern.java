@@ -75,6 +75,8 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     private int[][] arrivalTimes;
 
     private int[][] dwellTimes;
+    
+    private String[][] headsigns;
 
     private String[] zones;
 
@@ -90,11 +92,14 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     public ArrayTripPattern(Trip exemplar, ArrayList<Integer>[] departureTimes,
             ArrayList<Integer>[] runningTimes, ArrayList<Integer>[] arrivalTimes,
-            ArrayList<Integer>[] dwellTimes, String[] zones, ArrayList<Integer> perTripFlags,
+            ArrayList<Integer>[] dwellTimes, ArrayList<String>[] headsigns, String[] zones, ArrayList<Integer> perTripFlags,
             int[] perStopFlags, ArrayList<Trip> trips) {
         this.exemplar = exemplar;
         this.departureTimes = new int[departureTimes.length][departureTimes[0].size()];
         this.runningTimes = new int[runningTimes.length][runningTimes[0].size()];
+        if (headsigns != null) { 
+        	this.headsigns = new String[headsigns.length][headsigns[0].size()];
+        }
         if (arrivalTimes == null) {
             this.arrivalTimes = null;
             this.dwellTimes = null;
@@ -138,6 +143,26 @@ public class ArrayTripPattern implements TripPattern, Serializable {
                         bestDwellTimes[i] = this.dwellTimes[i][j];
                     }
                 }
+            }
+        }
+        if (headsigns != null) { 
+        	String[] nullRow = null;
+        	
+        	for (int i = 0; i < headsigns.length; ++i) {
+        		boolean rowIsNull = true;
+        		for (int j = 0; j < headsigns[i].size(); ++j) {
+        			this.headsigns[i][j] = headsigns[i].get(j);
+        			if (this.headsigns[i][j] != null) {
+        				rowIsNull = false; 
+        			}
+        		}
+        		if (rowIsNull) {
+        			if (nullRow == null) {
+        				nullRow = this.headsigns[i];
+        			} else {
+        				this.headsigns[i] = nullRow;
+        			}
+        		}
             }
         }
         for (int i = 0; i < perTripFlags.size(); ++i) {
@@ -293,4 +318,12 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         }
         return bestDwellTimes[stopIndex];
     }
+
+	@Override
+	public String getHeadsign(int stopIndex, int trip) {
+		if (headsigns == null) {
+			return null;
+		}
+		return headsigns[stopIndex][trip]; 
+	}
 }

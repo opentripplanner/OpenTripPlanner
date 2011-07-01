@@ -57,6 +57,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     public ArrayTripPattern arrayPattern = null;
 
     public ArrayList<Stop> stops;
+
+	private ArrayList<String>[] headsigns;
     
     @SuppressWarnings("unchecked")
     public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes) {
@@ -66,6 +68,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         runningTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         dwellTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
         arrivalTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
+        headsigns = (ArrayList<String>[]) Array.newInstance(ArrayList.class, hops);
         perTripFlags = new ArrayList<Integer>();
         perStopFlags = new int[hops + 1];
         zones = new String[hops + 1];
@@ -76,6 +79,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             runningTimes[i] = new ArrayList<Integer>();
             dwellTimes[i] = new ArrayList<Integer>();
             arrivalTimes[i] = new ArrayList<Integer>();
+            headsigns[i] = new ArrayList<String>();
         }
 
         stops = new ArrayList<Stop>(stopTimes.size());
@@ -105,6 +109,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         departureTimes[stopIndex].remove(hop);
         dwellTimes[stopIndex].remove(hop);
         arrivalTimes[stopIndex].remove(hop);
+        headsigns[stopIndex].remove(hop);
         if (stopIndex == 0) {
             perTripFlags.remove(hop);
             trips.remove(hop);
@@ -124,11 +129,12 @@ public final class BasicTripPattern implements Serializable, TripPattern {
      * @return 
      */
     public void addHop(int stopIndex, int insertionPoint, int departureTime, int runningTime,
-            int arrivalTime, int dwellTime, Trip trip) {
+            int arrivalTime, int dwellTime, String headsign, Trip trip) {
         ArrayList<Integer> stopRunningTimes = runningTimes[stopIndex];
         ArrayList<Integer> stopDepartureTimes = departureTimes[stopIndex];
         ArrayList<Integer> stopArrivalTimes = arrivalTimes[stopIndex];
         ArrayList<Integer> stopDwellTimes = dwellTimes[stopIndex];
+        ArrayList<String> stopHeadsigns = headsigns[stopIndex];
 
         // throw an exception when this departure time is not between the departure times it
         // should be between, indicating a trip that overtakes another.
@@ -151,6 +157,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         stopRunningTimes.add(insertionPoint, runningTime);
         stopArrivalTimes.add(insertionPoint, arrivalTime);
         stopDwellTimes.add(insertionPoint, dwellTime);
+        stopHeadsigns.add(insertionPoint, headsign);
     }
 
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
@@ -287,10 +294,38 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     /*
      * Attempt to simplify this pattern by removing dwell times and using arrival times for
      * departure times. For transit agencies that do not distinguish arrival and departure times,
-     * such as New York, this will save memory.
+     * such as New York, this will save memory.  Also removes headsigns if they are unnecessary.
      */
     public void simplify() {
-
+    	/* simplify headsigns */
+    	
+    	boolean allStopHeadsignsNull = true;
+    	ArrayList<String> nullRow = null;
+    
+    	for (int stopId = 0; stopId < headsigns.length; ++stopId) {
+    		ArrayList<String> stopHeadsigns = headsigns[stopId];
+    		boolean rowIsNull = true;
+    		for (int trip = 0; trip < stopHeadsigns.size(); ++trip) {
+    			if (stopHeadsigns.get(trip) != null) {
+    				rowIsNull = false;
+    				allStopHeadsignsNull = false;
+    			}
+    		}
+    		if (rowIsNull) {
+    			if (nullRow == null) {
+    				nullRow = stopHeadsigns;
+    			} else {
+    				headsigns[stopId] = nullRow;
+    			}
+    		}
+    	}
+    	
+    	if (allStopHeadsignsNull) {
+    		headsigns = null;
+    	}
+    	
+    	/* simplify dwells/arrivals/departures */
+    	
         for (int stopId = 0; stopId < departureTimes.length; ++stopId) {
             ArrayList<Integer> stopDwells = dwellTimes[stopId];
             for (int trip = 0; trip < stopDwells.size(); ++trip) {
@@ -329,7 +364,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
      */
     public ArrayTripPattern convertToArrayTripPattern() {
         if (arrayPattern == null) {
-            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, zones, perTripFlags, perStopFlags, trips);
+            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, headsigns, zones, perTripFlags, perStopFlags, trips);
             departureTimes = runningTimes = arrivalTimes = dwellTimes = null;
             zones = null;
             perTripFlags = null;
@@ -391,4 +426,12 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         }
         return true;
     }
+
+	@Override
+	public String getHeadsign(int stopIndex, int trip) {
+		if (headsigns == null) {
+			return null;
+		}
+		return headsigns[stopIndex].get(trip); 
+	}
 }

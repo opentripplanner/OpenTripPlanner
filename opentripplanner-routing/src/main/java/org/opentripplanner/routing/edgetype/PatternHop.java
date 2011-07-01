@@ -49,10 +49,6 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         this.stopIndex = stopIndex;
     }
 
-    public String getDirection() {
-        return pattern.getExemplar().getTripHeadsign();
-    }
-
     public double getDistance() {
         return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
     }
@@ -84,7 +80,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     public State traverse(State state0) {
         int trip = state0.getTrip();
         int runningTime = pattern.getRunningTime(stopIndex, trip);
-        EdgeNarrative en = new RouteNameNarrative(getPattern().getTrip(trip), this);
+        EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
         StateEditor s1 = state0.edit(this, en);
         s1.incrementTimeInSeconds(runningTime);
         s1.setZone(getEndStop().getZoneId());

@@ -21,6 +21,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -50,6 +51,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
 
     private StopTime end;
 
+    private Trip trip;
+    
     private AgencyAndId _serviceId;
 
     private int elapsed;
@@ -58,10 +61,11 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         return _serviceId;
     }
 
-    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end) {
+    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end, Trip trip) {
         super(startJourney, endJourney);
         this.start = start;
         this.end = end;
+        this.trip = trip;
         this._serviceId = start.getTrip().getServiceId();
         this.elapsed = end.getArrivalTime() - start.getDepartureTime();
     }
@@ -75,7 +79,8 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
     }
 
     public State traverse(State s0) {
-    	StateEditor s1 = s0.edit(this);
+    	EdgeNarrative en = new TransitNarrative(trip, start.getStopHeadsign(), this);
+    	StateEditor s1 = s0.edit(this, en);
     	s1.incrementTimeInSeconds(elapsed);
     	s1.incrementWeight(elapsed);
         s1.setZone(getEndStop().getZoneId());
