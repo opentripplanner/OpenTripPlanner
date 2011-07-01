@@ -4,11 +4,11 @@
   <parent>
     <artifactId>opentripplanner</artifactId>
     <groupId>org.opentripplanner</groupId>
-    <version>0.4.0</version>
+    <version>0.4.1-SNAPSHOT</version>
   </parent>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner-utils</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1-SNAPSHOT</version>
   <name>opentripplanner-utils</name>
   <url>http://maven.apache.org</url>
   <dependencies>
