@@ -224,6 +224,7 @@
 
   <properties>
     <geotools.version>2.6.4</geotools.version>
+    <jersey.version>1.1.2-ea</jersey.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <distribution_id>opengeo</distribution_id>
     <distribution_name>OpenGeo Maven Repository</distribution_name>
