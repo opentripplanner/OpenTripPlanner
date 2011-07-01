@@ -379,8 +379,9 @@ otp.planner.Itinerary = {
         // draw the itinerary
         for ( var i = startIndex; i <= endIndex; i++) {
             var from = this.m_fromStore.getAt(i);
-            var to = this.m_toStore.getAt(i);
-            var thru = from.get('order');
+            var to   = this.m_toStore.getAt(i);
+            var leg  = this.m_legStore.getAt(i);
+            var interline = leg.get('interline');
             var route = from.get('routeID');
             var mode = from.get('mode');
 
@@ -394,7 +395,8 @@ otp.planner.Itinerary = {
 
             // only show the route bubble if we're drawing the beginning of the
             // block (eg not a thru route transfer / stay on bus)
-            if (thru == null || thru != 'thru-route') {
+            if(interline == null || (interline != "true" && interline !== true))
+            {
                 this.createAndAddMarker(fromP.x, fromP.y, {
                     type : 'diskMarker',
                     mode : mode
@@ -661,13 +663,14 @@ otp.planner.Itinerary = {
             }
             else
             {
-                var order = leg.get('order');
-                if (order == 'thru-route') {
-                    text = this.templates.getInterlineLeg().applyTemplate(leg.data);
+                var interline = leg.get('interline');
+                if(interline == null || (interline != "true" && interline !== true))
+                {
+                    text  = this.templates.getTransitLeg().applyTemplate(leg.data);
                 }
                 else 
                 {
-                    text  = this.templates.getTransitLeg().applyTemplate(leg.data);
+                    text = this.templates.getInterlineLeg().applyTemplate(leg.data);
                 }
             }
             icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});

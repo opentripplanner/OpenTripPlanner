@@ -48,9 +48,6 @@ otp.planner.Templates = {
         otp.planner.Templates.THIS   = this;
         otp.planner.Templates.locale = this.locale;
 
-        if(this.TP_LEG_MODE == null)
-            this.TP_LEG_MODE = '<h4><a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a> {routeName}</h4>';
-
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
                   '<p><a href="#">{id}</a>: ',
@@ -65,9 +62,6 @@ otp.planner.Templates = {
                   '</tpl>',
                   '</p>'
             ).compile();
-
-        if(this.TP_LEG_CONTINUES == null)
-            this.TP_LEG_CONTINUES = '<h4><a href="#">' + this.locale.instructions.continue_as + '</a> {routeName} <span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span></h4>';
 
         if(this.tripFeedbackDetails == null)
             // Trip Planner state messaging (eg: feedback emails, etc...).
@@ -92,6 +86,12 @@ otp.planner.Templates = {
                     '<tpl if="walkDistance"><tr><td>{distanceVerb}</td><td>{walkDistance}</td></tr></tpl>',
                 '</table></div>'
             ).compile();
+
+        if(this.TP_LEG_MODE == null)
+            this.TP_LEG_MODE = '<h4><a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a> {routeName}</h4>';
+
+        if(this.TP_LEG_CONTINUES == null)
+            this.TP_LEG_CONTINUES = '<h4><a href="#">' + this.locale.instructions.continue_as + '</a> {routeName} <span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span></h4>';
 
         if(this.TP_LEG_BASE_STR == null)
             this.TP_LEG_BASE_STR = ''

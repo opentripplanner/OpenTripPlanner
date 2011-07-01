@@ -88,6 +88,7 @@ otp.planner.Utils = {
                   {name: 'agencyId',         mapping: '@agencyId'},
                   {name: 'headsign',         mapping: '@headsign'},
                   {name: 'order',            mapping: '@order'},
+                  {name: 'interline',        mapping: '@interlineWithPreviousLeg'},
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
