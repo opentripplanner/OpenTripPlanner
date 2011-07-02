@@ -21,8 +21,8 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 
 public class State implements Cloneable {
-    
-	/* Data which is likely to change at most traversals */
+
+    /* Data which is likely to change at most traversals */
     // the current time at this state
     protected long time;
     // accumulated weight up to this state 
@@ -37,12 +37,12 @@ public class State implements Cloneable {
     protected int hops;
     // allow traverse result chaining (multiple results)
     private State next;
-	/* StateData contains data which is unlikely to change as often */
+    /* StateData contains data which is unlikely to change as often */
     protected StateData stateData;
-    
-    
+
+
     /* CONSTRUCTORS */
-    
+
     /** 
      * Create a state representing the beginning of a trip
      * at the given vertex, at the current system time.
@@ -60,7 +60,7 @@ public class State implements Cloneable {
     public State(long time, Vertex vertex, TraverseOptions opt) {
         // parent-less states can only be created at the beginning of a trip. 
         // elsewhere, all states must be created from a parent 
-    	// and associated with an edge.
+        // and associated with an edge.
         this.time = time;
         this.weight = 0;
         this.vertex = vertex;
@@ -72,7 +72,7 @@ public class State implements Cloneable {
         stateData.options = opt;
         stateData.startTime = time;
     }
-    
+
     /**
      * Create a state editor to produce a child of this state,
      * which will be the result of traversing the given edge.
@@ -81,23 +81,23 @@ public class State implements Cloneable {
      * @return
      */
     public StateEditor edit(Edge e) {
-    	return new StateEditor(this, e);
+        return new StateEditor(this, e);
     }
 
     public StateEditor edit(Edge e, EdgeNarrative en) {
-    	return new StateEditor(this, e, en);
+        return new StateEditor(this, e, en);
     }
 
     protected State clone() {
-    	State ret;
-    	try {
-			ret = (State) super.clone();
-		} catch (CloneNotSupportedException e1) {
-			throw new IllegalStateException("This is not happening");
-		}
-		return ret;
-	}
-    
+        State ret;
+        try {
+            ret = (State) super.clone();
+        } catch (CloneNotSupportedException e1) {
+            throw new IllegalStateException("This is not happening");
+        }
+        return ret;
+    }
+
     /*
      *  FIELD ACCESSOR METHODS
      *  States are immutable, so they have only get methods.
@@ -110,19 +110,19 @@ public class State implements Cloneable {
      * @return - The extension value for the given key, or null if not present
      */
     public Object getExtension (Object key) { 
-    	return stateData.extensions.get(key); 
+        return stateData.extensions.get(key); 
     }
-    
-	public String toString() {
+
+    public String toString() {
         return "<State " + new Date(time) + " " + vertex + ">";
     }
-    
+
     public long getTime() {
-    	return this.time;
+        return this.time;
     }
-    
+
     public long getElapsedTime() {
-    	return Math.abs(this.time - stateData.startTime);
+        return Math.abs(this.time - stateData.startTime);
     }
 
     public int getTrip() {
@@ -164,81 +164,81 @@ public class State implements Cloneable {
     public double getWalkDistance() {
         return stateData.walkDistance;
     }
-    
-	public Vertex getVertex() {
-		return this.vertex;
-	}
 
-	/**
-	 * Multicriteria comparison. Returns true if this state is better than the other one
-	 * (or equal) both in terms of time and weight.
-	 */
-	public boolean dominates(State other) {
+    public Vertex getVertex() {
+        return this.vertex;
+    }
+
+    /**
+     * Multicriteria comparison. Returns true if this state is better than the other one
+     * (or equal) both in terms of time and weight.
+     */
+    public boolean dominates(State other) {
         // in the name of efficiency, these should probably be quantized
         // before comparison (AMB)
-		return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime(); 
-	}
+        return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime(); 
+    }
 
-	/**
-	 * Returns true if this state's weight is lower than the other one.
-	 * Considers only weight and not time or other criteria. 
-	 */
-	public boolean betterThan(State other) {
-		return this.weight < other.weight; 
-	}
+    /**
+     * Returns true if this state's weight is lower than the other one.
+     * Considers only weight and not time or other criteria. 
+     */
+    public boolean betterThan(State other) {
+        return this.weight < other.weight; 
+    }
 
-	public double getWeight() {
-		return this.weight;
-	}
+    public double getWeight() {
+        return this.weight;
+    }
 
-	public long getTimeDeltaMsec() {
-		return this.time - backState.time;
-	}
+    public long getTimeDeltaMsec() {
+        return this.time - backState.time;
+    }
 
-	public long getAbsTimeDeltaMsec() {
-		return Math.abs( this.time - backState.time );
-	}
+    public long getAbsTimeDeltaMsec() {
+        return Math.abs( this.time - backState.time );
+    }
 
-	public double getWeightDelta() {
-		return this.weight - backState.weight;
-	}
+    public double getWeightDelta() {
+        return this.weight - backState.weight;
+    }
 
-	public void checkNegativeWeight () {
-		double dw = this.weight - backState.weight; 
+    public void checkNegativeWeight () {
+        double dw = this.weight - backState.weight; 
         if (dw < 0) {
             throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
         }
-	}
-	
-	public boolean isOnboard() {
-		return this.backEdge instanceof OnBoardForwardEdge;
-	}
+    }
 
-	public EdgeNarrative getBackEdgeNarrative() {
-		return this.backEdgeNarrative;
-	}
+    public boolean isOnboard() {
+        return this.backEdge instanceof OnBoardForwardEdge;
+    }
 
-	public State getBackState() {
-		return this.backState;
-	}
+    public EdgeNarrative getBackEdgeNarrative() {
+        return this.backEdgeNarrative;
+    }
 
-	public Edge getBackEdge() {
-		return this.backEdge;
-	}
-	
-	public boolean exceedsHopLimit(int maxHops) {
-		return hops > maxHops;
-	}
+    public State getBackState() {
+        return this.backState;
+    }
 
-	public boolean exceedsWeightLimit(double maxWeight) {
-		return weight > maxWeight;
-	}
+    public Edge getBackEdge() {
+        return this.backEdge;
+    }
 
-	public long getStartTime() {
-		return stateData.startTime;
-	}
-	
-	/**
+    public boolean exceedsHopLimit(int maxHops) {
+        return hops > maxHops;
+    }
+
+    public boolean exceedsWeightLimit(double maxWeight) {
+        return weight > maxWeight;
+    }
+
+    public long getStartTime() {
+        return stateData.startTime;
+    }
+
+    /**
      * Optional next result that allows {@link Edge} to return multiple results from
      * {@link Edge#traverse(State, TraverseOptions)} or
      * {@link Edge#traverseBack(State, TraverseOptions)}
@@ -274,37 +274,36 @@ public class State implements Cloneable {
         next = existingResultChain;
         return this;
     }
-    
-	public State detachNextResult() {
-		State ret = this.next;
-		this.next = null;
-		return ret;
-	}
 
-	public TraverseOptions getOptions() {
-		return stateData.options;
-	}
+    public State detachNextResult() {
+        State ret = this.next;
+        this.next = null;
+        return ret;
+    }
 
-	public State reversedClone() {
-		long timeAdjustment = 0;
-		// introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
-		if (stateData.everBoarded) {
-			timeAdjustment = stateData.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
-			if (stateData.options.isArriveBy())
-				timeAdjustment *= -1;
-		}
+    public TraverseOptions getOptions() {
+        return stateData.options;
+    }
+
+    public State reversedClone() {
+        long timeAdjustment = 0;
+        // introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
+        if (stateData.everBoarded) {
+            timeAdjustment = stateData.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
+            if (stateData.options.isArriveBy())
+                timeAdjustment *= -1;
+        }
         return new State(this.time + timeAdjustment, this.vertex, stateData.options.reversedClone());
-	}
+    }
 
-	public void dumpPath() {
-		System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
-		State s = this;
-		while (s != null) {
-			System.out.printf("%s via %s \n", s, s.backEdgeNarrative);
-			s = s.backState;
-		}
-		System.out.printf("---- END CHAIN OF STATES ----\n");
-	}
+    public void dumpPath() {
+        System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
+        State s = this;
+        while (s != null) {
+            System.out.printf("%s via %s \n", s, s.backEdgeNarrative);
+            s = s.backState;
+        }
+        System.out.printf("---- END CHAIN OF STATES ----\n");
+    }
 
 }
-    
