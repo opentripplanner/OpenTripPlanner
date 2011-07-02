@@ -26,10 +26,9 @@ import org.opentripplanner.routing.core.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
- * on vehicle. When traversed forward, the the resultant state has the time of the next
- * departure, in addition the pattern that was boarded. When traversed backward, the result
- * state is unchanged.
+ * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station on
+ * vehicle. When traversed forward, the the resultant state has the time of the next departure, in
+ * addition the pattern that was boarded. When traversed backward, the result state is unchanged.
  */
 public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
@@ -49,12 +48,13 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 2L;
 
-    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible, String zone, Trip trip) {
+    public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible,
+                 String zone, Trip trip) {
         super(startStation, startJourney);
         this.hop = hop;
-	this.wheelchairAccessible = wheelchairAccessible;
-	this.zone = zone;
-	this.trip = trip;
+        this.wheelchairAccessible = wheelchairAccessible;
+        this.zone = zone;
+        this.trip = trip;
     }
 
     public String getDirection() {
@@ -82,61 +82,62 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
-    	TraverseOptions options = state0.getOptions();
-		if (options.wheelchairAccessible && !wheelchairAccessible) {
-			return null;
-		}
-		if (options.isArriveBy()) {
-			// backward traversal: make an unmodified child state
-			StateEditor s1 = state0.edit(this);
-			return s1.makeState();
-		} else {
-			// forward traversal: find a relevant transit trip
-	        if (!options.getModes().contains(hop.getMode())) {
-	            return null;
-	        }
-	        if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
-	            return null;
-	        }
-	        if (options.wheelchairAccessible && !wheelchairAccessible) {
-	           return null;
-	        }
-	
-	        long current_time = state0.getTime();
-	        
-	        /* check if this trip is running or not */
-	        AgencyAndId serviceId = hop.getServiceId();
-	        int wait = -1;
-	        for (ServiceDay sd : options.serviceDays) {
-	            int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
-	            // only check for service on days that are not in the future
-	            // this avoids unnecessarily examining tomorrow's services
-	            if (secondsSinceMidnight < 0) continue; 
-	            if (sd.serviceIdRunning(serviceId)) {
-	                int newWait = hop.getStartStopTime().getDepartureTime() - secondsSinceMidnight;
-	                if (wait < 0 || newWait < wait) {
-	                    wait = newWait;
-	                }
-	            }
-	        }
-	        if (wait < 0) {
-	            return null;
-	        }
-	        
-	        StateEditor s1 = state0.edit(this);
-	        s1.incrementTimeInSeconds(wait);
-	        s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
-	        s1.incrementNumBoardings();
-	        s1.setTripId(trip.getId());
-	        s1.setZone(zone);
-	        s1.setRoute(trip.getRoute().getId());
-	        return s1.makeState();
-		}
+        TraverseOptions options = state0.getOptions();
+        if (options.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
+        if (options.isArriveBy()) {
+            // backward traversal: make an unmodified child state
+            StateEditor s1 = state0.edit(this);
+            return s1.makeState();
+        } else {
+            // forward traversal: find a relevant transit trip
+            if (!options.getModes().contains(hop.getMode())) {
+                return null;
+            }
+            if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
+                return null;
+            }
+            if (options.wheelchairAccessible && !wheelchairAccessible) {
+                return null;
+            }
+
+            long current_time = state0.getTime();
+
+            /* check if this trip is running or not */
+            AgencyAndId serviceId = hop.getServiceId();
+            int wait = -1;
+            for (ServiceDay sd : options.serviceDays) {
+                int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+                // only check for service on days that are not in the future
+                // this avoids unnecessarily examining tomorrow's services
+                if (secondsSinceMidnight < 0)
+                    continue;
+                if (sd.serviceIdRunning(serviceId)) {
+                    int newWait = hop.getStartStopTime().getDepartureTime() - secondsSinceMidnight;
+                    if (wait < 0 || newWait < wait) {
+                        wait = newWait;
+                    }
+                }
+            }
+            if (wait < 0) {
+                return null;
+            }
+
+            StateEditor s1 = state0.edit(this);
+            s1.incrementTimeInSeconds(wait);
+            s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
+            s1.incrementNumBoardings();
+            s1.setTripId(trip.getId());
+            s1.setZone(zone);
+            s1.setRoute(trip.getRoute().getId());
+            return s1.makeState();
+        }
     }
 
-	@Override
-	public State optimisticTraverse(State s0) {
-		StateEditor s1 = s0.edit(this);
-		return s1.makeState();
-	}
+    @Override
+    public State optimisticTraverse(State s0) {
+        StateEditor s1 = s0.edit(this);
+        return s1.makeState();
+    }
 }
