@@ -47,8 +47,9 @@ public interface Edge {
 
     public State optimisticTraverse(State s0);
 
-	public void addPatch(Patch patch);
-	public List<Patch> getPatches();
-	public void removePatch(Patch patch);
+    public void addPatch(Patch patch);
 
+    public List<Patch> getPatches();
+
+    public void removePatch(Patch patch);
 }
