@@ -19,75 +19,73 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
- * An interface for classes that track which graph vertices are visited 
- * and their associated states, so that decisions can be made about whether
- * new states should be enqueued for later exploration. It also allows states
- * to be retrieved for a given target vertex.
+ * An interface for classes that track which graph vertices are visited and their associated states,
+ * so that decisions can be made about whether new states should be enqueued for later exploration.
+ * It also allows states to be retrieved for a given target vertex.
  * 
- * Different implementations of this interface allow the routing algorithm 
- * to switch from a basic Dijkstra search (which is sufficient for 
- * non-time-dependent modes e.g. bicycle) and the more complex label-setting 
- * approaches needed for time-dependent public transit routing.  
+ * Different implementations of this interface allow the routing algorithm to switch from a basic
+ * Dijkstra search (which is sufficient for non-time-dependent modes e.g. bicycle) and the more
+ * complex label-setting approaches needed for time-dependent public transit routing.
  * 
  * @author andrewbyrd
  */
 public interface ShortestPathTree {
 
-	/**
-	 * The add method checks a new State to see if it is non-dominated and thus worth
-	 * visiting later. If so, the method returns 'true' indicating that the state
-	 * is deemed useful and should be enqueued for later exploration. The method will 
-	 * also perform implementation-specific actions that track dominant 
-	 * or optimal states.
-	 * 
-	 * @param s - the State to add to the SPT, if it is deemed non-dominated
-	 * @return a boolean value indicating whether the state was added 
-	 * to the tree and should therefore be enqueued
-	 */
+    /**
+     * The add method checks a new State to see if it is non-dominated and thus worth visiting
+     * later. If so, the method returns 'true' indicating that the state is deemed useful and should
+     * be enqueued for later exploration. The method will also perform implementation-specific
+     * actions that track dominant or optimal states.
+     * 
+     * @param s
+     *            - the State to add to the SPT, if it is deemed non-dominated
+     * @return a boolean value indicating whether the state was added to the tree and should
+     *         therefore be enqueued
+     */
     public boolean add(State s);
-    
-    /** 
-     * The visit method should generally be called upon extracting a State
-     * from a priority queue. It checks whether the State is still worth
-     * visiting (i.e. whether it has been dominated since it was enqueued)
-     * and informs the ShortestPathTree that this State's outgoing edges have
-     * been relaxed.
+
+    /**
+     * The visit method should generally be called upon extracting a State from a priority queue. It
+     * checks whether the State is still worth visiting (i.e. whether it has been dominated since it
+     * was enqueued) and informs the ShortestPathTree that this State's outgoing edges have been
+     * relaxed.
      * 
-     * Note: This is necessary because OTP priority queues are not required
-     * to implement the decrease-key operation. In fact, decrease-key is not relevant
-     * when it is possible to have several States per vertex, as in multi-criteria
-     * time-dependent routing. Since a state may remain in the priority queue after
-     * being dominated, such sub-optimal States must be caught as they come out of 
-     * the queue to avoid unnecessary branching. 
+     * Note: This is necessary because OTP priority queues are not required to implement the
+     * decrease-key operation. In fact, decrease-key is not relevant when it is possible to have
+     * several States per vertex, as in multi-criteria time-dependent routing. Since a state may
+     * remain in the priority queue after being dominated, such sub-optimal States must be caught as
+     * they come out of the queue to avoid unnecessary branching.
      * 
-     * @param s - the state about to be visited
+     * @param s
+     *            - the state about to be visited
      * @return - whether this state is still considered worth visiting.
      */
     public boolean visit(State s);
-	    
-	/**
-	 * Returns a collection of 'interesting' states for the given Vertex. 
-	 * Depending on the implementation, this could contain a single optimal 
-	 * state, a set of Pareto-optimal states, or even states that are not known 
-	 * to be optimal but are judged interesting by some other criteria.  
-	 * 
-	 * @param dest - the vertex of interest
-	 * @return a collection of 'interesting' states at that vertex
-	 */
+
+    /**
+     * Returns a collection of 'interesting' states for the given Vertex. Depending on the
+     * implementation, this could contain a single optimal state, a set of Pareto-optimal states, or
+     * even states that are not known to be optimal but are judged interesting by some other
+     * criteria.
+     * 
+     * @param dest
+     *            - the vertex of interest
+     * @return a collection of 'interesting' states at that vertex
+     */
     public List<State> getStates(Vertex dest);
 
-	/**
-	 * Returns the 'best' state for the given Vertex, where 'best' 
-	 * depends on the implementation.  
-	 * 
-	 * @param dest - the vertex of interest
-	 * @return a 'best' state at that vertex
-	 */
+    /**
+     * Returns the 'best' state for the given Vertex, where 'best' depends on the implementation.
+     * 
+     * @param dest
+     *            - the vertex of interest
+     * @return a 'best' state at that vertex
+     */
     public State getState(Vertex dest);
 
     /**
-     * This should probably be somewhere else, but leaving it here for now 
-     * for backward compat. 
+     * This should probably be somewhere else, but leaving it here for now for backward compat.
+     * 
      * @param dest
      * @param optimize
      * @param options
@@ -97,11 +95,11 @@ public interface ShortestPathTree {
 
     public GraphPath getPath(Vertex dest, boolean optimize);
 
-    
     /**
      * How many vertices are referenced in this SPT?
+     * 
      * @return number of vertices
      */
-	int getVertexCount();
+    int getVertexCount();
 
 }
