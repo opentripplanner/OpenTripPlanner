@@ -45,6 +45,10 @@ public interface Edge {
 
     public State traverse(State s0);
 
+    /*
+     * Alternate traversal method that provides a lower bound on the changes in weight and time that
+     * will occur when traversing an edge. Used by RemainingWeightHeuristics.
+     */
     public State optimisticTraverse(State s0);
 
     public void addPatch(Patch patch);
