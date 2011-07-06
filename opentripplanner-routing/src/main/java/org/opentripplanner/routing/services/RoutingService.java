@@ -15,14 +15,24 @@ package org.opentripplanner.routing.services;
 
 import java.util.List;
 
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
 public interface RoutingService {
 
-    public List<GraphPath> route(Vertex fromVertex, Vertex toVertex, long time,
-            TraverseOptions options);
+    /**
+     * In the case of "arrive-by" routing, the origin state is actually the user's end location and
+     * the target vertex is the user's start location.
+     * 
+     * @param origin
+     *            the start state to begin the route search from
+     * @param target
+     *            the end vertex to route to
+     * @return the set of paths routing between the origin and the target
+     */
+    public List<GraphPath> route(State origin, Vertex target);
 
     /**
      * Here we wish to plan a trip that starts at "fromVertex", travels through the intermediate

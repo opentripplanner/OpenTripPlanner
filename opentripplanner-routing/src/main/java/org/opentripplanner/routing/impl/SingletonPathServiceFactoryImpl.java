@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.List;
-
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;

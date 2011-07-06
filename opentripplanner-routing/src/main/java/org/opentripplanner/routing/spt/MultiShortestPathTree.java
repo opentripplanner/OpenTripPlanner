@@ -19,6 +19,7 @@ import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;
@@ -32,6 +33,10 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     public MultiShortestPathTree() {
         stateSets = new IdentityHashMap<Vertex, List<State>>();
+    }
+    
+    public Set<Vertex> getVeritces() {
+        return stateSets.keySet();
     }
 
     /****

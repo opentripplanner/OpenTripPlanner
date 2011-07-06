@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -24,14 +25,14 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 public class AStar {
 
     private static final GenericAStar _instance = new GenericAStar();
-    
+
     public static GenericAStar getDefaultInstance() {
         return _instance;
     }
-    
+
     /**
-     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the 
-     * given time depending on the TraverseOptions (use TraverseOptions.setArriveBy).
+     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the given time
+     * depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
      * @param graph
      * @param origin
@@ -43,7 +44,7 @@ public class AStar {
     public static ShortestPathTree getShortestPathTree(Graph graph, String from_label,
             String to_label, long time, TraverseOptions options) {
 
-    	// Get origin vertex to make sure it exists
+        // Get origin vertex to make sure it exists
         Vertex origin = graph.getVertex(from_label);
         Vertex target = graph.getVertex(to_label);
 
@@ -51,8 +52,8 @@ public class AStar {
     }
 
     /**
-     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the 
-     * given time depending on the TraverseOptions (use TraverseOptions.setArriveBy).
+     * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the given time
+     * depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
      * @param graph
      * @param origin
@@ -63,7 +64,16 @@ public class AStar {
      */
     public static ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
             long time, TraverseOptions options) {
-        
-        return _instance.getShortestPathTree(graph, origin, target, time, options);
+
+        State s0;
+        if (options.isArriveBy()) {
+            s0 = new State(time, target, options);
+            target = origin;
+            origin = s0.getVertex();
+        } else {
+            s0 = new State(time, origin, options);
+        }
+
+        return _instance.getShortestPathTree(graph, s0, target);
     }
 }

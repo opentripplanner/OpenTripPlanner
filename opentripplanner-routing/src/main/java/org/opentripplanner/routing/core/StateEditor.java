@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
  * @author andrewbyrd
  */
 public class StateEditor {
-    
+
     private static final Logger _log = LoggerFactory.getLogger(StateEditor.class);
 
-    private State child;
+    protected State child;
 
     private boolean extensionsModified = false;
 
@@ -43,11 +43,14 @@ public class StateEditor {
         child.backEdge = e;
         child.backEdgeNarrative = en;
         child.hops = parent.hops + 1;
+        // We clear child.next here, since it could have already been set in the parent
+        child.next = null;
         // be clever
-        if (parent.vertex == en.getFromVertex()) {
+        // Note that we use equals(), not ==, here to allow for dynamically created vertices
+        if (parent.vertex.equals(en.getFromVertex())) {
             traversingBackward = false;
             child.vertex = en.getToVertex();
-        } else if (parent.vertex == en.getToVertex()) {
+        } else if (parent.vertex.equals(en.getToVertex())) {
             traversingBackward = true;
             child.vertex = en.getFromVertex();
         } else {
@@ -124,7 +127,7 @@ public class StateEditor {
         if (!extensionsModified) {
             HashMap<Object, Object> newExtensions;
             if (child.stateData.extensions == null)
-                newExtensions = new HashMap<Object,Object>(4);
+                newExtensions = new HashMap<Object, Object>(4);
             else
                 newExtensions = (HashMap<Object, Object>) child.stateData.extensions.clone();
             child.stateData.extensions = newExtensions;
@@ -248,6 +251,25 @@ public class StateEditor {
 
     public void setTime(long t) {
         child.time = t;
+    }
+
+    public void setStartTime(long t) {
+        cloneStateDataAsNeeded();
+        child.stateData.startTime = t;
+    }
+
+    /**
+     * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
+     * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
+     * 
+     * @param state
+     */
+    public void setFromState(State state) {
+        cloneStateDataAsNeeded();
+        child.stateData.route = state.stateData.route;
+        child.stateData.trip = state.stateData.trip;
+        child.stateData.tripId = state.stateData.tripId;
+        child.stateData.zone = state.stateData.zone;
     }
 
     /* PUBLIC GETTER METHODS */

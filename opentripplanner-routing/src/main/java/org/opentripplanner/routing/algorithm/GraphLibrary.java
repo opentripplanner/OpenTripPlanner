@@ -11,7 +11,6 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.HasEdges;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
 
 public class GraphLibrary {
 

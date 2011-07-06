@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.services.GraphService;
@@ -47,8 +48,9 @@ public class ContractionRoutingServiceImpl implements RoutingService {
     }
 
     @Override
-    public List<GraphPath> route(Vertex fromVertex, Vertex toVertex, long time,
-            TraverseOptions options) {
+    public List<GraphPath> route(State origin, Vertex target) {
+        
+        TraverseOptions options = origin.getOptions();
 
         ContractionHierarchySet hierarchies = _graphService.getContractionHierarchySet();
 
@@ -67,17 +69,11 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         		GenericAStar aStar = getAStarInstance(options);
 
         		Graph _graph = hierarchies.getGraph();
-        		ShortestPathTree spt = aStar.getShortestPathTree(_graph, fromVertex, toVertex,
-        				time, options);
+        		ShortestPathTree spt = aStar.getShortestPathTree(_graph, origin, target);
         		if (spt == null) {
         	        return Collections.emptyList();
         		}
-        		List<GraphPath> paths = null;
-        		
-        		if (options.isArriveBy())
-        			paths = spt.getPaths(fromVertex, true);
-        		else
-        			paths = spt.getPaths(toVertex, true);
+        		List<GraphPath> paths = spt.getPaths(target, true);
         		if (paths == null || paths.isEmpty()) {
         			options.maxWalkDistance *= 2;
         			continue; // retry
@@ -86,7 +82,10 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         		}
         	}
 
-        	GraphPath path = hierarchy.getShortestPath(fromVertex, toVertex, time, options);
+        	Vertex fromVertex = options.isArriveBy() ? target : origin.getVertex();
+        	Vertex toVertex = options.isArriveBy() ? origin.getVertex() : target;
+        	        
+        	GraphPath path = hierarchy.getShortestPath(fromVertex, toVertex, origin.getTime(), options);
         	if (path == null) {
         		options.maxWalkDistance *= 2;
         		continue;
@@ -112,17 +111,19 @@ public class ContractionRoutingServiceImpl implements RoutingService {
             /**
              * Find initial paths from the source vertex to the intermediate vertex
              */
-            List<GraphPath> firstPaths = route(fromVertex, v, time, options);
+            List<GraphPath> firstPaths = route(new State(time,fromVertex,options), v);
             if (!firstPaths.isEmpty()) {
                 firstLegPaths.put(v, firstPaths.get(0));
             }
 
             /**
-             * Find paths from this intermediate vertex to each other intermediat
+             * Find paths from this intermediate vertex to each other intermediate
              */
             HashMap<Vertex, GraphPath> outPaths = new HashMap<Vertex, GraphPath>();
             paths.put(v, outPaths);
 
+            State intermediateState = new State(time,v,options);
+            
             for (Vertex tv : intermediates) {
                 /**
                  * We probably don't need to compute paths where the source and target vertex are
@@ -131,7 +132,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
                 if (v == tv)
                     continue;
 
-                List<GraphPath> morePaths = route(v, tv, time, options);
+                List<GraphPath> morePaths = route(intermediateState, tv);
                 if (!morePaths.isEmpty()) {
                     outPaths.put(tv, morePaths.get(0));
                 }
@@ -140,7 +141,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
             /**
              * Find paths from the intermediate vertex to the target vertex
              */
-            List<GraphPath> lastPaths = route(v, toVertex, time, options);
+            List<GraphPath> lastPaths = route(intermediateState, toVertex);
             if (!lastPaths.isEmpty())
                 outPaths.put(toVertex, lastPaths.get(0));
         }

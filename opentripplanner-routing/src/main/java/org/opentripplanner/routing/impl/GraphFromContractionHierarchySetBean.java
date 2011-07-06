@@ -18,7 +18,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class GraphFromContractionHierarchySetBean extends AbstractFactoryBean {
+public class GraphFromContractionHierarchySetBean extends AbstractFactoryBean<Graph> {
 
     private ContractionHierarchySet chs;
 
@@ -33,7 +33,7 @@ public class GraphFromContractionHierarchySetBean extends AbstractFactoryBean {
     }
 
     @Override
-    protected Object createInstance() throws Exception {
+    protected Graph createInstance() throws Exception {
         return chs.getGraph();
     }
 

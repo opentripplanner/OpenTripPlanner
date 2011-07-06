@@ -47,13 +47,13 @@ public class GenericAStar {
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
 
     private boolean _verbose = false;
-    
+
     private ShortestPathTreeFactory _shortestPathTreeFactory;
 
     private SkipTraverseResultStrategy _skipTraversalResultStrategy;
 
     private SearchTerminationStrategy _searchTerminationStrategy;
-    
+
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
     }
@@ -67,34 +67,26 @@ public class GenericAStar {
     }
 
     /**
-     * Plots a path on graph from origin to target, DEPARTING at the time given in state and with
-     * the options options.
+     * Plots a path on graph from origin to target. In the case of "arrive-by" routing, the origin
+     * state is actually the user's end location and the target vertex is the user's start location.
      * 
      * @param graph
      * @param origin
      * @param target
-     * @param time 
-     * @param options
      * @return the shortest path, or null if none is found
      */
-    public ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target, long time, TraverseOptions options) {
+    public ShortestPathTree getShortestPathTree(Graph graph, State origin, Vertex target) {
 
         if (origin == null || target == null) {
             return null;
         }
 
-        State s0;
-        if (options.isArriveBy()) {
-            s0 = new State(time, target, options);
-        	target = origin;
-        	origin = s0.getVertex();
-        } else {
-            s0 = new State(time, origin, options);
-        }
+        TraverseOptions options = origin.getOptions();
+
         // from now on, target means "where this search will terminate"
         // not "the end of the trip from the user's perspective".
-        
-        ShortestPathTree spt = createShortestPathTree(s0, options);
+
+        ShortestPathTree spt = createShortestPathTree(origin, options);
 
         options.setTransferTable(graph.getTransferTable());
 
@@ -105,10 +97,10 @@ public class GenericAStar {
         Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
         // conditional could be eliminated by placing this before the o/d swap above
         if (options.isArriveBy()) {
-            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin);
+            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin.getVertex());
             extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
         } else {
-            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin);
+            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin.getVertex());
             extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
         }
 
@@ -117,20 +109,20 @@ public class GenericAStar {
 
         final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
 
-        double initialWeight = heuristic.computeInitialWeight(s0, target);
-        spt.add(s0);
+        double initialWeight = heuristic.computeInitialWeight(origin, target);
+        spt.add(origin);
 
         // Priority Queue
         OTPPriorityQueueFactory factory = BinHeap.FACTORY;
         OTPPriorityQueue<State> pq = factory.create(graph.getVertices().size() + extraEdges.size());
         // this would allow continuing a search from an existing state
-        pq.insert(s0, s0.getWeight() + initialWeight); 
+        pq.insert(origin, origin.getWeight() + initialWeight);
 
         options = options.clone();
         /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = origin.getDistanceToNearestTransitStop() + 
-        						 target.getDistanceToNearestTransitStop();
-        options.maxWalkDistance = Math.max(options.maxWalkDistance, minWalkDistance); 
+        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
+                + target.getDistanceToNearestTransitStop();
+        options.maxWalkDistance = Math.max(options.maxWalkDistance, minWalkDistance);
 
         long computationStartTime = System.currentTimeMillis();
         long maxComputationTime = options.maxComputationTime;
@@ -138,12 +130,12 @@ public class GenericAStar {
         boolean exit = false; // Unused?
 
         int nVisited = 0;
-        
+
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
 
             if (exit)
-                break;  // unused?
+                break; // unused?
 
             if (_verbose) {
                 double w = pq.peek_min_key();
@@ -160,17 +152,18 @@ public class GenericAStar {
             }
 
             // get the lowest-weight state in the queue
-            State u = pq.extract_min(); 
+            State u = pq.extract_min();
             // check that this state has not been dominated
-            // and mark vertex as visited 
-            if (! spt.visit(u)) 
-            	continue; 
+            // and mark vertex as visited
+            if (!spt.visit(u))
+                continue;
             Vertex u_vertex = u.getVertex();
             // Uncomment the following statement
-            // to print out a CSV (actually semicolon-separated) 
-            // list of visited nodes for display in  a GIS
-            //System.out.println(u_vertex + ";" + u_vertex.getX() + ";" + u_vertex.getY() + ";" + u.getWeight());
-            
+            // to print out a CSV (actually semicolon-separated)
+            // list of visited nodes for display in a GIS
+            // System.out.println(u_vertex + ";" + u_vertex.getX() + ";" + u_vertex.getY() + ";" +
+            // u.getWeight());
+
             if (_verbose)
                 System.out.println("   vertex " + u_vertex);
 
@@ -178,45 +171,49 @@ public class GenericAStar {
              * Should we terminate the search?
              */
             if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(origin, target, u, spt,
-                        options))
+                if (!_searchTerminationStrategy.shouldSearchContinue(origin.getVertex(), target, u,
+                        spt, options))
                     break;
             } else if (u_vertex == target) {
-            	LOG.debug("total vertices visited {}", nVisited);
+                LOG.debug("total vertices visited {}", nVisited);
                 return spt;
             }
 
             Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, u_vertex, options);
 
             nVisited += 1;
-            
+
             for (Edge edge : edges) {
 
-            	if (edge instanceof PatternBoard && u.getNumBoardings() > options.maxTransfers)
+                if (edge instanceof PatternBoard && u.getNumBoardings() > options.maxTransfers)
                     continue;
 
-            	// Iterate over traversal results. When an edge leads nowhere (as indicated by
+                // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
-                	// Could be: for (State v : traverseEdge...)
+                    // Could be: for (State v : traverseEdge...)
 
-                	// TEST: uncomment to verify that all optimisticTraverse functions are actually admissible
-                	//State lbs = edge.optimisticTraverse(u);                    
-                    //if ( ! (lbs.getWeight() <= v.getWeight())) {
-                	//    System.out.printf("inadmissible lower bound %f vs %f on edge %s\n", lbs.getWeightDelta(), v.getWeightDelta(), edge);
-                	//}
+                    // TEST: uncomment to verify that all optimisticTraverse functions are actually
+                    // admissible
+                    // State lbs = edge.optimisticTraverse(u);
+                    // if ( ! (lbs.getWeight() <= v.getWeight())) {
+                    // System.out.printf("inadmissible lower bound %f vs %f on edge %s\n",
+                    // lbs.getWeightDelta(), v.getWeightDelta(), edge);
+                    // }
 
-                	if( _skipTraversalResultStrategy != null 
-                        && _skipTraversalResultStrategy.shouldSkipTraversalResult(origin, target, u, v, spt, options))
+                    if (_skipTraversalResultStrategy != null
+                            && _skipTraversalResultStrategy.shouldSkipTraversalResult(
+                                    origin.getVertex(), target, u, v, spt, options))
                         continue;
 
                     double remaining_w = computeRemainingWeight(heuristic, v, target, options);
                     double estimate = v.getWeight() + remaining_w;
 
                     if (_verbose) {
-                    	System.out.println("      edge " + edge);
-                        System.out.println("      " + u.getWeight() + " -> " + v.getWeight() + "(w) + "
-                                + remaining_w + "(heur) = " + estimate + " vert = " + v.getVertex());
+                        System.out.println("      edge " + edge);
+                        System.out.println("      " + u.getWeight() + " -> " + v.getWeight()
+                                + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
+                                + v.getVertex());
                     }
 
                     if (estimate > options.maxWeight || isWorstTimeExceeded(v, options)) {
@@ -241,10 +238,10 @@ public class GenericAStar {
             return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
     }
 
-    private double computeRemainingWeight(final RemainingWeightHeuristic heuristic,
-            State v, Vertex target, TraverseOptions options) {
-    	// actually, the heuristic could figure this out from the TraverseOptions.
-    	// set private member back=options.isArriveBy() on initial weight computation.
+    private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
+            Vertex target, TraverseOptions options) {
+        // actually, the heuristic could figure this out from the TraverseOptions.
+        // set private member back=options.isArriveBy() on initial weight computation.
         if (options.isArriveBy())
             return heuristic.computeReverseWeight(v, target);
         else
@@ -269,8 +266,8 @@ public class GenericAStar {
         if (spt == null) {
             if (options.getModes().getTransit()) {
                 spt = new MultiShortestPathTree();
-            	//if (options.useServiceDays)
-                    options.setServiceDays(init.getTime());
+                // if (options.useServiceDays)
+                options.setServiceDays(init.getTime());
             } else {
                 spt = new BasicShortestPathTree();
             }

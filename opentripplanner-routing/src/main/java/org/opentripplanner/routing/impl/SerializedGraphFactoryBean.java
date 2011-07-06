@@ -17,7 +17,7 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
-public class SerializedGraphFactoryBean extends AbstractFactoryBean {
+public class SerializedGraphFactoryBean extends AbstractFactoryBean<ContractionHierarchySet> {
 
     private GraphBundle _graphBundle;
 
@@ -31,7 +31,7 @@ public class SerializedGraphFactoryBean extends AbstractFactoryBean {
     }
 
     @Override
-    protected Object createInstance() throws Exception {
+    protected ContractionHierarchySet createInstance() throws Exception {
         return ContractionHierarchySerializationLibrary.readGraph(_graphBundle.getGraphPath());
     }
 

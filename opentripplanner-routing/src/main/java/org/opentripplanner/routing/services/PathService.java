@@ -17,12 +17,26 @@ import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
+
     public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
             TraverseOptions options, int nItineraries);
+
+    /**
+     * In the case of "arrive-by" routing, the origin state is actually the user's end location and
+     * the target vertex is the user's start location.
+     * 
+     * @param origin
+     * @param target
+     * @param nItineraries
+     * @return
+     */
+    public List<GraphPath> plan(State origin, Vertex target, int nItineraries);
 
     /**
      * Here we wish to plan a trip that starts at "fromPlace", travels through the intermediate
@@ -37,9 +51,9 @@ public interface PathService {
      */
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediatePlaces,
             Date dateTime, TraverseOptions options);
-    
+
     public void setGraphService(GraphService graphService);
-    
+
     public GraphService getGraphService();
 
     public boolean isAccessible(String place, TraverseOptions options);

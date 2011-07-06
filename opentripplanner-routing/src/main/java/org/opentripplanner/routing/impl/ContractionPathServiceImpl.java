@@ -23,13 +23,13 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.RouteSpec;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -107,12 +107,29 @@ public class ContractionPathServiceImpl implements PathService {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
+        
+        Vertex origin = null;
+        Vertex target = null;
+        
+        if (options.isArriveBy()) {
+            origin = toVertex; 
+            target = fromVertex;
+        } else {
+            origin = fromVertex;
+            target = toVertex;
+        }
+        
+        State state = new State(targetTime.getTime(), origin, options);
 
-        return plan(fromVertex, toVertex, targetTime, options, nItineraries);
+
+        return plan(state, target, nItineraries);
     }
 
-    public List<GraphPath> plan(Vertex fromVertex, Vertex toVertex, Date targetTime,
-            TraverseOptions options, int nItineraries) {
+    @Override
+    public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
+        
+        Date targetTime = new Date(origin.getTime());
+        TraverseOptions options = origin.getOptions();
 
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
@@ -168,8 +185,7 @@ public class ContractionPathServiceImpl implements PathService {
             options.maxWeight = maxWeight;
             long searchBeginTime = System.currentTimeMillis();
         	LOG.debug("BEGIN SEARCH");
-            List<GraphPath> somePaths = _routingService.route(fromVertex, toVertex, 
-            		targetTime.getTime(), options);
+            List<GraphPath> somePaths = _routingService.route(origin, target); 
         	LOG.debug("END SEARCH {} msec", System.currentTimeMillis() - searchBeginTime);
             if (maxWeight == Double.MAX_VALUE) {
                 /*

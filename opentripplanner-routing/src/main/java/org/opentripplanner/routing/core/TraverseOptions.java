@@ -188,6 +188,11 @@ public class TraverseOptions implements Serializable, Cloneable {
      * into StateData, with all that entails.
      */
     public List<ServiceDay> serviceDays;
+    
+    /**
+     * This is true when a GraphPath is being traversed in reverse for optimization purposes.
+     */
+    private boolean reverseOptimizing = false;
 
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
@@ -258,6 +263,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     public TraverseOptions reversedClone() {
     	TraverseOptions ret = this.clone();
     	ret.setArriveBy( ! ret.isArriveBy());
+    	ret.reverseOptimizing = ! ret.reverseOptimizing;
     	return ret;
     }
     
@@ -394,5 +400,8 @@ public class TraverseOptions implements Serializable, Cloneable {
         this.serviceDays.add(new ServiceDay(time, cs));
         this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));
     }
-
+    
+    public boolean isReverseOptimizing() {
+        return reverseOptimizing;
+    }
 }

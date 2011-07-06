@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Date;
-import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -36,7 +35,7 @@ public class State implements Cloneable {
     // how many edges away from the initial state
     protected int hops;
     // allow traverse result chaining (multiple results)
-    private State next;
+    protected State next;
     /* StateData contains data which is unlikely to change as often */
     protected StateData stateData;
 
@@ -71,6 +70,10 @@ public class State implements Cloneable {
         this.stateData = new StateData();
         stateData.options = opt;
         stateData.startTime = time;
+    }
+    
+    public State createState(long time, Vertex vertex, TraverseOptions options){
+        return new State(time,vertex,options);
     }
 
     /**
@@ -286,14 +289,15 @@ public class State implements Cloneable {
     }
 
     public State reversedClone() {
-        long timeAdjustment = 0;
+        long timeAdjustment = 0;/*
         // introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
         if (stateData.everBoarded) {
             timeAdjustment = stateData.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
             if (stateData.options.isArriveBy())
                 timeAdjustment *= -1;
         }
-        return new State(this.time + timeAdjustment, this.vertex, stateData.options.reversedClone());
+        */
+        return createState(this.time + timeAdjustment, this.vertex, stateData.options.reversedClone());
     }
 
     public void dumpPath() {
@@ -305,5 +309,4 @@ public class State implements Cloneable {
         }
         System.out.printf("---- END CHAIN OF STATES ----\n");
     }
-
 }
