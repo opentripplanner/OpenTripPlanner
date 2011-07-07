@@ -9,23 +9,4 @@
 		<property name="path" value="/var/otp/graphs/" />
 	</bean>
 	
-	<bean id="pathServiceFactory"
-		class="org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl">
-		<property name="pathService" ref="pathService" />
-	</bean>
-
-	<!-- Multiple graphs -->
-	<!-- 
-	<bean id="pathServiceFactory"
-		class="org.opentripplanner.routing.impl.MultipleFilePathServiceFactoryImpl">
-		<property name="pathPattern" value="/var/otp/graphs/{}" />
-		<property name="subApplicationContextList">
-			<list>
-				<value>org/opentripplanner/api/application-context.xml</value>
-			</list>
-		</property>
-		<property name="asyncReload" value="false" />
-	</bean>
- 	-->
-
 </beans>
