@@ -140,13 +140,24 @@ public class NetworkLinkerLibrary {
      ****/
 
     private Vertex getLocation(Vertex v) {
+
+        String vertexLabel = "link for " + v.getStopId();
+
+        /**
+         * We only want to create the linkage vertex once. This method is potentially called
+         * multiple times with the same stop vertex in the case of "determineIncomingEdgesForVertex"
+         * and "determineIncomingEdgesForVertex".
+         */
+        Vertex existing = graph.getVertex(vertexLabel);
+        if (existing != null)
+            return existing;
+
         Coordinate coordinate = v.getCoordinate();
         /* right at an intersection? */
         List<Vertex> atIntersection = index.getIntersectionAt(coordinate);
         if (atIntersection != null) {
             /* create a vertex linked to all vertices at intersection */
-            Vertex linked = new GenericVertex("link for " + v.getStopId(), coordinate.x,
-                    coordinate.y);
+            Vertex linked = new GenericVertex(vertexLabel, coordinate.x, coordinate.y);
             graph.addVertex(linked);
             for (Vertex i : atIntersection) {
                 graph.addEdge(new FreeEdge(linked, i));
@@ -160,7 +171,7 @@ public class NetworkLinkerLibrary {
         if (edges == null || edges.size() < 2) {
             return null;
         }
-        return createVertex("link for " + v.getStopId(), edges, coordinate);
+        return createVertex(vertexLabel, edges, coordinate);
     }
 
     /** Create a vertex splitting the set of edges. If necessary, create new edges. */
@@ -244,7 +255,7 @@ public class NetworkLinkerLibrary {
                 e1.getPermission(), false);
         PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
-        
+
         PlainStreetEdge forward2 = new PlainStreetEdge(v2, midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
         PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, v1, backGeometryPair.getSecond(),
@@ -254,7 +265,7 @@ public class NetworkLinkerLibrary {
         forward2.setElevationProfile(e2.getElevationProfile(0, lengthOut));
         backward1.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength));
         backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength));
-        
+
         ListIterator<P2<PlainStreetEdge>> it = replacement.listIterator();
         while (it.hasNext()) {
             P2<PlainStreetEdge> pair = it.next();
