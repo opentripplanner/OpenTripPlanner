@@ -51,6 +51,11 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
 	private List<Patch> patches;
 
+	/**
+	 * If true, this turn is prohibited to vehicles (but permitted for walking). 
+	 */
+	private boolean restricted;
+
     public TurnEdge(StreetVertex fromv, StreetVertex tov) {
         this.fromv = fromv;
         this.tov = tov;
@@ -110,6 +115,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     }
 
     private State doTraverse(State s0, TraverseOptions options) {
+    	if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
+    		return null;
+    	}
         if (!fromv.canTraverse(options)) {
             if (options.getModes().contains(TraverseMode.BICYCLE)) {
             	// try walking bicycle, since you can't ride it here
@@ -158,6 +166,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     @Override
     public boolean canTraverse(TraverseOptions options) {
+    	if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
+    		return false;
+    	}
         return fromv.canTraverse(options);
     }
 
@@ -219,5 +230,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	@Override
 	public Set<String> getNotes() {
 		return fromv.getNotes();
+	}
+
+	public void setRestricted(boolean restricted) {
+		this.restricted = restricted;
 	}
 }

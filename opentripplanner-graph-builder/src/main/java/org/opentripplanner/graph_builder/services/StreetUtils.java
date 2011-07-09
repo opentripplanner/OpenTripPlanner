@@ -49,7 +49,7 @@ public class StreetUtils {
      * @param endpoints 
      * @param coordinateToStreetNames 
      */
-    public static void makeEdgeBased(Graph graph, Collection<Vertex> endpoints) {
+    public static void makeEdgeBased(Graph graph, Collection<Vertex> endpoints, Map<Edge, TurnRestriction> restrictions) {
         
         /* generate turns */
 
@@ -62,15 +62,28 @@ public class StreetUtils {
         	if (gv == null) {
         		continue; // the vertex could have been removed from endpoints
         	}
-        		
             for (Edge e : gv.getIncoming()) {
                 PlainStreetEdge pse = (PlainStreetEdge) e;
                 boolean replaced = false;
                 StreetVertex v1 = getStreetVertexForEdge(graph, pse);
+                TurnRestriction restriction = null;
+                if (restrictions != null) {
+                	restriction = restrictions.get(pse);
+                }
                 for (Edge e2 : graph.getOutgoing(v)) {
                     StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
+                    
+                    TurnEdge turn = new TurnEdge(v1, v2);
+                    if (restriction != null) {
+                    	if (restriction.type == TurnRestrictionType.NO_TURN && restriction.to == e2) {
+                    		turn.setRestricted(true);
+                    	} else if (restriction.type == TurnRestrictionType.ONLY_TURN && restriction.to != e2) {
+                    		turn.setRestricted(true);
+                    	}
+                    }
+                    
                     if (v1 != v2 && !v1.getEdgeId().equals(v2.getEdgeId())) {
-                        turns.add(new TurnEdge(v1, v2));
+                        turns.add(turn);
                         replaced = true;
                     }
                 }

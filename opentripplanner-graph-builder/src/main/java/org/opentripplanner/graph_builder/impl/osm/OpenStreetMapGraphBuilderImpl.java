@@ -26,11 +26,15 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.GraphBuilderUtils;
 import org.opentripplanner.graph_builder.model.osm.*;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
+import org.opentripplanner.graph_builder.services.TurnRestriction;
+import org.opentripplanner.graph_builder.services.TurnRestrictionType;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
@@ -258,6 +262,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
 
+		private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByFromWay = new HashMap<Long, List<TurnRestrictionTag>>();
+		private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByToWay = new HashMap<Long, List<TurnRestrictionTag>>();
+		
+		private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
+
         public void buildGraph(Graph graph) {
             // Remove all simple islands
             _nodes.keySet().retainAll(_nodesWithNeighbors);
@@ -377,13 +386,46 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         graph.addEdge(backStreet);
                     }
 
+
+                    /* Check if there are turn restrictions starting on this segment */
+                    List<TurnRestrictionTag> restrictionTags = turnRestrictionsByFromWay.get(way.getId());
+                    if (restrictionTags != null) {
+                    	for (TurnRestrictionTag tag : restrictionTags) {
+                    		if (tag.via == startNode) {
+                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                    			restriction.from = backStreet;
+                    		} else if (tag.via == endNode) {
+                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                    			restriction.from = street;
+                    		}
+                    	}
+                    }
+                    
+                    restrictionTags = turnRestrictionsByToWay.get(way);
+                    if (restrictionTags != null) {
+                    	for (TurnRestrictionTag tag : restrictionTags) {
+                    		if (tag.via == startNode) { 
+                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                    			restriction.to = street;
+                    		} else if (tag.via == endNode) {
+                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                    			restriction.to = backStreet;
+                    		}
+                    	}
+                    }
                     startNode = endNode;
                     osmStartNode = _nodes.get(startNode);
                 }
             }
-
+            
+            /* unify turn restrictions */
+            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
+            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
+            	turnRestrictions.put(restriction.from, restriction);
+            }
+            
             StreetUtils.pruneFloatingIslands(graph);
-            StreetUtils.makeEdgeBased(graph, endpoints);
+			StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
             
         }
 
@@ -419,7 +461,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             /* Currently only type=route;route=road relations are handled */
-            if(    !(relation.isTag("type", "route"       ) && relation.isTag("route", "road"))
+            if (   !(relation.isTag("type", "restriction" ))             		
+            	&& !(relation.isTag("type", "route"       ) && relation.isTag("route", "road"))
                 && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
                 return;
             }
@@ -460,32 +503,104 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _log.debug("Processing relations...");
 
             for(OSMRelation relation : _relations.values()) {
-                for( OSMRelationMember member : relation.getMembers()) {
-                    if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
-                        OSMWay way = _ways.get(member.getRef());
-                        if(way != null) {
-                            if(relation.hasTag("name")) {
-                                if(way.hasTag("otp:route_name")) {
-                                	way.addTag("otp:route_name", addUniqueName(way.getTag("otp:route_name"), relation.getTag("name")));
-                                } else {
-                                    way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
-                                }
-                            }
-                            if(relation.hasTag("ref")) {
-                                if(way.hasTag("otp:route_ref")) {
-                                    way.addTag("otp:route_ref", addUniqueName(way.getTag("otp:route_ref"), relation.getTag("ref")));
-                                } else {
-                                    way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
-                                }
-                            }
-                            if(relation.hasTag("highway") && relation.isTag("type", "multipolygon") && !way.hasTag("highway")) {
-                                way.addTag("highway", relation.getTag("highway"));
-                            }
-                        }
-                    }
-                }
+            	if (relation.isTag("type", "restriction" )) {
+            		processRestriction(relation);
+            	} else {
+            		processRoad(relation);
+            	}
             }
         }
+
+		/** A temporary holder for turn restrictions while we have only way/node ids but not yet edge objects */
+		class TurnRestrictionTag {
+			@SuppressWarnings("unused")
+			private long to;
+			@SuppressWarnings("unused")
+			private long from;
+			private long via;
+			private TurnRestrictionType type;
+
+			TurnRestrictionTag(long from, long to, long via, TurnRestrictionType type) {
+				this.from = from;
+				this.to = to;
+				this.via = via;
+				this.type = type;
+			}
+		}
+
+        /**
+         * Handle turn restrictions
+         * @param relation
+         */
+		private void processRestriction(OSMRelation relation) {
+			long from = -1, to = -1, via = -1;
+			for (OSMRelationMember member : relation.getMembers()) {
+				String role = member.getRole();
+				if (role.equals("from")) {
+					from = member.getRef();
+				} else if (role.equals("to")) {
+					to = member.getRef();
+				} else if (role.equals("via")) {
+					via = member.getRef();
+				}
+			}
+			if (from == -1 || to == -1 || via == -1) {
+				_log.debug("Bad restriction " + relation.getId());
+				return;
+			}
+			
+			TurnRestrictionTag tag;
+			if (relation.isTag("restriction", "no_right_turn")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
+			} else if (relation.isTag("restriction", "no_left_turn")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
+			} else if (relation.isTag("restriction", "no_straight_on")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
+			} else if (relation.isTag("restriction", "only_straight_on")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
+			} else if (relation.isTag("restriction", "only_right_turn")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
+			} else if (relation.isTag("restriction", "only_left_turn")) {
+				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
+			} else {
+				_log.debug("unknown restriction type " + relation.getTag("restriction"));
+				return;
+			}
+			TurnRestriction restriction = new TurnRestriction();
+			restriction.type = tag.type;
+			turnRestrictionsByTag.put(tag, restriction);
+			
+			GraphBuilderUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
+			GraphBuilderUtils.addToMapList(turnRestrictionsByToWay, to, tag);
+			
+		}
+		
+		private void processRoad(OSMRelation relation) {
+			for( OSMRelationMember member : relation.getMembers()) {
+			    if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
+			        OSMWay way = _ways.get(member.getRef());
+			        if(way != null) {
+			            if(relation.hasTag("name")) {
+			                if(way.hasTag("otp:route_name")) {
+			                	way.addTag("otp:route_name", addUniqueName(way.getTag("otp:route_name"), relation.getTag("name")));
+			                } else {
+			                    way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
+			                }
+			            }
+			            if(relation.hasTag("ref")) {
+			                if(way.hasTag("otp:route_ref")) {
+			                    way.addTag("otp:route_ref", addUniqueName(way.getTag("otp:route_ref"), relation.getTag("ref")));
+			                } else {
+			                    way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
+			                }
+			            }
+			            if(relation.hasTag("highway") && relation.isTag("type", "multipolygon") && !way.hasTag("highway")) {
+			                way.addTag("highway", relation.getTag("highway"));
+			            }
+			        }
+			    }
+			}
+		}
 
         private String addUniqueName(String routes, String name) {
         	String[] names = routes.split(", ");
@@ -641,7 +756,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 backStreet = getEdgeForStreet(end, start, way, startNode, d, permissions,
                         backGeometry, true);
             }
-
+            
             /* mark edges that are on roundabouts */
             if ("roundabout".equals(tags.get("junction"))) {
                 street.setRoundabout(true);

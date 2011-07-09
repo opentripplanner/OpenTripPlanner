@@ -214,7 +214,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             /* prune floating islands and generate turns */
             StreetUtils.pruneFloatingIslands(graph);
-            StreetUtils.makeEdgeBased(graph, intersectionsByLocation.values());
+            StreetUtils.makeEdgeBased(graph, intersectionsByLocation.values(), null);
 
             features.close(it2);
 
