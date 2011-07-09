@@ -24,7 +24,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.patch.AgencyAndIdListAdapter;
+import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
 
 /**
  * This represents a particular stop pattern on a particular route. For example,
@@ -53,7 +53,7 @@ public class RouteVariant implements Serializable {
 	private String name; // "N via Whitehall"
 	
 	//@XmlElementWrapper
-	@XmlJavaTypeAdapter(AgencyAndIdListAdapter.class)
+	@XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
 	private ArrayList<AgencyAndId> trips;
 	
 	private ArrayList<Stop> stops;

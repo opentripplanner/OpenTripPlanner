@@ -221,6 +221,22 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>maven-enunciate-plugin</artifactId>
+                <version>1.23</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>docs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- change this to wherever you want the docs -->
+                    <docsDir>${project.build.directory}/api-docs</docsDir>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -254,18 +270,6 @@
                 	</plugin>
                 </plugins>
             </build>
-            <reporting>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.enunciate</groupId>
-                        <artifactId>maven-enunciate-plugin</artifactId>
-                        <version>1.17</version>
-                        <configuration>
-                            <configFile>enunciate.xml</configFile> 
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </reporting>
         </profile>
     </profiles>
 
