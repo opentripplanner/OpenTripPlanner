@@ -24,6 +24,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.graph_builder.GraphBuilderUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
@@ -31,6 +32,7 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
@@ -69,7 +71,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 	private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
 	private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
 	private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
-	
+	List<TraverseMode> modes = new ArrayList<TraverseMode>();
 	
 	@Override
 	public void setDao(GtfsRelationalDao dao) {
@@ -113,6 +115,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 				if (e instanceof Alight || e instanceof Hop
 						|| e instanceof Dwell) {
 					Trip trip = ((AbstractEdge) e).getTrip();
+					addModeFromTrip(trip);
 					variant = addTripToVariant(trip);
 				} else if (e instanceof PatternAlight
 						|| e instanceof PatternHop || e instanceof PatternDwell) {
@@ -121,6 +124,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 					variant = addTripToVariant(exemplar);
 					for (Trip trip : pattern.getTrips()) {
 						variantsByTrip.put(trip.getId(), variant);
+						addModeFromTrip(trip);
 					}
 				} else {
 					continue;
@@ -182,8 +186,16 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 		_log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
 		
 		TransitIndexService service = new TransitIndexServiceImpl(
-				variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute);
+				variantsByRoute, variantsByTrip, preBoardEdges, 
+				preAlightEdges, directionsByRoute, modes);
 		graph.putService(TransitIndexService.class, service);
+	}
+
+	private void addModeFromTrip(Trip trip) {
+		TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
+		if (!modes.contains(mode)) {
+			modes.add(mode);
+		}
 	}
 
 	private void nameVariants(
@@ -208,10 +220,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 			for (RouteVariant variant : variants) {
 				variant.cleanup();
 				List<Stop> stops = variant.getStops();
-				addToHashList(starts, stops.get(0), variant);
-				addToHashList(ends, stops.get(stops.size() - 1), variant);
+				GraphBuilderUtils.addToMapList(starts, stops.get(0), variant);
+				GraphBuilderUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
 				for (Stop stop : stops) {
-					addToHashList(vias, stop, variant);
+					GraphBuilderUtils.addToMapList(vias, stop, variant);
 				}
 			}
 
@@ -337,20 +349,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
 		}
 
-	}
-
-	/**
-	 * An extremely common pattern: add an list in a hash value, creating that
-	 * list if necessary
-	 */
-	private static <T, U> void addToHashList(HashMap<T, List<U>> hashlist,
-			T key, U value) {
-		List<U> list = hashlist.get(key);
-		if (list == null) {
-			list = new ArrayList<U>();
-			hashlist.put(key, list);
-		}
-		list.add(value);
 	}
 
 	private RouteSegment getOrMakeSegment(RouteVariant variant,

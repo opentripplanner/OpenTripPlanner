@@ -13,6 +13,9 @@
 
 package org.opentripplanner.routing.core;
 
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType(name="TraverseMode")  
 public enum TraverseMode {
     WALK, BICYCLE, CAR, TRAM, SUBWAY, RAIL, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR, TRANSIT, TRAINISH, BUSISH, BOARDING, ALIGHTING, TRANSFER;
 

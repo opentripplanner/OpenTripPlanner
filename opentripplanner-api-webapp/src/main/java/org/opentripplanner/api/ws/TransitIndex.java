@@ -14,7 +14,6 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,7 +24,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteVariant;
@@ -39,8 +40,6 @@ import com.sun.jersey.api.spring.Autowire;
 @XmlRootElement
 @Autowire
 public class TransitIndex {
-
-	private static final Logger LOGGER = Logger.getLogger(TransitIndex.class.getCanonicalName());
 
 	private GraphService graphService;
 
@@ -71,6 +70,28 @@ public class TransitIndex {
 		response.directions = new ArrayList<String>(transitIndexService.getDirectionsForRoute(routeId));
 		
 		return response;
+	}
+
+	/**
+	 * Return a list of all available transit modes supported, if any.
+	 * @throws JSONException
+	 */
+	@GET
+	@Path("/modes")
+	@Produces ({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
+		MediaType.TEXT_XML })
+	public ModeList getModes() throws JSONException {
+		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
+		if (transitIndexService == null) {
+			return new ModeList();
+		}
+		
+		ModeList modes = new ModeList();
+		modes.modes = new ArrayList<TraverseMode>();
+		for (TraverseMode mode : transitIndexService.getAllModes()) {
+			modes.modes.add(mode);
+		}
+		return modes;
 	}
 
 }

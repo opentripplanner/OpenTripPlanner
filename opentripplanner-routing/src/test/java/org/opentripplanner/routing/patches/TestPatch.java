@@ -15,6 +15,7 @@ package org.opentripplanner.routing.patches;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -105,7 +107,12 @@ public class TestPatch extends TestCase {
 
 			@Override
 			public List<String> getDirectionsForRoute(AgencyAndId route) {
-				return null;
+				return Collections.emptyList();
+			}
+
+			@Override
+			public List<TraverseMode> getAllModes() {
+				return Collections.emptyList();
 			}
 		};
 		graph.putService(TransitIndexService.class, index);

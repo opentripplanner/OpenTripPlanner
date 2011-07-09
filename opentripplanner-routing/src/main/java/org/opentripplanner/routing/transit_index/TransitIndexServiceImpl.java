@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.TransitIndexService;
 
 public class TransitIndexServiceImpl implements TransitIndexService,
@@ -36,17 +37,21 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 
 	private HashMap<AgencyAndId,HashSet<String>> directionsForRoute;
 
+	private List<TraverseMode> modes;
+
 	public TransitIndexServiceImpl(
 			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
 			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
 			HashMap<AgencyAndId, Edge> preBoardEdges,
 			HashMap<AgencyAndId, Edge> preAlightEdges,
-			HashMap<AgencyAndId, HashSet<String>> directionsByRoute) {
+			HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
+			List<TraverseMode> modes) {
 		this.variantsByRoute = variantsByRoute;
 		this.variantsByTrip = variantsByTrip;
 		this.preBoardEdges = preBoardEdges;
 		this.preAlightEdges = preAlightEdges;
 		this.directionsForRoute = directionsByRoute;
+		this.modes = modes;
 	}
 
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
@@ -70,6 +75,11 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 	@Override
 	public Collection<String> getDirectionsForRoute(AgencyAndId route) {
 		return directionsForRoute.get(route);
+	}
+
+	@Override
+	public List<TraverseMode> getAllModes() {
+		return modes;
 	}
 
 }
