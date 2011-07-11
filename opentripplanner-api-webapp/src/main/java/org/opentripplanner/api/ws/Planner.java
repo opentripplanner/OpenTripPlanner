@@ -82,6 +82,9 @@ public class Planner {
      *            The time that the trip should depart (or arrive, for requests where arriveBy is
      *            true).
      * 
+     * @param routerId
+     *            Router ID used when in multiple graph mode. Unused in singleton graph mode.
+     * 
      * @param arriveBy
      *            Whether the trip should depart or arrive at the specified date and time.
      * 

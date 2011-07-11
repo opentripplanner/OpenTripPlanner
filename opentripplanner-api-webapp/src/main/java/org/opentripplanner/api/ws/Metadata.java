@@ -42,6 +42,9 @@ public class Metadata {
     /**
      * Returns metadata about the graph -- presently, this is just the extent of the graph.
      *
+     * @param routerId
+     *             Router ID used when in multiple graph mode. Unused in singleton graph mode.
+     *
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
      *
