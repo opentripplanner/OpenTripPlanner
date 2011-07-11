@@ -218,6 +218,7 @@ otp.locale.French = {
             toHere : "Arriver ici",
             minimize : "Optimiser pour",
             maxWalkDistance : "Marche maximum",
+            maxBikeDistance: "Parcours à vélo maximum",
             arriveDepart : "Arriver à/Partir de",
             mode : "Voyager par",
             wheelchair : "Accessible aux fauteuils roulants",
