@@ -87,8 +87,11 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             return null;
         }
         if (options.isArriveBy()) {
-            // backward traversal: make an unmodified child state
+            // backward traversal
             StateEditor s1 = state0.edit(this);
+            s1.setTripId(null);
+            s1.setLastAlightedTime(state0.getTime());
+            s1.setPreviousStop(fromv);
             return s1.makeState();
         } else {
             // forward traversal: find a relevant transit trip

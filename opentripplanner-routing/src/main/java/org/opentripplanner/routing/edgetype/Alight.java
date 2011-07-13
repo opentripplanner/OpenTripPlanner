@@ -118,6 +118,9 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
     	} else {
     		// forward traversal: just make an unmodified child state
         	StateEditor s1 = s0.edit(this);
+        	s1.setTripId(null);
+        	s1.setLastAlightedTime(s0.getTime());
+        	s1.setPreviousStop(tov);
         	return s1.makeState();
     	}
     }
