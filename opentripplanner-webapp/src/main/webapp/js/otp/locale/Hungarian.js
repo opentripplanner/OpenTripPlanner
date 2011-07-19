@@ -94,10 +94,10 @@ otp.locale.Hungarian = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "délkelet",
-        southWest:      "délnyugat",
-        northEast:      "északkelet",
-        northWest:      "északnyugat",
+        southeast:      "délkelet",
+        southwest:      "délnyugat",
+        northeast:      "északkelet",
+        northwest:      "északnyugat",
         north:          "észak",
         west:           "nyugat",
         south:          "dél",

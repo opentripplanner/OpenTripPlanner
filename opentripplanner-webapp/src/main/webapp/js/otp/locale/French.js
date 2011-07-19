@@ -87,10 +87,10 @@ otp.locale.French = {
 
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : {
-        southEast : "le sud-est",
-        southWest : "le sud-ouest",
-        northEast : "le nord-est",
-        northWest : "le nord-ouest",
+        southeast : "le sud-est",
+        southwest : "le sud-ouest",
+        northeast : "le nord-est",
+        northwest : "le nord-ouest",
         north : "le nord",
         west : "l'ouest",
         south : "le sud",

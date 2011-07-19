@@ -94,10 +94,10 @@ otp.locale.Gaelic = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "oirdheas",
-        southWest:      "iardheas",
-        northEast:      "oirthuaidh",
-        northWest:      "iarthuaidh",
+        southeast:      "oirdheas",
+        southwest:      "iardheas",
+        northeast:      "oirthuaidh",
+        northwest:      "iarthuaidh",
         north:          "thuaidh",
         west:           "thiar",
         south:          "theas",

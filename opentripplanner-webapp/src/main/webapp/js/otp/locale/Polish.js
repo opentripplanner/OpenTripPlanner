@@ -93,10 +93,10 @@ otp.locale.Polish = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "po³udniowy wschód",
-        southWest:      "po³udniowy zachód",
-        northEast:      "pó³nocny wschód",
-        northWest:      "pó³nocny zachód",
+        southeast:      "po³udniowy wschód",
+        southwest:      "po³udniowy zachód",
+        northeast:      "pó³nocny wschód",
+        northwest:      "pó³nocny zachód",
         north:          "pó³noc",
         west:           "zachód",
         south:          "po³udnie",

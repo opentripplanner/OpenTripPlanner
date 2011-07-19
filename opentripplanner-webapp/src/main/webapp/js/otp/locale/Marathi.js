@@ -93,10 +93,10 @@ otp.locale.Marathi = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southEast:      "आग्न्येय",
-        southWest:      "नैऋत्य",
-        northEast:      "ईशान्य",
-        northWest:      "वायव्य",
+        southeast:      "आग्न्येय",
+        southwest:      "नैऋत्य",
+        northeast:      "ईशान्य",
+        northwest:      "वायव्य",
         north:          "उत्तर",
         west:           "पश्चिम",
         south:          "दक्षिण",
