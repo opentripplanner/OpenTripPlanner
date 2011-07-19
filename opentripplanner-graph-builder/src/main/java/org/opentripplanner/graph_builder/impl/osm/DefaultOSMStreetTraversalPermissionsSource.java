@@ -58,6 +58,7 @@ public class DefaultOSMStreetTraversalPermissionsSource implements StreetTravers
         m.put("highway=bridleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
         m.put("highway=footway", StreetTraversalPermission.PEDESTRIAN);
+        m.put("highway=pedestrian", StreetTraversalPermission.PEDESTRIAN);
         m.put("highway=steps", StreetTraversalPermission.PEDESTRIAN);
 
         m.put("railway=platform", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
