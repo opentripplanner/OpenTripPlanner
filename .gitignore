@@ -1,8 +1,12 @@
 target/
+opentripplanner-admin-webapp/src/main/webapp/js/otp-min.js
 opentripplanner-api-extended/src/main/resources/data-sources.xml
 opentripplanner-api-webapp/src/main/resources/Message.properties
 opentripplanner-api-webapp/src/main/resources/Message_es.properties
 opentripplanner-api-webapp/src/main/resources/Message_fr.properties
 opentripplanner-api-webapp/src/main/resources/data-sources.xml
 opentripplanner-api-webapp/src/main/resources/org/
+opentripplanner-integration/src/main/resources/
+opentripplanner-webapp/src/main/webapp/js/lib-min.js
+opentripplanner-webapp/src/main/webapp/js/otp-min.js
 *~
