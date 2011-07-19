@@ -1,0 +1,8 @@
+target/
+opentripplanner-api-extended/src/main/resources/data-sources.xml
+opentripplanner-api-webapp/src/main/resources/Message.properties
+opentripplanner-api-webapp/src/main/resources/Message_es.properties
+opentripplanner-api-webapp/src/main/resources/Message_fr.properties
+opentripplanner-api-webapp/src/main/resources/data-sources.xml
+opentripplanner-api-webapp/src/main/resources/org/
+*~
