@@ -57,4 +57,8 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
     public boolean isRoundabout() {
         return base.isRoundabout();
     }
+
+    public boolean hasBogusName() {
+        return base.hasBogusName();
+    }
 }

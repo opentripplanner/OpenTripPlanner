@@ -35,6 +35,9 @@ public interface EdgeNarrative {
 
     public String getName();
 
+    /* True if the name is automatically generated rather than coming from OSM or GTFS */
+    public boolean hasBogusName();
+
     public Geometry getGeometry();
 
     public double getDistance();

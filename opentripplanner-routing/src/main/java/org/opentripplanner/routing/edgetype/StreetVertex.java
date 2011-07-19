@@ -83,6 +83,8 @@ public class StreetVertex extends GenericVertex {
 
 	private Set<String> note;
 
+	private boolean hasBogusName;
+
     public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<String> note) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
@@ -433,4 +435,11 @@ public class StreetVertex extends GenericVertex {
 		return note;
 	}
 
+	public boolean hasBogusName() {
+		return hasBogusName;
+	}
+
+	public void setBogusName(boolean hasBogusName) {
+		this.hasBogusName = hasBogusName;
+	}
 }

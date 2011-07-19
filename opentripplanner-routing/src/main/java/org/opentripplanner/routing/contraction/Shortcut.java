@@ -181,4 +181,9 @@ public class Shortcut implements DirectEdge, Serializable {
 
 		return s1;
 	}
+
+	@Override
+	public boolean hasBogusName() {
+		return false;
+	}
 }

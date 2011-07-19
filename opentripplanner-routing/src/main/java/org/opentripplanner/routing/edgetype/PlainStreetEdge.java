@@ -74,6 +74,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     private boolean roundabout = false;
 
     private Set<String> notes;
+
+	private boolean hasBogusName;
     
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
@@ -309,5 +311,13 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     @Override
     public String toString() {
         return "PlainStreetEdge(" + fromv + " -> " + tov + ")";
+    }
+
+    public boolean hasBogusName() {
+        return hasBogusName;
+    }
+    
+    public void setBogusName(boolean hasBogusName) {
+        this.hasBogusName = hasBogusName;
     }
 }

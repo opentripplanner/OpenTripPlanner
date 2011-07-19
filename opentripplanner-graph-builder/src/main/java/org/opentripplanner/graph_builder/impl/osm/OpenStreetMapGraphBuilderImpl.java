@@ -796,6 +796,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     permissions, back);
             street.setId(id);
 
+            if (!way.hasTag("name")) {
+                street.setBogusName(true);
+            }
+
             /* TODO: This should probably generalized somehow? */
             if (way.isTagFalse("wheelchair") || ("steps".equals(way.getTag("highway")) && !way.isTagTrue("wheelchair"))) {
                 street.setWheelchairAccessible(false);

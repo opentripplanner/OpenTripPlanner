@@ -102,4 +102,8 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
 			patches.remove(patch);
 		}
 	}
+
+	public boolean hasBogusName() {
+		return false;
+	}
 }

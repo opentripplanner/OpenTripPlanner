@@ -121,6 +121,7 @@ public class StreetUtils {
         newv.setSlopeOverride(e.getSlopeOverride());
         newv.setElevationProfile(e.getElevationProfile());
         newv.setRoundabout(e.isRoundabout());
+        newv.setBogusName(e.hasBogusName());
         graph.addVertex(newv);
         return newv;
     }

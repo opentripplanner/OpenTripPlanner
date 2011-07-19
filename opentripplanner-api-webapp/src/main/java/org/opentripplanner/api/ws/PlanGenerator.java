@@ -625,6 +625,7 @@ public class PlanGenerator {
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
+        step.bogusName = en.hasBogusName();
         return step;
     }
 

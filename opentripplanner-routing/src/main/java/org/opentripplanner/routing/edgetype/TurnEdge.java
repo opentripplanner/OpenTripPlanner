@@ -235,4 +235,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	public void setRestricted(boolean restricted) {
 		this.restricted = restricted;
 	}
+
+	@Override
+	public boolean hasBogusName() {
+		return fromv.hasBogusName();
+	}
 }
