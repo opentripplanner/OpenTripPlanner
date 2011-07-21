@@ -13,23 +13,19 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import java.util.Map;
-
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-
 /**
- * Factory interface for providing a collection of {@link StreetTraversalPermission} permissions
- * that determine how OSM streets can be traversed in various modes.
+ * Factory interface for providing a {@link WayPropertySet}  that determine how OSM 
+ * streets can be traversed in various modes and named.
  * 
- * @author bdferris
- * @see StreetTraversalPermission
- * @see OpenStreetMapGraphBuilderImpl#setDefaultAccessPermissionsSource(StreetTraversalPermissionsSource)
+ * @author bdferris, novalis
+ * @see WayProperty
+ * @see OpenStreetMapGraphBuilderImpl#setWayPropertySetSource(WayPropertySetSource)
  */
-public interface StreetTraversalPermissionsSource {
+public interface WayPropertySetSource {
 
     /**
      * 
-     * @return a map of street traversal permissions by matching key
+     * @return way properties
      */
-    public Map<String, StreetTraversalPermission> getPermissions();
+    public WayPropertySet getWayPropertySet();
 }

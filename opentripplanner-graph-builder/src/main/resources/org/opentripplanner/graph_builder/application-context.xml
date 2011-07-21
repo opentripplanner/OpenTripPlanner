@@ -22,4 +22,14 @@
         <property name="graphBuilders" ref="graphBuilders" />
     </bean>
 
+	 <bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>	
+				<entry key="org.opentripplanner.common.model.P2">
+					<bean class="org.opentripplanner.graph_builder.impl.osm.SafetyFeaturesEditor" />
+				</entry>
+			</map>
+		</property>
+	</bean>
+
 </beans>

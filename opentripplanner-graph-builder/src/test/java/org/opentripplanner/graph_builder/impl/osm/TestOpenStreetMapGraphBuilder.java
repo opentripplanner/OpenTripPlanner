@@ -18,9 +18,12 @@ import java.io.File;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.model.osm.OSMWay;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 
 
@@ -107,5 +110,63 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertTrue("There is no edge from v2 to v3", v3EdgeExists);
         assertTrue("There is no edge from v3 to v4", v4EdgeExists);
         assertTrue("There is no edge from v4back to v3back", v4BackEdgeExists);
+    }
+    
+    public void testWayDataSet() {
+    	OSMWay way = new OSMWay();
+    	way.addTag("highway", "footway");
+    	way.addTag("surface", "gravel");
+    	way.addTag("access", "no");
+    	
+    	WayPropertySet wayPropertySet = new WayPropertySet();
+    	
+    	// where there are no way specifiers, the default is used
+    	assertEquals(wayPropertySet.getDataForWay(way), wayPropertySet.defaultProperties);
+    	
+    	// add two equal matches: gravel only...
+    	OSMSpecifier gravel_only = new OSMSpecifier();
+    	gravel_only.addTag("surface","gravel");
+    	
+    	WayProperties gravel_is_safer = new WayProperties();
+    	gravel_is_safer.setSafetyFeatures(new P2<Double>(1.5, 1.5));
+    	
+    	wayPropertySet.addProperties(gravel_only, gravel_is_safer);
+    	
+    	//and footway only
+    	OSMSpecifier footway_only = new OSMSpecifier();
+    	footway_only.addTag("highway","footway");
+    	
+    	WayProperties footways_allow_peds = new WayProperties();
+    	footways_allow_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    	
+    	wayPropertySet.addProperties(footway_only, footways_allow_peds);
+ 
+    	WayProperties dataForWay = wayPropertySet.getDataForWay(way);
+    	//the first one is found
+    	assertEquals(dataForWay, gravel_is_safer);
+    	
+    	//add a better match
+    	OSMSpecifier gravel_and_footway = new OSMSpecifier();
+    	gravel_and_footway.addTag("surface","gravel");
+    	gravel_and_footway.addTag("highway","footway");
+    	
+    	WayProperties safer_and_peds = new WayProperties();
+    	safer_and_peds.setSafetyFeatures(new P2<Double>(1.5, 1.5));
+    	safer_and_peds.setPermission(StreetTraversalPermission.PEDESTRIAN);
+    	
+    	wayPropertySet.addProperties(gravel_and_footway, safer_and_peds);
+    	dataForWay = wayPropertySet.getDataForWay(way);
+    	assertEquals(dataForWay, safer_and_peds);
+    }
+    
+    public void testCreativeNaming() {
+    	OSMWay way = new OSMWay();
+    	way.addTag("highway", "footway");
+    	way.addTag("surface", "gravel");
+    	way.addTag("access", "no");
+    	
+    	CreativeNamer namer = new CreativeNamer();
+    	namer.setCreativeNamePattern("Highway with surface {surface} and access {access} and morx {morx}");
+    	assertEquals("Highway with surface gravel and access no and morx ", namer.generateCreativeName(way));
     }
 }

@@ -16,14 +16,10 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
-
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.GraphBuilderUtils;
@@ -60,64 +56,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
-    private Map<String, KeyValuePermission> _tagPermissions = new LinkedHashMap<String, KeyValuePermission>();
-    private Map<List<OSMKeyValue>, String>  _creativeNaming = new LinkedHashMap<List<OSMKeyValue>, String>();
-
-    private class OSMKeyValue {
-        public String key;
-        public String value;
-        public boolean wildcard;
-
-        public OSMKeyValue(String key, String value, boolean wildcard) {
-            this.key        = key;
-            this.value      = value;
-            this.wildcard   = wildcard;
-        }
-
-        public boolean equals(Object obj) {
-            if(this == obj)
-                return true;
-
-            if(obj == null || !(obj instanceof OSMKeyValue))
-                return false;
-
-            OSMKeyValue other = (OSMKeyValue) obj;
-
-            if(this.wildcard != other.wildcard)
-                return false;
-
-            if(this.wildcard == true && this.key.equals(other.key))
-                return true;
-
-            return this.key.equals(other.key) && this.value.equals(other.value);
-        }
-
-        public int hashCode() {
-            if(wildcard) {
-                return key.hashCode();
-            }
-            return key.hashCode() ^ value.hashCode();
-        }
-    };
-
-    private HashMap<P2<String>, P2<Double>> safetyFeatures = new HashMap<P2<String>, P2<Double>>();
-
-    private HashSet<P2<String>> _slopeOverrideTags = new HashSet<P2<String>>();
-
-    private class KeyValuePermission {
-        public String key;
-
-        public String value;
-
-        public StreetTraversalPermission permission;
-
-        public KeyValuePermission(String key, String value, StreetTraversalPermission permission) {
-            this.key = key;
-            this.value = value;
-            this.permission = permission;
-        }
-    };
-
+    private WayPropertySet wayPropertySet = new WayPropertySet();
+        
     /**
      * The source for OSM map data
      */
@@ -133,76 +73,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     }
 
     /**
-     * The set of traversal permissions for a given set of tags.
+     * Set the way properties from a {@link WayPropertySetSource} source.
      * 
-     * @param provider
+     * @param source the way properties source
      */
-    public void setDefaultAccessPermissions(LinkedHashMap<String, StreetTraversalPermission> mappy) {
-        for (String tag : mappy.keySet()) {
-            int ch_eq = tag.indexOf("=");
-
-            if (ch_eq < 0) {
-                _tagPermissions.put(tag, new KeyValuePermission(null, null, mappy.get(tag)));
-            } else {
-                String key = tag.substring(0, ch_eq), value = tag.substring(ch_eq + 1);
-
-                _tagPermissions.put(tag, new KeyValuePermission(key, value, mappy.get(tag)));
-            }
-        }
-        if (!_tagPermissions.containsKey("__default__")) {
-            _log.warn("No default permissions for osm tags...");
-        }
-    }
-    
-    /**
-     * Set the traversal permissions from a {@link StreetTraversalPermissionsSource} source.
-     * 
-     * @param source the permissions source
-     */
-    public void setDefaultAccessPermissionsSource(StreetTraversalPermissionsSource source) {
-        LinkedHashMap<String, StreetTraversalPermission> permisions = new LinkedHashMap<String,StreetTraversalPermission>(source.getPermissions());
-        setDefaultAccessPermissions(permisions);
-    }
-
-    /**
-     * Streets where the slope is assumed to be flat because the underlying topographic
-     * data cannot be trusted
-     * 
-     * @param features a list of osm attributes in the form key=value
-     */
-    public void setSlopeOverride(List<String> features) {
-        for (String tag : features) {
-            int ch_eq = tag.indexOf("=");
-
-            if (ch_eq >= 0) {
-                String key = tag.substring(0, ch_eq), value = tag.substring(ch_eq + 1);
-                _slopeOverrideTags.add(new P2<String>(key, value));
-            } 
-        }
-    }
-
-    public void setCreativeNaming(LinkedHashMap<String, String> mappy) {
-        for(String taglist : mappy.keySet()) {
-            List<OSMKeyValue> vals = new ArrayList<OSMKeyValue>();
-
-            for(String tag : taglist.split(";")) {
-                int ch_eq = tag.indexOf("=");
-
-                if(ch_eq < 0) {
-                    _log.warn("Missing equal sign: " + taglist + " >> " + tag);
-                } else {
-                    String key   = tag.substring(0, ch_eq),
-                           value = tag.substring(ch_eq + 1);
-
-                    if(value.equals("")) {
-                        vals.add(new OSMKeyValue(key, null, true));
-                    } else {
-                        vals.add(new OSMKeyValue(key, value, false));
-                    }
-                }
-            }
-            _creativeNaming.put(vals, mappy.get(taglist));
-        }
+    public void setDefaultWayPropertiesSource(WayPropertySetSource source) {
+    	wayPropertySet = source.getWayPropertySet();
     }
 
     @Override
@@ -226,33 +102,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         return (T) v;
     }
 
-    /**
-     * Sets processing of bicycle safety features from OSM tags. Takes a map from key,value pairs to
-     * forwards,backwards multipliers. In Spring XML, this looks like:
-     * 
-     * <property name="safetyFeatures"> 
-     *   <map> 
-     *     <entry key="opposite_lane=cycleway" value="1,0.1" />
-     *     <entry key="this_lane=cycleway" value="0.1,1" />
-     *    </map>
-     *  </property>
-     *
-     * Entries are multiplied 
-     *
-     * @param features
-     */
-    public void setSafetyFeatures(Map<String, String> features) {
-        safetyFeatures = new HashMap<P2<String>, P2<Double>>();
-        for (Map.Entry<String, String> entry : features.entrySet()) {
-            String[] kv = entry.getKey().split("=");
-            String[] strings = entry.getValue().split(",");
-            P2<Double> values = new P2<Double>(Double.parseDouble(strings[0]), Double
-                    .parseDouble(strings[1]));
-            safetyFeatures.put(new P2<String>(kv), values);
-        }
-    }
+    public void setWayPropertySet(WayPropertySet wayDataSet) {
+		this.wayPropertySet = wayDataSet;
+	}
 
-    private class Handler implements OpenStreetMapContentHandler {
+	public WayPropertySet getWayPropertySet() {
+		return wayPropertySet;
+	}
+
+	private class Handler implements OpenStreetMapContentHandler {
 
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
@@ -272,8 +130,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
             long wayIndex = 0;
-
-            createUsefulNames();
 
             // figure out which nodes that are actually intersections
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
@@ -298,7 +154,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (wayIndex % 1000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
-                StreetTraversalPermission permissions = getPermissionsForEntity(way);
+                
+                WayProperties wayData = wayPropertySet.getDataForWay(way); 
+                
+                String creativeName = wayPropertySet.getCreativeNameForWay(way);
+                if (creativeName != null) {
+                	way.addTag("otp:gen_name", creativeName);
+                }
+                
+                StreetTraversalPermission permissions = getPermissionsForEntity(way, wayData.getPermission());
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
 
@@ -375,15 +239,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, permissions, geometry);
+
+
                     PlainStreetEdge street = streets.getFirst();
 
                     if (street != null) {
                         graph.addEdge(street);
+                        Double safety = wayData.getSafetyFeatures().getFirst();
+						street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
                     }
 
                     PlainStreetEdge backStreet = streets.getSecond();
                     if (backStreet != null) {
                         graph.addEdge(backStreet);
+                        Double safety = wayData.getSafetyFeatures().getSecond();
+						backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
                     }
 
 
@@ -612,97 +482,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 			return routes + ", " + name;
 		}
 
-        private void createUsefulNames() {
-            Map<String, Set<OSMWay>> key_map = new HashMap<String, Set<OSMWay>>();
-            Map<OSMKeyValue, Set<OSMWay>> keyvalue_map = new HashMap<OSMKeyValue, Set<OSMWay>>();
-            Set<OSMWay> processed_ways = new HashSet<OSMWay>();
-            Pattern p = Pattern.compile("\\{(.+?)\\}");
-            Matcher m = p.matcher("");
-
-            _log.debug("Generating creative names...");
-
-            for(OSMWay way : _ways.values()) {
-                Map<String, String> tags = way.getTags();
-
-                /* If a way already has a name, then trying to give it another one
-                 * doesn't make alot of sense... */
-                if(tags.containsKey("name")) {
-                    continue;
-                }
-
-                for(String key : tags.keySet()) {
-                    OSMKeyValue kv = new OSMKeyValue(key, tags.get(key), false);
-                    Set<OSMWay> keyvalue_map_set = keyvalue_map.get(kv);
-                    Set<OSMWay> key_map_set = key_map.get(key);
-
-                    if(keyvalue_map_set == null) {
-                        keyvalue_map_set = new HashSet<OSMWay>();
-                        keyvalue_map.put(kv, keyvalue_map_set);
-                    }
-                    keyvalue_map_set.add(way);
-
-                    if(key_map_set == null) {
-                        key_map_set = new HashSet<OSMWay>();
-                        key_map.put(key, key_map_set);
-                    }
-                    key_map_set.add(way);
-                }
-            }
-
-            for(List<OSMKeyValue> lkv : _creativeNaming.keySet()) {
-                Set<OSMWay> hope   = null;
-                Map<String, Matcher> replace = new HashMap<String, Matcher>();
-                String format = _creativeNaming.get(lkv);
-
-                for(OSMKeyValue kv : lkv) {
-                    if(hope == null) {
-                        hope = new HashSet<OSMWay>();
-                        if(kv.wildcard) {
-                            if(key_map.containsKey(kv.key)) {
-                                hope.addAll(key_map.get(kv.key));
-                            }
-                        } else {
-                            if(keyvalue_map.containsKey(kv)) {
-                                hope.addAll(keyvalue_map.get(kv));
-                            }
-                        }
-                        hope.removeAll(processed_ways);
-                    } else {
-                        if(kv.wildcard) {
-                            if(key_map.containsKey(kv.key)) {
-                                hope.retainAll(key_map.get(kv.key));
-                            } else {
-                                hope.clear();
-                            }
-                        } else {
-                            if(keyvalue_map.containsKey(kv)) {
-                                hope.retainAll(keyvalue_map.get(kv));
-                            } else {
-                                hope.clear();
-                            }
-                        }
-                    }
-                }
-
-                m.reset(format);
-                while(m.find()) {
-                    replace.put(m.group(1), Pattern.compile("\\{" + m.group(1) + "\\}").matcher(""));
-                }
-
-                for(OSMWay way : hope) {
-                    String gen_name = format;
-                    for(String key : replace.keySet()) {
-                        Matcher nm = replace.get(key);
-                        nm.reset(gen_name);
-                        gen_name = nm.replaceAll(way.getTag(key));
-                    }
-
-                    way.addTag(new OSMTag("otp:gen_name", gen_name));
-                    processed_ways.add(way);
-                    _log.debug("generated name: " + way + " >> " + gen_name);
-                }
-            }
-        }
 
         /**
          * Handle oneway streets, cycleways, and whatnot. See
@@ -730,31 +509,62 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             PlainStreetEdge street = null, backStreet = null;
 
-            /*
-             * Three basic cases, 1) bidirectional for everyone, 2) unidirectional for cars only, 3)
-             * bidirectional for pedestrians only.
-             */
-
-            if (way.isTagTrue("oneway") && way.isTagFalse(tags.get("oneway:bicycle"))
-                            || "opposite_lane".equals(tags.get("cycleway")) || "opposite"
-                            .equals(tags.get("cycleway"))) { // 2.
-                street = getEdgeForStreet(start, end, way, startNode, d, permissions, geometry,
+            //pedestrian rules: everything is two-way (assuming pedestrians are allowed at all)
+            //bicycle rules: default: permissions;
+            /*           
+            oneway=... sets permissions for cars and bikes
+            oneway:bicycle overwrites these permissions for bikes only
+            
+            now, cycleway=opposite_lane, opposite, opposite_track can allow
+            once oneway has been set by oneway:bicycle, but should give a warning
+            if it conflicts with oneway:bicycle
+            
+            bicycle:backward=yes works like oneway:bicycle=no
+            bicycle:backwards=no works like oneway:bicycle=yes
+            
+            */
+            StreetTraversalPermission permissionsFront = permissions;
+            StreetTraversalPermission permissionsBack = permissions;
+            boolean oneWayBike = true;
+            if (way.isTagTrue("oneway") || "roundabout".equals(tags.get("junction"))) {
+            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            } 
+            if (way.isTag("oneway", "-1")) {
+            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            }
+            if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
+            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);	
+            	oneWayBike = true;
+            }
+            if (way.isTag("oneway:bicycle", "-1")) {
+            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+            }
+            if (way.isTagFalse("oneway:bicycle") || way.isTagTrue("bicycle:backwards")) {
+            	if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+            		permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
+            		permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+            	}
+            }
+            if (way.isTag("cycleway", "opposite") ||
+            		way.isTag("cycleway", "opposite_lane") || 
+            		way.isTag("cycleway", "opposite_track")) {
+            
+            	if (oneWayBike) {
+            		_log.warn("conflicting tags oneway:bicycle and cycleway:opposite* on way " + way.getId() + ", assuming one-way");
+            	} else {
+            		if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+            			permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+            		}
+            	}
+            }
+            
+            if (permissionsFront != StreetTraversalPermission.NONE) {
+                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront, geometry,
                         false);
-                if (permissions.remove(StreetTraversalPermission.CAR) != StreetTraversalPermission.NONE)
-                    backStreet = getEdgeForStreet(end, start, way, startNode, d, permissions
-                            .remove(StreetTraversalPermission.CAR), backGeometry, true);
-            } else if (way.isTagTrue("oneway")
-                    || "roundabout".equals(tags.get("junction"))) { // 3
-                street = getEdgeForStreet(start, end, way, startNode, d, permissions, geometry,
-                        false);
-                if (permissions.allows(StreetTraversalPermission.PEDESTRIAN))
-                    backStreet = getEdgeForStreet(end, start, way, startNode, d,
-                            StreetTraversalPermission.PEDESTRIAN, backGeometry, true);
-            } else { // 1.
-                street = getEdgeForStreet(start, end, way, startNode, d, permissions, geometry,
-                        false);
-                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissions,
-                        backGeometry, true);
+            }
+            if (permissionsBack != StreetTraversalPermission.NONE) {
+                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack, backGeometry,
+                        true);
             }
             
             /* mark edges that are on roundabouts */
@@ -763,21 +573,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (backStreet != null) backStreet.setRoundabout(true);
             }
 
-            /* set bicycle safety features according to configuration */
-
-            for (Map.Entry<P2<String>, P2<Double>> feature : safetyFeatures.entrySet()) {
-                String key = feature.getKey().getFirst();
-                String value = feature.getKey().getSecond();
-                if (value.equals(tags.get(key))) {
-                    P2<Double> multipliers = feature.getValue();
-                    if (street != null) {
-                        street.setBicycleSafetyEffectiveLength(street.getBicycleSafetyEffectiveLength() * multipliers.getFirst());
-                    }
-                    if (backStreet != null) {
-                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getBicycleSafetyEffectiveLength() * multipliers.getSecond());
-                    }
-                }
-            }
             return new P2<PlainStreetEdge>(street, backStreet);
         }
 
@@ -805,50 +600,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setWheelchairAccessible(false);
             }
 
-            Map<String, String> tags = way.getTags();
-            if(tags != null) {
-                for (P2<String> kvp : _slopeOverrideTags) {
-                    String key = kvp.getFirst();
-                    String value = kvp.getSecond();
-                    if (value.equals(tags.get(key))) {
-                        street.setSlopeOverride(true);
-                        break;
-                    }
-                }
-            }
+            street.setSlopeOverride(wayPropertySet.getSlopeOverride(way));
 
             return street;
         }
 
-        private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity) {
+        private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity, StreetTraversalPermission def) {
             Map<String, String> tags = entity.getTags();
-            StreetTraversalPermission def = null;
             StreetTraversalPermission permission = null;
-
-            for (KeyValuePermission kvp : _tagPermissions.values()) {
-                if (tags.containsKey(kvp.key) && kvp.value.equals(tags.get(kvp.key))) {
-                    def = kvp.permission;
-                    break;
-                }
-            }
-
-            if (def == null) {
-                if (_tagPermissions.containsKey("__default__")) {
-                    String all_tags = null;
-                    for (String key : tags.keySet()) {
-                        String tag = key + "=" + tags.get(key);
-                        if (all_tags == null) {
-                            all_tags = tag;
-                        } else {
-                            all_tags += "; " + tag;
-                        }
-                    }
-                    _log.debug("Used default permissions: " + all_tags);
-                    def = _tagPermissions.get("__default__").permission;
-                } else {
-                    def = StreetTraversalPermission.ALL;
-                }
-            }
 
             String access = tags.get("access");
             String motorcar = tags.get("motorcar");
@@ -859,12 +618,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * Only access=*, motorcar=*, bicycle=*, and foot=* is examined, since those are the
              * only modes supported by OTP (wheelchairs are not of concern here)
              * 
-             * Only *=no, and *=private are checked for, all other values are presumed to be
+             * Only a few values are checked for, all other values are presumed to be
              * permissive (=> This may not be perfect, but is closer to reality, since most people
              * don't follow the rules perfectly ;-)
              */
             if (access != null) {
-                if ("no".equals(access) || "private".equals(access)) {
+                if ("no".equals(access) || "private".equals(access) || "delivery".equals(access) || "agricultural".equals(access)) {
                     permission = StreetTraversalPermission.NONE;
                 } else {
                     permission = def;
