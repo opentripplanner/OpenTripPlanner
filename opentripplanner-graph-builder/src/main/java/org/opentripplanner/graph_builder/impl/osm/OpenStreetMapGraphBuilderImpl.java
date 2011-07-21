@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -246,14 +247,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (street != null) {
                         graph.addEdge(street);
                         Double safety = wayData.getSafetyFeatures().getFirst();
-						street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                        if (way.hasTag("note")) {
+                            street.setNote(new HashSet<String>(Arrays.asList(way.getTag("note"))));
+                        }
                     }
 
                     PlainStreetEdge backStreet = streets.getSecond();
                     if (backStreet != null) {
                         graph.addEdge(backStreet);
                         Double safety = wayData.getSafetyFeatures().getSecond();
-						backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
+                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
+                        if (way.hasTag("note")) {
+                            backStreet.setNote(new HashSet<String>(Arrays.asList(way.getTag("note"))));
+                        }
                     }
 
 
