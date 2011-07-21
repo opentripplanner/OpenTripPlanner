@@ -33,45 +33,98 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
     public WayPropertySet getWayPropertySet() {
         WayPropertySet props = new WayPropertySet();
 
-        setProperties(props, "highway=motorway", StreetTraversalPermission.CAR, 1.0, 1.0);
-        setProperties(props, "highway=motorway_link", StreetTraversalPermission.CAR, 1.0, 1.0);
-        setProperties(props, "highway=trunk", StreetTraversalPermission.CAR, 1.0, 1.0);
-        setProperties(props, "highway=trunk_link", StreetTraversalPermission.CAR, 1.0, 1.0);
+        setProperties(props, "highway=motorway", StreetTraversalPermission.CAR, 8.33, 8.33);
+        setProperties(props, "highway=motorway_link", StreetTraversalPermission.CAR, 8.33, 8.33);
+        setProperties(props, "highway=trunk", StreetTraversalPermission.CAR, 8.33, 8.33);
+        setProperties(props, "highway=trunk_link", StreetTraversalPermission.CAR, 8.33, 8.33);
 
         setProperties(props, "highway=motorway;cycleway=lane", StreetTraversalPermission.BICYCLE_AND_CAR, 1.5, 1.5);
         setProperties(props, "highway=motorway_link;cycleway=lane", StreetTraversalPermission.BICYCLE_AND_CAR, 1.5, 1.5);
-        setProperties(props, "highway=trunk;cycleway=lane", StreetTraversalPermission.BICYCLE_AND_CAR, 1.0, 1.5);
+        setProperties(props, "highway=trunk;cycleway=lane", StreetTraversalPermission.BICYCLE_AND_CAR, 1.5, 1.5);
         setProperties(props, "highway=trunk_link;cycleway=lane", StreetTraversalPermission.BICYCLE_AND_CAR, 1.5, 1.5);
 
-        setProperties(props, "highway=primary", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=primary_link", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=secondary", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=secondary_link", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=tertiary", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=tertiary_link", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=unclassified", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=residential", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=living_street", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=road", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=service", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=byway", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=track", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=mini_roundabout", StreetTraversalPermission.ALL, 1.0, 1.0);
-        setProperties(props, "highway=cycleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-        setProperties(props, "cycleway=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-        setProperties(props, "highway=pedestrian", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-        setProperties(props, "highway=path", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-        setProperties(props, "highway=bridleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
+        setProperties(props, "highway=primary", StreetTraversalPermission.ALL, 2.06, 2.06);
+        setProperties(props, "highway=primary_link", StreetTraversalPermission.ALL, 2.06, 2.06);
+        setProperties(props, "highway=secondary", StreetTraversalPermission.ALL, 1.18, 1.18);
+        setProperties(props, "highway=secondary_link", StreetTraversalPermission.ALL, 1.18, 1.18);
+        setProperties(props, "highway=tertiary", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=tertiary_link", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=unclassified", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=residential", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=living_street", StreetTraversalPermission.ALL, 0.7, 0.7);
+        setProperties(props, "highway=road", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=service", StreetTraversalPermission.ALL, 0.87, 0.87);
+        setProperties(props, "highway=byway", StreetTraversalPermission.ALL);
+        setProperties(props, "highway=mini_roundabout", StreetTraversalPermission.ALL, 0.9, 0.9);
+        setProperties(props, "highway=cycleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        
+        setProperties(props, "highway=*;cycleway=shared_lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
+        setProperties(props, "highway=*;cycleway=lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.87, 0.87);
+        setProperties(props, "highway=*;cycleway=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        setProperties(props, "highway=*;cycleway=opposite", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.10, 1.45);
+        setProperties(props, "highway=*;cycleway=opposite_lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.87);
+        setProperties(props, "highway=*;cycleway=opposite_track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.73);
+        
+        setProperties(props, "highway=*;cycleway:left=shared_lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.77);
+        setProperties(props, "highway=*;cycleway:left=lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.87);
+        setProperties(props, "highway=*;cycleway:left=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.73);
+        
+        setProperties(props, "highway=*;cycleway:right=shared_lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 1.0);
+        setProperties(props, "highway=*;cycleway:right=lane", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.87, 1.0);
+        setProperties(props, "highway=*;cycleway:right=track", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 1.0);
+        
+        
+        setProperties(props, "highway=pedestrian", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        setProperties(props, "highway=path", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        setProperties(props, "highway=path;bicycle=designated", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        setProperties(props, "highway=bridleway", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.18, 1.18);
+        setProperties(props, "highway=track", StreetTraversalPermission.ALL, 1.18, 1.18);
+        
+        setProperties(props, "highway=footway", StreetTraversalPermission.PEDESTRIAN);
+        setProperties(props, "highway=footway;bicycle=yes", StreetTraversalPermission.PEDESTRIAN, 0.84, 0.84); 
+        setProperties(props, "highway=pedestrian", StreetTraversalPermission.PEDESTRIAN);
+        setProperties(props, "highway=pedestrian;bicycle=yes", StreetTraversalPermission.PEDESTRIAN, 0.73, 0.73);
+        setProperties(props, "highway=steps", StreetTraversalPermission.PEDESTRIAN);
 
-        setProperties(props, "highway=footway", StreetTraversalPermission.PEDESTRIAN, 1.0, 1.0);
-        setProperties(props, "highway=pedestrian", StreetTraversalPermission.PEDESTRIAN, 1.0, 1.0);
-        setProperties(props, "highway=steps", StreetTraversalPermission.PEDESTRIAN, 1.0, 1.0);
+        setProperties(props, "railway=platform", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+        setProperties(props, "highway=platform", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-        setProperties(props, "railway=platform", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-        setProperties(props, "highway=platform", StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
+        setProperties(props, "highway=construction", StreetTraversalPermission.NONE);
+        setProperties(props, "highway=raceway", StreetTraversalPermission.NONE);
 
-        setProperties(props, "highway=construction", StreetTraversalPermission.NONE, 1.0, 1.0);
-        setProperties(props, "highway=raceway", StreetTraversalPermission.NONE, 1.0, 1.0);
+        /* surface mixins */
+        
+        /* sand and fine gravel are deadly for bikes */
+        setProperties(props, "surface=fine_gravel", StreetTraversalPermission.ALL, 100.0, 100.0, true);
+        setProperties(props, "surface=sand", StreetTraversalPermission.ALL, 100.0, 100.0, true);
+        
+        setProperties(props, "surface=unpaved", StreetTraversalPermission.ALL, 1.8, 1.8, true);
+        setProperties(props, "surface=compacted", StreetTraversalPermission.ALL, 1.8, 1.8, true);
+        
+        setProperties(props, "surface=cobblestones", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=paving_stones", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=glass_paver", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=pebblestones", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        
+        setProperties(props, "surface=ground", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=dirt", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=earth", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=grass", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=mud", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=wood", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=metal", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=artifical_turf", StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        
+        /* Portland-local mixins */
+        
+        setProperties(props, "rlis:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
+        setProperties(props, "rlis:bicycle=caution_area", StreetTraversalPermission.ALL, 1.6, 1.6, true);
+        setProperties(props, "CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97, true);
+        setProperties(props, "CCGIS:bicycle=caution_area", StreetTraversalPermission.ALL, 1.6, 1.6, true);
+        
+        //it is extremly unsafe to ride directly on the Scotsman
+        setProperties(props, "surface=tartan", StreetTraversalPermission.ALL, 2.0, 2.0, true);
+        
 
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
 
@@ -81,11 +134,11 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
     private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission) {
     	setProperties(propset, spec, permission, 1.0, 1.0);
     }
-
+    
     private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission, double safety, double safetyBack) {
     	setProperties(propset, spec, permission, safety, safetyBack, false);
     }
-
+    
     private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
     	WayProperties properties = new WayProperties();
     	properties.setPermission(permission);
