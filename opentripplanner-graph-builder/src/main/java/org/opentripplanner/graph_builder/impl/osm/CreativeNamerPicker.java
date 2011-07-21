@@ -13,6 +13,11 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
+/**
+ * Describes how unnamed OSM ways are to be named.
+ * @author novalis
+ *
+ */
 public class CreativeNamerPicker {
 	private OSMSpecifier specifier;
 	private CreativeNamer namer;
