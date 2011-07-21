@@ -32,16 +32,33 @@ public class WayPropertySet {
 	public WayProperties getDataForWay(OSMWay way) {
 		WayProperties result = defaultProperties;
 		int bestScore = 0;
+		List<WayProperties> mixins = new ArrayList<WayProperties>(); 
 		for (WayPropertyPicker picker : getWayProperties()) {
 			OSMSpecifier specifier = picker.getSpecifier();
 			WayProperties wayProperties = picker.getProperties();
 			int score = specifier.matchScore(way);
-			if (score > bestScore) {
+			if (picker.isSafetyMixin()) {
+				if (score > 0) {
+					mixins.add(wayProperties);
+				}
+			} else if (score > bestScore) {
 				result = wayProperties;
 				bestScore = score;
 			}
 		}
-		if (bestScore == 0) {
+		/* apply mixins */
+		if (mixins.size() > 0) {
+			result = result.clone();
+			P2<Double> safetyFeatures = result.getSafetyFeatures();
+			double first = safetyFeatures.getFirst();
+			double second = safetyFeatures.getSecond();
+			for (WayProperties properties : mixins) {
+				first *= properties.getSafetyFeatures().getFirst();
+				second *= properties.getSafetyFeatures().getSecond();
+			}
+			result.setSafetyFeatures(new P2<Double>(first, second));
+		}
+		if (bestScore == 0 && mixins.size() == 0) {
 			/* generate warning message */
 			String all_tags = null;
 			Map<String, String> tags = way.getTags();
@@ -88,10 +105,14 @@ public class WayPropertySet {
 		return result;
 	}
 
-	public void addProperties(OSMSpecifier spec, WayProperties properties) {
-		getWayProperties().add(new WayPropertyPicker(spec, properties));
+	public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
+		getWayProperties().add(new WayPropertyPicker(spec, properties, mixin));
 	}
-
+	
+	public void addProperties(OSMSpecifier spec, WayProperties properties) {
+		getWayProperties().add(new WayPropertyPicker(spec, properties, false));
+	}
+	
 	public void addAddCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
 		getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
 	}

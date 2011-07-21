@@ -78,10 +78,18 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
         return props;
     }
 
+    private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission) {
+    	setProperties(propset, spec, permission, 1.0, 1.0);
+    }
+
     private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission, double safety, double safetyBack) {
+    	setProperties(propset, spec, permission, safety, safetyBack, false);
+    }
+
+    private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
     	WayProperties properties = new WayProperties();
     	properties.setPermission(permission);
     	properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
-    	propset.addProperties(new OSMSpecifier(spec), properties);
+    	propset.addProperties(new OSMSpecifier(spec), properties, mixin);
     }
 }

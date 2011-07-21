@@ -10,8 +10,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  * @author novalis
  * 
  */
-public class WayProperties {
-
+public class WayProperties implements Cloneable {
 
 	private StreetTraversalPermission permission;
 
@@ -25,6 +24,7 @@ public class WayProperties {
 
 	private P2<Double> safetyFeatures = defaultSafetyFeatures;
 
+	
 	public void setSafetyFeatures(P2<Double> safetyFeatures) {
 		this.safetyFeatures = safetyFeatures;
 	}
@@ -40,5 +40,11 @@ public class WayProperties {
 	public StreetTraversalPermission getPermission() {
 		return permission;
 	}
-
+	
+	public WayProperties clone() {
+		WayProperties result = new WayProperties();
+		result.setPermission(permission);
+		result.setSafetyFeatures(new P2<Double>(safetyFeatures.getFirst(), safetyFeatures.getSecond()));
+		return result;
+	}
 }
