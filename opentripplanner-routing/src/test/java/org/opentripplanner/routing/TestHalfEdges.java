@@ -284,8 +284,10 @@ public class TestHalfEdges extends TestCase {
         extras = end.getExtra();
         assertEquals(10, extras.size());
         
-		//test that the closest vertex finder also adds an edge to transit stops
-        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.01), new TraverseOptions());
+		// test that the closest vertex finder also adds an edge to transit
+		// stops (if you are really close to the transit stop relative to the
+		// street)
+        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), new TraverseOptions());
         assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
