@@ -38,6 +38,7 @@ public class OSMSpecifier {
 		for (P2<String> pair : kvpairs) {
 			String tag = pair.getFirst();
 			String value = pair.getSecond();
+
 			String matchValue = match.getTag(tag);
 			//either this matches on a wildcard, or it matches exactly
 			if (value.equals("*") && matchValue != null) {
@@ -45,7 +46,15 @@ public class OSMSpecifier {
 			} else if (value.equals(matchValue)) {
 				score += 100;
 			} else {
-				return 0;
+				if (value.contains(":")) {
+					//treat cases like cobblestone:flattened as cobblestone if a more-specific match
+					//does not apply
+					value = value.split(":", 2)[0];
+				} else if (value.equals(matchValue)) {
+					score += 75;
+				} else {
+					return 0;
+				}
 			}
 			
 		}
