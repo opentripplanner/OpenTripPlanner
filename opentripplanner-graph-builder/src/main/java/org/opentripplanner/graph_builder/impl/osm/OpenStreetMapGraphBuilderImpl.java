@@ -516,20 +516,33 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             PlainStreetEdge street = null, backStreet = null;
 
-            //pedestrian rules: everything is two-way (assuming pedestrians are allowed at all)
-            //bicycle rules: default: permissions;
-            /*           
+            /*
+            pedestrian rules: everything is two-way (assuming pedestrians
+            are allowed at all)
+            bicycle rules: default: permissions;
+
+            cycleway=dismount means walk your bike -- the engine will
+            automatically try walking bikes any time it is forbidden to
+            ride them, so the only thing to do here is to remove bike
+            permissions
+
             oneway=... sets permissions for cars and bikes
             oneway:bicycle overwrites these permissions for bikes only
-            
+
             now, cycleway=opposite_lane, opposite, opposite_track can allow
-            once oneway has been set by oneway:bicycle, but should give a warning
-            if it conflicts with oneway:bicycle
-            
+            once oneway has been set by oneway:bicycle, but should give a
+            warning if it conflicts with oneway:bicycle
+
             bicycle:backward=yes works like oneway:bicycle=no
             bicycle:backwards=no works like oneway:bicycle=yes
-            
-            */
+
+             */
+
+
+            if (way.isTag("cycleway", "dismount")) {
+                permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
+            }
+
             StreetTraversalPermission permissionsFront = permissions;
             StreetTraversalPermission permissionsBack = permissions;
             boolean oneWayBike = true;
