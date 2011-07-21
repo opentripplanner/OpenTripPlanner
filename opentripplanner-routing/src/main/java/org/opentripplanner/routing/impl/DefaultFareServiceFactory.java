@@ -12,6 +12,12 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
+/**
+ * Implements the default GTFS fare rules as described in
+ * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
+ * @author novalis
+ *
+ */
 public class DefaultFareServiceFactory implements FareServiceFactory {
     private HashMap<AgencyAndId, FareRuleSet> fareRules;
     HashMap<AgencyAndId, FareAttribute> fareAttributes;
