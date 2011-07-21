@@ -14,7 +14,6 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -163,6 +162,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 	way.addTag("otp:gen_name", creativeName);
                 }
                 
+                Set<String> note = wayPropertySet.getNoteForWay(way);
+                
                 StreetTraversalPermission permissions = getPermissionsForEntity(way, wayData.getPermission());
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
@@ -248,8 +249,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         graph.addEdge(street);
                         Double safety = wayData.getSafetyFeatures().getFirst();
                         street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
-                        if (way.hasTag("note")) {
-                            street.setNote(new HashSet<String>(Arrays.asList(way.getTag("note"))));
+                        if (note != null) {
+                            street.setNote(note);
                         }
                     }
 
@@ -258,8 +259,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         graph.addEdge(backStreet);
                         Double safety = wayData.getSafetyFeatures().getSecond();
                         backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
-                        if (way.hasTag("note")) {
-                            backStreet.setNote(new HashSet<String>(Arrays.asList(way.getTag("note"))));
+                        if (note != null) {
+                            backStreet.setNote(note);
                         }
                     }
 

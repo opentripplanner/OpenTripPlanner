@@ -14,8 +14,10 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
@@ -29,7 +31,8 @@ public class WayPropertySet {
 	private List<WayPropertyPicker> wayProperties;
 	private List<CreativeNamerPicker> creativeNamers;
 	private List<SlopeOverridePicker> slopeOverrides;
-
+	private List<NotePicker> notes;
+	
 	public WayProperties defaultProperties;
 
 	public WayPropertySet() {
@@ -40,6 +43,7 @@ public class WayPropertySet {
 		wayProperties = new ArrayList<WayPropertyPicker>();
 		creativeNamers = new ArrayList<CreativeNamerPicker>();
 		slopeOverrides = new ArrayList<SlopeOverridePicker>();
+		notes = new ArrayList<NotePicker>();
 	}
 
 	public WayProperties getDataForWay(OSMWay way) {
@@ -91,7 +95,7 @@ public class WayPropertySet {
 	public String getCreativeNameForWay(OSMWay way) {
 		CreativeNamer bestNamer = null;
 		int bestScore = 0;
-		for (CreativeNamerPicker picker : getCreativeNamers()) {
+		for (CreativeNamerPicker picker : creativeNamers) {
 			OSMSpecifier specifier = picker.getSpecifier();
 			CreativeNamer namer = picker.getNamer();
 			if (specifier.matchScore(way) > bestScore) {
@@ -102,6 +106,22 @@ public class WayPropertySet {
 			return null;
 		}
 		return bestNamer.generateCreativeName(way);
+	}
+	
+
+	public Set<String> getNoteForWay(OSMWay way) {
+		HashSet<String> out = new HashSet<String>();
+		for (NotePicker picker : notes) {
+			OSMSpecifier specifier = picker.getSpecifier();
+			NoteProperties noteProperties = picker.getNoteProperties();
+			if (specifier.matchScore(way) > 0) {
+				out.add(noteProperties.generateNote(way).intern());
+			}
+		}
+		if (out.size () == 0) {
+			return null;
+		}
+		return out;
 	}
 
 	public boolean getSlopeOverride(OSMWay way) {
@@ -146,4 +166,7 @@ public class WayPropertySet {
 		return creativeNamers;
 	}
 
+	public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
+		notes.add(new NotePicker(osmSpecifier, properties));
+	}
 }

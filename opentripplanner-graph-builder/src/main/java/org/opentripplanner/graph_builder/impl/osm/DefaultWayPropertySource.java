@@ -128,10 +128,27 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
 
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
 
+        /* and the notes */
+        createNotes(props, "notes=*", "{notes}");
+        createNotes(props, "rlis:bicycle=caution_area", "Caution!");
+        createNotes(props, "CCGIS:bicycle=caution_area", "Caution!");
+        createNotes(props, "surface=unpaved", "Unpaved surface");
+        createNotes(props, "surface=compacted", "Unpaved surface");
+        createNotes(props, "surface=ground", "Unpaved surface");
+        createNotes(props, "surface=dirt", "Unpaved surface");
+        createNotes(props, "surface=earth", "Unpaved surface");
+        createNotes(props, "surface=grass", "Unpaved surface");
+        createNotes(props, "surface=mud", "Unpaved surface -- muddy!");
         return props;
     }
 
-    private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission) {
+    private void createNotes(WayPropertySet propset, String spec, String pattern) {
+    	NoteProperties properties = new NoteProperties();
+    	properties.setNotePattern(pattern);
+    	propset.addNote(new OSMSpecifier(spec), properties);
+	}
+
+	private void setProperties(WayPropertySet propset, String spec, StreetTraversalPermission permission) {
     	setProperties(propset, spec, permission, 1.0, 1.0);
     }
     
