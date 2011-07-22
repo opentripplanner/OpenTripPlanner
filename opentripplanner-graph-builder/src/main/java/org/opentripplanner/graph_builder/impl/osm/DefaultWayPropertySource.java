@@ -123,7 +123,7 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
         setProperties(props, "CCGIS:bicycle=caution_area", StreetTraversalPermission.ALL, 1.6, 1.6, true);
         
         //it is extremly unsafe to ride directly on the Scotsman
-        setProperties(props, "surface=tartan", StreetTraversalPermission.ALL, 2.0, 2.0, true);
+        setProperties(props, "surface=tartan", StreetTraversalPermission.ALL, 3.0, 3.0, true);
         
 
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
@@ -139,10 +139,63 @@ public class DefaultWayPropertySource implements WayPropertySetSource {
         createNotes(props, "surface=earth", "Unpaved surface");
         createNotes(props, "surface=grass", "Unpaved surface");
         createNotes(props, "surface=mud", "Unpaved surface -- muddy!");
+        
+        /* and some names */
+        createNames(props, "otp:route_ref=*", "Route {otp:route_ref}");
+		createNames(props, "highway=platform;ref=", "Platform {ref}");
+		createNames(props, "railway=platform;ref=", "Platform {ref}");
+
+		// Bridges/Tunnels
+		createNames(props, "highway=pedestrian;bridge=", "footbridge");
+		createNames(props, "highway=path;bridge=", "footbridge");
+		createNames(props, "highway=footway;bridge=", "footbridge");
+
+		createNames(props, "highway=pedestrian;tunnel=", "foottunnel");
+		createNames(props, "highway=path;tunnel=", "foottunnel");
+		createNames(props, "highway=footway;tunnel=", "foottunnel");
+
+		// Basic Mappings
+		createNames(props, "highway=motorway", "motorway");
+		createNames(props, "highway=motorway_link", "motorway link");
+		createNames(props, "highway=trunk", "trunk road");
+		createNames(props, "highway=trunk_link", "trunk road link");
+
+		createNames(props, "highway=primary", "road");
+		createNames(props, "highway=primary_link", "road");
+		createNames(props, "highway=secondary", "road");
+		createNames(props, "highway=secondary_link", "road");
+		createNames(props, "highway=tertiary", "road");
+		createNames(props, "highway=tertiary_link", "road");
+		createNames(props, "highway=unclassified", "road");
+		createNames(props, "highway=residential", "road");
+		createNames(props, "highway=living_street", "road");
+		createNames(props, "highway=road", "road");
+		createNames(props, "highway=service", "service road");
+		createNames(props, "highway=service;service=parking_aisle", "parking aisle");
+		createNames(props, "highway=byway", "byway");
+		createNames(props, "highway=track", "track");
+
+		createNames(props, "highway=cycleway", "cycleway");
+		createNames(props, "cycleway=track", "cycleway track");
+		createNames(props, "highway=pedestrian", "pedestrian way");
+		createNames(props, "highway=path", "path");
+		createNames(props, "highway=bridleway", "bridleway");
+
+		createNames(props, "highway=platform", "platform");
+		createNames(props, "railway=platform", "platform");
+
+		createNames(props, "highway=footway", "footway");
+		createNames(props, "highway=steps", "steps");
+        
         return props;
     }
 
-    private void createNotes(WayPropertySet propset, String spec, String pattern) {
+    private void createNames(WayPropertySet propset, String spec, String pattern) {
+    	CreativeNamer namer = new CreativeNamer(pattern);
+    	propset.addCreativeNamer(new OSMSpecifier(spec), namer);
+	}
+
+	private void createNotes(WayPropertySet propset, String spec, String pattern) {
     	NoteProperties properties = new NoteProperties();
     	properties.setNotePattern(pattern);
     	propset.addNote(new OSMSpecifier(spec), properties);
