@@ -146,7 +146,7 @@ public class WayPropertySet {
 		getWayProperties().add(new WayPropertyPicker(spec, properties, false));
 	}
 	
-	public void addAddCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
+	public void addCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
 		getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
 	}
 
