@@ -26,147 +26,149 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WayPropertySet {
-	private static Logger _log = LoggerFactory.getLogger(WayPropertySet.class);
+    private static Logger _log = LoggerFactory.getLogger(WayPropertySet.class);
 
-	private List<WayPropertyPicker> wayProperties;
-	private List<CreativeNamerPicker> creativeNamers;
-	private List<SlopeOverridePicker> slopeOverrides;
-	private List<NotePicker> notes;
-	
-	public WayProperties defaultProperties;
+    private List<WayPropertyPicker> wayProperties;
 
-	public WayPropertySet() {
-		/* sensible defaults */
-		defaultProperties = new WayProperties();
-		defaultProperties.setSafetyFeatures(new P2<Double>(1.0, 1.0));
-		defaultProperties.setPermission(StreetTraversalPermission.ALL);
-		wayProperties = new ArrayList<WayPropertyPicker>();
-		creativeNamers = new ArrayList<CreativeNamerPicker>();
-		slopeOverrides = new ArrayList<SlopeOverridePicker>();
-		notes = new ArrayList<NotePicker>();
-	}
+    private List<CreativeNamerPicker> creativeNamers;
 
-	public WayProperties getDataForWay(OSMWay way) {
-		WayProperties result = defaultProperties;
-		int bestScore = 0;
-		List<WayProperties> mixins = new ArrayList<WayProperties>(); 
-		for (WayPropertyPicker picker : getWayProperties()) {
-			OSMSpecifier specifier = picker.getSpecifier();
-			WayProperties wayProperties = picker.getProperties();
-			int score = specifier.matchScore(way);
-			if (picker.isSafetyMixin()) {
-				if (score > 0) {
-					mixins.add(wayProperties);
-				}
-			} else if (score > bestScore) {
-				result = wayProperties;
-				bestScore = score;
-			}
-		}
-		/* apply mixins */
-		if (mixins.size() > 0) {
-			result = result.clone();
-			P2<Double> safetyFeatures = result.getSafetyFeatures();
-			double first = safetyFeatures.getFirst();
-			double second = safetyFeatures.getSecond();
-			for (WayProperties properties : mixins) {
-				first *= properties.getSafetyFeatures().getFirst();
-				second *= properties.getSafetyFeatures().getSecond();
-			}
-			result.setSafetyFeatures(new P2<Double>(first, second));
-		}
-		if (bestScore == 0 && mixins.size() == 0) {
-			/* generate warning message */
-			String all_tags = null;
-			Map<String, String> tags = way.getTags();
-			for (String key : tags.keySet()) {
-				String tag = key + "=" + tags.get(key);
-				if (all_tags == null) {
-					all_tags = tag;
-				} else {
-					all_tags += "; " + tag;
-				}
-			}
-			_log.debug("Used default permissions: " + all_tags);
-		}
-		return result;
-	}
+    private List<SlopeOverridePicker> slopeOverrides;
 
-	public String getCreativeNameForWay(OSMWay way) {
-		CreativeNamer bestNamer = null;
-		int bestScore = 0;
-		for (CreativeNamerPicker picker : creativeNamers) {
-			OSMSpecifier specifier = picker.getSpecifier();
-			CreativeNamer namer = picker.getNamer();
-			if (specifier.matchScore(way) > bestScore) {
-				bestNamer = namer;
-			}
-		}
-		if (bestNamer == null) {
-			return null;
-		}
-		return bestNamer.generateCreativeName(way);
-	}
-	
+    private List<NotePicker> notes;
 
-	public Set<String> getNoteForWay(OSMWay way) {
-		HashSet<String> out = new HashSet<String>();
-		for (NotePicker picker : notes) {
-			OSMSpecifier specifier = picker.getSpecifier();
-			NoteProperties noteProperties = picker.getNoteProperties();
-			if (specifier.matchScore(way) > 0) {
-				out.add(noteProperties.generateNote(way).intern());
-			}
-		}
-		if (out.size () == 0) {
-			return null;
-		}
-		return out;
-	}
+    public WayProperties defaultProperties;
 
-	public boolean getSlopeOverride(OSMWay way) {
-		boolean result = false;
-		int bestScore = 0;
-		for (SlopeOverridePicker picker : slopeOverrides) {
-			OSMSpecifier specifier = picker.getSpecifier();
-			int score = specifier.matchScore(way);
-			if (score > bestScore) {
-				result = picker.getOverride();
-				bestScore = score;
-			}
-		}
-		return result;
-	}
+    public WayPropertySet() {
+        /* sensible defaults */
+        defaultProperties = new WayProperties();
+        defaultProperties.setSafetyFeatures(new P2<Double>(1.0, 1.0));
+        defaultProperties.setPermission(StreetTraversalPermission.ALL);
+        wayProperties = new ArrayList<WayPropertyPicker>();
+        creativeNamers = new ArrayList<CreativeNamerPicker>();
+        slopeOverrides = new ArrayList<SlopeOverridePicker>();
+        notes = new ArrayList<NotePicker>();
+    }
 
-	public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
-		getWayProperties().add(new WayPropertyPicker(spec, properties, mixin));
-	}
-	
-	public void addProperties(OSMSpecifier spec, WayProperties properties) {
-		getWayProperties().add(new WayPropertyPicker(spec, properties, false));
-	}
-	
-	public void addCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
-		getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
-	}
+    public WayProperties getDataForWay(OSMWay way) {
+        WayProperties result = defaultProperties;
+        int bestScore = 0;
+        List<WayProperties> mixins = new ArrayList<WayProperties>();
+        for (WayPropertyPicker picker : getWayProperties()) {
+            OSMSpecifier specifier = picker.getSpecifier();
+            WayProperties wayProperties = picker.getProperties();
+            int score = specifier.matchScore(way);
+            if (picker.isSafetyMixin()) {
+                if (score > 0) {
+                    mixins.add(wayProperties);
+                }
+            } else if (score > bestScore) {
+                result = wayProperties;
+                bestScore = score;
+            }
+        }
+        /* apply mixins */
+        if (mixins.size() > 0) {
+            result = result.clone();
+            P2<Double> safetyFeatures = result.getSafetyFeatures();
+            double first = safetyFeatures.getFirst();
+            double second = safetyFeatures.getSecond();
+            for (WayProperties properties : mixins) {
+                first *= properties.getSafetyFeatures().getFirst();
+                second *= properties.getSafetyFeatures().getSecond();
+            }
+            result.setSafetyFeatures(new P2<Double>(first, second));
+        }
+        if (bestScore == 0 && mixins.size() == 0) {
+            /* generate warning message */
+            String all_tags = null;
+            Map<String, String> tags = way.getTags();
+            for (String key : tags.keySet()) {
+                String tag = key + "=" + tags.get(key);
+                if (all_tags == null) {
+                    all_tags = tag;
+                } else {
+                    all_tags += "; " + tag;
+                }
+            }
+            _log.debug("Used default permissions: " + all_tags);
+        }
+        return result;
+    }
 
-	public void setWayProperties(List<WayPropertyPicker> wayProperties) {
-		this.wayProperties = wayProperties;
-	}
+    public String getCreativeNameForWay(OSMWay way) {
+        CreativeNamer bestNamer = null;
+        int bestScore = 0;
+        for (CreativeNamerPicker picker : creativeNamers) {
+            OSMSpecifier specifier = picker.getSpecifier();
+            CreativeNamer namer = picker.getNamer();
+            if (specifier.matchScore(way) > bestScore) {
+                bestNamer = namer;
+            }
+        }
+        if (bestNamer == null) {
+            return null;
+        }
+        return bestNamer.generateCreativeName(way);
+    }
 
-	public List<WayPropertyPicker> getWayProperties() {
-		return wayProperties;
-	}
+    public Set<String> getNoteForWay(OSMWay way) {
+        HashSet<String> out = new HashSet<String>();
+        for (NotePicker picker : notes) {
+            OSMSpecifier specifier = picker.getSpecifier();
+            NoteProperties noteProperties = picker.getNoteProperties();
+            if (specifier.matchScore(way) > 0) {
+                out.add(noteProperties.generateNote(way).intern());
+            }
+        }
+        if (out.size() == 0) {
+            return null;
+        }
+        return out;
+    }
 
-	public void setCreativeNamers(List<CreativeNamerPicker> creativeNamers) {
-		this.creativeNamers = creativeNamers;
-	}
+    public boolean getSlopeOverride(OSMWay way) {
+        boolean result = false;
+        int bestScore = 0;
+        for (SlopeOverridePicker picker : slopeOverrides) {
+            OSMSpecifier specifier = picker.getSpecifier();
+            int score = specifier.matchScore(way);
+            if (score > bestScore) {
+                result = picker.getOverride();
+                bestScore = score;
+            }
+        }
+        return result;
+    }
 
-	public List<CreativeNamerPicker> getCreativeNamers() {
-		return creativeNamers;
-	}
+    public void addProperties(OSMSpecifier spec, WayProperties properties, boolean mixin) {
+        getWayProperties().add(new WayPropertyPicker(spec, properties, mixin));
+    }
 
-	public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
-		notes.add(new NotePicker(osmSpecifier, properties));
-	}
+    public void addProperties(OSMSpecifier spec, WayProperties properties) {
+        getWayProperties().add(new WayPropertyPicker(spec, properties, false));
+    }
+
+    public void addCreativeNamer(OSMSpecifier spec, CreativeNamer namer) {
+        getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
+    }
+
+    public void setWayProperties(List<WayPropertyPicker> wayProperties) {
+        this.wayProperties = wayProperties;
+    }
+
+    public List<WayPropertyPicker> getWayProperties() {
+        return wayProperties;
+    }
+
+    public void setCreativeNamers(List<CreativeNamerPicker> creativeNamers) {
+        this.creativeNamers = creativeNamers;
+    }
+
+    public List<CreativeNamerPicker> getCreativeNamers() {
+        return creativeNamers;
+    }
+
+    public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
+        notes.add(new NotePicker(osmSpecifier, properties));
+    }
 }

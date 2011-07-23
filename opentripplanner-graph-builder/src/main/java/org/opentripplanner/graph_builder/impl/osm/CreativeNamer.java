@@ -17,33 +17,32 @@ import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 
 public class CreativeNamer {
 
-	/**
-	 * A creative name pattern is a template which may contain variables of the
-	 * form {{tag_name}}. When a way's creative name is created, the value of
-	 * its tag tag_name is substituted for the variable.
-	 * 
-	 * For example, "Highway with surface {{surface}}" might become
-	 * "Highway with surface gravel"
-	 */
-	private String creativeNamePattern;
+    /**
+     * A creative name pattern is a template which may contain variables of the form {{tag_name}}.
+     * When a way's creative name is created, the value of its tag tag_name is substituted for the
+     * variable.
+     * 
+     * For example, "Highway with surface {{surface}}" might become "Highway with surface gravel"
+     */
+    private String creativeNamePattern;
 
-	public CreativeNamer(String pattern) {
-		this.creativeNamePattern = pattern;
-	}
+    public CreativeNamer(String pattern) {
+        this.creativeNamePattern = pattern;
+    }
 
-	public CreativeNamer() {
-	}
+    public CreativeNamer() {
+    }
 
-	public String generateCreativeName(OSMWithTags way) {
-		return TemplateLibrary.generate(creativeNamePattern, way);
-	}
+    public String generateCreativeName(OSMWithTags way) {
+        return TemplateLibrary.generate(creativeNamePattern, way);
+    }
 
-	public void setCreativeNamePattern(String creativeNamePattern) {
-		this.creativeNamePattern = creativeNamePattern;
-	}
+    public void setCreativeNamePattern(String creativeNamePattern) {
+        this.creativeNamePattern = creativeNamePattern;
+    }
 
-	public String getCreativeNamePattern() {
-		return creativeNamePattern;
-	}
+    public String getCreativeNamePattern() {
+        return creativeNamePattern;
+    }
 
 }
