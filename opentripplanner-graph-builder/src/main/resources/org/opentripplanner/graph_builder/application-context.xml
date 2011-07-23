@@ -31,7 +31,7 @@
           <entry key="org.opentripplanner.graph_builder.impl.osm.CreativeNamer">
             <bean class="org.opentripplanner.graph_builder.impl.osm.CreativeNamerEditor" />
           </entry>
-          <entry key="org.opentripplanner.graph_builde.impl.osm.NoteProperties">
+          <entry key="org.opentripplanner.graph_builder.impl.osm.NoteProperties">
             <bean class="org.opentripplanner.graph_builder.impl.osm.NotePropertiesEditor" />
           </entry>
         </map>
