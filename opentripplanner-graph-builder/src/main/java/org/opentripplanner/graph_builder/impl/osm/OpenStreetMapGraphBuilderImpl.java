@@ -77,7 +77,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * 
      * @param source the way properties source
      */
-    public void setDefaultWayPropertiesSource(WayPropertySetSource source) {
+    public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
     	wayPropertySet = source.getWayPropertySet();
     }
 
