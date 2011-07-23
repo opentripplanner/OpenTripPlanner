@@ -159,7 +159,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 
                 String creativeName = wayPropertySet.getCreativeNameForWay(way);
                 if (creativeName != null) {
-                	way.addTag("otp:gen_name", creativeName);
+                    way.addTag("otp:gen_name", creativeName);
                 }
                 
                 Set<String> note = wayPropertySet.getNoteForWay(way);
@@ -434,6 +434,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
 			} else if (relation.isTag("restriction", "no_straight_on")) {
 				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
+			} else if (relation.isTag("restriction", "no_u_turn")) {
+                            tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
 			} else if (relation.isTag("restriction", "only_straight_on")) {
 				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
 			} else if (relation.isTag("restriction", "only_right_turn")) {
