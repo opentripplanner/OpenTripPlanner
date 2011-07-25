@@ -21,4 +21,5 @@ public interface StreetEdge extends EdgeWithElevation, DirectEdge {
     public boolean canTraverse(TraverseOptions options);
     public double getLength();
     public StreetTraversalPermission getPermission();
+	public boolean isNoThruTraffic();
 }

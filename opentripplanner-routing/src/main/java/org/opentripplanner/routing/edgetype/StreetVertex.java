@@ -81,9 +81,11 @@ public class StreetVertex extends GenericVertex {
 
     private boolean roundabout = false;
 
-	private Set<String> note;
+    private Set<String> note;
 
-	private boolean hasBogusName;
+    private boolean hasBogusName;
+
+    private boolean noThruTraffic = false;
 
     public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<String> note) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
@@ -442,4 +444,12 @@ public class StreetVertex extends GenericVertex {
 	public void setBogusName(boolean hasBogusName) {
 		this.hasBogusName = hasBogusName;
 	}
+
+    public void setNoThruTraffic(boolean noThruTraffic) {
+        this.noThruTraffic = noThruTraffic;
+    }
+
+    public boolean isNoThruTraffic() {
+        return noThruTraffic;
+    }
 }

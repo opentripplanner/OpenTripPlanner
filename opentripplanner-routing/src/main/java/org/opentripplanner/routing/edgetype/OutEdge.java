@@ -127,4 +127,9 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         }
         return false;
     }
+
+	@Override
+	public boolean isNoThruTraffic() {
+		return ((StreetVertex) fromv).isNoThruTraffic();
+	}
 }

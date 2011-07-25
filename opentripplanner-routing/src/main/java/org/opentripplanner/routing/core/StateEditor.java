@@ -78,6 +78,9 @@ public class StateEditor {
             _log.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
             defectiveTraversal = true;
         }
+        if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT) {
+            setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+        }
     }
 
     /* PUBLIC METHODS */
@@ -262,6 +265,11 @@ public class StateEditor {
         child.stateData.lastAlightedTime = lastAlightedTime;
     }
 
+    public void setNoThruTrafficState(NoThruTrafficState noThruTrafficState) {
+        cloneStateDataAsNeeded();
+        child.stateData.noThruTrafficState = noThruTrafficState;
+    }
+
     public void setTime(long t) {
         child.time = t;
     }
@@ -338,6 +346,10 @@ public class StateEditor {
 
     public long getLastAlightedTime() {
         return child.getLastAlightedTime();
+    }
+
+    public NoThruTrafficState getNoThruTrafficState() {
+        return child.stateData.noThruTrafficState;
     }
 
     public double getWalkDistance() {

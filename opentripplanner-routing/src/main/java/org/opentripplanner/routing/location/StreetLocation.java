@@ -140,11 +140,13 @@ public class StreetLocation extends GenericVertex {
                     lengthIn, false, street.getNotes());
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn));
             newFrom.setPermission(street.getPermission());
+            newFrom.setNoThruTraffic(street.isNoThruTraffic());
 
             location = new StreetVertex(label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
                     false, street.getNotes());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut));
             location.setPermission(street.getPermission());
+            location.setNoThruTraffic(street.isNoThruTraffic());
             
             cache.put(geometry, new P2<StreetVertex>(newFrom, location));
 

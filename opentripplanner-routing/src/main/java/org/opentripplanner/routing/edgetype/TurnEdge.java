@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -130,6 +131,36 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
+
+        if (options.getModes().getNonTransitMode().equals(TraverseMode.CAR)) {
+            switch (s0.getNoThruTrafficState()) {
+            case INIT:
+                if (fromv.isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
+                } else {
+                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+                }
+                break;
+            case IN_INITIAL_ISLAND:
+                if (!fromv.isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+                }
+                break;
+            case BETWEEN_ISLANDS:
+                if (fromv.isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
+                }
+                break;
+            case IN_FINAL_ISLAND:
+                if (!fromv.isNoThruTraffic()) {
+                    // we have now passed entirely through a no thru traffic region, which is
+                    // forbidden
+                    return null;
+                }
+                break;
+            }
+        }
+
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
@@ -137,7 +168,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         s1.incrementWeight(weight);
         if(s1.weHaveWalkedTooFar(options))
             return null;
-        
+
         return s1.makeState();
     }
 
@@ -239,5 +270,10 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	@Override
 	public boolean hasBogusName() {
 		return fromv.hasBogusName();
+	}
+
+	@Override
+	public boolean isNoThruTraffic() {
+		return fromv.isNoThruTraffic();
 	}
 }

@@ -23,6 +23,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -76,6 +77,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     private Set<String> notes;
 
 	private boolean hasBogusName;
+
+	private boolean noThruTraffic;
     
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
@@ -200,6 +203,36 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         weight *= options.walkReluctance;
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
+
+        if (options.getModes().getNonTransitMode().equals(TraverseMode.CAR)) {
+            switch (s0.getNoThruTrafficState()) {
+            case INIT:
+                if (isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
+                } else {
+                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+                }
+                break;
+            case IN_INITIAL_ISLAND:
+                if (!isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+                }
+                break;
+            case BETWEEN_ISLANDS:
+                if (isNoThruTraffic()) {
+                    s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
+                }
+                break;
+            case IN_FINAL_ISLAND:
+                if (!isNoThruTraffic()) {
+                    // we have now passed entirely through a no thru traffic region, which is
+                    // forbidden
+                    return null;
+                }
+                break;
+            }
+        }
+
         s1.incrementWalkDistance(length);
         s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
@@ -320,4 +353,12 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     public void setBogusName(boolean hasBogusName) {
         this.hasBogusName = hasBogusName;
     }
+
+	public void setNoThruTraffic(boolean noThruTraffic) {
+		this.noThruTraffic = noThruTraffic;
+	}
+
+	public boolean isNoThruTraffic() {
+		return noThruTraffic;
+	}
 }

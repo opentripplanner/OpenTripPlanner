@@ -581,13 +581,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             	}
             }
             
+            boolean noThruTraffic = way.isTag("access", "destination");
+
             if (permissionsFront != StreetTraversalPermission.NONE) {
                 street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront, geometry,
                         false);
+                street.setNoThruTraffic(noThruTraffic);
             }
             if (permissionsBack != StreetTraversalPermission.NONE) {
                 backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack, backGeometry,
                         true);
+                backStreet.setNoThruTraffic(noThruTraffic);
             }
             
             /* mark edges that are on roundabouts */
