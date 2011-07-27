@@ -334,13 +334,13 @@ public class TraverseModeSet implements Cloneable {
     }
 
     public TraverseMode getNonTransitMode() {
-        if (contains(TraverseMode.CAR)) {
+        if ((modes & MODE_CAR) != 0) {
             return TraverseMode.CAR;
         }
-        if (contains(TraverseMode.BICYCLE)) {
+        if ((modes & MODE_BICYCLE) != 0) {
             return TraverseMode.BICYCLE;
         }
-        if (contains(TraverseMode.WALK)) {
+        if ((modes & MODE_WALK) != 0) {
             return TraverseMode.WALK;
         }
         return null;
