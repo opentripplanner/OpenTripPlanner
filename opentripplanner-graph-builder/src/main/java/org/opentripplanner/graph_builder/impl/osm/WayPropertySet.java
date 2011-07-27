@@ -171,4 +171,12 @@ public class WayPropertySet {
     public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
         notes.add(new NotePicker(osmSpecifier, properties));
     }
+
+	public void setSlopeOverrides(List<SlopeOverridePicker> slopeOverrides) {
+		this.slopeOverrides = slopeOverrides;
+	}
+
+	public List<SlopeOverridePicker> getSlopeOverrides() {
+		return slopeOverrides;
+	}
 }
