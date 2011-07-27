@@ -175,15 +175,15 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=path;bridge=*", "footbridge");
         createNames(props, "highway=footway;bridge=*", "footbridge");
 
-        createNames(props, "highway=pedestrian;tunnel=*", "foottunnel");
-        createNames(props, "highway=path;tunnel=*", "foottunnel");
-        createNames(props, "highway=footway;tunnel=*", "foottunnel");
+        createNames(props, "highway=pedestrian;tunnel=*", "underpass");
+        createNames(props, "highway=path;tunnel=*", "underpass");
+        createNames(props, "highway=footway;tunnel=*", "underpass");
 
         // Basic Mappings
-        createNames(props, "highway=motorway", "motorway");
-        createNames(props, "highway=motorway_link", "motorway link");
-        createNames(props, "highway=trunk", "trunk road");
-        createNames(props, "highway=trunk_link", "trunk road link");
+        createNames(props, "highway=motorway", "road");
+        createNames(props, "highway=motorway_link", "onramp");
+        createNames(props, "highway=trunk", "road");
+        createNames(props, "highway=trunk_link", "onramp");
 
         createNames(props, "highway=primary", "road");
         createNames(props, "highway=primary_link", "road");
@@ -196,20 +196,20 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=living_street", "road");
         createNames(props, "highway=road", "road");
         createNames(props, "highway=service", "service road");
-        createNames(props, "highway=service;service=parking_aisle", "parking aisle");
+        createNames(props, "highway=service;service=parking_aisle", "parking lot");
         createNames(props, "highway=byway", "byway");
         createNames(props, "highway=track", "track");
 
-        createNames(props, "highway=cycleway", "cycleway");
-        createNames(props, "cycleway=track", "cycleway track");
-        createNames(props, "highway=pedestrian", "pedestrian way");
+        createNames(props, "highway=cycleway", "bike path");
+        createNames(props, "cycleway=track", "bike path");
+        createNames(props, "highway=pedestrian", "path");
         createNames(props, "highway=path", "path");
         createNames(props, "highway=bridleway", "bridleway");
 
         createNames(props, "highway=platform", "platform");
         createNames(props, "railway=platform", "platform");
 
-        createNames(props, "highway=footway", "footway");
+        createNames(props, "highway=footway", "steps");
         createNames(props, "highway=steps", "steps");
 
         return props;
