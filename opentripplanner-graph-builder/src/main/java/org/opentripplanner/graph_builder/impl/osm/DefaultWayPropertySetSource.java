@@ -206,12 +206,12 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "cycleway=track", "bike path");
         createNames(props, "highway=pedestrian", "path");
         createNames(props, "highway=path", "path");
+        createNames(props, "highway=footway", "path");
         createNames(props, "highway=bridleway", "bridleway");
 
         createNames(props, "highway=platform", "platform");
         createNames(props, "railway=platform", "platform");
 
-        createNames(props, "highway=footway", "steps");
         createNames(props, "highway=steps", "steps");
 
         return props;
