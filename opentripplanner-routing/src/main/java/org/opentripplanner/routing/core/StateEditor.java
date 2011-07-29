@@ -55,31 +55,41 @@ public class StateEditor {
         child.backState = parent;
         child.backEdge = e;
         child.backEdgeNarrative = en;
-        child.hops = parent.hops + 1;
-        // We clear child.next here, since it could have already been set in the parent
+        // We clear child.next here, since it could have already been set in the
+        // parent
         child.next = null;
-        // be clever
-        // Note that we use equals(), not ==, here to allow for dynamically created vertices
-        if (parent.vertex.equals(en.getFromVertex())) {
-            traversingBackward = false;
-            child.vertex = en.getToVertex();
-        } else if (parent.vertex.equals(en.getToVertex())) {
-            traversingBackward = true;
-            child.vertex = en.getFromVertex();
+        if (e == null) {
+            child.backState = null;
+            child.hops = 0;
+            child.vertex = parent.vertex;
+            child.stateData = child.stateData.clone();
         } else {
-            // Parent state is not at either end of edge.
-            _log.warn("Edge is not connected to parent state: {}", en);
-            _log.warn("   from   vertex: {}", en.getFromVertex());
-            _log.warn("   to     vertex: {}", en.getToVertex());
-            _log.warn("   parent vertex: {}", parent.vertex);
-            defectiveTraversal = true;
-        }
-        if (traversingBackward != parent.getOptions().isArriveBy()) {
-            _log.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
-            defectiveTraversal = true;
-        }
-        if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT) {
-            setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+            child.hops = parent.hops + 1;
+            // be clever
+            // Note that we use equals(), not ==, here to allow for dynamically
+            // created vertices
+            if (parent.vertex.equals(en.getFromVertex())) {
+                traversingBackward = false;
+                child.vertex = en.getToVertex();
+            } else if (parent.vertex.equals(en.getToVertex())) {
+                traversingBackward = true;
+                child.vertex = en.getFromVertex();
+            } else {
+                // Parent state is not at either end of edge.
+                _log.warn("Edge is not connected to parent state: {}", en);
+                _log.warn("   from   vertex: {}", en.getFromVertex());
+                _log.warn("   to     vertex: {}", en.getToVertex());
+                _log.warn("   parent vertex: {}", parent.vertex);
+                defectiveTraversal = true;
+            }
+            if (traversingBackward != parent.getOptions().isArriveBy()) {
+                _log
+                        .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
+                defectiveTraversal = true;
+            }
+            if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT) {
+                setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+            }
         }
     }
 
@@ -103,17 +113,22 @@ public class StateEditor {
             return null;
         }
 
-        // make it impossible to use a state with lower weight than its parent.
-        child.checkNegativeWeight();
+        if (child.backState != null) {
+            // make it impossible to use a state with lower weight than its
+            // parent.
+            child.checkNegativeWeight();
 
-        // check that time changes are coherent with edge traversal direction
-        if (traversingBackward ? (child.getTimeDeltaMsec() > 0) : (child.getTimeDeltaMsec() < 0)) {
-            _log.trace("Time was incremented the wrong direction during state editing. {}",
-                    child.backEdge);
-            return null;
+            // check that time changes are coherent with edge traversal
+            // direction
+            if (traversingBackward ? (child.getTimeDeltaMsec() > 0)
+                    : (child.getTimeDeltaMsec() < 0)) {
+                _log.trace("Time was incremented the wrong direction during state editing. {}",
+                        child.backEdge);
+                return null;
+            }
+
+            applyPatches();
         }
-
-        applyPatches();
         spawned = true;
         return child;
     }
@@ -393,5 +408,10 @@ public class StateEditor {
     private void cloneStateDataAsNeeded() {
         if (child.stateData == child.backState.stateData)
             child.stateData = child.stateData.clone();
+    }
+
+    public void setTraverseOptions(TraverseOptions options) {
+        child.stateData.options = options;
+        traversingBackward = options.isArriveBy();
     }
 }

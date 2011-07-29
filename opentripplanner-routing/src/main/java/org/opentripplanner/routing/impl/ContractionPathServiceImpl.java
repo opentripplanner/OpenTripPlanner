@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -183,6 +184,10 @@ public class ContractionPathServiceImpl implements PathService {
             }
             options.worstTime = maxTime;
             options.maxWeight = maxWeight;
+            StateEditor editor = new StateEditor(origin, null);
+            editor.setTraverseOptions(options);
+            origin = editor.makeState();
+
             long searchBeginTime = System.currentTimeMillis();
         	LOG.debug("BEGIN SEARCH");
             List<GraphPath> somePaths = _routingService.route(origin, target); 
