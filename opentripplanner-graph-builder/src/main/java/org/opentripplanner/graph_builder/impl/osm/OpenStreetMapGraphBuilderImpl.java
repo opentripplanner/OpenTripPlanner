@@ -596,7 +596,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             
             /* mark edges that are on roundabouts */
             if ("roundabout".equals(tags.get("junction"))) {
-                street.setRoundabout(true);
+            	if (street != null) street.setRoundabout(true);
                 if (backStreet != null) backStreet.setRoundabout(true);
             }
 
