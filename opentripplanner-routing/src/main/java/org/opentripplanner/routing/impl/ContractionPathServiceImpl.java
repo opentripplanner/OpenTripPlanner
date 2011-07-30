@@ -202,9 +202,14 @@ public class ContractionPathServiceImpl implements PathService {
                 }
                 GraphPath path = somePaths.get(0);
                 long duration = path.getDuration();
-                maxTime = path.getEndTime() + 
+                LOG.debug("Setting max time and weight for subsequent searches.");
+                LOG.debug("First path start time:  {}", path.getStartTime());
+                maxTime = path.getStartTime() + 
                 		  MAX_TIME_FACTOR * (options.isArriveBy() ? -duration : duration);
+                LOG.debug("First path duration:  {}", duration);
+                LOG.debug("Max time set to:  {}", maxTime);
                 maxWeight = path.getWeight() * MAX_WEIGHT_FACTOR;
+                LOG.debug("Max weight set to:  {}", maxWeight);
             }
             if (somePaths.isEmpty()) {
             	LOG.debug("NO PATHS FOUND");
