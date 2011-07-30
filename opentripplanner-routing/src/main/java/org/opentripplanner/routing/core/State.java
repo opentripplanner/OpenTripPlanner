@@ -24,46 +24,53 @@ public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
     // the current time at this state
     protected long time;
-    // accumulated weight up to this state 
+
+    // accumulated weight up to this state
     protected double weight;
-    // associate this state with a vertex in the graph 
+
+    // associate this state with a vertex in the graph
     protected Vertex vertex;
+
     // allow path reconstruction from states
     protected State backState;
+
     protected Edge backEdge;
+
     protected EdgeNarrative backEdgeNarrative;
+
     // how many edges away from the initial state
     protected int hops;
+
     // allow traverse result chaining (multiple results)
     protected State next;
+
     /* StateData contains data which is unlikely to change as often */
     protected StateData stateData;
 
-
     /* CONSTRUCTORS */
 
-    /** 
-     * Create a state representing the beginning of a trip
-     * at the given vertex, at the current system time.
+    /**
+     * Create a state representing the beginning of a trip at the given vertex, at the current
+     * system time.
      */
     public State(Vertex v, TraverseOptions opt) {
         this(System.currentTimeMillis(), v, opt);
     }
 
-    /** 
-     * Create a state representing the beginning of a search
-     * at the given vertex, at the given time.
+    /**
+     * Create a state representing the beginning of a search at the given vertex, at the given time.
+     * 
      * @param time - The time at which the search will start
      * @param v - The origin vertex of the search
      */
     public State(long time, Vertex vertex, TraverseOptions opt) {
-        // parent-less states can only be created at the beginning of a trip. 
-        // elsewhere, all states must be created from a parent 
+        // parent-less states can only be created at the beginning of a trip.
+        // elsewhere, all states must be created from a parent
         // and associated with an edge.
 
-    	// Round toward zero, 1-second precision.
-    	// Otherwise, rounding errors will cause missed trips in reverse-optimization.
-    	this.time = time / 1000 * 1000;
+        // Round toward zero, 1-second precision.
+        // Otherwise, rounding errors will cause missed trips in reverse-optimization.
+        this.time = time / 1000 * 1000;
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -75,14 +82,14 @@ public class State implements Cloneable {
         stateData.startTime = time;
         // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
     }
-    
-    public State createState(long time, Vertex vertex, TraverseOptions options){
-        return new State(time,vertex,options);
+
+    public State createState(long time, Vertex vertex, TraverseOptions options) {
+        return new State(time, vertex, options);
     }
 
     /**
-     * Create a state editor to produce a child of this state,
-     * which will be the result of traversing the given edge.
+     * Create a state editor to produce a child of this state, which will be the result of
+     * traversing the given edge.
      * 
      * @param e
      * @return
@@ -106,18 +113,18 @@ public class State implements Cloneable {
     }
 
     /*
-     *  FIELD ACCESSOR METHODS
-     *  States are immutable, so they have only get methods.
-     *  The corresponding set methods are in StateEditor. 
+     * FIELD ACCESSOR METHODS States are immutable, so they have only get methods. The corresponding
+     * set methods are in StateEditor.
      */
 
-    /** 
+    /**
      * Retrieve a State extension based on its key.
+     * 
      * @param key - An Object that is a key in this State's extension map
      * @return - The extension value for the given key, or null if not present
      */
-    public Object getExtension (Object key) { 
-        return stateData.extensions.get(key); 
+    public Object getExtension(Object key) {
+        return stateData.extensions.get(key);
     }
 
     public String toString() {
@@ -181,21 +188,21 @@ public class State implements Cloneable {
     }
 
     /**
-     * Multicriteria comparison. Returns true if this state is better than the other one
-     * (or equal) both in terms of time and weight.
+     * Multicriteria comparison. Returns true if this state is better than the other one (or equal)
+     * both in terms of time and weight.
      */
     public boolean dominates(State other) {
         // in the name of efficiency, these should probably be quantized
         // before comparison (AMB)
-        return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime(); 
+        return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime();
     }
 
     /**
-     * Returns true if this state's weight is lower than the other one.
-     * Considers only weight and not time or other criteria. 
+     * Returns true if this state's weight is lower than the other one. Considers only weight and
+     * not time or other criteria.
      */
     public boolean betterThan(State other) {
-        return this.weight < other.weight; 
+        return this.weight < other.weight;
     }
 
     public double getWeight() {
@@ -207,15 +214,15 @@ public class State implements Cloneable {
     }
 
     public long getAbsTimeDeltaMsec() {
-        return Math.abs( this.time - backState.time );
+        return Math.abs(this.time - backState.time);
     }
 
     public double getWeightDelta() {
         return this.weight - backState.weight;
     }
 
-    public void checkNegativeWeight () {
-        double dw = this.weight - backState.weight; 
+    public void checkNegativeWeight() {
+        double dw = this.weight - backState.weight;
         if (dw < 0) {
             throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
         }
@@ -275,8 +282,8 @@ public class State implements Cloneable {
      * return result;
      * </code>
      * 
-     * @param existingResultChain
-     *            the tail of an existing result chain, or null if the chain has not been started
+     * @param existingResultChain the tail of an existing result chain, or null if the chain has not
+     *        been started
      * @return
      */
     public State addToExistingResultChain(State existingResultChain) {
@@ -297,8 +304,8 @@ public class State implements Cloneable {
     }
 
     public State reversedClone() {
-    	// We no longer compensate for schedule slack (minTransferTime) here. 
-    	// It is distributed symmetrically over all preboard and prealight edges.
+        // We no longer compensate for schedule slack (minTransferTime) here.
+        // It is distributed symmetrically over all preboard and prealight edges.
         return createState(this.time, this.vertex, stateData.options.reversedClone());
     }
 
