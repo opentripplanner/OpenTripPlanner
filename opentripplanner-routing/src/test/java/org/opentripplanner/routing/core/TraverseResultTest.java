@@ -25,21 +25,23 @@ public class TraverseResultTest {
 
         State resultChain = null;
 
+        /* note: times are rounded to seconds toward zero */
+        
         for (int i = 0; i < 4; i++) {
-            State r = new State(i, null, null);
+            State r = new State(i * 1000, null, null);
             resultChain = r.addToExistingResultChain(resultChain);
         }
 
-        assertEquals(3.0, resultChain.time, 0.0);
+        assertEquals(3000, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(2.0, resultChain.time, 0.0);
+        assertEquals(2000, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(1.0, resultChain.time, 0.0);
+        assertEquals(1000, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
-        assertEquals(0.0, resultChain.time, 0.0);
+        assertEquals(0000, resultChain.time, 0.0);
 
         resultChain = resultChain.getNextResult();
         assertNull(resultChain);
