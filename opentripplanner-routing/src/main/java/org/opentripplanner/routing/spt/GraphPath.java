@@ -153,22 +153,21 @@ public class GraphPath {
      * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
      * from this state to the other end of the implicit path.
      */
-    private State reverse(State state) {
+    private State reverse(State orig) {
 
-        State root = state.reversedClone();
+        State ret = orig.reversedClone();
 
-        while (state.getBackState() != null) {
-            State next = state.getBackState();
-            Edge edge = state.getBackEdge();
-            EdgeNarrative narrative = state.getBackEdgeNarrative();
-            StateEditor editor = root.edit(edge, narrative);
-            editor.incrementTimeMsec(state.getAbsTimeDeltaMsec());
-            editor.incrementWeight(state.getWeightDelta());
-            root = editor.makeState();
-            state = state.getBackState();
+        while (orig.getBackState() != null) {
+            Edge edge = orig.getBackEdge();
+            EdgeNarrative narrative = orig.getBackEdgeNarrative();
+            StateEditor editor = ret.edit(edge, narrative);
+            editor.incrementTimeMsec(orig.getAbsTimeDeltaMsec());
+            editor.incrementWeight(orig.getWeightDelta());
+            ret  = editor.makeState();
+            orig = orig.getBackState();
         }
 
-        return root;
+        return ret;
     }
 
     /**
@@ -181,18 +180,18 @@ public class GraphPath {
      *            - a state resulting from a path search
      * @return a state at the other end of a reversed, optimized path
      */
-    private static State optimize(State s) {
+    // optimize is now very similar to reverse, and the two could conceivably be combined
+    private static State optimize(State orig) {
 
-        // reverse the search direction
-        State ret = s.reversedClone();
-        for (State orig = s; orig != null; orig = orig.getBackState()) {
-            Edge e = orig.getBackEdge();
-            if (e == null)
-                continue; // break
-            ret = e.traverse(ret);
+    	State ret = orig.reversedClone();
+        
+        while (orig.getBackState() != null) {
+            Edge edge = orig.getBackEdge();
+            ret = edge.traverse(ret);
             EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
             EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
             copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
+            orig = orig.getBackState();
         }
         return ret;
     }
