@@ -216,12 +216,18 @@ public class GenericAStar {
                                 + v.getVertex());
                     }
 
-                    if (estimate > options.maxWeight || isWorstTimeExceeded(v, options)) {
+                    if (estimate > options.maxWeight) {
                         // too expensive to get here
+                        if (_verbose)
+                            System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
+                    } else if (isWorstTimeExceeded(v, options)) {
+                        // too much time to get here
+                    	if (_verbose)
+                            System.out.println("         too much time to reach, not enqueued. time = " + v.getTime());
                     } else {
                         if (spt.add(v)) {
                             pq.insert(v, estimate);
-                        }
+                        } 
                     }
                 }
             }
