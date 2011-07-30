@@ -63,9 +63,9 @@ public class GraphPath {
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
         if (back) {
-            lastState = optimize ? optimize(s) : reverse(s, s.getOptions().reversedClone());
+            lastState = optimize ? optimize(s) : reverse(s);
         } else {
-            lastState = optimize ? reverse(optimize(s), s.getOptions()) : s;
+            lastState = optimize ? reverse(optimize(s)) : s;
         }
         // DEBUG
         // lastState = s;
@@ -153,9 +153,9 @@ public class GraphPath {
      * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
      * from this state to the other end of the implicit path.
      */
-    private State reverse(State state, TraverseOptions options) {
+    private State reverse(State state) {
 
-        State root = state.createState(state.getTime(), state.getVertex(), options);
+        State root = state.reversedClone();
 
         while (state.getBackState() != null) {
             State next = state.getBackState();
