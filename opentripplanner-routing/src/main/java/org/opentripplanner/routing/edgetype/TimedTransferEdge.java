@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * In fact, our schedule slack and minimum transfer time implementation requires these special edges
  * to allow 'instantaneous' synchronized transfers.
  * 
- * A TimedTransferEdge should connect a station_arrive vertex to a station_depart vertex, bypassing
+ * A TimedTransferEdge should connect a stop_arrive vertex to a stop_depart vertex, bypassing
  * the preboard and prealight edges that handle the transfer table and schedule slack. The cost of
  * boarding a vehicle should is added in (pattern)board edges, so it is still taken into account.
  * 

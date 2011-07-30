@@ -708,11 +708,9 @@ public class GTFSPatternHopFactory {
             Vertex toVertex = graph.getVertex(departureVertexId(id(toStop.getId())));
             switch (t.getTransferType()) {
             case 1:
-                // timed transfer 
-                // transferTable.setTransferTime(fromVertex, toVertex, TransferTable.TIMED_TRANSFER);
-                
-                // Handle timed (synchronized) transfers with edges that bypass the street network
-                // note that from and to vertex here are actually arrival and departure vertices
+                // timed (synchronized) transfer 
+                // Handle with edges that bypass the street network.
+                // from and to vertex here are stop_arrive and stop_depart vertices
                 graph.addEdge(new TimedTransferEdge(fromVertex, toVertex));
                 break;
             case 2:
