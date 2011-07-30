@@ -53,6 +53,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
@@ -708,7 +709,11 @@ public class GTFSPatternHopFactory {
             switch (t.getTransferType()) {
             case 1:
                 // timed transfer 
-                transferTable.setTransferTime(fromVertex, toVertex, TransferTable.TIMED_TRANSFER);
+                // transferTable.setTransferTime(fromVertex, toVertex, TransferTable.TIMED_TRANSFER);
+                
+                // Handle timed (synchronized) transfers with edges that bypass the street network
+                // note that from and to vertex here are actually arrival and departure vertices
+                graph.addEdge(new TimedTransferEdge(fromVertex, toVertex));
                 break;
             case 2:
                 // min transfer time
