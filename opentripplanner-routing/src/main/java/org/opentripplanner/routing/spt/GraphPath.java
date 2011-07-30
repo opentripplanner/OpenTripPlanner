@@ -162,8 +162,8 @@ public class GraphPath {
             Edge edge = state.getBackEdge();
             EdgeNarrative narrative = state.getBackEdgeNarrative();
             StateEditor editor = root.edit(edge, narrative);
-            editor.setTime(next.getTime());
-            editor.setFromState(state);
+            editor.incrementTimeMsec(state.getAbsTimeDeltaMsec());
+            editor.incrementWeight(state.getWeightDelta());
             root = editor.makeState();
             state = state.getBackState();
         }
