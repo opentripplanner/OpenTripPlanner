@@ -60,7 +60,10 @@ public class State implements Cloneable {
         // parent-less states can only be created at the beginning of a trip. 
         // elsewhere, all states must be created from a parent 
         // and associated with an edge.
-        this.time = time;
+
+    	// Round toward zero, 1-second precision.
+    	// Otherwise, rounding errors will cause missed trips in reverse-optimization.
+    	this.time = time / 1000 * 1000;
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -70,6 +73,7 @@ public class State implements Cloneable {
         this.stateData = new StateData();
         stateData.options = opt;
         stateData.startTime = time;
+        // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
     }
     
     public State createState(long time, Vertex vertex, TraverseOptions options){
@@ -293,15 +297,9 @@ public class State implements Cloneable {
     }
 
     public State reversedClone() {
-        long timeAdjustment = 0;/*
-        // introduce some slack so that minimum transfer time does not cause missed trips in reverse-optimize
-        if (stateData.everBoarded) {
-            timeAdjustment = stateData.options.minTransferTime * 500 + 1; // half of minTransferTime in msec 
-            if (stateData.options.isArriveBy())
-                timeAdjustment *= -1;
-        }
-        */
-        return createState(this.time + timeAdjustment, this.vertex, stateData.options.reversedClone());
+    	// We no longer compensate for schedule slack (minTransferTime) here. 
+    	// It is distributed symmetrically over all preboard and prealight edges.
+        return createState(this.time, this.vertex, stateData.options.reversedClone());
     }
 
     public void dumpPath() {
