@@ -52,6 +52,8 @@ public class PreBoardEdge extends FreeEdge {
 	        if (fromVertex.isLocal()) {
 	            s1.setAlightedLocal(true);
 	        }
+	        
+	        s1.incrementTimeMsec(options.minTransferTime * 500);
 	        return s1.makeState();
     	} else {
     		/* Traverse forward: apply stop(pair)-specific costs */
@@ -80,7 +82,7 @@ public class PreBoardEdge extends FreeEdge {
              * this stop. 
              */
             long t0 = s0.getTime();
-            long board_after;
+            long board_after = t0 + options.minTransferTime * 500;
             long transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
             	/* this is a transfer rather than an initial boarding */
@@ -92,15 +94,14 @@ public class PreBoardEdge extends FreeEdge {
                 int transfer_time = transferTable.getTransferTime(s0.getPreviousStop(), getToVertex());
                 if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
                 	// use min transfer time relative to arrival time at this stop
-                	board_after = t0 + options.minTransferTime * 1000;
                 } else if (transfer_time >= 0) {
                     // handle minimum time transfers (>0) and timed transfers (0)
                 	// relative to alight time at last stop
-                	board_after = s0.getLastAlightedTime() + transfer_time * 1000;
+                	long table_board_after = s0.getLastAlightedTime() + transfer_time * 1000;
                 	// do not let time run backward 
                 	// this could make timed transfers fail if there is walking involved
-                	if (board_after < t0) 
-                		board_after = t0; 
+                	if (table_board_after > board_after) 
+                		board_after = table_board_after; 
                 } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
                     return null;
                 } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
@@ -108,7 +109,6 @@ public class PreBoardEdge extends FreeEdge {
                 	// TODO: verify correctness of this method (AMB)
                     transfer_penalty = 0; 
                 	// use min transfer time relative to arrival time at this stop
-                	board_after = t0 + options.minTransferTime * 1000;
                 } else {
                 	throw new IllegalStateException("Undefined value in transfer table.");
                 }
@@ -118,7 +118,6 @@ public class PreBoardEdge extends FreeEdge {
                 }
             } else { 
             	/* this is a first boarding, not a transfer - divide minTransferTime in half */
-            	board_after = t0 + options.minTransferTime * 500; 
             }
 
             // penalize transfers more heavily if requested by the user
