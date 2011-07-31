@@ -101,6 +101,22 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                     int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
                                                                options.getModes().getBicycle(), false);
                     if (patternIndex >= 0) {
+                        boolean nextDay = false;
+                        Trip trip = pattern.getTrip(patternIndex);
+                        while (options.bannedTrips.contains(trip.getId())) {
+                            /* trip banned, try previous trip */
+                            patternIndex -= 1;
+                            if (patternIndex < 0) {
+                                /* ran out of trips today */
+                                nextDay = true;
+                                break;
+                            }
+                            trip = pattern.getTrip(patternIndex);
+                        }
+                        if (nextDay) {
+                            continue;
+                        }
+
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting 
                         // should be expressed as non-negative.

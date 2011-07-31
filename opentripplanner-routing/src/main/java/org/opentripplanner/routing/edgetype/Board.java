@@ -82,7 +82,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
-        TraverseOptions options = state0.getOptions();
+    	TraverseOptions options = state0.getOptions();
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
@@ -94,6 +94,9 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             s1.setPreviousStop(fromv);
             return s1.makeState();
         } else {
+            if (options.bannedTrips.contains(getTrip().getId())) {
+                return null;
+            }
             // forward traversal: find a relevant transit trip
             if (!options.getModes().contains(hop.getMode())) {
                 return null;

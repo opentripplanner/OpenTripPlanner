@@ -23,12 +23,12 @@ import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
@@ -56,9 +56,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class ContractionPathServiceImpl implements PathService {
 
     private static final int MAX_TIME_FACTOR = 2;
-	
+
     private static final int MAX_WEIGHT_FACTOR = 2;
-	
+
     private static final Logger LOG = LoggerFactory.getLogger(ContractionPathServiceImpl.class);
 
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
@@ -75,7 +75,7 @@ public class ContractionPathServiceImpl implements PathService {
     public GraphService getGraphService() {
         return _graphService;
     }
-    
+
     @Autowired
     public void setGraphService(GraphService graphService) {
         _graphService = graphService;
@@ -108,27 +108,26 @@ public class ContractionPathServiceImpl implements PathService {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
-        
+
         Vertex origin = null;
         Vertex target = null;
-        
+
         if (options.isArriveBy()) {
-            origin = toVertex; 
+            origin = toVertex;
             target = fromVertex;
         } else {
             origin = fromVertex;
             target = toVertex;
         }
-        
-        State state = new State(targetTime.getTime(), origin, options);
 
+        State state = new State(targetTime.getTime(), origin, options);
 
         return plan(state, target, nItineraries);
     }
 
     @Override
     public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
-        
+
         Date targetTime = new Date(origin.getTime());
         TraverseOptions options = origin.getOptions();
 
@@ -144,25 +143,30 @@ public class ContractionPathServiceImpl implements PathService {
         }
         // decide which A* heuristic to use
         if (_graphService.getGraph().hasService(WeightTable.class)
-        	&& options.getModes().getTransit()) {
-        	options.remainingWeightHeuristic = new TableRemainingWeightHeuristic(_graphService.getGraph());
-        	LOG.debug("Weight table present in graph and transit itinerary requested. Using table-driven A* heuristic.");
+                && options.getModes().getTransit()) {
+            options.remainingWeightHeuristic = new TableRemainingWeightHeuristic(_graphService
+                    .getGraph());
+            LOG
+                    .debug("Weight table present in graph and transit itinerary requested. Using table-driven A* heuristic.");
         } else {
-        	LOG.debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
+            LOG
+                    .debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
         }
 
         // EXPERIMENTAL
-        // options.remainingWeightHeuristic = new LBGRemainingWeightHeuristic(_graphService.getGraph());
-        
+        // options.remainingWeightHeuristic = new
+        // LBGRemainingWeightHeuristic(_graphService.getGraph());
+
         // If transit is not to be used, disable walk limit and only search for one itinerary.
-        if ( ! options.getModes().getTransit()) {
-        	nItineraries = 1;
-        	options.maxWalkDistance = Double.MAX_VALUE;
+        if (!options.getModes().getTransit()) {
+            nItineraries = 1;
+            options.maxWalkDistance = Double.MAX_VALUE;
         }
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
-        // The list of options specifying various modes, banned routes, etc to try for multiple itineraries 
+        // The list of options specifying various modes, banned routes, etc to try for multiple
+        // itineraries
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
         optionQueue.add(options);
 
@@ -182,16 +186,16 @@ public class ContractionPathServiceImpl implements PathService {
             if (options == null) {
                 break;
             }
-            options.worstTime = maxTime;
-            options.maxWeight = maxWeight;
             StateEditor editor = new StateEditor(origin, null);
             editor.setTraverseOptions(options);
             origin = editor.makeState();
 
+            // options.worstTime = maxTime;
+            // options.maxWeight = maxWeight;
             long searchBeginTime = System.currentTimeMillis();
-        	LOG.debug("BEGIN SEARCH");
-            List<GraphPath> somePaths = _routingService.route(origin, target); 
-        	LOG.debug("END SEARCH {} msec", System.currentTimeMillis() - searchBeginTime);
+            LOG.debug("BEGIN SEARCH");
+            List<GraphPath> somePaths = _routingService.route(origin, target);
+            LOG.debug("END SEARCH {} msec", System.currentTimeMillis() - searchBeginTime);
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
@@ -212,29 +216,38 @@ public class ContractionPathServiceImpl implements PathService {
                 LOG.debug("Max weight set to:  {}", maxWeight);
             }
             if (somePaths.isEmpty()) {
-            	LOG.debug("NO PATHS FOUND");
+                LOG.debug("NO PATHS FOUND");
                 continue;
             }
             for (GraphPath path : somePaths) {
                 if (!paths.contains(path)) {
-                	// DEBUG 
-                	// path.dump();
+                    // DEBUG
+                    // path.dump();
                     paths.add(path);
-                    // now, create a list of options, one with each route in this trip banned.
-                    // the HashSet banned is not strictly necessary as the optionsQueue will
-                    // already remove duplicate options, but it might be slightly faster as
-                    // hashing TraverseOptions is slow.
-                    LOG.debug("New routespecs: {}", path.getRouteSpecs());
-                    for (RouteSpec spec : path.getRouteSpecs()) {
-                        TraverseOptions newOptions = options.clone();
-                        newOptions.bannedRoutes.add(spec);
-                        if (!optionQueue.contains(newOptions)) {
-                            optionQueue.add(newOptions);
-                        }
+                    // now, create a list of options, one with each trip in this journey banned.
+
+                    LOG.debug("New trips: {}", path.getTrips());
+                    TraverseOptions newOptions = options.clone();
+                    for (AgencyAndId trip : path.getTrips()) {
+                        newOptions.bannedTrips.add(trip);
                     }
+
+                    if (!optionQueue.contains(newOptions)) {
+                        optionQueue.add(newOptions);
+                    }
+                    /*
+                     * // now, create a list of options, one with each route in this trip banned. //
+                     * the HashSet banned is not strictly necessary as the optionsQueue will //
+                     * already remove duplicate options, but it might be slightly faster as //
+                     * hashing TraverseOptions is slow. LOG.debug("New routespecs: {}",
+                     * path.getRouteSpecs()); for (RouteSpec spec : path.getRouteSpecs()) {
+                     * TraverseOptions newOptions = options.clone();
+                     * newOptions.bannedRoutes.add(spec); if (!optionQueue.contains(newOptions)) {
+                     * optionQueue.add(newOptions); } }
+                     */
                 }
             }
-        	LOG.debug("{} / {} itineraries", paths.size(), nItineraries);
+            LOG.debug("{} / {} itineraries", paths.size(), nItineraries);
         }
         if (paths.size() == 0) {
             return null;
@@ -249,10 +262,10 @@ public class ContractionPathServiceImpl implements PathService {
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
             Date targetTime, TraverseOptions options) {
 
-    	if (options.getModes().contains(TraverseMode.TRANSIT)) {
-    		throw new UnsupportedOperationException("TSP is not supported for transit trips");
-    	}
-    	
+        if (options.getModes().contains(TraverseMode.TRANSIT)) {
+            throw new UnsupportedOperationException("TSP is not supported for transit trips");
+        }
+
         ArrayList<String> notFound = new ArrayList<String>();
         Vertex fromVertex = getVertexForPlace(fromPlace, options);
         if (fromVertex == null) {
@@ -283,8 +296,8 @@ public class ContractionPathServiceImpl implements PathService {
             options.setCalendarService(_graphService.getCalendarService());
 
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, 
-        		targetTime.getTime(), options);
+        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices,
+                targetTime.getTime(), options);
 
         return Arrays.asList(path);
     }

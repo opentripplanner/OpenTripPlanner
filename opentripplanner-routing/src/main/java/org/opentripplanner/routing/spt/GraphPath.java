@@ -16,6 +16,7 @@ package org.opentripplanner.routing.spt;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Edge;
@@ -26,6 +27,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 
 /**
@@ -118,8 +120,13 @@ public class GraphPath {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
             Edge e = s.getBackEdge();
+            Trip trip = null;
             if (e instanceof PatternBoard) {
-                Trip trip = ((PatternBoard) e).getPattern().getTrip(s.getTrip());
+                trip = ((PatternBoard) e).getPattern().getTrip(s.getTrip());
+            } else if (e instanceof Board) {
+                trip = ((Board) e).getTrip();
+            }
+            if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
                 RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
                 ret.add(spec);
@@ -129,13 +136,39 @@ public class GraphPath {
         return ret;
     }
 
+    /**
+     * Get a list containing one AgencyAndId (trip id) for each vehicle boarded in this path.
+     * 
+     * @return a list of the ids of trips used by this path
+     */
+    public List<AgencyAndId> getTrips() {
+        List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+        for (State s : states) {
+            Edge e = s.getBackEdge();
+            Trip trip = null;
+            if (e instanceof PatternBoard) {
+                trip  = ((PatternBoard) e).getPattern().getTrip(s.getTrip());
+            } else if (e instanceof Board) {
+                trip = ((Board) e).getTrip();
+            } else {
+                continue;
+            }
+                        ret.add(trip.getId());
+        }
+        return ret;
+    }
+
     public String toString() {
         return "GraphPath(" + states.toString() + ")";
     }
 
+    /**
+     * Two paths are equal if they use the same ordered list of trips
+     */
     public boolean equals(Object o) {
         if (o instanceof GraphPath) {
-            return this.edges.equals(((GraphPath) o).edges);
+            GraphPath go = (GraphPath) o;
+            return go.getTrips().equals(getTrips());
         }
         return false;
     }

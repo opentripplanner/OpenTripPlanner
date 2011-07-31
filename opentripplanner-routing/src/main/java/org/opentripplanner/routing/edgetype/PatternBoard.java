@@ -109,6 +109,22 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                     int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
                                                                 options.getModes().getBicycle(), true);
                     if (patternIndex >= 0) {
+                        boolean nextDay = false;
+                        Trip trip = pattern.getTrip(patternIndex);
+                        while (options.bannedTrips.contains(trip.getId())) {
+                            /* trip banned, try next trip */
+                            patternIndex += 1;
+                            if (patternIndex >= pattern.getTrips().size()) {
+                                /* ran out of trips today */
+                                nextDay = true;
+                                break;
+                            }
+                            trip = pattern.getTrip(patternIndex);
+                        }
+                        if (nextDay) {
+                            continue;
+                        }
+
                         // a trip was found, index is valid, wait will be non-negative
                         int wait = (int) ((sd.time(getPattern().getDepartureTime(stopIndex, patternIndex)) - current_time) / 1000);
                         if (wait < 0) _log.error("negative wait time on board");

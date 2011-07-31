@@ -354,11 +354,23 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         this.hasBogusName = hasBogusName;
     }
 
-	public void setNoThruTraffic(boolean noThruTraffic) {
-		this.noThruTraffic = noThruTraffic;
-	}
+    public void setNoThruTraffic(boolean noThruTraffic) {
+        this.noThruTraffic = noThruTraffic;
+    }
 
-	public boolean isNoThruTraffic() {
-		return noThruTraffic;
-	}
+    public boolean isNoThruTraffic() {
+        return noThruTraffic;
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof PlainStreetEdge)) {
+            return false;
+        }
+        PlainStreetEdge pso = (PlainStreetEdge) o;
+        return pso.back == back && pso.fromv == fromv && pso.tov == tov && pso.length == length && pso.name.equals(name);
+    }
+
+    public int hashCode() {
+        return (back ? 2 : 0) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
+    }
 }

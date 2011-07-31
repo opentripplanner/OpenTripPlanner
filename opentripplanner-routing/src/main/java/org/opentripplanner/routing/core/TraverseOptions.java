@@ -100,10 +100,15 @@ public class TraverseOptions implements Serializable, Cloneable {
     public int boardCost = 60 * 2;
 
     /**
-     * Do not use certain named routes, probably because we're trying to find alternate itineraries.
+     * Do not use certain named routes
      */
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
     
+    /**
+     * Do not use certain trips
+     */
+    public HashSet<AgencyAndId> bannedTrips = new HashSet<AgencyAndId>();
+
     /**
      * Set of preferred routes by user.
      */
@@ -249,6 +254,7 @@ public class TraverseOptions implements Serializable, Cloneable {
         try {
             TraverseOptions clone = (TraverseOptions) super.clone();
             clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
+            clone.bannedTrips = (HashSet<AgencyAndId>) bannedTrips.clone();
             if (this.walkingOptions != this)
             	clone.walkingOptions = this.walkingOptions.clone();
             else
@@ -278,6 +284,7 @@ public class TraverseOptions implements Serializable, Cloneable {
                     && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
                     && waitReluctance == to.waitReluctance && boardCost == to.boardCost
                     && bannedRoutes.equals(to.bannedRoutes)
+                    && bannedTrips.equals(to.bannedTrips)
                     && minTransferTime == to.minTransferTime
                     && baseTransferPenalty == to.baseTransferPenalty;
         }
@@ -291,8 +298,8 @@ public class TraverseOptions implements Serializable, Cloneable {
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(optimizeTransferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode() + minTransferTime * 20996011
-                + (int) baseTransferPenalty;
+                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373 + 
+                + minTransferTime * 20996011 + (int) baseTransferPenalty;
     }
 
     public void setArriveBy(boolean back) {
