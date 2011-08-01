@@ -217,16 +217,19 @@ public class GraphPath {
      */
     // optimize is now very similar to reverse, and the two could conceivably be combined
     private static State optimize(State orig) {
-
     	State ret = orig.reversedClone();
-        
-        while (orig.getBackState() != null) {
-            Edge edge = orig.getBackEdge();
-            ret = edge.traverse(ret);
-            EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
-            EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
-            copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
-            orig = orig.getBackState();
+        Edge edge = null;
+        try {
+            while (orig.getBackState() != null) {
+                edge = orig.getBackEdge();
+                ret = edge.traverse(ret);
+                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
+                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
+                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
+                orig = orig.getBackState();
+            }
+        } catch (NullPointerException e) {
+            throw new RuntimeException("Cannot reverse path at edge: " + edge);
         }
         return ret;
     }
