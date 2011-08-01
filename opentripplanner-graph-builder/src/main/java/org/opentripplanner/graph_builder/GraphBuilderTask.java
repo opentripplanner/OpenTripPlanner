@@ -81,6 +81,9 @@ public class GraphBuilderTask implements Runnable {
         
         Graph graph = _graphService.getGraph();
         
+        if (_graphBundle == null) {
+            throw new RuntimeException("graphBuilderTask has no attribute graphBundle.");
+        }
         File graphPath = _graphBundle.getGraphPath();
         
         if( graphPath.exists() && ! _alwaysRebuild) {
