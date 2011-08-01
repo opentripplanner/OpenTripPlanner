@@ -59,7 +59,7 @@ public class FindMaxWalkDistances {
     private static void assignStopDistances(Graph graph, TransitStop origin) {
         
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-        options.maxWalkDistance = Double.MAX_VALUE;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.walkReluctance = 1.0;
         options.speed = 1.0;
         

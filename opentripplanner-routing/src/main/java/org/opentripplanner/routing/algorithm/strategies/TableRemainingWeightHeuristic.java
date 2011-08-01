@@ -137,7 +137,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
         
         double w; // return value
         if (wt.includes(v)) {
-	        double remainingWalk = options.maxWalkDistance - s0.getWalkDistance();
+	        double remainingWalk = options.getMaxWalkDistance() - s0.getWalkDistance();
 			w = Double.POSITIVE_INFINITY;
 			for (NearbyStop ns : targetStops) {
 				if (ns.distance > remainingWalk) continue;

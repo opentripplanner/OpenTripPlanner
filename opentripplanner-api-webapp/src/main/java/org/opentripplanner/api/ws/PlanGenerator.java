@@ -497,7 +497,7 @@ public class PlanGenerator {
             options.maxSlope = request.getMaxSlope();
         }
         if (request.getMaxWalkDistance() > 0) {
-            options.maxWalkDistance = request.getMaxWalkDistance();
+            options.setMaxWalkDistance(request.getMaxWalkDistance());
         }
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();

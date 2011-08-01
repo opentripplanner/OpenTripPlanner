@@ -362,7 +362,7 @@ public class ContractionHierarchy implements Serializable {
         this.mode = mode;
         options = new TraverseOptions(new TraverseModeSet(mode));
         options.optimizeFor = optimize;
-        options.maxWalkDistance = Double.MAX_VALUE;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.freezeTraverseMode();
         backOptions = options.clone();
         backOptions.setArriveBy(true);
@@ -655,8 +655,8 @@ public class ContractionHierarchy implements Serializable {
         /** max walk distance cannot be less than distances to nearest transit stops */
         double minWalkDistance = origin.getDistanceToNearestTransitStop() + 
         						 target.getDistanceToNearestTransitStop();
-        upOptions.maxWalkDistance = Math.max(upOptions.maxWalkDistance, minWalkDistance);
-        downOptions.maxWalkDistance = Math.max(downOptions.maxWalkDistance, minWalkDistance);
+        upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
+        downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
 
     	upOptions.setArriveBy(false);
     	downOptions.setArriveBy(true);
@@ -738,7 +738,7 @@ public class ContractionHierarchy implements Serializable {
                 if (VERBOSE)
                 	_log.debug("    extract up {}", u);
 
-                if (downclosed.contains(u) && downspt.getState(u).getWalkDistance() + up_su.getWalkDistance() <= up_su.getOptions().maxWalkDistance) {
+                if (downclosed.contains(u) && downspt.getState(u).getWalkDistance() + up_su.getWalkDistance() <= up_su.getOptions().getMaxWalkDistance()) {
                     double thisMeetingCost = up_su.getWeight() + downspt.getState(u).getWeight();
                     if (VERBOSE)
                     	_log.debug("    meeting at {}", u);
@@ -844,7 +844,7 @@ public class ContractionHierarchy implements Serializable {
                 if (VERBOSE)
                 	_log.debug("    extract down {}", down_u);
 
-                if (upclosed.contains(down_u) && upspt.getState(down_u).getWalkDistance() + down_su.getWalkDistance() <= down_su.getOptions().maxWalkDistance) {
+                if (upclosed.contains(down_u) && upspt.getState(down_u).getWalkDistance() + down_su.getWalkDistance() <= down_su.getOptions().getMaxWalkDistance()) {
                     double thisMeetingCost = down_su.getWeight() + upspt.getState(down_u).getWeight();
                     if (VERBOSE)
                     	_log.debug("    meeting at {}", down_u);

@@ -60,7 +60,7 @@ public class TraverseOptions implements Serializable, Cloneable {
     /**
      * A maxWalkDistance of Double.MAX_VALUE indicates no limit
      */
-    public double maxWalkDistance = Double.MAX_VALUE;
+    double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
@@ -326,13 +326,13 @@ public class TraverseOptions implements Serializable, Cloneable {
             speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
             boardCost = 240; // cyclists hate loading their bike a second time
             walkingOptions = new TraverseOptions();
-            walkingOptions.getModes().setTransit(false);
             walkingOptions.setArriveBy(this.isArriveBy());
+            walkingOptions.maxWalkDistance = maxWalkDistance;
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
-            walkingOptions.getModes().setTransit(false);
             walkingOptions.setArriveBy(this.isArriveBy());
+            walkingOptions.maxWalkDistance = maxWalkDistance;
         }
     }
 
@@ -410,5 +410,16 @@ public class TraverseOptions implements Serializable, Cloneable {
     
     public boolean isReverseOptimizing() {
         return reverseOptimizing;
+    }
+
+    public double getMaxWalkDistance() {
+        return maxWalkDistance;
+    }
+
+    public void setMaxWalkDistance(double maxWalkDistance) {
+        this.maxWalkDistance = maxWalkDistance;
+        if (walkingOptions != null) {
+            walkingOptions.maxWalkDistance = maxWalkDistance;
+        }
     }
 }

@@ -160,7 +160,7 @@ public class ContractionPathServiceImpl implements PathService {
         // If transit is not to be used, disable walk limit and only search for one itinerary.
         if (!options.getModes().getTransit()) {
             nItineraries = 1;
-            options.maxWalkDistance = Double.MAX_VALUE;
+            options.setMaxWalkDistance(Double.MAX_VALUE);
         }
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();

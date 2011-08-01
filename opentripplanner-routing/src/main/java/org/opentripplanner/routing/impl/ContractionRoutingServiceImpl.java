@@ -71,12 +71,12 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         		Graph _graph = hierarchies.getGraph();
         		ShortestPathTree spt = aStar.getShortestPathTree(_graph, origin, target);
         		if (spt == null) {
-        	        return Collections.emptyList();
+        		    return Collections.emptyList();
         		}
         		List<GraphPath> paths = spt.getPaths(target, true);
         		if (paths == null || paths.isEmpty()) {
-        			options.maxWalkDistance *= 2;
-        			continue; // retry
+        		    options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
+        		    continue; // retry
         		} else {
         			return paths;
         		}
@@ -87,10 +87,10 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         	        
         	GraphPath path = hierarchy.getShortestPath(fromVertex, toVertex, origin.getTime(), options);
         	if (path == null) {
-        		options.maxWalkDistance *= 2;
-        		continue;
+        	    options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
+        	    continue;
         	} else {
-        		return Arrays.asList(path);
+        	    return Arrays.asList(path);
         	}
         }
         return Collections.emptyList();

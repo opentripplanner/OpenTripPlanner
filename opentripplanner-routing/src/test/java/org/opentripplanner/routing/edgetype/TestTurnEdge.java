@@ -178,7 +178,7 @@ public class TestTurnEdge extends TestCase {
         assertFalse(found);
 
         // with a maxWalkDistance, the transfer will be taken.
-        options.maxWalkDistance = 10000;
+        options.setMaxWalkDistance(10000);
         spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
 
         path = spt.getPath(trIn, false);

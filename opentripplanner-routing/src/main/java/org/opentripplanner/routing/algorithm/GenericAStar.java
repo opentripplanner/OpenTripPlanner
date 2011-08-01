@@ -122,7 +122,7 @@ public class GenericAStar {
         /** max walk distance cannot be less than distances to nearest transit stops */
         double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
                 + target.getDistanceToNearestTransitStop();
-        options.maxWalkDistance = Math.max(options.maxWalkDistance, minWalkDistance);
+        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), minWalkDistance));
 
         long computationStartTime = System.currentTimeMillis();
         long maxComputationTime = options.maxComputationTime;
