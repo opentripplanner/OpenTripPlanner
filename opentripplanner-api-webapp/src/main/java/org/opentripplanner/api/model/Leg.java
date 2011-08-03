@@ -126,12 +126,16 @@ public class Leg {
 	public String routeLongName;
 
     /**
-     * bogus walk legs are those that have 0.0 distance, and just one instruction 
+     * bogus walk/bike/car legs are those that have 0.0 distance, 
+     * and just one instruction
+     * 
      * @return boolean true if the leg is bogus 
      */
-    public boolean isBogusWalkLeg() {
+    public boolean isBogusNonTransitLeg() {
         boolean retVal = false;
-        if( TraverseMode.WALK.toString().equals(this.mode)         &&
+        if( (TraverseMode.WALK.toString().equals(this.mode) ||
+             TraverseMode.CAR.toString().equals(this.mode) ||
+             TraverseMode.BICYCLE.toString().equals(this.mode)) &&
             (this.walkSteps == null || this.walkSteps.size() <= 1) && 
             this.distance == 0) {
             retVal = true;

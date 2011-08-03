@@ -119,7 +119,7 @@ public class Itinerary {
         Iterator<Leg> it = legs.iterator();
         while (it.hasNext()) {
             Leg leg = it.next();
-            if (leg.isBogusWalkLeg()) {
+            if (leg.isBogusNonTransitLeg()) {
                 it.remove();
             }
         }
