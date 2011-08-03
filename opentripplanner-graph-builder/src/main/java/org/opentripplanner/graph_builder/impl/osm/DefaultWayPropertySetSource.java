@@ -361,6 +361,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         createNames(props, "highway=steps", "steps");
 
+        //slope overrides
+        props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
+        props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
+
         return props;
     }
 
