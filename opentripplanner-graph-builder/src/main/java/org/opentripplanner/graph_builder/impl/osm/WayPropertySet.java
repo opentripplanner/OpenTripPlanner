@@ -179,4 +179,8 @@ public class WayPropertySet {
 	public List<SlopeOverridePicker> getSlopeOverrides() {
 		return slopeOverrides;
 	}
+
+    public void setSlopeOverride(OSMSpecifier spec, boolean override) {
+        slopeOverrides.add(new SlopeOverridePicker(spec, override));
+    }
 }
