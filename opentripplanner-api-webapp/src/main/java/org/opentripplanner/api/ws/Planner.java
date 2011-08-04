@@ -138,7 +138,8 @@ public class Planner {
             @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops,
             @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
-            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes)
+            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes,
+            @DefaultValue("0") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer transferPenalty)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -190,7 +191,13 @@ public class Planner {
             String[] table = bannedRoutes.split(",");
             request.setBannedRoutes(table);
         }
-        
+
+        //replace deprecated optimization preference
+        if (optimize == OptimizeType.TRANSFERS) {
+            optimize = OptimizeType.QUICK;
+            transferPenalty += 1800;
+        }
+        request.setTransferPenalty(transferPenalty);
         request.setOptimize(optimize);
         request.setModes(modes);
         request.setMinTransferTime(minTransferTime);

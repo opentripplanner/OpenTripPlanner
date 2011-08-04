@@ -66,7 +66,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 } else {
                     boardCost = options.boardCost;
                 }
-
+                if (s.isEverBoarded()) {
+                    boardCost += options.transferPenalty;
+                }
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
                     return options.walkReluctance * euclidianDistance / options.speed;
                 } else {
@@ -105,7 +107,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 } else {
                     boardCost = options.boardCost;
                 }
-
+                if (s.isEverBoarded()) {
+                    boardCost += options.transferPenalty;
+                }
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
                     return options.walkReluctance * euclidianDistance
                             / options.speed;

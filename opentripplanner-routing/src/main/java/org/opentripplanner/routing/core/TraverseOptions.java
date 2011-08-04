@@ -72,7 +72,7 @@ public class TraverseOptions implements Serializable, Cloneable {
      * and take the Q to Union Square, then transfer to the 6. If this takes less than
      * optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    public long optimizeTransferPenalty = 1800;
+    public long transferPenalty = 0;
 
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
@@ -177,7 +177,7 @@ public class TraverseOptions implements Serializable, Cloneable {
 
     private TransferTable transferTable;
 
-    public long baseTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+    public long nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
     
 
     /**
@@ -280,13 +280,14 @@ public class TraverseOptions implements Serializable, Cloneable {
                     && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
                     && wheelchairAccessible == to.wheelchairAccessible
                     && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
-                    && optimizeTransferPenalty == to.optimizeTransferPenalty
+                    && transferPenalty == to.transferPenalty
                     && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
                     && waitReluctance == to.waitReluctance && boardCost == to.boardCost
                     && bannedRoutes.equals(to.bannedRoutes)
                     && bannedTrips.equals(to.bannedTrips)
                     && minTransferTime == to.minTransferTime
-                    && baseTransferPenalty == to.baseTransferPenalty;
+                    && nonpreferredTransferPenalty == to.nonpreferredTransferPenalty
+                    && transferPenalty == to.transferPenalty;
         }
         return false;
     }
@@ -296,10 +297,11 @@ public class TraverseOptions implements Serializable, Cloneable {
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
-                + new Double(optimizeTransferPenalty).hashCode() + new Double(maxSlope).hashCode()
+                + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373 + 
-                + minTransferTime * 20996011 + (int) baseTransferPenalty;
+                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373
+                + minTransferTime * 20996011 + (int) nonpreferredTransferPenalty
+                + (int) transferPenalty * 163013803;
     }
 
     public void setArriveBy(boolean back) {

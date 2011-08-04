@@ -151,7 +151,7 @@ public class TestRequest extends TestCase {
                 new TraverseModeSet("WALK"),
                 1,
                 null, false,
-                "", "", "");
+                "", "", "", 0);
         
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);

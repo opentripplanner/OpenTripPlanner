@@ -524,7 +524,7 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(new GregorianCalendar(2009, 8, 1, 16, 20, 0).getTimeInMillis(), path.getEndTime());
         
         //when optimizing for fewest transfers, take the slow one-bus path
-        options.optimizeFor = OptimizeType.TRANSFERS;
+        options.transferPenalty = 1800;
         spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
                 new GregorianCalendar(2009, 8, 1, 16, 0, 0). getTimeInMillis(), options);
 

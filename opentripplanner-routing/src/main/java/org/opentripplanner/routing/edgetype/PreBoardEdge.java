@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
@@ -89,7 +88,7 @@ public class PreBoardEdge extends FreeEdge {
                 TransferTable transferTable = options.getTransferTable();
                 if (transferTable.hasPreferredTransfers()) {
                 	// only penalize transfers if there are some that will be depenalized
-                    transfer_penalty = options.baseTransferPenalty;
+                    transfer_penalty = options.nonpreferredTransferPenalty;
                 }
                 int transfer_time = transferTable.getTransferTime(s0.getPreviousStop(), getToVertex());
                 if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
@@ -121,10 +120,10 @@ public class PreBoardEdge extends FreeEdge {
             }
 
             // penalize transfers more heavily if requested by the user
-            if (options.optimizeFor == OptimizeType.TRANSFERS && s0.isEverBoarded()) {
+            if (s0.isEverBoarded()) {
                 //this is not the first boarding, therefore we must have "transferred" -- whether
                 //via a formal transfer or by walking.
-                transfer_penalty += options.optimizeTransferPenalty;
+                transfer_penalty += options.transferPenalty;
             }
 
             StateEditor s1 = s0.edit(this);

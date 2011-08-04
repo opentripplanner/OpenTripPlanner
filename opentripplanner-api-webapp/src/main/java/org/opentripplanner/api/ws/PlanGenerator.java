@@ -529,6 +529,9 @@ public class PlanGenerator {
                 options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
             }
         }
+        if (request.getTransferPenalty() != null) {
+            options.transferPenalty = request.getTransferPenalty();
+        }
         return options;
     }
 
