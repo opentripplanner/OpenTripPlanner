@@ -252,9 +252,8 @@ public class ContractionPathServiceImpl implements PathService {
         if (paths.size() == 0) {
             return null;
         }
-        // We order the list of returned routes by the time of arrival (not the duration of the
-        // trip)
-        Collections.sort(paths, new PathComparator());
+        // We order the list of returned paths by the time of arrival or departure (not path duration)
+        Collections.sort(paths, new PathComparator(origin.getOptions().isArriveBy()));
         return paths;
     }
 
