@@ -20,15 +20,17 @@ import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 @XmlRootElement
 public class GraphMetadata {
 
+
     /**
      * The bounding box of the graph, in decimal degrees.
      */
-    private double minLatitude, minLongitude, maxLatitude, maxLongitude;
+    private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
     public GraphMetadata() {
     }
@@ -43,45 +45,151 @@ public class GraphMetadata {
         Graph graph = graphService.getGraph();
         
         /* generate extents */
-        Envelope env = new Envelope();
+        Envelope leftEnv = new Envelope();
+        Envelope rightEnv = new Envelope();
+        double aRightCoordinate = 0;
         for (GraphVertex gv : graph.getVertices()) {
-            env.expandToInclude(gv.vertex.getCoordinate());
+            Coordinate c = gv.vertex.getCoordinate();
+            if (c.x < 0) {
+                leftEnv.expandToInclude(c);
+            } else {
+                rightEnv.expandToInclude(c);
+                aRightCoordinate = c.x;
+            }
         }
-        setMinLongitude(env.getMinX());
-        setMaxLongitude(env.getMaxX());
-        setMinLatitude(env.getMinY());
-        setMaxLatitude(env.getMaxY());
+
+        if (leftEnv.getArea() == 0) {
+            //the entire area is in the eastern hemisphere
+            setLowerLeftLongitude(rightEnv.getMinX());
+            setUpperRightLongitude(rightEnv.getMaxX());
+            setLowerLeftLatitude(rightEnv.getMinY());
+            setUpperRightLatitude(rightEnv.getMaxY());
+        } else if (rightEnv.getArea() == 0) {
+            //the entire area is in the western hemisphere
+            setLowerLeftLongitude(leftEnv.getMinX());
+            setUpperRightLongitude(leftEnv.getMaxX());
+            setLowerLeftLatitude(leftEnv.getMinY());
+            setUpperRightLatitude(leftEnv.getMaxY());
+        } else {
+            //the area spans two hemispheres.  Either it crosses the prime meridian,
+            //or it crosses the 180th meridian (roughly, the international date line).  We'll check a random
+            //coordinate to find out
+
+            if (aRightCoordinate < 90) {
+                //assume prime meridian
+                setLowerLeftLongitude(leftEnv.getMinX());
+                setUpperRightLongitude(rightEnv.getMaxX());
+            } else {
+                //assume 180th meridian
+                setLowerLeftLongitude(leftEnv.getMaxX());
+                setUpperRightLongitude(rightEnv.getMinX());
+            }
+            setUpperRightLatitude(Math.max(rightEnv.getMaxY(), leftEnv.getMaxY()));
+            setLowerLeftLatitude(Math.min(rightEnv.getMinY(), leftEnv.getMinY()));
+        }
     }
 
+    public void setLowerLeftLatitude(double lowerLeftLatitude) {
+        this.lowerLeftLatitude = lowerLeftLatitude;
+    }
+
+    public double getLowerLeftLatitude() {
+        return lowerLeftLatitude;
+    }
+
+    public void setUpperRightLatitude(double upperRightLatitude) {
+        this.upperRightLatitude = upperRightLatitude;
+    }
+
+    public double getUpperRightLatitude() {
+        return upperRightLatitude;
+    }
+
+    public void setUpperRightLongitude(double upperRightLongitude) {
+        this.upperRightLongitude = upperRightLongitude;
+    }
+
+    public double getUpperRightLongitude() {
+        return upperRightLongitude;
+    }
+
+    public void setLowerLeftLongitude(double lowerLeftLongitude) {
+        this.lowerLeftLongitude = lowerLeftLongitude;
+    }
+
+    public double getLowerLeftLongitude() {
+        return lowerLeftLongitude;
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public void setMinLatitude(double minLatitude) {
-        this.minLatitude = minLatitude;
+        lowerLeftLatitude = minLatitude;
     }
 
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public double getMinLatitude() {
-        return minLatitude;
+        return lowerLeftLatitude;
     }
 
-    public void setMaxLongitude(double maxLongitude) {
-        this.maxLongitude = maxLongitude;
-    }
-
-    public double getMaxLongitude() {
-        return maxLongitude;
-    }
-
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public void setMinLongitude(double minLongitude) {
-        this.minLongitude = minLongitude;
+        lowerLeftLongitude = minLongitude;
     }
 
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public double getMinLongitude() {
-        return minLongitude;
+        return lowerLeftLongitude;
     }
 
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public void setMaxLatitude(double maxLatitude) {
-        this.maxLatitude = maxLatitude;
+        upperRightLatitude = maxLatitude;
     }
 
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
     public double getMaxLatitude() {
-        return maxLatitude;
+        return upperRightLatitude;
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public void setMaxLongitude(double maxLongitude) {
+        upperRightLongitude = maxLongitude;
+    }
+
+    /**
+     * The bounding box of the graph, in decimal degrees.  These are the old, deprecated
+     * names; the new names are the lowerLeft/upperRight.
+     *  @deprecated
+     */
+    public double getMaxLongitude() {
+        return upperRightLongitude;
     }
 }
