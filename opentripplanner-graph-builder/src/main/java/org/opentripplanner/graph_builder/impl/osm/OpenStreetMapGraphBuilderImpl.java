@@ -541,19 +541,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
              */
 
+            boolean forceBikes = false;
+            if (way.isTag("bicycle", "yes") || way.isTag("bicycle", "designated")) {
+                permissions = permissions.add(StreetTraversalPermission.BICYCLE);
+                forceBikes = true;
+            }
 
             if (way.isTag("cycleway", "dismount")) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
+                if (forceBikes) {
+                    _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way " + way.getId() + ", assuming dismount");
+                }
             }
 
             StreetTraversalPermission permissionsFront = permissions;
             StreetTraversalPermission permissionsBack = permissions;
             boolean oneWayBike = true;
             if (way.isTagTrue("oneway") || "roundabout".equals(tags.get("junction"))) {
-            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             } 
             if (way.isTag("oneway", "-1")) {
-            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             }
             if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
             	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);	
