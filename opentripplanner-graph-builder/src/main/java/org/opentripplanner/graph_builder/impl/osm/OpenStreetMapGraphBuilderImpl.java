@@ -57,6 +57,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
     private WayPropertySet wayPropertySet = new WayPropertySet();
+
+    private double bikeSafetyFactor = 4.0;
         
     /**
      * The source for OSM map data
@@ -248,7 +250,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (street != null) {
                         graph.addEdge(street);
                         Double safety = wayData.getSafetyFeatures().getFirst();
-                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety * getBikeSafetyFactor());
                         if (note != null) {
                             street.setNote(note);
                         }
@@ -258,7 +260,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (backStreet != null) {
                         graph.addEdge(backStreet);
                         Double safety = wayData.getSafetyFeatures().getSecond();
-                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
+                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety * getBikeSafetyFactor());
                         if (note != null) {
                             backStreet.setNote(note);
                         }
@@ -695,5 +697,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             return permission;
         }
+    }
+
+    /**
+     * How much safer transit is than biking along an ordinary street. The default is 4.0, which
+     * probably does not reflect reality (especially for rail), but should generate plausible
+     * routes.  Do not lower this value below the reciprocal of the safety of the safest street
+     * according to your bicycle safety settings.
+     * 
+     * @param bikeSafetyFactor
+     */
+    public void setBikeSafetyFactor(double bikeSafetyFactor) {
+        this.bikeSafetyFactor = bikeSafetyFactor;
+    }
+
+    public double getBikeSafetyFactor() {
+        return bikeSafetyFactor;
     }
 }
