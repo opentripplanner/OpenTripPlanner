@@ -94,9 +94,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 1.18, 1.18);
         setProperties(props, "highway=track", StreetTraversalPermission.ALL, 1.18, 1.18);
 
-        setProperties(props, "highway=footway", StreetTraversalPermission.PEDESTRIAN);
-        setProperties(props, "highway=footway;bicycle=yes", StreetTraversalPermission.PEDESTRIAN,
-                0.84, 0.84);
         setProperties(props, "highway=pedestrian", StreetTraversalPermission.PEDESTRIAN);
         setProperties(props, "highway=pedestrian;bicycle=yes",
                 StreetTraversalPermission.PEDESTRIAN, 0.73, 0.73);
@@ -259,6 +256,21 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=secondary;cycleway:left=shared_lane",
                 StreetTraversalPermission.ALL, 1.18, 0.91);
 
+
+        setProperties(props, "footway = sidewalk;highway = footway", 
+                StreetTraversalPermission.PEDESTRIAN);
+        setProperties(props, "footway = sidewalk;highway = footway;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN, 0.84, 0.84);
+        setProperties(props, "highway = footway;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN, 0.73, 0.73);
+        setProperties(props, "footway = sidewalk;highway = footway;bicycle=yes", 
+                StreetTraversalPermission.PEDESTRIAN, 1.1, 1.1);
+
+        setProperties(props, "highway=footway", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
+        setProperties(props, "highway=footway;bicycle=yes", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
+
         /* surface mixins */
 
         /* sand and fine gravel are deadly for bikes */
@@ -283,7 +295,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "surface=metal", StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=artifical_turf", StreetTraversalPermission.ALL, 1.5, 1.5,
                 true);
-
+        
         /* Portland-local mixins */
 
         setProperties(props, "RLIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97,
