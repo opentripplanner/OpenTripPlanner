@@ -487,7 +487,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 c = fromv.getClass();
                 while (c != null && c != Object.class) {
                     metadataModel.addElement("From vertex class:" + c);
-                    fields = c.getFields();
+                    fields = c.getDeclaredFields();
                     for (int i = 0; i < fields.length; i++) {
                     Field field = fields[i];
                     int modifiers = field.getModifiers();
