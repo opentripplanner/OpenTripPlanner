@@ -149,7 +149,9 @@ public class TraverseOptions implements Serializable, Cloneable {
      * to time it might take to walk between transit stops. This time should also be overridden by
      * specific transfer timing information in transfers.txt
      */
-    public int minTransferTime = 60 * 4;
+    // initialize to zero so this does not inadvertently affect tests
+    // let Planner handle defaults
+    public int minTransferTime = 0;
 
     public int maxTransfers = 2;
 
