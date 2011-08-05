@@ -28,5 +28,5 @@ public interface StreetVertexIndexService {
     
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
     
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options);
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, boolean nearTransitBonus);
 }

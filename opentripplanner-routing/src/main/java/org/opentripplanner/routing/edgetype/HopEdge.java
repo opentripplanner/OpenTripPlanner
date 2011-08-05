@@ -14,13 +14,14 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.routing.core.EdgeNarrative;
 
 /**
  * Hops and PatternHops have start/stop Stops
  * @author novalis
  *
  */
-public interface HopEdge {
+public interface HopEdge extends EdgeNarrative {
 
 	Stop getEndStop();
 

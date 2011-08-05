@@ -167,7 +167,7 @@ public class NetworkLinkerLibrary {
         }
 
         /* split an edge bundle? */
-        Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options);
+        Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options, true);
         if (edges == null || edges.size() < 2) {
             return null;
         }
