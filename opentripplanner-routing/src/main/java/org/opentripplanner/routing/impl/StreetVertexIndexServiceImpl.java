@@ -410,6 +410,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                         Geometry eg = e.getGeometry();
                         if (eg != null) {
                             double distance = eg.distance(p);
+                            if (nearTransitBonus && edgesNearTransit.contains(e)) {
+                                //edges near transit are considered closer, causing preferential snapping.
+                                distance /= 2;
+                            }
 
                             if (distance <= bestDistance + DISTANCE_ERROR) {
 
