@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.opentripplanner.graph_builder.services.RegionsSource;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.services.GraphService;
@@ -58,10 +57,9 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
         
     	List<Envelope> regions = new ArrayList<Envelope>();
 
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex vertex = gv.vertex;
-            if (vertex instanceof TransitStop) {
-                Coordinate c = vertex.getCoordinate();
+        for (Vertex gv : graph.getVertices()) {
+            if (gv instanceof TransitStop) {
+                Coordinate c = gv.getCoordinate();
                 Envelope env = new Envelope(c);
                 double meters_per_degree_lon_here =  
                     METERS_PER_DEGREE_LAT * Math.cos(Math.toRadians(c.y));

@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder.impl;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -28,7 +28,7 @@ public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph) {
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
             for (Edge e: gv.getOutgoing()) {
                 if (e instanceof PatternEdge) {
                     PatternEdge pe = (PatternEdge) e;

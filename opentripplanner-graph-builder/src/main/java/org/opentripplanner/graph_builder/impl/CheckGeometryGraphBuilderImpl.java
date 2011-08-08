@@ -18,7 +18,6 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +37,9 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph) {
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
-            if (Double.isNaN(v.getCoordinate().x) || Double.isNaN(v.getCoordinate().y)) {
-                _log.warn("Vertex " + v + " has NaN location; this will cause doom.");
+        for (Vertex gv : graph.getVertices()) {
+            if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
+                _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
             }
             
             for (EdgeNarrative e : filter(gv.getOutgoing(),EdgeNarrative.class)) {
