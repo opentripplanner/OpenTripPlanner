@@ -13,6 +13,10 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.util.Collection;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -61,4 +65,28 @@ public interface Vertex extends Cloneable {
     public void setDistanceToNearestTransitStop(double distance);
 
     public double getDistanceToNearestTransitStop();
+    
+    /****
+     * Ex-HasEdges Interface
+     ****/
+
+    public int getDegreeIn();
+
+    public int getDegreeOut();
+
+    public Collection<Edge> getIncoming();
+
+    public Collection<Edge> getOutgoing();
+
+    /****
+     * Private Methods
+     *****/
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        incoming.trimToSize();
+        outgoing.trimToSize();
+        out.defaultWriteObject();
+    }
+
+
 }

@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.cast;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -44,7 +45,30 @@ public class GenericVertex implements Vertex, Serializable {
     private double distanceToNearestTransitStop = 0;
 
     static int maxIndex = 0;
+    
+    /* --- ex-graphvertex ---*/
+    
+    ArrayList<Edge> incoming = new ArrayList<Edge>();
+    ArrayList<Edge> outgoing = new ArrayList<Edge>();
 
+    public void addOutgoing(Edge ee) {
+        outgoing.add(ee);
+    }
+    
+    public void addIncoming(Edge ee) {
+        incoming.add(ee);
+    }
+    
+    public void removeOutgoing(Edge ee) {
+        outgoing.remove(ee);
+    }
+    
+    public void removeIncoming(Edge ee) {
+        incoming.remove(ee);
+    }
+    
+    /* --- END ex-graphvertex ---*/
+    
     public GenericVertex(String label, Coordinate coord, String name) {
         this(label, coord.x, coord.y, name);
     }
