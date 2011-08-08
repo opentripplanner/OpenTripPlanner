@@ -20,6 +20,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -68,6 +69,26 @@ public class GenericVertex implements Vertex, Serializable {
         incoming.remove(ee);
     }
     
+    @Override
+    public int getDegreeIn() {
+        return incoming.size();
+    }
+
+    @Override
+    public int getDegreeOut() {
+        return outgoing.size();
+    }
+
+    @Override
+    public Collection<Edge> getIncoming() {
+        return incoming;
+    }
+
+    @Override
+    public Collection<Edge> getOutgoing() {
+        return outgoing;
+    }
+
     private void writeObject(ObjectOutputStream out) throws IOException {
         incoming.trimToSize();
         outgoing.trimToSize();
