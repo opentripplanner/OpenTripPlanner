@@ -21,6 +21,9 @@ public class TestMessages extends TestCase {
 
     public void testLanguages() {
 
+        // Force default to make test work on non-US machines
+        Locale.setDefault(new Locale("en", "US"));
+
         String e = Message.GEOCODE_FROM_AMBIGUOUS.get();
         String f = Message.GEOCODE_FROM_AMBIGUOUS.get(Locale.CANADA_FRENCH);
         String s = Message.GEOCODE_FROM_AMBIGUOUS.get(new Locale("es"));
