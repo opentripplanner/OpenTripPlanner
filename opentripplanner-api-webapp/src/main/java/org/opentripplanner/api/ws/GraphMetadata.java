@@ -16,7 +16,7 @@ package org.opentripplanner.api.ws;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,8 +48,8 @@ public class GraphMetadata {
         Envelope leftEnv = new Envelope();
         Envelope rightEnv = new Envelope();
         double aRightCoordinate = 0;
-        for (GraphVertex gv : graph.getVertices()) {
-            Coordinate c = gv.vertex.getCoordinate();
+        for (Vertex gv : graph.getVertices()) {
+            Coordinate c = gv.getCoordinate();
             if (c.x < 0) {
                 leftEnv.expandToInclude(c);
             } else {
