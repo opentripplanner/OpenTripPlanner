@@ -17,7 +17,6 @@ import java.util.ArrayList;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -48,10 +47,10 @@ public class NetworkLinker {
 
         _log.debug("creating linkages...");
         int i = 0;
-        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(graph.getVertices());
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
 
-        for (GraphVertex gv : vertices) {
-            Vertex v = gv.vertex;
+        for (Vertex gv : vertices) {
+            Vertex v = gv;
             if (i % 100000 == 0)
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;

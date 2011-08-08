@@ -23,7 +23,6 @@ import java.util.List;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -119,8 +118,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
         transitStopTree = new STRtree();
         intersectionTree = new STRtree();
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
+
+        for (Vertex gv : graph.getVertices()) {
+            Vertex v = gv;
             // We only care about StreetEdges
             for (StreetEdge e : filter(gv.getOutgoing(), StreetEdge.class)) {
                 if (e.getGeometry() == null) {
