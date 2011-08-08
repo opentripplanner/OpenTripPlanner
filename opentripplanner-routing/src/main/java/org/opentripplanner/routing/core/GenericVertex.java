@@ -17,6 +17,7 @@ import static org.opentripplanner.common.IterableLibrary.cast;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -67,6 +68,12 @@ public class GenericVertex implements Vertex, Serializable {
         incoming.remove(ee);
     }
     
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        incoming.trimToSize();
+        outgoing.trimToSize();
+        out.defaultWriteObject();
+    }
+
     /* --- END ex-graphvertex ---*/
     
     public GenericVertex(String label, Coordinate coord, String name) {
