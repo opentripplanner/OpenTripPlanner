@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -58,10 +57,14 @@ public class StreetUtils {
         ArrayList<DirectEdge> turns = new ArrayList<DirectEdge>(endpoints.size());
         
         for (Vertex v : endpoints) {
-        	GraphVertex gv = graph.getGraphVertex(v.getLabel());
+        	Vertex gv = graph.getVertex(v.getLabel());
         	if (gv == null) {
         		continue; // the vertex could have been removed from endpoints
         	}
+                if (gv != v) {
+                    throw new IllegalStateException("Vertex in graph is not the same one at endpoint."); 
+                }
+
             for (Edge e : gv.getIncoming()) {
                 PlainStreetEdge pse = (PlainStreetEdge) e;
                 boolean replaced = false;
@@ -136,13 +139,13 @@ public class StreetUtils {
     	
     	TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
     	
-    	for (GraphVertex gv : graph.getVertices()) {
-    		if (!(gv.vertex instanceof EndpointVertex)) {
+    	for (Vertex gv : graph.getVertices()) {
+    		if (!(gv instanceof EndpointVertex)) {
     			continue;
     		}
-        	State s0 = new State(gv.vertex, options);
+        	State s0 = new State(gv, options);
     		for (Edge e: gv.getOutgoing()) {
-    			GenericVertex in = (GenericVertex) gv.vertex;
+    			GenericVertex in = (GenericVertex) gv;
     			if (!(e instanceof StreetEdge)) {
         			continue;
         		}
@@ -170,11 +173,11 @@ public class StreetUtils {
    	
     	ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
     	/* associate each node with a subgraph */
-    	for (GraphVertex gv : graph.getVertices()) {
-    		if (!(gv.vertex instanceof EndpointVertex)) {
+    	for (Vertex gv : graph.getVertices()) {
+    		if (!(gv instanceof EndpointVertex)) {
     			continue;
     		}
-    		Vertex vertex = gv.vertex;
+    		Vertex vertex = gv;
     		if (subgraphs.containsKey(vertex)) {
     			continue;
     		}

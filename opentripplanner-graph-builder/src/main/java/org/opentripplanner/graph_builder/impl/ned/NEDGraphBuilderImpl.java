@@ -27,7 +27,6 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -80,7 +79,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 Interpolator2D.create((GridCoverage2D) gridCov, new InterpolationBilinear()) :
                 gridCov;
 
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof EdgeWithElevation) {
                     processEdge((EdgeWithElevation) ee);
