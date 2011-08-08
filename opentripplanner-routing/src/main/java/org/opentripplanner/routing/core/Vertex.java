@@ -77,5 +77,17 @@ public interface Vertex extends Cloneable {
     public Collection<Edge> getIncoming();
 
     public Collection<Edge> getOutgoing();
+    
+    /****
+     * Ex-GraphVertex
+     ****/
+
+    public void addOutgoing(Edge ee);
+
+    public void addIncoming(Edge ee);
+    
+    public void removeOutgoing(Edge ee);
+
+    public void removeIncoming(Edge ee);
 
 }

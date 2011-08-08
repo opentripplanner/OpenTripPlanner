@@ -28,12 +28,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * This holds the edge list for every vertex.
+ * A graph is really just one or more indexes into a set of vertexes. 
+ * It used to keep edge lists for each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20110614L;
+    private static final long serialVersionUID = 20111019L;
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
@@ -42,7 +43,7 @@ public class Graph implements Serializable {
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
-    HashMap<String, GraphVertex> vertices;
+    HashMap<String, Vertex> vertices;
 
     private TransferTable transferTable = new TransferTable();
 
@@ -54,86 +55,114 @@ public class Graph implements Serializable {
     }
 
     public Graph() {
-        this.vertices = new HashMap<String, GraphVertex>();
+        this.vertices = new HashMap<String, Vertex>();
     }
 
+    /**
+     * Add the given vertex to the graph, or if one already exists with the same label,
+     * return that instead.
+     * @param vv the vertex to add
+     * @return the existing or new vertex
+     */
     public Vertex addVertex(Vertex vv) {
         String label = vv.getLabel();
-        GraphVertex gv = vertices.get(label);
+        Vertex gv = vertices.get(label);
         if (gv == null) {
-            gv = new GraphVertex(vv);
-            vertices.put(label, gv);
+            vertices.put(label, vv);
+            return vv;
         }
-        return gv.vertex;
+        return vv;
     }
 
+    /**
+     * If the graph contains a vertex with the given label, return it.
+     * Otherwise, create a new GenericVertex with the given label and coordinates,
+     * add it to the graph, and return it.
+     */
     public Vertex addVertex(String label, double x, double y) {
-        GraphVertex gv = vertices.get(label);
+        Vertex gv = vertices.get(label);
         if (gv == null) {
             Vertex vv = new GenericVertex(label, x, y);
-            gv = new GraphVertex(vv);
-            vertices.put(label, gv);
+            vertices.put(label, vv);
+            return vv;
         }
-        return gv.vertex;
+        return gv;
     }
 
+    /**
+     * If the graph contains a vertex with the given label, return it.
+     * Otherwise, create a new GenericVertex with the given parameters,
+     * add it to the graph, and return it.
+     */
     public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
-        GraphVertex gv = vertices.get(label);
+        Vertex gv = vertices.get(label);
         if (gv == null) {
             Vertex vv = new GenericVertex(label, x, y, name, stopId);
-            gv = new GraphVertex(vv);
-            vertices.put(label, gv);
+            vertices.put(label, vv);
+            return vv;
         }
-        return gv.vertex;
+        return gv;
     }
 
+    /**
+     * If the graph contains a vertex with the given label, return it.
+     * Otherwise, return null.
+     */
     public Vertex getVertex(String label) {
-        GraphVertex gv = vertices.get(label);
-        if (gv == null) {
-            return null;
-        }
-        return gv.vertex;
-    }
-
-    public GraphVertex getGraphVertex(String label) {
         return vertices.get(label);
     }
 
-    public Collection<GraphVertex> getVertices() {
+    // DEPRECATED
+//    public GraphVertex getGraphVertex(String label) {
+//        return vertices.get(label);
+//    }
+
+    public Collection<Vertex> getVertices() {
         return vertices.values();
     }
 
     public void addEdge(Vertex a, Vertex b, Edge ee) {
         a = addVertex(a);
         b = addVertex(b);
-        vertices.get(a.getLabel()).addOutgoing(ee);
-        vertices.get(b.getLabel()).addIncoming(ee);
+        // there is the potential here for the edge lists to no longer match 
+        // the vertices pointed to by the edge
+        if (ee.getFromVertex() != a)
+            throw new IllegalStateException("Saving an edge with the wrong vertex.");
+        a.addOutgoing(ee);
+        b.addIncoming(ee);
     }
 
     public void addEdge(DirectEdge ee) {
         Vertex fromv = ee.getFromVertex();
-        Vertex tov = ee.getToVertex();
+        Vertex tov   = ee.getToVertex();
         fromv = addVertex(fromv);
-        tov = addVertex(tov);
-        vertices.get(fromv.getLabel()).addOutgoing(ee);
-        vertices.get(tov.getLabel()).addIncoming(ee);
+        tov   = addVertex(tov);
+        // there is the potential here for the edge lists to no longer match 
+        // the vertices pointed to by the edge
+        if (ee.getFromVertex() != fromv || ee.getToVertex() != tov)
+            throw new IllegalStateException("Saving an edge with the wrong vertex.");
+        fromv.addOutgoing(ee);
+        tov  .addIncoming(ee);
     }
 
     public void addEdge(String from_label, String to_label, Edge ee) {
-        Vertex v1 = this.getVertex(from_label);
-        Vertex v2 = this.getVertex(to_label);
-
-        addEdge(v1, v2, ee);
+        Vertex a = this.getVertex(from_label);
+        Vertex b = this.getVertex(to_label);
+        // there is the potential here for the edge lists to no longer match 
+        // the vertices pointed to by the edge
+        if (ee.getFromVertex() != a)
+            throw new IllegalStateException("Saving an edge with the wrong vertex.");
+        addEdge(a, b, ee);
     }
 
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
         Coordinate c = new Coordinate(lon, lat);
-        for (GraphVertex vv : vertices.values()) {
-            double dist = vv.vertex.distance(c);
+        for (Vertex vv : vertices.values()) {
+            double dist = vv.distance(c);
             if (dist < minDist) {
-                ret = vv.vertex;
+                ret = vv;
                 minDist = dist;
             }
         }
@@ -159,70 +188,101 @@ public class Graph implements Serializable {
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
-        GraphVertex gv = getGraphVertex(vertex);
+        Vertex gv = this.getVertex(vertex.getLabel());
         if (gv == null) {
             return;
         }
+        if (gv != vertex) {
+            throw new IllegalStateException("Vertex has the same label as one in the graph, but is not the same object.");
+        }            
         vertices.remove(vertex.getLabel());
         for (Edge e : gv.getOutgoing()) {
             if (e instanceof DirectEdge) {
                 DirectEdge edge = (DirectEdge) e;
-                GraphVertex target = vertices.get(edge.getToVertex().getLabel());
+                // this used to grab the graphvertex by label... now it could possibly be a vertex that is not in the graph
+                // Vertex target = vertices.get(edge.getToVertex().getLabel());
+                Vertex target = edge.getToVertex();
                 if (target != null) {
                     target.removeIncoming(e);
                 }
             }
         }
         for (Edge e : gv.getIncoming()) {
+            // why only directedges?
             if (e instanceof DirectEdge) {
                 DirectEdge edge = (DirectEdge) e;
-                GraphVertex source = vertices.get(edge.getFromVertex().getLabel());
+                //Vertex source = vertices.get(edge.getFromVertex().getLabel());
+                Vertex source = edge.getFromVertex();
                 if (source != null) {
-                    source.removeIncoming(e);
+                    // changed to removeOutgoing (AB)
+                    source.removeOutgoing(e);
                 }
             }
         }
     }
 
+    public void removeEdge(AbstractEdge e) {
+        Vertex fv  = e.getFromVertex();
+        Vertex fgv = vertices.get(fv.getLabel());
+            if (fgv != null) {
+                if (fv != fgv)
+                    throw new IllegalStateException("Vertex / edge mismatch.");
+                else
+                    fgv.removeOutgoing(e);
+            }
+            Vertex tv  = e.getToVertex();
+            Vertex tgv = vertices.get(tv.getLabel());
+            if (tgv != null) {
+                if (tv != tgv)
+                    throw new IllegalStateException("Vertex / edge mismatch.");
+                else
+                    tgv.removeIncoming(e);
+            }
+    }
+
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (GraphVertex v : this.getVertices()) {
-            env.expandToInclude(v.vertex.getCoordinate());
+        for (Vertex v : this.getVertices()) {
+            env.expandToInclude(v.getCoordinate());
         }
         return env;
     }
 
+    // TODO: these should be removed (AB) 
+
     public Collection<Edge> getOutgoing(Vertex v) {
-        return vertices.get(v.getLabel()).outgoing;
+        return v.getOutgoing();
     }
 
     public Collection<Edge> getIncoming(Vertex v) {
-        return vertices.get(v.getLabel()).incoming;
+        return v.getIncoming();
     }
 
     public int getDegreeOut(Vertex v) {
-        return vertices.get(v.getLabel()).outgoing.size();
+        return v.getDegreeOut();
     }
 
     public int getDegreeIn(Vertex v) {
-        return vertices.get(v.getLabel()).incoming.size();
+        return v.getDegreeIn();
     }
 
     public Collection<Edge> getIncoming(String label) {
-        return vertices.get(label).incoming;
+        return vertices.get(label).getIncoming();
     }
 
     public Collection<Edge> getOutgoing(String label) {
-        return vertices.get(label).outgoing;
+        return vertices.get(label).getOutgoing();
     }
 
-    public GraphVertex getGraphVertex(Vertex vertex) {
-        return getGraphVertex(vertex.getLabel());
-    }
+//DEPRECATED
+//    public GraphVertex getGraphVertex(Vertex vertex) {
+//        return getGraphVertex(vertex.getLabel());
+//    }
 
-    public void addGraphVertex(GraphVertex graphVertex) {
-        vertices.put(graphVertex.vertex.getLabel(), graphVertex);
-    }
+//DEPRECATED
+//    public void addGraphVertex(GraphVertex graphVertex) {
+//        vertices.put(graphVertex.vertex.getLabel(), graphVertex);
+//    }
 
     public TransferTable getTransferTable() {
         return transferTable;
@@ -249,28 +309,9 @@ public class Graph implements Serializable {
         long t = d.getTime();
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
-
-    public void removeEdge(DirectEdge e) {
-        GraphVertex gv = vertices.get(e.getFromVertex().getLabel());
-        if (gv != null) {
-            gv.removeOutgoing(e);
-        }
-        gv = vertices.get(e.getToVertex().getLabel());
-        if (gv != null) {
-            gv.removeIncoming(e);
-        }
-    }
     
     public int countVertices () {
         return vertices.size();
-    }
-
-    public int countEdges () {
-        int nEdges = 0;
-        for (GraphVertex gv : vertices.values()) {
-            nEdges += gv.getDegreeOut();
-        }
-        return nEdges;
     }
 
     public GraphBundle getBundle() {
