@@ -177,20 +177,21 @@ public class GenericVertex implements Vertex, Serializable {
      * sequential non-branching streets, and empty dwells.
      */
     public void mergeFrom(Graph graph, GenericVertex other) {
-        GraphVertex gv = graph.getGraphVertex(this);
+        // GraphVertex gv = graph.getGraphVertex(this);
 
         // We only support Vertices that are direct edges when merging
-        Iterable<DirectEdge> incoming = cast(gv.incoming);
-        Iterable<DirectEdge> outgoing = cast(gv.outgoing);
-        Iterator<DirectEdge> it = incoming.iterator();
+        Iterable<DirectEdge> incoming = cast(this.incoming);
+        Iterable<DirectEdge> outgoing = cast(this.outgoing);
+
         //remove incoming edges from other to this
+        Iterator<DirectEdge> it = incoming.iterator();
         while(it.hasNext()) {
             DirectEdge edge = it.next();
             if (edge.getFromVertex() == other) {
                 it.remove();
             }
         }
-        //remove outgoing edges from other to this
+        //remove outgoing edges from this to other
         it = outgoing.iterator();
         while(it.hasNext()) {
             DirectEdge edge = it.next();
@@ -203,9 +204,8 @@ public class GenericVertex implements Vertex, Serializable {
             if (edge.getFromVertex() == this) {
                 continue;
             }
-
             edge.setToVertex(this);
-            gv.addIncoming(edge);
+            this.addIncoming(edge);
         }
         //add outgoing edges from other to outgoing from this
         for (AbstractEdge edge : cast(graph.getOutgoing(other), AbstractEdge.class)) {
@@ -213,7 +213,7 @@ public class GenericVertex implements Vertex, Serializable {
                 continue;
             }
             edge.setFromVertex(this);
-            gv.addOutgoing(edge);
+            this.addOutgoing(edge);
         }
         graph.removeVertex(other);
     }
