@@ -225,31 +225,31 @@ public class Graph implements Serializable {
         return env;
     }
 
-    // TODO: these should be removed (AB)
-
-    public Collection<Edge> getOutgoing(Vertex v) {
-        return v.getOutgoing();
-    }
-
-    public Collection<Edge> getIncoming(Vertex v) {
-        return v.getIncoming();
-    }
-
-    public int getDegreeOut(Vertex v) {
-        return v.getDegreeOut();
-    }
-
-    public int getDegreeIn(Vertex v) {
-        return v.getDegreeIn();
-    }
-
-    public Collection<Edge> getIncoming(String label) {
-        return vertices.get(label).getIncoming();
-    }
-
-    public Collection<Edge> getOutgoing(String label) {
-        return vertices.get(label).getOutgoing();
-    }
+// DEPRECATED
+//
+//    public Collection<Edge> getOutgoing(Vertex v) {
+//        return v.getOutgoing();
+//    }
+//
+//    public Collection<Edge> getIncoming(Vertex v) {
+//        return v.getIncoming();
+//    }
+//
+//    public int getDegreeOut(Vertex v) {
+//        return v.getDegreeOut();
+//    }
+//
+//    public int getDegreeIn(Vertex v) {
+//        return v.getDegreeIn();
+//    }
+//
+//    public Collection<Edge> getIncoming(String label) {
+//        return vertices.get(label).getIncoming();
+//    }
+//
+//    public Collection<Edge> getOutgoing(String label) {
+//        return vertices.get(label).getOutgoing();
+//    }
 
     // DEPRECATED
     // public GraphVertex getGraphVertex(Vertex vertex) {

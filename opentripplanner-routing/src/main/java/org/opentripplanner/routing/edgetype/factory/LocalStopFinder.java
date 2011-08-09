@@ -28,7 +28,6 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
@@ -77,9 +76,9 @@ public class LocalStopFinder {
         patterns = new HashSet<TripPattern>();
 
         int total = 0;
-        for (GraphVertex gv : graph.getVertices()) {
-            if (gv.vertex instanceof TransitStop) {
-                ((TransitStop) gv.vertex).setLocal(true);
+        for (Vertex gv : graph.getVertices()) {
+            if (gv instanceof TransitStop) {
+                ((TransitStop) gv).setLocal(true);
                 total ++;
             }
             for (Edge e : gv.getOutgoing()) {
@@ -236,12 +235,16 @@ public class LocalStopFinder {
 
             if (fromv instanceof TransitStop) {
                 Vertex departureVertex = null;
-                for (DirectEdge e : filter(graph.getOutgoing(fromv),DirectEdge.class)) {
+                for (DirectEdge e : filter(fromv.getOutgoing(),DirectEdge.class)) {
                     /* to departure vertex */
                     departureVertex = e.getToVertex();
                     break;
                 }
-                for (Edge e : graph.getOutgoing(departureVertex)) {
+                if (departureVertex == null) {
+                    _log.debug("Stop without departure vertex.");
+                    continue;
+                }
+                for (Edge e : departureVertex.getOutgoing()) {
                     if (e instanceof PatternBoard) {
                         /* finally, a PatternBoard */
                         TripPattern pattern = ((PatternBoard) e).getPattern();
@@ -268,7 +271,7 @@ public class LocalStopFinder {
                 return patternCosts;
             }
 
-            Iterable<Edge> outgoing = graph.getOutgoing(fromv);
+            Iterable<Edge> outgoing = fromv.getOutgoing();
 
             for (Edge edge : outgoing) {
 
@@ -311,13 +314,13 @@ public class LocalStopFinder {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
                     // enter to get to actual stop
-                    for (DirectEdge e : filter(graph.getOutgoing(v),DirectEdge.class)) {
+                    for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
                         v = e.getToVertex();
                         break;
                     }
                 }
-                for (DirectEdge e : filter(graph.getOutgoing(v),DirectEdge.class)) {
-                    for (Edge e2 : graph.getOutgoing(e.getToVertex())) {
+                for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
+                    for (Edge e2 : e.getToVertex().getOutgoing()) {
                         if (e2 instanceof PatternBoard) {
                             neighborhood.add(((PatternBoard) e2).getPattern());
                         }

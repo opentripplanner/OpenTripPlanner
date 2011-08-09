@@ -73,7 +73,7 @@ public class StreetUtils {
                 if (restrictions != null) {
                 	restriction = restrictions.get(pse);
                 }
-                for (Edge e2 : graph.getOutgoing(v)) {
+                for (Edge e2 : v.getOutgoing()) {
                     StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
                     
                     TurnEdge turn = new TurnEdge(v1, v2);
@@ -91,13 +91,19 @@ public class StreetUtils {
                     }
                 }
                 if (!replaced) {
+                    /*
+                     * NOTE that resetting the from-vertex only works because all of the 
+                     * endpoint vertices will soon have their edgelists reinitialized, and 
+                     * then all these edges will be re-added to the graph.
+                     * This can and does have rather unpredictable behavior, and should 
+                     * eventually be changed.
+                     */
                     pse.setFromVertex(v1);
                     turns.add(pse);
                 }
             }
         }
         /* remove standard graph */
-
         for (Vertex v : endpoints) {
             graph.removeVertexAndEdges(v);
         }
@@ -204,7 +210,7 @@ public class StreetUtils {
     }
     
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
-    	Collection<Edge> outgoing = new ArrayList<Edge>(graph.getOutgoing(v));
+    	Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
 		for (Edge e : outgoing) {
     		if (e instanceof PlainStreetEdge) {
     			PlainStreetEdge pse = (PlainStreetEdge) e;
@@ -217,7 +223,7 @@ public class StreetUtils {
     			}
     		}
     	}
-		if (graph.getOutgoing(v).size() == 0) {
+		if (v.getOutgoing().size() == 0) {
 			graph.removeVertexAndEdges(v);
 		}
 	}
