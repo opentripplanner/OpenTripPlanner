@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -33,7 +34,7 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TraverseOptions implements Cloneable {
+public class TraverseOptions implements Cloneable, Serializable {
 
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
@@ -232,6 +233,12 @@ public class TraverseOptions implements Cloneable {
     	this.setModes(new TraverseModeSet(mode));
 	}
 
+    public TraverseOptions(TraverseMode mode, OptimizeType optimize) {
+    	this();
+    	this.setModes(new TraverseModeSet(mode));
+        this.optimizeFor = optimize;
+	}
+
 	public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
     }
@@ -338,6 +345,10 @@ public class TraverseOptions implements Cloneable {
         return walkingOptions;
     }
 
+    public void setMode(TraverseMode mode) {
+        setModes(new TraverseModeSet(mode));
+    }
+
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
@@ -360,6 +371,14 @@ public class TraverseOptions implements Cloneable {
 
     public TraverseModeSet getModes() {
         return modes;
+    }
+
+    public void setOptimize(OptimizeType optimize) {
+        optimizeFor = optimize;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     /**
@@ -443,5 +462,23 @@ public class TraverseOptions implements Cloneable {
         if (walkingOptions != null) {
             walkingOptions.maxWalkDistance = maxWalkDistance;
         }
+    }
+
+    public final static int MIN_SIMILARITY = 1000;
+
+    public int similarity(TraverseOptions options) {
+        int s = 0;
+
+        if(getModes().getNonTransitMode() == options.getModes().getNonTransitMode()) {
+            s += 1000;
+        }
+        if(optimizeFor == options.optimizeFor) {
+            s += 700;
+        }
+        if(wheelchairAccessible == options.wheelchairAccessible) {
+            s += 500;
+        }
+
+        return s;
     }
 }

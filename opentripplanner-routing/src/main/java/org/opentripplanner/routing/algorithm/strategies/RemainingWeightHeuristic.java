@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import java.io.Serializable;
+
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -20,7 +22,7 @@ import org.opentripplanner.routing.core.Vertex;
  * Interface for classes that provides an admissible estimate of (lower bound on) 
  * the weight of a path to the target, starting from a given state.
  */
-public interface RemainingWeightHeuristic {
+public interface RemainingWeightHeuristic extends Serializable {
 	
 	/** 
 	 * It is important to evaluate the initial weight before computing additional weights, 

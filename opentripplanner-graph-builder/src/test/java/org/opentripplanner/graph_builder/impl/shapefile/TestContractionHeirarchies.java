@@ -41,7 +41,6 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
@@ -222,7 +221,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         // test getShortcuts
         
-        ContractionHierarchy testch = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 0.0);
+        ContractionHierarchy testch = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
         List<Shortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
@@ -233,7 +232,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertEquals(0, shortcuts.size());
 
         // test hierarchy construction
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         assertTrue(hierarchy.down.getVertices().size() == graphSize);
         assertTrue(hierarchy.up.getVertices().size() == graphSize);
@@ -360,7 +359,7 @@ public class TestContractionHeirarchies extends TestCase {
             }
         }
 
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
@@ -501,7 +500,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertTrue("Path must take subway", subway1);
 
         ContractionHierarchySet chs = new ContractionHierarchySet();
-        chs.addModeAndOptimize(new ModeAndOptimize(TraverseMode.WALK, OptimizeType.QUICK));
+        chs.addTraverseOptions(new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK));
         chs.setContractionFactor(0.50);
         chs.setGraph(graph);
         chs.build();

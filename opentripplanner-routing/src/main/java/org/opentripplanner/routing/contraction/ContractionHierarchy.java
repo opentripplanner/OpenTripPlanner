@@ -346,27 +346,24 @@ public class ContractionHierarchy implements Serializable {
      * Create a contraction hierarchy from a graph.
      * 
      * @param orig
-     * @param optimize
-     * @param mode
+     * @param options
      * @param contractionFactor
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
-    public ContractionHierarchy(Graph orig, OptimizeType optimize, TraverseMode mode,
-            double contractionFactor) {
+    public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
         graph = new Graph();
         // clone graph
         for (GraphVertex gv : orig.getVertices()) {
             graph.addGraphVertex(new GraphVertex(gv));
         }
 
-        this.mode = mode;
-        options = new TraverseOptions(new TraverseModeSet(mode));
-        options.optimizeFor = optimize;
-        options.setMaxWalkDistance(Double.MAX_VALUE);
-        options.freezeTraverseMode();
-        backOptions = options.clone();
+        this.options = options;
+        this.options.setMaxWalkDistance(Double.MAX_VALUE);
+        backOptions = this.options.clone();
         backOptions.setArriveBy(true);
         this.contractionFactor = contractionFactor;
+
+        this.mode = this.options.getModes().getNonTransitMode();
 
         init();
         useCoreVerticesFrom(orig);
