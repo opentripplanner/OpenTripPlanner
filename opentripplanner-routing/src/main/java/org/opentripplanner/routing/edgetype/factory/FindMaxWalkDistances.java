@@ -18,7 +18,6 @@ import java.util.HashSet;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -37,18 +36,18 @@ public class FindMaxWalkDistances {
 
     public static void find(Graph graph) {
         _log.debug("finding max walk distances");
-        for (GraphVertex gv : graph.getVertices()) {
-            gv.vertex.setDistanceToNearestTransitStop(Double.MAX_VALUE);
+        for (Vertex gv : graph.getVertices()) {
+            gv.setDistanceToNearestTransitStop(Double.MAX_VALUE);
         }
-        for (GraphVertex gv : graph.getVertices()) {
-            if (gv.vertex instanceof TransitStop) { 
-                assignStopDistances(graph, (TransitStop) gv.vertex);
+        for (Vertex gv : graph.getVertices()) {
+            if (gv instanceof TransitStop) { 
+                assignStopDistances(graph, (TransitStop) gv);
             }
         }
-        for (GraphVertex gv : graph.getVertices()) {
-            if (gv.vertex.getDistanceToNearestTransitStop() == Double.MAX_VALUE) {
+        for (Vertex gv : graph.getVertices()) {
+            if (gv.getDistanceToNearestTransitStop() == Double.MAX_VALUE) {
                 /* transit vertices don't get explored by assignStopDistances */
-                gv.vertex.setDistanceToNearestTransitStop(0);
+                gv.setDistanceToNearestTransitStop(0);
             }
         }
     }
@@ -80,7 +79,7 @@ public class FindMaxWalkDistances {
 
             closed.add(fromv);
 
-            Iterable<Edge> outgoing = graph.getOutgoing(fromv);
+            Iterable<Edge> outgoing = fromv.getOutgoing();
 
             for (Edge edge : outgoing) {
 
