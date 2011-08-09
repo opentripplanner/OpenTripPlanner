@@ -95,6 +95,36 @@ public class GenericVertex implements Vertex, Serializable {
         out.defaultWriteObject();
     }
 
+    @Override
+    public void removeAllEdges() {
+        for (Edge e : outgoing) {
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                // this used to grab the graphvertex by label... now it could possibly be a vertex
+                // that is not in the graph
+                // Vertex target = vertices.get(edge.getToVertex().getLabel());
+                Vertex target = edge.getToVertex();
+                if (target != null) {
+                    target.removeIncoming(e);
+                }
+            }
+        }
+        for (Edge e : incoming) {
+            // why only directedges?
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                // Vertex source = vertices.get(edge.getFromVertex().getLabel());
+                Vertex source = edge.getFromVertex();
+                if (source != null) {
+                    // changed to removeOutgoing (AB)
+                    source.removeOutgoing(e);
+                }
+            }
+        }
+        incoming = new ArrayList<Edge>();
+        outgoing = new ArrayList<Edge>();
+    }
+    
     /* --- END ex-graphvertex ---*/
     
     public GenericVertex(String label, Coordinate coord, String name) {
@@ -242,4 +272,5 @@ public class GenericVertex implements Vertex, Serializable {
     public static int getMaxIndex() {
     	return maxIndex;
     }
+
 }

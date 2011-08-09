@@ -194,31 +194,8 @@ public class Graph implements Serializable {
             throw new IllegalStateException(
                     "Vertex has the same label as one in the graph, but is not the same object.");
         }
+        vertex.removeAllEdges();
         vertices.remove(vertex.getLabel());
-        for (Edge e : gv.getOutgoing()) {
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
-                // this used to grab the graphvertex by label... now it could possibly be a vertex
-                // that is not in the graph
-                // Vertex target = vertices.get(edge.getToVertex().getLabel());
-                Vertex target = edge.getToVertex();
-                if (target != null) {
-                    target.removeIncoming(e);
-                }
-            }
-        }
-        for (Edge e : gv.getIncoming()) {
-            // why only directedges?
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
-                // Vertex source = vertices.get(edge.getFromVertex().getLabel());
-                Vertex source = edge.getFromVertex();
-                if (source != null) {
-                    // changed to removeOutgoing (AB)
-                    source.removeOutgoing(e);
-                }
-            }
-        }
     }
 
     public void removeEdge(AbstractEdge e) {
