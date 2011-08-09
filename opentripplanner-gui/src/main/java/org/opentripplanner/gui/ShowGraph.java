@@ -36,7 +36,6 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -255,12 +254,12 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         edgeIndex = new STRtree();
         Envelope env;
         // int xminx, xmax, ymin, ymax;
-        for (GraphVertex gv : graph.getVertices()) {
-        	Vertex v = gv.vertex;
+        for (Vertex gv : graph.getVertices()) {
+        	Vertex v = gv;
             if ((v instanceof TransitStop) ||
             	(v instanceof StreetLocation) || 
             	(v instanceof GenericVertex)) {
-            		Coordinate c = gv.vertex.getCoordinate();
+            		Coordinate c = gv.getCoordinate();
             		env = new Envelope(c);
             		vertexIndex.insert(env, v);
             }
