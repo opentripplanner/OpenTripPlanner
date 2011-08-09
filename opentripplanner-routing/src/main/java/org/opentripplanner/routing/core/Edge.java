@@ -75,4 +75,5 @@ public interface Edge {
     public List<Patch> getPatches();
 
     public void removePatch(Patch patch);
+    
 }

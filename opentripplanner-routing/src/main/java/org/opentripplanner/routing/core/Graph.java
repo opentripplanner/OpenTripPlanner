@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Collection;
@@ -23,6 +25,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -293,6 +297,26 @@ public class Graph implements Serializable {
 
     public void setBundle(GraphBundle bundle) {
         this.bundle = bundle;
+    }
+    
+    /* (de) serialization */
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        for (Vertex v : vertices.values()) {
+            for (Edge e : v.getOutgoing()) {
+                if (e instanceof AbstractEdge)
+                    ((AbstractEdge)e).fromv = v;
+                else if (e instanceof TurnEdge)
+                    ((TurnEdge)e).fromv = (StreetVertex) v;
+            }
+            for (Edge e : v.getIncoming()) {
+                if (e instanceof AbstractEdge)
+                    ((AbstractEdge)e).tov = v;
+                if (e instanceof TurnEdge)
+                    ((TurnEdge)e).tov = (StreetVertex) v;
+            }
+        }
     }
 
 }

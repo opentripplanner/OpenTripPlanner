@@ -28,9 +28,11 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected Vertex fromv;
+    /* protected rather than private because these are overwritten during deserialization */
+    
+    protected transient Vertex fromv;
 
-    protected Vertex tov;
+    protected transient Vertex tov;
 
     private List<Patch> patches;
 

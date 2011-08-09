@@ -48,9 +48,13 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     public int turnCost;
 
-    StreetVertex fromv;
+    /* these are set from edge lists during deserialization. 
+     * some other solution should be used instead of making them public 
+     */
+    
+    public transient StreetVertex fromv;
 
-    StreetVertex tov;
+    public transient StreetVertex tov;
 
     private List<Patch> patches;
 
