@@ -182,7 +182,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         store.open();
 
-        List<Agency> agencies = new ArrayList<Agency>();
+        List<Agency> agencies = new ArrayList<Agency>(readers.size());
         List<Class<?>> entityClasses = readers.get(0).getEntityClasses();
 
         for (Class<?> entityClass : entityClasses) {
