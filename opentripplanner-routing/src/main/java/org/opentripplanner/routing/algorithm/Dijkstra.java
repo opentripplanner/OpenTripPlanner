@@ -92,7 +92,7 @@ public class Dijkstra {
             if (u == target)
                 break;
 
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
+            Iterable<Edge> outgoing = u.getOutgoing();
             for (Edge edge : outgoing) {
             	State sv = edge.traverse(su);
                 if (sv != null
@@ -137,7 +137,7 @@ public class Dijkstra {
                 	break;
             }
             
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
+            Iterable<Edge> outgoing = u.getOutgoing();
             for (Edge edge : outgoing) {
 //                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
 //                    //only consider street edges when contracting

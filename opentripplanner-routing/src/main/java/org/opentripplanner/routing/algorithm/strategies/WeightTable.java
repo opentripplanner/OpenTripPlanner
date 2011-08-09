@@ -29,11 +29,9 @@ import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.GenericVertex;
@@ -63,7 +61,8 @@ public class WeightTable implements Serializable {
 	public WeightTable(Graph g) {
 		this.g = g;
 		// default max walk speed is biking speed
-		maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed; 
+		//maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed;
+		maxWalkSpeed = new TraverseOptions().speed;
 	}
 
 	public double getWeight(Vertex from, Vertex to) {
@@ -126,9 +125,9 @@ public class WeightTable implements Serializable {
 
 		LOG.debug("Number of vertices: " + g.getVertices().size());
 		stopVertices = new ArrayList<TransitStop>();
-		for (GraphVertex gv : g.getVertices())
-			if (gv.vertex instanceof TransitStop)
-				stopVertices.add((TransitStop) gv.vertex);
+		for (Vertex gv : g.getVertices())
+			if (gv instanceof TransitStop)
+				stopVertices.add((TransitStop) gv);
 		int nStops = stopVertices.size();
 
 		stopIndices = new IdentityHashMap<GenericVertex, Integer>(nStops);
@@ -231,8 +230,7 @@ public class WeightTable implements Serializable {
 					table[oi][di] = (float) w;
 					// LOG.debug("    Dest " + u + " w=" + w);
 				}
-				GraphVertex gu = g.getGraphVertex(uVertex.getLabel());
-				for (Edge e : gu.getOutgoing()) {
+				for (Edge e : uVertex.getOutgoing()) {
 					if (!(e instanceof PreBoardEdge)) {
 						State v = e.optimisticTraverse(u);
 						if (v != null && spt.add(v))
@@ -249,8 +247,7 @@ public class WeightTable implements Serializable {
 			q.add(origin);
 			while (!q.isEmpty()) {
 				Vertex u = q.poll();
-				GraphVertex gu = g.getGraphVertex(u.getLabel());
-				for (Edge e : gu.getOutgoing()) {
+				for (Edge e : u.getOutgoing()) {
 					if (e instanceof PatternBoard) {
 						Vertex v = ((PatternBoard) e).getToVertex();
 						// give onboard vertices same index as their
@@ -293,8 +290,7 @@ public class WeightTable implements Serializable {
 					}
 					continue;
 				}
-				GraphVertex gu = g.getGraphVertex(uVertex.getLabel());
-				for (Edge e : gu.getOutgoing()) {
+				for (Edge e : uVertex.getOutgoing()) {
 					// LOG.debug("        Edge " + e);
 					State v = e.optimisticTraverse(u);
 					if (v != null && spt.add(v))

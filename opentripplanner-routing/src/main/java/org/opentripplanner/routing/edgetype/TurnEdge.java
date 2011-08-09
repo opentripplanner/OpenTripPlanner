@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,13 +50,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     public int turnCost;
 
-    /* these are set from edge lists during deserialization. 
-     * some other solution should be used instead of making them public 
-     */
-    
-    public transient StreetVertex fromv;
+    StreetVertex fromv;
 
-    public transient StreetVertex tov;
+    StreetVertex tov;
 
     private List<Patch> patches;
 
@@ -296,7 +294,6 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 		return fromv.isNoThruTraffic();
 	}
 
-
     @Override
     public double weightLowerBound(TraverseOptions options) {
         return timeLowerBound(options) * options.walkReluctance;
@@ -307,4 +304,14 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return (fromv.length + turnCost/20) / options.speed;
     }
     
+	    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+	        if (fromv == null)
+	            System.out.printf("fromv null %s \n", this);
+
+	        if (tov == null)
+	            System.out.printf("tov null %s \n", this);
+	        
+	        out.defaultWriteObject();
+	    }
+
 }

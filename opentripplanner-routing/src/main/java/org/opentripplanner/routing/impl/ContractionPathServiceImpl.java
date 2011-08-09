@@ -24,10 +24,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+<<<<<<< HEAD
 import org.opentripplanner.routing.core.DirectEdge;
+=======
+import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.WeightTable;
+>>>>>>> fb0ce23... Adapt routing classes to GraphVertex refactor
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
@@ -399,11 +404,7 @@ public class ContractionPathServiceImpl implements PathService {
         Graph graph = _graphService.getGraph();
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();
-        GraphVertex gv = graph.getGraphVertex(start);
-        if (gv == null) {
-            return false;
-        }
-        for (Edge out : gv.getOutgoing()) {
+        for (Edge out : start.getOutgoing()) {
             if (out == edge) {
                 continue;
             }

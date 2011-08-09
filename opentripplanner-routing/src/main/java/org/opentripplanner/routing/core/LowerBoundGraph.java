@@ -54,15 +54,15 @@ public class LowerBoundGraph {
 			opt.setArriveBy(true);
 		LOG.info("Loading origial graph into compact representation...");
 		ArrayList<State> svs = new ArrayList<State>();
-		for (GraphVertex gv : original.getVertices()) {
-			GenericVertex u = (GenericVertex) (gv.vertex); 
+		for (Vertex gv : original.getVertices()) {
+			GenericVertex u = (GenericVertex) (gv); 
 			State su = new State(u, opt);
 			svs.clear();
 			Iterable<Edge> edges;
 			if (kind == INCOMING)
-				edges = original.getIncoming(u);
+				edges = u.getIncoming();
 			else 
-				edges = original.getOutgoing(u);
+				edges = u.getOutgoing();
 			// avoid empty edgelist entries by traversing all edges first
 			for (Edge e : edges) {
 				State sv = e.optimisticTraverse(su);
@@ -276,7 +276,7 @@ public class LowerBoundGraph {
 		while ( ! q.empty()) {
 			State  su = q.extract_min();
 			if ( ! spt.visit(su)) continue;
-			for (Edge e : originalGraph.getOutgoing(su.getVertex())) {
+			for (Edge e : su.getVertex().getOutgoing()) {
 				State sv = e.optimisticTraverse(su);
 				if (sv != null && spt.add(sv))
 					q.insert(sv, sv.getWeight());
