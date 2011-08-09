@@ -15,11 +15,15 @@ package org.opentripplanner.routing.core;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
@@ -27,6 +31,9 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -40,6 +47,8 @@ public class Graph implements Serializable {
     // whenever changes are made that could make existing graphs incompatible
     private static final long serialVersionUID = 20111019L;
 
+    private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+    
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
 
@@ -47,7 +56,7 @@ public class Graph implements Serializable {
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
-    HashMap<String, Vertex> vertices;
+    private transient HashMap<String, Vertex> vertices = new HashMap<String, Vertex>();
 
     private TransferTable transferTable = new TransferTable();
 
@@ -300,23 +309,46 @@ public class Graph implements Serializable {
     }
     
     /* (de) serialization */
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
+    
+    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        LOG.debug("Consolidating edges...");
+        // could be a list, use getOutgoing only
+        Set<Edge> edges = new HashSet<Edge>();
         for (Vertex v : vertices.values()) {
-            for (Edge e : v.getOutgoing()) {
-                if (e instanceof AbstractEdge)
-                    ((AbstractEdge)e).fromv = v;
-                else if (e instanceof TurnEdge)
-                    ((TurnEdge)e).fromv = (StreetVertex) v;
-            }
-            for (Edge e : v.getIncoming()) {
-                if (e instanceof AbstractEdge)
-                    ((AbstractEdge)e).tov = v;
-                if (e instanceof TurnEdge)
-                    ((TurnEdge)e).tov = (StreetVertex) v;
+            edges.addAll(v.getOutgoing());
+            edges.addAll(v.getIncoming());
+        }
+        LOG.debug("Writing graph...");
+        out.defaultWriteObject();
+        out.writeObject(edges);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        LOG.debug("Reading graph...");
+        in.defaultReadObject();
+        Set<Edge> edges = (HashSet<Edge>) in.readObject();
+        LOG.debug("Loading edges...");
+        this.vertices = new HashMap<String, Vertex>();
+        int count = 0;
+        for (Edge e : edges) {
+            if (++count % 1000 == 0)
+                LOG.debug("loading edge {} : {}", count, e);
+            Vertex fromv = e.getFromVertex();
+            Vertex tov = null;
+            if (e instanceof AbstractEdge)
+                tov = ((AbstractEdge)e).getToVertex();
+            else if (e instanceof TurnEdge)
+                tov = ((TurnEdge)e).getToVertex();
+            else
+                LOG.warn("Edge with no to-vertex: " + e);
+            
+            vertices.put(fromv.getLabel(), fromv);
+            fromv.addOutgoing(e);
+            if (tov != null) {
+                vertices.put(tov.getLabel(), tov);
+                tov.addIncoming(e);
             }
         }
     }
-
 }

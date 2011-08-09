@@ -50,8 +50,8 @@ public class GenericVertex implements Vertex, Serializable {
     
     /* --- ex-graphvertex ---*/
     
-    ArrayList<Edge> incoming = new ArrayList<Edge>();
-    ArrayList<Edge> outgoing = new ArrayList<Edge>();
+    private transient ArrayList<Edge> incoming = new ArrayList<Edge>();
+    private transient ArrayList<Edge> outgoing = new ArrayList<Edge>();
 
     public void addOutgoing(Edge ee) {
         outgoing.add(ee);
@@ -87,12 +87,6 @@ public class GenericVertex implements Vertex, Serializable {
     @Override
     public Collection<Edge> getOutgoing() {
         return outgoing;
-    }
-
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        incoming.trimToSize();
-        outgoing.trimToSize();
-        out.defaultWriteObject();
     }
 
     @Override
@@ -252,8 +246,19 @@ public class GenericVertex implements Vertex, Serializable {
         return index;
     }
 
+    /* SERIALIZATION */
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+// Transient so no need to trim
+//        incoming.trimToSize();
+//        outgoing.trimToSize();
+        out.defaultWriteObject();
+    }
+
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
+        this.incoming = new ArrayList<Edge>(2);
+        this.outgoing = new ArrayList<Edge>(2);
         index = maxIndex++;
     }
 

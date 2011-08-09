@@ -14,6 +14,9 @@
 package org.opentripplanner.routing.core;
 
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,14 +31,22 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /* protected rather than private because these are overwritten during deserialization */
-    
-    protected transient Vertex fromv;
+    protected Vertex fromv;
 
-    protected transient Vertex tov;
+    protected Vertex tov;
 
     private List<Patch> patches;
 
+    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        if (fromv == null)
+            System.out.printf("fromv null %s \n", this);
+
+        if (tov == null)
+            System.out.printf("tov null %s \n", this);
+        
+        out.defaultWriteObject();
+    }
+    
     public String toString() {
         return getClass().getName() + "(" + fromv + " -> " + tov + ")";
     }
