@@ -273,6 +273,11 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=footway;bicycle=yes", 
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
 
+        setProperties(props, "highway=service", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+        setProperties(props, "footway=service;service=parking_aisle;RLIS:bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.84, 0.84);
+        
         /* surface mixins */
 
         /* sand and fine gravel are deadly for bikes */
