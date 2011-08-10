@@ -581,11 +581,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             		way.isTag("cycleway", "opposite_track")) {
             
             	if (oneWayBike) {
-            		_log.warn("conflicting tags oneway:bicycle and cycleway:opposite* on way " + way.getId() + ", assuming one-way");
-            	} else {
-            		if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
-            			permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
-            		}
+            		_log.warn("conflicting tags oneway:bicycle and cycleway:opposite* on way " + way.getId() + ", assuming opposite");
+            	}
+            	if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+            	    permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             	}
             }
             
