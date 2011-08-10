@@ -25,6 +25,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
+import org.opentripplanner.routing.patch.StopAdapter;
 
 /**
  * This represents a particular stop pattern on a particular route. For example,
@@ -56,6 +57,7 @@ public class RouteVariant implements Serializable {
 	@XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
 	private ArrayList<AgencyAndId> trips;
 	
+	@XmlJavaTypeAdapter(StopAdapter.class)
 	private ArrayList<Stop> stops;
 
 	private ArrayList<RouteSegment> segments;
@@ -75,6 +77,7 @@ public class RouteVariant implements Serializable {
 	}
 
 	public void addTrip(Trip trip) {
+	    if (!trips.contains(trip.getId())) {
 		trips.add(trip.getId());
 		if (direction == null) {
 			direction = trip.getDirectionId();
@@ -83,6 +86,7 @@ public class RouteVariant implements Serializable {
 				direction = MULTIDIRECTION;
 			}
 		}
+	    }
 	}
 
 	public void addSegment(RouteSegment segment) {

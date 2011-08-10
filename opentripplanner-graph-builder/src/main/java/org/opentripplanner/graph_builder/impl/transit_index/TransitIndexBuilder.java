@@ -87,11 +87,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
 		for (GraphVertex gv : graph.getVertices()) {
 			RouteSegment segment = null;
-			RouteVariant variant = null;
 			if (gv.vertex instanceof StreetVertex || gv.vertex instanceof EndpointVertex) {
 				continue;
 			}
 			for (Edge e : gv.getOutgoing()) {
+		                 RouteVariant variant = null;
 				/*
 				 * gv.vertex could be a journey vertex, or it could be any of a
 				 * number of other types of vertex. If it is a journey vertex,
@@ -120,10 +120,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 				} else if (e instanceof PatternAlight
 						|| e instanceof PatternHop || e instanceof PatternDwell) {
 					TripPattern pattern = ((PatternEdge) e).getPattern();
-					Trip exemplar = pattern.getExemplar();
-					variant = addTripToVariant(exemplar);
 					for (Trip trip : pattern.getTrips()) {
 						variantsByTrip.put(trip.getId(), variant);
+						variant = addTripToVariant(trip);
 						addModeFromTrip(trip);
 					}
 				} else {
@@ -144,6 +143,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 				}
 			}
 			for (Edge e : gv.getIncoming()) {
+			        RouteVariant variant = null;
 				if (!(e instanceof AbstractEdge)) {
 					continue;
 				}
@@ -161,6 +161,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 				} else {
 					continue;
 				}
+
 				if (segment == null) {
 					segment = getOrMakeSegment(variant, segmentsByVertex,
 							gv.vertex);
@@ -371,16 +372,14 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 			return variant;
 		}
 		
-		if (trip.getDirectionId() != null) {
-			AgencyAndId routeId = trip.getRoute().getId(); 
-			String directionId = trip.getDirectionId();
-			HashSet<String> directions = directionsByRoute.get(routeId);
-			if (directions == null) {
-				directions = new HashSet<String>();
-				directionsByRoute.put(routeId, directions);
-			}
-			directions.add(directionId);
+		AgencyAndId routeId = trip.getRoute().getId();
+		String directionId = trip.getDirectionId();
+		HashSet<String> directions = directionsByRoute.get(routeId);
+		if (directions == null) {
+		    directions = new HashSet<String>();
+		    directionsByRoute.put(routeId, directions);
 		}
+		directions.add(directionId);
 		
 		// build the list of stops for this trip
 		List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
