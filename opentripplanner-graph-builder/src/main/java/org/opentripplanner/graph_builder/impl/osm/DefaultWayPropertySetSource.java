@@ -257,15 +257,17 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 StreetTraversalPermission.ALL, 1.18, 0.91);
 
 
-        setProperties(props, "footway = sidewalk;highway = footway", 
+        setProperties(props, "footway=sidewalk;highway=footway", 
                 StreetTraversalPermission.PEDESTRIAN);
-        setProperties(props, "footway = sidewalk;highway = footway;bicycle=designated", 
-                StreetTraversalPermission.PEDESTRIAN, 0.84, 0.84);
-        setProperties(props, "highway = footway;bicycle=designated", 
-                StreetTraversalPermission.PEDESTRIAN, 0.73, 0.73);
-        setProperties(props, "footway = sidewalk;highway = footway;bicycle=yes", 
-                StreetTraversalPermission.PEDESTRIAN, 1.1, 1.1);
-
+        setProperties(props, "footway=sidewalk;highway=footway;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+        setProperties(props, "footway=sidewalk;highway=footway;RLIS:bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.84, 0.84);
+        setProperties(props, "highway=footway;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        setProperties(props, "footway=sidewalk;highway=footway;bicycle=yes", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.5, 2.5);
+        
         setProperties(props, "highway=footway", 
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
         setProperties(props, "highway=footway;bicycle=yes", 
