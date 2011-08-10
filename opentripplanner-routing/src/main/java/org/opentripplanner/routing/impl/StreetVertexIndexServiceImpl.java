@@ -18,10 +18,8 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -31,7 +29,6 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -78,12 +75,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     private STRtree intersectionTree;
 
-    /**
-     * This is used to mark which edges are (nearly) coincident with transit lnes, so that they can
-     * be preferred by the snapper.
-     */
-    private HashSet<Edge> edgesNearTransit = new HashSet<Edge>();
-
     public static final double MAX_DISTANCE_FROM_STREET = 0.05;
 
     private static final double DISTANCE_ERROR = 0.00005;
@@ -91,8 +82,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     private static final double DIRECTION_ERROR = 0.05;
 
     private static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
-
-    private static final double MAX_HOP_DISTANCE_FOR_NEAR_TRANSIT = 2;
 
     public StreetVertexIndexServiceImpl() {
     }
@@ -123,68 +112,21 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         setup();
     }
 
-    @SuppressWarnings("unchecked")
     private void postSetup() {
 
         Graph graph = graphService.getGraph();
 
         transitStopTree = new STRtree();
         intersectionTree = new STRtree();
-
-        STRtree transitEdgeTree = new STRtree();
-
-        // preprocess to get transit edges
-        for (GraphVertex gv : graph.getVertices()) {
-            for (HopEdge e : filter(gv.getOutgoing(), HopEdge.class)) {
-                if (e.getGeometry() == null) {
-                    continue;
-                }
-                Envelope env = e.getGeometry().getEnvelopeInternal();
-                transitEdgeTree.insert(env, e);
-            }
-        }
-
-        GeometryFactory geometryFactory = new GeometryFactory();
-
         for (GraphVertex gv : graph.getVertices()) {
             Vertex v = gv.vertex;
             // We only care about StreetEdges
             for (StreetEdge e : filter(gv.getOutgoing(), StreetEdge.class)) {
-                Geometry streetGeometry = e.getGeometry();
-                if (streetGeometry == null) {
+                if (e.getGeometry() == null) {
                     continue;
                 }
-                Envelope env = streetGeometry.getEnvelopeInternal();
+                Envelope env = e.getGeometry().getEnvelopeInternal();
                 edgeTree.insert(env, e);
-
-                env = streetGeometry.getEnvelopeInternal();
-                env.expandBy(DistanceLibrary.metersToDegrees(10));
-                List<HopEdge> results = transitEdgeTree.query(env);
-
-                Coordinate[] streetCoords = streetGeometry.getCoordinates();
-                Point streetStart = geometryFactory.createPoint(streetCoords[0]);
-                Point streetEnd = geometryFactory
-                        .createPoint(streetCoords[streetCoords.length - 1]);
-
-                for (HopEdge hop : results) {
-                    //find the distance between the start/end of the street and the hop geometry
-                    //and between the start/end of the hop and the street geometry.  The sum of the 
-                    //best two is the distance, and anything less than 20 meters is considered "close" 
-                    Geometry hopGeometry = hop.getGeometry();
-                    Coordinate[] hopCoords = hopGeometry.getCoordinates();
-                    Point hopStart = geometryFactory.createPoint(hopCoords[0]);
-                    Point hopEnd = geometryFactory.createPoint(hopCoords[hopCoords.length - 1]);
-
-                    double[] distances = { streetGeometry.distance(hopStart),
-                            streetGeometry.distance(hopEnd), hopGeometry.distance(streetStart),
-                            hopGeometry.distance(streetEnd) };
-                    Arrays.sort(distances);
-                    double distance = distances [0] + distances[1];
-                    if (distance < MAX_HOP_DISTANCE_FOR_NEAR_TRANSIT) {
-                        edgesNearTransit.add(e);
-                        break;
-                    }
-                }
             }
             if (v instanceof TransitStop) {
                 // only index transit stops that (a) are entrances, or (b) have no associated
@@ -275,7 +217,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        Collection<StreetEdge> edges = getClosestEdges(coordinate, options, false);
+        Collection<StreetEdge> edges = getClosestEdges(coordinate, options);
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (edges != null) {
             StreetEdge bestStreet = edges.iterator().next();
@@ -319,7 +261,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, boolean nearTransitBonus) {
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options) {
         Envelope envelope = new Envelope(coordinate);
         List<StreetEdge> nearby = new LinkedList<StreetEdge>();
         int i = 0;
@@ -368,10 +310,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                             // than the query envelope size.
                             continue;
                         }
-                        if (nearTransitBonus && edgesNearTransit.contains(e)) {
-                            //edges near transit are considered closer, causing preferential snapping.
-                            distance /= 2;
-                        }
                         if (distance < bestDistance) {
                             bestDistance = distance;
                             bestEdge = e;
@@ -396,7 +334,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                     if (Double.isNaN(edgeDirection))
                         return Arrays.asList(bestEdge);
 
-                    TreeMap<Double, StreetEdge> parallel = new TreeMap<Double, StreetEdge>();
+                    List<StreetEdge> parallel = new ArrayList<StreetEdge>();
                     for (StreetEdge e : nearby) {
                         /* only include edges that this user can actually use */
                         if (e == null || e instanceof OutEdge) {
@@ -410,10 +348,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                         Geometry eg = e.getGeometry();
                         if (eg != null) {
                             double distance = eg.distance(p);
-                            if (nearTransitBonus && edgesNearTransit.contains(e)) {
-                                //edges near transit are considered closer, causing preferential snapping.
-                                distance /= 2;
-                            }
 
                             if (distance <= bestDistance + DISTANCE_ERROR) {
 
@@ -439,15 +373,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                                 double direction = Math.atan2(yd, xd);
 
                                 if (Math.abs(direction - edgeDirection) < DIRECTION_ERROR) {
-                                    while (parallel.containsKey(distance)) {
-                                        distance += 0.00000001;
-                                    }
-                                    parallel.put(distance, e);
+                                    parallel.add(e);
                                 }
                             }
                         }
                     }
-                    return parallel.values();
+                    return parallel;
                 }
             }
         }
