@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -56,11 +57,14 @@ public class TransitIndex {
 	@Path("/routeData")
 	@Produces ({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 		MediaType.TEXT_XML })
-	public RouteData getRouteData(
+	public Object getRouteData(
 			@QueryParam("agency") String agency,
 			@QueryParam("id") String id) throws JSONException {
 		
 		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
+		if (transitIndexService == null) {
+		    return new TransitError("No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+		}
 		RouteData response = new RouteData();
 		AgencyAndId routeId = new AgencyAndId(agency, id);
 		response.id = routeId;
@@ -80,8 +84,11 @@ public class TransitIndex {
 	@Path("/modes")
 	@Produces ({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
 		MediaType.TEXT_XML })
-	public ModeList getModes() throws JSONException {
+	public Object getModes() throws JSONException {
 		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
+	        if (transitIndexService == null) {
+	            return new TransitError("No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+	        }
 		if (transitIndexService == null) {
 			return new ModeList();
 		}
