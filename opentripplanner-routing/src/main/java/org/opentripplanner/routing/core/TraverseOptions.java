@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -199,6 +198,16 @@ public class TraverseOptions implements Cloneable {
      */
     private boolean reverseOptimizing = false;
 
+    /** 
+     * For the bike triangle, how important time is.  
+     * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1 
+     */
+    public double triangleTimeFactor;
+    /** For the bike triangle, how important slope is */
+    public double triangleSlopeFactor;
+    /** For the bike triangle, how important safety is */
+    public double triangleSafetyFactor;
+
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -287,7 +296,10 @@ public class TraverseOptions implements Cloneable {
                     && bannedTrips.equals(to.bannedTrips)
                     && minTransferTime == to.minTransferTime
                     && nonpreferredTransferPenalty == to.nonpreferredTransferPenalty
-                    && transferPenalty == to.transferPenalty;
+                    && transferPenalty == to.transferPenalty
+                    && triangleSafetyFactor == to.triangleSafetyFactor
+                    && triangleSlopeFactor == to.triangleSlopeFactor
+                    && triangleTimeFactor == to.triangleTimeFactor;
         }
         return false;
     }
@@ -301,7 +313,11 @@ public class TraverseOptions implements Cloneable {
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373
                 + minTransferTime * 20996011 + (int) nonpreferredTransferPenalty
-                + (int) transferPenalty * 163013803;
+                + (int) transferPenalty * 163013803 
+                + new Double(triangleSafetyFactor).hashCode() * 195233277
+                + new Double(triangleSlopeFactor).hashCode() * 136372361
+                + new Double(triangleTimeFactor).hashCode() * 790052899
+                ;
     }
 
     public void setArriveBy(boolean back) {

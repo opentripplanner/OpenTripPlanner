@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.NoThruTrafficState;
@@ -56,7 +55,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     private double bicycleSafetyEffectiveLength;
 
-    private double slopeCostEffectiveLength;
+    private double slopeWorkCost;
 
     private boolean wheelchairAccessible = true;
 
@@ -87,7 +86,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         this.length = length;
         slopeSpeedEffectiveLength = length;
         bicycleSafetyEffectiveLength = length;
-        slopeCostEffectiveLength = length;
+        slopeWorkCost = length;
         this.name = name;
         this.permission = permission;
         this.back = back;
@@ -133,9 +132,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                     2);
         }
         elevationProfile = elev;
-        P2<Double> result = StreetVertex.computeSlopeCost(elev, getName());
-        slopeCostEffectiveLength = result.getFirst();
-        maxSlope = result.getSecond();
+        SlopeCosts costs = StreetVertex.computeSlopeCost(elev, getName());
+        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
+        maxSlope = costs.maxSlope;
+        slopeWorkCost = costs.slopeWorkCost;
     }
 
     @Override
@@ -188,11 +188,22 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                 }
                 break;
             case FLAT:
-                weight = slopeCostEffectiveLength;
+                double speedOverhead = StreetVertex.SPEED_OVERHEAD
+                        * StreetVertex.WORK_NORMALIZATION_FACTOR * length
+                        * (options.speed - StreetVertex.DEFAULT_BICYCLE_SPEED);
+                weight = length / options.speed + slopeWorkCost + speedOverhead;
                 break;
             case QUICK:
-                weight = getSlopeSpeedEffectiveLength() / options.speed;
+                weight = slopeSpeedEffectiveLength / options.speed;
                 break;
+            case TRIANGLE:
+                double quick = slopeSpeedEffectiveLength / options.speed;
+                double safety = bicycleSafetyEffectiveLength / options.speed;
+                speedOverhead = StreetVertex.SPEED_OVERHEAD
+                        * StreetVertex.WORK_NORMALIZATION_FACTOR * length
+                        * (options.speed - StreetVertex.DEFAULT_BICYCLE_SPEED);
+                double slope = slopeWorkCost + speedOverhead;
+                weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
             default:
                 // TODO: greenways
                 weight = length / options.speed;

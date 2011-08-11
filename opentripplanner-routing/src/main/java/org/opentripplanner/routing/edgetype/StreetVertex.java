@@ -19,7 +19,6 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -39,6 +38,9 @@ public class StreetVertex extends GenericVertex {
 
     private static Logger log = LoggerFactory.getLogger(StreetVertex.class);
 
+    private static final double JOULES_PER_METER_ON_FLAT = 6.8;
+    private static final double JOULES_SLOPE_FACTOR = 7.37;
+    
     private static final long serialVersionUID = -385126804908021091L;
 
     /**
@@ -47,6 +49,23 @@ public class StreetVertex extends GenericVertex {
      */
 	public static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
+    /** 
+     * Adjustment to make work costs comparable to time and safety costs
+     */
+    public  static final double WORK_NORMALIZATION_FACTOR = 0.05;
+    
+    /** 
+     * Default speed used to compute work costs 
+     */
+    public static final double DEFAULT_BICYCLE_SPEED = 5;
+    
+    /**
+     * each additional m/s of speed over the default makes each meter this much worse.
+     * The actual number is closer to 2.0 on the speed range (5,10), but we definitely
+     * never want to go negative, and this number ensures that.
+     */
+    public static final double SPEED_OVERHEAD = JOULES_PER_METER_ON_FLAT/DEFAULT_BICYCLE_SPEED;
+    
     public LineString geometry;
 
     protected boolean wheelchairAccessible = true;
@@ -59,7 +78,7 @@ public class StreetVertex extends GenericVertex {
 
     protected double slopeSpeedEffectiveLength;
 
-    protected double slopeCostEffectiveLength;
+    protected double slopeWorkCost;
 
     protected StreetTraversalPermission permission;
 
@@ -93,7 +112,7 @@ public class StreetVertex extends GenericVertex {
         this.geometry = geometry;
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
-        this.slopeCostEffectiveLength = length;
+        this.slopeWorkCost = 0;
         this.slopeSpeedEffectiveLength = length;
         this.name = name;
         this.permission = StreetTraversalPermission.ALL;
@@ -153,17 +172,18 @@ public class StreetVertex extends GenericVertex {
         }
         elevationProfile = elev;
         // compute the cost of the elevation changes
-        P2<Double> result = computeSlopeCost(elev, getName());
-        slopeCostEffectiveLength = result.getFirst();
-        maxSlope = result.getSecond();
+        SlopeCosts costs= StreetVertex.computeSlopeCost(elev, getName());
+        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
+        maxSlope = costs.maxSlope;
+        slopeWorkCost = costs.slopeWorkCost;
     }
 
-    public static P2<Double> computeSlopeCost(PackedCoordinateSequence elev, String name) {
+    public static SlopeCosts computeSlopeCost(PackedCoordinateSequence elev, String name) {
         Coordinate[] coordinates = elev.toCoordinateArray();
         
         double maxSlope = 0;
         double slopeSpeedEffectiveLength = 0;
-        double slopeCostEffectiveLength = 0;
+        double slopeCost = 0;
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -179,11 +199,23 @@ public class StreetVertex extends GenericVertex {
             if (maxSlope < Math.abs(slope)) {
                 maxSlope = Math.abs(slope);
             }
-            slopeCostEffectiveLength += run * (1 + slope * slope * 10); // any slope is bad
+            /*
+             * This is the cost in joules holding speed fixed at 5 m/s, roughly, computed with
+             * data from analyticcycling.com. For faster speeds, the Y-intercept is higher, but the
+             * slope (of the road-slope vs joule-per-meter line) is nearly the same. This implies
+             * that it bottoms out lower (as for technical reasons the cost can never be less than
+             * zero). Since we have to cap it before we know the actual speed, this cost will be a
+             * bit low for fast riders on slight downslopes.
+             */
+
+            double watt_seconds = run * (JOULES_PER_METER_ON_FLAT + JOULES_SLOPE_FACTOR * slope);
+            watt_seconds = Math.max(watt_seconds, 0) * WORK_NORMALIZATION_FACTOR;
+            slopeCost += watt_seconds;
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
         }
-        return new P2<Double>(slopeSpeedEffectiveLength, maxSlope); 
+        return new SlopeCosts(slopeSpeedEffectiveLength, slopeCost, maxSlope); 
     }
+
     public static double slopeSpeedCoefficient(double slope, double altitude) {
         /*
          * computed by asking ZunZun for a quadratic b-spline approximating some values from
@@ -357,11 +389,20 @@ public class StreetVertex extends GenericVertex {
                 }
                 break;
             case FLAT:
-                weight = slopeCostEffectiveLength;
+                double speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
+                        * (options.speed - DEFAULT_BICYCLE_SPEED);
+                weight = length / options.speed + slopeWorkCost + speedOverhead;
                 break;
             case QUICK:
                 weight = slopeSpeedEffectiveLength / options.speed;
                 break;
+            case TRIANGLE:
+                double quick = slopeSpeedEffectiveLength / options.speed;
+                double safety = bicycleSafetyEffectiveLength / options.speed;
+                speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
+                        * (options.speed - DEFAULT_BICYCLE_SPEED);
+                double slope = slopeWorkCost + speedOverhead;
+                weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
             default:
                 // TODO: greenways
                 weight = length / options.speed;
