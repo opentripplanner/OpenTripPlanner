@@ -45,19 +45,6 @@
             <artifactId>spring-orm</artifactId>
             <version>3.0.5.RELEASE</version>
         </dependency>
-
-        <!-- 
-        <dependency>
-            <groupId>hsqldb</groupId>
-            <artifactId>hsqldb</artifactId>
-            <version>2.0.0-rc7</version>
-        </dependency>
-        -->
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.2.128</version>
-        </dependency>
         
         <dependency>
             <groupId>junit</groupId>
