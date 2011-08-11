@@ -15,6 +15,7 @@
                     <list>
                         <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
                             <property name="path" value="/home/otp/gtfs" />
+			    <property name="defaultBikesAllowed" value="true" />
                         </bean>
                     </list>
                 </property>
@@ -31,6 +32,10 @@
                 <property name="cacheDirectory" value="/home/otp/osm" />
             </bean>
         </property>
+	<property name="defaultWayPropertySetSource">
+          <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
+	</property>
+
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
