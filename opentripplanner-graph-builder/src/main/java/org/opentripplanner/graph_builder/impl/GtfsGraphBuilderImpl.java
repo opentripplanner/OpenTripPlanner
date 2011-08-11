@@ -190,15 +190,20 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             for (GtfsReader reader : readers) {
 
-                // Pre-load the agencies, since one agency can be mentioned across
-                // multiple feeds
+                // Agencies are the first entity class to be read.
+                // Accumulate the agencies from all GTFS feeds to allow cross-feed 
+                // references in later entity classes.
+                
+                // Set each reader's agency list to a copy of the list
+                // containing all agencies seen up to this point
                 if (entityClass.equals(Agency.class))
                     reader.setAgencies(agencies);
 
                 reader.readEntities(entityClass);
 
+                // Update the list of all agencies seen to include those just read 
                 if (entityClass.equals(Agency.class))
-                    agencies.addAll(reader.getAgencies());
+                    agencies = reader.getAgencies();
 
                 store.flush();
             }
