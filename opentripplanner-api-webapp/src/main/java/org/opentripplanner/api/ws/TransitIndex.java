@@ -89,9 +89,6 @@ public class TransitIndex {
 	        if (transitIndexService == null) {
 	            return new TransitError("No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
 	        }
-		if (transitIndexService == null) {
-			return new ModeList();
-		}
 		
 		ModeList modes = new ModeList();
 		modes.modes = new ArrayList<TraverseMode>();
