@@ -51,8 +51,11 @@ public class Money implements Comparable<Money> {
     }
     
     public boolean equals(Object other) {
-        Money m = (Money) other;
-        return m.currency.equals(currency) && m.cents == cents;
+        if (other instanceof Money) {
+            Money m = (Money) other;
+            return m.currency.equals(currency) && m.cents == cents;
+        }
+        return false;
     }
     
     public int compareTo(Money m) {

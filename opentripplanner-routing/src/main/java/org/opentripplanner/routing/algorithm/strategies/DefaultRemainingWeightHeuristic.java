@@ -120,7 +120,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance
                             / options.speed + boardCost;
-                    return distance = Math.min(distance, options.walkReluctance
+                    return Math.min(distance, options.walkReluctance
                             * euclidianDistance / options.speed);
                 }
             }

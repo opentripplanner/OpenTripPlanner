@@ -661,13 +661,15 @@ public class PlanGenerator {
         if (elevEdge.getElevationProfile() == null) {
             return "";
         }
-        String str = "";
+        StringBuilder str = new StringBuilder();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
         for (int i = 0; i < coordArr.length; i++) {
-            str += Math.round(coordArr[i].x + offset) + "," + Math.round(coordArr[i].y * 10.0)
-                    / 10.0 + (i < coordArr.length - 1 ? "," : "");
+            str.append(Math.round(coordArr[i].x + offset));
+            str.append(",");
+            str.append(Math.round(coordArr[i].y * 10.0) / 10.0);
+            str.append(i < coordArr.length - 1 ? "," : "");
         }
-        return str;
+        return str.toString();
     }
 
 }

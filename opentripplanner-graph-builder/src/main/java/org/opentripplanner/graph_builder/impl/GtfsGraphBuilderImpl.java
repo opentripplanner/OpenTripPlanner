@@ -286,7 +286,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         }
     }
 
-    private class EntityCounter implements EntityHandler {
+    private static class EntityCounter implements EntityHandler {
 
         private Map<Class<?>, Integer> _count = new HashMap<Class<?>, Integer>();
 
@@ -314,7 +314,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     }
 
-    private class EntityBikeability implements EntityHandler {
+    private static class EntityBikeability implements EntityHandler {
 
         private Boolean _defaultBikesAllowed;
 

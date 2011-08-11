@@ -79,6 +79,15 @@ public class PriorityQueueImpl<T> implements OTPPriorityQueue<T> {
         public int compareTo(Weighted<T> o) {
             return Double.compare(this.weight, o.weight);
         }
+        
+        @SuppressWarnings("unchecked")
+        public boolean equals(Object o) {
+            if (o instanceof Weighted<?>) {
+                Weighted<T> w = (Weighted<T>) o;
+                return compareTo(w) == 0;
+            }
+            return false;
+        }
     }
     
     private static class FactoryImpl implements OTPPriorityQueueFactory {

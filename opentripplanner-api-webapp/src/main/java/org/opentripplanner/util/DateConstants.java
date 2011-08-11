@@ -13,7 +13,10 @@
 
 package org.opentripplanner.util;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.text.SimpleDateFormat;
 
 /**
@@ -25,14 +28,16 @@ import java.text.SimpleDateFormat;
  */
 public interface DateConstants {
 
-    public static final String[] DF_LIST = { "yyyy.MM.dd.HH.mm.ss", "yyyy.MM.dd.HH.mm",
+    public static final List<String> DF_LIST = Collections.unmodifiableList(Arrays.asList(new String[] { 
+            "yyyy.MM.dd.HH.mm.ss", "yyyy.MM.dd.HH.mm",
             "yyyy.MM.dd.HH.mm.ss.SS", "M.d.yy h.mm a", "M.d.yyyy h.mm a", "M.d.yyyy h.mma",
             "M.d.yyyy h.mm", "M.d.yyyy k.mm", "M.d.yyyy", "yyyy.M.d", "h.mm a"
     // NOTE: don't change the order of these strings...the simplest should be on the
     // bottom...you risk parsing the wrong thing (and ending up with year 0012)
-    };
+    }));
 
-    public static final String[] SMALL_DF_LIST = { "M.d.yy", "yy.M.d", "h.mm a" };
+    public static final List<String> SMALL_DF_LIST = Collections.unmodifiableList(
+            Arrays.asList(new String[] { "M.d.yy", "yy.M.d", "h.mm a" }));
 
     // from apache date utils
     public static final String ISO_DATETIME_TIME_ZONE_FORMAT = "yyyy-MM-dd'T'HH:mm:ssZZ";

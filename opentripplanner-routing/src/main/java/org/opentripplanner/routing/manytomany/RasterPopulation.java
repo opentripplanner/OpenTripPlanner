@@ -29,12 +29,13 @@ public class RasterPopulation extends Population {
 		super();
 		System.out.printf("Loading targets from raster file %s\n", filename);
 
-		try {
+		PrintWriter csvWriter = null;
+        try {
 			File rasterFile = new File(filename);
 
 			// csv output for checking load region in GIS 
 			File csvFile = new File("/home/syncopate/Desktop/coverage.csv");
-			PrintWriter csvWriter = new PrintWriter(csvFile);
+			csvWriter = new PrintWriter(csvFile);
 			
 			// determine file format and CRS, then load raster
 			AbstractGridFormat format = GridFormatFinder.findFormat(rasterFile);
@@ -78,12 +79,16 @@ public class RasterPopulation extends Population {
 					// add this grid cell to the population
 					Vertex vertex = new GenericVertex("raster",
 							targetPos.getOrdinate(0), targetPos.getOrdinate(1));
-					Individual individual = new Individual(vertex, val[0]/100);
+					Individual individual = new Individual(vertex, val[0]/100.0);
 					elements.add(individual);
 				}
 			}
 		} catch (Exception ex) {
 			throw new IllegalStateException("Error loading population from raster file", ex);
+		} finally {
+		    if (csvWriter != null) {
+		        csvWriter.close();
+		    }
 		}
 		System.out.printf("Done loading raster from file\n");
 	}

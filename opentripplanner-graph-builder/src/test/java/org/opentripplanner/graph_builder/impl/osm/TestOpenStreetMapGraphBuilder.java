@@ -34,6 +34,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 		Graph gg = new Graph();
 
 		OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+		loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
 		FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
 
 		File file = new File(getClass().getResource("map.osm.gz").getFile());

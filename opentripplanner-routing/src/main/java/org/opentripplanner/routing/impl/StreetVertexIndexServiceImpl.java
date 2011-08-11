@@ -18,7 +18,6 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.Edge;
@@ -263,7 +262,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     @SuppressWarnings("unchecked")
     public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options) {
         Envelope envelope = new Envelope(coordinate);
-        List<StreetEdge> nearby = new LinkedList<StreetEdge>();
         int i = 0;
         double envelopeGrowthRate = 0.0002;
         GeometryFactory factory = new GeometryFactory();
@@ -291,7 +289,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
             bestDistance = Double.MAX_VALUE;
             StreetEdge bestEdge = null;
-            nearby = edgeTree.query(envelope);
+            List<StreetEdge> nearby = edgeTree.query(envelope);
             if (nearby != null) {
                 for (StreetEdge e : nearby) {
                     if (e == null || e instanceof OutEdge)

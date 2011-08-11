@@ -13,10 +13,20 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TraverseModeSet implements Cloneable {
+/**
+ * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
+ * more transit modes (bus, tram, etc).  This class allows efficiently adding or removing modes
+ * from a set.
+ * @author novalis
+ *
+ */
+public class TraverseModeSet implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = -1640048158419762255L;
 
     private static final int MODE_BICYCLE = 1;
 
@@ -311,13 +321,13 @@ public class TraverseModeSet implements Cloneable {
     }
 
     public String toString() {
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (TraverseMode mode : TraverseMode.values()) {
             if ((modes & getMaskForMode(mode)) != 0) {
-                if (out != "") {
-                    out += ", ";
+                if (out.length() != 0) {
+                    out.append(", ");
                 }
-                out += mode;
+                out.append(mode);
             }
         }
         return "TraverseMode (" + out + ")";

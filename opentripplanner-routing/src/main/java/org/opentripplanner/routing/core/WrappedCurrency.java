@@ -57,11 +57,11 @@ public class WrappedCurrency {
     }
     
     public boolean equals(Object o) {
-        if (o instanceof Currency) {
-            return value.equals(o);
+        if (o instanceof WrappedCurrency) {
+            WrappedCurrency c = (WrappedCurrency) o;
+            return value.equals(c.value);
         }
-        WrappedCurrency c = (WrappedCurrency) o;
-        return value.equals(c.value);
+        return false;
     }
     
     public Currency getCurrency() {

@@ -15,6 +15,7 @@ package org.opentripplanner.util;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -76,7 +77,7 @@ public class DateUtils implements DateConstants {
             String newString = input.replace('_', '.').replace('-', '.').replace(':', '.').replace(
                     '/', '.');
             if (newString != null) {
-                String[] dl = DF_LIST;
+                List<String> dl = DF_LIST;
 
                 // if it looks like we have a small date format, ala 11.4.09, then use another set
                 // of compares
@@ -243,7 +244,7 @@ public class DateUtils implements DateConstants {
         String hoursStr = secondsToHour(time);
         String amPmStr = withAmPm ? getAmPm(time) : "";
 
-        return new String(hoursStr + ":" + minutesStr + amPmStr);
+        return hoursStr + ":" + minutesStr + amPmStr;
     }
 
     public static String secondsToHour(int time) {
@@ -251,7 +252,7 @@ public class DateUtils implements DateConstants {
             return null;
         int hours = (time / 3600) % 12;
         String hoursStr = hours == 0 ? "12" : hours + "";
-        return new String(hoursStr);
+        return hoursStr;
     }
 
     public static String secondsToMinutes(int time) {
@@ -260,7 +261,7 @@ public class DateUtils implements DateConstants {
 
         int minutes = (time / 60) % 60;
         String minutesStr = (minutes < 10 ? "0" : "") + minutes;
-        return new String(minutesStr);
+        return minutesStr;
     }
 
     public static String getAmPm(int time) {

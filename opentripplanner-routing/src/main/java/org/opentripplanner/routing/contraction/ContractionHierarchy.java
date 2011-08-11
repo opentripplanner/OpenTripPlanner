@@ -87,7 +87,7 @@ public class ContractionHierarchy implements Serializable {
 
     private transient TraverseMode mode;
 
-    private ThreadPoolExecutor threadPool;
+    private transient ThreadPoolExecutor threadPool;
 
 
     /**
@@ -533,7 +533,7 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
 
-            float averageDegree = nEdges / nVertices;
+//            float averageDegree = nEdges / nVertices;
             
 //            int oldHopLimit = hopLimit;
 //            if (averageDegree > 10) {

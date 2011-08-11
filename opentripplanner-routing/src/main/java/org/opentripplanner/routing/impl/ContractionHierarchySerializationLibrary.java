@@ -34,7 +34,9 @@ public class ContractionHierarchySerializationLibrary {
     public static void writeGraph(ContractionHierarchySet hierarchy, File graphPath) throws IOException {
 
         if (!graphPath.getParentFile().exists())
-            graphPath.getParentFile().mkdirs();
+            if (!graphPath.getParentFile().mkdirs()) {
+                _log.error("Failed to create directories for graph bundle at " + graphPath);
+            }
 
         _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(graphPath)));

@@ -282,7 +282,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return id;
     }
 
-    public void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         id = null; // this is only used during graph construction
         out.writeObject(this);
     }

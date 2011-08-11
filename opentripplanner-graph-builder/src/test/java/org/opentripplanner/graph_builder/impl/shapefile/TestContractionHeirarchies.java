@@ -61,7 +61,6 @@ import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -134,7 +133,7 @@ public class TestContractionHeirarchies extends TestCase {
             for (int j = 0; j < N - 1; ++j) {
                 double lon = j * STEP + LON0;
                 double lat = i * STEP + LAT0;
-                double d = DistanceLibrary.distance(lat, lon, lat, lon + STEP);
+                double d = 111.111;
                 LineString geometry = GeometryUtils.makeLineString(lon, lat, lon + STEP, lat);
                 StreetVertex we = new StreetVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
                 StreetVertex ew = new StreetVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
@@ -144,7 +143,7 @@ public class TestContractionHeirarchies extends TestCase {
 
                 lon = i * STEP + LON0;
                 lat = j * STEP + LAT0;
-                d = DistanceLibrary.distance(lat, lon, lat + STEP, lon);
+                d = 111.111;
                 geometry = GeometryUtils.makeLineString(lon, lat, lon, lat + STEP);
                 StreetVertex sn = new StreetVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
                 StreetVertex ns = new StreetVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);

@@ -393,16 +393,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
 		/** A temporary holder for turn restrictions while we have only way/node ids but not yet edge objects */
 		class TurnRestrictionTag {
-			@SuppressWarnings("unused")
-			private long to;
-			@SuppressWarnings("unused")
-			private long from;
 			private long via;
 			private TurnRestrictionType type;
 
-			TurnRestrictionTag(long from, long to, long via, TurnRestrictionType type) {
-				this.from = from;
-				this.to = to;
+			TurnRestrictionTag(long via, TurnRestrictionType type) {
 				this.via = via;
 				this.type = type;
 			}
@@ -412,77 +406,80 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * Handle turn restrictions
          * @param relation
          */
-		private void processRestriction(OSMRelation relation) {
-			long from = -1, to = -1, via = -1;
-			for (OSMRelationMember member : relation.getMembers()) {
-				String role = member.getRole();
-				if (role.equals("from")) {
-					from = member.getRef();
-				} else if (role.equals("to")) {
-					to = member.getRef();
-				} else if (role.equals("via")) {
-					via = member.getRef();
-				}
-			}
-			if (from == -1 || to == -1 || via == -1) {
-				_log.debug("Bad restriction " + relation.getId());
-				return;
-			}
+        private void processRestriction(OSMRelation relation) {
+            long from = -1, to = -1, via = -1;
+            for (OSMRelationMember member : relation.getMembers()) {
+                String role = member.getRole();
+                if (role.equals("from")) {
+                    from = member.getRef();
+                } else if (role.equals("to")) {
+                    to = member.getRef();
+                } else if (role.equals("via")) {
+                    via = member.getRef();
+                }
+            }
+            if (from == -1 || to == -1 || via == -1) {
+                _log.debug("Bad restriction " + relation.getId());
+                return;
+            }
+
+            TurnRestrictionTag tag;
+            if (relation.isTag("restriction", "no_right_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+            } else if (relation.isTag("restriction", "no_left_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+            } else if (relation.isTag("restriction", "no_straight_on")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+            } else if (relation.isTag("restriction", "no_u_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+            } else if (relation.isTag("restriction", "only_straight_on")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+            } else if (relation.isTag("restriction", "only_right_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+            } else if (relation.isTag("restriction", "only_left_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+            } else {
+                _log.debug("unknown restriction type " + relation.getTag("restriction"));
+                return;
+            }
+            TurnRestriction restriction = new TurnRestriction();
+            restriction.type = tag.type;
+            turnRestrictionsByTag.put(tag, restriction);
+
+            GraphBuilderUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
+            GraphBuilderUtils.addToMapList(turnRestrictionsByToWay, to, tag);
 			
-			TurnRestrictionTag tag;
-			if (relation.isTag("restriction", "no_right_turn")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
-			} else if (relation.isTag("restriction", "no_left_turn")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
-			} else if (relation.isTag("restriction", "no_straight_on")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
-			} else if (relation.isTag("restriction", "no_u_turn")) {
-                            tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.NO_TURN);
-			} else if (relation.isTag("restriction", "only_straight_on")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
-			} else if (relation.isTag("restriction", "only_right_turn")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
-			} else if (relation.isTag("restriction", "only_left_turn")) {
-				tag = new TurnRestrictionTag(from, to, via, TurnRestrictionType.ONLY_TURN);
-			} else {
-				_log.debug("unknown restriction type " + relation.getTag("restriction"));
-				return;
-			}
-			TurnRestriction restriction = new TurnRestriction();
-			restriction.type = tag.type;
-			turnRestrictionsByTag.put(tag, restriction);
-			
-			GraphBuilderUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
-			GraphBuilderUtils.addToMapList(turnRestrictionsByToWay, to, tag);
-			
-		}
+        }
 		
-		private void processRoad(OSMRelation relation) {
-			for( OSMRelationMember member : relation.getMembers()) {
-			    if("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
-			        OSMWay way = _ways.get(member.getRef());
-			        if(way != null) {
-			            if(relation.hasTag("name")) {
-			                if(way.hasTag("otp:route_name")) {
-			                	way.addTag("otp:route_name", addUniqueName(way.getTag("otp:route_name"), relation.getTag("name")));
-			                } else {
-			                    way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
-			                }
-			            }
-			            if(relation.hasTag("ref")) {
-			                if(way.hasTag("otp:route_ref")) {
-			                    way.addTag("otp:route_ref", addUniqueName(way.getTag("otp:route_ref"), relation.getTag("ref")));
-			                } else {
-			                    way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
-			                }
-			            }
-			            if(relation.hasTag("highway") && relation.isTag("type", "multipolygon") && !way.hasTag("highway")) {
-			                way.addTag("highway", relation.getTag("highway"));
-			            }
-			        }
-			    }
-			}
-		}
+        private void processRoad(OSMRelation relation) {
+            for (OSMRelationMember member : relation.getMembers()) {
+                if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
+                    OSMWay way = _ways.get(member.getRef());
+                    if (way != null) {
+                        if (relation.hasTag("name")) {
+                            if (way.hasTag("otp:route_name")) {
+                                way.addTag("otp:route_name", addUniqueName(way
+                                        .getTag("otp:route_name"), relation.getTag("name")));
+                            } else {
+                                way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
+                            }
+                        }
+                        if (relation.hasTag("ref")) {
+                            if (way.hasTag("otp:route_ref")) {
+                                way.addTag("otp:route_ref", addUniqueName(way
+                                        .getTag("otp:route_ref"), relation.getTag("ref")));
+                            } else {
+                                way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
+                            }
+                        }
+                        if (relation.hasTag("highway") && relation.isTag("type", "multipolygon")
+                                && !way.hasTag("highway")) {
+                            way.addTag("highway", relation.getTag("highway"));
+                        }
+                    }
+                }
+            }
+        }
 
         private String addUniqueName(String routes, String name) {
         	String[] names = routes.split(", ");

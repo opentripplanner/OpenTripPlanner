@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Comparator;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
@@ -33,17 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
-public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
-
-    public static class HopArrivalTimeComparator implements Comparator<Hop> {
-
-        public int compare(Hop arg0, Hop arg1) {
-            int v1 = arg0.end.getArrivalTime();
-            int v2 = arg1.end.getArrivalTime();
-            return v1 - v2;
-        }
-
-    }
+public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
 
     private static final long serialVersionUID = -7761092317912812048L;
 
@@ -86,10 +74,6 @@ public class Hop extends AbstractEdge implements Comparable<Hop>,  OnBoardForwar
         s1.setZone(getEndStop().getZoneId());
         s1.setRoute(start.getTrip().getRoute().getId());
         return s1.makeState();
-    }
-
-    public int compareTo(Hop arg0) {
-        return this.end.compareTo(arg0.end);
     }
 
     public String toString() {

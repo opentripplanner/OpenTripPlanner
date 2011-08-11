@@ -276,6 +276,7 @@ public class NEDDownloader {
                     }
                     sb.append(buffer, 0, bytesRead);
                 }
+                reader.close();
                 contents = sb.toString();
                 HttpURLConnection httpconnection = (HttpURLConnection) connection;
                 httpconnection.disconnect();
@@ -413,6 +414,8 @@ public class NEDDownloader {
                 }
                 urls.add(new URL(line));
             }
+            reader.close();
+            is.close();
             if (urls.size() == 0) {
                 return getAndCacheUrls(file);
             }
@@ -444,12 +447,14 @@ public class NEDDownloader {
         try {
             FileInputStream inputStream = new FileInputStream(path);
             byte[] header = new byte[2];
-            inputStream.read(header, 0, 2);
+            int bytesRead = inputStream.read(header, 0, 2);
             inputStream.close();
-            if (header[0] != 'P' || header[1] != 'K') {
+            if (bytesRead != 2 || header[0] != 'P' || header[1] != 'K') {
                 // not a zip file
                 log.warn("not a zip file.");
-                path.delete();
+                if (!path.delete()) {
+                    log.error("Failed to delete incomplete file " + path);
+                }
                 throw new NotAZipFileException();
             }
             ZipFile zipFile = new ZipFile(path);
@@ -462,12 +467,13 @@ public class NEDDownloader {
                     FileOutputStream ostream = new FileOutputStream(tile);
                     byte[] buffer = new byte[4096];
                     while (true) {
-                        int bytesRead = istream.read(buffer);
+                        bytesRead = istream.read(buffer);
                         if (bytesRead == -1) {
                             break;
                         }
                         ostream.write(buffer, 0, bytesRead);
                     }
+                    ostream.close();
                     return tile;
                 }
             }

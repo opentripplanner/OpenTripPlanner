@@ -17,47 +17,50 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
- * The common data for ways with a given set of tags: * the safety features *
- * the slope override
+ * The common data for ways with a given set of tags: * the safety features * the slope override
  * 
  * @author novalis
  * 
  */
 public class WayProperties implements Cloneable {
 
-	private StreetTraversalPermission permission;
+    private StreetTraversalPermission permission;
 
-	/**
-	 * How much safer (less safe) this way is than the default, represented in
-	 * terms of something like DALYs lost per meter. The first element safety in
-	 * the direction of the way and the second is safety in the opposite
-	 * direction.
-	 */
-	private static final P2<Double> defaultSafetyFeatures = new P2<Double>(1.0, 1.0);
+    /**
+     * How much safer (less safe) this way is than the default, represented in terms of something
+     * like DALYs lost per meter. The first element safety in the direction of the way and the
+     * second is safety in the opposite direction.
+     */
+    private static final P2<Double> defaultSafetyFeatures = new P2<Double>(1.0, 1.0);
 
-	private P2<Double> safetyFeatures = defaultSafetyFeatures;
+    private P2<Double> safetyFeatures = defaultSafetyFeatures;
 
-	
-	public void setSafetyFeatures(P2<Double> safetyFeatures) {
-		this.safetyFeatures = safetyFeatures;
-	}
+    public void setSafetyFeatures(P2<Double> safetyFeatures) {
+        this.safetyFeatures = safetyFeatures;
+    }
 
-	public P2<Double> getSafetyFeatures() {
-		return safetyFeatures;
-	}
+    public P2<Double> getSafetyFeatures() {
+        return safetyFeatures;
+    }
 
-	public void setPermission(StreetTraversalPermission permission) {
-		this.permission = permission;
-	}
+    public void setPermission(StreetTraversalPermission permission) {
+        this.permission = permission;
+    }
 
-	public StreetTraversalPermission getPermission() {
-		return permission;
-	}
-	
-	public WayProperties clone() {
-		WayProperties result = new WayProperties();
-		result.setPermission(permission);
-		result.setSafetyFeatures(new P2<Double>(safetyFeatures.getFirst(), safetyFeatures.getSecond()));
-		return result;
-	}
+    public StreetTraversalPermission getPermission() {
+        return permission;
+    }
+
+    public WayProperties clone() {
+        WayProperties result;
+        try {
+            result = (WayProperties) super.clone();
+            result.setSafetyFeatures(new P2<Double>(safetyFeatures.getFirst(), safetyFeatures
+                    .getSecond()));
+            return result;
+        } catch (CloneNotSupportedException e) {
+            // unreached
+            throw new RuntimeException(e);
+        }
+    }
 }

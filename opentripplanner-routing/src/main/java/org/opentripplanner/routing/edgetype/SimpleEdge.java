@@ -35,5 +35,16 @@ public class SimpleEdge extends FreeEdge {
         s1.incrementWeight(weight);
         return s1.makeState();
     }
+
+    public boolean equals(Object other) {
+        if (other instanceof SimpleEdge) {
+            SimpleEdge simple = (SimpleEdge) other;
+            return super.equals(simple) && simple.weight == weight && simple.seconds == seconds;
+        }
+        return false;
+    }
     
+    public int hashCode() {
+        return fromv.hashCode() ^ tov.hashCode() + seconds + new Double(weight).hashCode();
+    }
 }

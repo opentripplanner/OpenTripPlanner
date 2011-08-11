@@ -34,9 +34,7 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TraverseOptions implements Serializable, Cloneable {
-
-    private static final long serialVersionUID = 3836092451659658815L;
+public class TraverseOptions implements Cloneable {
 
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 

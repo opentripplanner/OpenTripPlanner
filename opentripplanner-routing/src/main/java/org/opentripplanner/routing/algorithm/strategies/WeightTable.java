@@ -84,7 +84,7 @@ public class WeightTable implements Serializable {
 	// assignindices(Graph g)
 	// update(origin, dest, newval)
 
-	class PoolableBinHeapFactory<T> implements PoolableObjectFactory {
+	static class PoolableBinHeapFactory<T> implements PoolableObjectFactory {
 		private int size;
 
 		public PoolableBinHeapFactory(int size) {

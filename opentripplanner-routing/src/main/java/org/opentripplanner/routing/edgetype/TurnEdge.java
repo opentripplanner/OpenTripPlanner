@@ -127,7 +127,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
             return null;
         }
         
-        double angleLength = fromv.getLength() + turnCost / 20;
+        double angleLength = fromv.getLength() + turnCost / 20.0;
 
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
@@ -170,11 +170,6 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
             return null;
 
         return s1.makeState();
-    }
-
-    public Object clone() throws CloneNotSupportedException {
-        TurnEdge clone = (TurnEdge) super.clone();
-        return clone;
     }
 
     public String toString() {

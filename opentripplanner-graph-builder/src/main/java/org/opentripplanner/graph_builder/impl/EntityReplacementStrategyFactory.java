@@ -52,6 +52,7 @@ public class EntityReplacementStrategyFactory {
         for (int i = 1; i < ids.size(); i++)
           impl.addEntityReplacement(entityClass, ids.get(i), ids.get(0));
       }
+      reader.close();
     }
     return impl;
   }

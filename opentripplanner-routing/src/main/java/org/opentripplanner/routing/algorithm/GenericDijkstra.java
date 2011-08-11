@@ -136,7 +136,7 @@ public class GenericDijkstra {
                         continue;
 
                     if (_verbose)
-                        System.out.printf("  w = %d + %d = %d %s", u.getWeight(), v.getWeightDelta(), 
+                        System.out.printf("  w = %f + %f = %f %s", u.getWeight(), v.getWeightDelta(), 
                         		v.getWeight(),  v.getVertex());
                     
                     if (v.exceedsWeightLimit(options.maxWeight))

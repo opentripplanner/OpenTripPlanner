@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
@@ -82,8 +83,10 @@ public class WayPropertySet {
             /* generate warning message */
             String all_tags = null;
             Map<String, String> tags = way.getTags();
-            for (String key : tags.keySet()) {
-                String tag = key + "=" + tags.get(key);
+            for (Entry<String, String> entry : tags.entrySet()) {
+                String key = entry.getKey();
+                String value = entry.getValue();
+                String tag = key + "=" + value;
                 if (all_tags == null) {
                     all_tags = tag;
                 } else {

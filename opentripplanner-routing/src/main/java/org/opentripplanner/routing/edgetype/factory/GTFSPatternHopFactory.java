@@ -130,6 +130,14 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
         return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime(); 
     }
     
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof InterliningTrip) {
+            return compareTo((InterliningTrip) o) == 0;
+        }
+        return false;
+    }
+    
 }
 
 class BlockIdAndServiceId {

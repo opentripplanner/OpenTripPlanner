@@ -69,7 +69,6 @@ public class AStar {
         if (options.isArriveBy()) {
             s0 = new State(time, target, options);
             target = origin;
-            origin = s0.getVertex();
         } else {
             s0 = new State(time, origin, options);
         }

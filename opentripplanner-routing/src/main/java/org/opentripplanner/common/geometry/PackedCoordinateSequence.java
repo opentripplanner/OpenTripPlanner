@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * 
  * @version 1.7
  */
-public abstract class PackedCoordinateSequence implements CoordinateSequence, Serializable {
+public abstract class PackedCoordinateSequence implements CoordinateSequence, Serializable, Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -172,12 +172,19 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
      * @return
      */
     protected abstract Coordinate getCoordinateInternal(int index);
-
+    
     /**
      * @see java.lang.Object#clone()
      */
-    public abstract Object clone();
-
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            //unreached
+            throw new RuntimeException(e);
+        }
+    }
+    
     /**
      * Sets the ordinate of a coordinate in this sequence. <br>
      * Warning: for performance reasons the ordinate index is not checked - if it is over dimensions
@@ -296,9 +303,9 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
          * @see java.lang.Object#clone()
          */
         public Object clone() {
-            double[] clone = new double[coords.length];
-            System.arraycopy(coords, 0, clone, 0, coords.length);
-            return new Double(clone, dimension);
+            Double clone = (Double) super.clone();
+            clone.coords = coords.clone();
+            return clone;
         }
 
         /**
@@ -421,9 +428,9 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
          * @see java.lang.Object#clone()
          */
         public Object clone() {
-            float[] clone = new float[coords.length];
-            System.arraycopy(coords, 0, clone, 0, coords.length);
-            return new Float(clone, dimension);
+            Float clone = (Float) super.clone();
+            clone.coords = coords.clone();
+            return clone;
         }
 
         /**

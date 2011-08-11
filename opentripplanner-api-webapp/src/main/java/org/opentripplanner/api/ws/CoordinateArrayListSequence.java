@@ -21,7 +21,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 
 /** An instance of CoordinateSequence that can be efficiently extended */
-public class CoordinateArrayListSequence implements CoordinateSequence {
+public class CoordinateArrayListSequence implements CoordinateSequence, Cloneable {
     ArrayList<Coordinate> coordinates;
     
     public CoordinateArrayListSequence() {
@@ -41,9 +41,18 @@ public class CoordinateArrayListSequence implements CoordinateSequence {
         return env;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public CoordinateArrayListSequence clone() {
-        return new CoordinateArrayListSequence(coordinates);
+        CoordinateArrayListSequence clone;
+        try {
+            clone = (CoordinateArrayListSequence) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* never happens since super is Object */
+            throw new RuntimeException(e);
+        }
+        clone.coordinates = (ArrayList<Coordinate>) coordinates.clone();
+        return clone;
     }
 
     

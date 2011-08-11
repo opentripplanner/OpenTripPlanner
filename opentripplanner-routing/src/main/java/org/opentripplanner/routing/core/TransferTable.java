@@ -63,7 +63,7 @@ public class TransferTable implements Serializable {
         }
     }
     
-    public class Transfer {
+    public static class Transfer {
         public Vertex from, to;
         public int seconds;
         public Transfer(Vertex from, Vertex to, int seconds) {

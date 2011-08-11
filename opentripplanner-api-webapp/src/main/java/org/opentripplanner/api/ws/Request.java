@@ -251,7 +251,7 @@ public class Request implements RequestInf {
      *            the dateTime to set
      */
     public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime;
+        this.dateTime = new Date(dateTime.getTime());
     }
 
     /**
@@ -391,7 +391,7 @@ public class Request implements RequestInf {
     }
     
     public void setPreferredRoutes(String[] preferredRoutes) {
-        this.preferredRoutes = preferredRoutes;
+        this.preferredRoutes = preferredRoutes.clone();
     }
 
     public String[] getPreferredRoutes() {
@@ -399,7 +399,7 @@ public class Request implements RequestInf {
     }
 
     public void setUnpreferredRoutes(String[] unpreferredRoutes) {
-        this.unpreferredRoutes = unpreferredRoutes;
+        this.unpreferredRoutes = unpreferredRoutes.clone();
     }
 
     public String[] getUnpreferredRoutes() {
@@ -407,7 +407,7 @@ public class Request implements RequestInf {
     }
 
     public void setBannedRoutes(String[] bannedRoutes) {
-        this.bannedRoutes = bannedRoutes;
+        this.bannedRoutes = bannedRoutes.clone();
     }
 
     public String[] getBannedRoutes() {

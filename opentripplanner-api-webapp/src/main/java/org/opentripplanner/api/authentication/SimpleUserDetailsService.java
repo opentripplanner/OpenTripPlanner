@@ -35,7 +35,7 @@ public class SimpleUserDetailsService implements UserDetailsService {
 		authorities.add(new GrantedAuthorityImpl("user"));
 	}
 
-	public class SimpleUserDetails implements UserDetails {
+	public static class SimpleUserDetails implements UserDetails {
 		private static final long serialVersionUID = -6281467878234893438L;
 		
 		private String username;

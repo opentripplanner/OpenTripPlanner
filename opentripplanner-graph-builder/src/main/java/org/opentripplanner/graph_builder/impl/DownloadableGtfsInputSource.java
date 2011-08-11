@@ -64,8 +64,11 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
     private File getTemporaryDirectory() {
 
         if (_cacheDirectory != null) {
-            if (!_cacheDirectory.exists())
-                _cacheDirectory.mkdirs();
+            if (!_cacheDirectory.exists()) {
+                if (!_cacheDirectory.mkdirs()) {
+                    throw new RuntimeException("Failed to create cache directory " + _cacheDirectory);
+                }
+            }
             return _cacheDirectory;
         }
 
@@ -98,7 +101,9 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
                 copyStreams(in, out);
             } catch (RuntimeException e) {
                 out.close();
-                gtfsFile.delete();
+                if (!gtfsFile.delete()) {
+                    _log.error("Failed to delete incomplete file " + gtfsFile);
+                }
                 throw e;
             }
             return gtfsFile;

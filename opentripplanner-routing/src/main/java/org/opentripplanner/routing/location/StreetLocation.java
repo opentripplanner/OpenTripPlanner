@@ -125,7 +125,6 @@ public class StreetLocation extends GenericVertex {
         Geometry geometry = street.getGeometry();
         if (cache.containsKey (geometry)) {
             P2<StreetVertex> cached = cache.get(geometry);
-            newFrom = cached.getFirst();
             location = cached.getSecond();
         } else {
             P2<LineString> geometries = getGeometry(street, nearestPoint);
@@ -214,6 +213,11 @@ public class StreetLocation extends GenericVertex {
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return getCoordinate().hashCode();
+    }
+    
 	public void addExtraEdgeTo(Vertex target) {
 		extra.add(new FreeEdge(this, target));
 		extra.add(new FreeEdge(target, this));

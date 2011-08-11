@@ -96,4 +96,9 @@ public class GraphVertex implements Serializable, HasEdges {
         }
         return false;
     }
+    
+    @Override
+    public int hashCode() {
+        return incoming.hashCode() + 1337 * outgoing.hashCode();
+    }
 }
