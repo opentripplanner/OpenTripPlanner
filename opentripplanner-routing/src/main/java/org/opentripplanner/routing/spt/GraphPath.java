@@ -15,6 +15,7 @@ package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
@@ -34,6 +35,8 @@ import org.opentripplanner.routing.edgetype.PatternBoard;
  * A shortest path on the graph.
  */
 public class GraphPath {
+    private static final Logger LOGGER = Logger.getLogger(GraphPath.class.getCanonicalName());
+
     public LinkedList<State> states;
 
     public LinkedList<Edge> edges;
@@ -186,7 +189,7 @@ public class GraphPath {
      * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
      * from this state to the other end of the implicit path.
      */
-    private State reverse(State orig) {
+    private static State reverse(State orig) {
 
         State ret = orig.reversedClone();
 
@@ -217,6 +220,7 @@ public class GraphPath {
      */
     // optimize is now very similar to reverse, and the two could conceivably be combined
     private static State optimize(State orig) {
+        State unoptimized = orig;
     	State ret = orig.reversedClone();
         Edge edge = null;
         try {
@@ -229,7 +233,11 @@ public class GraphPath {
                 orig = orig.getBackState();
             }
         } catch (NullPointerException e) {
-            throw new RuntimeException("Cannot reverse path at edge: " + edge);
+            LOGGER.warning("Cannot reverse path at edge: " + edge
+                    + " returning unoptimized path.  If edge is a PatternInterlineDwell,"
+                    + " this is not totally unexpected; otherwise, you might want to"
+                    + " look into it");
+            return reverse(unoptimized);
         }
         return ret;
     }
