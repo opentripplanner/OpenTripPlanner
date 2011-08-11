@@ -73,7 +73,8 @@ public class TransitIndexBuilderTest extends TestCase {
 		assertEquals(1, variantsForRoute.size());
 		
 		directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "2"));
-		assertNull(directionsForRoute);
+		assertEquals(1, directionsForRoute.size());
+		assertEquals(null, directionsForRoute.iterator().next());
 
 	}
 }
