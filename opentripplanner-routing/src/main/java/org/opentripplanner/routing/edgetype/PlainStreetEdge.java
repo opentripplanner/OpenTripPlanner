@@ -293,9 +293,9 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return id;
     }
 
-    private void writeObject(ObjectOutputStream out) throws IOException {
-        id = null; // this is only used during graph construction
-        out.writeObject(this);
+    public void writeObject(ObjectOutputStream out) throws IOException {
+        id = null;
+        out.defaultWriteObject();
     }
 
     public boolean isCrossable() {
