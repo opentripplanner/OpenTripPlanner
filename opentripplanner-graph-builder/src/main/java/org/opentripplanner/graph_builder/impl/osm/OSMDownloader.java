@@ -132,8 +132,10 @@ public class OSMDownloader {
             _cacheDirectory = new File(tmpDir,"osm-tiles");
         }
         
-        if (!_cacheDirectory.mkdirs()) {
-            throw new RuntimeException("Failed to create directory " + _cacheDirectory);
+        if (!_cacheDirectory.exists()) {
+            if (!_cacheDirectory.mkdirs()) {
+                throw new RuntimeException("Failed to create directory " + _cacheDirectory);
+            }
         }
 
         File path = new File(_cacheDirectory, "map-" + key + ".osm");

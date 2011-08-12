@@ -97,10 +97,10 @@ public class NEDDownloader {
     }
 
     private File getPathToNEDArchive(String key) {
-        try {
-            cacheDirectory.mkdirs();
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating cache directory " + cacheDirectory, e);
+        if (!cacheDirectory.exists()) {
+            if (!cacheDirectory.mkdirs()) {
+                throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
+            }
         }
 
         File path = new File(cacheDirectory, "ned-" + key + ".zip");
@@ -108,10 +108,10 @@ public class NEDDownloader {
     }
 
     private File getPathToNEDTile(String key) {
-        try {
-            cacheDirectory.mkdirs();
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating cache directory " + cacheDirectory, e);
+        if (!cacheDirectory.exists()) {
+            if (!cacheDirectory.mkdirs()) {
+                throw new RuntimeException("Failed to create cache directory for NED at " + cacheDirectory);
+            }
         }
 
         File path = new File(cacheDirectory, "ned-" + key + ".tif");
