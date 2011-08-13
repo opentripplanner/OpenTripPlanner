@@ -188,10 +188,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                 }
                 break;
             case FLAT:
-                double speedOverhead = StreetVertex.SPEED_OVERHEAD
-                        * StreetVertex.WORK_NORMALIZATION_FACTOR * length
-                        * (options.speed - StreetVertex.DEFAULT_BICYCLE_SPEED);
-                weight = length / options.speed + slopeWorkCost + speedOverhead;
+                /* see notes in StreetVertex on speed overhead */
+                weight = length / options.speed + slopeWorkCost;
                 break;
             case QUICK:
                 weight = slopeSpeedEffectiveLength / options.speed;
@@ -199,11 +197,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             case TRIANGLE:
                 double quick = slopeSpeedEffectiveLength / options.speed;
                 double safety = bicycleSafetyEffectiveLength / options.speed;
-                speedOverhead = StreetVertex.SPEED_OVERHEAD
-                        * StreetVertex.WORK_NORMALIZATION_FACTOR * length
-                        * (options.speed - StreetVertex.DEFAULT_BICYCLE_SPEED);
-                double slope = slopeWorkCost + speedOverhead;
+                /* see notes in StreetVertex on speed overhead */
+                double slope = slopeWorkCost;
                 weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
+                break;
             default:
                 // TODO: greenways
                 weight = length / options.speed;
@@ -261,6 +258,14 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return slopeSpeedEffectiveLength;
     }
 
+    public void setSlopeWorkCost(double slopeWorkCost) {
+        this.slopeWorkCost = slopeWorkCost;
+    }
+
+    public double getWorkCost() {
+        return slopeWorkCost;
+    }
+
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
         this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
     }
@@ -294,7 +299,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     }
 
     public void writeObject(ObjectOutputStream out) throws IOException {
-        id = null;
+        id = null; 
         out.defaultWriteObject();
     }
 

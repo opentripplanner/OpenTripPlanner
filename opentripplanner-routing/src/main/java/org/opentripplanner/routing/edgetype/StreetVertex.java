@@ -38,8 +38,10 @@ public class StreetVertex extends GenericVertex {
 
     private static Logger log = LoggerFactory.getLogger(StreetVertex.class);
 
+    /* These numbers disagree with everything else I (David Turner) have read about the energy cost
+     of cycling but given that we are going to be fudging them anyway, they're not totally crazy */ 
     private static final double JOULES_PER_METER_ON_FLAT = 6.8;
-    private static final double JOULES_SLOPE_FACTOR = 7.37;
+    private static final double JOULES_SLOPE_FACTOR = 73.7;
     
     private static final long serialVersionUID = -385126804908021091L;
 
@@ -52,7 +54,7 @@ public class StreetVertex extends GenericVertex {
     /** 
      * Adjustment to make work costs comparable to time and safety costs
      */
-    public  static final double WORK_NORMALIZATION_FACTOR = 0.05;
+    public  static final double WORK_NORMALIZATION_FACTOR = 0.0294;
     
     /** 
      * Default speed used to compute work costs 
@@ -112,7 +114,7 @@ public class StreetVertex extends GenericVertex {
         this.geometry = geometry;
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
-        this.slopeWorkCost = 0;
+        this.slopeWorkCost = length;
         this.slopeSpeedEffectiveLength = length;
         this.name = name;
         this.permission = StreetTraversalPermission.ALL;
@@ -183,7 +185,7 @@ public class StreetVertex extends GenericVertex {
         
         double maxSlope = 0;
         double slopeSpeedEffectiveLength = 0;
-        double slopeCost = 0;
+        double slopeWorkCost = 0;
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
@@ -204,16 +206,18 @@ public class StreetVertex extends GenericVertex {
              * data from analyticcycling.com. For faster speeds, the Y-intercept is higher, but the
              * slope (of the road-slope vs joule-per-meter line) is nearly the same. This implies
              * that it bottoms out lower (as for technical reasons the cost can never be less than
-             * zero). Since we have to cap it before we know the actual speed, this cost will be a
-             * bit low for fast riders on slight downslopes.
+             * zero).  
+             * 
+             * This is moot, because we want a fairly high minimum cost, since the theoretical
+             * numbers do not really agree with cyclist preferences.  
              */
 
-            double watt_seconds = run * (JOULES_PER_METER_ON_FLAT + JOULES_SLOPE_FACTOR * slope);
-            watt_seconds = Math.max(watt_seconds, 0) * WORK_NORMALIZATION_FACTOR;
-            slopeCost += watt_seconds;
+            double slope_or_zero = Math.max(slope, 0);
+            double joules = run * (JOULES_PER_METER_ON_FLAT + JOULES_SLOPE_FACTOR * slope_or_zero);
+            slopeWorkCost += joules * WORK_NORMALIZATION_FACTOR;
             slopeSpeedEffectiveLength += run * slopeSpeedCoefficient(slope, coordinates[i].y);
         }
-        return new SlopeCosts(slopeSpeedEffectiveLength, slopeCost, maxSlope); 
+        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, maxSlope); 
     }
 
     public static double slopeSpeedCoefficient(double slope, double altitude) {
@@ -389,9 +393,16 @@ public class StreetVertex extends GenericVertex {
                 }
                 break;
             case FLAT:
-                double speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
-                        * (options.speed - DEFAULT_BICYCLE_SPEED);
-                weight = length / options.speed + slopeWorkCost + speedOverhead;
+                /*
+                 * We do not use the speed overhead (that is, how much harder a cyclist has to work
+                 * to overcome wind resistance and friction at high speeds) because while it more
+                 * accurately models the cost of biking on slopes, it makes it harder to compare
+                 * costs between transit and biking
+                 * 
+                 * double speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
+                 * (options.speed - DEFAULT_BICYCLE_SPEED);
+                 */
+                weight = length / options.speed + slopeWorkCost;
                 break;
             case QUICK:
                 weight = slopeSpeedEffectiveLength / options.speed;
@@ -399,10 +410,13 @@ public class StreetVertex extends GenericVertex {
             case TRIANGLE:
                 double quick = slopeSpeedEffectiveLength / options.speed;
                 double safety = bicycleSafetyEffectiveLength / options.speed;
-                speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
-                        * (options.speed - DEFAULT_BICYCLE_SPEED);
-                double slope = slopeWorkCost + speedOverhead;
+                /* See note under case FLAT
+                 * speedOverhead = SPEED_OVERHEAD * WORK_NORMALIZATION_FACTOR * length
+                 *      * (options.speed - DEFAULT_BICYCLE_SPEED);
+                 */
+                double slope = slopeWorkCost;
                 weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
+                break;
             default:
                 // TODO: greenways
                 weight = length / options.speed;
