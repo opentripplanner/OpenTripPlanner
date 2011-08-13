@@ -49,9 +49,14 @@ public class Place {
     public Double lat = null;
 
     /**
-     * The time the rider will be at the place.
+     * The time the rider will arrive at the place.
      */
-    public Date time = null;
+    public Date arrival = null;
+
+    /**
+     * The time the rider will depart the place.
+     */
+    public Date departure = null;
 
     /**
      * Returns the geometry in GeoJSON format
@@ -80,6 +85,6 @@ public class Place {
 	public Place(Double lon, Double lat, String name, AgencyAndId stopId,
 			Date time) {
 		this(lon, lat, name, stopId);
-		this.time = time;
+		this.arrival = departure = time;
 	}
 }

@@ -39,7 +39,10 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -280,6 +283,14 @@ public class PlanGenerator {
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         /* reset coordinates */
                         coordinates = new CoordinateArrayListSequence();
+
+                        if(showIntermediateStops && leg.stop != null) {
+                            // Remove the last stop -- it's the alighting one
+                            leg.stop.remove(leg.stop.size() - 1);
+                            if(leg.stop.isEmpty()) {
+                                leg.stop = null;
+                            }
+                        }
                     }
                     /* initialize new leg */
                     leg = makeLeg(currState);
@@ -351,8 +362,14 @@ public class PlanGenerator {
                         leg.stop = new ArrayList<Place>();
                     }
                     /* any further transit edge, add "from" vertex to intermediate stops */
-                    Place stop = makePlace(currState);
-                    leg.stop.add(stop);
+                    if( !(   currState.getBackEdge() instanceof Dwell
+                          || currState.getBackEdge() instanceof PatternDwell
+                          || currState.getBackEdge() instanceof PatternInterlineDwell)) {
+                        Place stop = makePlace(currState);
+                        leg.stop.add(stop);
+                    } else {
+                        leg.stop.get(leg.stop.size() - 1).departure = new Date(currState.getTime());
+                    }
                 }
             }
         } /* end loop over graphPath edge list */
@@ -365,6 +382,13 @@ public class PlanGenerator {
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
             if (startWalk != -1) {
                 leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i + 1));
+            }
+            if(showIntermediateStops && leg.stop != null) {
+                // Remove the last stop -- it's the alighting one
+                leg.stop.remove(leg.stop.size() - 1);
+                if(leg.stop.isEmpty()) {
+                    leg.stop = null;
+                }
             }
         }
         if (itinerary.transfers == -1) {
