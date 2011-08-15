@@ -97,6 +97,15 @@ public class Planner {
      * 
      * @param walkSpeed
      *            The user's walking speed in meters/second. Defaults to approximately 3 MPH.
+     *
+     * @param triangleSafetyFactor
+     *            For bike triangle routing, how much safety matters (range 0-1).
+     *
+     * @param triangleSlopeFactor
+     *            For bike triangle routing, how much slope matters (range 0-1).
+     *
+     * @param triangleTimeFactor
+     *            For bike triangle routing, how much time matters (range 0-1).            
      * 
      * @param optimize
      *            The set of characteristics that the user wants to optimize for. @See OptimizeType
@@ -131,6 +140,9 @@ public class Planner {
             @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
             @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
+            @DefaultValue("") @QueryParam(RequestInf.TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor,
+            @DefaultValue("") @QueryParam(RequestInf.TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor,
+            @DefaultValue("") @QueryParam(RequestInf.TRIANGLE_TIME_FACTOR) Double triangleTimeFactor,
             @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
             @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
             @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
@@ -168,6 +180,29 @@ public class Planner {
         }
         if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
+        }
+        if (walkSpeed != null) {
+            request.setWalkSpeed(walkSpeed);
+        }
+        if (triangleSafetyFactor != null || triangleSlopeFactor != null || triangleTimeFactor != null) {
+            if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
+                return error(request, Message.UNDERSPECIFIED_TRIANGLE);
+            }
+            if (optimize == null) {
+                optimize = OptimizeType.TRIANGLE;
+            }
+            if (optimize != OptimizeType.TRIANGLE) {
+                return error(request, Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET);
+            }
+            if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
+                return error(request, Message.TRIANGLE_NOT_AFFINE);
+            }
+            
+            request.setTriangleSafetyFactor(triangleSafetyFactor);
+            request.setTriangleSlopeFactor(triangleSlopeFactor);
+            request.setTriangleTimeFactor(triangleTimeFactor);
+        } else if (optimize == OptimizeType.TRIANGLE) {
+            return error(request, Message.TRIANGLE_VALUES_NOT_SET);
         }
         if (arriveBy != null && arriveBy) {
             request.setArriveBy(true);
@@ -228,6 +263,13 @@ public class Planner {
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }
+        return response;
+    }
+
+    private Response error(Request request, Message message) {
+        PlannerError error = new PlannerError(message);
+        Response response = new Response(request);
+        response.setError(error);
         return response;
     }
 

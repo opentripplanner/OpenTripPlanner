@@ -105,7 +105,11 @@ public class Request implements RequestInf {
     private Integer minTransferTime;
     private String[] bannedRoutes;
     private Integer transferPenalty;
-
+    private double walkSpeed;
+    private double triangleSafetyFactor;
+    private double triangleSlopeFactor;
+    private double triangleTimeFactor;
+    
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
         setIntermediatePlaces(new ArrayList<String>());
@@ -421,4 +425,37 @@ public class Request implements RequestInf {
     public Integer getTransferPenalty() {
         return transferPenalty;
     }
+
+    public void setWalkSpeed(double walkSpeed) {
+        this.walkSpeed = walkSpeed;
+    }
+
+    public double getWalkSpeed() {
+        return walkSpeed;
+    }
+
+    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
+        this.triangleSafetyFactor = triangleSafetyFactor;
+    }
+
+    public double getTriangleSafetyFactor() {
+        return triangleSafetyFactor;
+    }
+
+    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
+        this.triangleSlopeFactor = triangleSlopeFactor;
+    }
+
+    public double getTriangleSlopeFactor() {
+        return triangleSlopeFactor;
+    }
+
+    public void setTriangleTimeFactor(double triangleTimeFactor) {
+        this.triangleTimeFactor = triangleTimeFactor;
+    }
+
+    public double getTriangleTimeFactor() {
+        return triangleTimeFactor;
+    }
+
 }

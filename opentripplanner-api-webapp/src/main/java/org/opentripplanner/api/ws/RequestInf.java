@@ -42,6 +42,9 @@ public interface RequestInf {
 	public static String WALK_SPEED = "walkSpeed";
 	public static String WHEELCHAIR = "wheelchair";
 	public static String MIN_TRANSFER_TIME = "minTransferTime";
+        public static String TRIANGLE_TIME_FACTOR = "triangleTimeFactor";
+        public static String TRIANGLE_SAFETY_FACTOR = "triangleSafetyFactor";
+        public static String TRIANGLE_SLOPE_FACTOR = "triangleSlopeFactor";
 
 	/**
 	 * @return the from

@@ -503,6 +503,12 @@ public class PlanGenerator {
         if (request.getMaxWalkDistance() > 0) {
             options.setMaxWalkDistance(request.getMaxWalkDistance());
         }
+        if (request.getWalkSpeed() > 0) {
+            options.speed =  request.getWalkSpeed();
+        }
+        options.triangleSafetyFactor = request.getTriangleSafetyFactor();
+        options.triangleSlopeFactor = request.getTriangleSlopeFactor();
+        options.triangleTimeFactor = request.getTriangleTimeFactor();        
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();
         }
