@@ -256,7 +256,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=secondary;cycleway:left=shared_lane",
                 StreetTraversalPermission.ALL, 1.18, 0.91);
 
-
         setProperties(props, "footway=sidewalk;highway=footway", 
                 StreetTraversalPermission.PEDESTRIAN);
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=designated", 
@@ -273,9 +272,25 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=footway;bicycle=yes", 
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
 
+        setProperties(props, "path=sidewalk;highway=path", 
+                StreetTraversalPermission.PEDESTRIAN);
+        setProperties(props, "path=sidewalk;highway=path;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+        setProperties(props, "path=sidewalk;highway=path;RLIS:bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.84, 0.84);
+        setProperties(props, "highway=path;bicycle=designated", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.73, 0.73);
+        setProperties(props, "path=sidewalk;highway=path;bicycle=yes", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.5, 2.5);
+        
+        setProperties(props, "highway=path", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
+        setProperties(props, "highway=path;bicycle=yes", 
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
+
         setProperties(props, "highway=service", 
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
-        setProperties(props, "footway=service;service=parking_aisle;RLIS:bicycle=designated", 
+        setProperties(props, "highway=service;service=parking_aisle;RLIS:bicycle=designated", 
                 StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.84, 0.84);
         
         /* surface mixins */
