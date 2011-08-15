@@ -346,6 +346,7 @@ public class TraverseOptions implements Cloneable {
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
+            walkingOptions.walkReluctance = 4.0;
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
