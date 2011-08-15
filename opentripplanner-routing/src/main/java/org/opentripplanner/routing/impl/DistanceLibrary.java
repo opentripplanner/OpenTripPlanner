@@ -26,18 +26,32 @@ import com.vividsolutions.jts.geom.Envelope;
 public class DistanceLibrary {
 
     public static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
+    
+    // Max admissible lat/lon delta for approximated distance computation
+    public static final double MAX_LAT_DELTA_DEG = 4.0;
+    public static final double MAX_LON_DELTA_DEG = 4.0;
+    // 1 / Max over-estimation error of approximated distance, 
+    // for delta lat/lon in given range
+    public static final double MAX_ERR_INV = 0.999462;  
 
     public static final double distance(Coordinate from, Coordinate to) {
         return distance(from.y, from.x, to.y, to.x);
     }
 
+    public static final double fastDistance(Coordinate from, Coordinate to) {
+        return fastDistance(from.y, from.x, to.y, to.x);
+    }
+
     public static final double distance(double lat1, double lon1, double lat2, double lon2) {
         return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_KM * 1000);
     }
-
+    
+    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2) {
+        return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_KM * 1000);
+    }
+    
     public static final double distance(double lat1, double lon1, double lat2, double lon2,
             double radius) {
-
         // http://en.wikipedia.org/wiki/Great-circle_distance
         lat1 = toRadians(lat1); // Theta-s
         lon1 = toRadians(lon1); // Lambda-s
@@ -50,7 +64,23 @@ public class DistanceLibrary {
                 + DistanceLibrary.p2(cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(deltaLon)));
         double x = sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(deltaLon);
 
-        return radius * atan2(y, x);
+        return radius * atan2(y, x);        
+    }
+    
+    /**
+     * Approximated, fast and under-estimated equirectangular distance between two points.
+     * Works only for small delta lat/lon, fall-back on exact distance if not the case.
+     * See: http://www.movable-type.co.uk/scripts/latlong.html
+     */
+    public static final double fastDistance(double lat1, double lon1, double lat2, double lon2,
+            double radius) {
+    	if (Math.abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
+    			|| Math.abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
+    		return distance(lat1, lon1, lat2, lon2, radius);
+
+    	double dLat = Math.toRadians(lat2 - lat1);
+        double dLon = Math.toRadians(lon2 - lon1) * Math.cos(Math.toRadians((lat1 + lat2) / 2));
+        return radius * Math.sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
     }
 
     private static final double p2(double a) {

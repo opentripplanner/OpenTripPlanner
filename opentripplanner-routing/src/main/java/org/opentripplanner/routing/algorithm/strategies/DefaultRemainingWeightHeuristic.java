@@ -37,14 +37,14 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         this.options = s.getOptions();
         this.useTransit = options.getModes().getTransit();
         this.maxSpeed = getMaxSpeed(options);
-        return s.getVertex().distance(target) / maxSpeed;
+        return s.getVertex().fastDistance(target) / maxSpeed;
     }
 
     @Override
     public double computeForwardWeight(State s, Vertex target) {
 
     	Vertex sv = s.getVertex();
-        double euclidianDistance = sv.distance(target);
+        double euclidianDistance = sv.fastDistance(target);
         /*	On a non-transit trip, the remaining weight is simply distance / speed
          *	On a transit trip, there are two cases:
          *	(1) we're not on a transit vehicle.  In this case, there are two possible ways to 
@@ -95,7 +95,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
     	Vertex sv = s.getVertex();
         
-        double euclidianDistance = sv.distance(target);
+        double euclidianDistance = sv.fastDistance(target);
         
         if (useTransit) {
             if (s.isAlightedLocal()) {

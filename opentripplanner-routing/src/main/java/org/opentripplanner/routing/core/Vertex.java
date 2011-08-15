@@ -41,6 +41,11 @@ public interface Vertex extends Cloneable {
     public double distance(Vertex v);
 
     /**
+     * Fast, slightly approximated, under-estimated distance in meters to the vertex
+     */
+    public double fastDistance(Vertex v);
+    
+    /**
      * @return The location of the vertex in longitude/latitude
      */
     public Coordinate getCoordinate();

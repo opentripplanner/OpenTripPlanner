@@ -75,6 +75,11 @@ public class GenericVertex implements Vertex, Serializable {
     public double distance(Vertex v) {
         return DistanceLibrary.distance(getY(), getX(), v.getY(), v.getX());
     }
+    
+    @Override
+    public double fastDistance(Vertex v) {
+    	return DistanceLibrary.fastDistance(getY(), getX(), v.getY(), v.getX());
+    }
 
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());

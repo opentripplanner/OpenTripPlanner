@@ -261,7 +261,7 @@ public class LocalStopFinder {
                 }
             }
             
-            if (fromv.distance(origin) > LOCAL_STOP_SEARCH_RADIUS) {
+            if (fromv.fastDistance(origin) > LOCAL_STOP_SEARCH_RADIUS) {
                 /* we have now traveled far from the origin, so we know that anything we find
                  * from here on out is going to be too far
                  */
