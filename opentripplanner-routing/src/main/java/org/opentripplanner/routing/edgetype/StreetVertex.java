@@ -418,7 +418,6 @@ public class StreetVertex extends GenericVertex {
                 weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
                 break;
             default:
-                // TODO: greenways
                 weight = length / options.speed;
             }
         } else {
