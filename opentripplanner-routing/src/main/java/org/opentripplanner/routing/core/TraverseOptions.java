@@ -346,7 +346,11 @@ public class TraverseOptions implements Cloneable {
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
-            walkingOptions.walkReluctance = 4.0;
+            
+            // why 12? Because the default bike safety factor is 4, and we really want to only walk
+            // a bike to save a user from a walk which is roughly "around the block" -- that is,
+            // three times as long.
+            walkingOptions.walkReluctance *= 12.0; 
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
