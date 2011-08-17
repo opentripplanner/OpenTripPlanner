@@ -28,12 +28,14 @@ import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class GoogleGeocoder implements Geocoder {
 	
 	private GoogleJsonDeserializer googleJsonDeserializer = new GoogleJsonDeserializer();
 
 	@Override
-	public GeocoderResults geocode(String address) {
+	public GeocoderResults geocode(String address, Envelope bbox) {
 		String content = null;
 		
 		try {

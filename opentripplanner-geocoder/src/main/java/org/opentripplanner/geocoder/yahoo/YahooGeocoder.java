@@ -28,6 +28,8 @@ import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class YahooGeocoder implements Geocoder {
 
 	private String appId;
@@ -55,7 +57,7 @@ public class YahooGeocoder implements Geocoder {
 	}
 
 	@Override
-	public GeocoderResults geocode(String address) {
+	public GeocoderResults geocode(String address, Envelope bbox) {
 		if (appId == null) throw new NullPointerException("appid not set");
 		
 		String content = null;

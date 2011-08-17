@@ -25,6 +25,8 @@ import java.util.Collection;
 
 import javax.ws.rs.core.UriBuilder;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class GeocoderUSCSV implements Geocoder {
 
     private String geocoderBaseUrl;
@@ -44,7 +46,7 @@ public class GeocoderUSCSV implements Geocoder {
      * @see org.opentripplanner.api.geocode.Geocoder#geocode(java.lang.String)
      */
     @Override
-    public GeocoderResults geocode(String address) {
+    public GeocoderResults geocode(String address, Envelope bbox) {
         assert geocoderBaseUrl != null;
         
         String content = null;        

@@ -28,6 +28,8 @@ import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 public class NominatimGeocoder implements Geocoder {
     private String nominatimUrl;
     private Integer resultLimit;
@@ -72,13 +74,12 @@ public class NominatimGeocoder implements Geocoder {
         this.emailAddress = emailAddress;
     }
 
-        
     @Override 
-    public GeocoderResults geocode(String address) {
+    public GeocoderResults geocode(String address, Envelope bbox) {
         String content = null;
         try {
             // make json request
-            URL nominatimGeocoderUrl = getNominatimGeocoderUrl(address);
+            URL nominatimGeocoderUrl = getNominatimGeocoderUrl(address, bbox);
             URLConnection conn = nominatimGeocoderUrl.openConnection();
             BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
             
@@ -108,11 +109,14 @@ public class NominatimGeocoder implements Geocoder {
         return new GeocoderResults(geocoderResults);
     }
     
-    private URL getNominatimGeocoderUrl(String address) throws IOException {
+    private URL getNominatimGeocoderUrl(String address, Envelope bbox) throws IOException {
         UriBuilder uriBuilder = UriBuilder.fromUri(nominatimUrl);
         uriBuilder.queryParam("q", address);
         uriBuilder.queryParam("format", "json");
-        if (viewBox != null) {
+        if (bbox != null) {
+            uriBuilder.queryParam("viewbox", bbox.getMinX() + "," + bbox.getMinY() + "," + bbox.getMaxX() + "," + bbox.getMaxY());
+            uriBuilder.queryParam("bounded", 1);
+        } else if (viewBox != null) {
             uriBuilder.queryParam("viewbox", viewBox);
             uriBuilder.queryParam("bounded", 1);
         }
@@ -130,5 +134,5 @@ public class NominatimGeocoder implements Geocoder {
     private GeocoderResults noGeocoderResult(String error) {
         return new GeocoderResults(error);
     }
-    
+
 }

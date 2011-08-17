@@ -13,6 +13,8 @@
 
 package org.opentripplanner.geocoder;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * Multiplexe two geocoders: a master and a backup.
  * 
@@ -31,10 +33,10 @@ public class BackupGeocoder implements Geocoder {
     }
 
     @Override
-    public GeocoderResults geocode(String address) {
-        GeocoderResults retval = masterGeocoder.geocode(address);
+    public GeocoderResults geocode(String address, Envelope bbox) {
+        GeocoderResults retval = masterGeocoder.geocode(address, bbox);
         if (retval.getCount() == 0 || retval.getError() != null) {
-            retval = backupGeocoder.geocode(address);
+            retval = backupGeocoder.geocode(address, bbox);
         }
         return retval;
     }
