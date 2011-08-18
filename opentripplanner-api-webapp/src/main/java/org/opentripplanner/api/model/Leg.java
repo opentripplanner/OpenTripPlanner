@@ -61,8 +61,7 @@ public class Leg {
     public String route = "";
 
     /**
-     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
-     * the street being traversed.
+     * For transit legs, if the rider should stay on the vehicle as it changes route names.
      */
     @XmlAttribute
     public Boolean interlineWithPreviousLeg;
