@@ -16,19 +16,20 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
  * A collection of individual locations that will be used as either the origin
@@ -93,9 +94,8 @@ public class Population {
 				}
 				double data = (Double) feature.getAttribute(attribute);
 				// System.out.printf("%5.2f\t%s\n", data, point.toString());
-				Vertex vertex = new GenericVertex("pop_shp_" + i, point.getX(),
-						point.getY());
-				Individual individual = new Individual(vertex, data);
+				Individual individual = new Individual(point.getX(),
+						point.getY(), data);
 				population.elements.add(individual);
 				i++;
 			}
@@ -121,25 +121,57 @@ public class Population {
 		}
 	}
 
-	public void link(Graph graph) {
-		StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(
-				graph);
-		index.setup();
-		TraverseOptions opt = new TraverseOptions();
-		System.out.printf("Linking population to main graph. \n");
-		for (Individual i : elements) {
-			Vertex v = i.vertex;
-			Vertex close = index.getClosestVertex(new Coordinate(v.getX(), v
-					.getY()), opt);
-			graph.addEdge(new FreeEdge(v, close));
-			graph.addEdge(new FreeEdge(close, v));
-			if (close instanceof StreetLocation) {
-				// temp vertex with its own extra edges
-				for (DirectEdge de : ((StreetLocation) close).getExtra()) {
-					graph.addEdge(de);
-				}
-			}
-		}
-	}
+//	public void link(Graph graph) {
+//		StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(
+//				graph);
+//		index.setup();
+//		TraverseOptions opt = new TraverseOptions();
+//		System.out.printf("Linking population to main graph. \n");
+//		for (Individual i : elements) {
+//			Vertex v = i.vertex;
+//			Vertex close = index.getClosestVertex(new Coordinate(v.getX(), v
+//					.getY()), opt);
+//			graph.addEdge(new FreeEdge(v, close));
+//			graph.addEdge(new FreeEdge(close, v));
+////			if (close instanceof StreetLocation) {
+////				// temp vertex with its own extra edges
+////				for (DirectEdge de : ((StreetLocation) close).getExtra()) {
+////					graph.addEdge(de);
+////				}
+////			}
+//		}
+//	}
 
+	@SuppressWarnings("unchecked")
+	public void link(Graph graph) {
+
+		final double distance = 200;
+		
+		System.out.printf("Linking population to main graph. \n");
+		STRtree intersectionTree = new STRtree();
+	    for (GraphVertex gv : graph.getVertices()) {
+	        Vertex v = gv.vertex;
+            if (v instanceof StreetVertex || v instanceof EndpointVertex) {
+                Envelope env = new Envelope(v.getCoordinate());
+                intersectionTree.insert(env, v);
+            }
+        }
+
+		for (Individual i : elements) {
+			Coordinate c = new Coordinate(i.x, i.y);
+	        Envelope env = new Envelope(c);
+	        env.expandBy(DistanceLibrary.metersToDegrees(distance));
+	        List<Vertex> nearby = intersectionTree.query(env);
+	        Vertex best = null;
+	        double bestDist = Double.POSITIVE_INFINITY;
+	        for (Vertex nv : nearby) {
+	        	double thisDist = nv.distance(c);
+	            if (thisDist < bestDist) {
+	            	bestDist = thisDist;
+	            	best = nv;
+	            }
+	        }
+	        i.vertex = best;
+	    }
+	}	
 }
