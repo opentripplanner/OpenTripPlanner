@@ -180,7 +180,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                     // assume transfers are evaluated at boarding time,
                     // as trimet does
                     if (attribute.isTransferDurationSet()
-                            && tripTime > attribute.getTransferDuration() * 1000) {
+                            && tripTime > attribute.getTransferDuration()) {
                         continue;
                     }
                     float newFare = attribute.getPrice();

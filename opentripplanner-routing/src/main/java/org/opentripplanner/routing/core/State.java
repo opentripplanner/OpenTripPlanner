@@ -22,7 +22,7 @@ import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 public class State implements Cloneable {
 
     /* Data which is likely to change at most traversals */
-    // the current time at this state
+    // the current time at this state, in seconds
     protected long time;
 
     // accumulated weight up to this state
@@ -54,7 +54,7 @@ public class State implements Cloneable {
      * system time.
      */
     public State(Vertex v, TraverseOptions opt) {
-        this(System.currentTimeMillis(), v, opt);
+        this((int) (System.currentTimeMillis() / 1000), v, opt);
     }
 
     /**
@@ -68,9 +68,7 @@ public class State implements Cloneable {
         // elsewhere, all states must be created from a parent
         // and associated with an edge.
 
-        // Round toward zero, 1-second precision.
-        // Otherwise, rounding errors will cause missed trips in reverse-optimization.
-        this.time = time / 1000 * 1000;
+        this.time = time;
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -209,12 +207,12 @@ public class State implements Cloneable {
         return this.weight;
     }
 
-    public long getTimeDeltaMsec() {
-        return this.time - backState.time;
+    public int getTimeDeltaSec() {
+        return (int) (this.time - backState.time);
     }
 
-    public long getAbsTimeDeltaMsec() {
-        return Math.abs(this.time - backState.time);
+    public int getAbsTimeDeltaSec() {
+        return (int) Math.abs(this.time - backState.time);
     }
 
     public double getWeightDelta() {
@@ -317,5 +315,9 @@ public class State implements Cloneable {
             s = s.backState;
         }
         System.out.printf("---- END CHAIN OF STATES ----\n");
+    }
+
+    public long getTimeInMillis() {
+        return time * 1000;
     }
 }

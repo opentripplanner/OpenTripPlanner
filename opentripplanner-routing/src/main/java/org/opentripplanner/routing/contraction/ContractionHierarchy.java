@@ -116,7 +116,7 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
             // could just use keep states instead of making vertexIngress
-            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaMsec(), sv.getWalkDistance()));
+            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaSec(), sv.getWalkDistance()));
         }
 
         /* Compute the cost to each vertex with an outgoing edge from the target */
@@ -135,7 +135,7 @@ public class ContractionHierarchy implements Serializable {
             }
             Vertex w = sw.getVertex();
             wSet.add(w);
-            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaMsec(), sw.getWalkDistance()));
+            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaSec(), sw.getWalkDistance()));
             if (sw.exceedsWeightLimit(maxWWeight)) {
                 maxWWeight = sw.getWeight();
             }

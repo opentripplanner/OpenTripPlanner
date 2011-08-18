@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
-import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
@@ -32,6 +31,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 public class TestFares extends TestCase {
 
@@ -46,7 +46,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
+        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 12, 0, 0);
         spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", startTime, options);
 
@@ -67,7 +67,7 @@ public class TestFares extends TestCase {
         index.setup();
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = new GregorianCalendar(2009, 11, 1, 12, 0, 0).getTimeInMillis();
+        long startTime = TestUtils.dateInSeconds(2009, 11, 1, 12, 0, 0);
 
         // from zone 3 to zone 2
         spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", startTime,
@@ -82,7 +82,7 @@ public class TestFares extends TestCase {
 
         // long trip
 
-        startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
+        startTime = TestUtils.dateInSeconds(2009, 11, 1, 14, 0, 0);
         spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", startTime,
                 options);
 
@@ -94,7 +94,7 @@ public class TestFares extends TestCase {
         
         // complex trip
         options.maxTransfers = 5;
-        startTime = new GregorianCalendar(2009, 11, 1, 14, 0, 0).getTimeInMillis();
+        startTime = TestUtils.dateInSeconds(2009, 11, 1, 14, 0, 0);
         spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", startTime,
                 options);
 

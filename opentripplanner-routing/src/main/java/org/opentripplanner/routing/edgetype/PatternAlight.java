@@ -120,7 +120,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting 
                         // should be expressed as non-negative.
-                        int wait = (int) ((current_time - sd.time(pattern.getArrivalTime(stopIndex, patternIndex))) / 1000);
+                        int wait = (int) (current_time - sd.time(pattern.getArrivalTime(stopIndex, patternIndex)));
                         if (wait < 0) _log.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest arrival over all relevant schedules

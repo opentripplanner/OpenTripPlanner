@@ -126,7 +126,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                         }
 
                         // a trip was found, index is valid, wait will be non-negative
-                        int wait = (int) ((sd.time(getPattern().getDepartureTime(stopIndex, patternIndex)) - current_time) / 1000);
+                        int wait = (int) (sd.time(getPattern().getDepartureTime(stopIndex, patternIndex)) - current_time);
                         if (wait < 0) _log.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules

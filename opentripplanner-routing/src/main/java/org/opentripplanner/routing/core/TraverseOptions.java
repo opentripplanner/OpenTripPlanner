@@ -69,7 +69,7 @@ public class TraverseOptions implements Cloneable {
      * and take the Q to Union Square, then transfer to the 6. If this takes less than
      * optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    public long transferPenalty = 0;
+    public int transferPenalty = 0;
 
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
@@ -115,7 +115,7 @@ public class TraverseOptions implements Cloneable {
      *  Penalty added for using every route that is not preferred if user set any route as preferred.
      *  We return number of seconds that we are willing to wait for preferred route.
      */
-    public long useAnotherThanPreferredRoutesPenalty = 300;
+    public int useAnotherThanPreferredRoutesPenalty = 300;
     
     /**
      * Set of unpreferred routes for given user.
@@ -126,7 +126,7 @@ public class TraverseOptions implements Cloneable {
      *  Penalty added for using every unpreferred route. 
      *  We return number of seconds that we are willing to wait for preferred route.
      */
-    public long useUnpreferredRoutesPenalty = 300;
+    public int useUnpreferredRoutesPenalty = 300;
     
 
     /**
@@ -176,7 +176,7 @@ public class TraverseOptions implements Cloneable {
 
     private TransferTable transferTable;
 
-    public long nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+    public int nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
     
 
     /**
@@ -415,7 +415,7 @@ public class TraverseOptions implements Cloneable {
     public void setServiceDays(long time) {
         if( ! useServiceDays )
             return;
-        final long MSEC_IN_DAY = 1000 * 60 * 60 * 24;
+        final long SEC_IN_DAY = 60 * 60 * 24;
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
@@ -425,9 +425,9 @@ public class TraverseOptions implements Cloneable {
         // This should be a valid way to find yesterday and tomorrow,
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
-        this.serviceDays.add(new ServiceDay(time - MSEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time - SEC_IN_DAY, cs));
         this.serviceDays.add(new ServiceDay(time, cs));
-        this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time + SEC_IN_DAY, cs));
     }
     
     public boolean isReverseOptimizing() {

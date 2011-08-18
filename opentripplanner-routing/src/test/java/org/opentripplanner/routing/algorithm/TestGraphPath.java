@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 public class TestGraphPath extends TestCase {
     private Graph graph;
@@ -55,13 +56,13 @@ public class TestGraphPath extends TestCase {
         GraphPath path;
 
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
-                new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis(), options);
+                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
         assertTrue(path.states.size() == 12);
 
-        long bestStart = new GregorianCalendar(2009, 8, 7, 0, 20, 0).getTimeInMillis();
+        long bestStart = TestUtils.dateInSeconds(2009, 8, 7, 0, 20, 0);
         assertNotSame(bestStart, path.getStartTime());
 
         path = spt.getPath(stop_e, true); /* optimize */

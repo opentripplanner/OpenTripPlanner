@@ -201,7 +201,7 @@ public class PlanGenerator {
                 }
             }
 
-            edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
+            edgeElapsedTime = currState.getTimeInMillis() - currState.getBackState().getTimeInMillis();
 
             if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING) {
                 itinerary.waitingTime += edgeElapsedTime;
@@ -235,12 +235,12 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.ALIGHTING) {
                     /* alighting mode */
                     leg.to = makePlace(edgeNarrative.getToVertex());
-                    leg.endTime = new Date(currState.getBackState().getTime());
+                    leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                     continue;
                 } else if (changingToInterlinedTrip) {
                     /* finalize leg */
                     leg.to = makePlace(edgeNarrative.getFromVertex());
-                    leg.endTime = new Date(currState.getBackState().getTime());
+                    leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                     Geometry geometry = geometryFactory.createLineString(coordinates);
                     leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                     /* reset coordinates */
@@ -274,7 +274,7 @@ public class PlanGenerator {
                         if (leg.to == null) {
                             /* this stuff is filled in in the alight case, but not in the walk case */
                             leg.to = makePlace(edgeNarrative.getFromVertex());
-                            leg.endTime = new Date(currState.getBackState().getTime());
+                            leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                         }
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
@@ -360,7 +360,7 @@ public class PlanGenerator {
         if (leg != null) {
             /* finalize leg */
             leg.to = makePlace(edgeNarrative.getToVertex());
-            leg.endTime = new Date(finalState.getTime());
+            leg.endTime = new Date(finalState.getTimeInMillis());
             Geometry geometry = geometryFactory.createLineString(coordinates);
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
             if (startWalk != -1) {
@@ -405,7 +405,7 @@ public class PlanGenerator {
     private Leg makeLeg(State s) {
         Leg leg = new Leg();
 
-        leg.startTime = new Date(s.getBackState().getTime());
+        leg.startTime = new Date(s.getBackState().getTimeInMillis());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.route = en.getName();
         Trip trip = en.getTrip();
@@ -432,9 +432,9 @@ public class PlanGenerator {
         State startState = path.states.getFirst();
         State endState = path.states.getLast();
 
-        itinerary.startTime = new Date(startState.getTime());
-        itinerary.endTime = new Date(endState.getTime());
-        itinerary.duration = endState.getTime() - startState.getTime();
+        itinerary.startTime = new Date(startState.getTimeInMillis());
+        itinerary.endTime = new Date(endState.getTimeInMillis());
+        itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
         if (fareService != null) {
             itinerary.fare = fareService.getCost(path);
         }
@@ -451,7 +451,7 @@ public class PlanGenerator {
         Coordinate endCoord = state.getVertex().getCoordinate();
         String name = state.getVertex().getName();
         AgencyAndId stopId = state.getVertex().getStopId();
-        Date timeAtState = new Date(state.getTime());
+        Date timeAtState = new Date(state.getTimeInMillis());
         Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
         return place;
     }

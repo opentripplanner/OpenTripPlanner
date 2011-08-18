@@ -164,7 +164,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time) + turnCost / 20;
         s1.incrementWalkDistance(fromv.getLength());
-        s1.incrementTimeInSeconds((int) time);
+        s1.incrementTimeInSeconds((int) Math.ceil(time));
         s1.incrementWeight(weight);
         if(s1.weHaveWalkedTooFar(options))
             return null;

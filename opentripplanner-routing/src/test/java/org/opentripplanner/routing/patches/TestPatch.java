@@ -44,6 +44,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.opentripplanner.util.TestUtils;
 
 public class TestPatch extends TestCase {
 	private Graph graph;
@@ -147,7 +148,7 @@ public class TestPatch extends TestCase {
 		ShortestPathTree spt;
 		GraphPath path;
 
-		long startTime = new GregorianCalendar(2009, 8, 7, 0, 0, 0).getTimeInMillis();
+		long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
 				startTime, options);
 
@@ -158,7 +159,7 @@ public class TestPatch extends TestCase {
 		expectedNotes.add(note1);
 		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
 
-		startTime = new GregorianCalendar(2009, 8, 7, 0, 9, 0).getTimeInMillis();
+		startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 9, 0);
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
 				startTime, options);
 
@@ -170,7 +171,7 @@ public class TestPatch extends TestCase {
 	public void testRouteNotePatch() {
 		RouteNotePatch rnp1 = new RouteNotePatch();
 		rnp1.setStartTime(0);
-		rnp1.setEndTime(1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
+		rnp1.setEndTime(60 * 60 * 24 * 365 * 40); // until ~1/1/2011
 		rnp1.setStartTimeOfDay(21600); // six am
 		rnp1.setEndTimeOfDay(43200); // to noon
 		String note1 = "The route note";
@@ -185,7 +186,7 @@ public class TestPatch extends TestCase {
 		ShortestPathTree spt;
 		GraphPath path;
 
-		long startTime = new GregorianCalendar(2009, 8, 7, 7, 0, 0).getTimeInMillis();
+		long startTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
 		spt = AStar.getShortestPathTree(graph, stop_a, stop_e,
 				startTime, options);
 

@@ -46,5 +46,5 @@ public interface RoutingService {
      * @return
      */
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediateVertices,
-            long time, TraverseOptions options);
+            int time, TraverseOptions options);
 }

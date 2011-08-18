@@ -64,6 +64,7 @@ import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -387,7 +388,7 @@ public class TestContractionHeirarchies extends TestCase {
     public void testNYC() throws Exception {
     	// be sure this date matches your subway gtfs validity period
     	// it could be derived from the Graph's validity dates
-        long startTime = new GregorianCalendar(2009, 10, 11, 12, 0, 0).getTimeInMillis();
+        long startTime = TestUtils.dateInSeconds(2009, 10, 11, 12, 0, 0);
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;
@@ -560,13 +561,13 @@ public class TestContractionHeirarchies extends TestCase {
         options.setArriveBy(false);
         
         // test max time 
-        options.worstTime = startTime + 1000 * 60 * 90; //an hour and a half is too much time
+        options.worstTime = startTime + 60 * 90; //an hour and a half is too much time
 
         path = hierarchy.getShortestPath(start, end, startTime,
                 options);
         assertNotNull(path);
             
-        options.worstTime = startTime + 1000 * 60; //but one minute is not enough
+        options.worstTime = startTime + 60; //but one minute is not enough
 
         path = hierarchy.getShortestPath(start, end, startTime,
                 options);

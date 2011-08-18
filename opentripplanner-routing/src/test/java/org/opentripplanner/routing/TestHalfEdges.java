@@ -46,6 +46,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -184,21 +185,21 @@ public class TestHalfEdges extends TestCase {
         
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
-        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, startTime
-                .getTimeInMillis(), options);
+        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, TestUtils.toSeconds(startTime),
+                options);
 
         GraphPath pathBr = spt1.getPath(end, false);
         assertNotNull("There must be a path from br to end", pathBr);
         
-        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, startTime
-                .getTimeInMillis(), options);
+        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, TestUtils.toSeconds(startTime),
+                options);
 
         GraphPath pathTr = spt2.getPath(end, false);
         assertNotNull("There must be a path from tr to end", pathTr);
         assertTrue("path from bottom to end must be longer than path from top to end", pathBr.getWeight() > pathTr.getWeight());
         
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, startTime
-                .getTimeInMillis(), options);
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
+                options);
 
         GraphPath path = spt.getPath(end, false);
         assertNotNull("There must be a path from start to end", path);
@@ -212,8 +213,8 @@ public class TestHalfEdges extends TestCase {
         startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
 
         options.setArriveBy(true);
-        spt = AStar.getShortestPathTree(graph, start, end, startTime
-                .getTimeInMillis(), options);
+        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime), 
+                options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from start to end (looking back)", path);
@@ -231,8 +232,8 @@ public class TestHalfEdges extends TestCase {
         options = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, startTime
-                .getTimeInMillis(), options);
+        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
+                options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom along the right", path);
@@ -245,8 +246,8 @@ public class TestHalfEdges extends TestCase {
         
         start = StreetLocation.createStreetLocation("start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, startTime
-                .getTimeInMillis(), options);
+        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
+                options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom", path);

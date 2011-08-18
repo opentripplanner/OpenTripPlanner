@@ -241,7 +241,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         }
 
         s1.incrementWalkDistance(length);
-        s1.incrementTimeInSeconds((int) time);
+        s1.incrementTimeInSeconds((int) Math.ceil(time));
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
             return null;
