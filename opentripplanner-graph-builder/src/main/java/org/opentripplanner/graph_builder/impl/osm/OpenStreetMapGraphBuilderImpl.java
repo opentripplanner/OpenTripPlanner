@@ -281,7 +281,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     	}
                     }
                     
-                    restrictionTags = turnRestrictionsByToWay.get(way);
+                    restrictionTags = turnRestrictionsByToWay.get(way.getId());
                     if (restrictionTags != null) {
                     	for (TurnRestrictionTag tag : restrictionTags) {
                     		if (tag.via == startNode) { 
