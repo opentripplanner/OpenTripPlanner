@@ -151,7 +151,7 @@ public class Planner {
             @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes,
-            @DefaultValue("0") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer transferPenalty)
+            @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
