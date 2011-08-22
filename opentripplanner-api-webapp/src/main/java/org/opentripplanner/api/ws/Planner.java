@@ -139,7 +139,7 @@ public class Planner {
             @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
-            @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
+            @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @QueryParam(RequestInf.TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor,
             @QueryParam(RequestInf.TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor,
             @QueryParam(RequestInf.TRIANGLE_TIME_FACTOR) Double triangleTimeFactor,
