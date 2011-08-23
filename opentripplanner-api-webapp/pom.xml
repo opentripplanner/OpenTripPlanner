@@ -32,6 +32,11 @@
         </dependency>
         <dependency>
             <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-updater</artifactId>
+            <version>0.4.2-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
             <artifactId>opentripplanner-utils</artifactId>
             <version>0.4.2-SNAPSHOT</version>
         </dependency>

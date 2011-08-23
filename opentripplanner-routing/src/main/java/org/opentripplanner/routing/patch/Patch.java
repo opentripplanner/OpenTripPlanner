@@ -15,125 +15,22 @@ package org.opentripplanner.routing.patch;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.XmlType;
-
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
 
-@XmlType
-@XmlTransient
-public abstract class Patch implements Serializable {
-	private static final long serialVersionUID = 778531395626383517L;
+public interface Patch extends Serializable {
+    public Alert getAlert();
 
-	private long endTime;
-	private long startTime;
-	private int startTimeOfDay = 0; //by default, the whole day
-	private int endTimeOfDay = 86400;
-	protected Alert notes;
+    public boolean activeDuring(TraverseOptions options, long start, long end);
 
-	private String id;
+    public String getId();
 
-	@XmlElement
-	public long getEndTime() {
-		return endTime;
-	}
+    void setId(String id);
 
-	public void setEndTime(long endTime) {
-		this.endTime = endTime;
-	}
+    public void apply(Graph graph);
 
-	@XmlElement
-	public int getEndTimeOfDay() {
-		return endTimeOfDay;
-	}
+    public void remove(Graph graph);
 
-	public void setEndTimeOfDay(int endTimeOfDay) {
-		this.endTimeOfDay = endTimeOfDay;
-	}
-
-	@XmlElement
-	public Alert getNotes() {
-		return notes;
-	}
-
-	public void setNotes(Alert notes) {
-		this.notes = notes;
-	}
-
-	@XmlElement
-	public long getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(long startTime) {
-		this.startTime = startTime;
-	}
-
-	@XmlElement
-	public int getStartTimeOfDay() {
-		return startTimeOfDay;
-	}
-
-	public void setStartTimeOfDay(int startTimeOfDay) {
-		this.startTimeOfDay = startTimeOfDay;
-	}
-
-	public boolean activeDuring(TraverseOptions options, long start, long end) {
-		if (end < startTime || start >= endTime) {
-			return false;
-		}
-
-		int eventStart = -1;
-		int eventEnd = -1;
-		for (ServiceDay sd : options.serviceDays) {
-            eventStart = sd.secondsSinceMidnight(start);
-            eventEnd = sd.secondsSinceMidnight(end);
-            if (eventStart >= 0 && eventStart < 86400) {
-            	break;
-            }
-		}
-		return eventEnd >= startTimeOfDay && eventStart < endTimeOfDay;
-	}
-
-	public static State filterTraverseResultChain(State result, 
-			TraverseResultFilter traverseResultFilter) {
-		State out = null;
-		for (State old = result; old != null; old = old.getNextResult()) {
-			State filtered = traverseResultFilter.filter(old);
-			if (out == null) {
-				out = filtered;
-			} else {
-				filtered.addToExistingResultChain(out);
-			}
-		}
-		return out;
-	}
-
-	@XmlElement(required = true)
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public abstract void apply(Graph graph);
-
-	public abstract void remove(Graph graph);
-
-	public abstract void filterTraverseResult(StateEditor result);
-
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	public boolean equals(Object o) {
-		return (o instanceof Patch && ((Patch) o).getId().equals(id));
-	}
+    public void filterTraverseResult(StateEditor result);
 }

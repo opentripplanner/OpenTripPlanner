@@ -24,7 +24,6 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.opentripplanner.graph_builder.GraphBuilderUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
@@ -52,6 +51,7 @@ import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.TransitIndexServiceImpl;
+import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,10 +221,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 			for (RouteVariant variant : variants) {
 				variant.cleanup();
 				List<Stop> stops = variant.getStops();
-				GraphBuilderUtils.addToMapList(starts, stops.get(0), variant);
-				GraphBuilderUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
+				MapUtils.addToMapList(starts, stops.get(0), variant);
+				MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
 				for (Stop stop : stops) {
-					GraphBuilderUtils.addToMapList(vias, stop, variant);
+					MapUtils.addToMapList(vias, stop, variant);
 				}
 			}
 

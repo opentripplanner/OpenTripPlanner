@@ -10,10 +10,10 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.ws;
 
 import java.util.Collection;
-import java.util.logging.Logger;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -30,8 +30,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.patch.PatchCreationResponse;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.patch.PatchSet;
+import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.patch.RouteNotePatch;
 import org.opentripplanner.routing.services.PatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -43,8 +43,6 @@ import com.sun.jersey.api.spring.Autowire;
 @XmlRootElement
 @Autowire
 public class Patcher {
-
-	private static final Logger LOGGER = Logger.getLogger(Patcher.class.getCanonicalName());
 
 	private PatchService patchservice;
 
@@ -114,9 +112,14 @@ public class Patcher {
 				response.status = "Every patch must have an id";
 				return response;
 			}
-			if (patch instanceof RouteNotePatch && ((RouteNotePatch) patch).getRoute().getId().equals("")) {
-				response.status = "Every route note patch must have a route id";
+			if (patch instanceof AlertPatch) {
+			    AlertPatch alertPatch = (AlertPatch) patch;
+
+			    final AgencyAndId route = alertPatch.getRoute();
+                            if (route != null && route.getId().equals("")) {
+				response.status = "Every route patch must have a route id";
 				return response;
+                            }
 			}
 		}
 		for (Patch patch : patches.patches) {

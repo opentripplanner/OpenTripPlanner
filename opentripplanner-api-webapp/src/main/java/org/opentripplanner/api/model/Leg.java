@@ -165,7 +165,14 @@ public class Leg {
         if (alerts == null) {
             alerts = new ArrayList<Alert>();
         }
-        Note note = new Note(alert.alertHeaderText.getSomeTranslation());
+        String text = alert.alertHeaderText.getSomeTranslation();
+        if (text == null) {
+            text = alert.alertDescriptionText.getSomeTranslation();
+        }
+        if (text == null) {
+            text = alert.alertUrl.getSomeTranslation();
+        }
+        Note note = new Note(text);
         if (!notes.contains(note)) {
             notes.add(note);
         }

@@ -23,6 +23,7 @@
     <module>opentripplanner-gui</module>
     <module>opentripplanner-integration</module>
     <module>opentripplanner-routing</module>
+    <module>opentripplanner-updater</module>
     <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
   </modules>

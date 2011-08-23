@@ -32,7 +32,7 @@
 
 	<servlet>
 		<servlet-name>Jersey</servlet-name>
-		<servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+		<servlet-class>org.opentripplanner.api.servlet.ApiServlet</servlet-class>
 	    <!-- switch the order of these two init-param elements for Tomcat > 6.0 -->
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>

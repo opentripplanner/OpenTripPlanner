@@ -13,93 +13,103 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
-import org.opentripplanner.routing.services.TransitIndexService;
-import org.opentripplanner.routing.transit_index.RouteSegment;
-import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.opentripplanner.util.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PatchServiceImpl implements PatchService {
 
-	private GraphService graphService;
-	private HashSet<String> patches = new HashSet<String>();
+    private GraphService graphService;
+
+    private HashMap<String, Patch> patches = new HashMap<String, Patch>();
+    private HashMap<AgencyAndId,List<Patch>> patchesByRoute = new HashMap<AgencyAndId, List<Patch>>();
+    private HashMap<AgencyAndId, List<Patch>> patchesByStop = new HashMap<AgencyAndId, List<Patch>>();
 
     @Autowired
     public void setGraphService(GraphService graphService) {
-    	this.graphService = graphService;
+        this.graphService = graphService;
     }
 
-	@Override
-	public Collection<Patch> getStopPatches(AgencyAndId stop) {
-		Graph graph = graphService.getGraph();
-		TransitIndexService index = graph.getService(TransitIndexService.class);
-		
-		HashSet<Patch> patches = new HashSet<Patch>();
-		
-		Edge edge = index.getPrealightEdge(stop);
-		addAllPatchesFromEdge(patches, edge);
-		
-		edge = index.getPreboardEdge(stop);
-		addAllPatchesFromEdge(patches, edge);
+    @Override
+    public Collection<Patch> getStopPatches(AgencyAndId stop) {
+        List<Patch> result = patchesByStop.get(stop);
+        if (result == null) {
+            result = Collections.emptyList();
+        }
+        return result;
+    }
 
-		return patches;
-	}
+    @Override
+    public synchronized void apply(Patch patch) {
+        Graph graph = graphService.getGraph();
+        if (!patches.containsKey(patch.getId())) {
+            patch.apply(graph);
+            patches.put(patch.getId(), patch);
+            if (patch instanceof AlertPatch) {
+                AlertPatch alertPatch = (AlertPatch) patch;
+                AgencyAndId stop = alertPatch.getStop();
+                if (stop != null) {
+                    MapUtils.addToMapList(patchesByStop, stop, patch);
+                }
+                AgencyAndId route = alertPatch.getRoute();
+                if (route != null) {
+                    MapUtils.addToMapList(patchesByRoute, stop, patch);
+                }
+            }
+        }
+    }
 
-	private void addAllPatchesFromEdge(HashSet<Patch> patches, Edge edge) {
-		if (edge == null) {
-			return;
-		}
-		List<Patch> edgePatches = edge.getPatches();
-		if (edgePatches != null) {
-			patches.addAll(edgePatches);
-		}
-	}
+    @Override
+    public Collection<Patch> getRoutePatches(AgencyAndId route) {
+        List<Patch> result = patchesByRoute.get(route);
+        if (result == null) {
+            result = Collections.emptyList();
+        }
+        return result;
 
-	@Override
-	public synchronized void apply(Patch patch) {
-		Graph graph = graphService.getGraph();
-		if (!patches.contains(patch.getId())) {
-			patch.apply(graph);
-			patches.add(patch.getId());
-		}
-	}
+    }
 
-	@Override
-	public Collection<Patch> getRoutePatches(AgencyAndId route) {
-		Graph graph = graphService.getGraph();
-		TransitIndexService index = graph.getService(TransitIndexService.class);
-		HashSet<Patch> patches = new HashSet<Patch>();
-		
-		for (RouteVariant variant : index.getVariantsForRoute(route)) {
-			for (RouteSegment segment : variant.getSegments()) {
-				addAllPatchesFrom(patches, segment.board);
-				addAllPatchesFrom(patches, segment.alight);
-				addAllPatchesFrom(patches, segment.hopIn);
-				addAllPatchesFrom(patches, segment.dwell);
-				addAllPatchesFrom(patches, segment.hopOut);
-			}
-		}
-		
-		return patches;
-	}
+    @Override
+    public void expireAllExcept(Set<String> retain) {
 
-	private void addAllPatchesFrom(HashSet<Patch> patches, Edge edge) {
-		if (edge != null) {
-			if (edge.getPatches() != null) {
-				patches.addAll(edge.getPatches());
-			}
-		}
-	}
+        ArrayList<String> toRemove = new ArrayList<String>();
+        Graph graph = graphService.getGraph();
+
+        for (Entry<String, Patch> entry : patches.entrySet()) {
+            final String key = entry.getKey();
+            if (!retain.contains(key)) {
+                toRemove.add(key);
+                Patch patch = entry.getValue();
+                if (patch instanceof AlertPatch) {
+                    AlertPatch alertPatch = (AlertPatch) patch;
+                    AgencyAndId stop = alertPatch.getStop();
+                    if (stop != null) {
+                        MapUtils.removeFromMapList(patchesByStop, stop, patch);
+                    }
+                    AgencyAndId route = alertPatch.getRoute();
+                    if (route != null) {
+                        MapUtils.removeFromMapList(patchesByRoute, stop, patch);
+                    }
+                }
+                patch.remove(graph);
+            }
+        }
+        patches.keySet().removeAll(toRemove);
+    }
 
 }

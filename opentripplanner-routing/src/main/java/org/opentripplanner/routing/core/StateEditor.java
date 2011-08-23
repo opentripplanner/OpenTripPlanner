@@ -179,7 +179,7 @@ public class StateEditor {
     /**
      * Wrap the new State's predecessor EdgeNarrative so that it has the given note.
      */
-    public void addNote(Alert notes) {
+    public void addAlert(Alert notes) {
         child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, notes);
     }
 

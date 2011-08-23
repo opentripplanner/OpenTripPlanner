@@ -20,15 +20,13 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.patch.RouteNotePatch;
-import org.opentripplanner.routing.patch.StopNotePatch;
+import org.opentripplanner.routing.patch.AlertPatch;
 
 @XmlRootElement(name="PatchSet")
 public class PatchSet {
-	@XmlElements({
-	    @XmlElement(name = "StopNotePatch", type = StopNotePatch.class),
-	    @XmlElement(name = "RouteNotePatch", type = RouteNotePatch.class)
-	    })
-	public List<Patch> patches;
+    @XmlElements({
+        @XmlElement(name = "AlertPatch", type = AlertPatch.class)
+    })
+    public List<Patch> patches;
 	
 }

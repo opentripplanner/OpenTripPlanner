@@ -21,17 +21,15 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.patch.RouteNotePatch;
-import org.opentripplanner.routing.patch.StopNotePatch;
 
 @XmlRootElement
 public class PatchResponse {
 
 	@XmlElementWrapper
 	@XmlElements({
-	    @XmlElement(name = "StopNotePatch", type = StopNotePatch.class),
-	    @XmlElement(name = "RouteNotePatch", type = RouteNotePatch.class)
+	    @XmlElement(name = "AlertPatch", type = AlertPatch.class),
 	    })
 	public List<Patch> patches;
 	

@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.services;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.patch.Patch;
@@ -26,4 +27,6 @@ public interface PatchService {
 	
 	void apply(Patch patch);
 	
+	void expireAllExcept(Set<String> ids);
+
 }

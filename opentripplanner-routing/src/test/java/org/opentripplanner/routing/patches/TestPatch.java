@@ -37,8 +37,7 @@ import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.RouteNotePatch;
-import org.opentripplanner.routing.patch.StopNotePatch;
+import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -47,153 +46,166 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.util.TestUtils;
 
 public class TestPatch extends TestCase {
-	private Graph graph;
-	private TraverseOptions options;
+    private Graph graph;
 
-	public void setUp() throws Exception {
+    private TraverseOptions options;
 
-		GtfsContext context = GtfsLibrary.readGtfs(new File(
-				ConstantsForTests.FAKE_GTFS));
+    public void setUp() throws Exception {
 
-		options = new TraverseOptions();
-		options.setGtfsContext(context);
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
 
-		graph = new Graph();
-		GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
-		factory.run(graph);
-		TransitIndexService index = new TransitIndexService() {
-			/*
-			 * mock TransitIndexService always returns preboard/prealight edges
-			 * for stop A and a subset of variants for route 1
-			 */
-			@Override
-			public Edge getPrealightEdge(AgencyAndId stop) {
-				return graph.getOutgoing("agency_A_arrive").iterator().next();
-			}
+        options = new TraverseOptions();
+        options.setGtfsContext(context);
 
-			@Override
-			public Edge getPreboardEdge(AgencyAndId stop) {
-				return graph.getIncoming("agency_A_depart").iterator().next();
-			}
+        graph = new Graph();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(graph);
+        TransitIndexService index = new TransitIndexService() {
+            /*
+             * mock TransitIndexService always returns preboard/prealight edges for stop A and a
+             * subset of variants for route 1
+             */
+            @Override
+            public Edge getPrealightEdge(AgencyAndId stop) {
+                return graph.getOutgoing("agency_A_arrive").iterator().next();
+            }
 
-			@Override
-			public RouteVariant getVariantForTrip(AgencyAndId trip) {
-				return null;
-			}
+            @Override
+            public Edge getPreboardEdge(AgencyAndId stop) {
+                return graph.getIncoming("agency_A_depart").iterator().next();
+            }
 
-			@Override
-			public List<RouteVariant> getVariantsForRoute(AgencyAndId routeId) {
-				Route route = new Route();
-				route.setId(routeId);
-				route.setShortName(routeId.getId());
-				
-				PatternBoard somePatternBoard = (PatternBoard) graph.getOutgoing("agency_A_depart").iterator().next();
-				PatternHop somePatternHop = (PatternHop) graph.getOutgoing(somePatternBoard.getToVertex()).iterator().next();
-				
-				Stop stopA = somePatternHop.getStartStop(); 
-				ArrayList<Stop> stops = new ArrayList<Stop>();
-				stops.add(stopA);
-				
-				RouteVariant variant = new RouteVariant(route, stops);
-				RouteSegment segment = new RouteSegment(stopA.getId());
-				
-				segment.board = somePatternBoard;
-				segment.hopOut = somePatternHop;
-				variant.addSegment(segment);				
-				
-				ArrayList<RouteVariant> variants = new ArrayList<RouteVariant>();
-				variants.add(variant);
-				return variants;
-			}
+            @Override
+            public RouteVariant getVariantForTrip(AgencyAndId trip) {
+                return null;
+            }
 
-			@Override
-			public List<String> getDirectionsForRoute(AgencyAndId route) {
-				return Collections.emptyList();
-			}
+            @Override
+            public List<RouteVariant> getVariantsForRoute(AgencyAndId routeId) {
+                Route route = new Route();
+                route.setId(routeId);
+                route.setShortName(routeId.getId());
 
-			@Override
-			public List<TraverseMode> getAllModes() {
-				return Collections.emptyList();
-			}
-		};
-		graph.putService(TransitIndexService.class, index);
-	}
+                PatternBoard somePatternBoard = (PatternBoard) graph.getOutgoing("agency_A_depart")
+                        .iterator().next();
+                PatternHop somePatternHop = (PatternHop) graph.getOutgoing(
+                        somePatternBoard.getToVertex()).iterator().next();
 
-	public void testStopNotePatch() {
-		StopNotePatch snp1 = new StopNotePatch();
-		snp1.setStartTime(0);
-		snp1.setEndTime(1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
-		snp1.setStartTimeOfDay(0); // midnight
-		snp1.setEndTimeOfDay(600); // to ten past
-		Alert note1 = Alert.createSimpleAlerts("The first note");
-		snp1.setNotes(note1);
-		snp1.setId("id1");
-		snp1.setStop(new AgencyAndId("agency", "A"));
-		snp1.apply(graph);
+                Stop stopA = somePatternHop.getStartStop();
+                ArrayList<Stop> stops = new ArrayList<Stop>();
+                stops.add(stopA);
 
-		StopNotePatch snp2 = new StopNotePatch();
-		snp2.setStartTime(0);
-		snp2.setEndTime(1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2010
-		snp2.setStartTimeOfDay(540); // nine past midnight
-		snp2.setEndTimeOfDay(21600); // to 6am
-		Alert note2 = Alert.createSimpleAlerts("The second note");
-		snp2.setNotes(note2);
-		snp2.setId("id2");
-		snp2.setStop(new AgencyAndId("agency", "A"));
-		snp2.apply(graph);
+                RouteVariant variant = new RouteVariant(route, stops);
+                RouteSegment segment = new RouteSegment(stopA.getId());
 
-		Vertex stop_a = graph.getVertex("agency_A");
-		Vertex stop_e = graph.getVertex("agency_E_arrive");
+                segment.board = somePatternBoard;
+                segment.hopOut = somePatternHop;
+                variant.addSegment(segment);
 
-		ShortestPathTree spt;
-		GraphPath path;
+                ArrayList<RouteVariant> variants = new ArrayList<RouteVariant>();
+                variants.add(variant);
+                return variants;
+            }
 
-		long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
-		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
-				startTime, options);
+            @Override
+            public List<String> getDirectionsForRoute(AgencyAndId route) {
+                return Collections.emptyList();
+            }
 
-		path = spt.getPath(stop_e, false); // do not optimize because we want
-		// the first trip out of A
-		assertNotNull(path);
-		HashSet<Alert> expectedNotes = new HashSet<Alert>();
-		expectedNotes.add(note1);
-		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
+            @Override
+            public List<TraverseMode> getAllModes() {
+                return Collections.emptyList();
+            }
+        };
+        graph.putService(TransitIndexService.class, index);
+    }
 
-		startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 9, 0);
-		spt = AStar.getShortestPathTree(graph, stop_a, stop_e, 
-				startTime, options);
+    public void testStopAlertPatch() {
+        AlertPatch snp1 = new AlertPatch();
+        snp1.addTimePeriod(0, 1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
+        Alert note1 = Alert.createSimpleAlerts("The first note");
+        snp1.setAlert(note1);
+        snp1.setId("id1");
+        snp1.setStop(new AgencyAndId("agency", "A"));
+        snp1.apply(graph);
 
-		path = spt.getPath(stop_e, false);
-		expectedNotes.add(note2);
-		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
-	}
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
 
-	public void testRouteNotePatch() {
-		RouteNotePatch rnp1 = new RouteNotePatch();
-		rnp1.setStartTime(0);
-		rnp1.setEndTime(60 * 60 * 24 * 365 * 40); // until ~1/1/2011
-		rnp1.setStartTimeOfDay(21600); // six am
-		rnp1.setEndTimeOfDay(43200); // to noon
-		Alert note1 = Alert.createSimpleAlerts("The route note");
-		rnp1.setNotes(note1);
-		rnp1.setId("id1");
-		rnp1.setRoute(new AgencyAndId("agency", "1"));
-		rnp1.apply(graph);
+        ShortestPathTree spt;
+        GraphPath path;
 
-		Vertex stop_a = graph.getVertex("agency_A");
-		Vertex stop_e = graph.getVertex("agency_E_arrive");
+        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
 
-		ShortestPathTree spt;
-		GraphPath path;
+        path = spt.getPath(stop_e, true);
+        assertNotNull(path);
+        HashSet<Alert> expectedNotes = new HashSet<Alert>();
+        expectedNotes.add(note1);
+        assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
+    }
 
-		long startTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
-		spt = AStar.getShortestPathTree(graph, stop_a, stop_e,
-				startTime, options);
+    public void testTimeRanges() {
+        AlertPatch snp1 = new AlertPatch();
+        long breakTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        snp1.addTimePeriod(0, breakTime); // until the beginning of the day
+        long secondPeriodStartTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
+        long secondPeriodEndTime = TestUtils.dateInSeconds(2009, 8, 8, 0, 0, 0);
+        snp1.addTimePeriod(secondPeriodStartTime, secondPeriodEndTime);
+        Alert note1 = Alert.createSimpleAlerts("The first note");
+        snp1.setAlert(note1);
+        snp1.setId("id1");
+        snp1.setStop(new AgencyAndId("agency", "A"));
+        snp1.apply(graph);
 
-		path = spt.getPath(stop_e, false); 
-		assertNotNull(path);
-		HashSet<Alert> expectedNotes = new HashSet<Alert>();
-		expectedNotes.add(note1);
-		assertEquals(expectedNotes, path.states.get(2).getBackEdgeNarrative().getNotes());
-	}
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+
+        path = spt.getPath(stop_e, true);
+        assertNotNull(path);
+        // expect no notes because we are during the break
+        assertNull(path.states.get(1).getBackEdgeNarrative().getNotes());
+
+        // now a trip during the second period
+        startTime = TestUtils.dateInSeconds(2009, 8, 7, 8, 0, 0);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+
+        path = spt.getPath(stop_e, false); // do not optimize because we want the first trip
+        assertNotNull(path);
+        HashSet<Alert> expectedNotes = new HashSet<Alert>();
+        expectedNotes.add(note1);
+        assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
+    }
+
+    public void testRouteNotePatch() {
+        AlertPatch rnp1 = new AlertPatch();
+
+        rnp1.addTimePeriod(0, 1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
+        Alert note1 = Alert.createSimpleAlerts("The route note");
+        rnp1.setAlert(note1);
+        rnp1.setId("id1");
+        rnp1.setRoute(new AgencyAndId("agency", "1"));
+        rnp1.apply(graph);
+
+        Vertex stop_a = graph.getVertex("agency_A");
+        Vertex stop_e = graph.getVertex("agency_E_arrive");
+
+        ShortestPathTree spt;
+        GraphPath path;
+
+        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
+        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+
+        path = spt.getPath(stop_e, false);
+        assertNotNull(path);
+        HashSet<Alert> expectedNotes = new HashSet<Alert>();
+        expectedNotes.add(note1);
+        assertEquals(expectedNotes, path.states.get(2).getBackEdgeNarrative().getNotes());
+    }
 }

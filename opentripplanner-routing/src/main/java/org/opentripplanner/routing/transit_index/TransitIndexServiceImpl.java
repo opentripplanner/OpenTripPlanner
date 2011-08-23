@@ -15,6 +15,7 @@ package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -55,7 +56,11 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 	}
 
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
-		return variantsByRoute.get(route);
+		List<RouteVariant> variants = variantsByRoute.get(route);
+		if (variants == null) {
+		    return Collections.emptyList();
+		}
+		return variants;
 	}
 
 	public RouteVariant getVariantForTrip(AgencyAndId trip) {

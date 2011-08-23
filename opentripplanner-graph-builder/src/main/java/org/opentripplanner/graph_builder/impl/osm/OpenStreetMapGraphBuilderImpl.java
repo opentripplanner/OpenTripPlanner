@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.Iterator;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.GraphBuilderUtils;
 import org.opentripplanner.graph_builder.model.osm.*;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
@@ -38,6 +37,7 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -447,8 +447,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             restriction.type = tag.type;
             turnRestrictionsByTag.put(tag, restriction);
 
-            GraphBuilderUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
-            GraphBuilderUtils.addToMapList(turnRestrictionsByToWay, to, tag);
+            MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
+            MapUtils.addToMapList(turnRestrictionsByToWay, to, tag);
 			
         }
 		

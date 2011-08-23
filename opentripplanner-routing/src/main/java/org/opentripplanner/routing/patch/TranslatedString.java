@@ -44,6 +44,9 @@ public class TranslatedString implements Serializable {
     }
 
     public String getSomeTranslation() {
+        if (translations.isEmpty()) {
+            return null;
+        }
         return translations.values().iterator().next();
     }
 }
