@@ -32,19 +32,22 @@ otp.planner.FormsOptionsManager = {
     maxWalk:     null,
     wheelchair:  null,
     locale:      null,
+    bikeTriangle:  null,
 
     // the optimize store is used to control the optimize options
     optimizeStore: null,
         
     initialize : function(config) {
         otp.configure(this, config);
-        
+
         // we're also interested in the optimize options store
         // to filter some of the options
         this.optimizeStore = this.optimize.getStore();
 
         // add event handlers to the options that can affect others
         this.mode.on({scope: this, select: this.modeSelected});
+
+        this.optimize.on({scope: this, select: this.optSelected});
 
         // initially, we are set to transit mode (we assume here anyway)
         // we'll set up the initial options/state accordingly
@@ -56,10 +59,9 @@ otp.planner.FormsOptionsManager = {
     modeSelected : function(comboBox, record, idx) {
         var mode = record.get("opt");
         
-        var optimizeFilter = null;
         this.optimizeStore.clearFilter();
-        var showFewestTransfersOption = false;
-        var showSafeTripOption = false;
+        var showTransitOptions = false;
+        var showBikeOptions = false;
         
         // if we're neither a bike nor a transit mode
         // then we don't show the optimize options at all
@@ -81,26 +83,43 @@ otp.planner.FormsOptionsManager = {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxWalkDistance);
             }
             this.showComboBox(this.maxWalk);
-            showFewestTransfersOption = true;
             this.showComboBox(this.wheelchair);
+            showTransitOptions = true;
         } else {
             this.hideComboBox(this.maxWalk);
             this.hideComboBox(this.wheelchair);
         }
         if (this.isBike(mode)) {
-            showSafeTripOption = true;
+            showBikeOptions = true;
         }
+
+        // we don't display the combo box at all in this case
+        if(!showTransitOptions && !showBikeOptions) this.hideComboBox(this.optimize)        
+
+        this.optimizeStore.filterBy(this.getOptimizeFilter(showTransitOptions, showBikeOptions));
+        
+        this.bikeTriangle.disable();        
+    },
+    
+    getOptimizeFilter : function(record) {
+    	var mode = record.get("opt");
+      return this.getOptimizeFilter(this.isTransitOrBus(mode), this.isBike(mode));  
+    },
+    
+    getOptimizeFilter : function(showTransitOptions, showBikeOptions) {
+        var optimizeFilter;        
 
         // we don't have many permutations of filters currently
         // so a naive approach seems sufficient
-        if (showFewestTransfersOption && showSafeTripOption) {
-            return;
-        }
-        if (showFewestTransfersOption) {
+        if (showTransitOptions && showBikeOptions) {
             optimizeFilter = function(record) {
-                return record.get("opt") !== "SAFE";
+            	return true;
             };
-        } else if (showSafeTripOption) {
+        } else if (showTransitOptions) {
+            optimizeFilter = function(record) {
+                return record.get("opt") !== "SAFE" && record.get("opt") !== "TRIANGLE";
+            };
+        } else if (showBikeOptions) {
             optimizeFilter = function(record) {
                 return record.get("opt") !== "TRANSFERS";
             };
@@ -110,11 +129,8 @@ otp.planner.FormsOptionsManager = {
                 return !(opt === "TRANSFERS" ||
                          opt === "SAFE");
             };
-            // we don't display the combo box at all in this case
-            // leaving the filter here though just in case we
-            this.hideComboBox(this.optimize);
         }
-        this.optimizeStore.filterBy(optimizeFilter);
+        return optimizeFilter;
     },
     
     showComboBox : function(cb) {
@@ -137,7 +153,13 @@ otp.planner.FormsOptionsManager = {
     isBike : function(mode) {
         return mode.indexOf("BICYCLE") !== -1;
     },
-   
+    
+    optSelected : function(comboBox, record, idx) {
+    	  var optimize = record.get("opt");
+        if(optimize.indexOf("TRIANGLE") !== -1) this.bikeTriangle.enable();
+        else this.bikeTriangle.disable();
+    },
+    	   
     CLASS_NAME: "otp.planner.FormsOptionsManager"
 
 };

@@ -298,7 +298,8 @@ otp.locale.English = {
         [
           ['TRANSFERS', 'Fewest Transfers'],
           ['QUICK',     'Quickest Trip'],
-          ['SAFE',      'Safest Trip']
+          ['SAFE',      'Safest Trip'],
+          ['TRIANGLE',  'Custom Trip...']
         ],
     
         arriveDepart: 

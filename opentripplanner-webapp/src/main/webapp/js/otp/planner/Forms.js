@@ -62,6 +62,9 @@ otp.planner.StaticForms = {
     m_modeStore      : null,
     m_modeForm       : null,
     m_wheelchairForm : null,
+    
+    m_bikeTriangle          : null,
+    m_bikeTriangleContainer : null,
 
     // buttons
     m_submitButton   : null,
@@ -147,10 +150,18 @@ otp.planner.StaticForms = {
 
         otp.util.ExtUtils.setTripPlannerCookie();
 
+        var triParams = (this.m_optimizeForm.getValue() == "TRIANGLE") ?
+            {
+                triangleTimeFactor     : this.m_bikeTriangle.timeFactor,
+                triangleSlopeFactor    : this.m_bikeTriangle.slopeFactor,
+                triangleSafetyFactor   : this.m_bikeTriangle.safetyFactor
+            } : { };
+        
         this.m_panel.form.submit( {
             method  : 'GET',
             url     : this.url,
-            waitMsg : this.locale.tripPlanner.labels.submitMsg
+            waitMsg : this.locale.tripPlanner.labels.submitMsg,
+            params  : triParams
         });
 
         // analytics
@@ -624,6 +635,11 @@ otp.planner.StaticForms = {
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
+        if(retVal.opt == "TRIANGLE") {        
+            retVal.triangleTimeFactor   = this.m_bikeTriangle.timeFactor;
+            retVal.triangleSlopeFactor  = this.m_bikeTriangle.slopeFactor;
+            retVal.triangleSafetyFactor = this.m_bikeTriangle.safetyFactor;
+        }        
         var d = this.m_maxWalkDistanceForm.getValue();
         retVal.maxWalkDistance = d * 1.0;
         retVal.mode            = this.m_modeForm.getValue();
@@ -802,7 +818,7 @@ otp.planner.StaticForms = {
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
         this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
-
+        
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,
             id:          'form-tab',
@@ -825,13 +841,14 @@ otp.planner.StaticForms = {
             errorReader: new Ext.form.XmlErrorReader()
         };
         this.m_panel = new Ext.FormPanel(conf);
-
+        
         this.m_panel.on({
                 scope:           this,
                 beforeaction:    this.preSubmit,
                 actionfailed:    this.submitFailure,
                 actioncomplete:  this.submitSuccess
         });
+        
     },
     
     /**
@@ -1282,20 +1299,32 @@ otp.planner.StaticForms = {
             forceSelection: true,
             selectOnFocus:  true
         });
-
+        
+        this.m_bikeTriangleContainer = new Ext.Panel({  
+            name:           'bikeTriangleContainer',  
+        });
+        
+        this.m_bikeTriangle = new otp.planner.BikeTriangle({
+            container:      this.m_bikeTriangleContainer,             
+        }); 
+        
         if (this.useOptionDependencies) {
             this.m_optionsChangeManager = new otp.planner.FormsOptionsManager({
                 mode:        this.m_modeForm,
                 optimize:    this.m_optimizeForm,
                 maxWalk:     this.m_maxWalkDistanceForm,
                 wheelchair:  this.m_wheelchairForm,
-                locale:      this.locale
-            });
+                locale:      this.locale,
+                bikeTriangle:    this.m_bikeTriangle                
+            });            
         }
+        
+        var optimizeFilter = this.m_optionsChangeManager.getOptimizeFilter(this.m_modeStore.getAt(0));
+        this.m_optimizeForm.getStore().filterBy(optimizeFilter);
 
-        return [this.m_modeForm, this.m_optimizeForm, this.m_maxWalkDistanceForm, this.m_wheelchairForm];
+        return [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm, this.m_wheelchairForm];
     },
-
+    	
     CLASS_NAME: "otp.planner.Forms"
 };
 
