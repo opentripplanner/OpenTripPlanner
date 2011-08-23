@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,13 +115,13 @@ public class WayPropertySet {
         return bestNamer.generateCreativeName(way);
     }
 
-    public Set<String> getNoteForWay(OSMWay way) {
-        HashSet<String> out = new HashSet<String>();
+    public Set<Alert> getNoteForWay(OSMWay way) {
+        HashSet<Alert> out = new HashSet<Alert>();
         for (NotePicker picker : notes) {
             OSMSpecifier specifier = picker.getSpecifier();
             NoteProperties noteProperties = picker.getNoteProperties();
             if (specifier.matchScore(way) > 0) {
-                out.add(noteProperties.generateNote(way).intern());
+                out.add(Alert.createSimpleAlerts(noteProperties.generateNote(way).intern()));
             }
         }
         if (out.size() == 0) {

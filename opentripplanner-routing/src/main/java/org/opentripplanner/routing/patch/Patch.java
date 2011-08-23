@@ -34,7 +34,7 @@ public abstract class Patch implements Serializable {
 	private long startTime;
 	private int startTimeOfDay = 0; //by default, the whole day
 	private int endTimeOfDay = 86400;
-	protected String notes;
+	protected Alert notes;
 
 	private String id;
 
@@ -57,11 +57,11 @@ public abstract class Patch implements Serializable {
 	}
 
 	@XmlElement
-	public String getNotes() {
+	public Alert getNotes() {
 		return notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(Alert notes) {
 		this.notes = notes;
 	}
 

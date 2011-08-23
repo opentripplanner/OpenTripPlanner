@@ -24,6 +24,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -133,7 +134,7 @@ public class Shortcut implements DirectEdge, Serializable {
 		return traverse(s0);
 	}
 
-    public Set<String> getNotes() {
+    public Set<Alert> getNotes() {
     	return null;
     }
     

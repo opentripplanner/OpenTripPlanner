@@ -46,6 +46,7 @@ public interface RequestInf {
         public static String TRIANGLE_SAFETY_FACTOR = "triangleSafetyFactor";
         public static String TRIANGLE_SLOPE_FACTOR = "triangleSlopeFactor";
         public static String TRANSFER_PENALTY = "transferPenalty";
+        public static String LANGUAGE = "lang";
 
 	/**
 	 * @return the from

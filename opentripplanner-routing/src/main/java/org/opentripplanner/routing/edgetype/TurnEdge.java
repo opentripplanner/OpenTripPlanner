@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -254,7 +255,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	}
 
 	@Override
-	public Set<String> getNotes() {
+	public Set<Alert> getNotes() {
 		return fromv.getNotes();
 	}
 

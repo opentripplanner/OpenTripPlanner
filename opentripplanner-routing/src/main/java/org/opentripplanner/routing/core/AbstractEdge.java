@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 public abstract class AbstractEdge implements DirectEdge, Serializable {
@@ -64,7 +65,7 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     }
     
 
-    public Set<String> getNotes() {
+    public Set<Alert> getNotes() {
     	return null;
     }
     

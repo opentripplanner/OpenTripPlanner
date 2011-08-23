@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -73,7 +74,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     
     private boolean roundabout = false;
 
-    private Set<String> notes;
+    private Set<Alert> notes;
 
 	private boolean hasBogusName;
 
@@ -348,11 +349,11 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return roundabout;
     }
 
-    public Set<String> getNotes() {
+    public Set<Alert> getNotes() {
     	return notes;
     }
     
-    public void setNote(Set<String> notes) {
+    public void setNote(Set<Alert> notes) {
     	this.notes = notes;
     }
     

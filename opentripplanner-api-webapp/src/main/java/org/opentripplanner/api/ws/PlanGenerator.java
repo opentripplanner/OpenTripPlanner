@@ -46,6 +46,7 @@ import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
@@ -170,7 +171,7 @@ public class PlanGenerator {
         Itinerary itinerary = makeEmptyItinerary(path);
 
         Leg leg = null;
-        List<String> notesForNewLeg = new ArrayList<String>();
+        List<Alert> notesForNewLeg = new ArrayList<Alert>();
         Edge edge = null;
         EdgeNarrative edgeNarrative = null;
         TraverseMode mode = null;
@@ -193,13 +194,13 @@ public class PlanGenerator {
                 continue;
 
             /* Add in notes */
-            Set<String> notes = edgeNarrative.getNotes();
+            Set<Alert> notes = edgeNarrative.getNotes();
             if (notes != null) {
                 if (leg == null) {
                     notesForNewLeg.addAll(notes);
                 } else {
-                    for (String note : notes) {
-                        leg.addNote(note);
+                    for (Alert note : notes) {
+                        leg.addAlert(note);
                     }
                 }
             }
@@ -252,8 +253,8 @@ public class PlanGenerator {
                     /* initialize new leg */
                     leg = makeLeg(currState);
                     leg.interlineWithPreviousLeg = true;
-                    for (String noteForNewLeg : notesForNewLeg) {
-                        leg.addNote(noteForNewLeg);
+                    for (Alert noteForNewLeg : notesForNewLeg) {
+                        leg.addAlert(noteForNewLeg);
                     }
                     notesForNewLeg.clear();
                     leg.mode = mode.toString();
@@ -294,8 +295,8 @@ public class PlanGenerator {
                     }
                     /* initialize new leg */
                     leg = makeLeg(currState);
-                    for (String noteForNewLeg : notesForNewLeg) {
-                        leg.addNote(noteForNewLeg);
+                    for (Alert noteForNewLeg : notesForNewLeg) {
+                        leg.addAlert(noteForNewLeg);
                     }
                     notesForNewLeg.clear();
                     if (mode == null) {

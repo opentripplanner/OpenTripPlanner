@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.patch.NoteNarrative;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,8 +179,8 @@ public class StateEditor {
     /**
      * Wrap the new State's predecessor EdgeNarrative so that it has the given note.
      */
-    public void addNote(String note) {
-        child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, note);
+    public void addNote(Alert notes) {
+        child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, notes);
     }
 
     /* Incrementors */

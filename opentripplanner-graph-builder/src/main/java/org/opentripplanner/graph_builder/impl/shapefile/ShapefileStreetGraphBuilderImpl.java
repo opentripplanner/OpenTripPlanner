@@ -40,6 +40,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -186,8 +187,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
-                		HashSet<String> notes = new HashSet<String>();
-                		notes.add(note);
+                		HashSet<Alert> notes = Alert.newSimpleAlertSet(note);
                 		street.setNote(notes);
                 	}
                 }

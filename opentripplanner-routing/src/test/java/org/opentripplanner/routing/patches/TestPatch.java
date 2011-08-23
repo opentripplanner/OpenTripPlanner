@@ -16,7 +16,6 @@ package org.opentripplanner.routing.patches;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 
@@ -37,6 +36,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.RouteNotePatch;
 import org.opentripplanner.routing.patch.StopNotePatch;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -125,7 +125,7 @@ public class TestPatch extends TestCase {
 		snp1.setEndTime(1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
 		snp1.setStartTimeOfDay(0); // midnight
 		snp1.setEndTimeOfDay(600); // to ten past
-		String note1 = "The first note";
+		Alert note1 = Alert.createSimpleAlerts("The first note");
 		snp1.setNotes(note1);
 		snp1.setId("id1");
 		snp1.setStop(new AgencyAndId("agency", "A"));
@@ -136,7 +136,7 @@ public class TestPatch extends TestCase {
 		snp2.setEndTime(1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2010
 		snp2.setStartTimeOfDay(540); // nine past midnight
 		snp2.setEndTimeOfDay(21600); // to 6am
-		String note2 = "The second note";
+		Alert note2 = Alert.createSimpleAlerts("The second note");
 		snp2.setNotes(note2);
 		snp2.setId("id2");
 		snp2.setStop(new AgencyAndId("agency", "A"));
@@ -155,7 +155,7 @@ public class TestPatch extends TestCase {
 		path = spt.getPath(stop_e, false); // do not optimize because we want
 		// the first trip out of A
 		assertNotNull(path);
-		HashSet<String> expectedNotes = new HashSet<String>();
+		HashSet<Alert> expectedNotes = new HashSet<Alert>();
 		expectedNotes.add(note1);
 		assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
 
@@ -174,7 +174,7 @@ public class TestPatch extends TestCase {
 		rnp1.setEndTime(60 * 60 * 24 * 365 * 40); // until ~1/1/2011
 		rnp1.setStartTimeOfDay(21600); // six am
 		rnp1.setEndTimeOfDay(43200); // to noon
-		String note1 = "The route note";
+		Alert note1 = Alert.createSimpleAlerts("The route note");
 		rnp1.setNotes(note1);
 		rnp1.setId("id1");
 		rnp1.setRoute(new AgencyAndId("agency", "1"));
@@ -192,7 +192,7 @@ public class TestPatch extends TestCase {
 
 		path = spt.getPath(stop_e, false); 
 		assertNotNull(path);
-		HashSet<String> expectedNotes = new HashSet<String>();
+		HashSet<Alert> expectedNotes = new HashSet<Alert>();
 		expectedNotes.add(note1);
 		assertEquals(expectedNotes, path.states.get(2).getBackEdgeNarrative().getNotes());
 	}
