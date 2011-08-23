@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,13 +103,13 @@ public class StreetVertex extends GenericVertex {
 
     private boolean roundabout = false;
 
-    private Set<String> note;
+    private Set<Alert> notes;
 
     private boolean hasBogusName;
 
     private boolean noThruTraffic = false;
 
-    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<String> note) {
+    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<Alert> notes) {
         super(id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
@@ -118,7 +119,7 @@ public class StreetVertex extends GenericVertex {
         this.slopeSpeedEffectiveLength = length;
         this.name = name;
         this.permission = StreetTraversalPermission.ALL;
-        this.note = note;
+        this.notes = notes;
         
         if (geometry != null) {
             double angleR = DirectionUtils.getLastAngle(geometry);
@@ -418,7 +419,6 @@ public class StreetVertex extends GenericVertex {
                 weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
                 break;
             default:
-                // TODO: greenways
                 weight = length / options.speed;
             }
         } else {
@@ -488,9 +488,9 @@ public class StreetVertex extends GenericVertex {
         return roundabout;
     }
 
-	public Set<String> getNotes() {
-		return note;
-	}
+    public Set<Alert> getNotes() {
+        return notes;
+    }
 
 	public boolean hasBogusName() {
 		return hasBogusName;

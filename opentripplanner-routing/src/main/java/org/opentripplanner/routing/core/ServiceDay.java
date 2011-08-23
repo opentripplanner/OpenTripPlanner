@@ -36,9 +36,9 @@ public class ServiceDay {
      * serviceIds running on that day.
      */
     public ServiceDay(long time, CalendarService cs) {
-        ServiceDate sd = new ServiceDate(new Date(time));
+        ServiceDate sd = new ServiceDate(new Date(time * 1000));
         Date d = sd.getAsDate();        
-        this.midnight = d.getTime();
+        this.midnight = d.getTime() / 1000;
         this.serviceIdsRunning = cs.getServiceIdsOnDate(sd);
     }
 
@@ -53,28 +53,27 @@ public class ServiceDay {
      * Return number of seconds after midnight on this ServiceDay
      * for the given time.
      * 
-     * Note that time is in milliseconds since the epoch,
-     * and return value is in seconds.
+     * Note that the parameter and the return value are in seconds since the epoch
      * 
      * Return value may be negative, indicating that the time is 
      * before this ServiceDay.
      */
     public int secondsSinceMidnight(long time) {
-        return (int) (time - this.midnight) / 1000;
+        return (int) (time - this.midnight);
     }
     
     /* 
-     * Return number of milliseconds since the epoch
+     * Return number of seconds since the epoch
      * based on the given number of seconds after midnight on this ServiceDay
      * 
      * Input value may be negative, indicating that the time is 
      * before this ServiceDay.
      */
     public long time(int secondsSinceMidnight) {
-        return this.midnight + (1000L * (long)secondsSinceMidnight);
+        return this.midnight + secondsSinceMidnight;
     }
     
     public String toString() {
-        return Long.toString(this.midnight / 1000) + serviceIdsRunning;
+        return Long.toString(this.midnight) + serviceIdsRunning;
     }
 }

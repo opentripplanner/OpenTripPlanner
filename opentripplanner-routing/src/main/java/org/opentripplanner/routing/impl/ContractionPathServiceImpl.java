@@ -120,7 +120,7 @@ public class ContractionPathServiceImpl implements PathService {
             target = toVertex;
         }
 
-        State state = new State(targetTime.getTime(), origin, options);
+        State state = new State((int)(targetTime.getTime() / 1000), origin, options);
 
         return plan(state, target, nItineraries);
     }
@@ -128,13 +128,13 @@ public class ContractionPathServiceImpl implements PathService {
     @Override
     public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
 
-        Date targetTime = new Date(origin.getTime());
+        Date targetTime = new Date(origin.getTime() * 1000);
         TraverseOptions options = origin.getOptions();
 
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        options.setServiceDays(targetTime.getTime());
+        options.setServiceDays(targetTime.getTime() / 1000);
         if (options.getModes().getTransit()
                 && !_graphService.getGraph().transitFeedCovers(targetTime)) {
             // user wants a path through the transit network,
@@ -296,7 +296,7 @@ public class ContractionPathServiceImpl implements PathService {
 
         options.setTransferTable(_graphService.getGraph().getTransferTable());
         GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices,
-                targetTime.getTime(), options);
+                (int)(targetTime.getTime() / 1000), options);
 
         return Arrays.asList(path);
     }

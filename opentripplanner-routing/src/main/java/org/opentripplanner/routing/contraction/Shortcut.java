@@ -24,6 +24,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -96,7 +97,7 @@ public class Shortcut implements DirectEdge, Serializable {
             State s2 = second.traverse(s1);
             if (s2 == null)
                 return null;
-            time = (int) (Math.abs(s0.getTime() - s2.getTime()) / 1000);
+            time = (int) Math.abs(s0.getTime() - s2.getTime());
             weight = s2.getWeight() - s0.getWeight();
             mode = s2.getBackEdgeNarrative().getMode();
             walkDistance = s2.getWalkDistance() - s0.getWalkDistance();
@@ -133,7 +134,7 @@ public class Shortcut implements DirectEdge, Serializable {
 		return traverse(s0);
 	}
 
-    public Set<String> getNotes() {
+    public Set<Alert> getNotes() {
     	return null;
     }
     

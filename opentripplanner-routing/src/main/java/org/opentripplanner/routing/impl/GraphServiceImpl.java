@@ -24,8 +24,8 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -152,7 +152,7 @@ public class GraphServiceImpl implements GraphService {
        * Create an empty graph if not graph is found
        */
       Graph graph = new Graph();
-      List<ModeAndOptimize> modeList = Collections.emptyList();
+      List<TraverseOptions> modeList = Collections.emptyList();
       setContractionHierarchySet(new ContractionHierarchySet(graph, modeList));
       return;
     }

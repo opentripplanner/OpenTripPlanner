@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -65,21 +66,21 @@ public class TestTurnEdge extends TestCase {
         int expectedSecElapsed = (int) (streetLength / options.speed);
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
-        State s0 = new State(startTime.getTimeInMillis(), start, options);
+        State s0 = new State(TestUtils.toSeconds(startTime), start, options);
         State s1 = ee.traverse(s0);
 
         assertNotNull(s1);
         assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10); //they're not identical because of the turn cost
         // Has the time elapsed as expected?
-        assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis()) < 10000);
+        assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis() / 1000) < 10);
 
         options.setArriveBy(true);
-        s0 = new State(endTime.getTimeInMillis(), end, options);
+        s0 = new State(TestUtils.toSeconds(endTime), end, options);
         s1 = ee.traverse(s0);
 
         assertNotNull(s1);
         assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10);
-        assertTrue(Math.abs(s1.getTime() - startTime.getTimeInMillis()) < 10000);
+        assertTrue(Math.abs(s1.getTime() - startTime.getTimeInMillis() / 1000) < 10);
     }
 
     public void testMaxWalkDistance() {

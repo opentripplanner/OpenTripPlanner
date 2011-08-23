@@ -16,7 +16,6 @@ package org.opentripplanner.gtfs;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
 
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
@@ -115,16 +114,6 @@ public class GtfsLibrary {
         default:
             throw new IllegalArgumentException("unknown gtfs route type " + route.getType());
         }
-    }
-
-    public static long getTimeAsDay(long time) {
-        Calendar c = Calendar.getInstance();
-        c.setTimeInMillis(time);
-        c.set(Calendar.HOUR_OF_DAY, 0);
-        c.set(Calendar.MINUTE, 0);
-        c.set(Calendar.SECOND, 0);
-        c.set(Calendar.MILLISECOND, 0);
-        return c.getTimeInMillis();
     }
 
     private static class GtfsContextImpl implements GtfsContext {

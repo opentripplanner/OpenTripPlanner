@@ -52,7 +52,7 @@ public class PreBoardEdge extends FreeEdge {
 	            s1.setAlightedLocal(true);
 	        }
 	        
-	        s1.incrementTimeMsec(options.minTransferTime * 500);
+	        s1.incrementTimeInSeconds(options.minTransferTime / 2);
 	        return s1.makeState();
     	} else {
     		/* Traverse forward: apply stop(pair)-specific costs */
@@ -81,7 +81,7 @@ public class PreBoardEdge extends FreeEdge {
              * this stop. 
              */
             long t0 = s0.getTime();
-            long board_after = t0 + options.minTransferTime * 500;
+            long board_after = t0 + options.minTransferTime / 2;
             long transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
             	/* this is a transfer rather than an initial boarding */
@@ -96,7 +96,7 @@ public class PreBoardEdge extends FreeEdge {
                 } else if (transfer_time >= 0) {
                     // handle minimum time transfers (>0) and timed transfers (0)
                 	// relative to alight time at last stop
-                	long table_board_after = s0.getLastAlightedTime() + transfer_time * 1000;
+                	long table_board_after = s0.getLastAlightedTime() + transfer_time;
                 	// do not let time run backward 
                 	// this could make timed transfers fail if there is walking involved
                 	if (table_board_after > board_after) 
@@ -129,7 +129,7 @@ public class PreBoardEdge extends FreeEdge {
             StateEditor s1 = s0.edit(this);
             s1.setTime(board_after);
             s1.setEverBoarded(true); 
-            long wait_cost = (board_after - t0) / 1000;
+            long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);
             return s1.makeState();
     	}

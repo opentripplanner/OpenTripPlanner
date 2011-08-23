@@ -19,6 +19,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -26,7 +27,11 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
     protected EdgeNarrative base;
 
     public DelegatingEdgeNarrative(EdgeNarrative base) {
-	this.base = base;
+	    this.base = base;
+    }
+
+    public EdgeNarrative getBase() {
+        return base;
     }
 
     @Override
@@ -49,7 +54,7 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
         return base.getName();
     }
     
-    public Set<String> getNotes() {
+    public Set<Alert> getNotes() {
     	return base.getNotes();
     }
 

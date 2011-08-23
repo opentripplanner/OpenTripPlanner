@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -33,7 +34,7 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TraverseOptions implements Cloneable {
+public class TraverseOptions implements Cloneable, Serializable {
 
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
@@ -69,7 +70,7 @@ public class TraverseOptions implements Cloneable {
      * and take the Q to Union Square, then transfer to the 6. If this takes less than
      * optimize_transfer_penalty seconds, then that's what we'll return.
      */
-    public long transferPenalty = 0;
+    public int transferPenalty = 0;
 
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
@@ -115,7 +116,7 @@ public class TraverseOptions implements Cloneable {
      *  Penalty added for using every route that is not preferred if user set any route as preferred.
      *  We return number of seconds that we are willing to wait for preferred route.
      */
-    public long useAnotherThanPreferredRoutesPenalty = 300;
+    public int useAnotherThanPreferredRoutesPenalty = 300;
     
     /**
      * Set of unpreferred routes for given user.
@@ -126,7 +127,7 @@ public class TraverseOptions implements Cloneable {
      *  Penalty added for using every unpreferred route. 
      *  We return number of seconds that we are willing to wait for preferred route.
      */
-    public long useUnpreferredRoutesPenalty = 300;
+    public int useUnpreferredRoutesPenalty = 300;
     
 
     /**
@@ -176,7 +177,7 @@ public class TraverseOptions implements Cloneable {
 
     private TransferTable transferTable;
 
-    public long nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
+    public int nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
     
 
     /**
@@ -230,6 +231,12 @@ public class TraverseOptions implements Cloneable {
     public TraverseOptions(TraverseMode mode) {
     	this();
     	this.setModes(new TraverseModeSet(mode));
+	}
+
+    public TraverseOptions(TraverseMode mode, OptimizeType optimize) {
+    	this();
+    	this.setModes(new TraverseModeSet(mode));
+        this.optimizeFor = optimize;
 	}
 
 	public void setGtfsContext(GtfsContext context) {
@@ -338,6 +345,10 @@ public class TraverseOptions implements Cloneable {
         return walkingOptions;
     }
 
+    public void setMode(TraverseMode mode) {
+        setModes(new TraverseModeSet(mode));
+    }
+
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
@@ -346,7 +357,10 @@ public class TraverseOptions implements Cloneable {
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
-            walkingOptions.walkReluctance = 4.0;
+            
+            // why 40? Because the default bike safety factor is 4, and we really want to only walk
+            // a bike to save a user from a walk which is very much (10x) longer
+            walkingOptions.walkReluctance *= 40.0; 
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
@@ -357,6 +371,14 @@ public class TraverseOptions implements Cloneable {
 
     public TraverseModeSet getModes() {
         return modes;
+    }
+
+    public void setOptimize(OptimizeType optimize) {
+        optimizeFor = optimize;
+    }
+
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     /**
@@ -412,7 +434,7 @@ public class TraverseOptions implements Cloneable {
     public void setServiceDays(long time) {
         if( ! useServiceDays )
             return;
-        final long MSEC_IN_DAY = 1000 * 60 * 60 * 24;
+        final long SEC_IN_DAY = 60 * 60 * 24;
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
@@ -422,9 +444,9 @@ public class TraverseOptions implements Cloneable {
         // This should be a valid way to find yesterday and tomorrow,
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
-        this.serviceDays.add(new ServiceDay(time - MSEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time - SEC_IN_DAY, cs));
         this.serviceDays.add(new ServiceDay(time, cs));
-        this.serviceDays.add(new ServiceDay(time + MSEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time + SEC_IN_DAY, cs));
     }
     
     public boolean isReverseOptimizing() {
@@ -440,5 +462,23 @@ public class TraverseOptions implements Cloneable {
         if (walkingOptions != null) {
             walkingOptions.maxWalkDistance = maxWalkDistance;
         }
+    }
+
+    public final static int MIN_SIMILARITY = 1000;
+
+    public int similarity(TraverseOptions options) {
+        int s = 0;
+
+        if(getModes().getNonTransitMode() == options.getModes().getNonTransitMode()) {
+            s += 1000;
+        }
+        if(optimizeFor == options.optimizeFor) {
+            s += 700;
+        }
+        if(wheelchairAccessible == options.wheelchairAccessible) {
+            s += 500;
+        }
+
+        return s;
     }
 }

@@ -97,9 +97,9 @@ public class GraphPath {
         return states.getLast().getTime();
     }
 
-    public long getDuration() {
+    public int getDuration() {
         // test to see if it is the same as getStartTime - getEndTime;
-        return states.getLast().getElapsedTime();
+        return (int) states.getLast().getElapsedTime();
     }
 
     public double getWeight() {
@@ -199,7 +199,7 @@ public class GraphPath {
             StateEditor editor = ret.edit(edge, narrative);
             // note the distinction between setFromState and setBackState
             editor.setFromState(orig);
-            editor.incrementTimeMsec(orig.getAbsTimeDeltaMsec());
+            editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
             editor.incrementWeight(orig.getWeightDelta());
             ret  = editor.makeState();
             orig = orig.getBackState();

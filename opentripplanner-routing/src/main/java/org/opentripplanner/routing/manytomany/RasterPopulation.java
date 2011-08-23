@@ -77,9 +77,8 @@ public class RasterPopulation extends Population {
 							targetPos.getOrdinate(0), targetPos.getOrdinate(1),
 							val[0] / 100.0);
 					// add this grid cell to the population
-					Vertex vertex = new GenericVertex("raster",
-							targetPos.getOrdinate(0), targetPos.getOrdinate(1));
-					Individual individual = new Individual(vertex, val[0]/100.0);
+					Individual individual = new Individual(targetPos.getOrdinate(0), 
+							targetPos.getOrdinate(1), val[0]/100.0);
 					elements.add(individual);
 				}
 			}

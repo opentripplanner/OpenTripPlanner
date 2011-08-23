@@ -139,7 +139,7 @@ public class Planner {
             @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
             @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
             @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
-            @DefaultValue("1.33") @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
+            @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
             @QueryParam(RequestInf.TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor,
             @QueryParam(RequestInf.TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor,
             @QueryParam(RequestInf.TRIANGLE_TIME_FACTOR) Double triangleTimeFactor,
@@ -151,7 +151,7 @@ public class Planner {
             @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes,
-            @DefaultValue("0") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer transferPenalty)
+            @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)

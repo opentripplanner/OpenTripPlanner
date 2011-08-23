@@ -159,9 +159,17 @@ otp.planner.TripTab = {
             // step F: click on first itinerary (see callback below for more steps)
             this.activateItinerary(1);
 
-            // THIS LINE breaks new UI (not sure it's really needed -- just to highlight the first itinerary in tree)
-            // var path = z[0].getPath();
-            // tree.selectPath(path);
+            // step G: highlight the first itinerary (this has to be done in a callback because Ext is insane)
+            var firstId = z[0].attributes.id;
+            function selectFirstItinerary(node) {
+              node.eachChild( function(child) {
+                if(child.attributes.id == firstId ) {
+                  child.select();
+                  tree.un('expandnode', selectFirstItinerary);
+                }
+              });
+            };
+            tree.on('expandnode', selectFirstItinerary);
         }
 
         return this.isValid();

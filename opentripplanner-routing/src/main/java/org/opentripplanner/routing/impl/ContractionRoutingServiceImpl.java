@@ -98,7 +98,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
 
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediates,
-            long time, TraverseOptions options) {
+            int time, TraverseOptions options) {
 
         Map<Vertex, HashMap<Vertex, GraphPath>> paths = new HashMap<Vertex, HashMap<Vertex, GraphPath>>();
 

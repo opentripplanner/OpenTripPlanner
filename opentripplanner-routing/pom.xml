@@ -59,6 +59,13 @@
             <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.opentripplanner</groupId>
+            <artifactId>opentripplanner-utils</artifactId>
+            <version>0.4.2-SNAPSHOT</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <repositories>

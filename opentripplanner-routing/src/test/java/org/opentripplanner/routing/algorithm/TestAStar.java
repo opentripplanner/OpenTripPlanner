@@ -31,6 +31,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 public class TestAStar extends TestCase {
     public void testBasic() throws Exception {
@@ -46,13 +47,13 @@ public class TestAStar extends TestCase {
 
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = new GregorianCalendar(2009, 8, 7, 12, 0, 0).getTimeInMillis();
+        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 12, 0, 0);
         spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", startTime, options);
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
 
-        long endTime = new GregorianCalendar(2009, 8, 7, 13, 29).getTimeInMillis();
+        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 13, 29, 0);
 
         assertEquals(path.getEndTime(), endTime);
 
@@ -63,7 +64,7 @@ public class TestAStar extends TestCase {
 
         path = spt.getPath(gg.getVertex("Caltrain_Millbrae Caltrain"), true);
 
-        long expectedStartTime = new GregorianCalendar(2009, 8, 7, 12, 39).getTimeInMillis();
+        long expectedStartTime = TestUtils.toSeconds(new GregorianCalendar(2009, 8, 7, 12, 39));
 
 //        path.reverse();
 
@@ -100,8 +101,7 @@ public class TestAStar extends TestCase {
         for (int i = 0; i < maxLines.length; ++i) {
             String line = maxLines[i];
             options.bannedRoutes.add(new RouteSpec("TriMet", line));
-            spt = AStar.getShortestPathTree(graph, start, end, startTime
-                    .getTimeInMillis(), options);
+            spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime), options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {
@@ -134,17 +134,17 @@ public class TestAStar extends TestCase {
         TraverseOptions options = new TraverseOptions();
         options.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
-        options.worstTime = startTime.getTimeInMillis() + 1000 * 60 * 60; //one hour is way too much time
+        options.worstTime = TestUtils.toSeconds(startTime) + 60 * 60; //one hour is way too much time
 
         Vertex end = graph.getVertex("TriMet_8374");
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, startTime.getTimeInMillis(),
+        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
                 options);
         GraphPath path = spt.getPath(end, true);
         assertNotNull(path);
         
-        options.worstTime = startTime.getTimeInMillis() + 1000 * 60; //but one minute is not enough
+        options.worstTime = TestUtils.toSeconds(startTime) + 60; //but one minute is not enough
 
-        spt = AStar.getShortestPathTree(graph, start, end, startTime.getTimeInMillis(),
+        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
                 options);
         path = spt.getPath(end, true);
         assertNull(path);        
@@ -186,7 +186,7 @@ public class TestAStar extends TestCase {
         ShortestPathTree spt = null;
         for (int i = 0; i < n_trials; ++i) {
             spt = AStar.getShortestPathTree(graph, random[i], airport.getLabel(), 
-                    startTime.getTimeInMillis(), options);
+                    TestUtils.toSeconds(startTime), options);
         }
 
         endClock = System.nanoTime();

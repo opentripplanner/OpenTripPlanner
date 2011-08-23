@@ -10,17 +10,17 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ 
+package org.opentripplanner.util;
 
-package org.opentripplanner.geocoder;
+import java.util.GregorianCalendar;
 
-import com.vividsolutions.jts.geom.Envelope;
+public class TestUtils {
+    public static long dateInSeconds(int year, int month, int day, int hour, int minute, int second) {
+        return new GregorianCalendar(year, month, day, hour, minute, second).getTimeInMillis() / 1000;
+    }
 
-public class GeocoderNullImpl implements Geocoder {
-    
-    static final String ERROR_MSG = "no geocoder configured";
-    
-    @Override
-    public GeocoderResults geocode(String address, Envelope bbox) {
-        return new GeocoderResults(ERROR_MSG);
+    public static long toSeconds(GregorianCalendar time) {
+        return time.getTimeInMillis() / 1000;
     }
 }

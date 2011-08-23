@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.patch.NoteNarrative;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -120,8 +121,8 @@ public class StateEditor {
 
             // check that time changes are coherent with edge traversal
             // direction
-            if (traversingBackward ? (child.getTimeDeltaMsec() > 0)
-                    : (child.getTimeDeltaMsec() < 0)) {
+            if (traversingBackward ? (child.getTimeDeltaSec() > 0)
+                    : (child.getTimeDeltaSec() < 0)) {
                 _log.trace("Time was incremented the wrong direction during state editing. {}",
                         child.backEdge);
                 return null;
@@ -178,8 +179,8 @@ public class StateEditor {
     /**
      * Wrap the new State's predecessor EdgeNarrative so that it has the given note.
      */
-    public void addNote(String note) {
-        child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, note);
+    public void addNote(Alert notes) {
+        child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, notes);
     }
 
     /* Incrementors */
@@ -194,23 +195,20 @@ public class StateEditor {
         child.weight += weight;
     }
 
-    public void incrementTimeInSeconds(int seconds) {
-        incrementTimeMsec(1000L * seconds);
-    }
 
     /**
      * Advance or rewind the time of the new state by the given non-negative amount. Direction of
      * time is inferred from the direction of traversal. This is the only element of state that runs
      * backward when traversing backward.
      */
-    public void incrementTimeMsec(long msec) {
-        if (msec < 0) {
+    public void incrementTimeInSeconds(int seconds) {
+        if (seconds < 0) {
             _log.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
             defectiveTraversal = true;
             return;
         }
-        child.time += (traversingBackward ? -msec : msec);
+        child.time += (traversingBackward ? -seconds : seconds);
     }
 
     public void incrementWalkDistance(double length) {

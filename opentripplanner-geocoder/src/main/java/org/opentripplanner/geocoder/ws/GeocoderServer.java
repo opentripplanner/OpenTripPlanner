@@ -24,6 +24,9 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+
 
 @Path("/geocode")
 public class GeocoderServer {
@@ -36,13 +39,37 @@ public class GeocoderServer {
 
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public GeocoderResults geocode(@QueryParam("address") String address) {
+    public GeocoderResults geocode(
+            @QueryParam("address") String address,
+            @QueryParam("bbox") String bbox) {
         if (address == null) {
-            throw new WebApplicationException(Response.status(400)
-                    .entity("no address")
-                    .type("text/plain")
-                    .build());
+            error("no address");
         }
-        return geocoder.geocode(address);
+        if (bbox != null) {
+            // left,top,right,bottom
+            String[] elem = bbox.split(",");
+            if (elem.length == 4) {
+                try {
+                    double x1 = Double.parseDouble(elem[0]);
+                    double y1 = Double.parseDouble(elem[1]);
+                    double x2 = Double.parseDouble(elem[2]);
+                    double y2 = Double.parseDouble(elem[3]);
+                    Envelope envelope = new Envelope(new Coordinate(x1, y1), new Coordinate(x2, y2));
+                    return geocoder.geocode(address, envelope);
+                } catch (NumberFormatException e) {
+                    error("bad bounding box: use left,top,right,bottom");
+                }
+            } else {
+                error("bad bounding box: use left,top,right,bottom");
+            }
+        }
+        return geocoder.geocode(address, null);
+    }
+
+    private void error(String message) {
+        throw new WebApplicationException(Response.status(400)
+                .entity(message)
+                .type("text/plain")
+                .build());
     }
 }

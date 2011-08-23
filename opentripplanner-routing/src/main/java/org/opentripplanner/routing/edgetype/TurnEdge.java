@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -164,7 +165,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time) + turnCost / 20;
         s1.incrementWalkDistance(fromv.getLength());
-        s1.incrementTimeInSeconds((int) time);
+        s1.incrementTimeInSeconds((int) Math.ceil(time));
         s1.incrementWeight(weight);
         if(s1.weHaveWalkedTooFar(options))
             return null;
@@ -254,7 +255,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	}
 
 	@Override
-	public Set<String> getNotes() {
+	public Set<Alert> getNotes() {
 		return fromv.getNotes();
 	}
 

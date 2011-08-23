@@ -37,6 +37,7 @@ import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -164,7 +165,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     way.addTag("otp:gen_name", creativeName);
                 }
                 
-                Set<String> note = wayPropertySet.getNoteForWay(way);
+                Set<Alert> note = wayPropertySet.getNoteForWay(way);
                 
                 StreetTraversalPermission permissions = getPermissionsForEntity(way, wayData.getPermission());
                 if (permissions == StreetTraversalPermission.NONE)
@@ -281,7 +282,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     	}
                     }
                     
-                    restrictionTags = turnRestrictionsByToWay.get(way);
+                    restrictionTags = turnRestrictionsByToWay.get(way.getId());
                     if (restrictionTags != null) {
                     	for (TurnRestrictionTag tag : restrictionTags) {
                     		if (tag.via == startNode) { 

@@ -98,7 +98,7 @@ public class AStarTest {
         options.speed = 1.0;
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		System.currentTimeMillis(), options);
+        		0, options);
 
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
@@ -123,7 +123,7 @@ public class AStarTest {
         options.setArriveBy(true);
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		System.currentTimeMillis(), options);
+        		1000, options);
 
         GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
 
@@ -166,7 +166,7 @@ public class AStarTest {
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		System.currentTimeMillis(), options);
+        		0, options);
 
         GraphPath path = tree.getPath(toLocation, false);
 
@@ -202,7 +202,7 @@ public class AStarTest {
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
         ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		System.currentTimeMillis(), options);
+        		1000, options);
 
         GraphPath path = tree.getPath(fromLocation, false);
 
@@ -260,9 +260,9 @@ public class AStarTest {
         @Override
         public State traverse(State s0) {
             double d = getDistance();
-            long t = (long) (d * 1000 / s0.getOptions().speed);
+            int t = (int) (d / s0.getOptions().speed);
             StateEditor s1 = s0.edit(this);
-            s1.incrementTimeMsec(t);
+            s1.incrementTimeInSeconds(t);
             s1.incrementWeight(d);
             return s1.makeState();
         }

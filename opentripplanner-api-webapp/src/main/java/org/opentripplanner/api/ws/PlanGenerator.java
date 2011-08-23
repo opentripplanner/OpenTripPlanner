@@ -39,10 +39,14 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.PatternDwell;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
@@ -167,7 +171,7 @@ public class PlanGenerator {
         Itinerary itinerary = makeEmptyItinerary(path);
 
         Leg leg = null;
-        List<String> notesForNewLeg = new ArrayList<String>();
+        List<Alert> notesForNewLeg = new ArrayList<Alert>();
         Edge edge = null;
         EdgeNarrative edgeNarrative = null;
         TraverseMode mode = null;
@@ -190,18 +194,18 @@ public class PlanGenerator {
                 continue;
 
             /* Add in notes */
-            Set<String> notes = edgeNarrative.getNotes();
+            Set<Alert> notes = edgeNarrative.getNotes();
             if (notes != null) {
                 if (leg == null) {
                     notesForNewLeg.addAll(notes);
                 } else {
-                    for (String note : notes) {
-                        leg.addNote(note);
+                    for (Alert note : notes) {
+                        leg.addAlert(note);
                     }
                 }
             }
 
-            edgeElapsedTime = currState.getTime() - currState.getBackState().getTime();
+            edgeElapsedTime = currState.getTimeInMillis() - currState.getBackState().getTimeInMillis();
 
             if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING) {
                 itinerary.waitingTime += edgeElapsedTime;
@@ -235,12 +239,12 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.ALIGHTING) {
                     /* alighting mode */
                     leg.to = makePlace(edgeNarrative.getToVertex());
-                    leg.endTime = new Date(currState.getBackState().getTime());
+                    leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                     continue;
                 } else if (changingToInterlinedTrip) {
                     /* finalize leg */
                     leg.to = makePlace(edgeNarrative.getFromVertex());
-                    leg.endTime = new Date(currState.getBackState().getTime());
+                    leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                     Geometry geometry = geometryFactory.createLineString(coordinates);
                     leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                     /* reset coordinates */
@@ -249,8 +253,8 @@ public class PlanGenerator {
                     /* initialize new leg */
                     leg = makeLeg(currState);
                     leg.interlineWithPreviousLeg = true;
-                    for (String noteForNewLeg : notesForNewLeg) {
-                        leg.addNote(noteForNewLeg);
+                    for (Alert noteForNewLeg : notesForNewLeg) {
+                        leg.addAlert(noteForNewLeg);
                     }
                     notesForNewLeg.clear();
                     leg.mode = mode.toString();
@@ -274,17 +278,25 @@ public class PlanGenerator {
                         if (leg.to == null) {
                             /* this stuff is filled in in the alight case, but not in the walk case */
                             leg.to = makePlace(edgeNarrative.getFromVertex());
-                            leg.endTime = new Date(currState.getBackState().getTime());
+                            leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                         }
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
                         /* reset coordinates */
                         coordinates = new CoordinateArrayListSequence();
+
+                        if(showIntermediateStops && leg.stop != null) {
+                            // Remove the last stop -- it's the alighting one
+                            leg.stop.remove(leg.stop.size() - 1);
+                            if(leg.stop.isEmpty()) {
+                                leg.stop = null;
+                            }
+                        }
                     }
                     /* initialize new leg */
                     leg = makeLeg(currState);
-                    for (String noteForNewLeg : notesForNewLeg) {
-                        leg.addNote(noteForNewLeg);
+                    for (Alert noteForNewLeg : notesForNewLeg) {
+                        leg.addAlert(noteForNewLeg);
                     }
                     notesForNewLeg.clear();
                     if (mode == null) {
@@ -351,8 +363,14 @@ public class PlanGenerator {
                         leg.stop = new ArrayList<Place>();
                     }
                     /* any further transit edge, add "from" vertex to intermediate stops */
-                    Place stop = makePlace(currState);
-                    leg.stop.add(stop);
+                    if( !(   currState.getBackEdge() instanceof Dwell
+                          || currState.getBackEdge() instanceof PatternDwell
+                          || currState.getBackEdge() instanceof PatternInterlineDwell)) {
+                        Place stop = makePlace(currState);
+                        leg.stop.add(stop);
+                    } else {
+                        leg.stop.get(leg.stop.size() - 1).departure = new Date(currState.getTime());
+                    }
                 }
             }
         } /* end loop over graphPath edge list */
@@ -360,11 +378,18 @@ public class PlanGenerator {
         if (leg != null) {
             /* finalize leg */
             leg.to = makePlace(edgeNarrative.getToVertex());
-            leg.endTime = new Date(finalState.getTime());
+            leg.endTime = new Date(finalState.getTimeInMillis());
             Geometry geometry = geometryFactory.createLineString(coordinates);
             leg.legGeometry = PolylineEncoder.createEncodings(geometry);
             if (startWalk != -1) {
                 leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i + 1));
+            }
+            if(showIntermediateStops && leg.stop != null) {
+                // Remove the last stop -- it's the alighting one
+                leg.stop.remove(leg.stop.size() - 1);
+                if(leg.stop.isEmpty()) {
+                    leg.stop = null;
+                }
             }
         }
         if (itinerary.transfers == -1) {
@@ -405,7 +430,7 @@ public class PlanGenerator {
     private Leg makeLeg(State s) {
         Leg leg = new Leg();
 
-        leg.startTime = new Date(s.getBackState().getTime());
+        leg.startTime = new Date(s.getBackState().getTimeInMillis());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.route = en.getName();
         Trip trip = en.getTrip();
@@ -432,9 +457,9 @@ public class PlanGenerator {
         State startState = path.states.getFirst();
         State endState = path.states.getLast();
 
-        itinerary.startTime = new Date(startState.getTime());
-        itinerary.endTime = new Date(endState.getTime());
-        itinerary.duration = endState.getTime() - startState.getTime();
+        itinerary.startTime = new Date(startState.getTimeInMillis());
+        itinerary.endTime = new Date(endState.getTimeInMillis());
+        itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
         if (fareService != null) {
             itinerary.fare = fareService.getCost(path);
         }
@@ -451,7 +476,7 @@ public class PlanGenerator {
         Coordinate endCoord = state.getVertex().getCoordinate();
         String name = state.getVertex().getName();
         AgencyAndId stopId = state.getVertex().getStopId();
-        Date timeAtState = new Date(state.getTime());
+        Date timeAtState = new Date(state.getTimeInMillis());
         Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
         return place;
     }

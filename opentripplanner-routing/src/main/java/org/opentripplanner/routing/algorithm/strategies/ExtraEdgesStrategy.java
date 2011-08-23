@@ -15,6 +15,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.List;
 import java.util.Map;
+import java.io.Serializable;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
@@ -27,7 +28,7 @@ import org.opentripplanner.routing.core.Vertex;
  * @author bdferris
  * @see DefaultExtraEdgesStrategy
  */
-public interface ExtraEdgesStrategy {
+public interface ExtraEdgesStrategy extends Serializable {
 
     /**
      * Add any incoming edges from vertices in the graph to the origin vertex in a backwards search.

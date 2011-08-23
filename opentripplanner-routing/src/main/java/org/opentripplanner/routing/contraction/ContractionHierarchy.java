@@ -116,7 +116,7 @@ public class ContractionHierarchy implements Serializable {
                 continue;
             }
             // could just use keep states instead of making vertexIngress
-            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaMsec(), sv.getWalkDistance()));
+            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaSec(), sv.getWalkDistance()));
         }
 
         /* Compute the cost to each vertex with an outgoing edge from the target */
@@ -135,7 +135,7 @@ public class ContractionHierarchy implements Serializable {
             }
             Vertex w = sw.getVertex();
             wSet.add(w);
-            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaMsec(), sw.getWalkDistance()));
+            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaSec(), sw.getWalkDistance()));
             if (sw.exceedsWeightLimit(maxWWeight)) {
                 maxWWeight = sw.getWeight();
             }
@@ -346,27 +346,24 @@ public class ContractionHierarchy implements Serializable {
      * Create a contraction hierarchy from a graph.
      * 
      * @param orig
-     * @param optimize
-     * @param mode
+     * @param options
      * @param contractionFactor
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
-    public ContractionHierarchy(Graph orig, OptimizeType optimize, TraverseMode mode,
-            double contractionFactor) {
+    public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
         graph = new Graph();
         // clone graph
         for (GraphVertex gv : orig.getVertices()) {
             graph.addGraphVertex(new GraphVertex(gv));
         }
 
-        this.mode = mode;
-        options = new TraverseOptions(new TraverseModeSet(mode));
-        options.optimizeFor = optimize;
-        options.setMaxWalkDistance(Double.MAX_VALUE);
-        options.freezeTraverseMode();
-        backOptions = options.clone();
+        this.options = options;
+        this.options.setMaxWalkDistance(Double.MAX_VALUE);
+        backOptions = this.options.clone();
         backOptions.setArriveBy(true);
         this.contractionFactor = contractionFactor;
+
+        this.mode = this.options.getModes().getNonTransitMode();
 
         init();
         useCoreVerticesFrom(orig);

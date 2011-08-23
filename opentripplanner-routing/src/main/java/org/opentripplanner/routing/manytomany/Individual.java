@@ -10,13 +10,16 @@ import org.opentripplanner.routing.core.Vertex;
  *
  */
 public class Individual {
+	double x, y;
 	double data;
 	double result;
 	Vertex vertex;
 	
-	public Individual(Vertex vertex, double data) {
+	public Individual(double x, double y, double data) {
+		this.x = x;
+		this.y = y;
 		this.data = data;
-		this.vertex = vertex;
-		this.result = Double.POSITIVE_INFINITY;
+		this.vertex = null;
+		this.result = Double.NaN;
 	}
 }

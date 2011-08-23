@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.patch.Alert;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -61,8 +62,7 @@ public class Leg {
     public String route = "";
 
     /**
-     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
-     * the street being traversed.
+     * For transit legs, if the rider should stay on the vehicle as it changes route names.
      */
     @XmlAttribute
     public Boolean interlineWithPreviousLeg;
@@ -116,8 +116,15 @@ public class Leg {
     @XmlElementWrapper(name = "steps")
     public List<WalkStep> walkSteps;
 
+    /**
+     * Deprecated field formerly used for notes -- will be removed.  See
+     * alerts
+     */
     @XmlElement
-	private List<Note> notes;
+    private List<Note> notes;
+
+    @XmlElement
+    private List<Alert> alerts;
 
     @XmlAttribute
 	public String routeShortName;
@@ -151,13 +158,19 @@ public class Leg {
         return endTime.getTime() - startTime.getTime();
     }
 
-	public void addNote(String text) {
-		if (notes == null) {
-			notes = new ArrayList<Note>();
-		}
-		Note note = new Note(text);
-		if (!notes.contains(note)) {
-			notes.add(note);
-		}
-	}
+    public void addAlert(Alert alert) {
+        if (notes == null) {
+            notes = new ArrayList<Note>();
+        }
+        if (alerts == null) {
+            alerts = new ArrayList<Alert>();
+        }
+        Note note = new Note(alert.alertHeaderText.getSomeTranslation());
+        if (!notes.contains(note)) {
+            notes.add(note);
+        }
+        if (!alerts.contains(alert)) {
+            alerts.add(alert);
+        }
+    }
 }

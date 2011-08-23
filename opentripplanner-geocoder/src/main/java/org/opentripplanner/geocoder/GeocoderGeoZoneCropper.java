@@ -20,6 +20,8 @@ import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.vividsolutions.jts.geom.Envelope;
+
 /**
  * Filter results of a geocoding request by removing elements outside of the covered geographical
  * zone.
@@ -40,8 +42,8 @@ public class GeocoderGeoZoneCropper implements Geocoder {
     }
 
     @Override
-    public GeocoderResults geocode(String address) {
-        GeocoderResults retval = decorated.geocode(address);
+    public GeocoderResults geocode(String address, Envelope bbox) {
+        GeocoderResults retval = decorated.geocode(address, bbox);
         if (retval.getResults() != null) {
             List<GeocoderResult> results = new ArrayList<GeocoderResult>(retval.getCount());
             for (GeocoderResult result : retval.getResults()) {

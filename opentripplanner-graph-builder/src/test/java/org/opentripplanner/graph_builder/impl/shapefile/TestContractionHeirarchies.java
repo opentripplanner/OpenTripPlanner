@@ -41,7 +41,6 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.contraction.ModeAndOptimize;
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
@@ -64,6 +63,7 @@ import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -221,7 +221,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         // test getShortcuts
         
-        ContractionHierarchy testch = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 0.0);
+        ContractionHierarchy testch = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
         List<Shortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
@@ -232,7 +232,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertEquals(0, shortcuts.size());
 
         // test hierarchy construction
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         assertTrue(hierarchy.down.getVertices().size() == graphSize);
         assertTrue(hierarchy.up.getVertices().size() == graphSize);
@@ -359,7 +359,7 @@ public class TestContractionHeirarchies extends TestCase {
             }
         }
 
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, OptimizeType.QUICK, TraverseMode.WALK, 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
@@ -387,7 +387,7 @@ public class TestContractionHeirarchies extends TestCase {
     public void testNYC() throws Exception {
     	// be sure this date matches your subway gtfs validity period
     	// it could be derived from the Graph's validity dates
-        long startTime = new GregorianCalendar(2009, 10, 11, 12, 0, 0).getTimeInMillis();
+        long startTime = TestUtils.dateInSeconds(2009, 10, 11, 12, 0, 0);
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;
@@ -500,7 +500,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertTrue("Path must take subway", subway1);
 
         ContractionHierarchySet chs = new ContractionHierarchySet();
-        chs.addModeAndOptimize(new ModeAndOptimize(TraverseMode.WALK, OptimizeType.QUICK));
+        chs.addTraverseOptions(new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK));
         chs.setContractionFactor(0.50);
         chs.setGraph(graph);
         chs.build();
@@ -560,13 +560,13 @@ public class TestContractionHeirarchies extends TestCase {
         options.setArriveBy(false);
         
         // test max time 
-        options.worstTime = startTime + 1000 * 60 * 90; //an hour and a half is too much time
+        options.worstTime = startTime + 60 * 90; //an hour and a half is too much time
 
         path = hierarchy.getShortestPath(start, end, startTime,
                 options);
         assertNotNull(path);
             
-        options.worstTime = startTime + 1000 * 60; //but one minute is not enough
+        options.worstTime = startTime + 60; //but one minute is not enough
 
         path = hierarchy.getShortestPath(start, end, startTime,
                 options);
