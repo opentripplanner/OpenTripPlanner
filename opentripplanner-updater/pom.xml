@@ -87,8 +87,13 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- We use the Ant copy task to run the protobuf compiler -->
-            <plugin>
+            <!-- We use an Ant task to run the protobuf compiler.  The
+	      problem is that this relies on the user having protoc
+	      installed, which is an unpleasant requirement for a feature
+	      that most people aren't presently using.  So I've checked
+	      the generated source code into the tree and we'll ignore
+	      the missing protoc -->
+            <!--plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <version>1.2</version>
@@ -103,7 +108,7 @@
                             <tasks>
                               <mkdir dir="target/generated-sources"/>
                               <exec executable="protoc" failonerror="true">
-                                <arg value="--java_out=target/generated-sources"/>
+                                <arg value="-(remove this parenthesized addition)-java_out=target/generated-sources"/>
                                 <arg value="src/main/resources/gtfs-realtime.proto"/>
                               </exec>
                             </tasks>
@@ -129,7 +134,7 @@
                   </configuration>
                 </execution>
               </executions>
-            </plugin>
+            </plugin-->
         </plugins>
     </build>
 
