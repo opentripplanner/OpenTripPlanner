@@ -29,7 +29,7 @@ public class PatchResponse {
 
 	@XmlElementWrapper
 	@XmlElements({
-	    @XmlElement(name = "AlertPatch", type = AlertPatch.class),
+	    @XmlElement(name = "AlertPatch", type = AlertPatch.class)
 	    })
 	public List<Patch> patches;
 	
