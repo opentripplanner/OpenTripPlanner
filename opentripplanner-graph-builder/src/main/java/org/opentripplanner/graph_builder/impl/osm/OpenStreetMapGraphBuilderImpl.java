@@ -643,6 +643,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Map<String, String> tags = entity.getTags();
             StreetTraversalPermission permission = null;
 
+            String highway = tags.get("highway");
             String access = tags.get("access");
             String motorcar = tags.get("motorcar");
             String bicycle = tags.get("bicycle");
@@ -687,6 +688,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                 } else {
                     permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+                }
+            }
+
+            if (highway != null) {
+                if ("construction".equals(highway)) {
+                    permission = StreetTraversalPermission.NONE;
                 }
             }
 
