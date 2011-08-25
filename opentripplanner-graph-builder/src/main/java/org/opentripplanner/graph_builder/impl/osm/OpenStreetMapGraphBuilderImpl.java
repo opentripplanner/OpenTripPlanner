@@ -644,18 +644,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetTraversalPermission permission = null;
 
             String highway = tags.get("highway");
+            String cycleway = tags.get("cycleway");
             String access = tags.get("access");
             String motorcar = tags.get("motorcar");
             String bicycle = tags.get("bicycle");
             String foot = tags.get("foot");
 
             /*
-             * Only access=*, motorcar=*, bicycle=*, and foot=* is examined, since those are the
-             * only modes supported by OTP (wheelchairs are not of concern here)
+             * Only a few tags are examined here, because we only care about modes supported by OTP
+             * (wheelchairs are not of concern here)
              * 
-             * Only a few values are checked for, all other values are presumed to be
-             * permissive (=> This may not be perfect, but is closer to reality, since most people
-             * don't follow the rules perfectly ;-)
+             * Only a few values are checked for, all other values are presumed to be permissive (=>
+             * This may not be perfect, but is closer to reality, since most people don't follow the
+             * rules perfectly ;-)
              */
             if (access != null) {
                 if ("no".equals(access) || "private".equals(access) || "delivery".equals(access) || "agricultural".equals(access)) {
@@ -693,6 +694,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (highway != null) {
                 if ("construction".equals(highway)) {
+                    permission = StreetTraversalPermission.NONE;
+                }
+            } else {
+                if ("construction".equals(cycleway)) {
                     permission = StreetTraversalPermission.NONE;
                 }
             }
