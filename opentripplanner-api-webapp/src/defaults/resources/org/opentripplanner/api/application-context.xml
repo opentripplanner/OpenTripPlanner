@@ -15,8 +15,14 @@
 	</bean>
 	
 	<bean id="pathService" class="org.opentripplanner.routing.impl.ContractionPathServiceImpl">
+		<property name="remainingWeightHeuristicFactory" ref="heuristicFactory" />
 	</bean>
-	
+
+	<bean id="heuristicFactory" 
+	      class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl">
+		<!-- <constructor-arg ref="graphService" />  -->
+	</bean>
+
 	<bean id="patchService" class="org.opentripplanner.routing.impl.PatchServiceImpl">
 	</bean>
 

@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
@@ -42,6 +43,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -71,6 +73,13 @@ public class ContractionPathServiceImpl implements PathService {
     private RoutingService _routingService;
 
     private StreetVertexIndexService _indexService;
+    
+    private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
+    
+    @Autowired
+    public void setRemainingWeightHeuristicFactory(RemainingWeightHeuristicFactory hf) {
+        _remainingWeightHeuristicFactory = hf;
+    }
 
     public GraphService getGraphService() {
         return _graphService;
@@ -142,20 +151,9 @@ public class ContractionPathServiceImpl implements PathService {
             throw new TransitTimesException();
         }
         // decide which A* heuristic to use
-        if (_graphService.getGraph().hasService(WeightTable.class)
-                && options.getModes().getTransit()) {
-            options.remainingWeightHeuristic = new TableRemainingWeightHeuristic(_graphService
-                    .getGraph());
-            LOG
-                    .debug("Weight table present in graph and transit itinerary requested. Using table-driven A* heuristic.");
-        } else {
-            LOG
-                    .debug("No weight table in graph or non-transit itinerary requested. Keeping existing A* heuristic.");
-        }
-
-        // EXPERIMENTAL
-        // options.remainingWeightHeuristic = new
-        // LBGRemainingWeightHeuristic(_graphService.getGraph());
+        options.remainingWeightHeuristic = 
+        	_remainingWeightHeuristicFactory.getInstanceForSearch(options, target);
+        LOG.debug("Applied A* heuristic: {}", options.remainingWeightHeuristic);
 
         // If transit is not to be used, disable walk limit and only search for one itinerary.
         if (!options.getModes().getTransit()) {

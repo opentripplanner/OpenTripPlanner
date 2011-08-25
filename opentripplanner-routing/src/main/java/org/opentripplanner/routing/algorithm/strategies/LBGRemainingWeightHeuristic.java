@@ -35,7 +35,10 @@ import org.slf4j.LoggerFactory;
  * @author andrewbyrd
  */
 public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
-    private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
+
+	private static final long serialVersionUID = 20110824L;
+
+	private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
     private static HashMap<Graph, LowerBoundGraph> lbgCache = new HashMap<Graph, LowerBoundGraph>();
 
