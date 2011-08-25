@@ -29,7 +29,7 @@ public class ApiServlet extends SpringServlet {
 
     private PeriodicGraphUpdater updater;
 
-    @Autowired
+    @Autowired(required=false)
     public void setPeriodicGraphUpdater(PeriodicGraphUpdater updater) {
         this.updater = updater;
         updater.start();
