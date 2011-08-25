@@ -61,7 +61,7 @@ public class TinyTurnEdge extends FreeEdge {
     }
 
     public String toString() {
-        return "TurnRestrictedFreeEdge(" + fromv + " -> " + tov + ")";
+        return "TinyTurnEdge(" + fromv + " -> " + tov + ")";
     }
 
     public void setRestricted(boolean restricted) {
