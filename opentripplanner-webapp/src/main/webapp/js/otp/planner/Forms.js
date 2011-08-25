@@ -30,7 +30,7 @@ otp.planner.StaticForms = {
     planner          : null,
     contextMenu      : null,
     poi              : null,
-
+    hideWheelchair   : true,
     url              : '/opentripplanner-api-webapp/ws/plan',
 
     // forms & stores
@@ -635,7 +635,7 @@ otp.planner.StaticForms = {
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
-        if(retVal.opt == "TRIANGLE") {        
+        if(retVal.opt == "TRIANGLE") {
             retVal.triangleTimeFactor   = this.m_bikeTriangle.timeFactor;
             retVal.triangleSlopeFactor  = this.m_bikeTriangle.slopeFactor;
             retVal.triangleSafetyFactor = this.m_bikeTriangle.safetyFactor;

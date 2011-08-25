@@ -27,12 +27,14 @@ otp.planner.FormsOptionsManager = {
         
     // form option vars
     // these are ext combo boxes
-    mode:        null,
-    optimize:    null,
-    maxWalk:     null,
-    wheelchair:  null,
-    locale:      null,
+    mode:          null,
+    optimize:      null,
+    maxWalk:       null,
+    wheelchair:    null,
+    locale:        null,
     bikeTriangle:  null,
+    bikeDefault:   "TRIANGLE",
+    //bikeDefault:   "SAFE",
 
     // the optimize store is used to control the optimize options
     optimizeStore: null,
@@ -94,16 +96,27 @@ otp.planner.FormsOptionsManager = {
         }
 
         // we don't display the combo box at all in this case
-        if(!showTransitOptions && !showBikeOptions) this.hideComboBox(this.optimize)        
-
+        if(!showTransitOptions && !showBikeOptions) {
+            this.hideComboBox(this.optimize);
+        }
+  
         this.optimizeStore.filterBy(this.getOptimizeFilter(showTransitOptions, showBikeOptions));
-        
-        this.bikeTriangle.disable();        
+
+
+        this.bikeTriangle.disable();
+
+        // change bike options
+        if(showBikeOptions) {
+            this.optimize.setValue(this.bikeDefault);
+            if(this.bikeDefault == "TRIANGLE") {
+                this.bikeTriangle.enable();
+            }
+        }
     },
-    
+
     getOptimizeFilter : function(record) {
-    	var mode = record.get("opt");
-      return this.getOptimizeFilter(this.isTransitOrBus(mode), this.isBike(mode));  
+        var mode = record.get("opt");
+        return this.getOptimizeFilter(this.isTransitOrBus(mode), this.isBike(mode));  
     },
     
     getOptimizeFilter : function(showTransitOptions, showBikeOptions) {
