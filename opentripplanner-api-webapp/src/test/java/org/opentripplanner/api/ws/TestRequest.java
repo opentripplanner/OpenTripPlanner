@@ -40,6 +40,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
+import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -92,6 +93,8 @@ public class TestRequest extends TestCase {
         planner = new Planner();
         pathService = new ContractionPathServiceImpl();
         graph = new Graph();
+        pathService.setRemainingWeightHeuristicFactory(
+                new DefaultRemainingWeightHeuristicFactoryImpl());
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
