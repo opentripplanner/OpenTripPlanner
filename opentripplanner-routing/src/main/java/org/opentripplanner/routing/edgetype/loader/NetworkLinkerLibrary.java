@@ -264,9 +264,9 @@ public class NetworkLinkerLibrary {
         PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
 
-        PlainStreetEdge forward2 = new PlainStreetEdge(e2v2, midpoint, backGeometryPair.getFirst(),
+        PlainStreetEdge forward2 = new PlainStreetEdge(e2v1, midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
-        PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, e2v1, backGeometryPair.getSecond(),
+        PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, e2v2, backGeometryPair.getSecond(),
                 name, lengthIn, e2.getPermission(), true);
 
         forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn));
