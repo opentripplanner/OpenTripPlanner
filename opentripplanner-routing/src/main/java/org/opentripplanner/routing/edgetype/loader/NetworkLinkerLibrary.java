@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
+import static org.opentripplanner.common.IterableLibrary.*;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
@@ -33,6 +36,8 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -306,35 +311,55 @@ public class NetworkLinkerLibrary {
 
         /*
          * presently, start has a bunch of edges going the wrong way. We want to actually find a set
-         * of vertices in the same spot...
+         * of vertices in the same spot.
+         * newStart is at the same location as the start vertex, and thus the same location as
+         * the destination of endVertex's outgoing edges.
          */
-
         Vertex newStart = new GenericVertex("replace " + startVertex.getLabel(),
                 startVertex.getX(), startVertex.getY());
         newStart = graph.addVertex(newStart);
-        graph.addEdge(new FreeEdge(startVertex, newStart));
 
-        List<Vertex> startVertices = index.getIntersectionAt(startVertex.getCoordinate());
-        for (Vertex v : startVertices) {
-            graph.addEdge(new FreeEdge(newStart, v));
+        for (DirectEdge e: filter(graph.getOutgoing(endVertex), DirectEdge.class)) {
+            final Vertex toVertex = e.getToVertex();
+            if (!toVertex.getCoordinate().equals(startVertex.getCoordinate())) {
+                continue;
+            }
+            if (e instanceof TurnEdge) {
+                final TurnEdge turnEdge = (TurnEdge) e;
+                TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex);
+                newTurn.setRestricted(turnEdge.isRestricted());
+                newTurn.setTurnCost(turnEdge.turnCost);
+            } else {
+                graph.addEdge(new FreeEdge(newStart, toVertex));
+            }
         }
 
         /* and likewise end */
         Vertex newEnd = new GenericVertex("replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
         newEnd = graph.addVertex(newEnd);
-        graph.addEdge(new FreeEdge(endVertex, newEnd));
+        //graph.addEdge(new FreeEdge(endVertex, newEnd));
 
-        List<Vertex> endVertices = index.getIntersectionAt(endVertex.getCoordinate());
-        for (Vertex v : endVertices) {
-            graph.addEdge(new FreeEdge(newEnd, v));
+        for (DirectEdge e: filter(graph.getOutgoing(startVertex), DirectEdge.class)) {
+            final Vertex toVertex = e.getToVertex();
+            if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
+                continue;
+            }
+            if (e instanceof TurnEdge) {
+                final TurnEdge turnEdge = (TurnEdge) e;
+                TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex);
+                newTurn.setRestricted(turnEdge.isRestricted());
+                newTurn.setTurnCost(turnEdge.turnCost);
+            } else {
+                graph.addEdge(new FreeEdge(newEnd, toVertex));
+            }
         }
 
         /* create the replacement edges */
-        PlainStreetEdge forward = new PlainStreetEdge(newStart, newEnd, startVertex.getGeometry(),
+        PlainStreetEdge forward = new PlainStreetEdge(startVertex, newEnd, startVertex.getGeometry(),
                 startVertex.getName(), startVertex.getLength(), startVertex.getPermission(), false);
 
-        PlainStreetEdge backward = new PlainStreetEdge(newEnd, newStart, endVertex.getGeometry(),
+        PlainStreetEdge backward = new PlainStreetEdge(endVertex, newStart, endVertex.getGeometry(),
                 endVertex.getName(), endVertex.getLength(), endVertex.getPermission(), true);
 
         forward.setWheelchairAccessible(startVertex.isWheelchairAccessible());

@@ -159,6 +159,9 @@ public class StreetLocation extends GenericVertex {
         StreetEdge e;
         if (tov instanceof StreetVertex) {
             e = new TurnEdge(location, (StreetVertex) tov);
+            if (edge instanceof TurnEdge) {
+                ((TurnEdge)e).setRestricted(((TurnEdge) edge).isRestricted());
+            }
         } else {
             e = new OutEdge(location, tov);
         }

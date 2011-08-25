@@ -272,4 +272,8 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 	public boolean isNoThruTraffic() {
 		return fromv.isNoThruTraffic();
 	}
+
+    public boolean isRestricted() {
+        return restricted;
+    }
 }
