@@ -228,8 +228,11 @@ public class NetworkLinkerLibrary {
         PlainStreetEdge e1 = bestPair.getFirst();
         PlainStreetEdge e2 = bestPair.getSecond();
         String name = e1.getName();
-        Vertex v1 = e1.getFromVertex();
-        Vertex v2 = e1.getToVertex();
+        Vertex e1v1 = e1.getFromVertex();
+        Vertex e1v2 = e1.getToVertex();
+
+        Vertex e2v1 = e2.getFromVertex();
+        Vertex e2v2 = e2.getToVertex();
 
         LineString forwardGeometry = e1.getGeometry();
         LineString backGeometry = e2.getGeometry();
@@ -245,9 +248,9 @@ public class NetworkLinkerLibrary {
         double totalGeomLength = forwardGeometry.getLength();
         double lengthRatioIn = toMidpoint.getLength() / totalGeomLength;
         if (lengthRatioIn < 0.00001) {
-            return v1;
+            return e1v1;
         } else if (lengthRatioIn > 0.99999) {
-            return v2;
+            return e1v2;
         }
 
         double lengthIn = e1.getLength() * lengthRatioIn;
@@ -256,14 +259,14 @@ public class NetworkLinkerLibrary {
         GenericVertex midpoint = new GenericVertex("split at " + label, midCoord, name);
 
         // We are replacing two edges with four edges
-        PlainStreetEdge forward1 = new PlainStreetEdge(v1, midpoint, toMidpoint, name, lengthIn,
+        PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
-        PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, v2,
+        PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
 
-        PlainStreetEdge forward2 = new PlainStreetEdge(v2, midpoint, backGeometryPair.getFirst(),
+        PlainStreetEdge forward2 = new PlainStreetEdge(e2v2, midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
-        PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, v1, backGeometryPair.getSecond(),
+        PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, e2v1, backGeometryPair.getSecond(),
                 name, lengthIn, e2.getPermission(), true);
 
         forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn));
@@ -329,6 +332,7 @@ public class NetworkLinkerLibrary {
                 TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex);
                 newTurn.setRestricted(turnEdge.isRestricted());
                 newTurn.setTurnCost(turnEdge.turnCost);
+                graph.addEdge(newTurn);
             } else {
                 graph.addEdge(new FreeEdge(newStart, toVertex));
             }
@@ -338,7 +342,6 @@ public class NetworkLinkerLibrary {
         Vertex newEnd = new GenericVertex("replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
         newEnd = graph.addVertex(newEnd);
-        //graph.addEdge(new FreeEdge(endVertex, newEnd));
 
         for (DirectEdge e: filter(graph.getOutgoing(startVertex), DirectEdge.class)) {
             final Vertex toVertex = e.getToVertex();
@@ -350,6 +353,7 @@ public class NetworkLinkerLibrary {
                 TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex);
                 newTurn.setRestricted(turnEdge.isRestricted());
                 newTurn.setTurnCost(turnEdge.turnCost);
+                graph.addEdge(newTurn);
             } else {
                 graph.addEdge(new FreeEdge(newEnd, toVertex));
             }
@@ -363,7 +367,7 @@ public class NetworkLinkerLibrary {
                 endVertex.getName(), endVertex.getLength(), endVertex.getPermission(), true);
 
         forward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
-        backward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
+        backward.setWheelchairAccessible(endVertex.isWheelchairAccessible());
 
         forward.setElevationProfile(startVertex.getElevationProfile());
         backward.setElevationProfile(endVertex.getElevationProfile());
