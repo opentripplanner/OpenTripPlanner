@@ -261,17 +261,27 @@ public class NetworkLinkerLibrary {
         // We are replacing two edges with four edges
         PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
-        PlainStreetEdge backward1 = new PlainStreetEdge(midpoint, e1v2,
+        PlainStreetEdge forward2 = new PlainStreetEdge(midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
 
-        PlainStreetEdge forward2 = new PlainStreetEdge(e2v1, midpoint, backGeometryPair.getFirst(),
+        PlainStreetEdge backward1 = new PlainStreetEdge(e2v1, midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
         PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, e2v2, backGeometryPair.getSecond(),
                 name, lengthIn, e2.getPermission(), true);
 
+        double forwardBseLengthIn = e1.getBicycleSafetyEffectiveLength() * lengthRatioIn;
+        double forwardBseLengthOut = e1.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
+        forward1.setBicycleSafetyEffectiveLength(forwardBseLengthIn);
+        forward2.setBicycleSafetyEffectiveLength(forwardBseLengthOut);
+
+        double backwardBseLengthIn = e2.getBicycleSafetyEffectiveLength() * lengthRatioIn;
+        double backwardBseLengthOut = e2.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
+        backward1.setBicycleSafetyEffectiveLength(backwardBseLengthIn);
+        backward2.setBicycleSafetyEffectiveLength(backwardBseLengthOut);
+
         forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn));
-        forward2.setElevationProfile(e2.getElevationProfile(0, lengthOut));
-        backward1.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength));
+        backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut));
+        forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength));
         backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength));
 
         ListIterator<P2<PlainStreetEdge>> it = replacement.listIterator();
@@ -279,7 +289,7 @@ public class NetworkLinkerLibrary {
             P2<PlainStreetEdge> pair = it.next();
             if (pair == bestPair) {
                 it.set(new P2<PlainStreetEdge>(forward1, backward2));
-                it.add(new P2<PlainStreetEdge>(backward1, forward2));
+                it.add(new P2<PlainStreetEdge>(forward2, backward1));
                 break;
             }
         }
@@ -371,6 +381,9 @@ public class NetworkLinkerLibrary {
 
         forward.setElevationProfile(startVertex.getElevationProfile());
         backward.setElevationProfile(endVertex.getElevationProfile());
+
+        forward.setBicycleSafetyEffectiveLength(startVertex.getBicycleSafetyEffectiveLength());
+        backward.setBicycleSafetyEffectiveLength(endVertex.getBicycleSafetyEffectiveLength());
 
         P2<PlainStreetEdge> replacement = new P2<PlainStreetEdge>(forward, backward);
         return replacement;
