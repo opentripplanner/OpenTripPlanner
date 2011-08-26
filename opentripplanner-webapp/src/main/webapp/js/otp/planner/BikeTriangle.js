@@ -15,22 +15,24 @@
 otp.namespace("otp.planner");
 
 otp.planner.BikeTriangle = {
-    
-    container:	   null,   
-    panel:	      null,
-    cursor_size: 	20,
-    
+
+    container:    null,
+    panel:        null,
+    cursor_size:  20,
+
     triangleTimeFactor:    null,
     triangleSlopeFactor:   null,
     triangleSafetyFactor:  null,
 
-    timeFactor:    null,
-    slopeFactor:   null,
-    safetyFactor:  null,
-    
+    // default is 100% safety 
+    timeFactor:    0.0,
+    slopeFactor:   0.0,
+    safetyFactor:  1.0,
+
+
     initialize : function(config) {
         otp.configure(this, config);
-        
+
         this.panel = new Ext.Panel({  
             id:             'trip-bike-triangle',
             title:          'Custom Bike Options',
@@ -42,25 +44,22 @@ otp.planner.BikeTriangle = {
         
         var thisBT = this;
         this.panel.on({
-        	  render: function(obj) {
-        	      thisBT.render(thisBT.container.getWidth(), 120);
-        	  }
+              render: function(obj) {
+                  thisBT.render(thisBT.container.getWidth(), 120);
+              }
         });
-                                
     },
     
     render : function(width, height) {
-	     
-	     
         var tri_side = 2 * (height - this.cursor_size) * 1/Math.sqrt(3);
         var margin = this.cursor_size/2;	
 
         var canvas = Raphael(this.panel.body.id, width, height);
-        
+
         var bg = canvas.rect(0,0,width,height).attr({
-		      stroke: 'none',
-		      fill: '#eee'
-		  });
+              stroke: 'none',
+              fill: '#eee'
+          });
 
         var triangle = canvas.path(["M",margin+tri_side/2,margin,"L",margin+tri_side,height-margin,"L",margin,height-margin,"z"]);
 
@@ -153,6 +152,11 @@ otp.planner.BikeTriangle = {
             topoLabel.animate({opacity: 0}, animTime);
             safetyLabel.animate({opacity: 0}, animTime);
 
+            // was seeing really odd small numbers in scientific notation when topo neared zero so added this
+            if(topo < 0.005) {
+                topo = 0.0;
+            }
+            
             thisBT.timeFactor = time;
             thisBT.slopeFactor = topo;
             thisBT.safetyFactor = safety;
@@ -162,23 +166,23 @@ otp.planner.BikeTriangle = {
     },
 
     enable : function() {
-    	  if(this.container.findById('trip-bike-triangle') == null) {
-    	  	   this.container.add(this.panel);
-    	  }
-    	  this.panel.show();
-        this.container.doLayout();
+          if(this.container.findById('trip-bike-triangle') == null) {
+               this.container.add(this.panel);
+          }
+          this.panel.show();
+          this.container.doLayout();
     },
-    	
+
     disable : function() {
         if(!this.panel.hidden) {
-        	   this.panel.hide();
-        }    
+            this.panel.hide();
+        }
     },
-    
+
     distance : function(x1, y1, x2, y2) {
 	     return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
     },
-		
+
     distToSegment : function(px, py, x1, y1, x2, y2) {
         var r, dx ,dy;
         dx = x2 - x1;
@@ -186,10 +190,9 @@ otp.planner.BikeTriangle = {
         r = ((px - x1) * dx + (py - y1) * dy) / (dx * dx + dy * dy);
         return this.distance(px, py, (1 - r) * x1 + r * x2, (1 - r) * y1 + r * y2);
     },
-	
+
     CLASS_NAME: "otp.planner.BikeTriangle"
 
 };
 
 otp.planner.BikeTriangle = new otp.Class(otp.planner.BikeTriangle);
-    
