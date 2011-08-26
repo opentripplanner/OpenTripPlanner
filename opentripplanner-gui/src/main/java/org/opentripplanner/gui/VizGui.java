@@ -64,6 +64,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -805,8 +806,11 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	TraverseOptions options = new TraverseOptions(modeSet);
     	options.speed = 1; // override difference between bike and walk
     	options.walkReluctance = 1; // walk etc are same cost
+    	VisualTraverseVisitor visitor = new VisualTraverseVisitor(showGraph);
+    	options.aStarSearchFactory = visitor.getAStarSearchFactory();
     	options.maxSlope = 1; // even climb walls
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
+    	options.optimizeFor = OptimizeType.SAFE;
 
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);

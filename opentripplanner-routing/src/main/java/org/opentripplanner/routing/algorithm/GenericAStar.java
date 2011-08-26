@@ -53,6 +53,8 @@ public class GenericAStar {
 
     private SearchTerminationStrategy _searchTerminationStrategy;
 
+    private TraverseVisitor traverseVisitor;
+
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
     }
@@ -156,6 +158,11 @@ public class GenericAStar {
             // and mark vertex as visited
             if (!spt.visit(u))
                 continue;
+
+            if (traverseVisitor != null) {
+                traverseVisitor.visitVertex(u);
+            }
+
             Vertex u_vertex = u.getVertex();
             // Uncomment the following statement
             // to print out a CSV (actually semicolon-separated)
@@ -189,6 +196,9 @@ public class GenericAStar {
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     // Could be: for (State v : traverseEdge...)
 
+                    if (traverseVisitor != null) {
+                        traverseVisitor.visitEdge(edge, v);
+                    }
                     // TEST: uncomment to verify that all optimisticTraverse functions are actually
                     // admissible
                     // State lbs = edge.optimisticTraverse(u);
@@ -276,5 +286,9 @@ public class GenericAStar {
         }
 
         return spt;
+    }
+
+    public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
+        this.traverseVisitor = traverseVisitor;
     }
 }
