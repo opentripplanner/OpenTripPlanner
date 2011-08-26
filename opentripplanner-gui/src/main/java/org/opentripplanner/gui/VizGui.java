@@ -76,6 +76,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
+import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -849,6 +850,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         pathservice = new ContractionPathServiceImpl();
         pathservice.setGraphService(graphService);
+        pathservice.setRemainingWeightHeuristicFactory(
+                new DefaultRemainingWeightHeuristicFactoryImpl());
         indexService = new StreetVertexIndexServiceImpl();
         indexService.setGraphService(graphService);
         indexService.setup();
