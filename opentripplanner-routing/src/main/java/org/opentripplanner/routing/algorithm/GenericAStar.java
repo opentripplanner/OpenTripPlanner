@@ -28,7 +28,6 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
@@ -184,9 +183,6 @@ public class GenericAStar {
             nVisited += 1;
 
             for (Edge edge : edges) {
-
-                if (edge instanceof PatternBoard && u.getNumBoardings() > options.maxTransfers)
-                    continue;
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over.
