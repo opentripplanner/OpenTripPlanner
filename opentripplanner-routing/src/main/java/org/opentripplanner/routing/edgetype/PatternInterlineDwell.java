@@ -24,6 +24,7 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +42,12 @@ class InterlineDwellData implements Serializable {
 
     public int patternIndex;
 
-    public InterlineDwellData(int dwellTime, int patternIndex) {
+    public AgencyAndId trip;
+    
+    public InterlineDwellData(int dwellTime, int patternIndex, AgencyAndId trip) {
         this.dwellTime = dwellTime;
         this.patternIndex = patternIndex;
+        this.trip = trip;
     }
 }
 
@@ -73,9 +77,9 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
 	    dwellTime = 0;
             _log.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
         }
-        tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex));
+        tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
-                oldPatternIndex));
+                oldPatternIndex, trip));
         if (dwellTime < bestDwellTime) {
             bestDwellTime = dwellTime;
         }
@@ -104,9 +108,11 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     }
     
     public State traverse(State state0) {
+        TraverseOptions options = state0.getOptions();
+
         AgencyAndId tripId = state0.getTripId();
         InterlineDwellData dwellData;
-        if (state0.getOptions().isArriveBy()) {
+        if (options.isArriveBy()) {
         	// traversing backward
         	dwellData = reverseTripIdToInterlineDwellData.get(tripId);
         } else {
@@ -116,6 +122,10 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         if (dwellData == null) {
             return null;
         }
+        if (options.bannedTrips.contains(dwellData.trip)) {
+            return null;
+        }
+
         StateEditor s1 = state0.edit(this);
         s1.incrementTimeInSeconds(dwellData.dwellTime);
         s1.setTripId(targetTrip.getId());
