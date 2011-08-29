@@ -100,7 +100,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestWait = -1;
             int bestPatternIndex = -1;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            for (ServiceDay sd : options.serviceDays) {
+            SD: for (ServiceDay sd : options.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
@@ -109,20 +109,15 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                     int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
                                                                 options.getModes().getBicycle(), true);
                     if (patternIndex >= 0) {
-                        boolean nextDay = false;
                         Trip trip = pattern.getTrip(patternIndex);
                         while (options.bannedTrips.contains(trip.getId())) {
                             /* trip banned, try next trip */
                             patternIndex += 1;
                             if (patternIndex >= pattern.getTrips().size()) {
                                 /* ran out of trips today */
-                                nextDay = true;
-                                break;
+                                continue SD;
                             }
                             trip = pattern.getTrip(patternIndex);
-                        }
-                        if (nextDay) {
-                            continue;
                         }
 
                         // a trip was found, index is valid, wait will be non-negative
