@@ -278,7 +278,6 @@ public class PlanGenerator {
                         if (leg.to == null) {
                             /* this stuff is filled in in the alight case, but not in the walk case */
                             leg.to = makePlace(edgeNarrative.getFromVertex());
-                            leg.endTime = new Date(currState.getBackState().getTimeInMillis());
                         }
                         Geometry geometry = geometryFactory.createLineString(coordinates);
                         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
@@ -350,7 +349,9 @@ public class PlanGenerator {
                             .getElevationProfile();
                     previousElevation = applyElevation(profile, itinerary, previousElevation);
                 }
+                leg.endTime = new Date(currState.getTimeInMillis());
             } else if (mode.isTransit()) {
+                leg.endTime = new Date(currState.getTimeInMillis());
                 /* we are on a transit trip */
                 itinerary.transitTime += edgeElapsedTime;
                 if (showIntermediateStops) {
