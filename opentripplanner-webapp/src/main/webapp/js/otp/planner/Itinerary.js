@@ -443,6 +443,15 @@ otp.planner.Itinerary = {
         this.createAndAddMarker(toP.x, toP.y, {
             type : 'toMarker'
         });
+        
+        //create special marker for bike elevation
+        var bikeTopoMarker = otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, { // temp
+            type : 'fromBicycleMarker',
+            mode : 'BICYCLE'
+        });
+        bikeTopoMarker.id = 'bike-topo-marker';
+        bikeTopoMarker.style = { display : 'none' };
+        this.m_markers.push(bikeTopoMarker);
     },
 
     assignDirectionToMarkers : function(markers) 

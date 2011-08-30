@@ -287,23 +287,26 @@ otp.planner.TripTab = {
         
         /* draw topographic map */
         
-        if (otp.planner.Utils.supportsCanvas()) {
-            if (this.request.mode == "WALK" || this.request.mode.contains("BICYCLE")) {
-                var firstStep = this.m_activeItinerary.m_legStore.getAt(0).data.steps[0];
-                // Only show topo map if there's elevation data.
-                if (typeof firstStep.elevation == 'string' && firstStep.elevation != "") {
-                    this.ui.innerSouth.getEl().setHeight(180);
-                    this.ui.innerSouth.show();
-                    this.ui.viewport.doLayout();
-                    this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
-                }
-            } else {
-                if (this.ui.innerSouth.isVisible()) {
-                    this.ui.innerSouth.hide();
-                    this.ui.viewport.doLayout();
-                }
+        var hasBikeLeg = false;
+        for(var i=0; i<this.m_activeItinerary.m_legStore.getTotalCount(); i++) {
+            if(this.m_activeItinerary.m_legStore.getAt(i).get("mode")=="BICYCLE") {
+                hasBikeLeg = true;
+                break;
             }
         }
+        
+        if(hasBikeLeg){
+            this.ui.innerSouth.getEl().setHeight(180);
+            this.ui.innerSouth.show();
+            this.ui.viewport.doLayout();
+            this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+        }
+        else if (this.ui.innerSouth.isVisible()) {
+            // not a bike trip but topo panel still visible from previous trip
+            this.ui.innerSouth.hide();
+            this.ui.viewport.doLayout();
+        }
+        
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
     },

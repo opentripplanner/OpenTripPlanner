@@ -94,7 +94,7 @@ otp.planner.Planner = {
 
         // step 3: create the render and form (and add the form to the tab panel
         this.m_renderer = new otp.planner.Renderer(this);
-        this.m_topoRenderer = new otp.planner.TopoRenderer({panel:this.ui.innerSouth});
+        this.m_topoRenderer = new otp.planner.TopoRenderer({map: this.map, panel:this.ui.innerSouth});
         this.m_forms    = new otp.planner.Forms(this);
         this.addFormPanel(this.m_forms.getPanel());
 
@@ -275,6 +275,7 @@ otp.planner.Planner = {
         {
             this.m_activeTabID = 0;
             console.log("exception Planner.newTripPlan: exception " + e);
+            console.log(e.stack);
         }
         
         return true;
