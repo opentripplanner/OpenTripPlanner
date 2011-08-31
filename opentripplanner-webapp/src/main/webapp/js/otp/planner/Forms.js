@@ -62,7 +62,8 @@ otp.planner.StaticForms = {
     m_modeStore      : null,
     m_modeForm       : null,
     m_wheelchairForm : null,
-    
+    m_optionsManager : null,
+
     m_bikeTriangle          : null,
     m_bikeTriangleContainer : null,
 
@@ -511,7 +512,7 @@ otp.planner.StaticForms = {
             this.setRawInput(params.fromPlace, forms.m_fromPlace);
             this.setRawInput(params.toPlace,   forms.m_toForm);
             this.setRawInput(params.toPlace,   forms.m_toPlace);
-            
+
             if (params.fromPlace && params.fromPlace.length > 2 && params.fromPlace.indexOf(",") > 0) {
                 var lat = this.getLat(params.fromPlace);
                 var lon = this.getLon(params.fromPlace);
@@ -577,14 +578,31 @@ otp.planner.StaticForms = {
                 forms.m_time.setRawValue(time);
                 time = true;
             }
-            if(params.opt)
-                forms.m_optimizeForm.setValue(params.opt);
+
+            if(params.mode)
+            {
+                forms.m_modeForm.setValue(params.mode);
+                if(this.m_optionsManager)
+                {
+                    this.m_optionsManager.doMode(params.mode);
+                }
+            }
+
+            // optimize / minimize option : how to optimize the trip, safest, quickets, least tranfers, etc...
             if(params.min)
-                forms.m_optimizeForm.setValue(params.min);
+                params.opt = params.min;
+            if(params.opt)
+            {
+                forms.m_optimizeForm.setValue(params.opt);
+                if(this.m_optionsManager)
+                {
+                    this.m_optionsManager.doOpt(params.opt);
+                }
+            }
+
+
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
-            if(params.mode)
-                forms.m_modeForm.setValue(params.mode);
             if(params.wheelchair)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
@@ -1305,26 +1323,26 @@ otp.planner.StaticForms = {
         });
         
         this.m_bikeTriangle = new otp.planner.BikeTriangle({
-            container:      this.m_bikeTriangleContainer,             
+            container:      this.m_bikeTriangleContainer,
         }); 
         
         if (this.useOptionDependencies) {
-            this.m_optionsChangeManager = new otp.planner.FormsOptionsManager({
+            this.m_optionsManager = new otp.planner.FormsOptionsManager({
                 mode:        this.m_modeForm,
                 optimize:    this.m_optimizeForm,
                 maxWalk:     this.m_maxWalkDistanceForm,
                 wheelchair:  this.m_wheelchairForm,
                 locale:      this.locale,
-                bikeTriangle:    this.m_bikeTriangle                
-            });            
+                bikeTriangle:    this.m_bikeTriangle
+            });
+
+            //var optimizeFilter = this.m_optionsManager.getOptimizeFilter(this.m_modeStore.getAt(0));
+            //this.m_optimizeForm.getStore().filterBy(optimizeFilter);
         }
-        
-        var optimizeFilter = this.m_optionsChangeManager.getOptimizeFilter(this.m_modeStore.getAt(0));
-        this.m_optimizeForm.getStore().filterBy(optimizeFilter);
 
         return [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm, this.m_wheelchairForm];
     },
-    	
+
     CLASS_NAME: "otp.planner.Forms"
 };
 
