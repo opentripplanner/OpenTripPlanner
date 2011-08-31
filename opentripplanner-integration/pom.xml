@@ -54,29 +54,31 @@
 
     <build>
         <plugins>
-            <!-- We use the Ant copy task to copy in a couple of default resources if they are not already present -->
-            <!-- Note that we used this instead of resources:copy-resources because it wasn't supported in m2eclipse -->
+            <!-- Copy in a couple of default resources if they are not already present -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.2</version>
+                <artifactId>maven-resources-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copy-resources</id>
                         <phase>process-resources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <tasks>
-                                <copy todir="${basedir}/src/main/resources">
-                                    <fileset dir="${basedir}/src/defaults/resources" />
-                                </copy>
-                            </tasks>
+                            <outputDirectory>${basedir}/src/main/resources</outputDirectory>
+                            <overwrite>false</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/defaults/resources </directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
             <!--  Build a graph -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
