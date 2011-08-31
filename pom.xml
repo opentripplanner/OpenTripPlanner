@@ -53,6 +53,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
+          <!-- m2eclipse lifecycle mapping configuration -->
+          <!-- should not affect builds outside IDE -->
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
           <version>1.0.0</version>
