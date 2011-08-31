@@ -16,26 +16,26 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-api-webapp</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-webapp</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
         </dependency>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-api-extended</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
         </dependency>
         <dependency>

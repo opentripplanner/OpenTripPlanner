@@ -25,14 +25,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-routing</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

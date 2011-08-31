@@ -56,9 +56,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-utils</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>

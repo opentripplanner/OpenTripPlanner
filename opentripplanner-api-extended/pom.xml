@@ -24,9 +24,16 @@
             <version>0.2-SNAPSHOT</version>
         </dependency-->
         <dependency>
-            <groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>0.4.2-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>${project.groupId}</groupId>
+          <artifactId>opentripplanner-utils</artifactId>
+          <version>${project.version}</version>
+          <type>jar</type>
+          <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -117,14 +124,6 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
-      </dependency>
-
-      <dependency>
-      	<groupId>org.opentripplanner</groupId>
-      	<artifactId>opentripplanner-utils</artifactId>
-      	<version>0.4.2-SNAPSHOT</version>
-      	<type>jar</type>
-      	<scope>compile</scope>
       </dependency>
     </dependencies>
 
