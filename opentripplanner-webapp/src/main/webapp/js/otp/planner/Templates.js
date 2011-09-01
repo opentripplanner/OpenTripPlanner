@@ -17,11 +17,16 @@ otp.namespace("otp.planner");
 /**
   * Web Map / TripPlanner
   */
-otp.planner.ParamTemplate = 'fromPlace={[values.fromPlace.replace(/&/g,"@")]}'
+otp.planner.ParamTemplate = 'submit'
+        + '&fromPlace={[values.fromPlace.replace(/&/g,"@")]}'
         + '&toPlace={[values.toPlace.replace(/&/g,"@")]}'
-        + '&arr={arriveBy}&min={opt}&maxWalkDistance={maxWalkDistance}&mode={mode}&itinID={itinID}&submit'
+        + '&mode={mode}'
+        + '&min={opt}'
+        + '<tpl if="opt == \'TRIANGLE\'">&triangleTimeFactor={triangleTimeFactor}&triangleSlopeFactor={triangleSlopeFactor}&triangleSafetyFactor={triangleSafetyFactor}</tpl>'
+        + '&maxWalkDistance={maxWalkDistance}'
+        + '&time={time}'
         + '&date={date}'
-        + '&time={time}';
+        + '&arr={arriveBy}&itinID={itinID}';
 
 otp.planner.Templates = {
 
@@ -66,8 +71,16 @@ otp.planner.Templates = {
         if(this.tripFeedbackDetails == null)
             // Trip Planner state messaging (eg: feedback emails, etc...).
             this.tripFeedbackDetails = new Ext.XTemplate( 
-                this.locale.labels.trip_details + ': {fromPlace} ' + this.locale.directions.to + ' {toPlace} {arr} {time} ' + this.locale.directions.on + ' {date}, {opt} ' + this.locale.labels.with_a_walk + ' {walk} ' + this.locale.directions.via + ' {mode}.'
+                this.locale.labels.trip_details 
+                + ': {fromPlace} ' + this.locale.directions.to + ' {toPlace}'
+                + ' {arriveBy} {time} ' + this.locale.directions.on + ' {date}, '
+                + this.locale.directions.via + ' {mode}.'
+                + ' {opt}'
+                + '<tpl if="opt == \'TRIANGLE\'"> (tf={triangleTimeFactor}, sf={triangleSlopeFactor}, hf={triangleSafetyFactor})</tpl>'
+                + ','
+                + this.locale.labels.with_a_walk + ' {maxWalkDistance}m <br/>' 
             ).compile();
+
 
         if(this.tripPrintTemplate == null)
             this.tripPrintTemplate = new Ext.XTemplate( 

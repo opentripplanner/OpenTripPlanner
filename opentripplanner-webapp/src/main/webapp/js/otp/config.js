@@ -21,7 +21,7 @@ otp.config_defaults = {
     planner : {
         url            : null,
         linkTemplates  : [
-           {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
+            {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_transit, url: otp.config.locale.tripPlanner.link.google_domain + '/maps?<tpl if="arriveBy == \'Arrive\'">ttype=arr&</tpl>date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
 //            {name:'TriMet (Map Planner)',  url:'http://maps.trimet.org?<tpl if="opt == \'TRANSFERS\'">min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">walk=0.9999&</tpl>arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
@@ -34,7 +34,7 @@ otp.config_defaults = {
 
         // showWheelchairForm   : false,  // turn on/off the wheelchair check box (on by default)
 
-        // useOptionDependencies=true will change the trip form around based on certain form options (e.g., bike mode == no wheelchair or walk options, etc...) 
+        // when useOptionDependencies is true, the trip form changes context based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
         useOptionDependencies: true,
 
         geocoder  :

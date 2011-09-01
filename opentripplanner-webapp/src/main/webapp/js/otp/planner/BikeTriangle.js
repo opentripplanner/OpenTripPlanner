@@ -132,13 +132,13 @@ otp.planner.BikeTriangle = {
             time = ((height-2*margin)-(ny-margin))/(height-2*margin);
             topo = thisBT.distToSegment(nx, ny, margin+tri_side/2, margin, margin+tri_side, height-margin)/(height-2*margin);
             safety = 1- time - topo;
-    
+
             timeBar.attr({width: barWidth*time});
             topoBar.attr({width: barWidth*topo});
             safetyBar.attr({width: barWidth*safety});
             timeLabel.attr("text", "Time: "+Math.round(time*100)+"%");
             topoLabel.attr("text", "Hills: "+Math.round(topo*100)+"%");
-            safetyLabel.attr("text", "Safety: "+Math.round(safety*100)+"%");    	
+            safetyLabel.attr("text", "Safety: "+Math.round(safety*100)+"%");
     
             this.attr({cx: nx, cy: ny});
         },

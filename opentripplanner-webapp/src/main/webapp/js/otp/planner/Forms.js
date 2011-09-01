@@ -686,10 +686,9 @@ otp.planner.StaticForms = {
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         if(retVal.opt == "TRIANGLE") {
-            retVal.triangleTimeFactor   = this.m_bikeTriangle.timeFactor;
-            retVal.triangleSlopeFactor  = this.m_bikeTriangle.slopeFactor;
-            retVal.triangleSafetyFactor = this.m_bikeTriangle.safetyFactor;
-        }        
+            var triopts = this.m_bikeTriangle.getFormData();
+            otp.extend(retVal, triopts);
+        }
         var d = this.m_maxWalkDistanceForm.getValue();
         retVal.maxWalkDistance = d * 1.0;
         retVal.mode            = this.m_modeForm.getValue();

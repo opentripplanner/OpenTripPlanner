@@ -114,7 +114,7 @@ otp.planner.Utils = {
                   }},
                   {name: 'routeName',        mapping: '@route'},
                   {name: 'routeNumber',      mapping: 'route/number'},
-                  {name: 'url',         mapping: 'lineURL/@param'},
+                  {name: 'url',              mapping: 'lineURL/@param'},
                   {name: 'fromName',         mapping: 'from/name'},
                   {name: 'fromDescription',  mapping: 'from/description'},
                   {name: 'fromStopId',       mapping: 'from/stopId'},
