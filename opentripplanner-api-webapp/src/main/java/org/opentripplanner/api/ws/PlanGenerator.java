@@ -625,7 +625,6 @@ public class PlanGenerator {
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle, edgeResult.isRoundabout());
-                step.becomes = !pathService.multipleOptionsBefore(edge);
                 // new step, set distance to length of first edge
                 distance = edgeResult.getDistance();
             } else {
@@ -633,7 +632,7 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
                         edgeResult.isRoundabout());
-                boolean optionsBefore = pathService.multipleOptionsBefore(edge);
+                boolean optionsBefore = pathService.multipleOptionsBefore(edge, currState.getBackState());
                 if (edgeResult.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {

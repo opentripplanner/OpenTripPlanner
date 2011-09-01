@@ -24,9 +24,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -37,6 +34,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -327,7 +325,7 @@ public class ContractionPathServiceImpl implements PathService {
         return true;
     }
 
-    public boolean multipleOptionsBefore(Edge edge) {
+    public boolean multipleOptionsBefore(Edge edge, State state) {
         Graph graph = _graphService.getGraph();
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();
@@ -339,7 +337,10 @@ public class ContractionPathServiceImpl implements PathService {
             if (out == edge) {
                 continue;
             }
-            if (!(out instanceof TurnEdge || out instanceof OutEdge)) {
+            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+                continue;
+            }
+            if (state != null && out.traverse(state) == null) {
                 continue;
             }
             // there were paths we didn't take.

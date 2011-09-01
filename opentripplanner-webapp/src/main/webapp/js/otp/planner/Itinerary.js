@@ -650,10 +650,6 @@ otp.planner.Itinerary = {
                             {
                                 stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
                             }
-                            else if (step.becomes == true)
-                            {
-                                stepText += directionText + ' <strong>' + steps[j-1].streetName + '</strong> ' +  this.locale.directions['becomes'] + ' <strong>' + step.streetName + '</strong>';
-                            }
                             else
                             {
                                 stepText += directionText; 

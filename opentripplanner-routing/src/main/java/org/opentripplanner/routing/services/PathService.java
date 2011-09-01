@@ -58,5 +58,5 @@ public interface PathService {
 
     public boolean isAccessible(String place, TraverseOptions options);
 
-    public boolean multipleOptionsBefore(Edge edge);
+    public boolean multipleOptionsBefore(Edge edge, State state);
 }
