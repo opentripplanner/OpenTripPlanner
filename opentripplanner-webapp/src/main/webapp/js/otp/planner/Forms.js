@@ -7,12 +7,20 @@
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
 otp.namespace("otp.planner");
+
+/** TODO: this code needs refactoring
+ *   1. the geocode code is really awful ... very hard to follow, has from & to branches everywhere, no docs, all over the place, etc...
+ *   2. geocode -- hate the use of delagates here (maybe because I don't understand them, but they seem convoluted ... and it seems they're an Ext-ism, which is not supported in 4.0)
+ *   3  geocode (and a lot of other stuff) feels like it could use a bit of OOP ... reduce the number of from/to branches, etc...
+ *   4. documentation is lacking in many parts 
+ *   5. this class is reaching 1500 lines (and a bit of redundancy / cut-paste)
+ */
 
 /**
   * otp/planner/Forms.js 
@@ -78,7 +86,7 @@ otp.planner.StaticForms = {
 
     // to enable masking of the from/to fields
     m_fromToFP       : null,
-    
+
     // hold state for whether geocoding is currently active
     m_fromGeocoding  : false,
     m_toGeocoding    : false,
@@ -102,7 +110,7 @@ otp.planner.StaticForms = {
             },
             ['date', 'time', 'from', 'to', 'locations', 'fromList', 'toList']
         );
-        
+
         this.makeMainPanel();
 
         // step 3: set the singleton & status stuff to this 
@@ -117,8 +125,30 @@ otp.planner.StaticForms = {
         return this.m_panel;
     },
 
+    /** 
+     * called when someone hit's enter on the form
+     * we need to check the from & to form (if the geocode is active) for a dirty state
+     */
+    enter : function()
+    {
+        // when GEOCODER is active on the forms, we must make sure to geocode prior submitting with the enter key
+        if (this.geocoder.enabled) {
+            if(this.m_fromForm.isDirty())
+                this.fromChanged(this, this.m_fromForm.getRawValue());
+            if(this.m_toForm.isDirty())
+                this.toChanged(this, this.m_toForm.getRawValue());
+        }
+
+        this.submit();
+    },
+
+
     /**
-     *
+     * called when submitting the form
+     * 
+     * TODO: this whole thing needs a major refactoring -- 
+     *  -- the geocoder code should be more object based vs. all these conditionals 
+     *  -- things in general need to be reduced and cleaned up... 1500+ lines is a big hint
      */
     submit : function()
     {
@@ -390,7 +420,6 @@ otp.planner.StaticForms = {
         try {this.m_geoErrorPopup.close();  } catch(e){}
     },
 
-    /** wrapper (with try / catch) for planner focus() */
     focus : function()
     {
         this.planner.focus();
@@ -398,7 +427,7 @@ otp.planner.StaticForms = {
 
 
     /** will look in text forms first, then hidden form variable, then coordinate for value */
-    /** TODO: from & to form values must be re-thought we only allow one value x,y -or- string value */ 
+    /** TODO: from & to form values must be re-thought we only allow one value x,y -or- string value */
     getFrom : function()
     {
         /*
@@ -429,7 +458,10 @@ otp.planner.StaticForms = {
             this.m_fromCoord = x + ',' + y;
 //            this.setRawInput(this.m_fromCoord, this.m_fromForm);
 //            this.setRawInput(this.m_fromCoord, this.m_fromPlace);
-            if(this.poi && !noPoi) this.poi.setFrom(y, x, fString, moveMap);
+            if(this.poi && !noPoi)
+                this.poi.setFrom(y, x, fString, moveMap);
+
+            this.m_fromForm.setLastValue();
         }
     },
 
@@ -462,7 +494,10 @@ otp.planner.StaticForms = {
             this.m_toCoord = x + ',' + y;
 //            this.setRawInput(this.m_toCoord, this.m_toForm);
 //            this.setRawInput(this.m_toCoord, this.m_toPlace);
-            if(this.poi && !noPoi) this.poi.setTo(y, x, tString, moveMap);
+            if(this.poi && !noPoi)
+                this.poi.setTo(y, x, tString, moveMap);
+            
+            this.m_toForm.setLastValue();
         }
     },
 
@@ -840,7 +875,7 @@ otp.planner.StaticForms = {
             id:          'form-tab',
             buttonAlign: 'center',
             border:      false,
-            keys:        {key: [10, 13], scope: this, handler: this.submit},
+            keys:        {key: [10, 13], scope: this, handler: this.enter},
             items:       [  fromToFP,
                             optFP,
                             this.m_routerIdForm,
@@ -984,7 +1019,7 @@ otp.planner.StaticForms = {
         }
         var loadMask = new Ext.LoadMask(this.m_fromToFP.getEl(), {msg: this.locale.tripPlanner.geocoder.working});
         loadMask.show();
-        
+
         if (comboBoxIdentifier === "from") {
             this.m_fromGeocoding = true;
         } else if (comboBoxIdentifier === "to") {
@@ -1013,7 +1048,7 @@ otp.planner.StaticForms = {
         });
         ;
     },
-    
+
     fromChanged : function(comboBox, value) {
         if (this.isCoordinate(value)) {
             var lat = this.getLat(value);
@@ -1051,6 +1086,7 @@ otp.planner.StaticForms = {
         return !isNaN(lat) && !isNaN(lon);
     },
 
+    /** TODO refactor and clean this up */
     handleGeocoderResponse: function(response, ajaxOptions, comboBoxIdentifier) {
         var xml = response.responseXML;
         var errorNode = Ext.DomQuery.selectNode("error", xml);
@@ -1096,6 +1132,7 @@ otp.planner.StaticForms = {
             var resultsSelector = new otp.planner.GeocoderResultsSelector({
                 locale: this.locale,
                 callback: function(lat, lng, description) {
+                  // TODO refactor all of this ... these from/to conditionals can go away with a lil OOP
                   if (comboBoxIdentifier === "from") {
                       self.setFrom(description, lat, lng, true, false);
                   } else if (comboBoxIdentifier === "to") {

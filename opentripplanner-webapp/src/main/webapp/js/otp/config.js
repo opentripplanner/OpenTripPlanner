@@ -40,7 +40,10 @@ otp.config_defaults = {
         geocoder  :
         {
             enabled : false,
-            url     : "/geocoder/geocode",
+            url     : "/geocoder/geocode",  
+            // debug-url : '/js/otp/planner/test/geo-zoo.xml',
+            // debug-url : '/js/otp/planner/test/geo-multi.xml', 
+            // debut-enabled : true,
             addressParamName : "address"
         },
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')

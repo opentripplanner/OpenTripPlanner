@@ -20,9 +20,6 @@ otp.namespace("otp.core");
  */
 otp.core.ComboBox = {
 
-    m_form       : null,
-    m_store      : null,
-    m_template   : null,
     maxNumValues : 10,
     id           : 'cb.id',
     name         : 'cb.name',
@@ -35,6 +32,12 @@ otp.core.ComboBox = {
     msgTarget    : 'qtip',
     emptyText    : '...',
     maxHeight    : 150,
+
+    m_form       : null,
+    m_store      : null,
+    m_template   : null,
+    m_lastValue  : null,
+
     /**
      * constructor of sorts
      */
@@ -90,6 +93,22 @@ otp.core.ComboBox = {
 
         this.m_form  = new Ext.form.ComboBox(formOptions);
     },
+
+    /** dirty means that the form is not empty, and it's different than it was before */
+    isDirty : function()
+    {
+        var retVal = false;
+        var v = this.m_form.getRawValue();
+
+        // to be considered dirty, there must first be some content in the form
+        if(v != null && v.length > 0)
+        {
+            // and the existing form content doesn't match what was in the form previously
+            retVal = (v != this.m_lastValue);
+        }
+        return retVal;
+    },
+
 
     /**
      * persist Ext ComboBox's text field content into a Cookie
@@ -150,12 +169,20 @@ otp.core.ComboBox = {
     setRawValue : function(val)
     {
         this.m_form.setRawValue(val);
+        this.setLastValue(val);
     },
-    
+
+    setLastValue : function(val)
+    {
+        if(val == null)
+            val = this.getRawValue();
+
+        this.m_lastValue = val;
+    },
+
     /** TODO allow the form to load it's store from another store, in combo with a template */
     load : function(store, template)
     {
-        
     },
 
     clear : function()

@@ -191,10 +191,11 @@ otp.planner.BikeTriangle = {
         return this.distance(px, py, (1 - r) * x1 + r * x2, (1 - r) * y1 + r * y2);
     },
 
-    setSHT : function(s, h, t) {
-        this.safetyFactor = otp.util.ObjUtils.toFloat(s, 1.0);
-        this.slopeFactor  = otp.util.ObjUtils.toFloat(h, 0.0);
-        this.timeFactor   = otp.util.ObjUtils.toFloat(t, 0.0);
+    /** */
+    setSHT : function(safe, hills, time) {
+        this.safetyFactor = otp.util.ObjUtils.toFloat(safe,  1.0);
+        this.slopeFactor  = otp.util.ObjUtils.toFloat(hills, 0.0);
+        this.timeFactor   = otp.util.ObjUtils.toFloat(time,  0.0);
     },
 
     /** NOTE: don't rename this stuff, as OTP api depends on these values */
