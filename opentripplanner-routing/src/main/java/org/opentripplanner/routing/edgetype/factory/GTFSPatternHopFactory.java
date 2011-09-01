@@ -392,7 +392,7 @@ public class GTFSPatternHopFactory {
                             addTripToInterliningMap(trip, stopTimes, tripPattern);
                         }
                         tripPattern.setTripFlags(insertionPoint,
-                                ((trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+                                ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
                                 | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
                                     || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
                     }
@@ -682,7 +682,7 @@ public class GTFSPatternHopFactory {
         }
 
         tripPattern.setTripFlags(0, 
-                                ((trip.getWheelchairAccessible() != 0) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+                                ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
                                 | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
                                     || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
 
@@ -742,7 +742,7 @@ public class GTFSPatternHopFactory {
 
         String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();
-        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() != 0;
+        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() == 1;
 
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
@@ -769,7 +769,7 @@ public class GTFSPatternHopFactory {
 
             if (st0.getPickupType() != 1) {
                 Board boarding = new Board(startStation, startJourneyDepart, hop,
-                        tripWheelchairAccessible && s0.getWheelchairBoarding() != 0,
+                        tripWheelchairAccessible && s0.getWheelchairBoarding() == 1,
                         st0.getStop().getZoneId(), trip);
                 graph.addEdge(boarding);
             }
