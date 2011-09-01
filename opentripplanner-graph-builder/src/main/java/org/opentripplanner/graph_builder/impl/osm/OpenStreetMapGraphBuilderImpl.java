@@ -547,7 +547,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 forceBikes = true;
             }
 
-            if (way.isTag("cycleway", "dismount")) {
+            if (way.isTag("cycleway", "dismount") || way.isTag("bicycle", "dismount")) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
                     _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way " + way.getId() + ", assuming dismount");
