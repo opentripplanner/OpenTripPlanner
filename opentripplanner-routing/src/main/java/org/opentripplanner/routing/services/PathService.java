@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Date;
 import java.util.List;
 
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -59,4 +60,6 @@ public interface PathService {
     public boolean isAccessible(String place, TraverseOptions options);
 
     public boolean multipleOptionsBefore(Edge edge, State state);
+
+	public List<DirectEdge> getOutgoingEdges(Vertex vertex);
 }

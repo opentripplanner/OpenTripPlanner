@@ -30,6 +30,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
@@ -44,6 +45,9 @@ import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.patch.Alert;
@@ -653,8 +657,51 @@ public class PlanGenerator {
                     distance += edgeResult.getDistance();
                 } else {
                     // we are not on a roundabout, and not continuing straight through.
-                    // figure out if there were turn options at the last intersection.
-                    if (optionsBefore) {
+
+                    // figure out if there were other plausible turn options at the last intersection
+                    // to see if we should generate a "left to continue" instruction.
+                    boolean shouldGenerateContinue = false;
+                    if (edge instanceof PlainStreetEdge) {
+                        //the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
+
+                        double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
+                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState.getBackState().getVertex())) {
+                            if (alternative instanceof TinyTurnEdge) {
+                                alternative = pathService.getOutgoingEdges(alternative.getToVertex()).get(0);
+                            }
+                            double altAngle = DirectionUtils.getFirstAngle(alternative.getGeometry());
+                            double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
+                            if (altAngleDiff - angleDiff < Math.PI / 16) {
+                                shouldGenerateContinue = true;
+                                break;
+                            }
+                        }
+                    } else if (edge instanceof TinyTurnEdge) {
+                        // do nothing as this will be handled in other cases
+                    } else {
+                        double newAngle;
+                        if (currState.getVertex() instanceof StreetVertex) {
+                            newAngle = DirectionUtils.getFirstAngle(((StreetVertex)currState.getVertex()).getGeometry());
+                        } else {
+                            Edge oge = pathService.getOutgoingEdges(currState.getVertex()).get(0);
+                            newAngle = DirectionUtils.getFirstAngle(((DirectEdge)oge).getGeometry());
+                        }
+                        double angleDiff = getAbsoluteAngleDiff(newAngle, thisAngle);
+                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState.getBackState().getVertex())) {
+                            if (alternative == edge) {
+                                continue;
+                            }
+                            alternative = pathService.getOutgoingEdges(alternative.getToVertex()).get(0);
+                            double altAngle = DirectionUtils.getFirstAngle(alternative.getGeometry());
+                            double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
+                            if (altAngleDiff - angleDiff < Math.PI / 16) {
+                                shouldGenerateContinue = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (shouldGenerateContinue) {
                         // turn to stay on same-named street
                         step = createWalkStep(currState);
                         steps.add(step);
@@ -672,7 +719,19 @@ public class PlanGenerator {
         return steps;
     }
 
-    private WalkStep createWalkStep(State s) {
+    private double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
+        double angleDiff = thisAngle - lastAngle;
+        if (angleDiff < 0) {
+            angleDiff += Math.PI * 2;
+        }
+        double ccwAngleDiff = Math.PI * 2 - angleDiff;
+        if (ccwAngleDiff < angleDiff) {
+            angleDiff = ccwAngleDiff;
+        }
+        return angleDiff;
+	}
+
+	private WalkStep createWalkStep(State s) {
         EdgeNarrative en = s.getBackEdgeNarrative();
         WalkStep step;
         step = new WalkStep();

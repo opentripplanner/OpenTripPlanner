@@ -24,6 +24,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -35,6 +36,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -350,4 +352,20 @@ public class ContractionPathServiceImpl implements PathService {
         return foundAlternatePaths;
     }
 
+	public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
+        Graph graph = _graphService.getGraph();
+        GraphVertex gv = graph.getGraphVertex(vertex);
+        if (gv == null) {
+            return Collections.emptyList();
+        }
+        List<DirectEdge> result = new ArrayList<DirectEdge>();
+        for (Edge out : gv.getOutgoing()) {
+
+            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+                continue;
+            }
+            result.add((StreetEdge) out);
+        }
+        return result;
+	}
 }
