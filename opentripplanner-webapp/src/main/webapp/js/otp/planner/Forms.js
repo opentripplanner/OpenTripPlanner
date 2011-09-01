@@ -1,7 +1,7 @@
 /* This program is free software: you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
-   the License, or (at your option) any later version.
+   the License, or (at your option) any later version.a
    
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -25,13 +25,16 @@ otp.planner.StaticForms = {
     FIELD_ANCHOR     : '95%',
 
     // external (config) objects
-    routerId         : null,
-    locale           : null,
-    planner          : null,
-    contextMenu      : null,
-    poi              : null,
-    hideWheelchair   : true,
-    url              : '/opentripplanner-api-webapp/ws/plan',
+    routerId              : null,
+    locale                : null,
+    planner               : null,
+    contextMenu           : null,
+    poi                   : null,
+    url                   : '/opentripplanner-api-webapp/ws/plan',
+    showWheelchairForm    : true,
+    useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
+    fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
+    geocoder              : {},    // geocoder config
 
     // forms & stores
     m_panel          : null,
@@ -47,8 +50,6 @@ otp.planner.StaticForms = {
     m_toPlace        : null,
     m_fromPlace      : null,
     m_intermediatePlaces : null,
-
-    fromToOverride   : null,  // over-ride me to get rid of From / To from with something else
 
     m_date           : null,
     m_time           : null,
@@ -74,20 +75,14 @@ otp.planner.StaticForms = {
     m_toCoord        : otp.util.Constants.BLANK_LAT_LON,
 
     m_xmlRespRecord  : null,
-    
-    // geocoder config
-    geocoder         : {},
-    
+
     // to enable masking of the from/to fields
     m_fromToFP       : null,
     
     // hold state for whether geocoding is currently active
     m_fromGeocoding  : false,
     m_toGeocoding    : false,
-    
-    // whether to have the planner form options dependent
-    // ie, selecting the mode affects what others options you can select
-    useOptionDependencies : false,
+
 
     /**
      * @constructor
@@ -111,7 +106,7 @@ otp.planner.StaticForms = {
         this.makeMainPanel();
 
         // step 3: set the singleton & status stuff to this 
-        otp.planner.StaticForms = this;        
+        otp.planner.StaticForms = this;
     },
 
     /**
@@ -151,13 +146,11 @@ otp.planner.StaticForms = {
 
         otp.util.ExtUtils.setTripPlannerCookie();
 
-        var triParams = (this.m_optimizeForm.getValue() == "TRIANGLE") ?
-            {
-                triangleTimeFactor     : this.m_bikeTriangle.timeFactor,
-                triangleSlopeFactor    : this.m_bikeTriangle.slopeFactor,
-                triangleSafetyFactor   : this.m_bikeTriangle.safetyFactor
-            } : { };
-        
+        // get bike form data if we're using the triangle
+        var triParams = {};
+        if(this.m_bikeTriangle && this.m_optimizeForm.getValue() == "TRIANGLE")
+            triParams = this.m_bikeTriangle.getFormData();
+
         this.m_panel.form.submit( {
             method  : 'GET',
             url     : this.url,
@@ -513,6 +506,10 @@ otp.planner.StaticForms = {
             this.setRawInput(params.toPlace,   forms.m_toForm);
             this.setRawInput(params.toPlace,   forms.m_toPlace);
 
+            // triangleSafetyFactor=0.409&triangleSlopeFactor=0.0974&triangleTimeFactor=0.493
+            if(this.m_bikeTriangle)
+                this.m_bikeTriangle.setSHT(params.triangleSafetyFactor, params.triangleSlopeFactor, params.triangleTimeFactor);
+
             if (params.fromPlace && params.fromPlace.length > 2 && params.fromPlace.indexOf(",") > 0) {
                 var lat = this.getLat(params.fromPlace);
                 var lon = this.getLon(params.fromPlace);
@@ -603,7 +600,7 @@ otp.planner.StaticForms = {
 
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
-            if(params.wheelchair)
+            if(params.wheelchair && this.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
             // stupid trip planner form processing...
@@ -661,7 +658,8 @@ otp.planner.StaticForms = {
         var d = this.m_maxWalkDistanceForm.getValue();
         retVal.maxWalkDistance = d * 1.0;
         retVal.mode            = this.m_modeForm.getValue();
-        retVal.wheelchair      = this.m_wheelchairForm.getValue();
+        if(this.showWheelchairForm)
+            retVal.wheelchair      = this.m_wheelchairForm.getValue();
         retVal.intermediate_places = ''; //TODO: intermediate stops
 
         // break up the from coordinate into lat & lon
@@ -1321,26 +1319,34 @@ otp.planner.StaticForms = {
         this.m_bikeTriangleContainer = new Ext.Panel({  
             name:           'bikeTriangleContainer',  
         });
-        
+
         this.m_bikeTriangle = new otp.planner.BikeTriangle({
             container:      this.m_bikeTriangleContainer,
         }); 
-        
-        if (this.useOptionDependencies) {
-            this.m_optionsManager = new otp.planner.FormsOptionsManager({
-                mode:        this.m_modeForm,
-                optimize:    this.m_optimizeForm,
-                maxWalk:     this.m_maxWalkDistanceForm,
-                wheelchair:  this.m_wheelchairForm,
-                locale:      this.locale,
-                bikeTriangle:    this.m_bikeTriangle
-            });
 
-            //var optimizeFilter = this.m_optionsManager.getOptimizeFilter(this.m_modeStore.getAt(0));
-            //this.m_optimizeForm.getStore().filterBy(optimizeFilter);
+        // default transit true filter
+        var filter = otp.planner.FormsOptionsManagerStatic.getOptimizeFilter(true, false);
+        this.m_optimizeForm.getStore().filterBy(filter);
+
+        if (this.useOptionDependencies) {
+            var usecfg = {
+                mode:         this.m_modeForm,
+                optimize:     this.m_optimizeForm,
+                maxWalk:      this.m_maxWalkDistanceForm,
+                locale:       this.locale,
+                bikeTriangle: this.m_bikeTriangle
+            }
+            if(this.showWheelchairForm)
+                usecfg.wheelchair = this.m_wheelchairForm;
+            this.m_optionsManager = new otp.planner.FormsOptionsManager(usecfg);
         }
 
-        return [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm, this.m_wheelchairForm];
+        var retVal = [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm];
+        if(this.showWheelchairForm)
+            retVal.push(this.m_wheelchairForm);
+
+        return retVal;
+
     },
 
     CLASS_NAME: "otp.planner.Forms"

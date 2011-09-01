@@ -23,7 +23,7 @@ otp.namespace("otp.planner");
  * how the changes are propagated.
  * 
  */
-otp.planner.FormsOptionsManager = {
+otp.planner.FormsOptionsManagerStatic = {
         
     // form option vars
     // these are ext combo boxes
@@ -94,12 +94,12 @@ otp.planner.FormsOptionsManager = {
             } else {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxWalkDistance);
             }
-            this.showComboBox(this.maxWalk);
-            this.showComboBox(this.wheelchair);
+            if(this.maxWalk)    this.showComboBox(this.maxWalk);
+            if(this.wheelchair) this.showComboBox(this.wheelchair);
             showTransitOptions = true;
         } else {
-            this.hideComboBox(this.maxWalk);
-            this.hideComboBox(this.wheelchair);
+            if(this.maxWalk)    this.hideComboBox(this.maxWalk);
+            if(this.wheelchair) this.hideComboBox(this.wheelchair);
         }
         if (this.isBike(mode)) {
             showBikeOptions = true;
@@ -139,7 +139,7 @@ otp.planner.FormsOptionsManager = {
     },
 
     getOptimizeFilter : function(showTransitOptions, showBikeOptions) {
-        var optimizeFilter;        
+        var optimizeFilter;
 
         // we don't have many permutations of filters currently
         // so a naive approach seems sufficient
@@ -190,4 +190,4 @@ otp.planner.FormsOptionsManager = {
 
 };
 
-otp.planner.FormsOptionsManager = new otp.Class(otp.planner.FormsOptionsManager);
+otp.planner.FormsOptionsManager = new otp.Class(otp.planner.FormsOptionsManagerStatic);

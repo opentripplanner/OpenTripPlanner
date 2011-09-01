@@ -141,6 +141,29 @@ otp.util.ObjUtils = {
         return retVal;
     },
 
+
+    /** */
+    toFloat : function(num, defVal)
+    {
+        var retVal = defVal;
+        try
+        {
+            if(num)
+            {
+                retVal = num * 0.999999999;
+                if(isNaN(retVal))
+                    retVal = defVal;
+            }
+        }
+        catch(e)
+        {
+            retVal = defVal;
+        }
+
+        return retVal;
+    },
+
+
     /** */
     getCoordinate : function(coord, defVal)
     {
