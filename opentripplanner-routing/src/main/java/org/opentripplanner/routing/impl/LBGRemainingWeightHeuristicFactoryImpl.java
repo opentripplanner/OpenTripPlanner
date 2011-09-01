@@ -36,7 +36,7 @@ public class LBGRemainingWeightHeuristicFactoryImpl implements
 			Vertex target) {
 		if (opt.getModes().getTransit()) {
 			LOG.debug("Transit itinerary requested.");
-			return new LBGRemainingWeightHeuristic(_graphService.getGraph());
+			return new LBGRemainingWeightHeuristic(_graphService.getGraph(), opt);
 		} else {
 			LOG.debug("Non-transit itinerary requested.");
 			return new DefaultRemainingWeightHeuristic();

@@ -15,10 +15,12 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.HashMap;
 
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.LowerBoundGraph;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.slf4j.Logger;
@@ -36,11 +38,12 @@ import org.slf4j.LoggerFactory;
  */
 public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
-	private static final long serialVersionUID = 20110824L;
+    private static final long serialVersionUID = 20110901L;
 
-	private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
+    private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
-    private static HashMap<Graph, LowerBoundGraph> lbgCache = new HashMap<Graph, LowerBoundGraph>();
+    private static HashMap<GraphAndDirection, LowerBoundGraph> 
+        lbgCache = new HashMap<GraphAndDirection, LowerBoundGraph>();
 
     LowerBoundGraph lbg;
 
@@ -48,13 +51,20 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     double[] weights;
 
-    public LBGRemainingWeightHeuristic(Graph g) {
-        this.lbg = lbgCache.get(g);
+    public LBGRemainingWeightHeuristic(Graph g, TraverseOptions opt) {
+        GraphAndDirection key = new GraphAndDirection(g, opt.isArriveBy());
+        this.lbg = lbgCache.get(key);
         if (this.lbg == null) {
+            LOG.debug("no lower bound graph found for: {}", key);
             LOG.debug("BEGIN Making lower bound graph");
-            this.lbg = new LowerBoundGraph(g, LowerBoundGraph.OUTGOING);
+            if (opt.isArriveBy())
+                this.lbg = new LowerBoundGraph(g, LowerBoundGraph.OUTGOING);
+            else 
+                this.lbg = new LowerBoundGraph(g, LowerBoundGraph.INCOMING);
             LOG.debug("END   Making lower bound graph");
-            lbgCache.put(g, this.lbg);
+            lbgCache.put(key, this.lbg);
+        } else {
+            LOG.debug("reusing cached lower bound graph found for: {}", key);
         }
     }
 
@@ -71,7 +81,6 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
-        // return 0;
         int index = ((GenericVertex) s.getVertex()).getIndex();
         if (index < weights.length) {
             double h = weights[index];
@@ -90,5 +99,12 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     @Override
     public void reset() {
+    }
+    
+    private static class GraphAndDirection extends T2<Graph, Boolean> {
+        private static final long serialVersionUID = 20110901L;
+        public GraphAndDirection(Graph g, Boolean i) {
+            super(g, i);
+        }
     }
 }
