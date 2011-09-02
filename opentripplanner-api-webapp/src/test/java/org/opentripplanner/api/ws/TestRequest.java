@@ -162,20 +162,16 @@ public class TestRequest extends TestCase {
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
         List<WalkStep> steps = leg.walkSteps;
-        assertEquals(3, steps.size());
+        assertEquals(2, steps.size());
         WalkStep step0 = steps.get(0);
         WalkStep step1 = steps.get(1);
-        WalkStep step2 = steps.get(2);
         assertEquals(AbsoluteDirection.NORTH, step0.absoluteDirection);
         assertEquals("NE 43RD AVE", step0.streetName);
         
         assertEquals("NE 43RD AVE", step1.streetName);
-        assertEquals(RelativeDirection.SLIGHTLY_RIGHT, step1.relativeDirection);
+        assertEquals(RelativeDirection.LEFT, step1.relativeDirection);
         assertTrue(step1.stayOn);
-        
-        assertEquals("NE 43RD AVE", step2.streetName);
-        assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
-        assertTrue(step2.stayOn);
+
     }
     
 
