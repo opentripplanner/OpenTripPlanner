@@ -76,11 +76,11 @@ otp.planner.BikeTriangle = {
 
         var labelS = canvas.text(margin + tri_side - 22, height-margin-14, "S");
         labelS.attr({fill:"blue", "font-size":labelSize, "font-weight":"bold"});	
-		
+
         var barLeft = margin*2 + tri_side; 
         var barWidth = width - margin*3 - tri_side;
         var barHeight = (height-margin*4)/3;
-	
+
         var timeBar = canvas.rect(barLeft, margin, barWidth*.333, barHeight);
         timeBar.attr({fill:"red", stroke:"none"});
 
@@ -101,7 +101,7 @@ otp.planner.BikeTriangle = {
 
         var cursor = canvas.circle(margin+tri_side/2, height-margin-(1/Math.sqrt(3))*(tri_side/2), this.cursor_size/2).attr({
             fill: "rgb(0,0,128)",
-            stroke: "none",
+            stroke: "none"
         });
 
         var time, topo, safety;
@@ -113,10 +113,10 @@ otp.planner.BikeTriangle = {
             this.ox = this.attr("cx");
             this.oy = this.attr("cy");
             this.animate({opacity: .5}, animTime);
-            timeBar.animate({opacity: .25}, animTime);    	
-            topoBar.animateWith(timeBar, {opacity: .25}, animTime);    	
-            safetyBar.animateWith(timeBar, {opacity: .25}, animTime);    
-            timeLabel.animate({opacity: 1}, animTime);    	
+            timeBar.animate({opacity: .25}, animTime);
+            topoBar.animateWith(timeBar, {opacity: .25}, animTime);
+            safetyBar.animateWith(timeBar, {opacity: .25}, animTime);
+            timeLabel.animate({opacity: 1}, animTime);
             topoLabel.animate({opacity: 1}, animTime);
             safetyLabel.animate({opacity: 1}, animTime);
         },
@@ -128,7 +128,7 @@ otp.planner.BikeTriangle = {
             var offset =  (ny-margin)/(height-margin*2) * tri_side/2; 	
             if(nx < margin + (tri_side/2) - offset) nx = margin + (tri_side/2) - offset; 
             if(nx > margin + (tri_side/2) + offset) nx = margin + (tri_side/2) + offset;
-            
+
             time = ((height-2*margin)-(ny-margin))/(height-2*margin);
             topo = thisBT.distToSegment(nx, ny, margin+tri_side/2, margin, margin+tri_side, height-margin)/(height-2*margin);
             safety = 1- time - topo;

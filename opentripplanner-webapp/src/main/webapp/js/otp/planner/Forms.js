@@ -1353,11 +1353,11 @@ otp.planner.StaticForms = {
         });
         
         this.m_bikeTriangleContainer = new Ext.Panel({  
-            name:           'bikeTriangleContainer',  
+            name:           'bikeTriangleContainer'
         });
 
         this.m_bikeTriangle = new otp.planner.BikeTriangle({
-            container:      this.m_bikeTriangleContainer,
+            container:      this.m_bikeTriangleContainer
         }); 
 
         // default transit true filter
