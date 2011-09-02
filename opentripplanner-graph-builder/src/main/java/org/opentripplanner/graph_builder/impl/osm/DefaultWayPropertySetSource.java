@@ -330,9 +330,17 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 true);
         setProperties(props, "RLIS:bicycle=caution_area", StreetTraversalPermission.ALL, 1.6, 1.6,
                 true);
+        setProperties(props, "RLIS:bicycle:left=caution_area", StreetTraversalPermission.ALL, 1.0, 1.6,
+                true);
+        setProperties(props, "RLIS:bicycle:right=caution_area", StreetTraversalPermission.ALL, 1.6, 1.0,
+                true);
         setProperties(props, "CCGIS:bicycle=designated", StreetTraversalPermission.ALL, 0.97, 0.97,
                 true);
         setProperties(props, "CCGIS:bicycle=caution_area", StreetTraversalPermission.ALL, 1.6, 1.6,
+                true);
+        setProperties(props, "CCGIS:bicycle:left=caution_area", StreetTraversalPermission.ALL, 1.0, 1.6,
+                true);
+        setProperties(props, "CCGIS:bicycle:right=caution_area", StreetTraversalPermission.ALL, 1.6, 1.0,
                 true);
 
         // it is extremly unsafe to ride directly on the Scotsman
