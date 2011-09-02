@@ -257,6 +257,11 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=secondary;cycleway:left=shared_lane",
                 StreetTraversalPermission.ALL, 1.5, 0.91);
 
+        setProperties(props, "highway=residential;cycleway:left=lane;cycleway:right=track",
+                StreetTraversalPermission.ALL, 0.75, 0.77);
+        setProperties(props, "highway=residential;cycleway:right=lane;cycleway:left=track",
+                StreetTraversalPermission.ALL, 0.75, 0.75);
+        
         setProperties(props, "footway=sidewalk;highway=footway", 
                 StreetTraversalPermission.PEDESTRIAN);
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=designated", 
