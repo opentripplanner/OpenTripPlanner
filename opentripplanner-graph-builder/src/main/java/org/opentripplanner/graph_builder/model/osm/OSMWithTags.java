@@ -50,7 +50,7 @@ public class OSMWithTags {
     if(_tags == null)
       _tags = new HashMap<String, String>();
 
-    _tags.put(tag.getK(), tag.getV());
+    _tags.put(tag.getK().toLowerCase(), tag.getV());
   }
 
   /**
@@ -63,7 +63,7 @@ public class OSMWithTags {
     if(_tags == null)
       _tags = new HashMap<String, String>();
 
-    _tags.put(key, value);
+    _tags.put(key.toLowerCase(), value);
   }
   
   /**
@@ -77,6 +77,7 @@ public class OSMWithTags {
    * Is the tag defined?
    */
   public boolean hasTag(String tag) {
+    tag = tag.toLowerCase();
     return _tags != null && _tags.containsKey(tag);
   }
 
@@ -84,6 +85,7 @@ public class OSMWithTags {
    * Determines if a tag contains a false value. 'no', 'false', and '0' are considered false.
    */
   public boolean isTagFalse(String tag) {
+    tag = tag.toLowerCase();
     if(_tags == null)
       return false;
 
@@ -94,6 +96,7 @@ public class OSMWithTags {
    * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
    */
   public boolean isTagTrue(String tag) {
+    tag = tag.toLowerCase();
     if(_tags == null)
       return false;
 
@@ -104,6 +107,7 @@ public class OSMWithTags {
    * Gets a tag's value.
    */
   public String getTag(String tag) {
+    tag = tag.toLowerCase();
     if(_tags != null && _tags.containsKey(tag))
       return _tags.get(tag);
 
@@ -114,6 +118,7 @@ public class OSMWithTags {
    * Checks is a tag contains the specified value.
    */
   public Boolean isTag(String tag, String value) {
+    tag = tag.toLowerCase();
     if(_tags != null && _tags.containsKey(tag) && value != null)
       return value.equals(_tags.get(tag));
 

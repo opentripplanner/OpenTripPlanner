@@ -49,8 +49,8 @@ public class OSMSpecifier {
 	public int matchScore(OSMWithTags match) {
 		int score = 0;
 		for (P2<String> pair : kvpairs) {
-			String tag = pair.getFirst();
-			String value = pair.getSecond();
+      String tag = pair.getFirst().toLowerCase();
+			String value = pair.getSecond().toLowerCase();
 
 			String matchValue = match.getTag(tag);
 			//either this matches on a wildcard, or it matches exactly
