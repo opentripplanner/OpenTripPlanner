@@ -541,6 +541,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
              */
 
+            if (way.isTag("foot", "yes") || way.isTag("foot", "designated")) {
+                permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
+            }
+
+            if (way.isTagFalse("foot")) {
+                permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
+            }
+
             boolean forceBikes = false;
             if (way.isTag("bicycle", "yes") || way.isTag("bicycle", "designated")) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
