@@ -581,8 +581,11 @@ otp.planner.Itinerary = {
         var containsCarMode  = false;
 
         var retVal = new Array();
+
+        // step 1: start node
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true}, clickCallback, scope));
 
+        // step 2: leg and (sub-leg) instruction nodes
         for(var i = 0; i < store.getCount(); i++)
         {
             var leg = store.getAt(i);
@@ -594,36 +597,47 @@ otp.planner.Itinerary = {
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
             var legId = this.id + this.LEG_ID + i;
+            var instructions = null; 
 
+            // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
             if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
             {
-                if (mode === 'bicycle') {
-                    verb = this.locale.instructions.bike_toward;
-                    containsBikeMode = true;
-                } else if (mode === 'walk') {
+                var template = 'TP_WALK_LEG';
+                if (mode === 'walk') {
                     verb = this.locale.instructions.walk_toward;
+                }
+                else if (mode === 'bicycle') {
+                    verb = this.locale.instructions.bike_toward;
+                    template = 'TP_BICYCLE_LEG';
+                    containsBikeMode = true;
                 } else if (mode === 'drive') {
                     verb = this.locale.instructions.drive_toward;
+                    template = 'TP_CAR_LEG';
                     containsDriveMode = true;
                 } else {
                     verb = this.locale.instructions.move_toward;
                 }
                 hasKids = false;
+
                 if (!leg.data.formattedSteps)
                 {
-                    leg.data.formattedSteps = this.formattedStepNarrative(leg.data.steps, verb);
+                    instructions = this.formattedStepNarrative(leg.data.steps, verb);
+                    leg.data.formattedSteps = instructions;
                 }
-                var template = mode == 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
                 text = this.templates[template].applyTemplate(leg.data);
             }
             else
             {
                 text = this.templates.applyTransitLeg(leg);
             }
-            icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
-            retVal.push(otp.util.ExtUtils.makeTreeNode({id: legId, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
+
+            // step 2c: add a leg node to array
+            var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeName});
+            var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf: hasKids}, clickCallback, scope); 
+            retVal.push(node);
         }
 
+        // step 3: build details node's content 
         var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
         if(containsBikeMode)
             tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
@@ -632,6 +646,7 @@ otp.planner.Itinerary = {
         var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
+        // step 4: end and details nodes
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
 
@@ -640,7 +655,7 @@ otp.planner.Itinerary = {
 
     /** make bike / walk turn by turn narrative */
     /** TODO -- direction arrow / icons */
-    formattedStepNarrative : function(steps, verb)
+    formattedStepNarrative : function(steps, verb, itinId)
     {
         var retVal = [];
 
