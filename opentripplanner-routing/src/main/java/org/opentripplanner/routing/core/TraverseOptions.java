@@ -353,7 +353,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         this.modes = modes;
         if (modes.getBicycle()) {
             speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
-            boardCost = 240; // cyclists hate loading their bike a second time
+            boardCost = 10 * 60; // cyclists hate loading their bike a second time
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
