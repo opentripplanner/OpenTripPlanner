@@ -625,12 +625,10 @@ otp.planner.Itinerary = {
                     if (instructions && instructions.length >= 1) {
                         // if we only have 1 instruction, then just render the text in the parent mode node
                         if (instructions.length == 1) {
-                            leg.data.formattedSteps = instructions[0];
+                            leg.data.formattedSteps = '<p class="steps">' + instructions[0] + '</p>';
                         }
                         else {
-                            //isLeaf = false;
-                            // TODO - fix clickable tree (see below, then delete me)
-                            leg.data.formattedSteps = instructions;
+                            isLeaf = false;
                         }
                     }
                 }
@@ -645,19 +643,15 @@ otp.planner.Itinerary = {
             var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeName});
             var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope);
 
-            // step 2d: if we have insturction sub-nodes, add them to the tree...
-/* WIP
+            // step 2d: if we have instruction sub-nodes, add them to the tree...
             if (instructions && instructions.length > 1) {
-                //node.appendChild(instructions);
-                //node.expand();
-
-                var n;
-                n = otp.util.ExtUtils.makeTreeNode({id:legId + "--" + 1, text:instructions[0], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope); 
-                retVal.push(n);
-                n = otp.util.ExtUtils.makeTreeNode({id:legId + "--" + 2, text:instructions[1], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope); 
-                retVal.push(n);
+                for (var i = 0; i < instructions.length; i++)
+                {
+                    var t = otp.util.ExtUtils.makeTreeNode({id:legId + "-" + i, text:instructions[i], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:true}, this.instructionClickCB, this);
+                    node.appendChild(t);
+                }
             }
-*/
+
             retVal.push(node);
         }
 
@@ -682,9 +676,7 @@ otp.planner.Itinerary = {
     formattedStepNarrative : function(steps, verb, itinId)
     {
         var retVal = [];
-
-        var stepText = "";
-        var noStepsYet = true;
+        var isFirstStep = true;
 
         for (var j = 0; j < steps.length; j++)
         {
@@ -694,40 +686,49 @@ otp.planner.Itinerary = {
                 // TODO: Include explicit instruction about entering/exiting transit station or stop?
                 continue;
             }
-            stepText = "<li>";
-            var relativeDirection = step.relativeDirection;
-            var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
-            if (relativeDirection == null || noStepsYet == true)
-            {
-                stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
-                noStepsYet = false;
-            }
-            else 
-            {
-                relativeDirection = relativeDirection.toLowerCase();
-                var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
-                if (relativeDirection == "continue")
-                {
-                    stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
-                }
-                else if (step.stayOn == true)
-                {
-                    stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
-                }
-                else
-                {
-                    stepText += directionText; 
-                    if (step.exit != null) {
-                        stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
-                    }
-                    stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
-                }
-            }
-            stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+            var stepText = this.instructionStepText(step, isFirstStep);
+            isFirstStep = false;
             retVal.push(stepText);
         }
 
         return retVal;
+    },
+
+    /** create the an individual instruction narrative */ 
+    instructionStepText : function(step, isFirstStep)
+    {
+        var stepText = "";
+
+        var relativeDirection = step.relativeDirection;
+        if (relativeDirection == null || isFirstStep == true)
+        {
+            var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
+            stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
+        }
+        else 
+        {
+            relativeDirection = relativeDirection.toLowerCase();
+            var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
+            if (relativeDirection == "continue")
+            {
+                stepText += directionText + ' <strong>' + step.streetName + '</strong>';
+            }
+            else if (step.stayOn == true)
+            {
+                stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
+            }
+            else
+            {
+                stepText += directionText; 
+                if (step.exit != null) {
+                    stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
+                }
+                stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
+            }
+        }
+        stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+
+        return stepText;
     },
 
     instructionClickCB : function(n, m, o, p, q)

@@ -163,9 +163,10 @@ otp.planner.Templates = {
                   '<tpl if="duration != null && duration &gt; 0">',
                     '<p class="transfers">' + this.locale.labels.about + ' {duration} ' + this.getDurationTemplateString() + ' - {distance}</p>', 
                   '</tpl>',
-                  '<ol class="steps"><tpl for="formattedSteps">',
+                  //'<ol class="steps">', </ol>
+                  '<tpl for="formattedSteps">',
                     '{.}',
-                  '</tpl></ol>'
+                  '</tpl>'
             ).compile();
     },
 
