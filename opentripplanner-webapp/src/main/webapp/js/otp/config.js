@@ -20,6 +20,7 @@ otp.config_defaults = {
 
     planner : {
         url            : null,
+        showStopIds    : true,
         linkTemplates  : [
             {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},

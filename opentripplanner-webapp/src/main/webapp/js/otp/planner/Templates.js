@@ -101,7 +101,12 @@ otp.planner.Templates = {
             ).compile();
 
         if(this.TP_LEG_MODE == null)
-            this.TP_LEG_MODE = '<h4><a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a> {routeName}</h4>';
+            this.TP_LEG_MODE = ''
+                + '<h4>' 
+                + '<a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a>'
+                + ' {routeName} '
+                + '<tpl if="headsign != null && headsign.length &gt; 0"> ' + this.locale.directions.to + ' {headsign}</tpl>'
+                + '</h4>';
 
         if(this.TP_LEG_CONTINUES == null)
             this.TP_LEG_CONTINUES = '<h4><a href="#">' + this.locale.instructions.continue_as + '</a> {routeName} <span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span></h4>';
@@ -109,17 +114,19 @@ otp.planner.Templates = {
         if(this.TP_LEG_BASE_STR == null)
             this.TP_LEG_BASE_STR = ''
                 + '<p><b>{startTimeDisplayShort}</b> ' + this.locale.instructions.depart + ' {fromName}'
-                + '<tpl if="headsign != null && headsign.length &gt; 0"> ({headsign})</tpl>'
-                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds"><br/>' + this.locale.labels.stop_id + ' {fromStopId}</tpl>'
+                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds">'
+                + '<br/><span class="stopid">' + this.locale.labels.stop_id + ' {fromStopId}</span>'
+                + '</tpl>'
                 + '</p>'
                 + '<tpl if="duration != null"><div class="duration">{duration} ' + this.getDurationTemplateString() + '</div></tpl>'
                 + '<p><b>{endTimeDisplayShort}</b> ' + this.locale.instructions.arrive + ' {toName}'
-                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds"><br/>' + this.locale.labels.stop_id + ' {toStopId}</tpl>'
-                + '</p>'
+                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds">'
+                +   '<br/><span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span>'
+                + '</tpl></p>'
                 + '<tpl if="alerts != null && alerts.length &gt; 0">'
                 + '<tpl for="alerts">'
-                +   '<p><br/><img src="images/ui/alert.gif" align="absmiddle"/> '
-                +   '<b>' + this.locale.labels.alert_for_rt + ' {parent.routeNumber}: </b>{.}</p>'
+                +   '<p class="alert"><img src="images/ui/trip/alert.png" align="absmiddle"/> '
+                +   '<b>' + this.locale.labels.alert_for_rt + ' {parent.routeName}: </b>{.}</p>'
                 + '</tpl>'
                 + '</tpl>';
 
@@ -151,7 +158,7 @@ otp.planner.Templates = {
                     this.locale.directions.to + ' {toName}',
                   '</h4>',
                   '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds">',
-                    '<p>' + this.locale.labels.stopID + ' {toStopId}</p>',
+                    '<p><span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span></p>',
                   '</tpl>',
                   '<tpl if="duration != null && duration &gt; 0">',
                     '<p class="transfers">' + this.locale.labels.about + ' {duration} ' + this.getDurationTemplateString() + ' - {distance}</p>', 
@@ -185,6 +192,24 @@ otp.planner.Templates = {
             this.m_interlineLeg = new Ext.XTemplate(this.TP_LEG_CONTINUES + this.TP_LEG_BASE_STR).compile();
 
         return this.m_interlineLeg;
+    },
+
+    applyTransitLeg : function(leg)
+    {
+        var retVal = null;
+        if(leg)
+        {
+            var interline = leg.get('interline');
+            if (interline == null || (interline != "true" && interline !== true)) 
+            {
+                retVal = this.getTransitLeg().applyTemplate(leg.data); 
+            }
+            else 
+            {
+                retVal = this.getInterlineLeg().applyTemplate(leg.data);
+            }
+        }
+        return retVal;
     },
 
     CLASS_NAME: "otp.planner.Templates"

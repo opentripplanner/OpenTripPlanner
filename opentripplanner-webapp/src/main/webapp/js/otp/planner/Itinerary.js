@@ -127,8 +127,9 @@ otp.planner.Itinerary = {
                 if (!this.m_markers[i].geometry._otp_reprojected) {
                     this.m_markers[i].geometry._otp_reprojected = true;
                     this.m_markers[i].geometry.transform(
-                            this.map.dataProjection, mLayer.map
-                                    .getProjectionObject());
+                            this.map.dataProjection, 
+                            mLayer.map.getProjectionObject()
+                    );
                 }
             }
         }
@@ -258,10 +259,8 @@ otp.planner.Itinerary = {
 
             if (otp.util.Modes.isTransit(mode)) {
                 var geoJson = leg.get('legGeometry');
-                var geoLine = new OpenLayers.Feature.Vector(geoJson, null,
-                        otp.util.OpenLayersUtils.RED_STYLE);
-                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from,
-                        this.m_toStore.getAt(i));
+                var geoLine = new OpenLayers.Feature.Vector(geoJson, null, otp.util.OpenLayersUtils.RED_STYLE);
+                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                 vectors.push(geoLine);
             }
         }
@@ -289,11 +288,8 @@ otp.planner.Itinerary = {
 
             var mode = from.get('mode');
             if (mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER') {
-                var geoLine = new OpenLayers.Feature.Vector(leg
-                        .get('legGeometry'), null,
-                        otp.util.OpenLayersUtils.BLACK_STYLE);
-                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from,
-                        this.m_toStore.getAt(i));
+                var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'), null, otp.util.OpenLayersUtils.BLACK_STYLE);
+                var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                 vectors.push(geoLine);
             }
         }
@@ -357,12 +353,10 @@ otp.planner.Itinerary = {
         var walk = this.m_fromStore.getAt(endIndex);
         var walkP = walk.get('geometry');
         mode = walk.get('mode');
-        // Don't draw another walk marker if the first leg is a walk or bike and
-        // there's only one leg
+        // Don't draw another walk marker if the first leg is a walk or bike and there's only one leg
         if ((mode === 'WALK' || mode === 'BICYCLE') && endIndex > 0) {
             endIndex--;
-            var markerType = (mode === 'BICYCLE') ? 'bicycleMarker'
-                    : 'walkMarker';
+            var markerType = (mode === 'BICYCLE') ? 'bicycleMarker' : 'walkMarker';
             markersToAdd.push([walkP.x, walkP.y, {
                 type : markerType,
                 mode : mode
@@ -443,7 +437,7 @@ otp.planner.Itinerary = {
         this.createAndAddMarker(toP.x, toP.y, {
             type : 'toMarker'
         });
-        
+
         //create special marker for bike elevation
         var bikeTopoMarker = otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, { // temp
             type : 'fromBicycleMarker',
@@ -586,8 +580,7 @@ otp.planner.Itinerary = {
         var containsCarMode  = false;
 
         var retVal = new Array();
-        retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true},
-                                                   clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true}, clickCallback, scope));
 
         for(var i = 0; i < store.getCount(); i++)
         {
@@ -599,91 +592,42 @@ otp.planner.Itinerary = {
             var mode = leg.get('mode').toLowerCase();
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
+            var legId = this.id + this.LEG_ID + i;
+
             if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
             {
-                var verb;
                 if (mode === 'bicycle') {
                     verb = this.locale.instructions.bike_toward;
                     containsBikeMode = true;
                 } else if (mode === 'walk') {
                     verb = this.locale.instructions.walk_toward;
                 } else if (mode === 'drive') {
-                    containsCarMode = true;
                     verb = this.locale.instructions.drive_toward;
+                    containsDriveMode = true;
                 } else {
                     verb = this.locale.instructions.move_toward;
                 }
                 hasKids = false;
                 if (!leg.data.formattedSteps)
                 {
-                    leg.data.formattedSteps = [];
-                    var steps = leg.data.steps;
-                    var stepText = "";
-                    var noStepsYet = true;
-
-                    for (var j = 0; j < steps.length; j++)
-                    {
-                        step = steps[j];
-                        if (step.streetName == "street transit link")
-                        {
-                            // TODO: Include explicit instruction about entering/exiting transit station or stop?
-                            continue;
-                        }
-                        stepText = "<li>";
-                        var relativeDirection = step.relativeDirection;
-                        var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
-                        if (relativeDirection == null || noStepsYet == true)
-                        {
-                            stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
-                            noStepsYet = false;
-                        }
-                        else 
-                        {
-                            relativeDirection = relativeDirection.toLowerCase();
-                            var directionText = this.locale.directions[relativeDirection];
-                            directionText = directionText.substr(0,1).toUpperCase() + directionText.substr(1);
-                            if (relativeDirection == "continue")
-                            {
-                                stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
-                            }
-                            else if (step.stayOn == true)
-                            {
-                                stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
-                            }
-                            else
-                            {
-                                stepText += directionText; 
-                                if (step.exit != null) {
-                            		stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
-                                }
-                                stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
-                            }
-                        }
-                        stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
-                        leg.data.formattedSteps.push(stepText);
-                    }
+                    leg.data.formattedSteps = this.formattedStepNarrative(leg.data.steps, verb);
                 }
                 var template = mode == 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
                 text = this.templates[template].applyTemplate(leg.data);
             }
             else
             {
-                var interline = leg.get('interline');
-                if(interline == null || (interline != "true" && interline !== true))
-                {
-                    text  = this.templates.getTransitLeg().applyTemplate(leg.data);
-                }
-                else 
-                {
-                    text = this.templates.getInterlineLeg().applyTemplate(leg.data);
-                }
+                text = this.templates.applyTransitLeg(leg);
             }
             icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
-            retVal.push(otp.util.ExtUtils.makeTreeNode({id: this.id + this.LEG_ID + i, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
+            retVal.push(otp.util.ExtUtils.makeTreeNode({id: legId, text: text, cls: 'itiny', icon: icon, iconCls: 'itiny-inline-icon', leaf: hasKids}, clickCallback, scope));
         }
 
-        var tripDetailsDistanceVerb = containsBikeMode ? this.locale.instructions.bike_verb  : 
-                                         containsCarMode ? this.locale.instructions.car_verb : this.locale.instructions.walk_verb;
+        var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
+        if(containsBikeMode)
+            tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
+        else if(containsCarMode) 
+            tripDetailsDistanceVerb = this.locale.instructions.car_verb;
         var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
@@ -692,6 +636,61 @@ otp.planner.Itinerary = {
 
         return retVal;
     },
+
+    /** make bike / walk turn by turn narrative */
+    /** TODO -- direction arrow / icons */
+    formattedStepNarrative : function(steps, verb)
+    {
+        var retVal = [];
+
+        var stepText = "";
+        var noStepsYet = true;
+
+        for (var j = 0; j < steps.length; j++)
+        {
+            var step = steps[j];
+            if (step.streetName == "street transit link")
+            {
+                // TODO: Include explicit instruction about entering/exiting transit station or stop?
+                continue;
+            }
+            stepText = "<li>";
+            var relativeDirection = step.relativeDirection;
+            var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
+            if (relativeDirection == null || noStepsYet == true)
+            {
+                stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
+                noStepsYet = false;
+            }
+            else 
+            {
+                relativeDirection = relativeDirection.toLowerCase();
+                var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
+                if (relativeDirection == "continue")
+                {
+                    stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
+                }
+                else if (step.stayOn == true)
+                {
+                    stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
+                }
+                else
+                {
+                    stepText += directionText; 
+                    if (step.exit != null) {
+                        stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
+                    }
+                    stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
+                }
+            }
+            stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+
+            retVal.push(stepText);
+        }
+
+        return retVal;
+    },
+
 
     CLASS_NAME: "otp.planner.Itinerary"
 };

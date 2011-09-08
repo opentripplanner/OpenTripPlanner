@@ -241,6 +241,19 @@ padding: 8px;
  }
 
 /* FRANK ADDED schedules.css OVERRIDE */
+.stopid {
+    color: #808080 !important;
+    font: 11px/13px Arial, Helvetica, sans-serif;
+}
+
+p.alert {
+    margin: 5px 10px 0 5px !important;
+    font: 89%/100% Arial, Helvetica, sans-serif;
+}
+p.alert img {
+    margin-left:-2px;
+}
+
 .duration {
 background-image: url(images/ui/trip/tdots.gif)!important;
 background-repeat: no-repeat;

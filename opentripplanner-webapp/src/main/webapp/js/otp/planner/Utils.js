@@ -92,19 +92,22 @@ otp.planner.Utils = {
                   {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
                   {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
                   {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
-                  {name: 'endTimeDisplayShort', mapping: 'endTime', convert: prettyTime},
+                  {name: 'endTimeDisplayShort',   mapping: 'endTime',   convert: prettyTime},
                   {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
                   {name: 'distance',         mapping: 'distance', convert: prettyDistance},
                   {name: 'direction',        mapping: 'direction'},
                   {name: 'key',              mapping: 'key'},
-                  {name: 'alerts',           mapping: 'route', convert: function(n, p)
+                  {name: 'alerts',           mapping: 'leg', 
+                  convert: function(n, p)
                   {
-                      var nodes = Ext.DomQuery.select('route/alert', p);
+                      // TODO: we're using the DEPRICATED notes/text fields.
+                      //       need to rewrite this with alerts/.../note
+                      var nodes = Ext.DomQuery.select('notes', p);
                       var alerts = [];
                       for(var i = 0; i < nodes.length; i++)
                       {
                           var node = nodes[i];
-                          var x = Ext.DomQuery.selectValue('description', node);
+                          var x = Ext.DomQuery.selectValue('text', node);
                           if(x)
                           {
                               alerts.push(x);
@@ -112,21 +115,26 @@ otp.planner.Utils = {
                       }
                       return alerts;
                   }},
-                  {name: 'routeName',        mapping: '@route'},
+                  {name: 'routeName',        mapping: '@route',
+                                             convert: function(val, rec) {
+                                                return otp.planner.Utils.makeRouteName(val, rec);
+                                             }
+                  },
                   {name: 'routeNumber',      mapping: 'route/number'},
                   {name: 'url',              mapping: 'lineURL/@param'},
                   {name: 'fromName',         mapping: 'from/name'},
                   {name: 'fromDescription',  mapping: 'from/description'},
-                  {name: 'fromStopId',       mapping: 'from/stopId'},
+                  {name: 'fromStopId',       mapping: 'from/stopId/id'},
                   {name: 'fromCity',         mapping: 'from/@areaValue'},
                   {name: 'toName',           mapping: 'to/name'},
                   {name: 'toDescription',    mapping: 'to/description'},
-                  {name: 'toStopId',         mapping: 'to/stopId'},
+                  {name: 'toStopId',         mapping: 'to/stopId/id'},
                   {name: 'toCity',           mapping: 'to/@areaValue'},
                   {name: 'steps',            mapping: 'steps', 
                                              convert: function(val, rec) {
                                                 return otp.planner.Utils.makeWalkSteps(val, rec);
-                                             } },
+                                             }
+                  },
                   {name: 'legGeometry',      mapping: 'legGeometry/points',
                                              convert: function(n,p) {
                                                 return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
@@ -142,6 +150,14 @@ otp.planner.Utils = {
     domSelect : function(nodeName, xml)
     {
         return Ext.DomQuery.select(nodeName, xml);
+    },
+
+    /**
+     * parse the <steps></steps> element into a JavaScript
+     */
+    makeRouteName : function(val, rec)
+    {
+        return val;
     },
 
     /**
