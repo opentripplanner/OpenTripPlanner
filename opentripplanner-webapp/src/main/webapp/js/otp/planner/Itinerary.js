@@ -591,13 +591,13 @@ otp.planner.Itinerary = {
             var leg = store.getAt(i);
             leg.data.showStopIds = this.showStopIds;
             var text;
-            var hasKids = true;
-            var sched = null;
+            var isLeaf = true;
+            var sched  = null;
             var mode = leg.get('mode').toLowerCase();
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
             var legId = this.id + this.LEG_ID + i;
-            var instructions = null; 
+            var instructions = null;
 
             // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
             if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
@@ -617,12 +617,22 @@ otp.planner.Itinerary = {
                 } else {
                     verb = this.locale.instructions.move_toward;
                 }
-                hasKids = false;
-
                 if (!leg.data.formattedSteps)
                 {
-                    instructions = this.formattedStepNarrative(leg.data.steps, verb);
-                    leg.data.formattedSteps = instructions;
+                    instructions = this.formattedStepNarrative(leg.data.steps, verb, legId);
+                    leg.data.formattedSteps = "";
+                    isLeaf = true;
+                    if (instructions && instructions.length >= 1) {
+                        // if we only have 1 instruction, then just render the text in the parent mode node
+                        if (instructions.length == 1) {
+                            leg.data.formattedSteps = instructions[0];
+                        }
+                        else {
+                            //isLeaf = false;
+                            // TODO - fix clickable tree (see below, then delete me)
+                            leg.data.formattedSteps = instructions;
+                        }
+                    }
                 }
                 text = this.templates[template].applyTemplate(leg.data);
             }
@@ -633,7 +643,21 @@ otp.planner.Itinerary = {
 
             // step 2c: add a leg node to array
             var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeName});
-            var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf: hasKids}, clickCallback, scope); 
+            var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope);
+
+            // step 2d: if we have insturction sub-nodes, add them to the tree...
+/* WIP
+            if (instructions && instructions.length > 1) {
+                //node.appendChild(instructions);
+                //node.expand();
+
+                var n;
+                n = otp.util.ExtUtils.makeTreeNode({id:legId + "--" + 1, text:instructions[0], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope); 
+                retVal.push(n);
+                n = otp.util.ExtUtils.makeTreeNode({id:legId + "--" + 2, text:instructions[1], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope); 
+                retVal.push(n);
+            }
+*/
             retVal.push(node);
         }
 
@@ -700,13 +724,16 @@ otp.planner.Itinerary = {
                 }
             }
             stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
-
             retVal.push(stepText);
         }
 
         return retVal;
     },
 
+    instructionClickCB : function(n, m, o, p, q)
+    {
+        alert("instrution");
+    },
 
     CLASS_NAME: "otp.planner.Itinerary"
 };
