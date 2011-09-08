@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
@@ -67,6 +68,11 @@ public class Dwell extends AbstractEdge {
 
     public String getDirection() {
         return stopTime.getTrip().getTripHeadsign();
+    }
+
+    @Override
+    public Trip getTrip() {
+        return stopTime.getTrip();
     }
 
     public double getDistance() {
