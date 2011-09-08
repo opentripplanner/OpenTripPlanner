@@ -155,17 +155,27 @@ otp.util.StringFormattingUtils = {
                 case 'nw': retVal = directions.northWest; break;
                 default  : return defVal;
             }
-            
-            if(capitolize && retVal && retVal.length > 1)
+
+            if(capitolize)
             {
-                var t = retVal.substring(0,1).toUpperCase();
-                var u = retVal.substring(1);
-                retVal = t + u;
+                retVal = this.capitolize(retVal);
             }
         }
         catch(Exp)
         {}
         
+        return retVal;
+    },
+
+    capitolize : function(inWord)
+    {
+        var retVal = inWord;
+        if(inWord != null && typeof(inWord)=='string' && inWord.length > 1)
+        {
+            var t = retVal.substring(0,1).toUpperCase();
+            var u = retVal.substring(1);
+            retVal = t + u;
+        }
         return retVal;
     },
 

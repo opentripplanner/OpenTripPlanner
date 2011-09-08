@@ -40,6 +40,7 @@ otp.planner.Planner = {
     geocoder                : null,
     useOptionDependencies   : null,
     showWheelchairForm      : null,
+    showStopIds             : null,
     templates               : null,
 
     // new tab (itineraries tabs) management
