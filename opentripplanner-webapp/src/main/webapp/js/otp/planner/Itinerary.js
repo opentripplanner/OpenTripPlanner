@@ -581,23 +581,26 @@ otp.planner.Itinerary = {
         var containsCarMode  = false;
 
         var retVal = new Array();
+        var numLegs = store.getCount();
 
         // step 1: start node
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true}, clickCallback, scope));
 
         // step 2: leg and (sub-leg) instruction nodes
-        for(var i = 0; i < store.getCount(); i++)
+        for(var i = 0; i < numLegs; i++)
         {
             var leg = store.getAt(i);
-            leg.data.showStopIds = this.showStopIds;
             var text;
-            var isLeaf = true;
+            var verb;
             var sched  = null;
             var mode = leg.get('mode').toLowerCase();
             var routeName = leg.get('routeName');
             var agencyId = leg.get('agencyId');
-            var legId = this.id + this.LEG_ID + i;
+
+            var isLeaf = true;
             var instructions = null;
+            var legId = this.id + this.LEG_ID + i;
+            leg.data.showStopIds = this.showStopIds;
 
             // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
             if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
@@ -619,18 +622,9 @@ otp.planner.Itinerary = {
                 }
                 if (!leg.data.formattedSteps)
                 {
-                    instructions = this.formattedStepNarrative(leg.data.steps, verb, legId);
+                    instructions = this.makeInstructionStepsNodes(leg.data.steps, verb, legId);
                     leg.data.formattedSteps = "";
-                    isLeaf = true;
-                    if (instructions && instructions.length >= 1) {
-                        // if we only have 1 instruction, then just render the text in the parent mode node
-                        if (instructions.length == 1) {
-                            leg.data.formattedSteps = '<p class="steps">' + instructions[0] + '</p>';
-                        }
-                        else {
-                            isLeaf = false;
-                        }
-                    }
+                    isLeaf = false;
                 }
                 text = this.templates[template].applyTemplate(leg.data);
             }
@@ -644,12 +638,9 @@ otp.planner.Itinerary = {
             var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope);
 
             // step 2d: if we have instruction sub-nodes, add them to the tree...
-            if (instructions && instructions.length > 1) {
-                for (var i = 0; i < instructions.length; i++)
-                {
-                    var t = otp.util.ExtUtils.makeTreeNode({id:legId + "-" + i, text:instructions[i], cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:true}, this.instructionClickCB, this);
-                    node.appendChild(t);
-                }
+            if (instructions && instructions.length >= 1)
+            {
+                node.appendChild(instructions);
             }
 
             retVal.push(node);
@@ -672,68 +663,99 @@ otp.planner.Itinerary = {
     },
 
     /** make bike / walk turn by turn narrative */
-    /** TODO -- direction arrow / icons */
-    formattedStepNarrative : function(steps, verb, itinId)
+    makeInstructionStepsNodes : function(steps, verb, legId)
     {
         var retVal = [];
         var isFirstStep = true;
 
-        for (var j = 0; j < steps.length; j++)
+        var stepNum = 1;
+        for (var i = 0; i < steps.length; i++)
         {
-            var step = steps[j];
+            var step = steps[i];
             if (step.streetName == "street transit link")
             {
                 // TODO: Include explicit instruction about entering/exiting transit station or stop?
                 continue;
             }
-            var stepText = this.instructionStepText(step, isFirstStep);
-            isFirstStep = false;
-            retVal.push(stepText);
+
+            this.addNarrativeToStep(step, verb, stepNum);
+            var node = otp.util.ExtUtils.makeTreeNode({id:legId + "-" + i, text:step.narrative, cls:'itiny', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true}, this.instructionClickCB, this);
+            node.m_step = step;
+            stepNum++;
+
+            retVal.push(node);
         }
 
         return retVal;
     },
 
-    /** create the an individual instruction narrative */ 
-    instructionStepText : function(step, isFirstStep)
+    /** adds narrative and direction information to the step */ 
+    addNarrativeToStep : function(step, verb, stepNum, dontEditStep)
     {
-        var stepText = "";
+        var stepText   = "<strong>" + stepNum + ".</strong> ";
+        var iconURL  = null;
 
         var relativeDirection = step.relativeDirection;
-        if (relativeDirection == null || isFirstStep == true)
+        if (relativeDirection == null || stepNum == 1)
         {
             var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
-            stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on + ' <strong>' + step.streetName + '</strong>';
+            stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on;
+            iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon();
         }
         else 
         {
             relativeDirection = relativeDirection.toLowerCase();
+            iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon(relativeDirection);
+
             var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
             if (relativeDirection == "continue")
             {
-                stepText += directionText + ' <strong>' + step.streetName + '</strong>';
+                stepText += directionText;
             }
             else if (step.stayOn == true)
             {
-                stepText += directionText + " " + this.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
+                stepText += directionText + " " + this.locale.directions['to_continue'];
             }
             else
             {
-                stepText += directionText; 
+                stepText += directionText;
                 if (step.exit != null) {
                     stepText += " " + this.locale.ordinal_exit[step.exit] + " ";
                 }
-                stepText += " " + this.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
+                stepText += " " + this.locale.directions['on'];
             }
         }
+        stepText += ' <strong>' + step.streetName + '</strong>';
         stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+
+        // edit the step object (by default, unless otherwise told)
+        if(!dontEditStep)
+        {
+            step.narrative  = stepText;
+            step.iconURL    = iconURL;
+            step.bubbleHTML = '<img src="' + iconURL + '"></img> ' + ' <strong>' + stepNum + '.</strong> ' + step.streetName;
+        }
 
         return stepText;
     },
 
-    instructionClickCB : function(n, m, o, p, q)
+    /** */
+    instructionClickCB : function(node, m)
     {
-        alert("instrution");
+        if(node && node.m_step)
+        {
+            this.map.pan(node.m_step.lon, node.m_step.lat);
+        }
+    },
+
+
+    /** hover steps to show a small popup with direction icon and street name */
+    instructionHoverCB : function(node, m)
+    {
+        if (node && node.m_step)
+        {
+            this.map.tooltip(node.m_step.lon, node.m_step.lat, node.m_step.bubbleHTML);
+        }
     },
 
     CLASS_NAME: "otp.planner.Itinerary"

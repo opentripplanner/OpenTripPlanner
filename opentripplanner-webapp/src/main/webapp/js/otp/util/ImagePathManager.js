@@ -75,3 +75,31 @@ otp.util.imagePathManager = (function() {
         }
     };
 })();
+
+
+/** more image path utils */
+otp.util.ImagePathManagerUtils = {
+
+    /** 
+     * direction / arrow icons
+     * default return (when dir is null) is a clear icon
+     */
+    getStepDirectionIcon : function(dir, path)
+    {
+        if(path == null)
+            path = "images/ui/trip/directions/";
+
+        var retVal = path + "clear.png";
+        try
+        {
+            retVal = path + dir.toLowerCase() + ".png";
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
+    CLASS_NAME : "otp.util.ImagePathManagerUtils"
+};

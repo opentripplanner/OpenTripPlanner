@@ -448,9 +448,6 @@ otp.util.OpenLayersUtils = {
     {
         try 
         {
-            if(prj == null)
-                prj = otp.core.MapStatic.dataProjection;
-
             if(z && z >= wideZoomLimit && z <= closeZoomLimit)
             {
                 map.zoomTo(z);
@@ -463,15 +460,39 @@ otp.util.OpenLayersUtils = {
             {
                 map.zoomTo(wideZoomLimit);
             }
-            
-            if (x && y) 
-            {
-                map.setCenter((new OpenLayers.LonLat(x, y)).transform(prj, map.getProjectionObject()));
-            }
+
+            this.pan(map, x, y, prj);
         }
         catch(ex)
         {
         }
+    },
+
+
+    pan : function(map, x, y, prj)
+    {
+        if (x && y) 
+        {
+            var ll = this.getLonLat(map, x, y, prj);
+            map.setCenter(ll);
+        }
+    },
+
+
+    getLonLat : function(map, x, y, prj)
+    {
+        var retVal = null;
+        try
+        {
+            if(prj == null)
+                prj = otp.core.MapStatic.dataProjection;
+            retVal = new OpenLayers.LonLat(x, y).transform(prj, map.getProjectionObject());
+        }
+        catch(e)
+        {
+            console.log(e);
+        }
+        return retVal;
     },
 
     ///////////// MOUSE COORDS ///////////// MOUSE COORDS ///////////// MOUSE COORDS ///////////// MOUSE COORDS /////////////
@@ -577,9 +598,6 @@ otp.util.OpenLayersUtils = {
     {
         try
         {
-            if(prj == null)
-                prj = otp.core.MapStatic.dataProjection;
-
             if (zoom && (zoom < 0 || zoom > 9))
             {
                  zoom = 2;
@@ -587,7 +605,8 @@ otp.util.OpenLayersUtils = {
 
             if (x && y)
             {
-                map.setCenter(new OpenLayers.LonLat(x, y).transform(prj, map.getProjectionObject()), zoom);
+                var ll = this.getLonLat(map, x, y, prj);
+                map.setCenter(ll, zoom);
             }
             else if (zoom)
             {

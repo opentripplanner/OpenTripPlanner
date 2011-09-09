@@ -319,6 +319,55 @@ otp.core.MapStatic = {
         this.map.zoomToExtent(extent);
     },
 
+    /** */
+    pan : function(x, y)
+    {
+        otp.util.OpenLayersUtils.pan(this.map, x, y);
+    },
+
+
+    /** */
+    tooltip : function(x, y, html)
+    {
+        var ll = otp.util.OpenLayersUtils.getLonLat(this.map, x, y);
+        if(!this.tooltipPopup)
+        {
+/*
+            this.tooltipPopup = new GeoExt.Popup({
+                location: ll,
+                map: this.map,
+                unpinable: false,
+                close: false,
+                html: "<div>PX</div>"
+            });
+*/
+            this.tooltipPopup = new OpenLayers.Popup.FramedCloud(
+                "tooltip-popup", 
+                ll,
+                new OpenLayers.Size(700, 1),
+                html,
+                null,
+                false
+            );
+            this.tooltipPopup.minSize = new OpenLayers.Size(160,76),
+            this.tooltipPopup.maxSize = new OpenLayers.Size(700,76),
+            this.tooltipPopup.opacity = 0.50;
+            this.map.addPopup(this.tooltipPopup);
+        }
+        this.tooltipPopup.lonlat = ll;
+        this.tooltipPopup.setContentHTML(html);
+        this.tooltipPopup.updatePosition();
+        this.tooltipPopup.updateSize();
+        this.tooltipPopup.show();
+    },
+
+    tooltipHide : function()
+    {
+        if(this.tooltipPopup)
+            this.tooltipPopup.hide()
+    },
+
+
     /**
      * Remove all features from non base layers on the map
      */
