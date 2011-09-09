@@ -46,32 +46,61 @@ public class OSMSpecifier {
 	 * @param match an OSM tagged object to compare to this specifier 
 	 * @return
 	 */
+	public P2<Integer> matchScores(OSMWithTags match) {
+		int leftScore = 0, rightScore = 0;
+		for (P2<String> pair : kvpairs) {
+			String tag = pair.getFirst().toLowerCase();
+			String value = pair.getSecond().toLowerCase();
+
+			String leftMatchValue = match.getTag(tag + ":left");
+			String rightMatchValue = match.getTag(tag + ":right");
+			String matchValue = match.getTag(tag);
+			if (leftMatchValue == null) {
+				leftMatchValue = matchValue;
+			}
+			if (rightMatchValue == null) {
+				rightMatchValue = matchValue;
+			}
+
+			leftScore += getTagScore(value, leftMatchValue);
+			rightScore += getTagScore(value, rightMatchValue);
+		}
+		P2<Integer> score = new P2<Integer>(leftScore, rightScore);
+		return score;
+	}
+
 	public int matchScore(OSMWithTags match) {
 		int score = 0;
 		for (P2<String> pair : kvpairs) {
-      String tag = pair.getFirst().toLowerCase();
+			String tag = pair.getFirst().toLowerCase();
 			String value = pair.getSecond().toLowerCase();
 
 			String matchValue = match.getTag(tag);
-			//either this matches on a wildcard, or it matches exactly
-			if (value.equals("*") && matchValue != null) {
-				score += 1; //wildcard matches are basically tiebreakers
-			} else if (value.equals(matchValue)) {
-				score += 100;
-			} else {
-				if (value.contains(":")) {
-					//treat cases like cobblestone:flattened as cobblestone if a more-specific match
-					//does not apply
-					value = value.split(":", 2)[0];
-				} else if (value.equals(matchValue)) {
-					score += 75;
+			score += getTagScore(value, matchValue);
+		}
+		return score;
+	}
+	private int getTagScore(String value,
+			String leftMatchValue) {
+		//either this matches on a wildcard, or it matches exactly
+		if (value.equals("*") && leftMatchValue != null) {
+			return 1; //wildcard matches are basically tiebreakers
+		} else if (value.equals(leftMatchValue)) {
+			return 100;
+		} else {
+			if (value.contains(":")) {
+				//treat cases like cobblestone:flattened as cobblestone if a more-specific match
+				//does not apply
+				value = value.split(":", 2)[0];
+				if (value.equals(leftMatchValue)) {
+					return 75;
 				} else {
 					return 0;
 				}
+			} else {
+				return 0;
 			}
-			
 		}
-		return score;
 	}
 
 	public void addTag(String key, String value) {

@@ -63,4 +63,13 @@ public class WayProperties implements Cloneable {
             throw new RuntimeException(e);
         }
     }
+
+	public boolean equals(Object o) {
+		if (o instanceof WayProperties) {
+			WayProperties other = (WayProperties) o;
+			return safetyFeatures.equals(other.safetyFeatures)
+					&& permission == other.permission;
+		}
+		return false;
+	}
 }

@@ -182,6 +182,21 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 		dataForWay = wayPropertySet.getDataForWay(way);
 		assertEquals(dataForWay.getSafetyFeatures().getFirst(), 1.5);
 
+		//test a left-right distinction
+		way = new OSMWay();
+		way.addTag("highway", "footway");
+		way.addTag("cycleway", "lane");
+		way.addTag("cycleway:right", "track");
+
+		OSMSpecifier track_only = new OSMSpecifier("highway=footway;cycleway=track");
+		WayProperties track_is_safest = new WayProperties();
+		track_is_safest.setSafetyFeatures(new P2<Double>(0.25, 0.25));
+
+		wayPropertySet.addProperties(track_only, track_is_safest);
+		dataForWay = wayPropertySet.getDataForWay(way);
+		assertEquals(0.25, dataForWay.getSafetyFeatures().getFirst()); //right (with traffic) comes from track
+		assertEquals(0.75, dataForWay.getSafetyFeatures().getSecond()); //left comes from lane
+
 	}
 
 	public void testCreativeNaming() {
