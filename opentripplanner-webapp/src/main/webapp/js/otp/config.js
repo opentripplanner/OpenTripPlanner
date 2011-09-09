@@ -33,10 +33,9 @@ otp.config_defaults = {
             {name:otp.config.locale.tripPlanner.link.google_walk,    url:otp.config.locale.tripPlanner.link.google_domain + '/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
 
-        // showWheelchairForm   : false,  // turn on/off the wheelchair check box (on by default)
-
-        // when useOptionDependencies is true, the trip form changes context based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
-        useOptionDependencies: true,
+        showWheelchairForm   : true,   // turn on/off the wheelchair check box (on by default)
+        showStopIds          : true,   // show stop ids as part of the itinerary
+        useOptionDependencies: true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
 
         geocoder  :
         {
