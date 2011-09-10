@@ -88,6 +88,60 @@ try
     //
     otp.util.OPT_ARRAY   = ['opt', 'text'];
     otp.util.OPT_RECORD  = new Ext.data.Record.create(otp.util.OPT_ARRAY);
+
+
+    /** 
+     * tree node plugin 
+     * @see http://www.sencha.com/forum/showthread.php?23479-TreeNode-mouseover-event&p=180375
+     */
+    Ext.tree.NodeMouseoverPlugin = Ext.extend(Object, {
+        init: function(tree) {
+            if (!tree.rendered) {
+                tree.on('render', function() {this.init(tree)}, this);
+                return;
+            }
+            this.tree = tree;
+            //tree.body.on('mouseover', this.onTreeMouseover, this, {delegate: 'a.x-tree-node-anchor'});
+            //tree.body.on('mouseout',  this.onTreeMouseout,  this, {delegate: 'a.x-tree-node-anchor'});
+            tree.body.on('mouseover', this.onTreeMouseover, this, {delegate: 'div.x-tree-node-el'});
+            tree.body.on('mouseout',  this.onTreeMouseout,  this, {delegate: 'div.x-tree-node-el'});
+        },
+    
+        XfireEvent : function(e, t, event) {
+            var nodeEl = Ext.fly(t).up('div.x-tree-node-el');
+            if (nodeEl) {
+                var nodeId = nodeEl.getAttributeNS('ext', 'tree-node-id');
+                if (nodeId) {
+                    var node = this.tree.getNodeById(nodeId);
+                    if(node) {
+                        node.fireEvent(event, node, e);
+                    }
+                    
+                }
+            }
+        },
+    
+        fireEvent : function(e, t, event) {
+            if(t && t.attributes) 
+            {
+                var nodeId = t.getAttribute('ext:tree-node-id');
+                if (nodeId) {
+                    var node = this.tree.getNodeById(nodeId);
+                    if(node) {
+                        node.fireEvent(event, node, e);
+                    }
+                }
+            }
+        },
+    
+        onTreeMouseover: function(e, t) {
+            this.fireEvent(e, t, 'mouseover');
+        },
+
+        onTreeMouseout: function(e, t) {
+            this.fireEvent(e, t, 'mouseout');
+        }
+    });
 }
 catch(e)
 {
@@ -334,6 +388,7 @@ otp.util.ExtUtils = {
         };
     },
 
+
     /**
      * utility to set a callback, with param for setting scope of callback
      * 
@@ -342,22 +397,33 @@ otp.util.ExtUtils = {
      * @param {Object} callback
      * @param {Object} scopeObj
      */     
-    setClickCallback : function(node, callback, scopeObj)
+    setCallback : function(node, event, callback, scopeObj)
     {
-        try
+        if(node && event && callback)
         {
-            if(callback)
-            {
-                if(scopeObj)
-                    node.on({'click': callback, scope: scopeObj});
-                else
-                    node.on('click', callback);
-            }
-        }  
-        catch(Exe)
-        {
+            var e = {};
+            e[event] = callback;
+            if(scopeObj)
+                e['scope'] = scopeObj;
+            node.on(e);
         }
     },
+
+    setClickCallback: function(node, callback, scopeObj)
+    {
+        this.setCallback(node, "click", callback, scopeObj);
+    },
+
+    setMouseOverCallback: function(node, callback, scopeObj)
+    {
+        this.setCallback(node, "mouseover", callback, scopeObj);
+    },
+
+    setMouseOutCallback: function(node, callback, scopeObj)
+    {
+        this.setCallback(node, "mouseout", callback, scopeObj);
+    },
+
 
     /**
      * given a mouseEl (or context menu el), and another panel (say a panel containing a map), return the pixel X,Y 
@@ -471,6 +537,7 @@ otp.util.ExtUtils = {
 
     //////////////////////  TREE UTILS  //////////////////////  TREE UTILS  //////////////////////
 
+    
     /**
      * makes a new tree object
      * 
@@ -482,14 +549,17 @@ otp.util.ExtUtils = {
      * @param {Function} clickCallback
      * @param {Object}   scope (for callback)
      */
-    makeTreeNode : function(treeNodeConfig, /*id, text, nodeCLS, iconCLS, isLeaf, */clickCallback, scope)
+    makeTreeNode : function(treeNodeConfig, clickCallback, scope, overCallback, outCallback)
     {
         var configDefaults = {margins: '0 0 0 0', cmargins: '0 2 0 0', expanded: true, collapsible: true};
         var config = Ext.apply({}, treeNodeConfig, configDefaults);
         var treeNode = new Ext.tree.TreeNode(config);
-        this.setClickCallback(treeNode, clickCallback, scope);
+        this.setClickCallback(treeNode,     clickCallback, scope);
+        this.setMouseOverCallback(treeNode, overCallback,  scope);
+        this.setMouseOutCallback(treeNode,  outCallback,   scope);
         return treeNode;
     },
+
 
     /** */
     clearTreeNode : function(node)

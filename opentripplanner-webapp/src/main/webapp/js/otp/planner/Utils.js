@@ -284,6 +284,7 @@ otp.planner.Utils = {
                 leaf: false
         }, clickCallback, scope);
         var retVal = new Ext.tree.TreePanel({
+            plugins    : new Ext.tree.NodeMouseoverPlugin(),
             root       : root,
             id         : thisID,
             lines      : false,

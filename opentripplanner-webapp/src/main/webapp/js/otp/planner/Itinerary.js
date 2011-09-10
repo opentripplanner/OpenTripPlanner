@@ -678,7 +678,9 @@ otp.planner.Itinerary = {
             }
 
             this.addNarrativeToStep(step, verb, stepNum);
-            var node = otp.util.ExtUtils.makeTreeNode({id:legId + "-" + i, text:step.narrative, cls:'itiny', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true}, this.instructionClickCB, this);
+            
+            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true};
+            var node = otp.util.ExtUtils.makeTreeNode(cfg, this.instructionClickCB, this, this.instructionHoverCB, this.instructionOutCB);
             node.m_step = step;
             stepNum++;
 
@@ -744,6 +746,8 @@ otp.planner.Itinerary = {
         if(node && node.m_step)
         {
             this.map.pan(node.m_step.lon, node.m_step.lat);
+            this.instructionHoverCB(node, m);
+            node.m_clicked = true;
         }
     },
 
@@ -756,6 +760,15 @@ otp.planner.Itinerary = {
             this.map.tooltip(node.m_step.lon, node.m_step.lat, node.m_step.bubbleHTML);
         }
     },
+
+    /** mouse out callback */
+    instructionOutCB : function(node, m)
+    {
+        if(!node.m_clicked)
+            this.map.tooltipHide();
+        node.m_clicked = false;
+    },
+
 
     CLASS_NAME: "otp.planner.Itinerary"
 };
