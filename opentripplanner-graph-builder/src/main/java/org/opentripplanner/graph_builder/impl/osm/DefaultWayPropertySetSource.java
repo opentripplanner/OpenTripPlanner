@@ -17,15 +17,15 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
-* Factory interface for providing a default collection of {@link WayProperties} that determine how
-* OSM streets can be traversed in various modes.
-*
-* Also supports
-*
-* @author bdferris, novalis
-* @see WayPropertySetSource
-* @see OpenStreetMapGraphBuilderImpl#setDefaultAccessPermissionsSource(props, WayPropertySetSource)
-*/
+ * Factory interface for providing a default collection of {@link WayProperties} that determine how
+ * OSM streets can be traversed in various modes.
+ *
+ * Also supports
+ *
+ * @author bdferris, novalis
+ * @see WayPropertySetSource
+ * @see OpenStreetMapGraphBuilderImpl#setDefaultAccessPermissionsSource(props, WayPropertySetSource)
+ */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
     /* properties and permissions for ways */
@@ -414,6 +414,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=living_street", "road");
         createNames(props, "highway=road", "road");
         createNames(props, "highway=service", "service road");
+        createNames(props, "highway=service;service=alley", "alley");
         createNames(props, "highway=service;service=parking_aisle", "parking lot");
         createNames(props, "highway=byway", "byway");
         createNames(props, "highway=track", "track");
