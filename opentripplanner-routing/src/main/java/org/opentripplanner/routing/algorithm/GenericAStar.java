@@ -148,7 +148,11 @@ public class GenericAStar {
              */
             if (maxComputationTime > 0) {
                 if ((System.currentTimeMillis() - computationStartTime) > maxComputationTime) {
-                    break;
+                    LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
+                    // Returning null indicates something went wrong and search should be aborted.
+                    // This is distinct from the empty list of paths which implies that a result may still
+                    // be found by retrying with altered options (e.g. max walk distance)
+                    return null;
                 }
             }
 

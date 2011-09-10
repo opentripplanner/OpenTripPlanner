@@ -76,6 +76,13 @@ public class ContractionPathServiceImpl implements PathService {
     
     private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
     
+    private double _maxComputationTime = 0; // seconds
+
+    // zero or negative number of seconds means no computation time limit
+    public void setMaxComputationTime (double seconds) {
+        _maxComputationTime = seconds;
+    }
+
     @Autowired
     public void setRemainingWeightHeuristicFactory(RemainingWeightHeuristicFactory hf) {
         _remainingWeightHeuristicFactory = hf;
@@ -163,6 +170,9 @@ public class ContractionPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
+        // break out of search after this time, to prevent slow response times
+        long computationEndTime = (long) (System.currentTimeMillis() + _maxComputationTime * 1000);
+        
         // The list of options specifying various modes, banned routes, etc to try for multiple
         // itineraries
         Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
@@ -187,6 +197,16 @@ public class ContractionPathServiceImpl implements PathService {
             StateEditor editor = new StateEditor(origin, null);
             editor.setTraverseOptions(options);
             origin = editor.makeState();
+            
+            // determine how much time is left for computation (convert absolute to relative time)
+            long remainingComputationTime = computationEndTime - System.currentTimeMillis();
+            LOG.debug("remaining time for search: {} sec", remainingComputationTime / 1000.0);
+            if (remainingComputationTime <= 0) {
+                LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
+                break;
+            }
+            options.maxComputationTime = remainingComputationTime;
+            // options.maxComputationTime = Math.min(remainingComputationTime, (long)(maxIterationTime * 1000));
 
             // options.worstTime = maxTime;
             // options.maxWeight = maxWeight;

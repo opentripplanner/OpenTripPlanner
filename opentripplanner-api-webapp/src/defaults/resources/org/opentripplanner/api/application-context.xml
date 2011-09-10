@@ -16,6 +16,7 @@
 	
 	<bean id="pathService" class="org.opentripplanner.routing.impl.ContractionPathServiceImpl">
 		<property name="remainingWeightHeuristicFactory" ref="heuristicFactory" />
+		<property name="maxComputationTime" value="10.0" />
 	</bean>
 
 	<bean id="heuristicFactory" 

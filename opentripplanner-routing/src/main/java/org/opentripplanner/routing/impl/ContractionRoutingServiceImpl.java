@@ -33,15 +33,18 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ContractionRoutingServiceImpl implements RoutingService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(ContractionRoutingServiceImpl.class);
     private static final int MAX_TRIES = 4;
-	private GraphService _graphService;
-
+    private GraphService _graphService;
+    
     @Autowired
     public void setGraphService(GraphService graphService) {
         _graphService = graphService;
@@ -59,11 +62,13 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         
         int tries = 0;
         
+        // this loop allows retrying the search with progressively longer walking distances
         while (tries < MAX_TRIES) {
         	if (options.remainingWeightHeuristic != null) {
         		options.remainingWeightHeuristic.reset();
         	}
         	tries += 1;
+        	LOG.debug("try number {} ; max walk distance = {}", tries, options.getMaxWalkDistance());
         	if (hierarchy == null) {
 
         		GenericAStar aStar = getAStarInstance(options);
