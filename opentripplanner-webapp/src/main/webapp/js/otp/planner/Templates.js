@@ -74,7 +74,7 @@ otp.planner.Templates = {
                 this.locale.labels.trip_details 
                 + ': {fromPlace} ' + this.locale.directions.to + ' {toPlace}'
                 + ' {arriveBy} {time} ' + this.locale.directions.on + ' {date}, '
-                + this.locale.directions.via + ' {mode}.'
+                + this.locale.directions.via + ' {[otp.util.Modes.translate(values["mode"])]}.'
                 + ' {opt}'
                 + '<tpl if="opt == \'TRIANGLE\'"> (tf={triangleTimeFactor}, sf={triangleSlopeFactor}, hf={triangleSafetyFactor})</tpl>'
                 + ','
@@ -103,7 +103,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_MODE == null)
             this.TP_LEG_MODE = ''
                 + '<h4>' 
-                + '<a href="#">{[otp.planner.Templates.locale.modes[values["mode"]]]}</a>'
+                + '<a href="#">{[otp.util.Modes.translate(values["mode"])]}</a>'
                 + ' {routeName} '
                 + '<tpl if="headsign != null && headsign.length &gt; 0"> ' + this.locale.directions.to + ' {headsign}</tpl>'
                 + '</h4>';

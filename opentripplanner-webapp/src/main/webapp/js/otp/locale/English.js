@@ -166,17 +166,17 @@ otp.locale.English = {
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
     modes :
     {
-        WALK:           "WALK",
-        BICYCLE:        "BICYCLE",
-        CAR:            "CAR",
-        TRAM:           "TRAM",
-        SUBWAY:         "SUBWAY",
-        RAIL:           "RAIL",
-        BUS:            "BUS",
-        FERRY:          "FERRY",
-        CABLE_CAR:      "CABLE CAR",
-        GONDOLA:        "GONDOLA",
-        FUNICULAR:      "FUNICULAR"
+        WALK:           "Walk",
+        BICYCLE:        "Bicycle",
+        CAR:            "Car",
+        TRAM:           "Tram",
+        SUBWAY:         "Subway",
+        RAIL:           "Rail",
+        BUS:            "Bus",
+        FERRY:          "Ferry",
+        CABLE_CAR:      "Cable Car",
+        GONDOLA:        "Gondola",
+        FUNICULAR:      "Funicular"
     },
 
     ordinal_exit:

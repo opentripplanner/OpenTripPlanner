@@ -322,9 +322,8 @@ otp.planner.Itinerary = {
         var from = this.m_fromStore.getAt(startIndex);
         var fromP = from.get('geometry');
         var mode = from.get('mode');
-        if (mode !== 'WALK' && mode !== 'BICYCLE') {
-            // if the first leg isn't a walk or bike, then assume it's a transit
-            // leg 
+
+        if (otp.util.Modes.isTransit(mode)) {
             // so paint the route icon (eg: fromStore.getAt(0))
             startIndex = 0;
             this.createAndAddMarker (fromP.x, fromP.y, {
@@ -603,7 +602,11 @@ otp.planner.Itinerary = {
             leg.data.showStopIds = this.showStopIds;
 
             // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
-            if(mode === 'walk' || mode === 'bicycle' || mode === 'car') 
+            if(otp.util.Modes.isTransit(mode))
+            {
+                text = this.templates.applyTransitLeg(leg);
+            }
+            else
             {
                 var template = 'TP_WALK_LEG';
                 if (mode === 'walk') {
@@ -627,10 +630,6 @@ otp.planner.Itinerary = {
                     isLeaf = false;
                 }
                 text = this.templates[template].applyTemplate(leg.data);
-            }
-            else
-            {
-                text = this.templates.applyTransitLeg(leg);
             }
 
             // step 2c: add a leg node to array

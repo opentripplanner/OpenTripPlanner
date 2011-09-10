@@ -14,7 +14,7 @@ if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.co
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
-	routerId      : "",
+    routerId      : "",
     locale        : otp.config.locale,
     metricsSystem : otp.config.locale.config.metricsSystem,  // Metrics system (e.g., 'english' == feet, miles, other value or null is metric system)
 

@@ -52,5 +52,21 @@ otp.util.Modes =  {
     },
 
 
+    /** return mode name from locale */
+    translate : function(mode, locale) {
+        if(mode == null) return mode;
+        if(locale == null)
+            locale = otp.config.locale;
+
+        var retVal = mode;
+        try {
+            retVal = locale.modes[mode];
+        } catch(e) {
+        }
+
+        return retVal;
+    },
+
+
     CLASS_NAME : "otp.util.Modes"
 };
