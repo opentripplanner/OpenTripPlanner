@@ -232,15 +232,31 @@ padding: 8px;
      list-style-type: decimal !important;
  }
  
- #tripplanner-panel .itiny ol.steps li strong {
-    font-weight: bold;
- }
- 
  .canvas-container {
     overflow: auto;
  }
 
 /* FRANK ADDED schedules.css OVERRIDE */
+strong {
+    font-weight: bold;
+ }
+ 
+.mapTooltipPopup {
+    background: url("images/map/trip/tooltip-popup-bg.png") no-repeat scroll 0 0 transparent;
+    height: 45px !important;
+    width:  212px !important;
+    padding: 2px 0 0 11px !important;
+    left: 0px;
+    top: -12px;
+    font-size: 12px;
+    overflow: auto;
+    position: relative;
+}
+
+.mapTooltipPopup img {
+    top: 4px;
+}
+
 .stopid {
     color: #808080 !important;
     font: 11px/13px Arial, Helvetica, sans-serif;

@@ -325,9 +325,32 @@ otp.core.MapStatic = {
         otp.util.OpenLayersUtils.pan(this.map, x, y);
     },
 
-
     /** */
     tooltip : function(x, y, html)
+    {
+        var ll = otp.util.OpenLayersUtils.getLonLat(this.map, x, y);
+        if (!this.tooltipPopup) 
+        {
+            // popup for map tooltips
+            OpenLayers.Popup.ToolTip = OpenLayers.Class(OpenLayers.Popup, { 
+                'contentDisplayClass': 'mapTooltipPopup' 
+            }); 
+
+            this.tooltipPopup = new OpenLayers.Popup.ToolTip("mapTooltipPopup", null, new OpenLayers.Size(155, 16), null, false);
+            this.tooltipPopup.setOpacity(0.95);
+            this.map.addPopup(this.tooltipPopup);
+        }
+
+        this.tooltipPopup.lonlat = ll;
+        this.tooltipPopup.setContentHTML(html);
+        this.tooltipPopup.updatePosition();
+        this.tooltipPopup.updateSize();
+        this.tooltipPopup.show();
+
+    },
+
+    /** */
+    Xtooltip : function(x, y, html)
     {
         var ll = otp.util.OpenLayersUtils.getLonLat(this.map, x, y);
         if(!this.tooltipPopup)
@@ -341,6 +364,7 @@ otp.core.MapStatic = {
                 html: "<div>PX</div>"
             });
 */
+
             this.tooltipPopup = new OpenLayers.Popup.FramedCloud(
                 "tooltip-popup", 
                 ll,
