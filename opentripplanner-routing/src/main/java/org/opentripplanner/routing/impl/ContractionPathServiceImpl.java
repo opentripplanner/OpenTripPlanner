@@ -198,15 +198,19 @@ public class ContractionPathServiceImpl implements PathService {
             editor.setTraverseOptions(options);
             origin = editor.makeState();
             
-            // determine how much time is left for computation (convert absolute to relative time)
-            long remainingComputationTime = computationEndTime - System.currentTimeMillis();
-            LOG.debug("remaining time for search: {} sec", remainingComputationTime / 1000.0);
-            if (remainingComputationTime <= 0) {
-                LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
-                break;
+            if (_maxComputationTime > 0) {
+                // determine how much time is left for computation (convert absolute to relative time)
+                long remainingComputationTime = computationEndTime - System.currentTimeMillis();
+                LOG.debug("remaining time for search: {} sec", remainingComputationTime / 1000.0);
+                if (remainingComputationTime <= 0) {
+                    LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
+                    break;
+                }
+                options.maxComputationTime = remainingComputationTime;
+                // options.maxComputationTime = Math.min(remainingComputationTime, (long)(maxIterationTime * 1000));
+            } else {
+                options.maxComputationTime = 0;
             }
-            options.maxComputationTime = remainingComputationTime;
-            // options.maxComputationTime = Math.min(remainingComputationTime, (long)(maxIterationTime * 1000));
 
             // options.worstTime = maxTime;
             // options.maxWeight = maxWeight;
