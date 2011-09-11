@@ -154,9 +154,9 @@ public class TestHalfEdges extends TestCase {
         graph.addEdge(new TurnEdge(bottom, right));
         graph.addEdge(new TurnEdge(right, topBack));
         
-        station1 = new TransitStop("transitVertex 1", -74.005, 40.0099999, "transitVertex 1", new AgencyAndId("A", "fleem station"), null);
+        station1 = new TransitStop("transitVertex 1", -74.005, 40.0099999, "transitVertex 1", new AgencyAndId("A", "fleem station"), null, null);
         graph.addVertex(station1);
-        station2 = new TransitStop("transitVertex 2", -74.002, 40.0099999, "transitVertex 2", new AgencyAndId("A", "morx station"), null);
+        station2 = new TransitStop("transitVertex 2", -74.002, 40.0099999, "transitVertex 2", new AgencyAndId("A", "morx station"), null, null);
         graph.addVertex(station2);
     }
 

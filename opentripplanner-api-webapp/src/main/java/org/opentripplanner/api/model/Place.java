@@ -34,10 +34,15 @@ public class Place {
     public String name = null;
 
     /** 
-     * The ID of the stop.  Depending on the transit agency, this may or may not be something that
-     * users care about.
+     * The ID of the stop. This is often something that users don't care about.
      */
     public AgencyAndId stopId = null;
+
+    /** 
+     * The "code" of the stop. Depending on the transit agency, this is often
+     * something that users care about.
+     */
+    public String stopCode = null;
 
     /**
      * The longitude of the place.
@@ -81,14 +86,15 @@ public class Place {
         this.name = name;
     }
 
-    public Place(Double lon, Double lat, String name, AgencyAndId stopId) {
+    public Place(Double lon, Double lat, String name, AgencyAndId stopId, String stopCode) {
         this(lon, lat, name);
         this.stopId = stopId;
+        this.stopCode = stopCode;
 	}
 
-	public Place(Double lon, Double lat, String name, AgencyAndId stopId,
+	public Place(Double lon, Double lat, String name, AgencyAndId stopId, String stopCode,
 			Date time) {
-		this(lon, lat, name, stopId);
+		this(lon, lat, name, stopId, stopCode);
 		this.arrival = departure = time;
 	}
 }

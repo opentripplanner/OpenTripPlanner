@@ -131,9 +131,9 @@ otp.planner.Templates = {
             this.TP_LEG_BASE_STR = ''
                 + '<p class="leg-info">'
                 + '<span class="time">{startTimeDisplayShort}</span> ' + this.locale.instructions.depart + ' {fromName}'
-                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds == true">'
+                + '<tpl if="fromStopCode != null && fromStopCode.length &gt; 0 && showStopCodes == true">'
                 +   '<br/>'
-                +   '<span class="stopid">' + this.locale.labels.stop_id + ' {fromStopId}</span>'
+                +   '<span class="stopid">' + this.locale.labels.stop_id + ' {fromStopCode}</span>'
                 + '</tpl>'
                 + '</p>'
                 + '<tpl if="duration != null">'
@@ -141,9 +141,9 @@ otp.planner.Templates = {
                 + '</tpl>'
                 + '<p class="leg-info">'
                 + '<span class="time">{endTimeDisplayShort}</span> ' + this.locale.instructions.arrive + ' {toName}'
-                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds == true">'
+                + '<tpl if="toStopCode != null && toStopCode.length &gt; 0 && showStopCodes == true">'
                 +   '<br/>'
-                +   '<span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span>'
+                +   '<span class="stopid">' + this.locale.labels.stop_id + ' {toStopCode}</span>'
                 + '</tpl>'
                 + '</p>'
                 + '<tpl if="alerts != null && alerts.length &gt; 0">'
@@ -180,8 +180,8 @@ otp.planner.Templates = {
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
                     this.locale.directions.to + ' {toName}',
                   '</h4>',
-                  '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds == true">',
-                    '<p class="leg-info"><span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span></p>',
+                  '<tpl if="toStopCode != null && toStopCode.length &gt; 0 && showStopCodes == true">',
+                    '<p class="leg-info"><span class="stopid">' + this.locale.labels.stop_id + ' {toStopCode}</span></p>',
                   '</tpl>',
                   '<tpl if="duration != null && duration &gt; 0">',
                     '<p class="leg-info transfers">' + this.locale.labels.about + ' {duration} ' + this.getDurationTemplateString() + ' - {distance}</p>', 

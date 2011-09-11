@@ -485,16 +485,16 @@ public class GTFSPatternHopFactory {
         for (Stop stop : _dao.getAllStops()) {
             //add a vertex representing the stop
             Vertex stopVertex = graph.addVertex(new TransitStop(id(stop.getId()), stop.getLon(),
-                    stop.getLat(), stop.getName(), stop.getId(), stop));
+                    stop.getLat(), stop.getName(), stop.getId(), stop.getCode(), stop));
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
                 Vertex arrive = graph.addVertex(new Vertex(arrivalVertexId(id(stop.getId())), stop.getLon(),
-                        stop.getLat(), stop.getName(), stop.getId()));
+                        stop.getLat(), stop.getName(), stop.getId(), stop.getCode()));
 
                 //add a vertex representing departing from at the stop
                 Vertex depart = graph.addVertex(new Vertex(departureVertexId(id(stop.getId())), stop.getLon(),
-                        stop.getLat(), stop.getName(), stop.getId()));
+                        stop.getLat(), stop.getName(), stop.getId(), stop.getCode()));
 
                 //add edges from arrive to stop and stop to depart
 
@@ -641,13 +641,13 @@ public class GTFSPatternHopFactory {
 
             // create journey vertices
 
-            Vertex startJourneyDepart = graph.addVertex(departId, s0.getName(), s0.getId(), s0.getLon(), s0.getLat());
+            Vertex startJourneyDepart = graph.addVertex(departId, s0.getName(), s0.getId(), s0.getCode(), s0.getLon(), s0.getLat());
 
-            Vertex endJourneyArrive = graph.addVertex(arriveId, s1.getName(), s1.getId(), s1.getLon(), s1.getLat());
+            Vertex endJourneyArrive = graph.addVertex(arriveId, s1.getName(), s1.getId(), s0.getCode(), s1.getLon(), s1.getLat());
             Vertex startJourneyArrive;
             if (i != 0) {
                 startJourneyArrive = graph.addVertex(
-                        id(s0.getId()) + "_" + id(trip.getId())  + "_" + st0.getStopSequence() + "_A", s0.getName(), s0.getId(), s0.getLon(), s0.getLat());
+                        id(s0.getId()) + "_" + id(trip.getId())  + "_" + st0.getStopSequence() + "_A", s0.getName(), s0.getId(), s0.getCode(), s0.getLon(), s0.getLat());
 
                 PatternDwell dwell = new PatternDwell(startJourneyArrive, startJourneyDepart, i,
                         tripPattern);
@@ -753,12 +753,12 @@ public class GTFSPatternHopFactory {
             Vertex endStation = graph.getVertex(arrivalVertexId(id(s1.getId())));
 
             // create journey vertices
-            Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId + "_" + st0.getStopSequence() + "_A",  s0.getName(), s0.getId(), s0.getLon(),
-                    s0.getLat());
-            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + tripId + "_" + st0.getStopSequence() + "_D", s0.getName(), s0.getId(), s0.getLon(),
-                    s0.getLat());
-            Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_" + tripId + "_" + st1.getStopSequence() + "_A",  s1.getName(), s1.getId(), s1.getLon(), s1
-                    .getLat());
+            Vertex startJourneyArrive = graph.addVertex(id(s0.getId()) + "_" + tripId + "_" + st0.getStopSequence() + "_A",
+                    s0.getName(), s0.getId(), s0.getCode(), s0.getLon(), s0.getLat());
+            Vertex startJourneyDepart = graph.addVertex(id(s0.getId()) + "_" + tripId + "_" + st0.getStopSequence() + "_D",
+                    s0.getName(), s0.getId(), s0.getCode(), s0.getLon(), s0.getLat());
+            Vertex endJourneyArrive = graph.addVertex(id(s1.getId()) + "_" + tripId + "_" + st1.getStopSequence() + "_A",
+                    s1.getName(), s1.getId(), s0.getCode(), s1.getLon(), s1.getLat());
 
             Dwell dwell = new Dwell(startJourneyArrive, startJourneyDepart, st0);
             graph.addEdge(dwell);

@@ -48,6 +48,8 @@ public class Vertex implements Cloneable, Serializable{
 
     private AgencyAndId stopId = null;
 
+    private String stopCode = null;
+
     private double y;
 
     private double x;
@@ -80,11 +82,18 @@ public class Vertex implements Cloneable, Serializable{
         this(label, x, y);
         this.name = name;
     }
-    
+
     public Vertex(String label, double x, double y, String name, AgencyAndId stopId) {
         this(label, x, y);
         this.name = name;
         this.stopId = stopId;
+    }
+    
+    public Vertex(String label, double x, double y, String name, AgencyAndId stopId, String stopCode) {
+        this(label, x, y);
+        this.name = name;
+        this.stopId = stopId;
+        this.stopCode = stopCode;
     }
 
 
@@ -213,10 +222,16 @@ public class Vertex implements Cloneable, Serializable{
         return new Coordinate(getX(), getY());
     }
 
-    /** For vertices that represent stops, the passenger-facing stop ID 
+    /** For vertices that represent stops, the non-passenger-facing stop ID 
      *  (for systems like TriMet that have this feature).  */
     public AgencyAndId getStopId() {
         return stopId;
+    }
+
+    /** For vertices that represent stops, the passenger-facing stop ID/Code
+     *  (for systems like TriMet that have this feature).  */
+    public String getStopCode() {
+        return stopCode;
     }
 
     /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */

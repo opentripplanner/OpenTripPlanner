@@ -123,10 +123,10 @@ public class Graph implements Serializable {
      * If the graph contains a vertex with the given label, return it. Otherwise, create a new
      * Vertex with the given parameters, add it to the graph, and return it.
      */
-    public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
+    public Vertex addVertex(String label, String name, AgencyAndId stopId, String stopCode, double x, double y) {
         Vertex gv = vertices.get(label);
         if (gv == null) {
-            Vertex vv = new Vertex(label, x, y, name, stopId);
+            Vertex vv = new Vertex(label, x, y, name, stopId, stopCode);
             vertices.put(label, vv);
             return vv;
         }

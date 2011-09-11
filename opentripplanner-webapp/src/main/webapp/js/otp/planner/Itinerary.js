@@ -28,7 +28,7 @@ otp.planner.Itinerary = {
     map            : null,
     locale         : null,
     templates      : null,
-    showStopIds    : false,
+    showStopCodes    : false,
     useRouteLongName : false,
 
     // raw data

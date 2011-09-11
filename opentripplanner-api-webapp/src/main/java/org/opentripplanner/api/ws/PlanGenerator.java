@@ -504,8 +504,9 @@ public class PlanGenerator {
         Coordinate endCoord = state.getVertex().getCoordinate();
         String name = state.getVertex().getName();
         AgencyAndId stopId = state.getVertex().getStopId();
+        String stopCode = state.getVertex().getStopCode();
         Date timeAtState = new Date(state.getTimeInMillis());
-        Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
+        Place place = new Place(endCoord.x, endCoord.y, name, stopId, stopCode, timeAtState);
         return place;
     }
 
@@ -518,6 +519,7 @@ public class PlanGenerator {
         Coordinate endCoord = vertex.getCoordinate();
         Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
         place.stopId = vertex.getStopId();
+        place.stopCode = vertex.getStopCode();
         return place;
     }
 

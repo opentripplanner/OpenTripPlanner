@@ -119,10 +119,10 @@ otp.planner.Utils = {
                   {name: 'routeLongName',    mapping: '@routeLongName'},
                   {name: 'fromName',         mapping: 'from/name'},
                   {name: 'fromDescription',  mapping: 'from/description'},
-                  {name: 'fromStopId',       mapping: 'from/stopId/id'},
+                  {name: 'fromStopCode',     mapping: 'from/stopCode'},
                   {name: 'toName',           mapping: 'to/name'},
                   {name: 'toDescription',    mapping: 'to/description'},
-                  {name: 'toStopId',         mapping: 'to/stopId/id'},
+                  {name: 'toStopCode',       mapping: 'to/stopCode'},
 
                   {name: 'steps',            mapping: 'steps', 
                                              convert: function(val, rec) {

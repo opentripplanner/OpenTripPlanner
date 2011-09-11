@@ -28,8 +28,8 @@ public class TransitStop extends Vertex {
      */
     private boolean local = false;
 
-    public TransitStop(String id, double lon, double lat, String name, AgencyAndId stopId, Stop stop) {
-        super(id, lon, lat, name, stopId);
+    public TransitStop(String id, double lon, double lat, String name, AgencyAndId stopId, String stopCode, Stop stop) {
+        super(id, lon, lat, name, stopId, stopCode);
         if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
         }

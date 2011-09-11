@@ -101,16 +101,16 @@ otp.planner.StepData = new otp.Class(otp.planner.StepData);
 otp.planner.ItineraryDataFactoryStatic = {
 
     // requried params 
-    id           : null,
-    store        : null,
-    templates    : null,
-    locale       : null,
-    showStopIds  : false,
+    id            : null,
+    store         : null,
+    templates     : null,
+    locale        : null,
+    showStopCodes : false,
 
-    from         : null,
-    to           : null,
-    details      : null,
-    modes        : null,  // otp.util.ItineraryModes (Modes.js line 126) ... requires an Itinerary object, and From store...
+    from          : null,
+    to            : null,
+    details       : null,
+    modes         : null,  // otp.util.ItineraryModes (Modes.js line 126) ... requires an Itinerary object, and From store...
 
     // optional 
     dontEditStep     : false,
@@ -164,8 +164,8 @@ otp.planner.ItineraryDataFactoryStatic = {
         var numLegs = this.store.getCount();
         for(var i = 0; i < numLegs; i++)
         {
-            var leg              = this.store.getAt(i);
-            leg.data.showStopIds = this.showStopIds;
+            var leg                = this.store.getAt(i);
+            leg.data.showStopCodes = this.showStopCodes;
 
             var text         = null;
             var verb         = null;
