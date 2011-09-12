@@ -36,8 +36,8 @@ otp.locale.English = {
         toHere           : "End a trip here",
 
         centerHere       : "Center map here",
-        zoomInHere       : "Zoom in here",
-        zoomOutHere      : "Zoom out of here",
+        zoomInHere       : "Zoom in",
+        zoomOutHere      : "Zoom out",
         previous         : "Last map position",
         next             : "Next map position"
     },

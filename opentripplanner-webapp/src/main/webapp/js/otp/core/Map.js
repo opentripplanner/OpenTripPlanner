@@ -38,6 +38,9 @@ otp.core.MapStatic = {
     // Options passed into the OpenLayers.Map constructor
     options          : null,
     baseLayerOptions : null,
+    THIS             : null,
+    CLOSE_ZOOM       : 18,
+    tooltipLinks     : true,
 
     /**
      * An OpenLayers.Bounds object that defines the default extent used when
@@ -88,6 +91,7 @@ otp.core.MapStatic = {
 
         otp.core.MapSingleton = this;
         var self = this;
+        otp.core.MapStatic.THIS = this;
 
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
@@ -96,7 +100,7 @@ otp.core.MapStatic = {
         }
         var pageParameters = Ext.urlDecode(window.location.search.substring(1));
         if (pageParameters["fromPlace"] !== undefined) {
-	  console.log(pageParameters.properties);
+            console.log(pageParameters.properties);
             return;
         }
         if (this.defaultExtent === 'automatic') {
@@ -112,7 +116,7 @@ otp.core.MapStatic = {
             var _params = {};
             if (this.routerId)
                 _params = { routerId : this.routerId };
-            OpenLayers.Request.GET({
+                OpenLayers.Request.GET({
                     // TODO: store the base /ws URL someplace else
                     url: '/opentripplanner-api-webapp/ws/metadata',
                     params: _params,
@@ -161,6 +165,7 @@ otp.core.MapStatic = {
             this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
         }
     },
+
 
     /** */
     getContextMenu : function(cm) {
@@ -241,7 +246,7 @@ otp.core.MapStatic = {
     {
         if (this.defaultExtent && this.defaultExtent !== 'automatic') {
             this.updateSize();
-            self.map.zoomToDefaultExtent();
+            otp.core.MapStatic.THIS.map.zoomToDefaultExtent();
         }
     },
 
@@ -299,7 +304,8 @@ otp.core.MapStatic = {
     /** */
     zoomOut : function()
     {
-        this.map.zoomOut();
+        var self = otp.core.MapStatic.THIS;
+        self.map.zoomOut();
     },
 
     /** */
@@ -320,75 +326,116 @@ otp.core.MapStatic = {
     },
 
     /** */
+    zoomAllTheWayIn : function(x, y, zoom)
+    {
+        var self = otp.core.MapStatic.THIS;
+        if(!zoom)
+            zoom=self.CLOSE_ZOOM;
+
+        // pan before zoom
+        if(x && y)
+            self.pan(x, y);
+
+        self.map.zoomTo(zoom);
+    },
+
+    /** */
     pan : function(x, y)
     {
         otp.util.OpenLayersUtils.pan(this.map, x, y);
     },
 
     /** */
-    tooltip : function(x, y, html)
+    tooltip : function(x, y, html, contentSize)
     {
-        var ll = otp.util.OpenLayersUtils.getLonLat(this.map, x, y);
-        if (!this.tooltipPopup) 
+        var self = otp.core.MapStatic.THIS;
+
+        // step 1: make lat/lon object and tooltip window (just once)
+        var ll = otp.util.OpenLayersUtils.getLonLat(self.map, x, y);
+        if (!self.tooltipPopup) 
         {
             // popup for map tooltips
             OpenLayers.Popup.ToolTip = OpenLayers.Class(OpenLayers.Popup, { 
                 'contentDisplayClass': 'mapTooltipPopup' 
             }); 
-
-            this.tooltipPopup = new OpenLayers.Popup.ToolTip("mapTooltipPopup", null, new OpenLayers.Size(155, 16), null, false);
-            this.tooltipPopup.setOpacity(0.95);
-            this.map.addPopup(this.tooltipPopup);
+            self.tooltipPopup = new OpenLayers.Popup.ToolTip("mapTooltipPopup", null, new OpenLayers.Size(155, 16), null, false);
+            self.tooltipPopup.setOpacity(1.00);
+            self.map.addPopup(self.tooltipPopup);
         }
 
-        this.tooltipPopup.lonlat = ll;
-        this.tooltipPopup.setContentHTML(html);
-        this.tooltipPopup.updatePosition();
-        this.tooltipPopup.updateSize();
-        this.tooltipPopup.show();
+        // step 2: add streetview and zoom in links to html
+        if(self.tooltipLinks)
+        {
+            // TODO - localize Zoom In and StreetView strings
 
+            // zoom in link if we're close in, else show the zoom out
+            var zoom = "";
+            if(self.map.getZoom() < (self.CLOSE_ZOOM - 1))
+                zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomAllTheWayIn(' + x + ',' + y  + ');">' + self.locale.contextMenu.zoomInHere + '</a>';
+            else
+                zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
+
+            // if content is shorter than 25 characters, we have tooltip space, so break the links to next line 
+            if(contentSize && contentSize <= 30)
+                html += '<br/>';
+            else 
+                html += ' ';
+    
+            // append links to tooltip content
+            html += '<span class="popLinks">' 
+                 +  zoom
+                 +  ' | <a href="#" onClick="otp.core.MapStatic.streetview(' + x + ',' + y  + ');">Streetview (© Google)</a>'
+                 +  '</span>';
+        }
+
+        self.tooltipPopup.setContentHTML(html);
+        self.tooltipPopup.lonlat = ll;
+        self.tooltipPopup.updatePosition();
+//        self.tooltipPopup.updateSize();
+        self.tooltipPopup.show();
     },
 
     /** */
-    Xtooltip : function(x, y, html)
-    {
-        var ll = otp.util.OpenLayersUtils.getLonLat(this.map, x, y);
-        if(!this.tooltipPopup)
-        {
-/*
-            this.tooltipPopup = new GeoExt.Popup({
-                location: ll,
-                map: this.map,
-                unpinable: false,
-                close: false,
-                html: "<div>PX</div>"
-            });
-*/
-
-            this.tooltipPopup = new OpenLayers.Popup.FramedCloud(
-                "tooltip-popup", 
-                ll,
-                new OpenLayers.Size(700, 1),
-                html,
-                null,
-                false
-            );
-            this.tooltipPopup.minSize = new OpenLayers.Size(160,76),
-            this.tooltipPopup.maxSize = new OpenLayers.Size(700,76),
-            this.tooltipPopup.opacity = 0.50;
-            this.map.addPopup(this.tooltipPopup);
-        }
-        this.tooltipPopup.lonlat = ll;
-        this.tooltipPopup.setContentHTML(html);
-        this.tooltipPopup.updatePosition();
-        this.tooltipPopup.updateSize();
-        this.tooltipPopup.show();
-    },
-
     tooltipHide : function()
     {
-        if(this.tooltipPopup)
-            this.tooltipPopup.hide()
+        var self = otp.core.MapStatic.THIS;
+        if(self.tooltipPopup)
+            self.tooltipPopup.hide()
+    },
+
+
+    /** */
+    streetview : function(x, y) 
+    {
+        var self = otp.core.MapStatic.THIS;
+        var ll = otp.util.OpenLayersUtils.getLonLat(self.map, x, y);
+        if (!self.streetviewPopup) 
+        {
+            // popup for map tooltips
+            OpenLayers.Popup.StreetView = OpenLayers.Class(OpenLayers.Popup, { 
+                'contentDisplayClass': 'mapStreetviewPopup',
+                'panMapIfOutOfView'  : true
+            }); 
+            self.streetviewPopup = new OpenLayers.Popup.StreetView("mapStreetViewPopup", null, new OpenLayers.Size(300, 200), null, true, self.streetviewHide);
+            self.map.addPopup(self.streetviewPopup);
+        }
+
+        var html = '<iframe width="95%" height="90%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" '
+                 + ' src="http://maps.google.com/maps?output=svembed&layer=c&cbp=0,0,0,0,&cbll=' + y + ',' + x + '&ll=' + y + ',' + x + '&z=17"></iframe>';
+
+        self.streetviewPopup.setContentHTML(html);
+        self.streetviewPopup.lonlat = ll;
+        self.streetviewPopup.updatePosition();
+        self.streetviewPopup.setBackgroundColor('0xFFFFFF');
+        self.streetviewPopup.show();
+    },
+
+    /** */
+    streetviewHide : function()
+    {
+        var self = otp.core.MapStatic.THIS;
+        if(self.streetviewPopup)
+            self.streetviewPopup.hide()
     },
 
 

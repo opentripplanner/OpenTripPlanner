@@ -257,6 +257,18 @@ strong {
     top: 4px;
 }
 
+.mapStreetviewPopup {
+    background: url("images/map/trip/streetview-popup-bg.png") no-repeat scroll 0 0 transparent;
+    height: 210px !important;
+    width:  320px !important;
+    padding: 21px 0 0 17px !important;
+    top: -21px;
+    left: 0px;
+    font-size: 12px;
+    overflow: auto;
+    position: relative;
+}
+
 .stopid {
     color: #808080 !important;
     font: 11px/13px Arial, Helvetica, sans-serif;
@@ -543,42 +555,6 @@ height: 21px!important;
 padding: 0!important;
 }
 
-.bus-icon {
-border: 0!important;
-background-image: url(images/ui/trip/mode/bus.gif)!important;
-float: left;
-width: 16px!important;
-height: 17px!important;
-padding: 0!important;
-}
-
-.streetcar-icon {
-border: 0!important;
-background-image: url(images/ui/trip/mode/streetcar.gif)!important;
-float: left;
-padding: 0!important;
-}
-
-.ltrail-icon {
-border: 0!important;
-background-image: url(images/ui/trip/mode/rail.gif)!important;
-float: left;
-padding: 0!important;
-}
-
-.commrail-icon {
-border: 0!important;
-background-image: url(images/ui/trip/mode/cr.gif)!important;
-float: left;
-padding: 0!important;
-}
-
-.tram-icon {
-border: 0!important;
-background-image: url(images/ui/trip/mode/tram.gif)!important;
-float: left;
-padding: 0!important;
-}
 
 .walk-icon {
 border: 0!important;

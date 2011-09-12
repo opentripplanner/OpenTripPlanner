@@ -735,6 +735,7 @@ otp.planner.Itinerary = {
             step.narrative  = stepText;
             step.iconURL    = iconURL;
             step.bubbleHTML = '<img src="' + iconURL + '"></img> ' + ' <strong>' + stepNum + '.</strong> ' + step.streetName;
+            step.bubbleLen  = step.streetName.length + 3;
         }
 
         return stepText;
@@ -757,16 +758,25 @@ otp.planner.Itinerary = {
     {
         if (node && node.m_step)
         {
-            this.map.tooltip(node.m_step.lon, node.m_step.lat, node.m_step.bubbleHTML);
+            this.map.tooltip(node.m_step.lon, node.m_step.lat, node.m_step.bubbleHTML, node.m_step.bubbleLen);
         }
     },
 
     /** mouse out callback */
+    clickCount : 0,
     instructionOutCB : function(node, m)
     {
         if(!node.m_clicked)
+        {
             this.map.tooltipHide();
-        node.m_clicked = false;
+            this.map.streetviewHide();
+            this.clickCount = 0;
+        }
+        if(this.clickCount > 2) 
+        {
+            node.m_clicked = false;
+        }
+        this.clickCount++;
     },
 
 
