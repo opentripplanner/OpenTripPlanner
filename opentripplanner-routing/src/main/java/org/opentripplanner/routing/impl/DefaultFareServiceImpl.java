@@ -25,9 +25,11 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.FareAttribute;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.services.FareService;
@@ -49,6 +51,8 @@ class Ride {
     String endZone;
 
     long startTime;
+
+    long endTime;
 
     //generic classifier and start/end stops, unused in DefaultFareServiceImpl but maybe useful elsewhere 
 	public Object classifier;
@@ -127,20 +131,29 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         List<Ride> rides = new ArrayList<Ride>();
         Ride newRide = null;
         for (State curr : states) {
+        	EdgeNarrative edgeNarrative = curr.getBackEdgeNarrative();
+        	/* skip initial state, which has no back edges */
+            if (edgeNarrative == null)
+                continue;
+
             String zone = curr.getZone();
             AgencyAndId route = curr.getRoute();
+            TraverseMode mode = edgeNarrative.getMode();
             if (zone == null && route == null) {
                 newRide = null;
             } else {
-                if (newRide == null || !route.equals(newRide.route)) {
-                    newRide = new Ride();
-                    rides.add(newRide);
-                    newRide.startZone = zone;
-                    newRide.route = route;
-                    newRide.startTime = curr.getTime();
-                }
-                newRide.zones.add(zone);
-                newRide.endZone = zone;
+                if (mode.isTransit() || mode == TraverseMode.BOARDING){
+                  if (newRide == null || !route.equals(newRide.route)) {
+                      newRide = new Ride();
+                      rides.add(newRide);
+                      newRide.startZone = zone;
+                      newRide.route = route;
+                      newRide.startTime = curr.getTime();
+                  }
+                  newRide.zones.add(zone);
+                  newRide.endZone = zone;
+                  newRide.endTime = curr.getTime();
+            	}
             }
         }
 
@@ -168,11 +181,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             transfersUsed += 1;
 
             long tripTime = ride.startTime - startTime;
-
             // find the best fare that matches this set of rides
-            for (AgencyAndId fareId : fareRules.keySet()) {
+            for (AgencyAndId fareId : fareAttributes.keySet()) {
                 FareRuleSet ruleSet = fareRules.get(fareId);
-                if (ruleSet.matches(startZone, ride.endZone, zones, routes)) {
+                if (ruleSet==null || ruleSet.matches(startZone, ride.endZone, zones, routes)) {
                     FareAttribute attribute = fareAttributes.get(fareId);
                     if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                         continue;
