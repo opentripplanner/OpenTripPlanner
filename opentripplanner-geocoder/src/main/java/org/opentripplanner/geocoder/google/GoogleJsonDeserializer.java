@@ -17,12 +17,10 @@ import flexjson.JSONDeserializer;
 
 public class GoogleJsonDeserializer {
 	
-	@SuppressWarnings("unchecked")
-	private JSONDeserializer jsonDeserializer;
+	private JSONDeserializer<GoogleGeocoderResults> jsonDeserializer;
 	
-	@SuppressWarnings("unchecked")
 	public GoogleJsonDeserializer() {
-		jsonDeserializer = new JSONDeserializer()
+		jsonDeserializer = new JSONDeserializer<GoogleGeocoderResults>()
         	.use(null, GoogleGeocoderResults.class);
 	}
 
