@@ -192,8 +192,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
-        // will work only for arriveby searches
-        s1.incrementWeight(state0.getOptions().boardCost); 
+        // following line will work only for arriveby searches
+        // it produces inadmissible heuristics for depart-after searches
+        // s1.incrementWeight(state0.getOptions().boardCost); 
         return s1.makeState();
     }
 
