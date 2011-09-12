@@ -181,6 +181,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             transfersUsed += 1;
 
             long tripTime = ride.startTime - startTime;
+            long journeyTime = ride.endTime - startTime;
             // find the best fare that matches this set of rides
             for (AgencyAndId fareId : fareAttributes.keySet()) {
                 FareRuleSet ruleSet = fareRules.get(fareId);
@@ -193,6 +194,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                     // as trimet does
                     if (attribute.isTransferDurationSet()
                             && tripTime > attribute.getTransferDuration()) {
+                        continue;
+                    }
+                    if (attribute.isJourneyDurationSet()
+                            && journeyTime > attribute.getJourneyDuration()) {
                         continue;
                     }
                     float newFare = attribute.getPrice();
