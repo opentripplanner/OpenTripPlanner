@@ -598,8 +598,7 @@ class EDCNamespaceContext implements NamespaceContext {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public Iterator getPrefixes(String namespace) {
+    public Iterator<?> getPrefixes(String namespace) {
         return null;
     }
 }
