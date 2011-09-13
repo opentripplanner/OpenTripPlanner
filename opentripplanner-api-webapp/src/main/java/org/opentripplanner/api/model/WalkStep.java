@@ -14,6 +14,14 @@
 
 package org.opentripplanner.api.model;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+
+import org.opentripplanner.routing.patch.Alert;
+
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
  * <p>
@@ -90,6 +98,9 @@ public class WalkStep {
      * x is the distance from the start of the step, y is the elevation at this distance.
      */
     public String elevation;
+
+    @XmlElement
+	public List<Alert> alerts;
     
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
@@ -143,4 +154,19 @@ public class WalkStep {
         int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
         absoluteDirection = AbsoluteDirection.values()[octant];
     }
+
+	public void addAlerts(Collection<Alert> newAlerts) {
+		if (newAlerts == null) {
+			return;
+		}
+		if (alerts == null) {
+			alerts = new ArrayList<Alert>(newAlerts);
+			return;
+		}
+		for (Alert alert : newAlerts) {
+			if (!alerts.contains(alert)) {
+				alerts.add(alert);
+			}
+		}
+	}
 }

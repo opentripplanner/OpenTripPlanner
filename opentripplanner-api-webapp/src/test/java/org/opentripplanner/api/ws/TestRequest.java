@@ -24,6 +24,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.ws.RequestInf;
+import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
@@ -113,6 +114,9 @@ public class TestRequest extends TestCase {
 
         schema.setPermissionConverter(perms);
 
+        //as a test, use prefixes ("NE", SE", etc) as an alert
+        schema.setNoteConverter(new AttributeFeatureConverter<String> ("PREFIX"));
+
         builder.setSchema(schema );
         builder.buildGraph(graph);
         ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, null);
@@ -173,7 +177,34 @@ public class TestRequest extends TestCase {
         assertTrue(step1.stayOn);
 
     }
-    
+
+	public void testAlerts() throws Exception {
+		Vertex v1 = graph.getVertex("114789 back");//SE 47th and Ash
+		Vertex v2 = graph.getVertex("114237");// NE 47th and Davis note that we cross Burnside this go from SE to NE
+		assertNotNull(v1);
+		assertNotNull(v2);
+
+		Response response = planner.getItineraries(v1.getLabel(),
+				v2.getLabel(), null, "2009-01-01", "11:11:11", null, false,
+				false, 840.0, 1.33, null, null, null, OptimizeType.QUICK,
+				new TraverseModeSet("WALK"), 1, null, false, "", "", "", 0);
+
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Leg leg = itinerary.legs.get(0);
+        List<WalkStep> steps = leg.walkSteps;
+        assertEquals(2, steps.size());
+        WalkStep step0 = steps.get(0);
+        WalkStep step1 = steps.get(1);
+
+        assertNotNull(step0.alerts);
+		assertEquals(1, step0.alerts.size());
+		assertEquals("SE",
+				step0.alerts.get(0).alertHeaderText.getSomeTranslation());
+
+		assertEquals(1, step1.alerts.size());
+		assertEquals("NE",
+				step1.alerts.get(0).alertHeaderText.getSomeTranslation());
+	}
 
     public void testIntermediate() throws Exception {
         

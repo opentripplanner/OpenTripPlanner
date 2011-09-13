@@ -592,15 +592,15 @@ public class PlanGenerator {
 
         for (State currState : states) {
             Edge edge = currState.getBackEdge();
-            EdgeNarrative edgeResult = currState.getBackEdgeNarrative();
+            EdgeNarrative edgeNarrative = currState.getBackEdgeNarrative();
             if (edge instanceof FreeEdge) {
                 continue;
             }
-            Geometry geom = edgeResult.getGeometry();
+            Geometry geom = edgeNarrative.getGeometry();
             if (geom == null) {
                 continue;
             }
-            String streetName = edgeResult.getName();
+            String streetName = edgeNarrative.getName();
             if (step == null) {
                 // first step
                 step = createWalkStep(currState);
@@ -608,7 +608,7 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
-                distance = edgeResult.getDistance();
+                distance = edgeNarrative.getDistance();
             } else if (step.streetName != streetName
                     && (step.streetName != null && !step.streetName.equals(streetName))) {
                 /* street name has changed */
@@ -622,29 +622,29 @@ public class PlanGenerator {
                 /* start a new step */
                 step = createWalkStep(currState);
                 steps.add(step);
-                if (edgeResult.isRoundabout()) {
+                if (edgeNarrative.isRoundabout()) {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
-                step.setDirections(lastAngle, thisAngle, edgeResult.isRoundabout());
+                step.setDirections(lastAngle, thisAngle, edgeNarrative.isRoundabout());
                 // new step, set distance to length of first edge
-                distance = edgeResult.getDistance();
+                distance = edgeNarrative.getDistance();
             } else {
                 /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
-                        edgeResult.isRoundabout());
+                        edgeNarrative.isRoundabout());
                 boolean optionsBefore = pathService.multipleOptionsBefore(edge, currState.getBackState());
-                if (edgeResult.isRoundabout()) {
+                if (edgeNarrative.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {
                         // increment exit count if we passed one.
                         roundaboutExit += 1;
                     }
                 }
-                if (edgeResult.isRoundabout() || direction == RelativeDirection.CONTINUE) {
+                if (edgeNarrative.isRoundabout() || direction == RelativeDirection.CONTINUE) {
                     // we are continuing almost straight, or continuing along a roundabout.
                     // just append elevation info onto the existing step.
                     if (step.elevation != null) {
@@ -654,7 +654,7 @@ public class PlanGenerator {
                         step.elevation += s;
                     }
                     // extending a step, increment the existing distance
-                    distance += edgeResult.getDistance();
+                    distance += edgeNarrative.getDistance();
                 } else {
                     // we are not on a roundabout, and not continuing straight through.
 
@@ -708,12 +708,13 @@ public class PlanGenerator {
                         step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
                         // new step, set distance to length of first edge
-                        distance = edgeResult.getDistance();
+                        distance = edgeNarrative.getDistance();
                     }
                 }
             }
             // increment the total length for this step
-            step.distance += edgeResult.getDistance();
+            step.distance += edgeNarrative.getDistance();
+            step.addAlerts(edgeNarrative.getNotes());
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
@@ -740,6 +741,7 @@ public class PlanGenerator {
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
         step.bogusName = en.hasBogusName();
+        step.addAlerts(en.getNotes());
         return step;
     }
 
