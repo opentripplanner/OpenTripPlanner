@@ -576,8 +576,9 @@ otp.planner.Itinerary = {
         var toId  = this.id + '-' + otp.planner.Utils.TO_ID;
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
         
-        var containsBikeMode = false;
-        var containsCarMode  = false;
+        var containsBikeMode    = false;
+        var containsCarMode     = false;
+        var containsTransitMode = false;
 
         var retVal = new Array();
         var numLegs = store.getCount();
@@ -605,6 +606,7 @@ otp.planner.Itinerary = {
             if(otp.util.Modes.isTransit(mode))
             {
                 text = this.templates.applyTransitLeg(leg);
+                containsTransitMode = true;
             }
             else
             {
@@ -632,9 +634,16 @@ otp.planner.Itinerary = {
                 text = this.templates[template].applyTemplate(leg.data);
             }
 
-            // step 2c: add a leg node to array
+            // step 2c: make this leg (tree) node
             var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeName});
-            var node = otp.util.ExtUtils.makeTreeNode({id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf}, clickCallback, scope);
+            var cfg = {id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf};
+            if(numLegs > 2)
+            {
+                // show/hide instructions if our trip has more than 2 legs 
+                cfg.expanded = false;
+                cfg.singleClickExpand = true;
+            }
+            var node = otp.util.ExtUtils.makeTreeNode(cfg, clickCallback, scope);
 
             // step 2d: if we have instruction sub-nodes, add them to the tree...
             if (instructions && instructions.length >= 1)
@@ -679,7 +688,7 @@ otp.planner.Itinerary = {
 
             this.addNarrativeToStep(step, verb, stepNum);
             
-            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true};
+            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny-steps', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true};
             var node = otp.util.ExtUtils.makeTreeNode(cfg, this.instructionClickCB, this, this.instructionHoverCB, this.instructionOutCB);
             node.m_step = step;
             stepNum++;

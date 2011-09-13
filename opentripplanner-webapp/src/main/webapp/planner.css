@@ -483,7 +483,17 @@ font-size: 12px;
 padding-left: 7px;
 padding-top: 3px;
 min-height: 24px!important;
-border-bottom: 1px solid #808080;
+border-top: 1px solid #808080;
+vertical-align: middle;
+margin: 0;
+}
+
+.itiny-steps {
+font-size: 11px;
+padding-left: 10px;
+padding-top: 3px;
+min-height: 16px!important;
+/*border-bottom: 1px groove #707070; */
 vertical-align: middle;
 margin: 0;
 }

@@ -71,12 +71,12 @@ otp.planner.Renderer = {
             this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
-                                    
+
             var style = otp.util.OpenLayersUtils.getMarkerStyle();
             var styleMap = new OpenLayers.StyleMap(style);
             var uniqueValueRules = otp.util.OpenLayersUtils.getMarkerUniqueValueRules();
             styleMap.addUniqueValueRules("default", "type", uniqueValueRules);
-            
+
             var markerLayerOptions = {
                     isBaseLayer: false,
                     rendererOptions: {yOrdering: true},
