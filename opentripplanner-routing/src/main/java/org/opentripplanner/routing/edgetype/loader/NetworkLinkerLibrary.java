@@ -391,12 +391,12 @@ public class NetworkLinkerLibrary {
 
     private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
         // find most common start and end points, which will be ends of this street
-        HashMap<StreetVertex, Set<Edge>> numEdgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
+        HashMap<StreetVertex, Set<Edge>> edgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
         for (Edge edge : edges) {
-            Set<Edge> starting = numEdgesStartingAt.get(edge.getFromVertex());
+            Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
             if (starting == null) {
                 starting = new HashSet<Edge>();
-                numEdgesStartingAt.put((StreetVertex) edge.getFromVertex(), starting);
+                edgesStartingAt.put((StreetVertex) edge.getFromVertex(), starting);
             }
             starting.add(edge);
         }
@@ -405,7 +405,7 @@ public class NetworkLinkerLibrary {
         int maxEnding = 0;
         Entry<StreetVertex, Set<Edge>> startingVertex = null;
         Entry<StreetVertex, Set<Edge>> endingVertex = null;
-        for (Entry<StreetVertex, Set<Edge>> entry : numEdgesStartingAt.entrySet()) {
+        for (Entry<StreetVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
             int numEdges = entry.getValue().size();
             if (numEdges >= maxStarting) {
                 endingVertex = startingVertex;
