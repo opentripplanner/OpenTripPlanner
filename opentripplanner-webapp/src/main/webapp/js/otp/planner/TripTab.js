@@ -355,14 +355,15 @@ otp.planner.TripTab = {
         if (retVal == null) {
             var itin = this.m_itinerariesStore.getAt(id - 1);
             retVal = new otp.planner.Itinerary( {
-                locale      : this.locale,
-                templates   : this.templates,
-                showStopIds : this.planner.showStopIds,
-                map  : this.planner.map,
-                xml  : itin,
-                from : this.m_from,
-                to   : this.m_to,
-                id   : id
+                map              : this.planner.map,
+                locale           : this.locale,
+                templates        : this.templates,
+                showStopIds      : this.planner.showStopIds,
+                useRouteLongName : this.planner.useRouteLongName,
+                xml              : itin,
+                from             : this.m_from,
+                to               : this.m_to,
+                id               : id
             });
             if (retVal != null && retVal.isValid()) {
                 this.m_itineraryCache[id] = retVal;

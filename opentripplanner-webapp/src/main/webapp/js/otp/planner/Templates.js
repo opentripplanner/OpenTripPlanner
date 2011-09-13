@@ -100,16 +100,25 @@ otp.planner.Templates = {
                 '</table></div>'
             ).compile();
 
+        if(this.HEADSIGN == null)
+            this.HEADSIGN = '<tpl if="headsign != null && headsign.length &gt; 0"> ' + this.locale.directions.to + ' {headsign}</tpl>';
+
         if(this.TP_LEG_MODE == null)
             this.TP_LEG_MODE = ''
                 + '<h4>' 
                 + '<a href="#">{[otp.util.Modes.translate(values["mode"])]}</a>'
                 + ' {routeName} '
-                + '<tpl if="headsign != null && headsign.length &gt; 0"> ' + this.locale.directions.to + ' {headsign}</tpl>'
+                + this.HEADSIGN
                 + '</h4>';
 
         if(this.TP_LEG_CONTINUES == null)
-            this.TP_LEG_CONTINUES = '<h4><a href="#">' + this.locale.instructions.continue_as + '</a> {routeName} <span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span></h4>';
+            this.TP_LEG_CONTINUES = ''
+                + '<h4>'
+                + '<a href="#">' + this.locale.instructions.continue_as + '</a> '
+                + ' {routeName} '
+                + this.HEADSIGN
+                + '<span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span>'
+                + '</h4>';
 
         if(this.TP_LEG_BASE_STR == null)
             this.TP_LEG_BASE_STR = ''
@@ -126,7 +135,7 @@ otp.planner.Templates = {
                 + '<tpl if="alerts != null && alerts.length &gt; 0">'
                 + '<tpl for="alerts">'
                 +   '<p class="alert"><img src="images/ui/trip/alert.png" align="absmiddle"/> '
-                +   '<b>' + this.locale.labels.alert_for_rt + ' {parent.routeName}: </b>{.}</p>'
+                +   '<b>' + this.locale.labels.alert_for_rt + ' {parent.routeShortName}: </b>{.}</p>'
                 + '</tpl>'
                 + '</tpl>';
 

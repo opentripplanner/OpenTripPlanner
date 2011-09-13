@@ -29,6 +29,7 @@ otp.planner.Itinerary = {
     locale         : null,
     templates      : null,
     showStopIds    : false,
+    useRouteLongName : false,
 
     // raw data
     xml            : null,
@@ -249,7 +250,8 @@ otp.planner.Itinerary = {
     /**
      * 
      */
-    makeRouteLines : function(vLayer) {
+    makeRouteLines : function(vLayer)
+    {
         var vectors = new Array();
 
         var endIndex = this.m_fromStore.getCount() - 1;
@@ -592,10 +594,10 @@ otp.planner.Itinerary = {
             var leg = store.getAt(i);
             var text;
             var verb;
-            var sched  = null;
-            var mode = leg.get('mode').toLowerCase();
-            var routeName = leg.get('routeName');
-            var agencyId = leg.get('agencyId');
+            var sched     = null;
+            var mode      = leg.get('mode').toLowerCase();
+            var agencyId  = leg.get('agencyId');
+            var routeId   = leg.get('routeShortName');
 
             var isLeaf = true;
             var instructions = null;
@@ -605,6 +607,7 @@ otp.planner.Itinerary = {
             // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
             if(otp.util.Modes.isTransit(mode))
             {
+                leg.set('routeName', this.makeRouteName(leg));
                 text = this.templates.applyTransitLeg(leg);
                 containsTransitMode = true;
             }
@@ -635,7 +638,7 @@ otp.planner.Itinerary = {
             }
 
             // step 2c: make this leg (tree) node
-            var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeName});
+            var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeId});
             var cfg = {id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf};
             if(numLegs > 2)
             {
@@ -669,6 +672,34 @@ otp.planner.Itinerary = {
 
         return retVal;
     },
+
+
+    /** 
+     * pass in a transit leg record, and build the route name from GTFS route-short-name and route-long-name
+     * e.g, TriMet has route-short-name=1 and route-long-name=Vermont...thus the full route name of 1-Vermont
+     *
+     * @see override this method for your own template
+     */
+    makeRouteName : function(rec)
+    {
+        var routeName = rec.get('routeShortName');
+
+        // step 1: configure parameter must be set to true
+        if(this.useRouteLongName)
+        {
+            var routeLongName = rec.get('routeLongName');
+    
+            // step 2: make sure routeName has something
+            if(routeName == null || routeName.length < 1)
+                routeName = routeLongName;
+    
+            // step 3: construct route name as combo of routeName (id) and routeLongName
+            if(routeLongName && routeLongName != routeName)
+                routeName = routeName + "-" + routeLongName;
+        }
+        return routeName;
+    },
+
 
     /** make bike / walk turn by turn narrative */
     makeInstructionStepsNodes : function(steps, verb, legId)
@@ -781,7 +812,7 @@ otp.planner.Itinerary = {
             this.map.streetviewHide();
             this.clickCount = 0;
         }
-        if(this.clickCount > 2) 
+        if(this.clickCount >= 2) 
         {
             node.m_clicked = false;
         }

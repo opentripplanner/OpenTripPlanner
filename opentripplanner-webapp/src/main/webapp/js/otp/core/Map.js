@@ -376,7 +376,7 @@ otp.core.MapStatic = {
                 zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
 
             // if content is shorter than 25 characters, we have tooltip space, so break the links to next line 
-            if(contentSize && contentSize <= 30)
+            if(contentSize && contentSize <= 25)
                 html += '<br/>';
             else 
                 html += ' ';
@@ -391,7 +391,6 @@ otp.core.MapStatic = {
         self.tooltipPopup.setContentHTML(html);
         self.tooltipPopup.lonlat = ll;
         self.tooltipPopup.updatePosition();
-//        self.tooltipPopup.updateSize();
         self.tooltipPopup.show();
     },
 

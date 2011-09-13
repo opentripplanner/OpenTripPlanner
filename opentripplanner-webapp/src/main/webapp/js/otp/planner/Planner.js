@@ -38,10 +38,14 @@ otp.planner.Planner = {
     fromToOverride          : null,
     linkTemplates           : null,
     geocoder                : null,
-    useOptionDependencies   : null,
+    templates               : null,
+
+    // see config.js to override these options
     showWheelchairForm      : null,
     showStopIds             : null,
-    templates               : null,
+    useOptionDependencies   : null,
+    useRouteLongName        : null,
+
 
     // new tab (itineraries tabs) management
     m_tabs        : null,

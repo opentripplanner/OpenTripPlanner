@@ -115,21 +115,15 @@ otp.planner.Utils = {
                       }
                       return alerts;
                   }},
-                  {name: 'routeName',        mapping: '@route',
-                                             convert: function(val, rec) {
-                                                return otp.planner.Utils.makeRouteName(val, rec);
-                                             }
-                  },
-                  {name: 'routeNumber',      mapping: 'route/number'},
-                  {name: 'url',              mapping: 'lineURL/@param'},
+                  {name: 'routeShortName',   mapping: '@route'},
+                  {name: 'routeLongName',    mapping: '@routeLongName'},
                   {name: 'fromName',         mapping: 'from/name'},
                   {name: 'fromDescription',  mapping: 'from/description'},
                   {name: 'fromStopId',       mapping: 'from/stopId/id'},
-                  {name: 'fromCity',         mapping: 'from/@areaValue'},
                   {name: 'toName',           mapping: 'to/name'},
                   {name: 'toDescription',    mapping: 'to/description'},
                   {name: 'toStopId',         mapping: 'to/stopId/id'},
-                  {name: 'toCity',           mapping: 'to/@areaValue'},
+
                   {name: 'steps',            mapping: 'steps', 
                                              convert: function(val, rec) {
                                                 return otp.planner.Utils.makeWalkSteps(val, rec);
@@ -150,14 +144,6 @@ otp.planner.Utils = {
     domSelect : function(nodeName, xml)
     {
         return Ext.DomQuery.select(nodeName, xml);
-    },
-
-    /**
-     * parse the <steps></steps> element into a JavaScript
-     */
-    makeRouteName : function(val, rec)
-    {
-        return val;
     },
 
     /**
