@@ -180,24 +180,26 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     length += JTS.orthodromicDistance(coordinates[i],
                             coordinates[i + 1], worldCRS);
                 }
-
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
+
                 PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
                 street.setId(id);
+                graph.addEdge(street);
+
+                LineString reversed = (LineString) geom.reverse();
+                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
+                backStreet.setId(id);
+                graph.addEdge(backStreet);
+
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
                 	if (note != null && note.length() > 0) {
                 		HashSet<Alert> notes = Alert.newSimpleAlertSet(note);
                 		street.setNote(notes);
+                		backStreet.setNote(notes);
                 	}
                 }
-                graph.addEdge(street);
-                
-                LineString reversed = (LineString) geom.reverse();
-                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
-                backStreet.setId(id);
-                graph.addEdge(backStreet);
-                
+
                 boolean slopeOverride = slopeOverrideCoverter.convert(feature);
                 street.setSlopeOverride(slopeOverride);
                 backStreet.setSlopeOverride(slopeOverride);
