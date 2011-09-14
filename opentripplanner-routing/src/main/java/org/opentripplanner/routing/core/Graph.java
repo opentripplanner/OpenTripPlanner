@@ -28,17 +28,17 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * This holds the edge list for every vertex.
- * 
  */
 public class Graph implements Serializable {
-	// update serialVersionId to the current date in format YYYYMMDDL
-	// whenever changes are made that could make existing graphs incompatible
-	private static final long serialVersionUID = 20110614L;
+    // update serialVersionId to the current date in format YYYYMMDDL
+    // whenever changes are made that could make existing graphs incompatible
+    private static final long serialVersionUID = 20110614L;
 
-	// transit feed validity information in seconds since epoch
-    private long transitServiceStarts = Long.MAX_VALUE;           
-    private long transitServiceEnds = 0;   
-    
+    // transit feed validity information in seconds since epoch
+    private long transitServiceStarts = Long.MAX_VALUE;
+
+    private long transitServiceEnds = 0;
+
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
     HashMap<String, GraphVertex> vertices;
@@ -219,35 +219,37 @@ public class Graph implements Serializable {
     public TransferTable getTransferTable() {
         return transferTable;
     }
-    
-	// Infer the time period covered by the trasit feed
+
+    // Infer the time period covered by the trasit feed
     public void updateTransitFeedValidity(CalendarServiceData data) {
-    	final long SEC_IN_DAY = 24 * 60 * 60;
-    	for (AgencyAndId sid : data.getServiceIds()) {
-    		for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
-    			long t = sd.getAsDate().getTime();
-    			// assume feed is unreliable after midnight on last service day
-    	       	long u = t + SEC_IN_DAY; 
-    			if (t < this.transitServiceStarts) this.transitServiceStarts = t;
-    	       	if (u > this.transitServiceEnds) this.transitServiceEnds = u;	
-    		}
-    	}
+        final long SEC_IN_DAY = 24 * 60 * 60;
+        for (AgencyAndId sid : data.getServiceIds()) {
+            for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
+                long t = sd.getAsDate().getTime();
+                // assume feed is unreliable after midnight on last service day
+                long u = t + SEC_IN_DAY;
+                if (t < this.transitServiceStarts)
+                    this.transitServiceStarts = t;
+                if (u > this.transitServiceEnds)
+                    this.transitServiceEnds = u;
+            }
+        }
     }
 
     // Check to see if we have transit information for a given date
     public boolean transitFeedCovers(Date d) {
-    	long t = d.getTime();
-    	return t >= this.transitServiceStarts && t < this.transitServiceEnds; 
+        long t = d.getTime();
+        return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 
-	public void removeEdge(DirectEdge e) {
-		GraphVertex gv = vertices.get(e.getFromVertex().getLabel());
-		if (gv != null) {
-			gv.removeOutgoing(e);
-		}
-		gv = vertices.get(e.getToVertex().getLabel());
-		if (gv != null) {
-			gv.removeIncoming(e);
-		}
-	}
+    public void removeEdge(DirectEdge e) {
+        GraphVertex gv = vertices.get(e.getFromVertex().getLabel());
+        if (gv != null) {
+            gv.removeOutgoing(e);
+        }
+        gv = vertices.get(e.getToVertex().getLabel());
+        if (gv != null) {
+            gv.removeIncoming(e);
+        }
+    }
 }
