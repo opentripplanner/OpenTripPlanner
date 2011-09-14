@@ -159,17 +159,20 @@ public class PlanGenerator {
         return plan;
     }
 
-    /**
-     * Generate an itinerary from a @{link GraphPath}. The algorithm here is to walk over each edge
-     * in the graph path, accumulating geometry, time, and length data. On mode change, a new leg is
-     * generated. Street legs undergo an additional processing step to generate turn-by-turn
-     * directions.
-     * 
-     * @param path
-     * @param showIntermediateStops whether intermediate stops are included in the generated
-     *        itinerary
-     * @return itinerary
-     */
+	/**
+	 * Generate an itinerary from a @{link GraphPath}. The algorithm here is to
+	 * walk over each state in the graph path, accumulating geometry, time, and
+	 * length data from the incoming edge. When the incoming edge and outgoing
+	 * edge have different modes (or when a vehicle changes names due to
+	 * interlining) a new leg is generated. Street legs undergo an additional
+	 * processing step to generate turn-by-turn directions.
+	 *
+	 * @param path
+	 * @param showIntermediateStops
+	 *            whether intermediate stops are included in the generated
+	 *            itinerary
+	 * @return itinerary
+	 */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
 
         Itinerary itinerary = makeEmptyItinerary(path);
