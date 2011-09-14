@@ -304,16 +304,16 @@ public class TestHalfEdges extends TestCase {
         NetworkLinker nl = new NetworkLinker(graph);
         nl.createLinkage();
         int numVerticesAfter = graph.getVertices().size();
-        assertEquals (4, numVerticesAfter - numVerticesBefore);
+        assertEquals (6, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = graph.getOutgoing(station1);
-        assertTrue(outgoing.size() == 1);
+        assertTrue(outgoing.size() == 2);
         DirectEdge edge = (DirectEdge) outgoing.iterator().next();
         
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
         
         outgoing = graph.getOutgoing(station2);
-        assertTrue(outgoing.size() == 1);
+        assertTrue(outgoing.size() == 2);
         edge = (DirectEdge) outgoing.iterator().next();
         
         Vertex station2point = edge.getToVertex();

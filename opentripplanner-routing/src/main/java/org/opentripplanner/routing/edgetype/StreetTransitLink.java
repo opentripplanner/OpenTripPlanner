@@ -68,6 +68,10 @@ public class StreetTransitLink extends AbstractEdge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+        // disallow traversing two StreetTransitLinks in a row.
+        // prevents router using transit stops as shortcuts to get around turn restrictions.
+        if (s0.getBackEdge() instanceof StreetTransitLink)
+            return null;
         // Do not check here whether transit modes are selected. A check for the presence of 
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.

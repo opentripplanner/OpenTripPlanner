@@ -240,7 +240,7 @@ public class Graph implements Serializable {
     	return t >= this.transitServiceStarts && t < this.transitServiceEnds; 
     }
 
-	public void removeEdge(AbstractEdge e) {
+	public void removeEdge(DirectEdge e) {
 		GraphVertex gv = vertices.get(e.getFromVertex().getLabel());
 		if (gv != null) {
 			gv.removeOutgoing(e);

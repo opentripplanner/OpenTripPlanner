@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import static org.opentripplanner.common.IterableLibrary.*;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
@@ -54,6 +56,9 @@ public class NetworkLinkerLibrary {
     private static Logger _log = LoggerFactory.getLogger(NetworkLinkerLibrary.class);
 
     HashMap<HashSet<Edge>, LinkedList<P2<PlainStreetEdge>>> replacements = new HashMap<HashSet<Edge>, LinkedList<P2<PlainStreetEdge>>>();
+    
+    /* a map to track which vertices were associated with each transit stop, to avoid repeat splitting */
+    private HashMap<Vertex, Collection<Vertex>> splitVertices = new HashMap<Vertex, Collection<Vertex>> (); 
 
     private GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -79,63 +84,68 @@ public class NetworkLinkerLibrary {
      * @return true if the links were successfully added, otherwise false
      */
     public boolean determineEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
-        Vertex location = getLocation(v);
+        Collection<Vertex> location = getLocation(v);
         if (location == null) {
+            // why is this being called here? (AMB)
             getLocation(v);
             return false;
         } else {
-
-            graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
-            graph.addEdge(new StreetTransitLink(v, location, wheelchairAccessible));
+            for (Vertex v2 : location) {
+                graph.addEdge(new StreetTransitLink(v2, v, wheelchairAccessible));
+                graph.addEdge(new StreetTransitLink(v, v2, wheelchairAccessible));
+            }
             return true;
         }
     }
 
-    /**
-     * Add edges from street locations to the target vertex.
-     * 
-     * @param v
-     * @param wheelchairAccessible
-     * @return true if the links were successfully added, otherwise false
-     */
-    public boolean determineIncomingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
-        Vertex location = getLocation(v);
-        if (location == null) {
-            getLocation(v);
-            return false;
-        } else {
-            graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
-            return true;
-        }
-    }
-
-    /**
-     * Add edges from the target vertex to street locations.
-     * 
-     * @param v
-     * @param wheelchairAccessible
-     * @return true if the links were successfully added, otherwise false
-     */
-    public boolean determineOutgoingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
-        Vertex location = getLocation(v);
-        if (location == null) {
-            getLocation(v);
-            return false;
-        } else {
-            graph.addEdge(new StreetTransitLink(v, location, wheelchairAccessible));
-            return true;
-        }
-    }
+//    /**
+//     * Add edges from street locations to the target vertex.
+//     * 
+//     * @param v
+//     * @param wheelchairAccessible
+//     * @return true if the links were successfully added, otherwise false
+//     */
+//    public boolean determineIncomingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
+//        Vertex location = getLocation(v);
+//        if (location == null) {
+//            getLocation(v);
+//            return false;
+//        } else {
+//            graph.addEdge(new StreetTransitLink(location, v, wheelchairAccessible));
+//            return true;
+//        }
+//    }
+//
+//    /**
+//     * Add edges from the target vertex to street locations.
+//     * 
+//     * @param v
+//     * @param wheelchairAccessible
+//     * @return true if the links were successfully added, otherwise false
+//     */
+//    public boolean determineOutgoingEdgesForVertex(Vertex v, boolean wheelchairAccessible) {
+//        Vertex location = getLocation(v);
+//        if (location == null) {
+//            getLocation(v);
+//            return false;
+//        } else {
+//            graph.addEdge(new StreetTransitLink(v, location, wheelchairAccessible));
+//            return true;
+//        }
+//    }
 
     public void addAllReplacementEdgesToGraph() {
 
-        /* insert newly created edges into the graph */
         for (Entry<HashSet<Edge>, LinkedList<P2<PlainStreetEdge>>> entry : replacements.entrySet()) {
-            LinkedList<P2<PlainStreetEdge>> edges = entry.getValue();
-            for (P2<PlainStreetEdge> edge : edges) {
-                PlainStreetEdge e1 = edge.getFirst();
-                graph.addEdge(e1);
+            /* insert newly created edges into the graph */
+            for (P2<PlainStreetEdge> edge : entry.getValue()) {
+                graph.addEdge(edge.getFirst() );
                 graph.addEdge(edge.getSecond());
+            }
+            /* remove original (replaced) edges from the graph */
+            for (Edge edge : entry.getKey()) {
+                // uncomment to remove replaced edges
+                // graph.removeEdge((DirectEdge)edge);
             }
         }
     }
@@ -144,31 +154,30 @@ public class NetworkLinkerLibrary {
      * Private Methods
      ****/
 
-    private Vertex getLocation(Vertex v) {
-
-        String vertexLabel = "link for " + v.getStopId();
+    private Collection<Vertex> getLocation(Vertex v) {
 
         /**
-         * We only want to create the linkage vertex once. This method is potentially called
+         * We only want to create the linkage vertices once. This method is potentially called
          * multiple times with the same stop vertex in the case of "determineIncomingEdgesForVertex"
          * and "determineIncomingEdgesForVertex".
          */
-        Vertex existing = graph.getVertex(vertexLabel);
+        Collection<Vertex> existing = splitVertices.get(v);
         if (existing != null)
             return existing;
 
+        String vertexLabel = "link for " + v.getStopId();
         Coordinate coordinate = v.getCoordinate();
         /* right at an intersection? */
         List<Vertex> atIntersection = index.getIntersectionAt(coordinate);
         if (atIntersection != null) {
-            /* create a vertex linked to all vertices at intersection */
-            Vertex linked = new GenericVertex(vertexLabel, coordinate.x, coordinate.y);
-            graph.addVertex(linked);
-            for (Vertex i : atIntersection) {
-                graph.addEdge(new FreeEdge(linked, i));
-                graph.addEdge(new FreeEdge(i, linked));
-            }
-            return linked;
+//            /* create a vertex linked to all vertices at intersection */
+//            Vertex linked = new GenericVertex(vertexLabel, coordinate.x, coordinate.y);
+//            graph.addVertex(linked);
+//            for (Vertex i : atIntersection) {
+//                graph.addEdge(new FreeEdge(linked, i));
+//                graph.addEdge(new FreeEdge(i, linked));
+//            }
+            return atIntersection;
         }
 
         /* split an edge bundle? */
@@ -181,7 +190,7 @@ public class NetworkLinkerLibrary {
 
     /** Create a vertex splitting the set of edges. If necessary, create new edges. */
 
-    private Vertex createVertex(String label, Collection<StreetEdge> edges, Coordinate coordinate) {
+    private Collection<Vertex> createVertex(String label, Collection<StreetEdge> edges, Coordinate coordinate) {
 
         if (edges.size() < 2) {
             // can't replace too few edges
@@ -207,6 +216,7 @@ public class NetworkLinkerLibrary {
         P2<PlainStreetEdge> bestPair = null;
 
         Point p = geometryFactory.createPoint(coordinate);
+        
         for (P2<PlainStreetEdge> pair : replacement) {
             PlainStreetEdge e1 = pair.getFirst();
             double dist = e1.getGeometry().distance(p);
@@ -222,7 +232,7 @@ public class NetworkLinkerLibrary {
     /**
      * Split a matched pair of edges at the given coordinate
      */
-    private Vertex split(LinkedList<P2<PlainStreetEdge>> replacement, String label,
+    private Collection<Vertex> split(LinkedList<P2<PlainStreetEdge>> replacement, String label,
             P2<PlainStreetEdge> bestPair, Coordinate coordinate) {
 
         PlainStreetEdge e1 = bestPair.getFirst();
@@ -247,26 +257,31 @@ public class NetworkLinkerLibrary {
 
         double totalGeomLength = forwardGeometry.getLength();
         double lengthRatioIn = toMidpoint.getLength() / totalGeomLength;
+
+        /* Is splitting unnecessary because coordinate is coincident with an endpoint? */
+        // note: the pair potentially being split was generated by the 'replace' method,
+        // so the two PlainStreetEdges are known to be pointing in opposite directions.
         if (lengthRatioIn < 0.00001) {
-            return e1v1;
+            return Arrays.asList(e1v1, e2v2);
         } else if (lengthRatioIn > 0.99999) {
-            return e1v2;
+            return Arrays.asList(e1v2, e2v1);
         }
 
         double lengthIn = e1.getLength() * lengthRatioIn;
         double lengthOut = e1.getLength() * (1 - lengthRatioIn);
 
-        GenericVertex midpoint = new GenericVertex("split at " + label, midCoord, name);
+        Vertex e1midpoint = new GenericVertex("split 1 at " + label, midCoord, name);
+        Vertex e2midpoint = new GenericVertex("split 2 at " + label, midCoord, name);
 
         // We are replacing two edges with four edges
-        PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, midpoint, toMidpoint, name, lengthIn,
+        PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
-        PlainStreetEdge forward2 = new PlainStreetEdge(midpoint, e1v2,
+        PlainStreetEdge forward2 = new PlainStreetEdge(e1midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
 
-        PlainStreetEdge backward1 = new PlainStreetEdge(e2v1, midpoint, backGeometryPair.getFirst(),
+        PlainStreetEdge backward1 = new PlainStreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
                 name, lengthOut, e2.getPermission(), false);
-        PlainStreetEdge backward2 = new PlainStreetEdge(midpoint, e2v2, backGeometryPair.getSecond(),
+        PlainStreetEdge backward2 = new PlainStreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
                 name, lengthIn, e2.getPermission(), true);
 
         double forwardBseLengthIn = e1.getBicycleSafetyEffectiveLength() * lengthRatioIn;
@@ -293,7 +308,7 @@ public class NetworkLinkerLibrary {
                 break;
             }
         }
-        return midpoint;
+        return Arrays.asList(e1midpoint, e2midpoint);
     }
 
     /**
@@ -390,7 +405,7 @@ public class NetworkLinkerLibrary {
     }
 
     private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
-        // find most common start and end points, which will be ends of this street
+        // find the two most common edge start points, which will be the endpoints of this street
         HashMap<StreetVertex, Set<Edge>> edgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
         for (Edge edge : edges) {
             Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
@@ -400,7 +415,7 @@ public class NetworkLinkerLibrary {
             }
             starting.add(edge);
         }
-
+        
         int maxStarting = 0;
         int maxEnding = 0;
         Entry<StreetVertex, Set<Edge>> startingVertex = null;
