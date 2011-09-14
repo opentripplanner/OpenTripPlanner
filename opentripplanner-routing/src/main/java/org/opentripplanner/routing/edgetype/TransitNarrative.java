@@ -66,4 +66,8 @@ public class TransitNarrative extends DelegatingEdgeNarrative {
 			return newtrip;
 		}
 	}
+
+	public String toString() {
+		return "TransitNarrative(" + base + ")";
+	}
 }
