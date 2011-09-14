@@ -56,7 +56,7 @@ public class StreetTransitLink extends AbstractEdge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.WALK;
+        return TraverseMode.STL;
     }
 
     public String getName() {
