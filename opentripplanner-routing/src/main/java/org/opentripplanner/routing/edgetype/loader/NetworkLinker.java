@@ -76,7 +76,7 @@ public class NetworkLinker {
                 }
 
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!networkLinkerLibrary.determineEdgesForVertex(v, wheelchairAccessible)) {
+                if (!networkLinkerLibrary.connectVertexToStreets(v, wheelchairAccessible)) {
                     _log.warn("Stop " + ts + " not near any streets; it will not be usable");
                 }
             }
