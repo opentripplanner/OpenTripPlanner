@@ -252,4 +252,17 @@ public class Graph implements Serializable {
             gv.removeIncoming(e);
         }
     }
+    
+    public int countVertices () {
+        return vertices.size();
+    }
+
+    public int countEdges () {
+        int nEdges = 0;
+        for (GraphVertex gv : vertices.values()) {
+            nEdges += gv.getDegreeOut();
+        }
+        return nEdges;
+    }
+
 }

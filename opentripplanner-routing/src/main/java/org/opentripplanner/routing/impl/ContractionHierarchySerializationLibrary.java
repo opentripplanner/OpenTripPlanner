@@ -24,6 +24,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
+import org.opentripplanner.routing.core.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,8 @@ public class ContractionHierarchySerializationLibrary {
             }
 
         _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
+        Graph g = hierarchy.getGraph();
+        _log.info("Main graph size: |V|={} |E|={}", g.countVertices(), g.countEdges());
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(graphPath)));
         out.writeObject(hierarchy);
         out.close();
@@ -51,10 +54,12 @@ public class ContractionHierarchySerializationLibrary {
         try {
         	ContractionHierarchySet hierarchy = (ContractionHierarchySet) in.readObject();
     		_log.info("Graph read");
+    	        Graph g = hierarchy.getGraph();
+    	        _log.info("Main graph size: |V|={} |E|={}", g.countVertices(), g.countEdges());
     		return hierarchy;
     	} catch (InvalidClassException ex) {
     		_log.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
     		throw new IllegalStateException("Stored Graph version error", ex);
-    	} 
+    	}
     }
 }
