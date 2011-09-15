@@ -384,6 +384,16 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNotes(props, "surface=mud", "Unpaved surface -- muddy!");
 
         /* and some names */
+        // Basics
+        createNames(props, "highway=cycleway", "bike path");
+        createNames(props, "cycleway=track", "bike path");
+        createNames(props, "highway=pedestrian", "path");
+        createNames(props, "highway=path", "path");
+        createNames(props, "highway=footway", "path");
+        createNames(props, "highway=bridleway", "bridleway");
+        createNames(props, "highway=footway;bicycle=no", "footpath");
+
+        // Platforms
         createNames(props, "otp:route_ref=*", "Route {otp:route_ref}");
         createNames(props, "highway=platform;ref=*", "Platform {ref}");
         createNames(props, "railway=platform;ref=*", "Platform {ref}");
@@ -420,13 +430,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=track", "track");
 
         createNames(props, "highway=footway;footway=sidewalk", "sidewalk");
-
-        createNames(props, "highway=cycleway", "bike path");
-        createNames(props, "cycleway=track", "bike path");
-        createNames(props, "highway=pedestrian", "path");
-        createNames(props, "highway=path", "path");
-        createNames(props, "highway=footway", "path");
-        createNames(props, "highway=bridleway", "bridleway");
 
         createNames(props, "highway=platform", "platform");
         createNames(props, "railway=platform", "platform");
