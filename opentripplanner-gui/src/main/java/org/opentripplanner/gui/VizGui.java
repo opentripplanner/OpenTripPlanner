@@ -64,7 +64,6 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -79,6 +78,7 @@ import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.LBGRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -371,6 +371,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         clearRouteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showGraph.highlightGraphPath(null);
+//                showGraph.clearHighlights();
             }
         });
         routingPanel.add(clearRouteButton);
@@ -797,12 +798,15 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         	return;
         }
         TraverseModeSet modeSet = new TraverseModeSet();
-        modeSet.setTransit(transitCheckBox.isSelected());
-        modeSet.setTrainish(trainCheckBox.isSelected());
-        modeSet.setBusish(busCheckBox.isSelected());
         modeSet.setWalk(walkCheckBox.isSelected());
         modeSet.setBicycle(bikeCheckBox.isSelected());
         modeSet.setFerry(ferryCheckBox.isSelected());
+        modeSet.setTrainish(trainCheckBox.isSelected());
+        modeSet.setBusish(busCheckBox.isSelected());
+        // must set generic transit mode last, and only when it is checked
+        // otherwise 'false' will clear trainish and busish 
+        if (transitCheckBox.isSelected())
+            modeSet.setTransit(true);
     	TraverseOptions options = new TraverseOptions(modeSet);
     	options.speed = 1; // override difference between bike and walk
     	options.walkReluctance = 1; // walk etc are same cost
@@ -810,8 +814,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	options.aStarSearchFactory = visitor.getAStarSearchFactory();
     	options.maxSlope = 1; // even climb walls
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
-    	options.optimizeFor = OptimizeType.SAFE;
-
+    	//options.optimizeFor = OptimizeType.QUICK;
+    	// there should be a ui element for walk distance
+    	options.setMaxWalkDistance(3000);
+    	
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
@@ -863,6 +869,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingService = new ContractionRoutingServiceImpl();
         routingService.setGraphService(graphService);
         pathservice.setRoutingService(routingService);
+        pathservice.setRemainingWeightHeuristicFactory(
+                new LBGRemainingWeightHeuristicFactoryImpl(graphService));
     }
     
     public Graph getGraph() {
