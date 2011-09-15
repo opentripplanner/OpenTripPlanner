@@ -141,8 +141,10 @@ public class WayPropertySet {
 		for (CreativeNamerPicker picker : creativeNamers) {
 			OSMSpecifier specifier = picker.getSpecifier();
 			CreativeNamer namer = picker.getNamer();
-			if (specifier.matchScore(way) > bestScore) {
+			int score = specifier.matchScore(way);
+			if (score > bestScore) {
 				bestNamer = namer;
+				bestScore = score;
 			}
 		}
 		if (bestNamer == null) {
