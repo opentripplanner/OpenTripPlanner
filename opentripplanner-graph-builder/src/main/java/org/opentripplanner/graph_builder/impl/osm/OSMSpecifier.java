@@ -80,19 +80,18 @@ public class OSMSpecifier {
 		}
 		return score;
 	}
-	private int getTagScore(String value,
-			String leftMatchValue) {
+	private int getTagScore(String value, String matchValue) {
 		//either this matches on a wildcard, or it matches exactly
-		if (value.equals("*") && leftMatchValue != null) {
+		if (value.equals("*") && matchValue != null) {
 			return 1; //wildcard matches are basically tiebreakers
-		} else if (value.equals(leftMatchValue)) {
+		} else if (value.equals(matchValue)) {
 			return 100;
 		} else {
 			if (value.contains(":")) {
 				//treat cases like cobblestone:flattened as cobblestone if a more-specific match
 				//does not apply
 				value = value.split(":", 2)[0];
-				if (value.equals(leftMatchValue)) {
+				if (value.equals(matchValue)) {
 					return 75;
 				} else {
 					return 0;
