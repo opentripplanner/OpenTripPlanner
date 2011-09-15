@@ -160,11 +160,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 
                 WayProperties wayData = wayPropertySet.getDataForWay(way); 
                 
-                String creativeName = wayPropertySet.getCreativeNameForWay(way);
-                if (creativeName != null) {
-                    way.addTag("otp:gen_name", creativeName);
+                if (!way.hasTag("name")) {
+                    String creativeName = wayPropertySet.getCreativeNameForWay(way);
+                    if (creativeName != null) {
+                        way.addTag("otp:gen_name", creativeName);
+                    }
                 }
-                
                 Set<Alert> note = wayPropertySet.getNoteForWay(way);
                 
                 StreetTraversalPermission permissions = getPermissionsForEntity(way, wayData.getPermission());
