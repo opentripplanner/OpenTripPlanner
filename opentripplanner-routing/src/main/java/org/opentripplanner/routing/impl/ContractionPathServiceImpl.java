@@ -76,11 +76,36 @@ public class ContractionPathServiceImpl implements PathService {
     
     private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
     
-    private double _maxComputationTime = 0; // seconds
+    private double _firstPathTimeout = 0; // seconds
+    
+    private double _multiPathTimeout = 0; // seconds
+    
+    /**
+     * Give up on searching for itineraries after this many seconds have elapsed.
+     */
+    public void setTimeout (double seconds) {
+        _firstPathTimeout = seconds;
+        _multiPathTimeout = seconds;
+    }
 
-    // zero or negative number of seconds means no computation time limit
-    public void setMaxComputationTime (double seconds) {
-        _maxComputationTime = seconds;
+    /**
+     * Give up on searching for the first itinerary after this many seconds have elapsed.
+     * A negative or zero value means search forever. 
+     */
+    public void setFirstPathTimeout (double seconds) {
+        _firstPathTimeout = seconds;
+    }
+    
+    /**
+     * Stop searching for additional itineraries (beyond the first one) after this many seconds 
+     * have elapsed, relative to the beginning of the search for the first itinerary. 
+     * A negative or zero value means search forever. 
+     * Setting this lower than the firstPathTimeout will avoid searching for additional
+     * itineraries when finding the first itinerary takes a long time. This helps keep overall 
+     * response time down while assuring that the end user will get at least one response.
+     */
+    public void setMultiPathTimeout (double seconds) {
+        _multiPathTimeout = seconds;
     }
 
     @Autowired
@@ -170,8 +195,12 @@ public class ContractionPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
-        // break out of search after this time, to prevent slow response times
-        long computationEndTime = (long) (System.currentTimeMillis() + _maxComputationTime * 1000);
+        // convert relative timeouts to absolute timeouts
+        long searchBeginTime = System.currentTimeMillis();
+        long abortFirst = _firstPathTimeout <= 0 ? 0 :
+                (long) (searchBeginTime + _firstPathTimeout * 1000);
+        long abortMulti = _multiPathTimeout <= 0 ? 0 :
+                (long) (searchBeginTime + _multiPathTimeout * 1000);
         
         // The list of options specifying various modes, banned routes, etc to try for multiple
         // itineraries
@@ -192,32 +221,31 @@ public class ContractionPathServiceImpl implements PathService {
         while (paths.size() < nItineraries) {
             options = optionQueue.poll();
             if (options == null) {
+                LOG.debug("Ran out of options to try.");
                 break;
             }
             StateEditor editor = new StateEditor(origin, null);
             editor.setTraverseOptions(options);
             origin = editor.makeState();
             
-            if (_maxComputationTime > 0) {
-                // determine how much time is left for computation (convert absolute to relative time)
-                long remainingComputationTime = computationEndTime - System.currentTimeMillis();
-                LOG.debug("remaining time for search: {} sec", remainingComputationTime / 1000.0);
-                if (remainingComputationTime <= 0) {
-                    LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
-                    break;
-                }
-                options.maxComputationTime = remainingComputationTime;
-                // options.maxComputationTime = Math.min(remainingComputationTime, (long)(maxIterationTime * 1000));
-            } else {
-                options.maxComputationTime = 0;
-            }
+            // apply appropriate timeout
+            options.searchAbortTime = paths.isEmpty() ? abortFirst : abortMulti;
+            options.maxComputationTime = 0;
 
             // options.worstTime = maxTime;
             // options.maxWeight = maxWeight;
-            long searchBeginTime = System.currentTimeMillis();
-            LOG.debug("BEGIN SEARCH");
+            long subsearchBeginTime = System.currentTimeMillis();
+            LOG.debug("BEGIN SUBSEARCH");
             List<GraphPath> somePaths = _routingService.route(origin, target);
-            LOG.debug("END SEARCH {} msec", System.currentTimeMillis() - searchBeginTime);
+            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
+                    System.currentTimeMillis() - subsearchBeginTime,
+                    System.currentTimeMillis() - searchBeginTime);
+            if (somePaths == null) {
+                // search failed, likely due to timeout
+                LOG.warn("Aborting search. {} paths found, elapsed time {} sec", 
+                        paths.size(), (System.currentTimeMillis() - searchBeginTime) / 1000.0);
+                break;
+            }
             if (maxWeight == Double.MAX_VALUE) {
                 /*
                  * the worst trip we are willing to accept is at most twice as bad or twice as long.
@@ -238,7 +266,7 @@ public class ContractionPathServiceImpl implements PathService {
                 LOG.debug("Max weight set to:  {}", maxWeight);
             }
             if (somePaths.isEmpty()) {
-                LOG.debug("NO PATHS FOUND");
+                LOG.debug("No paths were found.");
                 continue;
             }
             for (GraphPath path : somePaths) {

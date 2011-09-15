@@ -176,7 +176,6 @@ public class LowerBoundGraph {
 	
 	// single-source shortest path (weight to all reachable destinations)
 	public double[] sssp(StreetLocation origin) {
-		LOG.info("Initializing SSSP");
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();

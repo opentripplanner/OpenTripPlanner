@@ -154,12 +154,22 @@ public class TraverseOptions implements Cloneable, Serializable {
     public int maxTransfers = 2;
 
     /**
-     * Set a hard limit on computation time. Any positive value will be treated as a limit in the
-     * computation time for one search instance, in milliseconds. A zero or negative value implies
-     * no limit.
+     * Set a hard limit on computation time. Any positive value will be treated as a limit on the
+     * computation time for one search instance, in milliseconds relative to search start time. 
+     * A zero or negative value implies no limit.
      */
     public long maxComputationTime = 0;
 
+    /**
+     * The search will be aborted if it is still running after this time (in milliseconds since the 
+     * epoch). A negative or zero value implies no limit. 
+     * This provides an absolute timeout, whereas the maxComputationTime is relative to the 
+     * beginning of an individual search. While the two might seem equivalent, we trigger search 
+     * retries in various places where it is difficult to update relative timeout value. 
+     * The earlier of the two timeouts is applied. 
+     */
+    public long searchAbortTime = 0;
+    
     private TraverseOptions walkingOptions;
     
     public GenericAStarFactory aStarSearchFactory = null;

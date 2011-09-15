@@ -125,9 +125,12 @@ public class GenericAStar {
                 + target.getDistanceToNearestTransitStop();
         options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), minWalkDistance));
 
-        long computationStartTime = System.currentTimeMillis();
-        long maxComputationTime = options.maxComputationTime;
-
+        long abortTime = Long.MAX_VALUE;
+        if (options.searchAbortTime > 0)
+            abortTime = Math.min(abortTime, options.searchAbortTime);
+        if (options.maxComputationTime > 0)
+            abortTime = Math.min(abortTime, System.currentTimeMillis() + options.maxComputationTime);
+        
         boolean exit = false; // Unused?
 
         int nVisited = 0;
@@ -146,14 +149,12 @@ public class GenericAStar {
             /**
              * Terminate the search prematurely if we've hit our computation wall.
              */
-            if (maxComputationTime > 0) {
-                if ((System.currentTimeMillis() - computationStartTime) > maxComputationTime) {
-                    LOG.warn("Max computation time exceeded for origin {} target {}", origin, target);
-                    // Returning null indicates something went wrong and search should be aborted.
-                    // This is distinct from the empty list of paths which implies that a result may still
-                    // be found by retrying with altered options (e.g. max walk distance)
-                    return null;
-                }
+            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+                LOG.warn("Search timeout. origin={} target={}", origin, target);
+                // Returning null indicates something went wrong and search should be aborted.
+                // This is distinct from the empty list of paths which implies that a result may still
+                // be found by retrying with altered options (e.g. max walk distance)
+                return null;
             }
 
             // get the lowest-weight state in the queue
