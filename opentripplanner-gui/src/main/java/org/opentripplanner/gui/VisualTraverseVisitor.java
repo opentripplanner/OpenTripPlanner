@@ -36,23 +36,23 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitEdge(Edge edge, State state) {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         if (edge instanceof DirectEdge) {
-            gui.highlightEdge((DirectEdge) edge);
+            gui.enqueueHighlightedEdge((DirectEdge) edge);
         }
-        gui.highlightVertex(state.getVertex());
+        //gui.highlightVertex(state.getVertex());
     }
 
     @Override
     public void visitVertex(State state) {
-        seen.add(state.getVertex());
-        gui.setHighlightedVertices(seen);
-        gui.highlightVertex(state.getVertex());
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+//        seen.add(state.getVertex());
+//        gui.setHighlightedVertices(seen);
+//        gui.highlightVertex(state.getVertex());
     }
 
     public GenericAStarFactory getAStarSearchFactory() {

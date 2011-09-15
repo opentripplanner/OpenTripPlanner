@@ -371,7 +371,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         clearRouteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showGraph.highlightGraphPath(null);
-//                showGraph.clearHighlights();
+                showGraph.clearHighlights();
             }
         });
         routingPanel.add(clearRouteButton);

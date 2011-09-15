@@ -24,7 +24,9 @@ import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
@@ -79,8 +81,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	private List<Vertex> visibleVertices; 
     private List<DirectEdge> visibleStreetEdges = new ArrayList<DirectEdge>(1000); 
     private List<DirectEdge> visibleTransitEdges = new ArrayList<DirectEdge>(1000); 
-    private List<Vertex> highlightedVertices;
-    private List<DirectEdge> highlightedEdges;
+    private List<Vertex> highlightedVertices = new ArrayList<Vertex>(1000);
+    private List<DirectEdge> highlightedEdges = new ArrayList<DirectEdge>(1000);
+    // these queues are filled by a search in another thread, so must be threadsafe
+    private Queue<Vertex> newHighlightedVertices = new LinkedBlockingQueue<Vertex>();
+    private Queue<DirectEdge> newHighlightedEdges = new LinkedBlockingQueue<DirectEdge>();
     private Vertex highlightedVertex;
     private DirectEdge highlightedEdge;
     private GraphPath highlightedGraphPath;
@@ -364,7 +369,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     	fill(240, 240, 240);
     	Vertex v = s.getVertex();
     	drawVertex(v, 8);
-    	str += " " + shortDateFormat.format(new Date(s.getTime()));
+    	str += " " + shortDateFormat.format(new Date(s.getTime() * 1000));
     	str += " [" + (int)s.getWeight() + "]";
     	double x = toScreenX(v.getX()) + 10;
     	double y = toScreenY(v.getY());
@@ -463,7 +468,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	        }
             /* Draw highlighted edges in another color */
             noFill();
-        	stroke(200, 200, 000, 128); // yellow transparent edge highlight
+        	stroke(200, 200, 000, 16); // yellow transparent edge highlight
             strokeWeight(8);   
 	  	    if (highlightedEdges != null) {
 		  	    for (DirectEdge e : highlightedEdges) {
@@ -495,6 +500,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	        }
             noFill();
   	    } else if (drawLevel==DRAW_MINIMAL) {
+  	        handleNewHighlights();
   	        // Black background box
   	    	fill(0, 0, 0);
   	    	stroke(30, 128, 30);
@@ -510,6 +516,19 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
   	    }
   	    drawOffset = 0;
   	    if (drawLevel > DRAW_MINIMAL) drawLevel -= 1; // move to next layer
+    }
+
+    private void handleNewHighlights() {
+        noFill();
+        stroke(200, 200, 000, 16); // yellow transparent edge highlight
+        strokeWeight(8);   
+        while (! newHighlightedEdges.isEmpty()) {
+            DirectEdge de = newHighlightedEdges.poll();
+            if (de != null) {
+                drawEdge(de);
+                highlightedEdges.add(de);
+            }
+        }
     }
     
     private double toScreenY(double y) {
@@ -617,6 +636,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         drawLevel = DRAW_ALL;
     }
 
+    public void enqueueHighlightedEdge (DirectEdge de) {
+        newHighlightedEdges.add(de);
+    }
+    
+    public void clearHighlights() {
+        highlightedEdges.clear();
+        highlightedVertices.clear();
+        drawLevel = DRAW_ALL;
+    }
+    
     public void highlightEdge(DirectEdge selected) {
         highlightedEdge = selected;
         drawLevel = DRAW_ALL;
