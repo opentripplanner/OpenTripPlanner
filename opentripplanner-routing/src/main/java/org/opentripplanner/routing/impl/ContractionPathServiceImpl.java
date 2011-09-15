@@ -233,7 +233,7 @@ public class ContractionPathServiceImpl implements PathService {
             options.maxComputationTime = 0;
 
             // options.worstTime = maxTime;
-            // options.maxWeight = maxWeight;
+            options.maxWeight = maxWeight;
             long subsearchBeginTime = System.currentTimeMillis();
             LOG.debug("BEGIN SUBSEARCH");
             List<GraphPath> somePaths = _routingService.route(origin, target);
