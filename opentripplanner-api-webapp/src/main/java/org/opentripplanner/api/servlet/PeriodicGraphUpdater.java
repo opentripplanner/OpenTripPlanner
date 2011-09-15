@@ -3,13 +3,10 @@ package org.opentripplanner.api.servlet;
 import java.util.List;
 
 import org.opentripplanner.updater.Updater;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PeriodicGraphUpdater {
-	private static final Logger log = LoggerFactory.getLogger(PeriodicGraphUpdater.class);
     private UpdateTask updater;
 
     private long updateFrequency = 1000 * 60 * 5; // five minutes
@@ -71,7 +68,7 @@ public class PeriodicGraphUpdater {
                     now = System.currentTimeMillis();
                 }
                 for (Updater updater : getUpdaters()) {
-                    log.info("running updater " + updater.getUrl());
+                    System.out.println("running updater " + updater.getUrl());
                     updater.run();
                 }
 
