@@ -97,22 +97,27 @@ public class WayPropertySet {
 		}
 		if ((bestLeftScore == 0 || bestRightScore == 0)
 				&& (leftMixins.size() == 0 || rightMixins.size() == 0)) {
-			/* generate warning message */
-			String all_tags = null;
-			Map<String, String> tags = way.getTags();
-			for (Entry<String, String> entry : tags.entrySet()) {
-				String key = entry.getKey();
-				String value = entry.getValue();
-				String tag = key + "=" + value;
-				if (all_tags == null) {
-					all_tags = tag;
-				} else {
-					all_tags += "; " + tag;
-				}
-			}
+			String all_tags = dumpTags(way);
 			_log.debug("Used default permissions: " + all_tags);
 		}
 		return result;
+	}
+
+	private String dumpTags(OSMWay way) {
+		/* generate warning message */
+		String all_tags = null;
+		Map<String, String> tags = way.getTags();
+		for (Entry<String, String> entry : tags.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			String tag = key + "=" + value;
+			if (all_tags == null) {
+				all_tags = tag;
+			} else {
+				all_tags += "; " + tag;
+			}
+		}
+		return all_tags;
 	}
 
 	private void applyMixins(WayProperties result, List<WayProperties> mixins,
