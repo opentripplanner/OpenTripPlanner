@@ -370,7 +370,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             
             // why 40? Because the default bike safety factor is 4, and we really want to only walk
             // a bike to save a user from a walk which is very much (10x) longer
-            walkingOptions.walkReluctance *= 40.0; 
+            walkingOptions.walkReluctance *= 20.0;
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
