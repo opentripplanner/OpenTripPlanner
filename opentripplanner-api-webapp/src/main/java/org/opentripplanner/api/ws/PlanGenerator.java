@@ -199,6 +199,7 @@ public class PlanGenerator {
             if (backEdgeNarrative == null) {
                 // this is the first state, so we need to create the initial leg
                 leg = makeLeg(nextState);
+                leg.mode = mode.toString(); // maybe makeLeg should be setting the mode ?
                 itinerary.addLeg(leg);
                 if (mode.isOnStreetNonTransit()) {
                     startWalk = i;
