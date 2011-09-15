@@ -184,48 +184,47 @@ public class PlanGenerator {
 
         State prevState = null;
         EdgeNarrative backEdgeNarrative = null;
-		for (State nextState : path.states) {
+        for (State nextState : path.states) {
             i++;
-			/* grab base edge and associated narrative information from SPT edge */
-			if (prevState == null) {
-				prevState = nextState;
-				continue;
-			}
-			EdgeNarrative frontEdgeNarrative = nextState.getBackEdgeNarrative();
-			backEdgeNarrative = prevState.getBackEdgeNarrative();
-			Edge backEdge = prevState.getBackEdge();
-			TraverseMode mode = frontEdgeNarrative.getMode();
+            /* grab base edge and associated narrative information from SPT edge */
+            if (prevState == null) {
+                prevState = nextState;
+                continue;
+            }
+            EdgeNarrative frontEdgeNarrative = nextState.getBackEdgeNarrative();
+            backEdgeNarrative = prevState.getBackEdgeNarrative();
+            Edge backEdge = prevState.getBackEdge();
+            TraverseMode mode = frontEdgeNarrative.getMode();
 
-			if (backEdgeNarrative == null) {
-				// this is the first state, so we need to create the initial leg
-				leg = makeLeg(nextState);
-				itinerary.addLeg(leg);
-				if (mode.isOnStreetNonTransit()) {
-					startWalk = i;
-				}
-				prevState = nextState;
-				continue;
-			}
+            if (backEdgeNarrative == null) {
+                // this is the first state, so we need to create the initial leg
+                leg = makeLeg(nextState);
+                itinerary.addLeg(leg);
+                if (mode.isOnStreetNonTransit()) {
+                    startWalk = i;
+                }
+                prevState = nextState;
+                continue;
+            }
             /* skip initial state, which has no back edges */
 
-            edgeElapsedTime = nextState.getTimeInMillis() - nextState.getBackState().getTimeInMillis();
+            edgeElapsedTime = nextState.getTimeInMillis()
+                    - nextState.getBackState().getTimeInMillis();
 
             TraverseMode previousMode = backEdgeNarrative.getMode();
-			if (previousMode == null) {
-				previousMode = prevState.getBackState().getBackEdgeNarrative()
-						.getMode();
-			}
-			// handle the effects of the previous edge on the leg
-			/* ignore edges that should not contribute to the narrative */
-			if (backEdge instanceof FreeEdge) {
-				prevState = nextState;
-				continue;
-			}
+            if (previousMode == null) {
+                previousMode = prevState.getBackState().getBackEdgeNarrative().getMode();
+            }
+            // handle the effects of the previous edge on the leg
+            /* ignore edges that should not contribute to the narrative */
+            if (backEdge instanceof FreeEdge) {
+                prevState = nextState;
+                continue;
+            }
 
-			if (previousMode == TraverseMode.BOARDING
-					|| previousMode == TraverseMode.ALIGHTING) {
-				itinerary.waitingTime += edgeElapsedTime;
-			}
+            if (previousMode == TraverseMode.BOARDING || previousMode == TraverseMode.ALIGHTING) {
+                itinerary.waitingTime += edgeElapsedTime;
+            }
 
             leg.distance += backEdgeNarrative.getDistance();
 
@@ -271,9 +270,9 @@ public class PlanGenerator {
                         leg.stop = new ArrayList<Place>();
                     }
                     /* any further transit edge, add "from" vertex to intermediate stops */
-                    if( !(   nextState.getBackEdge() instanceof Dwell
-                          || nextState.getBackEdge() instanceof PatternDwell
-                          || nextState.getBackEdge() instanceof PatternInterlineDwell)) {
+                    if (!(nextState.getBackEdge() instanceof Dwell
+                            || nextState.getBackEdge() instanceof PatternDwell || nextState
+                            .getBackEdge() instanceof PatternInterlineDwell)) {
                         Place stop = makePlace(nextState);
                         leg.stop.add(stop);
                     } else {
@@ -282,120 +281,113 @@ public class PlanGenerator {
                 }
             }
 
-			// now, transition between legs if necessary
+            // now, transition between legs if necessary
 
-			boolean changingToInterlinedTrip = leg != null && leg.route != null
-					&& !leg.route.equals(backEdgeNarrative.getName())
-					&& mode.isTransit() && previousMode != null
-					&& previousMode.isTransit();
+            boolean changingToInterlinedTrip = leg != null && leg.route != null
+                    && !leg.route.equals(backEdgeNarrative.getName()) && mode.isTransit()
+                    && previousMode != null && previousMode.isTransit();
 
-			if ((mode != previousMode || changingToInterlinedTrip)
-					&& mode != TraverseMode.STL) {
-				/*
-				 * change in mode. make a new leg if we are entering walk or
-				 * transit, otherwise just update the general itinerary info and
-				 * move to next edge.
-				 */
-				boolean endLeg = false;
-				if (previousMode == TraverseMode.STL
-						&& mode.isOnStreetNonTransit()) {
-					// switching from STL to wall or bike, so we need to fix up
-					// the start time,
-					// mode, etc
+            if ((mode != previousMode || changingToInterlinedTrip) && mode != TraverseMode.STL) {
+                /*
+                 * change in mode. make a new leg if we are entering walk or transit, otherwise just
+                 * update the general itinerary info and move to next edge.
+                 */
+                boolean endLeg = false;
+                if (previousMode == TraverseMode.STL && mode.isOnStreetNonTransit()) {
+                    // switching from STL to wall or bike, so we need to fix up
+                    // the start time,
+                    // mode, etc
 
-					leg.startTime = new Date(nextState.getTimeInMillis());
-					leg.route = frontEdgeNarrative.getName();
-					leg.mode = mode.toString();
-				} else if (mode == TraverseMode.TRANSFER) {
-					/* transferring mode is only used in transit-only planners */
-					itinerary.walkTime += edgeElapsedTime;
-					itinerary.walkDistance += backEdgeNarrative.getDistance();
-				} else if (mode == TraverseMode.BOARDING) {
-					/* boarding mode */
-					itinerary.transfers++;
-					endLeg = true;
-				} else if (mode == TraverseMode.ALIGHTING
-						|| changingToInterlinedTrip) {
-					endLeg = true;
-				} else {
-					if (previousMode == TraverseMode.ALIGHTING) {
-						// in this case, we are changing from an alighting mode
-						// (preAlight) to
-						// an onstreetnontransit. In this case, we have already
-						// closed the
-						// transit leg with alighting, so we don't want to
-						// finalize a leg.
-					} else if (previousMode == TraverseMode.BOARDING) {
-						// we are changing from boarding to an on-transit mode,
-						// so we need to
-						// fix up the leg's route and departure time data
-						leg.startTime = new Date(prevState.getTimeInMillis());
-						leg.route = frontEdgeNarrative.getName();
-						leg.mode = mode.toString();
-						Trip trip = frontEdgeNarrative.getTrip();
-						if (trip != null) {
-							leg.headsign = trip.getTripHeadsign();
-							leg.agencyId = trip.getId().getAgencyId();
-							leg.tripShortName = trip.getTripShortName();
-							leg.routeShortName = trip.getRoute().getShortName();
-							leg.routeLongName = trip.getRoute().getLongName();
+                    leg.startTime = new Date(nextState.getTimeInMillis());
+                    leg.route = frontEdgeNarrative.getName();
+                    leg.mode = mode.toString();
+                } else if (mode == TraverseMode.TRANSFER) {
+                    /* transferring mode is only used in transit-only planners */
+                    itinerary.walkTime += edgeElapsedTime;
+                    itinerary.walkDistance += backEdgeNarrative.getDistance();
+                } else if (mode == TraverseMode.BOARDING) {
+                    /* boarding mode */
+                    itinerary.transfers++;
+                    endLeg = true;
+                } else if (mode == TraverseMode.ALIGHTING || changingToInterlinedTrip) {
+                    endLeg = true;
+                } else {
+                    if (previousMode == TraverseMode.ALIGHTING) {
+                        // in this case, we are changing from an alighting mode
+                        // (preAlight) to
+                        // an onstreetnontransit. In this case, we have already
+                        // closed the
+                        // transit leg with alighting, so we don't want to
+                        // finalize a leg.
+                    } else if (previousMode == TraverseMode.BOARDING) {
+                        // we are changing from boarding to an on-transit mode,
+                        // so we need to
+                        // fix up the leg's route and departure time data
+                        leg.startTime = new Date(prevState.getTimeInMillis());
+                        leg.route = frontEdgeNarrative.getName();
+                        leg.mode = mode.toString();
+                        Trip trip = frontEdgeNarrative.getTrip();
+                        if (trip != null) {
+                            leg.headsign = trip.getTripHeadsign();
+                            leg.agencyId = trip.getId().getAgencyId();
+                            leg.tripShortName = trip.getTripShortName();
+                            leg.routeShortName = trip.getRoute().getShortName();
+                            leg.routeLongName = trip.getRoute().getLongName();
 
-						}
-					} else {
-						// we are probably changing between walk and bike
-						endLeg = true;
-					}
-				}
-				if (endLeg) {
-					/* finalize leg */
-					/* finalize prior leg if it exists */
-					if (startWalk != -1) {
-						leg.walkSteps = getWalkSteps(pathService,
-								path.states.subList(startWalk, i - 1));
-					}
-					leg.to = makePlace(frontEdgeNarrative.getFromVertex());
-					leg.endTime = new Date(prevState.getTimeInMillis());
-					Geometry geometry = geometryFactory
-							.createLineString(coordinates);
-					leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-					/* reset coordinates */
-					coordinates = new CoordinateArrayListSequence();
+                        }
+                    } else {
+                        // we are probably changing between walk and bike
+                        endLeg = true;
+                    }
+                }
+                if (endLeg) {
+                    /* finalize leg */
+                    /* finalize prior leg if it exists */
+                    if (startWalk != -1) {
+                        leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk,
+                                i - 1));
+                    }
+                    leg.to = makePlace(frontEdgeNarrative.getFromVertex());
+                    leg.endTime = new Date(prevState.getTimeInMillis());
+                    Geometry geometry = geometryFactory.createLineString(coordinates);
+                    leg.legGeometry = PolylineEncoder.createEncodings(geometry);
+                    /* reset coordinates */
+                    coordinates = new CoordinateArrayListSequence();
 
-					if (showIntermediateStops && leg.stop != null) {
-						// Remove the last stop -- it's the alighting one
-						leg.stop.remove(leg.stop.size() - 1);
-						if (leg.stop.isEmpty()) {
-							leg.stop = null;
-						}
-					}
+                    if (showIntermediateStops && leg.stop != null) {
+                        // Remove the last stop -- it's the alighting one
+                        leg.stop.remove(leg.stop.size() - 1);
+                        if (leg.stop.isEmpty()) {
+                            leg.stop = null;
+                        }
+                    }
 
-					/* initialize new leg */
-					leg = makeLeg(nextState);
-					if (changingToInterlinedTrip) {
-						leg.interlineWithPreviousLeg = true;
-					}
-					leg.mode = mode.toString();
+                    /* initialize new leg */
+                    leg = makeLeg(nextState);
+                    if (changingToInterlinedTrip) {
+                        leg.interlineWithPreviousLeg = true;
+                    }
+                    leg.mode = mode.toString();
 
-					startWalk = -1;
-					leg.route = backEdgeNarrative.getName();
-					if (mode.isOnStreetNonTransit()) {
-						/*
-						 * on-street (walk/bike) leg mark where in edge list
-						 * on-street legs begin, so step-by-step instructions
-						 * can be generated for this sublist later
-						 */
-						startWalk = i;
-					} else {
-						/* transit leg */
-						startWalk = -1;
-					}
-					itinerary.addLeg(leg);
-				}
+                    startWalk = -1;
+                    leg.route = backEdgeNarrative.getName();
+                    if (mode.isOnStreetNonTransit()) {
+                        /*
+                         * on-street (walk/bike) leg mark where in edge list on-street legs begin,
+                         * so step-by-step instructions can be generated for this sublist later
+                         */
+                        startWalk = i;
+                    } else {
+                        /* transit leg */
+                        startWalk = -1;
+                    }
+                    itinerary.addLeg(leg);
+                }
 
-			} /* end handling mode changes */
+            } /* end handling mode changes */
 
-			prevState = nextState;
-		} /* end loop over graphPath edge list */
+            prevState = nextState;
+        } /* end loop over graphPath edge list */
 
         if (leg != null) {
             /* finalize leg */
@@ -407,10 +399,10 @@ public class PlanGenerator {
             if (startWalk != -1) {
                 leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i + 1));
             }
-            if(showIntermediateStops && leg.stop != null) {
+            if (showIntermediateStops && leg.stop != null) {
                 // Remove the last stop -- it's the alighting one
                 leg.stop.remove(leg.stop.size() - 1);
-                if(leg.stop.isEmpty()) {
+                if (leg.stop.isEmpty()) {
                     leg.stop = null;
                 }
             }
@@ -422,15 +414,15 @@ public class PlanGenerator {
         return itinerary;
     }
 
-	private Set<Alert> addNotesToLeg(Leg leg, EdgeNarrative edgeNarrative) {
-		Set<Alert> notes = edgeNarrative.getNotes();
-		if (notes != null) {
-			for (Alert note : notes) {
-				leg.addAlert(note);
-			}
-		}
-		return notes;
-	}
+    private Set<Alert> addNotesToLeg(Leg leg, EdgeNarrative edgeNarrative) {
+        Set<Alert> notes = edgeNarrative.getNotes();
+        if (notes != null) {
+            for (Alert note : notes) {
+                leg.addAlert(note);
+            }
+        }
+        return notes;
+    }
 
     /**
      * Adjusts an Itinerary's elevation fields from an elevation profile
@@ -562,11 +554,11 @@ public class PlanGenerator {
             options.setMaxWalkDistance(request.getMaxWalkDistance());
         }
         if (request.getWalkSpeed() > 0) {
-            options.speed =  request.getWalkSpeed();
+            options.speed = request.getWalkSpeed();
         }
         options.triangleSafetyFactor = request.getTriangleSafetyFactor();
         options.triangleSlopeFactor = request.getTriangleSlopeFactor();
-        options.triangleTimeFactor = request.getTriangleTimeFactor();        
+        options.triangleTimeFactor = request.getTriangleTimeFactor();
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();
         }
@@ -625,7 +617,7 @@ public class PlanGenerator {
                 continue;
             }
             if (!edgeNarrative.getMode().isOnStreetNonTransit()) {
-				continue; // ignore STLs and the like
+                continue; // ignore STLs and the like
             }
             Geometry geom = edgeNarrative.getGeometry();
             if (geom == null) {
@@ -647,7 +639,7 @@ public class PlanGenerator {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
                     step.exit = Integer.toString(roundaboutExit); // ordinal numbers from
-                                                                  // localization
+                    // localization
                     roundaboutExit = 0;
                 }
                 /* start a new step */
@@ -667,7 +659,8 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
                         edgeNarrative.isRoundabout());
-                boolean optionsBefore = pathService.multipleOptionsBefore(edge, currState.getBackState());
+                boolean optionsBefore = pathService.multipleOptionsBefore(edge, currState
+                        .getBackState());
                 if (edgeNarrative.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {
@@ -689,18 +682,22 @@ public class PlanGenerator {
                 } else {
                     // we are not on a roundabout, and not continuing straight through.
 
-                    // figure out if there were other plausible turn options at the last intersection
+                    // figure out if there were other plausible turn options at the last
+                    // intersection
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
                     if (edge instanceof PlainStreetEdge) {
-                        //the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
+                        // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
 
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState.getBackState().getVertex())) {
+                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState
+                                .getBackState().getVertex())) {
                             if (alternative instanceof TinyTurnEdge) {
-                                alternative = pathService.getOutgoingEdges(alternative.getToVertex()).get(0);
+                                alternative = pathService.getOutgoingEdges(
+                                        alternative.getToVertex()).get(0);
                             }
-                            double altAngle = DirectionUtils.getFirstAngle(alternative.getGeometry());
+                            double altAngle = DirectionUtils.getFirstAngle(alternative
+                                    .getGeometry());
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
                             if (altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
@@ -712,19 +709,25 @@ public class PlanGenerator {
                     } else {
                         double newAngle;
                         if (currState.getVertex() instanceof StreetVertex) {
-                            newAngle = DirectionUtils.getFirstAngle(((StreetVertex)currState.getVertex()).getGeometry());
+                            newAngle = DirectionUtils.getFirstAngle(((StreetVertex) currState
+                                    .getVertex()).getGeometry());
                         } else {
-                            List<DirectEdge> outgoingEdges = pathService.getOutgoingEdges(currState.getVertex());
-							Edge oge = outgoingEdges.get(0);
-                            newAngle = DirectionUtils.getFirstAngle(((DirectEdge)oge).getGeometry());
+                            List<DirectEdge> outgoingEdges = pathService.getOutgoingEdges(currState
+                                    .getVertex());
+                            Edge oge = outgoingEdges.get(0);
+                            newAngle = DirectionUtils.getFirstAngle(((DirectEdge) oge)
+                                    .getGeometry());
                         }
                         double angleDiff = getAbsoluteAngleDiff(newAngle, thisAngle);
-                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState.getBackState().getVertex())) {
+                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState
+                                .getBackState().getVertex())) {
                             if (alternative == edge) {
                                 continue;
                             }
-                            alternative = pathService.getOutgoingEdges(alternative.getToVertex()).get(0);
-                            double altAngle = DirectionUtils.getFirstAngle(alternative.getGeometry());
+                            alternative = pathService.getOutgoingEdges(alternative.getToVertex())
+                                    .get(0);
+                            double altAngle = DirectionUtils.getFirstAngle(alternative
+                                    .getGeometry());
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
                             if (altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
@@ -762,9 +765,9 @@ public class PlanGenerator {
             angleDiff = ccwAngleDiff;
         }
         return angleDiff;
-	}
+    }
 
-	private WalkStep createWalkStep(State s) {
+    private WalkStep createWalkStep(State s) {
         EdgeNarrative en = s.getBackEdgeNarrative();
         WalkStep step;
         step = new WalkStep();
