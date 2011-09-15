@@ -596,7 +596,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             	}
             }
             
-            boolean noThruTraffic = way.isTag("access", "destination");
+            boolean noThruTraffic = way.isTag("access", "destination") ||
+                way.isTag("access", "private");
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
                 street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront, geometry,
@@ -667,7 +668,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * rules perfectly ;-)
              */
             if (access != null) {
-                if ("no".equals(access) || "private".equals(access) || "delivery".equals(access) 
+                if ("no".equals(access) || "delivery".equals(access)
                         || "agricultural".equals(access) || "license".equals("access")) {
                     permission = StreetTraversalPermission.NONE;
                 } else {
