@@ -99,7 +99,7 @@ public class UpdateHandler {
             patch.setTimePeriods(periods);
             patch.setId(id);
             patch.setAlert(alertText);
-            patch.apply(graph);
+            patchService.apply(patch);
             patchIds.add(id);
         }
     }
