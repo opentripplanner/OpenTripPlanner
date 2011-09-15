@@ -2,15 +2,14 @@ package org.opentripplanner.api.servlet;
 
 import java.util.List;
 
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.updater.Updater;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PeriodicGraphUpdater {
-    GraphService graphService;
-
+	private static final Logger log = LoggerFactory.getLogger(PeriodicGraphUpdater.class);
     private UpdateTask updater;
 
     private long updateFrequency = 1000 * 60 * 5; // five minutes
@@ -18,11 +17,6 @@ public class PeriodicGraphUpdater {
     private Thread thread;
 
     private List<Updater> updaters;
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
 
     public void start() {
         updater = new UpdateTask();
@@ -77,8 +71,7 @@ public class PeriodicGraphUpdater {
                     now = System.currentTimeMillis();
                 }
                 for (Updater updater : getUpdaters()) {
-                    System.out.println("running updater " + updater.getUrl());
-                    updater.setGraphService(graphService);
+                    log.info("running updater " + updater.getUrl());
                     updater.run();
                 }
 

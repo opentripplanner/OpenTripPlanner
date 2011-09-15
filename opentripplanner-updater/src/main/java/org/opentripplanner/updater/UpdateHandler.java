@@ -5,12 +5,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.TimePeriod;
 import org.opentripplanner.routing.patch.TranslatedString;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +29,6 @@ public class UpdateHandler {
 
     private Set<String> patchIds = new HashSet<String>();
 
-    private Graph graph;
-
-    private GraphService graphService;
-
     private PatchService patchService;
     
     public UpdateHandler(FeedMessage message) {
@@ -42,7 +36,6 @@ public class UpdateHandler {
     }
 
     public void update() {
-        graph = graphService.getGraph();
         for (FeedEntity entity : message.getEntityList()) {
             if (!entity.hasAlert()) {
                 continue;
@@ -121,10 +114,6 @@ public class UpdateHandler {
 
     public void setDefaultAgencyId(String defaultAgencyId) {
         this.defaultAgencyId = defaultAgencyId.intern();
-    }
-
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
     }
 
     public void setPatchService(PatchService patchService) {

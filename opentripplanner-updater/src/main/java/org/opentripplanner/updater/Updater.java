@@ -22,7 +22,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +37,6 @@ public class Updater implements Runnable {
 
     private String defaultAgencyId;
 
-    private GraphService graphService;
 
     private PatchService patchService;
 
@@ -75,17 +73,11 @@ public class Updater implements Runnable {
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
             UpdateHandler updateHandler = new UpdateHandler(feed);
             updateHandler.setDefaultAgencyId(defaultAgencyId);
-            updateHandler.setGraphService(graphService);
             updateHandler.setPatchService(getPatchService());
             updateHandler.update();
         } catch (IOException e) {
             log.error("Eror reading gtfs-realtime feed from " + url, e);
         }
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
     }
 
     @Autowired
