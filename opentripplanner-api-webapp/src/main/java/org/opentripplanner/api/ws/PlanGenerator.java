@@ -305,6 +305,7 @@ public class PlanGenerator {
                     leg.startTime = new Date(nextState.getTimeInMillis());
                     leg.route = frontEdgeNarrative.getName();
                     leg.mode = mode.toString();
+                    startWalk = i;
                 } else if (mode == TraverseMode.TRANSFER) {
                     /* transferring mode is only used in transit-only planners */
                     itinerary.walkTime += edgeElapsedTime;
