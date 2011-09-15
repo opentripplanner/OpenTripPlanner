@@ -27,7 +27,7 @@ public class PeriodicGraphUpdater {
     public void start() {
         updater = new UpdateTask();
         thread = new Thread(updater);
-        thread.setDaemon(true);
+        thread.setDaemon(false);
         thread.start();
     }
 
@@ -57,6 +57,7 @@ public class PeriodicGraphUpdater {
 
         public void finish() {
             this.finished = true;
+            Thread.currentThread().interrupt();
         }
 
         @Override
