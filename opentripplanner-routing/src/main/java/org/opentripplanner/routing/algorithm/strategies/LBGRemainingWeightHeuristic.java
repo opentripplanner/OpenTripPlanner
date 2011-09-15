@@ -93,7 +93,10 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
     private void recalculate(Vertex target) {
         if (target != this.target) {
             this.target = target;
-            this.weights = lbg.sssp((StreetLocation) target);
+            if (target instanceof StreetLocation)
+                this.weights = lbg.sssp((StreetLocation) target);
+            else 
+                this.weights = lbg.sssp(target);
         }
     }
 
