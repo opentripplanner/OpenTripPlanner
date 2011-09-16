@@ -536,6 +536,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
     
     private void desaturate() {
+        final float f = 200;
         loadPixels();
         for (int i = 0; i < width*height; i++) {
            int c = pixels[i];
@@ -543,9 +544,9 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
            float g = green(c);
            float b = blue(c);
            float avg = (r + g + b) / 3;
-           r += (avg - r) / 20;
-           g += (avg - g) / 20;
-           b += (avg - b) / 20;
+           r += (avg - r) / f;
+           g += (avg - g) / f;
+           b += (avg - b) / f;
            pixels[i] = color(r, g, b);
         }
         updatePixels();
