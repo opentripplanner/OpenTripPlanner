@@ -500,7 +500,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 	        }
             noFill();
   	    } else if (drawLevel==DRAW_MINIMAL) {
-  	        handleNewHighlights();
+  	        if (! newHighlightedEdges.isEmpty())
+  	                handleNewHighlights();
   	        // Black background box
   	    	fill(0, 0, 0);
   	    	stroke(30, 128, 30);
@@ -519,8 +520,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     private void handleNewHighlights() {
+        //fill(0, 0, 0, 1);
+        //rect(0,0,this.width, this.height);
+        desaturate();
         noFill();
-        stroke(200, 200, 000, 16); // yellow transparent edge highlight
+        stroke(256, 8, 0, 8); 
         strokeWeight(8);   
         while (! newHighlightedEdges.isEmpty()) {
             DirectEdge de = newHighlightedEdges.poll();
@@ -531,6 +535,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         }
     }
     
+    private void desaturate() {
+        loadPixels();
+        for (int i = 0; i < width*height; i++) {
+           int c = pixels[i];
+           float r = red(c);
+           float g = green(c);
+           float b = blue(c);
+           float avg = (r + g + b) / 3;
+           r += (avg - r) / 20;
+           g += (avg - g) / 20;
+           b += (avg - b) / 20;
+           pixels[i] = color(r, g, b);
+        }
+        updatePixels();
+    }
+   
     private double toScreenY(double y) {
         return map(y, modelBounds.getMinY(), modelBounds.getMaxY(), getSize().height, 0);
     }
@@ -653,7 +673,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     public void highlightGraphPath(GraphPath gp) {
         highlightedGraphPath = gp;
-        drawLevel = DRAW_ALL;
+        //drawLevel = DRAW_ALL;
+        drawLevel = DRAW_TRANSIT; // leave streets in grey
     }
 
     public void setHighlightedVertices(Set<Vertex> vertices) {
