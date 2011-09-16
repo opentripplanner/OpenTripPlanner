@@ -677,7 +677,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * rules perfectly ;-)
              */
             if (access != null) {
-                if ("no".equals(access) || "delivery".equals(access)
+            	if ("no".equals(access)) {
+            		//this can actually be overridden
+                	permission = StreetTraversalPermission.NONE;
+                	if ("yes".equals(motorcar)) {
+                    	permission = permission.add(StreetTraversalPermission.CAR);
+            		}
+            		if ("yes".equals(bicycle)) {
+                    	permission = permission.add(StreetTraversalPermission.BICYCLE);
+            		}
+            		if ("yes".equals(foot)) {
+                    	permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+            		}
+            	} else if ("delivery".equals(access)
                         || "agricultural".equals(access) || "license".equals("access")) {
                     permission = StreetTraversalPermission.NONE;
                 } else {
