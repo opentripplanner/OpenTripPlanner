@@ -71,7 +71,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
  * 
- * A StopPattern is an intermediate object used when processing GTFS files. It represents an ordered
+ * A ScheduledStopPattern is an intermediate object used when processing GTFS files. It represents an ordered
  * list of stops and a service ID. Any two trips with the same stops in the same order, and that
  * operate on the same days, can be combined using a TripPattern to save memory.
  */
@@ -242,9 +242,9 @@ public class GTFSPatternHopFactory {
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      */
     public void run(Graph graph) {
-    	if (fareServiceFactory == null) {
-    		fareServiceFactory = new DefaultFareServiceFactory();
-    	}
+		if (fareServiceFactory == null) {
+			fareServiceFactory = new DefaultFareServiceFactory();
+		}
         fareServiceFactory.setDao(_dao);
 
         // Load stops
@@ -932,10 +932,11 @@ public class GTFSPatternHopFactory {
     }
     
     private List<StopTime> getNonduplicateStopTimesForTrip(Trip trip) {
-    	List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
-    	ArrayList<StopTime> filtered = new ArrayList<StopTime>(unfiltered.size());
-    	for (StopTime st : unfiltered) {
-    		if (filtered.size() > 0) {
+		List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
+		ArrayList<StopTime> filtered = new ArrayList<StopTime>(
+				unfiltered.size());
+		for (StopTime st : unfiltered) {
+			if (filtered.size() > 0) {
     			StopTime lastStopTime = filtered.get(filtered.size() - 1);
     			if (lastStopTime.getStop().equals(st.getStop())) {
     				lastStopTime.setDepartureTime(st.getDepartureTime());
@@ -949,8 +950,8 @@ public class GTFSPatternHopFactory {
     	if (filtered.size() == unfiltered.size()) {
     		return unfiltered;
     	}
-    	return filtered;
-    }
+		return filtered;
+	}
 
 	public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
 		this.fareServiceFactory = fareServiceFactory;
