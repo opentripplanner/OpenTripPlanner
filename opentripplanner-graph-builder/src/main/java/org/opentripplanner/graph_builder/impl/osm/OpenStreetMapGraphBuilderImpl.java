@@ -27,6 +27,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.TurnRestriction;
 import org.opentripplanner.graph_builder.services.TurnRestrictionType;
+import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
@@ -58,6 +59,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private Map<Object, Object> _uniques = new HashMap<Object, Object>();
 
     private WayPropertySet wayPropertySet = new WayPropertySet();
+
+    private CustomNamer customNamer;
 
     private double bikeSafetyFactor = 4.0;
         
@@ -628,6 +631,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             id = unique(id);
 
             String name = way.getAssumedName();
+
+			if (customNamer != null) {
+				name = customNamer.name(way, name);
+			}
+
             if (name == null) {
                 name = id;
             }
@@ -735,4 +743,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     public double getBikeSafetyFactor() {
         return bikeSafetyFactor;
     }
+
+	public CustomNamer getCustomNamer() {
+		return customNamer;
+	}
+
+	public void setCustomNamer(CustomNamer customNamer) {
+		this.customNamer = customNamer;
+	}
 }
