@@ -28,22 +28,24 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 /**
  * Implements the default GTFS fare rules as described in
  * http://groups.google.com/group/gtfs-changes/msg/4f81b826cb732f3b
+ * 
  * @author novalis
- *
+ * 
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
     private HashMap<AgencyAndId, FareRuleSet> fareRules;
+
     HashMap<AgencyAndId, FareAttribute> fareAttributes;
-    
-	public FareService makeFareService() {
-		return new DefaultFareServiceImpl(fareRules, fareAttributes); 
-	}
+
+    public FareService makeFareService() {
+        return new DefaultFareServiceImpl(fareRules, fareAttributes);
+    }
 
     private HashMap<AgencyAndId, FareRuleSet> getFareRules(GtfsRelationalDao dao) {
         if (fareRules == null) {
             fareRules = new HashMap<AgencyAndId, FareRuleSet>();
             Collection<FareRule> rules = dao.getAllFareRules();
-            for (FareRule rule: rules) {
+            for (FareRule rule : rules) {
                 FareAttribute fare = rule.getFare();
                 AgencyAndId id = fare.getId();
                 FareRuleSet fareRule = fareRules.get(id);
@@ -69,16 +71,16 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         }
         return fareRules;
     }
-    
-	@Override
-	public void setDao(GtfsRelationalDao dao) {
-	    
+
+    @Override
+    public void setDao(GtfsRelationalDao dao) {
+
         fareRules = getFareRules(dao);
-        fareAttributes = new HashMap<AgencyAndId, FareAttribute>(); 
-        for (AgencyAndId fareId: fareRules.keySet()) {
-            FareAttribute attribute = dao.getFareAttributeForId(fareId);
-            fareAttributes.put(fareId, attribute);
+        Collection<FareAttribute> fA = dao.getAllFareAttributes();
+        fareAttributes = new HashMap<AgencyAndId, FareAttribute>();
+        for (FareAttribute fare : fA) {
+            fareAttributes.put(fare.getId(), fare);
         }
-		
-	}
+
+    }
 }
