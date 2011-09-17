@@ -66,6 +66,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -816,12 +817,9 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     	options.aStarSearchFactory = visitor.getAStarSearchFactory();
     	options.maxSlope = 1; // even climb walls
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
-    	//options.optimizeFor = OptimizeType.QUICK;
-    	// there should be a ui element for walk distance
-    	options.setMaxWalkDistance(7607);
-        pathservice.setRemainingWeightHeuristicFactory(
-                //new LBGRemainingWeightHeuristicFactoryImpl(graphService));
-                  new DefaultRemainingWeightHeuristicFactoryImpl());
+    	// there should be a ui element for walk distance and optimize type
+    	options.optimizeFor = OptimizeType.QUICK;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
 
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
