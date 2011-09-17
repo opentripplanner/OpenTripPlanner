@@ -59,6 +59,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 import processing.core.PApplet;
 import processing.core.PFont;
 
+
 /**
  * Processing applet to show a map of the graph. 
  * The user can:
@@ -71,6 +72,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
 	private static final int FRAME_RATE = 30;
     private static final long serialVersionUID = -8336165356756970127L;
+    
+    private static final boolean VIDEO = true; 
+    private static final String  VIDEO_PATH = "/home/syncopate/pathimage/"; 
+    private int videoFrameNumber = 0;
+
     Graph graph;
     STRtree vertexIndex;
     STRtree edgeIndex;
@@ -363,6 +369,13 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         	}
         }
     	labelState(gp.states.getLast(), "end");
+
+        if (VIDEO) {
+            // freeze on final path for a few frames
+            for (int i=0; i<10; i++)
+                saveVideoFrame();
+            resetVideoFrameNumber();
+        }
     }
 
     private void labelState(State s, String str) {
@@ -458,7 +471,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     	} else if (drawLevel == DRAW_VERTICES) {    	        
       	    /* turn off vertex display when zoomed out */
         	final double METERS_PER_DEGREE_LAT = 111111.111111;
-      	    drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 10);
+      	    drawTransitStopVertices = (modelBounds.getHeight() * METERS_PER_DEGREE_LAT / this.width < 4);
 	        /* Draw selected visible vertices */
         	fill(60, 60, 200);
 	        for (Vertex v : visibleVertices) {
@@ -524,8 +537,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         //rect(0,0,this.width, this.height);
         desaturate();
         noFill();
-        stroke(256, 8, 0, 8); 
-        strokeWeight(8);   
+        stroke(256, 0, 0, 128); //, 8); 
+        strokeWeight(6);   
         while (! newHighlightedEdges.isEmpty()) {
             DirectEdge de = newHighlightedEdges.poll();
             if (de != null) {
@@ -533,10 +546,20 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                 highlightedEdges.add(de);
             }
         }
+        if (VIDEO)
+            saveVideoFrame();
     }
     
+    private void saveVideoFrame() {
+        save(VIDEO_PATH + "/" + videoFrameNumber++ + ".bmp");        
+    }
+
+    private void resetVideoFrameNumber() {
+        videoFrameNumber = 0;        
+    }
+
     private void desaturate() {
-        final float f = 200;
+        final float f = 8;
         loadPixels();
         for (int i = 0; i < width*height; i++) {
            int c = pixels[i];
