@@ -237,6 +237,8 @@ public class GenericAStar {
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTime());
                     } else {
                         if (spt.add(v)) {
+                            if (traverseVisitor != null)
+                                traverseVisitor.visitEnqueue(u);
                             pq.insert(v, estimate);
                         } 
                     }
