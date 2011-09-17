@@ -60,6 +60,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -78,8 +80,8 @@ import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
-import org.opentripplanner.routing.impl.LBGRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -203,7 +205,7 @@ class VertexList extends AbstractListModel {
  * bunch of weird buttons designed to debug specific cases.
  * 
  */
-public class VizGui extends JFrame implements VertexSelectionListener {
+public class VizGui extends JFrame implements VertexSelectionListener, RemainingWeightHeuristicFactory {
 
     private static final long serialVersionUID = 1L;
 
@@ -816,8 +818,11 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
     	//options.optimizeFor = OptimizeType.QUICK;
     	// there should be a ui element for walk distance
-    	options.setMaxWalkDistance(3000);
-    	
+    	options.setMaxWalkDistance(7607);
+        pathservice.setRemainingWeightHeuristicFactory(
+                //new LBGRemainingWeightHeuristicFactoryImpl(graphService));
+                  new DefaultRemainingWeightHeuristicFactoryImpl());
+
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
@@ -869,11 +874,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingService = new ContractionRoutingServiceImpl();
         routingService.setGraphService(graphService);
         pathservice.setRoutingService(routingService);
-        pathservice.setRemainingWeightHeuristicFactory(
-                new LBGRemainingWeightHeuristicFactoryImpl(graphService));
+        pathservice.setRemainingWeightHeuristicFactory(this);
     }
     
     public Graph getGraph() {
         return graph;
+    }
+
+    @Override
+    // the vizgui serves as its own remainingweightheuristicfactory
+    // so ui elements could be used to select the heuristic
+    public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target) {
+        return new TrivialRemainingWeightHeuristic();
     }
 }
