@@ -13,23 +13,21 @@
 
 package org.opentripplanner.gui;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
 
 public class VisualTraverseVisitor implements TraverseVisitor {
 
     private ShowGraph gui;
 
-    List<Vertex> seen = new ArrayList<Vertex>();
-
+    private int sleepAfter = 10;
+    
+    private int nEnqueued = 0;
+    
     public VisualTraverseVisitor(ShowGraph gui) {
         this.gui = gui;
     }
@@ -44,17 +42,29 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitVertex(State state) {
-        try {
-            Thread.sleep(1);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (--sleepAfter <= 0) {
+            sleepAfter = (int) Math.ceil(Math.pow(nEnqueued, 0.8));
+            nEnqueued = 0;
+            try {
+                Thread.sleep(2);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 //        seen.add(state.getVertex());
 //        gui.setHighlightedVertices(seen);
 //        gui.highlightVertex(state.getVertex());
     }
 
+    @Override
+    public void visitEnqueue(State state) {
+//        Edge e = state.getBackEdge();
+//        if (e instanceof DirectEdge) {
+//            gui.enqueueHighlightedEdge((DirectEdge) e);
+//        }
+        nEnqueued += 1;
+    }
+    
     public GenericAStarFactory getAStarSearchFactory() {
         return new GenericAStarFactory() {
 
