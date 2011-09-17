@@ -79,9 +79,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=service", 
             StreetTraversalPermission.ALL, 1.1, 1.1);
         setProperties(props, "highway=residential", 
-            StreetTraversalPermission.ALL, 0.92, 0.92);
+            StreetTraversalPermission.ALL, 0.98, 0.98);
         setProperties(props, "highway=residential_link", 
-            StreetTraversalPermission.ALL, 0.92, 0.92);
+            StreetTraversalPermission.ALL, 0.98, 0.98);
         setProperties(props, "highway=tertiary", 
             StreetTraversalPermission.ALL, 1, 1);
         setProperties(props, "highway=tertiary_link", 
@@ -142,9 +142,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=service;cycleway=opposite_lane", 
             StreetTraversalPermission.ALL);         
         setProperties(props, "highway=residential;cycleway=opposite_lane",
-            StreetTraversalPermission.ALL, 0.92, 0.77);
+            StreetTraversalPermission.ALL, 0.98, 0.77);
         setProperties(props, "highway=residential_link;cycleway=opposite_lane",
-            StreetTraversalPermission.ALL, 0.92, 0.77);
+            StreetTraversalPermission.ALL, 0.98, 0.77);
         setProperties(props, "highway=tertiary;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 1, 0.87);
         setProperties(props, "highway=tertiary_link;cycleway=opposite_lane",
@@ -192,9 +192,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=*;cycleway=opposite_track", 
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.73);
         setProperties(props, "highway=residential;cycleway=opposite_track",
-            StreetTraversalPermission.ALL, 0.92, 0.7);
+            StreetTraversalPermission.ALL, 0.98, 0.7);
         setProperties(props, "highway=residential_link;cycleway=opposite_track",
-            StreetTraversalPermission.ALL, 0.92, 0.7);
+            StreetTraversalPermission.ALL, 0.98, 0.7);
         setProperties(props, "highway=tertiary;cycleway=opposite_track",
             StreetTraversalPermission.ALL, 1, 0.75);
         setProperties(props, "highway=tertiary_link;cycleway=opposite_track",
@@ -236,9 +236,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=service;cycleway=opposite",
             StreetTraversalPermission.ALL);
         setProperties(props, "highway=residential;cycleway=opposite",
-            StreetTraversalPermission.ALL, 0.92, 1.1);
+            StreetTraversalPermission.ALL, 0.98, 0.98);
         setProperties(props, "highway=residential_link;cycleway=opposite",
-            StreetTraversalPermission.ALL, 0.92, 1.1);
+            StreetTraversalPermission.ALL, 0.98, 0.98);
         setProperties(props, "highway=tertiary;cycleway=opposite", 
             StreetTraversalPermission.ALL, 1, 1.25);
         setProperties(props, "highway=tertiary_link;cycleway=opposite", 
