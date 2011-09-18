@@ -156,53 +156,60 @@ background-image: url(images/ui/buttons/systemmap.png)!important;
 }
 
 #trip-details {
-border: 1px solid #4c4c4c;
-background-color: #f9f9f9;
-cursor: text;
-padding: 10px 0 10px 10px;
+  border: 1px solid #4c4c4c;
+  background-color: #f9f9f9;
+  cursor: text;
+  padding: 10px 0 10px 10px;
 }
 
 #trip-details table td {
-font: 80%/120% "Helvetica Neue", Arial, Helvetica, sans-serif;
-vertical-align: top;
-padding: 0 8px 2px 0;
+  font: 80%/120% "Helvetica Neue", Arial, Helvetica, sans-serif;
+  vertical-align: top;
+  padding: 0 8px 2px 0;
+}
+
+#trip-details h3 {
+    color: lightgray;
+    font: bold 18px/20px Arial,Helvetica,sans-serif;
+    margin: 0 0 5px;
+    padding: 0;
 }
 
 .trip-details-shell {
-background-color: #FFF;
-cursor: text;
-padding: 0 15px 20px;
+    background-color: #FFF;
+    cursor: text;
+    padding: 0 15px 20px;
 }
 
 .no-icon {
-line-height: 0;
-background-image: none!important;
-border: 0!important;
-padding: 0!important;
+    line-height: 0;
+    background-image: none!important;
+    border: 0!important;
+    padding: 0!important;
 }
 
 #tp-accordion .x-panel-body {
-background-color: #e6e6e6;
-border-color: #D0D0D0;
+    background-color: #e6e6e6;
+    border-color: #D0D0D0;
 }
 
 #tp-accordion .x-panel-btns {
-background-color: #4c4c4c;
-border-color: #D0D0D0;
+    background-color: #4c4c4c;
+    border-color: #D0D0D0;
 }
 
 #tp-accordion .x-form-item {
-font-size: 9pt;
-font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 #tp-accordion .x-form-field {
-font-size: 9pt;
-font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+    font-size: 9pt;
+    font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
 }
 
 #tripplanner-panel .x-tree-node-leaf {
-background-color: #e6e6e6;
+    background-color: #e6e6e6;
 }
 
 #tripplanner-panel .x-tree-node-over {

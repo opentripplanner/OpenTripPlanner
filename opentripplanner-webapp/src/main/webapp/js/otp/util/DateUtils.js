@@ -19,8 +19,8 @@ otp.namespace("otp.util");
  */
 otp.util.DateUtils = {
 
-    DATE_TIME_FORMAT_STRING : "D, M jS g:iA",
-    TIME_FORMAT_STRING : "g:iA",
+    DATE_TIME_FORMAT_STRING : "D, M jS g:ia",
+    TIME_FORMAT_STRING : "g:ia",
 
     /** creates a nicely formatted date @ time string */
     getPrettyDate : function(pre, post, date)

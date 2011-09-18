@@ -54,6 +54,7 @@ otp.planner.Renderer = {
     clear : function()
     {
         this.map.removeAllFeatures();
+        this.map.closeAllPopups();
     },
 
     /** */

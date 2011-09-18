@@ -153,7 +153,7 @@ otp.locale.English = {
     {
         about        : "About",
         stop_id      : "Stop ID",
-        trip_details : "Trip Details",
+        trip_details : "Trip details",
         fare         : "Fare",
         fare_symbol  : "$",
         travel       : "Travel",

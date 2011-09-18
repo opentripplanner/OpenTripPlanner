@@ -586,7 +586,7 @@ otp.planner.Itinerary = {
         var numLegs = store.getCount();
 
         // step 1: start node
-        retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny', iconCls: 'start-icon', leaf: true}, clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: fmId, text: fmTxt, cls: 'itiny magnify', iconCls: 'start-icon', leaf: true}, clickCallback, scope));
 
         // step 2: leg and (sub-leg) instruction nodes
         for(var i = 0; i < numLegs; i++)
@@ -639,7 +639,7 @@ otp.planner.Itinerary = {
 
             // step 2c: make this leg (tree) node
             var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeId});
-            var cfg = {id:legId, text:text, cls:'itiny', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf};
+            var cfg = {id:legId, text:text, cls:'itiny magnify', icon:icon, iconCls:'itiny-inline-icon', leaf:isLeaf};
             if(numLegs > 2)
             {
                 // show/hide instructions if our trip has more than 2 legs 
@@ -667,7 +667,7 @@ otp.planner.Itinerary = {
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
         // step 4: end and details nodes
-        retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny magnify', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
 
         return retVal;

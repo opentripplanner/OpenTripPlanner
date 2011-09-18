@@ -437,6 +437,12 @@ otp.core.MapStatic = {
             self.streetviewPopup.hide()
     },
 
+    /** hide / close anything on the map */
+    closeAllPopups : function()
+    {
+        this.tooltipHide();
+        this.streetviewHide();
+    },
 
     /**
      * Remove all features from non base layers on the map
