@@ -239,7 +239,7 @@ otp.planner.Utils = {
         var thisID = this.ITINERARIES_TREE + id;
         var root = otp.util.ExtUtils.makeTreeNode({
                 id: 'root-' + thisID,
-                text: '<B>' + id + '</B>',
+                text: '<strong>' + id + '</strong>',
                 cls: this.ITIN_CLS,
                 iconCls: this.ITIN_CLS,
                 leaf: false
@@ -264,7 +264,7 @@ otp.planner.Utils = {
         var thisID = this.TRIPDETAILS_TREE + id;
         var root = otp.util.ExtUtils.makeTreeNode({
                 id: 'root-' + thisID,
-                text: '<B>' + id + '</B>',
+                text: '<strong>' + id + '</strong>',
                 cls: this.DETAIL_CLS,
                 iconCls: this.DETAIL_CLS,
                 leaf: false
