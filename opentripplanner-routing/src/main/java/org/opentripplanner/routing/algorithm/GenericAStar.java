@@ -238,7 +238,7 @@ public class GenericAStar {
                     } else {
                         if (spt.add(v)) {
                             if (traverseVisitor != null)
-                                traverseVisitor.visitEnqueue(u);
+                                traverseVisitor.visitEnqueue(v);
                             pq.insert(v, estimate);
                         } 
                     }
