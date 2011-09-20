@@ -126,7 +126,7 @@ public class State implements Cloneable {
     }
 
     public String toString() {
-        return "<State " + new Date(getTimeInMillis()) + " " + vertex + ">";
+        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " + vertex + ">";
     }
 
     public long getTime() {
