@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.AbstractEdge;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -78,7 +79,8 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         	}
         }
 
-        StateEditor s1 = s0.edit(this);
+        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        StateEditor s1 = s0.edit(this, en);
 
         double time = fromv.getLength() / options.speed;
         double weight = fromv.computeWeight(s0, options, time);

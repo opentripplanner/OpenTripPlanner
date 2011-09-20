@@ -42,6 +42,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -219,6 +220,19 @@ public class PlanGenerator {
             if (previousMode == null) {
                 previousMode = prevState.getBackState().getBackEdgeNarrative().getMode();
             }
+            
+            if (backEdgeNarrative instanceof LegSwitchingEdge) {
+            	leg.walkSteps = getWalkSteps(pathService, path.states.subList(startWalk, i - 1));
+            	leg = makeLeg(nextState);
+            	leg.mode = mode.toString(); //may need to fix this up
+            	itinerary.addLeg(leg);
+            	if (mode.isOnStreetNonTransit()) {
+                    startWalk = i;
+                }
+            	prevState = nextState;
+            	continue;
+            }
+            
             // handle the effects of the previous edge on the leg
             /* ignore edges that should not contribute to the narrative */
             if (backEdge instanceof FreeEdge) {
