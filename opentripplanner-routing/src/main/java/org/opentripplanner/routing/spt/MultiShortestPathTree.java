@@ -35,7 +35,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
     
-    public Set<Vertex> getVeritces() {
+    public Set<Vertex> getVertices() {
         return stateSets.keySet();
     }
 
