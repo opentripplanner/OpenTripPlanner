@@ -248,6 +248,16 @@ strong {
     font-weight: bold;
  }
  
+/*  for map tooltip popups */
+.olPopup,
+.olPopup > div,
+.olHoverPopup,
+.olHoverPopup > div {
+    background-color: transparent!important;
+    overflow: visible!important;
+}
+
+ 
 .mapTooltipPopup {
     background: url("images/map/trip/tooltip-popup-bg.png") no-repeat scroll 0 0 transparent;
     height: 45px !important;
@@ -256,8 +266,9 @@ strong {
     left: 0px;
     top: -12px;
     font-size: 12px;
-    overflow: auto;
     position: relative;
+    background-color: transparent !important;
+    overflow: visible !important;
 }
 
 .mapTooltipPopup img {
@@ -272,8 +283,14 @@ strong {
     top: -21px;
     left: 0px;
     font-size: 12px;
-    overflow: auto;
     position: relative;
+    background-color: transparent !important;
+    overflow: visible !important;
+}
+
+#mapStreetviewPopup .olPopupCloseBox {
+    right:   2px !important;
+    top:   -19px !important;
 }
 
 .stopid {

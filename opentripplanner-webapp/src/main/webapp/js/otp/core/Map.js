@@ -380,11 +380,11 @@ otp.core.MapStatic = {
                 html += '<br/>';
             else 
                 html += ' ';
-    
+
             // append links to tooltip content
             html += '<span class="popLinks">' 
                  +  zoom
-                 +  ' | <a href="#" onClick="otp.core.MapStatic.streetview(' + x + ',' + y  + ');">Streetview (© Google)</a>'
+                 +  ' | <a href="#" onClick="otp.core.MapStatic.streetview(' + x + ',' + y  + ');">Streetview (&copy; Google)</a>'
                  +  '</span>';
         }
 

@@ -812,7 +812,7 @@ otp.planner.Itinerary = {
             this.map.streetviewHide();
             this.clickCount = 0;
         }
-        if(this.clickCount >= 2) 
+        if(this.clickCount >= 3) 
         {
             node.m_clicked = false;
         }
