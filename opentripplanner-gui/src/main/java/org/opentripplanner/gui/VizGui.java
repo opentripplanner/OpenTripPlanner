@@ -811,11 +811,8 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
     	TraverseOptions options = new TraverseOptions(modeSet);
-    	options.speed = 1; // override difference between bike and walk
-    	options.walkReluctance = 1; // walk etc are same cost
     	VisualTraverseVisitor visitor = new VisualTraverseVisitor(showGraph);
     	options.aStarSearchFactory = visitor.getAStarSearchFactory();
-    	options.maxSlope = 1; // even climb walls
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
     	// there should be a ui element for walk distance and optimize type
     	options.optimizeFor = OptimizeType.QUICK;
