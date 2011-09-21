@@ -133,34 +133,33 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
 
-        if (options.getModes().getNonTransitMode().equals(TraverseMode.CAR)) {
-            switch (s0.getNoThruTrafficState()) {
-            case INIT:
-                if (fromv.isNoThruTraffic()) {
-                    s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
-                } else {
-                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-                }
-                break;
-            case IN_INITIAL_ISLAND:
-                if (!fromv.isNoThruTraffic()) {
-                    s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-                }
-                break;
-            case BETWEEN_ISLANDS:
-                if (fromv.isNoThruTraffic()) {
-                    s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
-                }
-                break;
-            case IN_FINAL_ISLAND:
-                if (!fromv.isNoThruTraffic()) {
-                    // we have now passed entirely through a no thru traffic region, which is
-                    // forbidden
-                    return null;
-                }
-                break;
-            }
-        }
+		switch (s0.getNoThruTrafficState()) {
+		case INIT:
+			if (fromv.isNoThruTraffic()) {
+				s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
+			} else {
+				s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+			}
+			break;
+		case IN_INITIAL_ISLAND:
+			if (!fromv.isNoThruTraffic()) {
+				s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+			}
+			break;
+		case BETWEEN_ISLANDS:
+			if (fromv.isNoThruTraffic()) {
+				s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
+			}
+			break;
+		case IN_FINAL_ISLAND:
+			if (!fromv.isNoThruTraffic()) {
+				// we have now passed entirely through a no thru traffic region,
+				// which is
+				// forbidden
+				return null;
+			}
+			break;
+		}
 
         double time = angleLength / options.speed;
         double weight = fromv.computeWeight(s0, options, time) + turnCost / 20;
