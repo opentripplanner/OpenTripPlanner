@@ -103,6 +103,20 @@ public class OSMWithTags {
     return ("yes".equals(getTag(tag)) || "1".equals(getTag(tag)) || "true".equals(getTag(tag)));
   }
 
+  public boolean doesTagAllowAccess(String tag) {
+	  if(_tags == null) {
+		    return false;
+	  }
+	  if (isTagTrue(tag)) {
+		  return true;
+	  }
+	  tag = tag.toLowerCase();
+	  String value = getTag(tag);
+	return ("designated".equals(value) || "official".equals(value) || 
+			"permissive".equals(value) || "unknown".equals(value)) || 
+			value.endsWith("access");
+  }
+	  
   /**
    * Gets a tag's value.
    */

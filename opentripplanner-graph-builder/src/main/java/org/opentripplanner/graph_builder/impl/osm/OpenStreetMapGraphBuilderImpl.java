@@ -601,7 +601,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             
             boolean noThruTraffic = way.isTag("access", "destination") ||
-                way.isTag("access", "private");
+                way.isTag("access", "private") || way.isTag("access", "customers") ||
+                way.isTag("access", "delivery") || way.isTag("access", "forestry") ||
+                way.isTag("access", "agricultural");
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
                 street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront, geometry,
@@ -677,17 +679,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * rules perfectly ;-)
              */
             if (access != null) {
-            if ("no".equals(access) || "delivery".equals(access)
-                        || "agricultural".equals(access) || "license".equals(access)) {
+            if ("no".equals(access) || "license".equals(access)) {
             		//this can actually be overridden
                 	permission = StreetTraversalPermission.NONE;
-                	if ("yes".equals(motorcar)) {
+                	if (entity.doesTagAllowAccess("motorcar")) {
                     	permission = permission.add(StreetTraversalPermission.CAR);
             		}
-            		if ("yes".equals(bicycle)) {
+            		if (entity.doesTagAllowAccess("bicycle")) {
                     	permission = permission.add(StreetTraversalPermission.BICYCLE);
             		}
-            		if ("yes".equals(foot)) {
+            		if (entity.doesTagAllowAccess("foot")) {
                     	permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
             		}
                 } else {
@@ -698,7 +699,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (motorcar != null) {
-                if ("no".equals(motorcar) || "private".equals(motorcar)) {
+            	if ("no".equals(motorcar) || "license".equals(motorcar)) {
                     permission = permission.remove(StreetTraversalPermission.CAR);
                 } else {
                     permission = permission.add(StreetTraversalPermission.CAR);
@@ -706,7 +707,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (bicycle != null) {
-                if ("no".equals(bicycle) || "private".equals(bicycle)) {
+            	if ("no".equals(bicycle) || "license".equals(bicycle)) {
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
                 } else {
                     permission = permission.add(StreetTraversalPermission.BICYCLE);
@@ -714,7 +715,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (foot != null) {
-                if ("no".equals(foot) || "private".equals(foot)) {
+            	if ("no".equals(foot) || "license".equals(foot)) {
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                 } else {
                     permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
