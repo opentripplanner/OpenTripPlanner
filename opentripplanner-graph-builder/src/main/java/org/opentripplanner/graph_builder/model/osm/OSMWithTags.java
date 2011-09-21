@@ -113,8 +113,7 @@ public class OSMWithTags {
 	  tag = tag.toLowerCase();
 	  String value = getTag(tag);
 	return ("designated".equals(value) || "official".equals(value) || 
-			"permissive".equals(value) || "unknown".equals(value)) || 
-			value.endsWith("access");
+			"permissive".equals(value) || "unknown".equals(value));
   }
 	  
   /**
