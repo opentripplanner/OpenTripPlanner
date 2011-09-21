@@ -24,139 +24,142 @@ import java.util.Map;
 
 public class OSMWithTags {
 
-  /* To save memory this is only created when an entity actually has tags. */
-  private Map<String, String> _tags;
+    /* To save memory this is only created when an entity actually has tags. */
+    private Map<String, String> _tags;
 
-  protected long id;
+    protected long id;
 
-  /**
-   * Gets the id.
-   */
-  public long getId() {
-    return id;
-  }
+    /**
+     * Gets the id.
+     */
+    public long getId() {
+        return id;
+    }
 
-  /**
-   * Sets the id.
-   */
-  public void setId(long id) {
-    this.id = id;
-  }
+    /**
+     * Sets the id.
+     */
+    public void setId(long id) {
+        this.id = id;
+    }
 
-  /**
-   * Adds a tag.
-   */
-  public void addTag(OSMTag tag) {
-    if(_tags == null)
-      _tags = new HashMap<String, String>();
+    /**
+     * Adds a tag.
+     */
+    public void addTag(OSMTag tag) {
+        if (_tags == null)
+            _tags = new HashMap<String, String>();
 
-    _tags.put(tag.getK().toLowerCase(), tag.getV());
-  }
+        _tags.put(tag.getK().toLowerCase(), tag.getV());
+    }
 
-  /**
-   * Adds a tag.
-   */
-  public void addTag(String key, String value) {
-    if(key == null || value == null)
-      return;
+    /**
+     * Adds a tag.
+     */
+    public void addTag(String key, String value) {
+        if (key == null || value == null)
+            return;
 
-    if(_tags == null)
-      _tags = new HashMap<String, String>();
+        if (_tags == null)
+            _tags = new HashMap<String, String>();
 
-    _tags.put(key.toLowerCase(), value);
-  }
-  
-  /**
-   * The tags of an entity.
-   */
-  public Map<String,String> getTags() {
-    return _tags;
-  }
+        _tags.put(key.toLowerCase(), value);
+    }
 
-  /**
-   * Is the tag defined?
-   */
-  public boolean hasTag(String tag) {
-    tag = tag.toLowerCase();
-    return _tags != null && _tags.containsKey(tag);
-  }
+    /**
+     * The tags of an entity.
+     */
+    public Map<String, String> getTags() {
+        return _tags;
+    }
 
-  /**
-   * Determines if a tag contains a false value. 'no', 'false', and '0' are considered false.
-   */
-  public boolean isTagFalse(String tag) {
-    tag = tag.toLowerCase();
-    if(_tags == null)
-      return false;
+    /**
+     * Is the tag defined?
+     */
+    public boolean hasTag(String tag) {
+        tag = tag.toLowerCase();
+        return _tags != null && _tags.containsKey(tag);
+    }
 
-    return ("no".equals(getTag(tag)) || "0".equals(getTag(tag)) || "false".equals(getTag(tag)));
-  }
+    /**
+     * Determines if a tag contains a false value. 'no', 'false', and '0' are considered false.
+     */
+    public boolean isTagFalse(String tag) {
+        tag = tag.toLowerCase();
+        if (_tags == null)
+            return false;
 
-  /**
-   * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
-   */
-  public boolean isTagTrue(String tag) {
-    tag = tag.toLowerCase();
-    if(_tags == null)
-      return false;
+        return ("no".equals(getTag(tag)) || "0".equals(getTag(tag)) || "false".equals(getTag(tag)));
+    }
 
-    return ("yes".equals(getTag(tag)) || "1".equals(getTag(tag)) || "true".equals(getTag(tag)));
-  }
+    /**
+     * Determines if a tag contains a true value. 'yes', 'true', and '1' are considered true.
+     */
+    public boolean isTagTrue(String tag) {
+        tag = tag.toLowerCase();
+        if (_tags == null)
+            return false;
 
-  public boolean doesTagAllowAccess(String tag) {
-	  if(_tags == null) {
-		    return false;
-	  }
-	  if (isTagTrue(tag)) {
-		  return true;
-	  }
-	  tag = tag.toLowerCase();
-	  String value = getTag(tag);
-	return ("designated".equals(value) || "official".equals(value) || 
-			"permissive".equals(value) || "unknown".equals(value));
-  }
-	  
-  /**
-   * Gets a tag's value.
-   */
-  public String getTag(String tag) {
-    tag = tag.toLowerCase();
-    if(_tags != null && _tags.containsKey(tag))
-      return _tags.get(tag);
+        return ("yes".equals(getTag(tag)) || "1".equals(getTag(tag)) || "true".equals(getTag(tag)));
+    }
 
-    return null;
-  }
+    public boolean doesTagAllowAccess(String tag) {
+        if (_tags == null) {
+            return false;
+        }
+        if (isTagTrue(tag)) {
+            return true;
+        }
+        tag = tag.toLowerCase();
+        String value = getTag(tag);
+        return ("designated".equals(value) || "official".equals(value)
+             || "permissive".equals(value) || "unknown".equals(value));
+    }
 
-  /**
-   * Checks is a tag contains the specified value.
-   */
-  public Boolean isTag(String tag, String value) {
-    tag = tag.toLowerCase();
-    if(_tags != null && _tags.containsKey(tag) && value != null)
-      return value.equals(_tags.get(tag));
+    /**
+     * Gets a tag's value.
+     */
+    public String getTag(String tag) {
+        tag = tag.toLowerCase();
+        if (_tags != null && _tags.containsKey(tag))
+            return _tags.get(tag);
 
-    return false;
-  }
+        return null;
+    }
 
-  /** Returns a name-like value for an entity (if one exists). The otp: namespaced
-   *  tags are created by {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations processRelations}
-   */
-  public String getAssumedName() {
-    if(_tags.containsKey("name"))
-      return _tags.get("name");
+    /**
+     * Checks is a tag contains the specified value.
+     */
+    public Boolean isTag(String tag, String value) {
+        tag = tag.toLowerCase();
+        if (_tags != null && _tags.containsKey(tag) && value != null)
+            return value.equals(_tags.get(tag));
 
-    if(_tags.containsKey("otp:route_name"))
-      return _tags.get("otp:route_name");
+        return false;
+    }
 
-    if(_tags.containsKey("otp:gen_name"))
-      return _tags.get("otp:gen_name");
+    /**
+     * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
+     * by
+     * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations
+     * processRelations}
+     */
+    public String getAssumedName() {
+        if (_tags.containsKey("name"))
+            return _tags.get("name");
 
-    if(_tags.containsKey("otp:route_ref"))
-      return _tags.get("otp:route_ref");
+        if (_tags.containsKey("otp:route_name"))
+            return _tags.get("otp:route_name");
 
-    if(_tags.containsKey("ref"))
-      return _tags.get("ref");
+        if (_tags.containsKey("otp:gen_name"))
+            return _tags.get("otp:gen_name");
 
-    return null;
-  }
+        if (_tags.containsKey("otp:route_ref"))
+            return _tags.get("otp:route_ref");
+
+        if (_tags.containsKey("ref"))
+            return _tags.get("ref");
+
+        return null;
+    }
 }
