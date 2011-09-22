@@ -32,14 +32,45 @@ public class TinyTurnEdge extends FreeEdge {
     private boolean restricted = false;
 
     private int turnCost = 0;
+    
+    private StreetTraversalPermission permission;
 
-    public TinyTurnEdge(Vertex from, Vertex to) {
+    public TinyTurnEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
         super(from, to);
+        this.permission = permission;
+    }
+    
+    public boolean canTraverse(TraverseOptions options) {
+        if (options.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return true;
+        }
+
+        if (options.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        }
+
+        if (options.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
+            return true;
+        }
+
+        return false;
     }
 
     @Override
     public State traverse(State s0) {
         TraverseOptions options = s0.getOptions();
+
+        if (!canTraverse(options)) {
+            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            	// try walking bike since you can't ride here
+                return doTraverse(s0, options.getWalkingOptions());
+            }
+            return null;
+        }
+        return doTraverse(s0, options);
+    }
+    
+    public State doTraverse(State s0, TraverseOptions options) {
         if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
@@ -49,6 +80,7 @@ public class TinyTurnEdge extends FreeEdge {
         EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
         s1.incrementWeight(weight);
+        s1.incrementTimeInSeconds((int) Math.ceil(time));
         return s1.makeState();
     }
 
