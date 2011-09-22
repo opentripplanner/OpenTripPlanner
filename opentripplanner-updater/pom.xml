@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.4.2-SNAPSHOT</version>
+        <version>0.4.2</version>
     </parent>
 
     <repositories>
@@ -104,10 +104,10 @@
                         </goals>
                         <configuration>
                             <tasks>
-                              <mkdir dir="target/generated-sources"/>
+                              <mkdir dir="target/generated-sources" />
                               <exec executable="protoc" failonerror="true">
-                                <arg value="-(remove this parenthesized addition)-java_out=target/generated-sources"/>
-                                <arg value="src/main/resources/gtfs-realtime.proto"/>
+                                <arg value="-(remove this parenthesized addition)-java_out=target/generated-sources" />
+                                <arg value="src/main/resources/gtfs-realtime.proto" />
                               </exec>
                             </tasks>
                         </configuration>

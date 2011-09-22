@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
-  <version>0.4.2-SNAPSHOT</version>
+  <version>0.4.2</version>
   <packaging>pom</packaging>
 
   <name>OpenTripPlanner</name>
@@ -76,7 +76,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <ignore/>
+                    <ignore />
                   </action>
                 </pluginExecution>
               </pluginExecutions>
