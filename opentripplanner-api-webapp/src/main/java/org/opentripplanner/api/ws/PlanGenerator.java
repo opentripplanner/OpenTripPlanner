@@ -211,7 +211,6 @@ public class PlanGenerator {
                 prevState = nextState;
                 continue;
             }
-            /* skip initial state, which has no back edges */
 
             edgeElapsedTime = nextState.getTimeInMillis()
                     - nextState.getBackState().getTimeInMillis();
@@ -236,6 +235,7 @@ public class PlanGenerator {
             // handle the effects of the previous edge on the leg
             /* ignore edges that should not contribute to the narrative */
             if (backEdge instanceof FreeEdge) {
+            	leg.mode = frontEdgeNarrative.getMode().toString();
                 prevState = nextState;
                 continue;
             }
