@@ -46,6 +46,7 @@ otp.planner.Templates = {
 
     tripFeedbackDetails : null,
     tripPrintTemplate   : null,
+    streetviewTemplate  : null,
 
     initialize : function(config) {
         otp.configure(this, config);
@@ -85,6 +86,11 @@ otp.planner.Templates = {
         if(this.tripPrintTemplate == null)
             this.tripPrintTemplate = new Ext.XTemplate( 
                 '{url}?' + otp.planner.ParamTemplate
+            ).compile();
+
+        if(this.streetviewTemplate == null)
+            this.streetviewTemplate =  new Ext.XTemplate(
+                '<a href="#" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
             ).compile();
 
         if(this.TP_TRIPDETAILS == null)
