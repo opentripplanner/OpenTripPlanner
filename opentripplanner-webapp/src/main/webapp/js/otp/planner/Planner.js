@@ -43,9 +43,10 @@ otp.planner.Planner = {
     // see config.js to override these options
     showWheelchairForm      : null,
     showStopIds             : null,
+    showPrintButton         : null,
+    showLinksButton         : null,
     useOptionDependencies   : null,
     useRouteLongName        : null,
-
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -251,17 +252,25 @@ otp.planner.Planner = {
      */
     newTripPlan : function(xml, request)
     {
-/** seems to be fixed in Extjs 3.0 ... at least on the Mac
-
-        if(Ext.isOpera)
-        {
-            Ext.Msg.alert('Opera Browser', "The Opera Browser <b>will not</b> show your trip planning details.  I suggest that you use another browser (eg: Firefox, Safari, Chrome or IE) when trip planning with this map.");
-        }
-*/
-
         try 
         {
-            var trip = new otp.planner.TripTab({planner:this, ui:this.ui, xml:xml, templates:this.templates, linkTemplates:this.linkTemplates, id:++this.m_tabCount, renderer:this.m_renderer, topoRenderer:this.m_topoRenderer, locale:this.locale, request:request}); 
+            var cfg = {
+                  planner      : this, 
+                  locale       : this.locale, 
+                  ui           : this.ui, 
+                  renderer     : this.m_renderer, 
+                  topoRenderer : this.m_topoRenderer, 
+                  templates    : this.templates, 
+                  linkTemplates: this.linkTemplates, 
+
+                  xml : xml,
+                  id  : ++this.m_tabCount, 
+                  request:request,
+
+                  showPrintButton : this.showPrintButton,
+                  showLinksButton : this.showLinksButton
+            }; 
+            var trip = new otp.planner.TripTab(cfg);
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
             {

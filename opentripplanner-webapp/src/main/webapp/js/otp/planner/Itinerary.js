@@ -767,7 +767,7 @@ otp.planner.Itinerary = {
             }
         }
         stepText += ' <strong>' + step.streetName + '</strong>';
-        stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+        stepText += ' - ' + otp.planner.Utils.prettyDistance(step.distance) + '';
 
         // edit the step object (by default, unless otherwise told)
         if(!dontEditStep)

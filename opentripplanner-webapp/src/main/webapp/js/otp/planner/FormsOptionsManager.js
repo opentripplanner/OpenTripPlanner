@@ -145,21 +145,25 @@ otp.planner.FormsOptionsManagerStatic = {
         // so a naive approach seems sufficient
         if (showTransitOptions && showBikeOptions) {
             optimizeFilter = function(record) {
-            	return true;
+                return true;
             };
         } else if (showTransitOptions) {
             optimizeFilter = function(record) {
-                return record.get("opt") !== "SAFE" && record.get("opt") !== "TRIANGLE";
+                var opt = record.get("opt");
+                var val = (opt !== "SAFE" && opt !== "TRIANGLE");
+                return val;
             };
         } else if (showBikeOptions) {
             optimizeFilter = function(record) {
-                return record.get("opt") !== "TRANSFERS";
+                var opt = record.get("opt");
+                var val = opt !== "TRANSFERS";
+                return val;
             };
         } else {
             optimizeFilter = function(record) {
                 var opt = record.get("opt");
-                return !(opt === "TRANSFERS" ||
-                         opt === "SAFE");
+                var val = !(opt === "TRANSFERS" || opt === "SAFE");
+                return val;
             };
         }
         return optimizeFilter;

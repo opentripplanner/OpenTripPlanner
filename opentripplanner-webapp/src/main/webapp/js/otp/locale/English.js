@@ -296,10 +296,10 @@ otp.locale.English = {
 
         options: 
         [
-          ['TRANSFERS', 'Fewest Transfers'],
-          ['QUICK',     'Quickest Trip'],
-          ['SAFE',      'Safest Trip'],
-          ['TRIANGLE',  'Custom Trip...']
+          ['TRANSFERS', 'Fewest transfers'],
+          ['QUICK',     'Quickest trip'],
+          ['SAFE',      'Safest trip'],
+          ['TRIANGLE',  'Custom trip...']
         ],
     
         arriveDepart: 
@@ -331,7 +331,8 @@ otp.locale.English = {
         mode : 
         [
             ['TRANSIT,WALK', 'Transit'],
-            ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
+// DO WE REALLY NEED THIS?  ISN'T BUS & TRAIN the same as TRANSIT, WALK
+//          ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],

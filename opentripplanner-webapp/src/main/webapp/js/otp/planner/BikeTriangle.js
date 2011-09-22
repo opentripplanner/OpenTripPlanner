@@ -33,15 +33,14 @@ otp.planner.BikeTriangle = {
     initialize : function(config) {
         otp.configure(this, config);
 
+        // note: removed panel border and title (w/title=null...was 'Custom Bike Options')
+        //        style: {   border: '1px solid gray' }
         this.panel = new Ext.Panel({  
-            id:             'trip-bike-triangle',
-            title:          'Custom Bike Options',
-            name:           'bikeTriangle',  
-            style:          {
-                                border: '1px solid gray'
-                            }
-        });
-        
+            id:      'trip-bike-triangle',
+            name:    'bikeTriangle',
+            title:    null
+       });
+
         var thisBT = this;
         this.panel.on({
               render: function(obj) {

@@ -38,6 +38,10 @@ otp.planner.TripTab = {
     xml           : null,
     request       : null,
 
+    showPrintButton  : true,  // turn on/off itinerary print button
+    showLinksButton  : true,  // turn on/off itinerary links button
+
+
     id            : 0,
 
     m_utils       : otp.planner.Utils,
@@ -133,26 +137,36 @@ otp.planner.TripTab = {
                 handler: this.editCB
             });
 
-            var p = new Ext.Toolbar.Button({
-                text:    this.locale.buttons.print,
-                iconCls: 'print-button',
-                tooltip: this.locale.buttons.printTip,
-                scope:   this,
-                handler: this.printCB
-            });
+            var buttons = [r, e];
 
-            var l = new Ext.Toolbar.Button({
-                text:    this.locale.buttons.link,
-                iconCls: 'link-button',
-                tooltip: this.locale.buttons.linkTip,
-                scope:   this,
-                handler: this.linkCB
-            });
+            if(this.showPrintButton)
+            {
+                var p = new Ext.Toolbar.Button({
+                    text:    this.locale.buttons.print,
+                    iconCls: 'print-button',
+                    tooltip: this.locale.buttons.printTip,
+                    scope:   this,
+                    handler: this.printCB
+                });
+                buttons.push(p);
+            }
 
-            // step D: create UI panel & tree & add tree to Itineary renderer 
+            if (this.showLinksButton)
+            {
+                var l = new Ext.Toolbar.Button({
+                    text: this.locale.buttons.link,
+                    iconCls: 'link-button',
+                    tooltip: this.locale.buttons.linkTip,
+                    scope: this,
+                    handler: this.linkCB
+                });
+                buttons.push(l);
+            }
+
+            // step D: create UI panel & tree & add tree to Itinerary renderer 
             this.m_itinerariesTree = this.m_utils.makeItinerariesTree(this.id, this.itineraryClick, this);
             this.m_tripDetailsTree = this.m_utils.makeTripDetailsTree(this.id, null, null);
-            this.m_panel           = this.m_utils.makeTripTab(this.id, this.m_title, this.m_itinerariesTree, this.m_tripDetailsTree, [r, e, p, l]);
+            this.m_panel           = this.m_utils.makeTripTab(this.id, this.m_title, this.m_itinerariesTree, this.m_tripDetailsTree, buttons);
 
             // step E: add itineraries to tree
             var tree = this.m_itinerariesTree;

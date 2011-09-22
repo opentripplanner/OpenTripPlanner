@@ -35,6 +35,8 @@ otp.config_defaults = {
 
         showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
         showStopIds           : true,   // show stop ids as part of the itinerary
+        showPrintButton       : false,  // turn on/off itinerary print button
+        showLinksButton       : true,   // turn on/off itinerary links button
         useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
         useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
 
