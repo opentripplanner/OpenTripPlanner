@@ -397,6 +397,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "otp:route_ref=*", "Route {otp:route_ref}");
         createNames(props, "highway=platform;ref=*", "Platform {ref}");
         createNames(props, "railway=platform;ref=*", "Platform {ref}");
+        createNames(props, "railway=platform;highway=footway;footway=sidewalk", "platform");
+        createNames(props, "railway=platform;highway=path;path=sidewalk", "platform");
+        createNames(props, "railway=platform;highway=pedestrian", "platform");
+        createNames(props, "railway=platform;highway=path", "platform");
+        createNames(props, "railway=platform;highway=footway", "platform");
+        createNames(props, "highway=platform", "platform");
+        createNames(props, "railway=platform", "platform");
 
         // Bridges/Tunnels
         createNames(props, "highway=pedestrian;bridge=*", "footbridge");
@@ -409,9 +416,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         // Basic Mappings
         createNames(props, "highway=motorway", "road");
-        createNames(props, "highway=motorway_link", "onramp");
+        createNames(props, "highway=motorway_link", "ramp");
         createNames(props, "highway=trunk", "road");
-        createNames(props, "highway=trunk_link", "onramp");
+        createNames(props, "highway=trunk_link", "ramp");
 
         createNames(props, "highway=primary", "road");
         createNames(props, "highway=primary_link", "road");
@@ -430,9 +437,6 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=track", "track");
 
         createNames(props, "highway=footway;footway=sidewalk", "sidewalk");
-
-        createNames(props, "highway=platform", "platform");
-        createNames(props, "railway=platform", "platform");
 
         createNames(props, "highway=steps", "steps");
 
