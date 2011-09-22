@@ -79,6 +79,11 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 	private boolean hasBogusName;
 
 	private boolean noThruTraffic;
+
+	/**
+	 * This street is a staircase
+	 */
+	private boolean stairs;
     
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
@@ -208,7 +213,11 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         } else {
             weight = time;
         }
-        weight *= options.walkReluctance;
+        if (isStairs()) {
+        	weight *= options.stairsReluctance;
+        } else {
+        	weight *= options.walkReluctance;
+        }
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
 
@@ -388,4 +397,12 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     public int hashCode() {
         return (back ? 2 : 0) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
     }
+
+	public boolean isStairs() {
+		return stairs;
+	}
+
+	public void setStairs(boolean stairs) {
+		this.stairs = stairs;
+	}
 }

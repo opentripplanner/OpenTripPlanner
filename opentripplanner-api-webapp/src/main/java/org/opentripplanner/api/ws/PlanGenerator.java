@@ -562,8 +562,7 @@ public class PlanGenerator {
 
         TraverseModeSet modeSet = request.getModeSet();
         assert (modeSet.isValid());
-        TraverseOptions options = new TraverseOptions(modeSet);
-        options.optimizeFor = request.getOptimize();
+        TraverseOptions options = new TraverseOptions(modeSet, request.getOptimize());
         options.setArriveBy(request.isArriveBy());
         options.wheelchairAccessible = request.getWheelchair();
         if (request.getMaxSlope() > 0) {

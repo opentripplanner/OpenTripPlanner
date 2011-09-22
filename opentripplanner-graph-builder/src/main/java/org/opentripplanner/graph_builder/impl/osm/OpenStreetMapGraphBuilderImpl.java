@@ -641,6 +641,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (name == null) {
                 name = id;
             }
+
+            boolean steps = "steps".equals(way.getTag("highway"));
+            if (steps) {
+            	//consider the elevation gain of stairs, roughly
+            	length *= 2;
+            }
+
             PlainStreetEdge street = new PlainStreetEdge(start, end, geometry, name, length,
                     permissions, back);
             street.setId(id);
@@ -648,9 +655,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (!way.hasTag("name")) {
                 street.setBogusName(true);
             }
+            street.setStairs(steps);
 
             /* TODO: This should probably generalized somehow? */
-            if (way.isTagFalse("wheelchair") || ("steps".equals(way.getTag("highway")) && !way.isTagTrue("wheelchair"))) {
+			if (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair"))) {
                 street.setWheelchairAccessible(false);
             }
 

@@ -91,7 +91,10 @@ public class StreetVertex extends GenericVertex {
 
     public int outAngle;
 
-    protected boolean crossable = true; //can this street be safely crossed?
+    /** is this street a staircase */
+    private boolean stairs = false;
+
+    protected boolean crossable = true; //can this street be safely crossed? (unused)
     
     protected double bicycleSafetyEffectiveLength;
 
@@ -424,7 +427,11 @@ public class StreetVertex extends GenericVertex {
         } else {
             weight = time;
         }
-        weight *= options.walkReluctance;
+        if (stairs) {
+        	weight *= options.stairsReluctance;
+        } else {
+        	weight *= options.walkReluctance;
+        }
         return weight;
     }
 
@@ -507,4 +514,12 @@ public class StreetVertex extends GenericVertex {
     public boolean isNoThruTraffic() {
         return noThruTraffic;
     }
+
+	public void setStairs(boolean stairs) {
+		this.stairs = stairs;
+	}
+
+	public boolean isStairs() {
+		return stairs;
+	}
 }

@@ -123,6 +123,7 @@ public class StreetUtils {
         newv.setRoundabout(e.isRoundabout());
         newv.setBogusName(e.hasBogusName());
         newv.setNoThruTraffic(e.isNoThruTraffic());
+        newv.setStairs(e.isStairs());
         graph.addVertex(newv);
         return newv;
     }
