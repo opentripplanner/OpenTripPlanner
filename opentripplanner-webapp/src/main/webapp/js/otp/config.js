@@ -20,7 +20,23 @@ otp.config_defaults = {
 
     planner : {
         url            : null,
-        showStopIds    : true,
+
+        // options to turn stuff on / off on the planner
+        showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
+        showStopIds           : true,   // show stop ids as part of the itinerary
+        showPrintButton       : false,  // turn on/off itinerary print button
+        showLinksButton       : true,   // turn on/off itinerary links button
+        useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
+        useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
+
+        // will add a tree node to the bottom of the itinerary with this message
+        itineraryMessages : {
+            transit         : null,
+            bicycle         : null,
+            bicycle_transit : null,
+            walk            : null 
+        },
+
         linkTemplates  : [
             {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},
@@ -32,13 +48,6 @@ otp.config_defaults = {
             {name:otp.config.locale.tripPlanner.link.walk_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_walk,    url:otp.config.locale.tripPlanner.link.google_domain + '/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
-
-        showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
-        showStopIds           : true,   // show stop ids as part of the itinerary
-        showPrintButton       : false,  // turn on/off itinerary print button
-        showLinksButton       : true,   // turn on/off itinerary links button
-        useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
-        useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
 
         geocoder  :
         {

@@ -819,8 +819,72 @@ otp.planner.Itinerary = {
         this.clickCount++;
     },
 
-
     CLASS_NAME: "otp.planner.Itinerary"
 };
-
 otp.planner.Itinerary = new otp.Class(otp.planner.Itinerary);
+
+
+/**
+ * instance object that retains modes used in this itinerary
+ */
+otp.planner.ItineraryModes = {
+
+    itineraryMessages : null,
+    itinerary         : null,
+
+    m_message      : null,
+    m_hasWalk      : false,
+    m_hasTransit   : false,
+    m_hasBike      : false,
+    m_hasBus       : false,
+    m_hasTrain     : false,
+
+
+    /**
+     * 
+     */
+    initialize : function(config, itinerary)
+    {
+        otp.configure(this, config);
+        this.itinerary = itinerary;
+        this._findModes();
+        this._findMessage();
+    },
+
+    getMessage : function()
+    {
+        return this.m_message;
+    },
+
+    /** mark different modes this itinerary uses */
+    _findModes : function()
+    {
+        var endIndex = this.itinerary.m_fromStore.getCount();
+        for (var i = 0; i < endIndex; i++)
+        {
+            var from = this.m_fromStore.getAt(i);
+            var mode = from.get('mode');
+            
+            if (otp.util.Modes.isTransit(mode))
+            {
+                
+            }
+            else
+            {
+                
+            }
+        }
+    },
+
+    /** mark different modes this itinerary uses */
+    _findMessage : function()
+    {
+        if(this.itineraryMessages)
+        {
+            
+        }
+    },
+
+    CLASS_NAME : "otp.planner.ItineraryModes"
+};
+otp.planner.ItineraryModes = new otp.Class(otp.planner.ItineraryModes);

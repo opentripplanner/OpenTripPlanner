@@ -14,9 +14,6 @@
 
 otp.namespace("otp.util");
 
-/**
- * strings that routing engine uses to define modes
- */
 otp.util.Modes =  {
 
     WALK        : 'WALK',
@@ -33,27 +30,77 @@ otp.util.Modes =  {
     TRAINISH    : 'TRAINISH', 
     BUSISH      : 'BUSISH',
 
+    getTransitModes : function()
+    {
+        return [this.TRAM, this.SUBWAY, this.BUS, this.RAIL, this.GONDOLA, this.FERRY, this.CABLE_CAR, this.FUNICULAR, this.TRANSIT, this.TRAINISH, this.BUSISH];
+    },
 
-    /** return transit */
-    isTransit : function(mode) {
-        var transitModes = [this.TRAM, this.SUBWAY, this.BUS, this.RAIL, this.GONDOLA, this.FERRY, this.CABLE_CAR, this.FUNICULAR, this.BUSISH, this.TRANSIT, this.TRAINISH];
-        var retVal   = false;
-        if(mode != null) {
-            for(var i = 0; i < transitModes.length; i++) {
-                var m = transitModes[i];
-                if(mode.toUpperCase().indexOf(m) >= 0 ) {
-                    retVal = true;
-                    break;
-                }
-            }
-        }
-
-        return retVal;
+    isTransit : function(mode)
+    {
+        if(mode == null) return false;
+        return otp.util.ObjUtils.isInArray(mode.toUpperCase(), this.getTransitModes());
     },
 
 
+    getTrainModes : function()
+    {
+        return [this.TRAM, this.SUBWAY, this.RAIL, this.GONDOLA, this.CABLE_CAR, this.FUNICULAR, this.TRAINISH];
+    },
+
+    isTrain : function(mode)
+    {
+        if(mode == null) return false;
+        return otp.util.ObjUtils.isInArray(mode.toUpperCase(), this.getTrainModes());
+    },
+
+    getBusModes : function()
+    {
+        return [this.BUS, this.BUSISH];
+    },
+
+    isBus : function(mode)
+    {
+        if(mode == null) return false;
+        return otp.util.ObjUtils.isInArray(mode.toUpperCase(), this.getBusModes());
+    },
+
+    getBicycleModes : function()
+    {
+        return [this.BICYCLE, "BIKE"];
+    },
+
+    isBikeAndTransit : function(mode)
+    {
+        if(mode == null) return false;
+
+        var hasBike    = false;
+        var hasTransit = false;
+
+        var keys = null;
+        if(mode.indexOf(','))
+            keys = mode.split(',');
+         else
+            keys = mode.split('_');
+
+         if(keys)
+         {
+             for (var i = 0; i < array.length; i++)
+             {
+                 var m = array[i];
+                 if (otp.util.ObjUtils.isInArray(mode.toUpperCase(), this.getTransitModes())) 
+                    hasTransit = true;
+                 if (otp.util.ObjUtils.isInArray(mode.toUpperCase(), this.getBicycleModes())) 
+                    hasBike = true;
+             }
+         }
+
+         var retVal = hasBike && hasTransit;
+         return retVal;
+    },
+
     /** return mode name from locale */
-    translate : function(mode, locale) {
+    translate : function(mode, locale)
+    {
         if(mode == null) return mode;
         if(locale == null)
             locale = otp.config.locale;

@@ -27,6 +27,31 @@ otp.util.ObjUtils = {
     m_fixNameSpacing       : true,
     m_capitolize           : true,
 
+    /** string & sub-string search of an array (slightly different than array.indexOf) */
+    isInArray : function (str, array)
+    {
+        var retVal = false;
+        try
+        {
+            for(var i = 0; i < array.length; i++)
+            {
+                var m = array[i];
+                if(str.indexOf(m) >= 0 )
+                {
+                    retVal = true;
+                    break;
+                }
+            }
+        }
+        catch(e)
+        {
+            console.log("isInArray error" + e);
+        }
+
+        return retVal;
+     },
+
+
     /** */
     isArray : function (obj)
     {

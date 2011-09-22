@@ -375,16 +375,25 @@ otp.core.MapStatic = {
             else
                 zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
 
-            // if content is shorter than 25 characters, we have tooltip space, so break the links to next line 
+            // if content is shorter than 25 characters, we have tooltip space, so break the links to next line and use the @Google)
+            var streetview = '<a href="#" onClick="otp.core.MapStatic.streetview(' + x + ',' + y  + ');">${1}</a>'
+            var svConf = {name:'sv'};
             if(contentSize && contentSize <= 25)
+            {
                 html += '<br/>';
-            else 
+                svConf.name = 'Streetview (&copy; Google)'
+            }
+            else
+            { 
                 html += ' ';
+                svConf.name = 'Streetview';
+            }
 
             // append links to tooltip content
             html += '<span class="popLinks">' 
                  +  zoom
-                 +  ' | <a href="#" onClick="otp.core.MapStatic.streetview(' + x + ',' + y  + ');">Streetview (&copy; Google)</a>'
+                 +  ' | '
+                 +  streetview
                  +  '</span>';
         }
 
