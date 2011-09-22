@@ -79,6 +79,9 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public double walkReluctance = 2.0;
 
+    /** Used instead of walk reluctance for stairs */
+	public double stairsReluctance = 2.0;
+
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
@@ -244,9 +247,13 @@ public class TraverseOptions implements Cloneable, Serializable {
 	}
 
     public TraverseOptions(TraverseMode mode, OptimizeType optimize) {
+    	this(new TraverseModeSet(mode), optimize);
+	}
+
+    public TraverseOptions(TraverseModeSet modeSet, OptimizeType optimize) {
     	this();
-    	this.setModes(new TraverseModeSet(mode));
         this.optimizeFor = optimize;
+    	this.setModes(modeSet);
 	}
 
 	public void setGtfsContext(GtfsContext context) {
@@ -316,7 +323,8 @@ public class TraverseOptions implements Cloneable, Serializable {
                     && transferPenalty == to.transferPenalty
                     && triangleSafetyFactor == to.triangleSafetyFactor
                     && triangleSlopeFactor == to.triangleSlopeFactor
-                    && triangleTimeFactor == to.triangleTimeFactor;
+                    && triangleTimeFactor == to.triangleTimeFactor
+                    && stairsReluctance == to.stairsReluctance;
         }
         return false;
     }
@@ -334,6 +342,7 @@ public class TraverseOptions implements Cloneable, Serializable {
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
+                + new Double(stairsReluctance).hashCode() * 315595321
                 ;
     }
 
@@ -367,10 +376,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
-            
-            // why 20? Because the default bike safety factor is 4, and we really want to only walk
-            // a bike to save a user from a walk which is very much (5x) longer
-            walkingOptions.walkReluctance *= 20.0;
+            walkingOptions.speed *= 0.3; //assume walking bikes is slow
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
