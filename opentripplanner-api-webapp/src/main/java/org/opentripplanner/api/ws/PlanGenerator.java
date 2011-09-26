@@ -206,8 +206,6 @@ public class PlanGenerator {
                         .getElevationProfile();
                 previousElevation = applyElevation(profile, itinerary, previousElevation);
             }
-            System.out.println("contemplating edge " + backEdge + " and " + pgstate + "and mode "
-                    + mode);
 
             switch (pgstate) {
             case START:
