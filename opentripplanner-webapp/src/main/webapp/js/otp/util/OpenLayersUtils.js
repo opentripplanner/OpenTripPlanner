@@ -70,6 +70,7 @@ otp.util.OpenLayersUtils = {
             },
             options
         );
+        layer.OTP_LAYER = true;
         map.addLayer(layer);
 
         return layer;

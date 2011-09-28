@@ -53,8 +53,7 @@ otp.planner.Renderer = {
     /** */
     clear : function()
     {
-        this.map.removeAllFeatures();
-        this.map.closeAllPopups();
+        this.map.cleanMap();
     },
 
     /** */
@@ -70,6 +69,7 @@ otp.planner.Renderer = {
                     displayInLayerSwitcher: false
             };
             this.m_vectorLayer = new OpenLayers.Layer.Vector('trip-vector-layer', vectorLayerOptions);
+            this.m_vectorLayer.OTP_LAYER = true;
             this.map.getMap().addLayer(this.m_vectorLayer);
             this.m_vectorLayer.setZIndex(222);   // HACK: sets click index of trip back for clicability of other map layers
 
@@ -86,6 +86,7 @@ otp.planner.Renderer = {
                     displayInLayerSwitcher: false
             };
             this.m_markerLayer = new OpenLayers.Layer.Vector('trip-marker-layer', markerLayerOptions);
+            this.m_markerLayer.OTP_LAYER = true;
             this.map.getMap().addLayer(this.m_markerLayer);
             this.m_markerLayer.setZIndex(223);   // HACK: sets click index of trip back for clickability of other map layers
         }

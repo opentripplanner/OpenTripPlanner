@@ -284,11 +284,11 @@ otp.util.StringFormattingUtils = {
         var retVal = inStr;
         try
         {
-            if(!defStr)  defStr  = inStr;
+            if(!defStr) defStr  = inStr;
 
-            inStr = trimet.utils.StringUtils.stripNonPrints(inStr);
-            inStr = trimet.utils.StringUtils.stripCurseWords(inStr);
-            inStr = trimet.utils.StringUtils.maxLen(inStr, maxSize);
+            inStr = this.stripNonPrints(inStr);
+            inStr = this.stripCurseWords(inStr);
+            inStr = this.maxLen(inStr, maxSize);
             retVal = inStr;
         }
         catch(ex)

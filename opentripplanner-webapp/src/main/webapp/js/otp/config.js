@@ -41,8 +41,6 @@ otp.config_defaults = {
             {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_transit, url: otp.config.locale.tripPlanner.link.google_domain + '/maps?<tpl if="arriveBy == \'Arrive\'">ttype=arr&</tpl>date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
-//            {name:'TriMet (Map Planner)',  url:'http://maps.trimet.org?<tpl if="opt == \'TRANSFERS\'">min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">walk=0.9999&</tpl>arr={arriveBy}&date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},
-//            {name:'TriMet (Text Planner - time and date reset to current)', url:'http://trimet.org/go/cgi-bin/plantrip.cgi?<tpl if="arriveBy == \'Arrive\'">Arr=A&</tpl><tpl if="opt == \'TRANSFERS\'">Min=X&</tpl><tpl if="maxWalkDistance &gt; 1000.0">Walk=0.9999&</tpl>date={date}&time={time}&from={fromLat},{fromLon}&to={toLat},{toLon}&submit'},            
             {name:otp.config.locale.tripPlanner.link.bike_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_bikes,   url:otp.config.locale.tripPlanner.link.google_domain + '/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=b'},
             {name:otp.config.locale.tripPlanner.link.walk_separator, separator:true},
@@ -55,7 +53,7 @@ otp.config_defaults = {
             url     : "/geocoder/geocode",  
             // debug-url : '/js/otp/planner/test/geo-zoo.xml',
             // debug-url : '/js/otp/planner/test/geo-multi.xml', 
-            // debut-enabled : true,
+            // debug-enabled : true,
             addressParamName : "address"
         },
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')

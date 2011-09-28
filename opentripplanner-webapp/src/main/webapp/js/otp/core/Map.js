@@ -75,6 +75,10 @@ otp.core.MapStatic = {
      * @param controls:null to get the default control (or supply an array of custom controls)
      * @param numZoomLevels can be increased to 14...but not recommended for a public map.
      * 
+     * IMPORTANT: when adding new layers to this OL map, make sure you add layer.OTP_LAYER = true
+     *            if you expect the layer to be cleared by _removeAllFeatures() below (e.g., things
+     *            like OTP route highlight layers, etc...).
+     * 
      * @methodOf otp.Map
      */
     initialize : function(config)
@@ -88,6 +92,7 @@ otp.core.MapStatic = {
             this.map.addLayer(this.baseLayer);
         }
         this.map.setBaseLayer(this.baseLayer, true);
+        this.map.events.register('click', this, this.closeAllPopups);
 
         otp.core.MapSingleton = this;
         var self = this;
@@ -248,6 +253,7 @@ otp.core.MapStatic = {
             this.updateSize();
             otp.core.MapStatic.THIS.map.zoomToDefaultExtent();
         }
+        this.cleanMap();
     },
 
     /**
@@ -446,6 +452,13 @@ otp.core.MapStatic = {
             self.streetviewPopup.hide()
     },
 
+    /** */
+    cleanMap : function()
+    {
+        this.closeAllPopups()
+        this._removeAllFeatures();
+    },
+
     /** hide / close anything on the map */
     closeAllPopups : function()
     {
@@ -454,9 +467,9 @@ otp.core.MapStatic = {
     },
 
     /**
-     * Remove all features from non base layers on the map
+     * Remove all OTP features from non base layers on the map
      */
-    removeAllFeatures : function()
+    _removeAllFeatures : function()
     {
         // mini events system
         // if this expands some more, we should have a more proper event system
@@ -467,7 +480,7 @@ otp.core.MapStatic = {
         for (var i = 0; i < this.map.layers.length; i++)
         {
             var layer = this.map.layers[i];
-            if (!layer.isBaseLayer)
+            if (!layer.isBaseLayer && layer.OTP_LAYER)
             {
                 if (typeof layer.removeFeatures === 'function') {
                     layer.removeFeatures(layer.features);

@@ -176,7 +176,7 @@ otp.util.ExtUtils = {
             root            : root,
             fields          : fields
         };
-        trimet.extend(c, config);
+        otp.extend(c, config);
 
         var retVal = new Ext.data.JsonStore(c);
         retVal.proxy.on("exception",

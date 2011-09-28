@@ -45,6 +45,7 @@ otp.planner.poi.Control = {
 
         // step 2: make layer
         this.layer = new OpenLayers.Layer.Vector(this.name, {projection: otp.core.MapStatic.dataProjection, displayInLayerSwitcher: false});
+        this.layer.OTP_LAYER = true;
         this.drag  = new OpenLayers.Control.DragFeature(this.layer);
 
         this.map.addLayer(this.layer);
@@ -266,19 +267,6 @@ otp.planner.poi.Control = {
         popup.doLayout();
 
         return popup;
-    },
-
-    /** */
-    OLDmakePopup : function(feature, config, text, trustedText)
-    {
-        if(trustedText == null)
-            trustedText = "";
-        if(text == null)
-            text = feature.attributes.m_text;
-            
-        //text = trimet.utils.StringUtils.clean(text);
-        feature.attributes.m_text = text;
-        return new otp.planner.poi.Popup(feature, config, text + ' ' + trustedText);
     },
 
     /** */

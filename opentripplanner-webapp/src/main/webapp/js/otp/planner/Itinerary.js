@@ -281,7 +281,8 @@ otp.planner.Itinerary = {
      * makes lines between from / to / transfers NOTE: should only be called
      * when creating a new itinerary (not every time that itinerary is drawn)
      */
-    makeWalkLines : function(vLayer) {
+    makeWalkLines : function(vLayer)
+    {
         var vectors = new Array();
 
         var endIndex = this.m_fromStore.getCount() - 1;
@@ -781,14 +782,18 @@ otp.planner.Itinerary = {
         return stepText;
     },
 
+    outCount : 0,
+    clicked  : null,
+
     /** */
     instructionClickCB : function(node, m)
     {
         if(node && node.m_step)
         {
+            this.clicked  = node;
+            this.outCount = 0;
             this.map.pan(node.m_step.lon, node.m_step.lat);
             this.instructionHoverCB(node, m);
-            node.m_clicked = true;
         }
     },
 
@@ -803,20 +808,25 @@ otp.planner.Itinerary = {
     },
 
     /** mouse out callback */
-    clickCount : 0,
     instructionOutCB : function(node, m)
     {
-        if(!node.m_clicked)
+        // clear all map tooltips
+        this.map.tooltipHide();
+        this.map.streetviewHide();
+
+        // stopping condition for clicked tooltips
+        if(this.outCount >= 5) 
         {
-            this.map.tooltipHide();
-            this.map.streetviewHide();
-            this.clickCount = 0;
+            this.clicked = null;
         }
-        if(this.clickCount >= 3) 
+        this.outCount++;
+
+        // if we had an earlier click event (and haven't yet exceeded the outCount), show the clicked tooltip again 
+        if(this.clicked)
         {
-            node.m_clicked = false;
+            // reset the map tool-tip back to our 'clicked' node 
+            this.instructionHoverCB(this.clicked);
         }
-        this.clickCount++;
     },
 
     CLASS_NAME: "otp.planner.Itinerary"
