@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -38,9 +39,9 @@ import com.vividsolutions.jts.geom.Geometry;
 public class TestTurnEdge extends TestCase {
 
     public void testStreetSpeed() {
-        assertTrue(Math.abs(StreetVertex.slopeSpeedCoefficient(0,0) - 1) < 0.01);
-        assertTrue(Math.abs(StreetVertex.slopeSpeedCoefficient(0.35, 0) - 0.0624) < 0.02);
-        assertTrue(Math.abs(StreetVertex.slopeSpeedCoefficient(0, 5000) - 1.17) < 0.03);
+        assertTrue(Math.abs(ElevationUtils.slopeSpeedCoefficient(0,0) - 1) < 0.01);
+        assertTrue(Math.abs(ElevationUtils.slopeSpeedCoefficient(0.35, 0) - 0.0624) < 0.02);
+        assertTrue(Math.abs(ElevationUtils.slopeSpeedCoefficient(0, 5000) - 1.17) < 0.03);
     }
 
     public void testStreetWalk() {

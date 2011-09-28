@@ -29,6 +29,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -128,20 +130,29 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     public PackedCoordinateSequence getElevationProfile() {
         return elevationProfile;
     }
+
     @Override
     public void setElevationProfile(PackedCoordinateSequence elev) {
-        if (elev == null) {
+        if (elev == null || elev.size() < 2) {
             return;
         }
         if (slopeOverride) {
             elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),elev.getCoordinate((elev.size()-1))},
                     2);
         }
+
         elevationProfile = elev;
-        SlopeCosts costs = StreetVertex.computeSlopeCost(elev, getName());
+
+        //compute the various costs of the elevation changes
+        double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
+        length *= lengthMultiplier;
+        bicycleSafetyEffectiveLength *= lengthMultiplier;
+
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, getName());
         slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
+        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
     }
 
     @Override
@@ -180,8 +191,9 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         double time = length / options.speed;
         double weight;
         if (options.wheelchairAccessible) {
-            weight = getSlopeSpeedEffectiveLength() / options.speed;
+            weight = slopeSpeedEffectiveLength / options.speed;
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            time = slopeSpeedEffectiveLength / options.speed;
             switch (options.optimizeFor) {
             case SAFE:
             	weight = bicycleSafetyEffectiveLength / options.speed;
@@ -201,11 +213,21 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                 weight = slopeSpeedEffectiveLength / options.speed;
                 break;
             case TRIANGLE:
-                double quick = slopeSpeedEffectiveLength / options.speed;
-                double safety = bicycleSafetyEffectiveLength / options.speed;
-                /* see notes in StreetVertex on speed overhead */
+                double quick = slopeSpeedEffectiveLength;
+                /*
+                 * Ideally, weight would be a pure affine combination of the safety, slope, and 
+                 * speed costs.  Unfortunately, this leads to speed being undervalued, since it has
+                 * less extreme values.  Since the triangle is basically a UI gimmick, I have finely
+                 * tuned these values to look good on a particular trip and I'll hope that they work
+                 * everywhere. 
+                 */
+                double safety = bicycleSafetyEffectiveLength * 0.2 + quick * 0.8;
                 double slope = slopeWorkCost;
-                weight = quick * options.triangleTimeFactor + slope * options.triangleSlopeFactor + safety * options.triangleSafetyFactor;
+                if (elevationProfile != null && elevationProfile.size() > 1) {
+                    slope = ElevationUtils.getSlopeCosts(elevationProfile, name).slopeWorkCost;
+                }
+                weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
+                weight /= options.speed;
                 break;
             default:
                 weight = length / options.speed;
@@ -214,40 +236,40 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             weight = time;
         }
         if (isStairs()) {
-        	weight *= options.stairsReluctance;
+            weight *= options.stairsReluctance;
         } else {
-        	weight *= options.walkReluctance;
+            weight *= options.walkReluctance;
         }
         EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
 
-		switch (s0.getNoThruTrafficState()) {
-		case INIT:
-			if (isNoThruTraffic()) {
-				s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
-			} else {
-				s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-			}
-			break;
-		case IN_INITIAL_ISLAND:
-			if (!isNoThruTraffic()) {
-				s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-			}
-			break;
-		case BETWEEN_ISLANDS:
-			if (isNoThruTraffic()) {
-				s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
-			}
-			break;
-		case IN_FINAL_ISLAND:
-			if (!isNoThruTraffic()) {
-				// we have now passed entirely through a no thru traffic region,
-				// which is
-				// forbidden
-				return null;
-			}
-			break;
-		}
+        switch (s0.getNoThruTrafficState()) {
+        case INIT:
+            if (isNoThruTraffic()) {
+                s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
+            } else {
+                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+            }
+            break;
+        case IN_INITIAL_ISLAND:
+            if (!isNoThruTraffic()) {
+                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
+            }
+            break;
+        case BETWEEN_ISLANDS:
+            if (isNoThruTraffic()) {
+                s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
+            }
+            break;
+        case IN_FINAL_ISLAND:
+            if (!isNoThruTraffic()) {
+                // we have now passed entirely through a no thru traffic region,
+                // which is
+                // forbidden
+                return null;
+            }
+            break;
+        }
 
         s1.incrementWalkDistance(length);
         s1.incrementTimeInSeconds((int) Math.ceil(time));
@@ -398,11 +420,11 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return (back ? 2 : 0) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
     }
 
-	public boolean isStairs() {
-		return stairs;
-	}
+    public boolean isStairs() {
+        return stairs;
+    }
 
-	public void setStairs(boolean stairs) {
-		this.stairs = stairs;
-	}
+    public void setStairs(boolean stairs) {
+        this.stairs = stairs;
+    }
 }

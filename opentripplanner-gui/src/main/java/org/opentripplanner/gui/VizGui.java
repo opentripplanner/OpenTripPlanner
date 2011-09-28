@@ -815,7 +815,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     	options.aStarSearchFactory = visitor.getAStarSearchFactory();
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
     	// there should be a ui element for walk distance and optimize type
-    	options.optimizeFor = OptimizeType.QUICK;
+    	options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
 
         System.out.println("--------");

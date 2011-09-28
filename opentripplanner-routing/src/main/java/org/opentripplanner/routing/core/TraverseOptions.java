@@ -216,11 +216,11 @@ public class TraverseOptions implements Cloneable, Serializable {
      * For the bike triangle, how important time is.  
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1 
      */
-    public double triangleTimeFactor;
+    private double triangleTimeFactor;
     /** For the bike triangle, how important slope is */
-    public double triangleSlopeFactor;
+    private double triangleSlopeFactor;
     /** For the bike triangle, how important safety is */
-    public double triangleSafetyFactor;
+    private double triangleSafetyFactor;
 
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
@@ -377,6 +377,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
             walkingOptions.speed *= 0.3; //assume walking bikes is slow
+            walkingOptions.optimizeFor = optimizeFor;
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
@@ -391,6 +392,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setOptimize(OptimizeType optimize) {
         optimizeFor = optimize;
+        walkingOptions.optimizeFor = optimize;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -496,5 +498,32 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
 
         return s;
+    }
+
+    public double getTriangleSafetyFactor() {
+        return triangleSafetyFactor;
+    }
+
+    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
+        this.triangleSafetyFactor = triangleSafetyFactor;
+        walkingOptions.triangleSafetyFactor = triangleSafetyFactor;
+    }
+
+    public double getTriangleSlopeFactor() {
+        return triangleSlopeFactor;
+    }
+
+    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
+        this.triangleSlopeFactor = triangleSlopeFactor;
+        walkingOptions.triangleSlopeFactor = triangleSlopeFactor;
+    }
+
+    public double getTriangleTimeFactor() {
+        return triangleTimeFactor;
+    }
+
+    public void setTriangleTimeFactor(double triangleTimeFactor) {
+        this.triangleTimeFactor = triangleTimeFactor;
+        walkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
 }

@@ -79,10 +79,11 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         	}
         }
 
-        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        TraverseMode traverseMode = options.getModes().getNonTransitMode();
+        EdgeNarrative en = new FixedModeEdge(this, traverseMode);
         StateEditor s1 = s0.edit(this, en);
 
-        double time = fromv.getLength() / options.speed;
+        double time = fromv.getEffectiveLength(traverseMode) / options.speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) time);

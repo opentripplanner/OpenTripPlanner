@@ -183,7 +183,6 @@ public class PlanGenerator {
         double previousElevation = Double.MAX_VALUE;
         int startWalk = -1;
         int i = -1;
-        Date transitStartTime = null;
         PlanGenState pgstate = PlanGenState.START;
 
         for (State state : path.states) {
@@ -509,9 +508,9 @@ public class PlanGenerator {
         if (request.getWalkSpeed() > 0) {
             options.speed = request.getWalkSpeed();
         }
-        options.triangleSafetyFactor = request.getTriangleSafetyFactor();
-        options.triangleSlopeFactor = request.getTriangleSlopeFactor();
-        options.triangleTimeFactor = request.getTriangleTimeFactor();
+        options.setTriangleSafetyFactor(request.getTriangleSafetyFactor());
+        options.setTriangleSlopeFactor(request.getTriangleSlopeFactor());
+        options.setTriangleTimeFactor(request.getTriangleTimeFactor());
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();
         }

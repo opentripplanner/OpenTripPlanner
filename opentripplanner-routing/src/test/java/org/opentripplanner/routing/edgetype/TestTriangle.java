@@ -22,6 +22,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.util.SlopeCosts;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -52,47 +54,55 @@ public class TestTriangle extends TestCase {
         };
         PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
         testStreet.setElevationProfile(elev);
-        testStreet.setSlopeSpeedEffectiveLength(length); // normalize length
-
+        
+        double trueLength = ElevationUtils.getLengthMultiplierFromElevation(elev) * length;
+        testStreet.setSlopeSpeedEffectiveLength(trueLength); // normalize length
+        
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, "test");
+        
         TraverseOptions options = new TraverseOptions(TraverseMode.BICYCLE);
         options.optimizeFor = OptimizeType.TRIANGLE;
         options.speed = 6.0;
         options.walkReluctance = 1;
 
-        options.triangleSafetyFactor = 0;
-        options.triangleSlopeFactor = 0;
-        options.triangleTimeFactor = 1;
+        options.setTriangleSafetyFactor(0);
+        options.setTriangleSlopeFactor(0);
+        options.setTriangleTimeFactor(1);
         State startState = new State(v1, options);
 
         State result = testStreet.traverse(startState);
         double timeWeight = result.getWeight();
-        assertEquals(length / options.speed, timeWeight);
+        double expectedSpeedWeight = trueLength / options.speed;
+		assertEquals(expectedSpeedWeight, timeWeight);
 
-        options.triangleSafetyFactor = 0;
-        options.triangleSlopeFactor = 1;
-        options.triangleTimeFactor = 0;
+        options.setTriangleSafetyFactor(0);
+        options.setTriangleSlopeFactor(1);
+        options.setTriangleTimeFactor(0);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double slopeWeight = result.getWeight();
         assertTrue(length * 1.5 / options.speed < slopeWeight);
-        assertTrue(length * 1.5 * 2 / options.speed > slopeWeight);
+        assertTrue(length * 1.5 * 10 / options.speed > slopeWeight);
 
-        options.triangleSafetyFactor = 1;
-        options.triangleSlopeFactor = 0;
-        options.triangleTimeFactor = 0;
+        options.setTriangleSafetyFactor(1);
+        options.setTriangleSlopeFactor(0);
+        options.setTriangleTimeFactor(0);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double safetyWeight = result.getWeight();
-        assertEquals(length * 0.74 / options.speed, safetyWeight);
+        double slopeSafety = costs.slopeSafetyCost;
+        double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / options.speed;
+        expectedSafetyWeight = expectedSafetyWeight * 0.2 + timeWeight * 0.8;
+        assertEquals(expectedSafetyWeight, safetyWeight);
 
         final double ONE_THIRD = 1/3.0;
-        options.triangleSafetyFactor = ONE_THIRD;
-        options.triangleSlopeFactor = ONE_THIRD;
-        options.triangleTimeFactor = ONE_THIRD;
+        options.setTriangleSafetyFactor(ONE_THIRD);
+        options.setTriangleSlopeFactor(ONE_THIRD);
+        options.setTriangleTimeFactor(ONE_THIRD);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double averageWeight = result.getWeight();
-        assertEquals(safetyWeight * ONE_THIRD + slopeWeight * ONE_THIRD + timeWeight * ONE_THIRD, averageWeight);
+        assertTrue(Math.abs(safetyWeight * ONE_THIRD + slopeWeight * ONE_THIRD + timeWeight * ONE_THIRD - averageWeight) < 0.00000001);
 
     }
 }
