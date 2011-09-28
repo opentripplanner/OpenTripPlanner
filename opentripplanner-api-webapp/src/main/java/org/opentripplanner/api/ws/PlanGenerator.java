@@ -282,7 +282,7 @@ public class PlanGenerator {
             case TRANSIT:
                 String route = backEdgeNarrative.getName();
                 if (mode == TraverseMode.ALIGHTING) {
-                    if (showIntermediateStops && leg.stop != null) {
+                    if (showIntermediateStops && leg.stop != null && leg.stop.size() > 0) {
                         // Remove the last stop -- it's the alighting one
                         leg.stop.remove(leg.stop.size() - 1);
                         if (leg.stop.isEmpty()) {
