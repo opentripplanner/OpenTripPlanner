@@ -223,9 +223,6 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                  */
                 double safety = bicycleSafetyEffectiveLength * 0.2 + quick * 0.8;
                 double slope = slopeWorkCost;
-                if (elevationProfile != null && elevationProfile.size() > 1) {
-                    slope = ElevationUtils.getSlopeCosts(elevationProfile, name).slopeWorkCost;
-                }
                 weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
                 weight /= options.speed;
                 break;
