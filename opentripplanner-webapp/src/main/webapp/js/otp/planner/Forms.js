@@ -91,6 +91,8 @@ otp.planner.StaticForms = {
     m_fromGeocoding  : false,
     m_toGeocoding    : false,
 
+    THIS             : null,
+
 
     /**
      * @constructor
@@ -101,6 +103,8 @@ otp.planner.StaticForms = {
         // step 1: bit of init (before configure override happens)
         otp.configure(this, config);
         this.routerId = config.routerId;
+        this.THIS = this;
+        otp.planner.StaticForms.THIS = this;
 
         // step 2: setup
         if(this.m_xmlRespRecord == null)
@@ -422,63 +426,26 @@ otp.planner.StaticForms = {
 
     focus : function()
     {
-        this.planner.focus();
+        this.THIS.planner.focus();
     },
-
-
-    /** will look in text forms first, then hidden form variable, then coordinate for value */
-    /** TODO: from & to form values must be re-thought we only allow one value x,y -or- string value */
-    getFrom : function()
-    {
-        /*
-        var retVal = this.m_fromForm.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_fromPlace.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_fromCoord;
-        return retVal;
-        */
-        return this.m_fromCoord ||
-               this.m_fromForm ||
-               this.m_fromPlace;
-    },
-
 
     /**
      * set from form with either/both a string and X/Y
      * NOTE: x & y are reversed -- really are lat,lon
      *
      */
-    setFrom : function(fString, x, y, moveMap, noPoi)
+    setFrom : function(fString, lat, lon, moveMap, noPoi)
     {
-        this.focus();
-//        otp.util.ExtUtils.formSetRawValue(this.m_fromForm, fString);
-        if(x && x > -181.1 && y && y > -181.1) 
+        this.THIS.focus();
+        if(lat && lat > -181.1 && lon && lon > -181.1) 
         {
-            this.m_fromCoord = x + ',' + y;
-//            this.setRawInput(this.m_fromCoord, this.m_fromForm);
-//            this.setRawInput(this.m_fromCoord, this.m_fromPlace);
-            if(this.poi && !noPoi)
-                this.poi.setFrom(y, x, fString, moveMap);
+            this.THIS.m_fromCoord = lat + ',' + lon;
+            if(this.THIS.poi && !noPoi)
+                this.THIS.poi.setFrom(lon, lat, fString, moveMap);
 
-            this.m_fromForm.setLastValue();
+            otp.util.ExtUtils.formSetRawValue(this.THIS.m_fromForm, fString, this.THIS.m_fromCoord);
+            this.THIS.m_fromForm.setLastValue();
         }
-    },
-
-    /** will look in text forms first, then hidden form variable, then coordinate for value */
-    getTo : function()
-    {
-        /*
-        var retVal = this.m_toForm.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_toPlace.getRawValue();
-        if(retVal == null || retVal.length < 1)
-            retVal = this.m_toCoord;
-        return retVal;
-        */
-        return this.m_toCoord ||
-               this.m_toForm ||
-               this.m_toPlace;
     },
 
     /**
@@ -487,22 +454,39 @@ otp.planner.StaticForms = {
      */
     setTo : function(tString, x, y, moveMap, noPoi)
     {
-        this.focus();
-//        otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString);
+        this.THIS.focus();
         if(x && x > -180.1 && y && y > -181.1) 
         {
-            this.m_toCoord = x + ',' + y;
-//            this.setRawInput(this.m_toCoord, this.m_toForm);
-//            this.setRawInput(this.m_toCoord, this.m_toPlace);
-            if(this.poi && !noPoi)
-                this.poi.setTo(y, x, tString, moveMap);
-            
-            this.m_toForm.setLastValue();
+            this.THIS.m_toCoord = x + ',' + y;
+            if(this.THIS.poi && !noPoi)
+                this.THIS.poi.setTo(y, x, tString, moveMap);
+
+            otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString, this.THIS.m_toCoord);
+            this.THIS.m_toForm.setLastValue();
         }
     },
 
+
+    /** will look in text forms first, then hidden form variable, then coordinate for value */
+    getFrom : function()
+    {
+        return this.m_fromCoord ||
+               this.m_fromForm ||
+               this.m_fromPlace;
+    },
+
+
+    /** will look in text forms first, then hidden form variable, then coordinate for value */
+    getTo : function()
+    {
+        return this.m_toCoord ||
+               this.m_toForm ||
+               this.m_toPlace;
+    },
+
+
     /** a simple helper class to set data in a form */
-    setRawInput : function(p, f)
+    setRawInput : function(p, f, d)
     {
         var retVal = false;
 
@@ -512,7 +496,7 @@ otp.planner.StaticForms = {
         && p.match('Address, .*Stop ID') == null
         )
         {
-            otp.util.ExtUtils.formSetRawValue(f, p);
+            otp.util.ExtUtils.formSetRawValue(f, p, d);
             retVal = true;
         }
 

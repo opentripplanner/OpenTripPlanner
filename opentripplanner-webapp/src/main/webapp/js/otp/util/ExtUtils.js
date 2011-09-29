@@ -307,18 +307,18 @@ otp.util.ExtUtils = {
         return otp.util.ExtUtils.makePopupWithConfig(c, isShow, closeable, noCloseButton);
     },
 
-
     /**
      * within an exception block because if the form is hidden, Ext throws an error
      */
-    formSetRawValue : function(form, value)
+    formSetRawValue : function(form, value, defValue)
     {
-        try
+        if(form && form.setRawValue)
         {
-            form.setRawValue(value);
-        }
-        catch(e)
-        {
+            var v = defValue;
+            if(value)
+                v = value;
+            if(v)
+                form.setRawValue(v);
         }
     },
 
