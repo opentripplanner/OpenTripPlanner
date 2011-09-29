@@ -26,6 +26,8 @@ import org.opentripplanner.routing.core.Vertex;
  */
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
+    private static final long serialVersionUID = -5172878150967231550L;
+
     private TraverseOptions options;
 
     private boolean useTransit = false;
@@ -134,7 +136,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 30 m/s, which is roughly
         	// the highway speed limit
-            return 30;
+            return 10;
         } else {
             if (options.optimizeFor == OptimizeType.QUICK) {
                 return options.speed;
