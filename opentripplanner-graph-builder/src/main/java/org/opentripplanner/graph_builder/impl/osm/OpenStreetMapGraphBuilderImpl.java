@@ -595,9 +595,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             	if (oneWayBike) {
             		_log.warn("conflicting tags oneway:bicycle and cycleway:opposite* on way " + way.getId() + ", assuming opposite");
             	}
-            	if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
-            	    permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
-            	}
+            	permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
             
             boolean noThruTraffic = way.isTag("access", "destination") ||
