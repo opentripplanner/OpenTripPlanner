@@ -90,6 +90,7 @@ otp.core.UI = {
                     id        : otp.util.OpenLayersUtils.MAP_PANEL,
                     region    : 'center',
                     layout    : 'fit',
+                    stateful  : false,
                     map       : this.map.getMap(),
                     zoom      : this.map.getMap().getZoom(),
                     bodyStyle : 'background-color:#F7F7F2'
