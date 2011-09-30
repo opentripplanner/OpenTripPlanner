@@ -20,6 +20,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Calculates street traversal permissions based upon a fixed set of cases.
@@ -65,6 +67,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
  */
 public class CaseBasedTraversalPermissionConverter implements
         SimpleFeatureConverter<P2<StreetTraversalPermission>> {
+
+    private static Logger log = LoggerFactory.getLogger(CaseBasedBicycleSafetyFeatureConverter.class);
 
     private String _attributeName;
 
@@ -132,6 +136,7 @@ public class CaseBasedTraversalPermissionConverter implements
         }
         P2<StreetTraversalPermission> permission = _permissions.get(key.toString());
         if (permission == null) {
+            log.info("unexpected permission " + key.toString());
             return _defaultPermission;
         }
         return permission;
