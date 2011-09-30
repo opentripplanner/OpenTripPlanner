@@ -60,6 +60,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
          */
         if (useTransit) {
             if (s.isAlightedLocal()) {
+                if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                    return -1;
+                }
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;
@@ -72,10 +75,16 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     boardCost += options.transferPenalty;
                 }
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
+                    if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                        return -1;
+                    }
                     return options.walkReluctance * euclidianDistance / options.speed;
                 } else {
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
+                    if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                        return -1;
+                    }
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance / options.speed
                             + boardCost;
@@ -101,6 +110,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         
         if (useTransit) {
             if (s.isAlightedLocal()) {
+                if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                    return -1;
+                }
                 return options.walkReluctance * euclidianDistance / options.speed;
             } else {
                 int boardCost;
@@ -113,12 +125,18 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     boardCost += options.transferPenalty;
                 }
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
+                    if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                        return -1;
+                    }
                     return options.walkReluctance * euclidianDistance
                             / options.speed;
                 } else {
                     double mandatoryWalkDistance = target
                             .getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
+                    if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                        return -1;
+                    }
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance
                             / options.speed + boardCost;
@@ -134,8 +152,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
     public static double getMaxSpeed(TraverseOptions options) {
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
-            // assume that the max average transit speed over a hop is 30 m/s, which is roughly
-        	// the highway speed limit
+            // assume that the max average transit speed over a hop is 10 m/s, which is roughly
+            // true in Portland and NYC, but *not* true on highways
             return 10;
         } else {
             if (options.optimizeFor == OptimizeType.QUICK) {

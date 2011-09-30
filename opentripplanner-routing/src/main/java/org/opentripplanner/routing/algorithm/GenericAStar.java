@@ -218,6 +218,9 @@ public class GenericAStar {
                         continue;
 
                     double remaining_w = computeRemainingWeight(heuristic, v, target, options);
+                    if (remaining_w < 0) {
+                        continue;
+                    }
                     double estimate = v.getWeight() + remaining_w;
 
                     if (_verbose) {

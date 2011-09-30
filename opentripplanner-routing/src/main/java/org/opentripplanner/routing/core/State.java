@@ -78,6 +78,7 @@ public class State implements Cloneable {
         this.stateData = new StateData();
         stateData.options = opt;
         stateData.startTime = time;
+        stateData.tripSeqHash = 0;
         // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
     }
 
@@ -190,9 +191,16 @@ public class State implements Cloneable {
      * both in terms of time and weight.
      */
     public boolean dominates(State other) {
-        // in the name of efficiency, these should probably be quantized
-        // before comparison (AMB)
-        return this.weight <= other.weight && this.getElapsedTime() <= other.getElapsedTime();
+        if (other.weight == 0) {
+            return false;
+        }
+
+        if (this.similarTripSeq(other)) {
+            return this.weight <= other.weight;
+        }
+
+        double weightDiff = this.weight / other.weight;
+        return (weightDiff < 1.02 && this.weight - other.weight < 30) && this.getElapsedTime() - other.getElapsedTime() <= 30;
     }
 
     /**
@@ -319,5 +327,9 @@ public class State implements Cloneable {
 
     public long getTimeInMillis() {
         return time * 1000;
+    }
+
+    public boolean similarTripSeq(State existing) {
+        return this.stateData.tripSeqHash == existing.stateData.tripSeqHash;
     }
 }

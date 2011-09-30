@@ -240,8 +240,16 @@ public class StateEditor {
     }
 
     public void setTripId(AgencyAndId tripId) {
+        final int SMALL_PRIME = 31;
+        final int LARGE_PRIME = 24421;
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
+        // tripId is set to null when alighting.
+        // only update hash when encountering a new tripid
+        if (tripId != null) {
+            child.stateData.tripSeqHash *= LARGE_PRIME;
+            child.stateData.tripSeqHash += tripId.getId().hashCode() * SMALL_PRIME;
+        }
     }
 
     public void setWalkDistance(double walkDistance) {

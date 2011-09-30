@@ -44,6 +44,8 @@ public class GraphPath {
     // needed to track repeat invocations of path-reversing methods
     private boolean back;
 
+    private double walkDistance = 0;
+
     private TraverseOptions options;
 
     /**
@@ -67,6 +69,7 @@ public class GraphPath {
 
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
+        walkDistance = s.getWalkDistance();
         if (back) {
             lastState = optimize ? optimize(s) : reverse(s);
         } else {
@@ -263,6 +266,10 @@ public class GraphPath {
         for (State s : states)
             System.out.println(s + " via " + s.getBackEdge());
         System.out.println(" --- END GRAPHPATH DUMP ---");
+    }
+
+    public double getWalkDistance() {
+        return walkDistance;
     }
 
 }
