@@ -186,6 +186,12 @@ public class StateEditor {
     /* Incrementors */
 
     public void incrementWeight(double weight) {
+        if (Double.isNaN(weight)) {
+            _log.warn("A state's weight is being incremented by NaN while traversing edge "
+                    + child.backEdge);
+            defectiveTraversal = true;
+            return;
+        }
         if (weight < 0) {
             _log.warn("A state's weight is being incremented by a negative amount while traversing edge "
                     + child.backEdge);
