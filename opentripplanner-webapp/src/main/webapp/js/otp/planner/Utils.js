@@ -263,23 +263,23 @@ otp.planner.Utils = {
     {
         var thisID = this.TRIPDETAILS_TREE + id;
         var root = otp.util.ExtUtils.makeTreeNode({
-                id: 'root-' + thisID,
-                text: '<strong>' + id + '</strong>',
-                cls: this.DETAIL_CLS,
-                iconCls: this.DETAIL_CLS,
-                leaf: false
+                id      : 'root-' + thisID,
+                text    : '<strong>' + id + '</strong>',
+                cls     : this.DETAIL_CLS,
+                iconCls : this.DETAIL_CLS,
+                leaf    : false
         }, clickCallback, scope);
         var retVal = new Ext.tree.TreePanel({
-            plugins    : new Ext.tree.NodeMouseoverPlugin(),
-            root       : root,
-            id         : thisID,
-            lines      : false,
-            //autoScroll:true,
-            collapsible:   false,
-            rootVisible:   false,
-            collapseFirst: false,
-            margins:  '0 0 0 0',
-            cmargins: '0 0 0 0'
+            plugins       : new Ext.tree.NodeMouseoverPlugin(),
+            root          : root,
+            id            : thisID,
+            lines         : false,
+            //autoScroll  : true,
+            collapsible   : false,
+            rootVisible   : false,
+            collapseFirst : false,
+            margins       : '0 0 0 0',
+            cmargins      : '0 0 0 0'
         });
         
         return retVal;

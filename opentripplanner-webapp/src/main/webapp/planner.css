@@ -563,6 +563,7 @@ padding: 0!important;
 .itinys-icon {display: none; visibility: collapse;}
 .start-icon {background-image:url(images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
 .end-icon {background-image:url(images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
+.caution-icon {background-image:url(images/ui/trip/caution.gif) !important;float:left;width:20px!important;height:20px!important;}
 .busish-icon,.bus-icon {background-image:url(images/ui/trip/mode/bus.png) !important;float:left;width:21px!important;height:21px!important;}
 .subway-icon,.transit-icon {background-image:url(images/ui/trip/mode/subway.png) !important;float:left;width:21px!important;height:21px!important;}
 .ltrail-icon, .light_trail-icon {background-image:url(images/ui/trip/mode/lite_rail.png) !important;float:left;width:21px!important;height:21px!important;}

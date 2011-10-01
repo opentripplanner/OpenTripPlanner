@@ -41,6 +41,7 @@ otp.core.MapStatic = {
     THIS             : null,
     CLOSE_ZOOM       : 18,
     tooltipLinks     : true,
+    tooltipCleared   : true,
 
     /**
      * An OpenLayers.Bounds object that defines the default extent used when
@@ -464,6 +465,7 @@ otp.core.MapStatic = {
     {
         this.tooltipHide();
         this.streetviewHide();
+        this.tooltipCleared = true;
     },
 
     /**

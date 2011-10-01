@@ -56,6 +56,7 @@ otp.planner.Itinerary = {
 
     // misc
     m_valid        : false,
+    m_modes        : null,
 
     /** */
     initialize : function(config)
@@ -68,12 +69,13 @@ otp.planner.Itinerary = {
         this.m_legStore   = otp.planner.Utils.makeLegStore();
         this.m_fromStore  = otp.planner.Utils.makeFromStore();
         this.m_toStore    = otp.planner.Utils.makeToStore();
-        
-        this.load();
+
+        this._load();
+        this.m_modes = new otp.util.ItineraryModes(config, this);
     },
 
     /** */
-    load : function()
+    _load : function()
     {
         this.m_legStore.loadData(this.xml.node);
         this.m_fromStore.loadData(this.xml.node);
@@ -315,7 +317,8 @@ otp.planner.Itinerary = {
    /**
     * Gets a new Marker Layer for drawing the trip plan's features upon
     */
-    makeMarkers : function() {
+    makeMarkers : function()
+    {
         var startIndex = 0;
         var endIndex = this.m_fromStore.getCount() - 1;
 
@@ -451,6 +454,7 @@ otp.planner.Itinerary = {
         this.m_markers.push(bikeTopoMarker);
     },
 
+    /** */
     assignDirectionToMarkers : function(markers) 
     {
         if (markers.length === 0) {
@@ -667,8 +671,14 @@ otp.planner.Itinerary = {
         var tripDetailsData = Ext.apply({}, itin.data, {distanceVerb: tripDetailsDistanceVerb});
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
 
-        // step 4: end and details nodes
-        retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny magnify', iconCls: 'end-icon', leaf: true}, clickCallback, scope));
+        // step 4: end, mode note and details nodes
+        retVal.push(otp.util.ExtUtils.makeTreeNode({id: toId, text: toTxt, cls: 'itiny magnify', iconCls: 'end-icon', leaf: true}, clickCallback, scope)); 
+        if(this.m_modes && this.m_modes.getMessage())
+        {
+            var m = this.m_modes.getMessage();
+            var n = otp.util.ExtUtils.makeTreeNode({id:tpId+'-modeinfo', text:m, cls:'itiny', iconCls:'caution-icon', leaf:true});
+            retVal.push(n);
+        }
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
 
         return retVal;
@@ -792,6 +802,7 @@ otp.planner.Itinerary = {
         {
             this.clicked  = node;
             this.outCount = 0;
+            this.map.tooltipCleared = false;
             this.map.pan(node.m_step.lon, node.m_step.lat);
             this.instructionHoverCB(node, m);
         }
@@ -815,7 +826,7 @@ otp.planner.Itinerary = {
         this.map.streetviewHide();
 
         // stopping condition for clicked tooltips
-        if(this.outCount >= 5) 
+        if(this.outCount >= 5 || this.map.tooltipCleared) 
         {
             this.clicked = null;
         }
@@ -832,69 +843,3 @@ otp.planner.Itinerary = {
     CLASS_NAME: "otp.planner.Itinerary"
 };
 otp.planner.Itinerary = new otp.Class(otp.planner.Itinerary);
-
-
-/**
- * instance object that retains modes used in this itinerary
- */
-otp.planner.ItineraryModes = {
-
-    itineraryMessages : null,
-    itinerary         : null,
-
-    m_message      : null,
-    m_hasWalk      : false,
-    m_hasTransit   : false,
-    m_hasBike      : false,
-    m_hasBus       : false,
-    m_hasTrain     : false,
-
-
-    /**
-     * 
-     */
-    initialize : function(config, itinerary)
-    {
-        otp.configure(this, config);
-        this.itinerary = itinerary;
-        this._findModes();
-        this._findMessage();
-    },
-
-    getMessage : function()
-    {
-        return this.m_message;
-    },
-
-    /** mark different modes this itinerary uses */
-    _findModes : function()
-    {
-        var endIndex = this.itinerary.m_fromStore.getCount();
-        for (var i = 0; i < endIndex; i++)
-        {
-            var from = this.m_fromStore.getAt(i);
-            var mode = from.get('mode');
-            
-            if (otp.util.Modes.isTransit(mode))
-            {
-                
-            }
-            else
-            {
-                
-            }
-        }
-    },
-
-    /** mark different modes this itinerary uses */
-    _findMessage : function()
-    {
-        if(this.itineraryMessages)
-        {
-            
-        }
-    },
-
-    CLASS_NAME : "otp.planner.ItineraryModes"
-};
-otp.planner.ItineraryModes = new otp.Class(otp.planner.ItineraryModes);

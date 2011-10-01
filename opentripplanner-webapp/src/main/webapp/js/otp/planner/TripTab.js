@@ -38,10 +38,6 @@ otp.planner.TripTab = {
     xml           : null,
     request       : null,
 
-    showPrintButton  : true,  // turn on/off itinerary print button
-    showLinksButton  : true,  // turn on/off itinerary links button
-
-
     id            : 0,
 
     m_utils       : otp.planner.Utils,
@@ -139,7 +135,7 @@ otp.planner.TripTab = {
 
             var buttons = [r, e];
 
-            if(this.showPrintButton)
+            if(this.planner.showPrintButton)
             {
                 var p = new Ext.Toolbar.Button({
                     text:    this.locale.buttons.print,
@@ -151,7 +147,7 @@ otp.planner.TripTab = {
                 buttons.push(p);
             }
 
-            if (this.showLinksButton)
+            if (this.planner.showLinksButton)
             {
                 var l = new Ext.Toolbar.Button({
                     text: this.locale.buttons.link,
@@ -323,7 +319,7 @@ otp.planner.TripTab = {
             this.ui.innerSouth.hide();
             this.ui.viewport.doLayout();
         }
-        
+
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
     },
@@ -358,7 +354,8 @@ otp.planner.TripTab = {
      *
      * @param {Object} id
      */
-    getItinerary : function(id) {
+    getItinerary : function(id)
+    {
         var retVal = null;
         if (id == null) {
             id = 1;
@@ -366,7 +363,8 @@ otp.planner.TripTab = {
 
         // try to get itinerary object from cache...if not there, create it
         var retVal = this.m_itineraryCache[id];
-        if (retVal == null) {
+        if (retVal == null)
+        {
             var itin = this.m_itinerariesStore.getAt(id - 1);
             retVal = new otp.planner.Itinerary( {
                 map              : this.planner.map,
@@ -374,6 +372,7 @@ otp.planner.TripTab = {
                 templates        : this.templates,
                 showStopIds      : this.planner.showStopIds,
                 useRouteLongName : this.planner.useRouteLongName,
+                itineraryMessages: this.planner.itineraryMessages,
                 xml              : itin,
                 from             : this.m_from,
                 to               : this.m_to,

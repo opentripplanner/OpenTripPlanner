@@ -47,6 +47,7 @@ otp.planner.Planner = {
     showLinksButton         : null,
     useOptionDependencies   : null,
     useRouteLongName        : null,
+    itineraryMessages       : null,
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -261,7 +262,8 @@ otp.planner.Planner = {
                   renderer     : this.m_renderer, 
                   topoRenderer : this.m_topoRenderer, 
                   templates    : this.templates, 
-                  linkTemplates: this.linkTemplates, 
+                  linkTemplates: this.linkTemplates,
+                  itineraryMessages : this.itineraryMessages,
 
                   xml : xml,
                   id  : ++this.m_tabCount, 
