@@ -225,6 +225,7 @@
                     <execution>
                         <goals>
                             <goal>docs</goal>
+                            <!-- default binding for docs goal is process-sources phase -->
                         </goals>
                     </execution>
                 </executions>
