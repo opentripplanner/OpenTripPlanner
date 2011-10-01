@@ -480,7 +480,7 @@ margin-top: 2px;
 margin-bottom: 5px;
 }
 
-.itiny h4 {
+.itiny h4, .itiny-note h4 {
 vertical-align: middle;
 margin-top: 2px;
 margin-bottom: 5px;
@@ -502,7 +502,7 @@ a.x-tree-node-anchor:link, a.x-tree-node-anchor:visited {
     font-weight: normal;
 }
 
-.itiny {
+.itiny, .itiny-note {
 font-size: 12px;
 padding-left: 7px;
 padding-top: 3px;

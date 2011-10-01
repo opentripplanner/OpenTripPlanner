@@ -676,7 +676,10 @@ otp.planner.Itinerary = {
         if(this.m_modes && this.m_modes.getMessage())
         {
             var m = this.m_modes.getMessage();
-            var n = otp.util.ExtUtils.makeTreeNode({id:tpId+'-modeinfo', text:m, cls:'itiny', iconCls:'caution-icon', leaf:true});
+            var i = "images/ui/trip/caution.gif";
+            if(this.m_modes.itineraryMessages && this.m_modes.itineraryMessages.icon)
+                i = this.m_modes.itineraryMessages.icon;
+            var n = otp.util.ExtUtils.makeTreeNode({id:tpId+'-modeinfo', text:m, cls:'itiny-note', icon:i, iconCls:'itiny-inline-icon', leaf:true});
             retVal.push(n);
         }
         retVal.push(otp.util.ExtUtils.makeTreeNode({id: tpId, text: tpTxt, cls: 'trip-details-shell', iconCls: 'no-icon', leaf: true}, clickCallback, scope));
@@ -729,7 +732,7 @@ otp.planner.Itinerary = {
             }
 
             this.addNarrativeToStep(step, verb, stepNum);
-            
+
             var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny-steps', icon:step.iconURL, iconCls:'itiny-inline-icon', leaf:true};
             var node = otp.util.ExtUtils.makeTreeNode(cfg, this.instructionClickCB, this, this.instructionHoverCB, this.instructionOutCB);
             node.m_step = step;

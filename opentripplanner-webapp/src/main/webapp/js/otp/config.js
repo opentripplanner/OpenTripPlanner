@@ -31,7 +31,10 @@ otp.config_defaults = {
 
         // will add a tree node to the bottom of the itinerary with this message
         itineraryMessages : {
+            icon            : null,
             transit         : null,
+            bus             : null,
+            train           : null,
             bicycle         : null,
             bicycle_transit : null,
             walk            : null 
