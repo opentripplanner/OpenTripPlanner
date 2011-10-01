@@ -39,6 +39,7 @@ public class StateData implements Cloneable {
     protected Vertex previousStop;
     protected long lastAlightedTime;
     protected NoThruTrafficState noThruTrafficState = NoThruTrafficState.INIT;
+    protected int tripSeqHash;
 
     protected HashMap<Object, Object> extensions;
     // the traverseOptions that were used to reach this state

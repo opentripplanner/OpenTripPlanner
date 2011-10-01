@@ -77,7 +77,12 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     	TraverseOptions options = state0.getOptions();
     	if (options.isArriveBy()) {
     		/* reverse traversal, not so much to do */
-        	if (!getPattern().canBoard(stopIndex)) {
+            // do not alight immediately when arrive-depart dwell has been eliminated
+            // this affects multi-itinerary searches
+    	    if (state0.getBackEdgeNarrative() instanceof PatternAlight) {
+                return null;
+            }
+            if (!getPattern().canBoard(stopIndex)) {
                 return null;
             }
             StateEditor s1 = state0.edit(this);

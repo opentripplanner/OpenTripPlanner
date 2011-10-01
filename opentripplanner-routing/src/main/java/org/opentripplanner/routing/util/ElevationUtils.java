@@ -34,6 +34,9 @@ public class ElevationUtils {
             lastX = c.x;
             lastY = c.y;
         }
+        if (flatLength == 0) {
+            return 0;
+        }
         return trueLength / flatLength;
     }
 
@@ -47,6 +50,9 @@ public class ElevationUtils {
         for (int i = 0; i < coordinates.length - 1; ++i) {
             double run = coordinates[i + 1].x - coordinates[i].x;
             double rise = coordinates[i + 1].y - coordinates[i].y;
+            if (run == 0) {
+                continue;
+            }
             double slope = rise / run;
             if (slope > 0.35 || slope < -0.35) {
                 slope = 0; // Baldwin St in Dunedin, NZ, is the steepest street

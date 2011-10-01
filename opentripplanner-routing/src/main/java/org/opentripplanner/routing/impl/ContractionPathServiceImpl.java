@@ -217,6 +217,7 @@ public class ContractionPathServiceImpl implements PathService {
         }
 
         double maxWeight = Double.MAX_VALUE;
+        double maxWalk = options.getMaxWalkDistance();
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         while (paths.size() < nItineraries) {
             options = optionQueue.poll();
@@ -224,6 +225,7 @@ public class ContractionPathServiceImpl implements PathService {
                 LOG.debug("Ran out of options to try.");
                 break;
             }
+            options.setMaxWalkDistance(maxWalk);
             StateEditor editor = new StateEditor(origin, null);
             editor.setTraverseOptions(options);
             origin = editor.makeState();
@@ -264,6 +266,9 @@ public class ContractionPathServiceImpl implements PathService {
                 LOG.debug("Max time set to:  {}", maxTime);
                 maxWeight = path.getWeight() * MAX_WEIGHT_FACTOR;
                 LOG.debug("Max weight set to:  {}", maxWeight);
+                if (path.getWalkDistance() > maxWalk) {
+                    maxWalk = path.getWalkDistance() * 1.25;
+                }
             }
             if (somePaths.isEmpty()) {
                 LOG.debug("No paths were found.");
@@ -271,6 +276,9 @@ public class ContractionPathServiceImpl implements PathService {
             }
             for (GraphPath path : somePaths) {
                 if (!paths.contains(path)) {
+                    if (path.getWalkDistance() > maxWalk) {
+                        maxWalk = path.getWalkDistance() * 1.25;
+                    }
                     // DEBUG
                     // path.dump();
                     paths.add(path);
