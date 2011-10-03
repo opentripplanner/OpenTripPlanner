@@ -585,7 +585,8 @@ public class PlanGenerator {
                 // new step, set distance to length of first edge
                 distance = edgeNarrative.getDistance();
             } else if (step.streetName != streetName
-                    && (step.streetName != null && !step.streetName.equals(streetName))) {
+                    && (step.streetName != null && !step.streetName.equals(streetName)) 
+                    && (!step.bogusName || !edgeNarrative.hasBogusName())) {
                 /* street name has changed */
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
