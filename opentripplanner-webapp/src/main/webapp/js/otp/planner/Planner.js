@@ -305,20 +305,29 @@ otp.planner.Planner = {
     {
         this.m_renderer.clear();
         var newTab = this.m_tabs[activeTab.id];
+        
+        // remove the topo graph from the south panel, if applicable 
+        var oldTab = this.m_tabs[this.m_activeTabID];
+        if(oldTab != null && oldTab.topoRenderer != null) {
+            oldTab.topoRenderer.removeFromPanel();
+        }
+
+        // draw the new tab, if applicable
         if (newTab != null) {
             this.m_activeTabID = activeTab.id;
-            newTab.draw();
+            newTab.draw();            
         } else {
             this.m_activeTabID = 0;
             this.controller.deactivate(this.CLASS_NAME);
-
-            // hide the topo map
-            if (this.ui.innerSouth.isVisible()) {
-                this.ui.innerSouth.hide();
-                this.ui.viewport.doLayout();
-            }
             this.m_forms.panelActivated();
         }
+        
+        // hide the south panel, if empty
+        if (this.ui.innerSouth.isVisible()  && this.ui.innerSouth.getEl().dom.childNodes.length == 0) {
+            this.ui.innerSouth.hide();
+            this.ui.viewport.doLayout();
+        }
+        
     },
 
 

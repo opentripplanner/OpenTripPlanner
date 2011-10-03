@@ -28,6 +28,7 @@ otp.planner.TopoRenderer = {
     map :       null,
     panel :     null,
     
+    mainContainerDiv :      null,
     axisDiv :               null,
     terrainContainerDiv :   null,
     terrainDiv :            null,
@@ -505,17 +506,27 @@ otp.planner.TopoRenderer = {
             this.previewDiv.style.height = lowerHeight + 'px';
             this.previewDiv.style.width = width + 'px';        
         }
+
+        this.mainContainerDiv = document.createElement('div');
+        this.mainContainerDiv.appendChild(this.axisDiv);
+        this.mainContainerDiv.appendChild(this.terrainContainerDiv);
+        this.terrainContainerDiv.appendChild(this.terrainDiv);
+        if(showPreview) this.mainContainerDiv.appendChild(this.previewDiv);
+
         
         // Remove all existing elements from the topo panel and add the new div
         var panelEl = this.panel.getEl();
         while (panelEl.first()) { 
             panelEl.first().remove();
         }
-        panelEl.appendChild(this.axisDiv);
-        panelEl.appendChild(this.terrainContainerDiv);
-        this.terrainContainerDiv.appendChild(this.terrainDiv);
-        if(showPreview) panelEl.appendChild(this.previewDiv);
-    },    
+        panelEl.appendChild(this.mainContainerDiv);
+    },
+    
+    removeFromPanel : function() {
+        try {
+    	    this.panel.getEl().dom.removeChild(this.mainContainerDiv);
+        } catch(e) { }
+    },
 
     pointAlongLineString : function(ls, d) {
         var points = ls.components;

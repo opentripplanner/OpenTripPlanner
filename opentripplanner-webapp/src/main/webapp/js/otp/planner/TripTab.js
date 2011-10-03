@@ -314,11 +314,6 @@ otp.planner.TripTab = {
             this.ui.viewport.doLayout();
             this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         }
-        else if (this.ui.innerSouth.isVisible()) {
-            // not a bike trip but topo panel still visible from previous trip
-            this.ui.innerSouth.hide();
-            this.ui.viewport.doLayout();
-        }
 
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
