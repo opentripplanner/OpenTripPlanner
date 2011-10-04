@@ -87,16 +87,18 @@ otp.planner.FormsOptionsManagerStatic = {
         // and we want to reset the optimize option too
         // because it's possible that it's no longer valid
         this.optimize.reset();
+        if(this.maxWalk)    this.showComboBox(this.maxWalk);
+        if(this.wheelchair) this.showComboBox(this.wheelchair);
 
-        if (this.isTransitOrBus(mode)) {
+        if(this.isTransitOrBus(mode)) {
             if (this.isBike(mode)) {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxBikeDistance);
             } else {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxWalkDistance);
             }
-            if(this.maxWalk)    this.showComboBox(this.maxWalk);
-            if(this.wheelchair) this.showComboBox(this.wheelchair);
             showTransitOptions = true;
+        } else if(this.isWalk(mode)) {
+            if(this.maxWalk)    this.hideComboBox(this.maxWalk);
         } else {
             if(this.maxWalk)    this.hideComboBox(this.maxWalk);
             if(this.wheelchair) this.hideComboBox(this.wheelchair);
@@ -173,21 +175,25 @@ otp.planner.FormsOptionsManagerStatic = {
         cb.show();
         cb.label.show();
     },
-    
+
     hideComboBox : function(cb) {
         cb.reset();
         cb.hide();
         cb.label.hide();
     },
-    
+
     isTransitOrBus : function(mode) {
-        return mode.indexOf("TRANSIT") !== -1 ||
+        return mode.indexOf("TRANSIT")  !== -1 ||
                mode.indexOf("TRAINISH") !== -1 ||
-               mode.indexOf("BUSISH") !== -1;
+               mode.indexOf("BUSISH")   !== -1;
     },
 
     isBike : function(mode) {
         return mode.indexOf("BICYCLE") !== -1;
+    },
+
+    isWalk : function(mode) {
+        return mode.indexOf("WALK") !== -1;
     },
 
     CLASS_NAME: "otp.planner.FormsOptionsManager"
