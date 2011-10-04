@@ -19,26 +19,17 @@ otp.namespace("otp.util");
  */
 otp.util.AnalyticsUtils = {
 
-    TRIP_SUBMIT      : "/imap/planner/submit",
-    TRIP_SUCCESS     : "/imap/planner/success",
-    TRIP_GEO_ERROR   : "/imap/planner/error/geocoder",
-    TRIP_ERROR       : "/imap/planner/error/other",
-    TRIP_PRINT       : "/imap/planner/print",
-    TRIP_EDIT        : "/imap/planner/edit",
-    TRIP_REVERSE     : "/imap/planner/reverse",
-    TRIP_FORM_REVERSE: "/imap/planner/form-reverse",
+    OTP_TRIP_SUBMIT      : "/imap/planner/submit",
+    OTP_TRIP_SUCCESS     : "/imap/planner/success",
+    OTP_TRIP_GEO_ERROR   : "/imap/planner/error/geocoder",
+    OTP_TRIP_ERROR       : "/imap/planner/error/other",
+    OTP_TRIP_PRINT       : "/imap/planner/print",
+    OTP_TRIP_EDIT        : "/imap/planner/edit",
+    OTP_TRIP_REVERSE     : "/imap/planner/reverse",
+    OTP_TRIP_FORM_REVERSE: "/imap/planner/form-reverse",
 
-    VEHICLES         : "/imap/vehicles",
-    SEARCH           : "/imap/search",
-    TC               : "/imap/tc",
-    PR               : "/imap/pr",
-    ZIPCAR           : "/imap/zipcar",
-    ROUTES           : "/imap/routes",
     MEASURE          : "/imap/measure",
     DIALOG           : "/imap/dialog",
-
-    MOBILITY         : "/imap/mobility/start",
-    MOBILITY_LAYER   : "/imap/mobility/layer",
 
     gaJsHost         : (("https:" == document.location.protocol) ? "https://ssl." : "http://www."),
     pageTracker      : null,
@@ -83,7 +74,7 @@ otp.util.AnalyticsUtils = {
     {
         Ext.onReady(function()
         {
-            otp.util.AnalyticsUtils.initGoogleAnalytics(domain, id);
+            otp.util.Analytics.initGoogleAnalytics(domain, id);
         });
     },
 
@@ -103,3 +94,5 @@ otp.util.AnalyticsUtils = {
 
     CLASS_NAME : "otp.util.AnalyticsUtils"
 };
+otp.util.Analytics = otp.util.AnalyticsUtils;
+

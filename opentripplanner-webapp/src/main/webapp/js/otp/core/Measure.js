@@ -148,7 +148,7 @@ otp.core.Measure = {
         this.m_control.activate();
         this.toggleOutput(true);
         this.m_onOff = true;
-        otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.MEASURE);
+        otp.util.Analytics.gaEvent(otp.util.Analytics.MEASURE);
     },
 
     /** turn the measure control off */

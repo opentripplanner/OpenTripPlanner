@@ -193,7 +193,7 @@ otp.planner.StaticForms = {
         });
 
         // analytics
-        otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUBMIT);
+        otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_SUBMIT);
     },
 
     /**
@@ -227,7 +227,7 @@ otp.planner.StaticForms = {
             return;
         }
         if(this.poi) this.poi.clearTrip();
-        otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_SUCCESS);
+        otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_SUCCESS);
     },
 
     /** */
@@ -336,7 +336,7 @@ otp.planner.StaticForms = {
                 var zz = new Ext.Panel({layout:'anchor', items:e});
                 this.m_geoErrorPopup = otp.util.ExtUtils.makePopup({layout:'anchor',items:[zz]}, this.locale.tripPlanner.error.title, true, 360, errorWindowHeight, true, false, 50, 170);
                 message = null;
-                otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_GEO_ERROR + "/from/" + (from != null) + "/to/" + (to != null));
+                otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_GEO_ERROR);
             }
             else
             {
@@ -355,7 +355,7 @@ otp.planner.StaticForms = {
                     }
                     message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
                 }
-                otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_ERROR + "/" + code);
+                otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_ERROR);
             }
         } 
         catch(e) 
@@ -452,14 +452,14 @@ otp.planner.StaticForms = {
      * set to form with either/both a string and X/Y
      * NOTE: x & y are reversed -- really are lat,lon
      */
-    setTo : function(tString, x, y, moveMap, noPoi)
+    setTo : function(tString, lat, lon, moveMap, noPoi)
     {
         this.THIS.focus();
-        if(x && x > -180.1 && y && y > -181.1) 
+        if(lat && lat > -181.1 && lon && lon > -181.1) 
         {
-            this.THIS.m_toCoord = x + ',' + y;
+            this.THIS.m_toCoord = lat + ',' + lon;
             if(this.THIS.poi && !noPoi)
-                this.THIS.poi.setTo(y, x, tString, moveMap);
+                this.THIS.poi.setTo(lon, lat, tString, moveMap);
 
             otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString, this.THIS.m_toCoord);
             this.THIS.m_toForm.setLastValue();
@@ -954,7 +954,7 @@ otp.planner.StaticForms = {
                 if (this.poi) {
                     this.poi.reverseStyles();
                 }
-                otp.util.AnalyticsUtils.gaEvent(otp.util.AnalyticsUtils.TRIP_FORM_REVERSE);
+                otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_FORM_REVERSE);
             }
         });
 
