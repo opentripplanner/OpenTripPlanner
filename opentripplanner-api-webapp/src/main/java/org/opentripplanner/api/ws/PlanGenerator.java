@@ -205,6 +205,9 @@ public class PlanGenerator {
                         .getElevationProfile();
                 previousElevation = applyElevation(profile, itinerary, previousElevation);
             }
+            if (mode != null && mode.isOnStreetNonTransit()) {
+                itinerary.walkDistance += backEdgeNarrative.getDistance();
+            }
 
             switch (pgstate) {
             case START:
