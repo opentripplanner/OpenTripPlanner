@@ -62,7 +62,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private CustomNamer customNamer;
 
-    private double bikeSafetyFactor = 4.0;
+    private double bikeSafetyFactor = 1.0;
         
     /**
      * The source for OSM map data
