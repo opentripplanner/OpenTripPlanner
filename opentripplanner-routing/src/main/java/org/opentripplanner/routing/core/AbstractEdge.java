@@ -83,6 +83,13 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     public State optimisticTraverse (State s0) {
     	return this.traverse(s0);
     }
+    
+    /**
+     * Edge weights are non-negative. Zero is an admissible default lower bound. 
+     */
+    public double weightLowerBound(TraverseOptions options) {
+    	return 0;
+    }
         
     @Override
     public void addPatch(Patch patch) {

@@ -197,6 +197,17 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         return s1.makeState();
     }
 
+    /**
+     * If the search is proceeding forward, board cost is added at board edges. 
+     * Otherwise it is added at alight edges.
+     */
+    public double weightLowerBound(TraverseOptions options) {
+    	if (options.isArriveBy())
+    		return 0;
+    	else
+    		return options.boardCost;
+    }
+
     public int getStopIndex() {
         return stopIndex;
     }

@@ -133,4 +133,15 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 		StateEditor s1 = s0.edit(this);
 		return s1.makeState();
 	}
+	
+    /**
+     * If the search is proceeding backward, board cost is added at alight edges. 
+     * Otherwise it is added at board edges.
+     */
+    public double weightLowerBound(TraverseOptions options) {
+    	if (options.isArriveBy())
+    		return options.boardCost;
+    	else
+    		return 0;
+    }
 }

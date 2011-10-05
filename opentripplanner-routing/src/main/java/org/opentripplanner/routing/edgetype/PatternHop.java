@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
@@ -69,13 +70,10 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     	return s1.makeState();
     }
 
-    public State optimisticTraverseBack(State state0) {
-        int runningTime = pattern.getBestRunningTime(stopIndex);
-        StateEditor s1 = state0.edit(this);
-        s1.incrementTimeInSeconds(-runningTime);
-        s1.incrementWeight(runningTime);
-        return s1.makeState();
-    }
+	@Override
+	public double weightLowerBound(TraverseOptions options) {
+		return pattern.getBestRunningTime(stopIndex);
+	}
     
     public State traverse(State state0) {
         int trip = state0.getTrip();

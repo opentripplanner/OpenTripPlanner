@@ -141,6 +141,17 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         }
     }
 
+    /**
+     * If the search is proceeding forward, board cost is added at board edges. 
+     * Otherwise it is added at alight edges.
+     */
+    public double weightLowerBound(TraverseOptions options) {
+    	if (options.isArriveBy())
+    		return 0;
+    	else
+    		return options.boardCost;
+    }
+
     @Override
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);

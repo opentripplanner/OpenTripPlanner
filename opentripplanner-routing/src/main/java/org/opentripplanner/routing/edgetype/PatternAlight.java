@@ -202,6 +202,17 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         // s1.incrementWeight(state0.getOptions().boardCost); 
         return s1.makeState();
     }
+    
+    /**
+     * If the search is proceeding backward, board cost is added at alight edges. 
+     * Otherwise it is added at board edges.
+     */
+    public double weightLowerBound(TraverseOptions options) {
+    	if (options.isArriveBy())
+    		return options.boardCost;
+    	else
+    		return 0;
+    }
 
     public int getStopIndex() {
         return stopIndex;

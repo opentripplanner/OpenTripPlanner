@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
@@ -186,5 +187,10 @@ public class Shortcut implements DirectEdge, Serializable {
 	@Override
 	public boolean hasBogusName() {
 		return false;
+	}
+
+	@Override
+	public double weightLowerBound(TraverseOptions options) {
+		return weight == -1 ? 0 : weight;
 	}
 }
