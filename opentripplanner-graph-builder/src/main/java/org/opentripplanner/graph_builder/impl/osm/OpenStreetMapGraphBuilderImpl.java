@@ -749,7 +749,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * How much safer transit is than biking along an ordinary street. The default is 4.0, which
      * probably does not reflect reality (especially for rail), but should generate plausible
      * routes.  Do not lower this value below the reciprocal of the safety of the safest street
-     * according to your bicycle safety settings.
+     * according to your bicycle safety settings, or you will break the default A* heuristic.
      * 
      * @param bikeSafetyFactor
      */
