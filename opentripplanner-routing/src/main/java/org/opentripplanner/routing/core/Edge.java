@@ -54,6 +54,9 @@ public interface Edge {
     /**
      * Intended to replace optimisticTraverse, on the grounds that the lower bound on an edge's weight 
      * should not be path-dependent, so the state is not needed.
+     * 
+     * @return a lower bound on this edge's weight, given these {@link TraverseOptions}.
+     * Double.POSITIVE_INFINITY if the edge cannot be traversed with the given {@link TraverseOptions}.
      */
     public double weightLowerBound(TraverseOptions options);
 
