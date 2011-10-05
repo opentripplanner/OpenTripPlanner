@@ -187,4 +187,7 @@ public class GenericVertex implements Vertex, Serializable {
     	return index;
     }
     
+    public static int getMaxIndex() {
+    	return maxIndex;
+    }
 }
