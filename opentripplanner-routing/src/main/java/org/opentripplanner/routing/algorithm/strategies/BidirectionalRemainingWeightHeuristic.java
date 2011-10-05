@@ -14,16 +14,11 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.GenericVertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
-import org.opentripplanner.routing.core.LowerBoundGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
