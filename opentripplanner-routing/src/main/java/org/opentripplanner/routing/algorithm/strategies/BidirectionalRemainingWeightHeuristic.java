@@ -24,12 +24,13 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A heuristic that performs a single-source / all destinations shortest path search backward
- * from the target of the main search, using lower bounds on the weight of each edge.
+ * A heuristic that performs a single-source / all destinations shortest path search backward from
+ * the target of the main search, using lower bounds on the weight of each edge.
  * 
  * @author andrewbyrd
  */
@@ -42,15 +43,15 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
     Vertex target;
 
     double[] weights;
-    
-	int nVertices = 0;
+
+    int nVertices = 0;
 
     Graph g;
 
-//    TraverseOptions opt;
-    
+    // TraverseOptions opt;
+
     public BidirectionalRemainingWeightHeuristic(Graph g) {
-    	this.g = g;
+        this.g = g;
     }
 
     @Override
@@ -69,7 +70,7 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
         int index = ((GenericVertex) s.getVertex()).getIndex();
         if (index < weights.length) {
             double h = weights[index];
-            //System.out.printf("h=%f at %s\n", h, s.getVertex());
+            // System.out.printf("h=%f at %s\n", h, s.getVertex());
             return h == Double.POSITIVE_INFINITY ? 0 : h;
         } else
             return 0;
@@ -78,61 +79,63 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
     private void recalculate(Vertex target, TraverseOptions options) {
         if (target != this.target) {
             this.target = target;
-    		nVertices = GenericVertex.getMaxIndex();
-       		weights = new double[nVertices];
-    		Arrays.fill(weights, Double.POSITIVE_INFINITY);
-        	BinHeap<Vertex> q = new BinHeap<Vertex>();
-    		long t0 = System.currentTimeMillis();
+            nVertices = GenericVertex.getMaxIndex();
+            weights = new double[nVertices];
+            Arrays.fill(weights, Double.POSITIVE_INFINITY);
+            BinHeap<Vertex> q = new BinHeap<Vertex>();
+            long t0 = System.currentTimeMillis();
 
-        	if (target instanceof StreetLocation) {
-        		for (DirectEdge de : ((StreetLocation)target).getExtra()) {
-        			GenericVertex toVertex = (GenericVertex)(de.getToVertex());  
-        			int toIndex = toVertex.getIndex();
-        			if (toVertex == target) continue;
-        			if (toIndex >= nVertices) continue;
-        			weights[toIndex] = 0;
-        			q.insert(toVertex, 0);
-        		}
-        	} else {
-        		int i = ((GenericVertex)target).getIndex();
-        		weights[i] = 0;
-    			q.insert(target, 0);
-        	}
+            if (target instanceof StreetLocation) {
+                for (DirectEdge de : ((StreetLocation) target).getExtra()) {
+                    GenericVertex toVertex = (GenericVertex) (de.getToVertex());
+                    int toIndex = toVertex.getIndex();
+                    if (toVertex == target)
+                        continue;
+                    if (toIndex >= nVertices)
+                        continue;
+                    weights[toIndex] = 0;
+                    q.insert(toVertex, 0);
+                }
+            } else {
+                int i = ((GenericVertex) target).getIndex();
+                weights[i] = 0;
+                q.insert(target, 0);
+            }
 
-    		while ( ! q.empty()) {
-    			double uw = q.peek_min_key();
-    			Vertex u  = q.extract_min();
-    			int ui = ((GenericVertex)u).getIndex();
-    			if (uw > weights[ui])
-    				continue;
-    			//System.out.println("Extract " + u + " weight " + uw);
-    			GraphVertex gv = g.getGraphVertex(u);
-    			if (gv == null)
-    				continue;
-    			Iterable<Edge> edges;
-    			if (options.isArriveBy())
-    				edges = gv.getOutgoing();
-    			else
-    				edges = gv.getIncoming();
-    			for (Edge e : edges) {
-    				if (e instanceof DirectEdge) {
-	    				GenericVertex v = (GenericVertex) ((DirectEdge)e).getToVertex();
-	    				double vw = uw + e.weightLowerBound(options);
-	    				int vi = v.getIndex();
-	    				if (weights[vi] > vw) {
-	    					weights[vi] = vw;
-	    	    			//System.out.println("Insert " + v + " weight " + vw);
-	    					q.insert(v, vw);
-	    				}
-    				}
-    			}
-    		}
-    		LOG.info("End SSSP ({} msec)", System.currentTimeMillis() - t0);
+            while (!q.empty()) {
+                double uw = q.peek_min_key();
+                Vertex u = q.extract_min();
+                int ui = ((GenericVertex) u).getIndex();
+                if (uw > weights[ui])
+                    continue;
+                // System.out.println("Extract " + u + " weight " + uw);
+                GraphVertex gv = g.getGraphVertex(u);
+                if (gv == null)
+                    continue;
+                Iterable<Edge> edges;
+                if (options.isArriveBy())
+                    edges = gv.getOutgoing();
+                else
+                    edges = gv.getIncoming();
+                for (Edge e : edges) {
+                    if (e instanceof DirectEdge) {
+                        GenericVertex v = (GenericVertex) ((DirectEdge) e).getToVertex();
+                        double vw = uw + e.weightLowerBound(options);
+                        int vi = v.getIndex();
+                        if (weights[vi] > vw) {
+                            weights[vi] = vw;
+                            // System.out.println("Insert " + v + " weight " + vw);
+                            q.insert(v, vw);
+                        }
+                    }
+                }
+            }
+            LOG.info("End SSSP ({} msec)", System.currentTimeMillis() - t0);
         }
     }
-    
+
     @Override
     public void reset() {
     }
-    
+
 }
