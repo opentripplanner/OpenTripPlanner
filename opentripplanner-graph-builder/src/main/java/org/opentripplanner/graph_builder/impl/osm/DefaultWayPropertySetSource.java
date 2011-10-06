@@ -404,6 +404,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "railway=platform;highway=footway", "platform");
         createNames(props, "highway=platform", "platform");
         createNames(props, "railway=platform", "platform");
+        createNames(props, "railway=platform;highway=footway;bicycle=no", "platform");
 
         // Bridges/Tunnels
         createNames(props, "highway=pedestrian;bridge=*", "footbridge");
