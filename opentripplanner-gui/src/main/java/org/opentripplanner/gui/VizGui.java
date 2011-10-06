@@ -60,6 +60,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.DirectEdge;
@@ -880,6 +881,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     // the vizgui serves as its own remainingweightheuristicfactory
     // so ui elements could be used to select the heuristic
     public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target) {
-        return new TrivialRemainingWeightHeuristic();
+        return new BidirectionalRemainingWeightHeuristic(graph);
+        //return new DefaultRemainingWeightHeuristic();
     }
 }
