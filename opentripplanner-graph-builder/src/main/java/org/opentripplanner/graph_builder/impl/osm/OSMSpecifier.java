@@ -48,6 +48,7 @@ public class OSMSpecifier {
      */
     public P2<Integer> matchScores(OSMWithTags match) {
         int leftScore = 0, rightScore = 0;
+        int leftMatches = 0, rightMatches = 0;
         for (P2<String> pair : kvpairs) {
             String tag = pair.getFirst().toLowerCase();
             String value = pair.getSecond().toLowerCase();
@@ -62,9 +63,21 @@ public class OSMSpecifier {
                 rightMatchValue = matchValue;
             }
 
-            leftScore += getTagScore(value, leftMatchValue);
-            rightScore += getTagScore(value, rightMatchValue);
+            int leftTagScore = getTagScore(value, leftMatchValue);
+            leftScore += leftTagScore;
+            if (leftTagScore > 0) {
+                leftMatches ++;
+            }
+            int rightTagScore = getTagScore(value, rightMatchValue);
+            rightScore += rightTagScore;
+            if (rightTagScore > 0) {
+                rightMatches ++;
+            }
         }
+        int allMatchLeftBonus = (leftMatches == kvpairs.size()) ? 10 : 0;
+        leftScore += allMatchLeftBonus;
+        int allMatchRightBonus = (rightMatches == kvpairs.size()) ? 10 : 0;
+        rightScore += allMatchRightBonus;
         P2<Integer> score = new P2<Integer>(leftScore, rightScore);
         return score;
     }
