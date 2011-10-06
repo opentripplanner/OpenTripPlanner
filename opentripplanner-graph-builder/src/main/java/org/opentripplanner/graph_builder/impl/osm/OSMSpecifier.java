@@ -21,100 +21,101 @@ import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 
 /** Specifies a class of OSM tagged objects (e.g. ways) by a list tags and their values */
 public class OSMSpecifier {
-	public List<P2<String>> kvpairs;
-	
-	public OSMSpecifier() {
-		kvpairs = new ArrayList<P2<String>>();
-	}
-	
-	public OSMSpecifier(String spec) {
-		this();
-		setKvpairs(spec);
-	}
-	
-	public void setKvpairs(String spec) {
-		String[] pairs = spec.split(";");
-		for (String pair : pairs) {
-			String[] kv = pair.split("=");
-			kvpairs.add(new P2<String>(kv[0], kv[1]));
-		}
-	}
-	
-	/**
-	 * Returns a score comparing how well the parameter matches
-	 * this specifier 
-	 * @param match an OSM tagged object to compare to this specifier 
-	 * @return
-	 */
-	public P2<Integer> matchScores(OSMWithTags match) {
-		int leftScore = 0, rightScore = 0;
-		for (P2<String> pair : kvpairs) {
-			String tag = pair.getFirst().toLowerCase();
-			String value = pair.getSecond().toLowerCase();
+    public List<P2<String>> kvpairs;
 
-			String leftMatchValue = match.getTag(tag + ":left");
-			String rightMatchValue = match.getTag(tag + ":right");
-			String matchValue = match.getTag(tag);
-			if (leftMatchValue == null) {
-				leftMatchValue = matchValue;
-			}
-			if (rightMatchValue == null) {
-				rightMatchValue = matchValue;
-			}
+    public OSMSpecifier() {
+        kvpairs = new ArrayList<P2<String>>();
+    }
 
-			leftScore += getTagScore(value, leftMatchValue);
-			rightScore += getTagScore(value, rightMatchValue);
-		}
-		P2<Integer> score = new P2<Integer>(leftScore, rightScore);
-		return score;
-	}
+    public OSMSpecifier(String spec) {
+        this();
+        setKvpairs(spec);
+    }
 
-	public int matchScore(OSMWithTags match) {
-		int score = 0;
-		for (P2<String> pair : kvpairs) {
-			String tag = pair.getFirst().toLowerCase();
-			String value = pair.getSecond().toLowerCase();
+    public void setKvpairs(String spec) {
+        String[] pairs = spec.split(";");
+        for (String pair : pairs) {
+            String[] kv = pair.split("=");
+            kvpairs.add(new P2<String>(kv[0], kv[1]));
+        }
+    }
 
-			String matchValue = match.getTag(tag);
-			score += getTagScore(value, matchValue);
-		}
-		return score;
-	}
-	private int getTagScore(String value, String matchValue) {
-		//either this matches on a wildcard, or it matches exactly
-		if (value.equals("*") && matchValue != null) {
-			return 1; //wildcard matches are basically tiebreakers
-		} else if (value.equals(matchValue)) {
-			return 100;
-		} else {
-			if (value.contains(":")) {
-				//treat cases like cobblestone:flattened as cobblestone if a more-specific match
-				//does not apply
-				value = value.split(":", 2)[0];
-				if (value.equals(matchValue)) {
-					return 75;
-				} else {
-					return 0;
-				}
-			} else {
-				return 0;
-			}
-		}
-	}
+    /**
+     * Returns a score comparing how well the parameter matches this specifier
+     * 
+     * @param match an OSM tagged object to compare to this specifier
+     * @return
+     */
+    public P2<Integer> matchScores(OSMWithTags match) {
+        int leftScore = 0, rightScore = 0;
+        for (P2<String> pair : kvpairs) {
+            String tag = pair.getFirst().toLowerCase();
+            String value = pair.getSecond().toLowerCase();
 
-	public void addTag(String key, String value) {
-		kvpairs.add(new P2<String>(key, value));
-	}
-	
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		for (P2<String> pair: kvpairs) {
-			builder.append(pair.getFirst());
-			builder.append("=");
-			builder.append(pair.getSecond());
-			builder.append(";");
-		}
-		builder.deleteCharAt(builder.length() - 1); //remove trailing semicolon
-		return builder.toString();
-	}
+            String leftMatchValue = match.getTag(tag + ":left");
+            String rightMatchValue = match.getTag(tag + ":right");
+            String matchValue = match.getTag(tag);
+            if (leftMatchValue == null) {
+                leftMatchValue = matchValue;
+            }
+            if (rightMatchValue == null) {
+                rightMatchValue = matchValue;
+            }
+
+            leftScore += getTagScore(value, leftMatchValue);
+            rightScore += getTagScore(value, rightMatchValue);
+        }
+        P2<Integer> score = new P2<Integer>(leftScore, rightScore);
+        return score;
+    }
+
+    public int matchScore(OSMWithTags match) {
+        int score = 0;
+        for (P2<String> pair : kvpairs) {
+            String tag = pair.getFirst().toLowerCase();
+            String value = pair.getSecond().toLowerCase();
+
+            String matchValue = match.getTag(tag);
+            score += getTagScore(value, matchValue);
+        }
+        return score;
+    }
+
+    private int getTagScore(String value, String matchValue) {
+        // either this matches on a wildcard, or it matches exactly
+        if (value.equals("*") && matchValue != null) {
+            return 1; // wildcard matches are basically tiebreakers
+        } else if (value.equals(matchValue)) {
+            return 100;
+        } else {
+            if (value.contains(":")) {
+                // treat cases like cobblestone:flattened as cobblestone if a more-specific match
+                // does not apply
+                value = value.split(":", 2)[0];
+                if (value.equals(matchValue)) {
+                    return 75;
+                } else {
+                    return 0;
+                }
+            } else {
+                return 0;
+            }
+        }
+    }
+
+    public void addTag(String key, String value) {
+        kvpairs.add(new P2<String>(key, value));
+    }
+
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        for (P2<String> pair : kvpairs) {
+            builder.append(pair.getFirst());
+            builder.append("=");
+            builder.append(pair.getSecond());
+            builder.append(";");
+        }
+        builder.deleteCharAt(builder.length() - 1); // remove trailing semicolon
+        return builder.toString();
+    }
 }
