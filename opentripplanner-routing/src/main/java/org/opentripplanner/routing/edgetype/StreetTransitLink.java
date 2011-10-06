@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -86,6 +87,14 @@ public class StreetTransitLink extends AbstractEdge {
         s1.incrementWeight(STL_TRAVERSE_COST);
         return s1.makeState();
     }
+    
+    // anecdotally, the lower bound search is about 2x faster when you don't reach stops
+    // and therefore don't even consider boarding
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return options.transitAllowed() ? 0 : Double.POSITIVE_INFINITY;
+    }
+
 
     public Vertex getFromVertex() {
         return fromv;
