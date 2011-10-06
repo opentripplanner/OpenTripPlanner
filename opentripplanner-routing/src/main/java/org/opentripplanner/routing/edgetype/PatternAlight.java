@@ -203,15 +203,25 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         return s1.makeState();
     }
     
-    /**
-     * If the search is proceeding backward, board cost is added at alight edges. 
+    /*
+     * If the main search is proceeding backward, board cost is added at alight edges. 
      * Otherwise it is added at board edges.
+     * If the mode or serviceIds of this pattern make it useless, block traversal during
+     * the heuristic-producing search. This will leave a bunch of INFs in the heuristic 
+     * table and avoid exploration during the main search. 
      */
     public double weightLowerBound(TraverseOptions options) {
     	if (options.isArriveBy())
     		return options.boardCost;
     	else
-    		return 0;
+            if (!options.getModes().get(modeMask)) {
+                return Double.POSITIVE_INFINITY;
+            }
+            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            for (ServiceDay sd : options.serviceDays)
+                if (sd.serviceIdRunning(serviceId))
+                    return 0;
+            return Double.POSITIVE_INFINITY;
     }
 
     public int getStopIndex() {
