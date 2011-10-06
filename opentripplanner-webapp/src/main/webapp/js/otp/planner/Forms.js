@@ -622,6 +622,8 @@ otp.planner.StaticForms = {
             if(params.wheelchair && this.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
+            this.setRawInput(params.routerId, forms.m_routerIdForm);
+            
             // stupid trip planner form processing...
 
             // Hour=7&Minute=02&AmPm=pm
@@ -669,6 +671,8 @@ otp.planner.StaticForms = {
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
+        retVal.routerId  = this.m_routerIdForm.getValue();
+
         if(retVal.opt == "TRIANGLE") {
             var triopts = this.m_bikeTriangle.getFormData();
             otp.extend(retVal, triopts);
@@ -852,7 +856,7 @@ otp.planner.StaticForms = {
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
         this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
-        
+
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,
             id:          'form-tab',
@@ -1355,7 +1359,8 @@ otp.planner.StaticForms = {
                 maxWalk:      this.m_maxWalkDistanceForm,
                 locale:       this.locale,
                 bikeTriangle: this.m_bikeTriangle
-            }
+            };
+
             if(this.showWheelchairForm)
                 usecfg.wheelchair = this.m_wheelchairForm;
             this.m_optionsManager = new otp.planner.FormsOptionsManager(usecfg);
