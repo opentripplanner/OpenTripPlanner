@@ -372,6 +372,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         props.defaultProperties.setPermission(StreetTraversalPermission.ALL);
 
         /* and the notes */
+        createNotes(props, "note=*", "{note}");
         createNotes(props, "notes=*", "{notes}");
         createNotes(props, "RLIS:bicycle=caution_area", "Caution!");
         createNotes(props, "CCGIS:bicycle=caution_area", "Caution!");
@@ -441,10 +442,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         createNames(props, "highway=steps", "steps");
 
-        createNames(props, "highway=footway;footway=crossing", "street crossing");
-        createNames(props, "highway=path;path=crossing", "street crossing");
-
-        //slope overrides
+                //slope overrides
         props.setSlopeOverride(new OSMSpecifier("bridge=*"), true);
         props.setSlopeOverride(new OSMSpecifier("tunnel=*"), true);
 
