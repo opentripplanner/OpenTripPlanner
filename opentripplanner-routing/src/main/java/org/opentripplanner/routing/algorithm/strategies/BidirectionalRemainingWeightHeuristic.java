@@ -71,7 +71,10 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
-            return h == Double.POSITIVE_INFINITY ? 0 : h;
+            // return infinite heuristic values 
+            // so transit boarding is not even attempted useless patterns
+            // return h == Double.POSITIVE_INFINITY ? 0 : h;
+            return h;
         } else
             return 0;
     }
@@ -119,13 +122,18 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
                     edges = gv.getIncoming();
                 for (Edge e : edges) {
                     if (e instanceof DirectEdge) {
-                        GenericVertex v = (GenericVertex) ((DirectEdge) e).getToVertex();
+                        GenericVertex v;
+                        if (options.isArriveBy())
+                            v = (GenericVertex) ((DirectEdge) e).getToVertex();
+                        else
+                            v = (GenericVertex) ((DirectEdge) e).getFromVertex();
                         double vw = uw + e.weightLowerBound(options);
                         int vi = v.getIndex();
                         if (weights[vi] > vw) {
                             weights[vi] = vw;
-                            // System.out.println("Insert " + v + " weight " + vw);
+                            // selectively rekeying did not seem to offer any speed advantage
                             q.insert(v, vw);
+                            // System.out.println("Insert " + v + " weight " + vw);
                         }
                     }
                 }
