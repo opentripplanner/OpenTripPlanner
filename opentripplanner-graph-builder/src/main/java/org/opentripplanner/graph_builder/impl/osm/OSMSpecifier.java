@@ -84,13 +84,19 @@ public class OSMSpecifier {
 
     public int matchScore(OSMWithTags match) {
         int score = 0;
+        int matches = 0;
         for (P2<String> pair : kvpairs) {
             String tag = pair.getFirst().toLowerCase();
             String value = pair.getSecond().toLowerCase();
 
             String matchValue = match.getTag(tag);
-            score += getTagScore(value, matchValue);
+            int tagScore = getTagScore(value, matchValue);
+            score += tagScore;
+            if (tagScore > 0) {
+                matches += 1;
+            }
         }
+        score += matches == kvpairs.size() ? 10 : 0;
         return score;
     }
 

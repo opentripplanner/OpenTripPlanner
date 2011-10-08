@@ -194,6 +194,17 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                                                                        // from track
         assertEquals(0.75, dataForWay.getSafetyFeatures().getSecond()); // left comes from lane
 
+        
+        way = new OSMWay();
+        way.addTag("highway", "footway");
+        way.addTag("footway", "sidewalk");
+        way.addTag("RLIS:reviewed", "no");
+        WayPropertySet propset = new WayPropertySet();
+        CreativeNamer namer = new CreativeNamer("platform");
+        propset.addCreativeNamer(new OSMSpecifier("railway=platform;highway=footway;footway=sidewalk"), namer);
+        namer = new CreativeNamer("sidewalk");
+        propset.addCreativeNamer(new OSMSpecifier("highway=footway;footway=sidewalk"), namer);
+        assertEquals ("sidewalk", propset.getCreativeNameForWay(way));
     }
 
     public void testCreativeNaming() {
