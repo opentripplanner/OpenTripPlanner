@@ -84,13 +84,16 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     	return this.traverse(s0);
     }
     
-    /**
-     * Edge weights are non-negative. Zero is an admissible default lower bound. 
-     */
+    /* Edge weights are non-negative. Zero is an admissible default lower bound. */
     public double weightLowerBound(TraverseOptions options) {
     	return 0;
     }
         
+    /* No edge should take less than zero time to traverse. */
+    public double timeLowerBound(TraverseOptions options) {
+        return 0;
+    }
+
     @Override
     public void addPatch(Patch patch) {
     	if (patches == null) {

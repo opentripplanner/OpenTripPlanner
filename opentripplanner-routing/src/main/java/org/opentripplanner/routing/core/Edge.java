@@ -60,6 +60,16 @@ public interface Edge {
      */
     public double weightLowerBound(TraverseOptions options);
 
+    /**
+     * Another replacement for optimisticTraverse, intended for use in resource-limited shortest
+     * path searches.
+     * 
+     * @return a lower bound on the time it takes to traverse this edge, given these 
+     * {@link TraverseOptions}. Double.POSITIVE_INFINITY if the edge cannot be traversed 
+     * with the given {@link TraverseOptions}.
+     */
+    public double timeLowerBound(TraverseOptions options);
+
     public void addPatch(Patch patch);
 
     public List<Patch> getPatches();
