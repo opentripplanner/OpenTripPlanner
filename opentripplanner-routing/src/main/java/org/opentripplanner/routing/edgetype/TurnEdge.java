@@ -276,8 +276,14 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return restricted;
     }
 
-	@Override
-	public double weightLowerBound(TraverseOptions options) {
-		return fromv.length / options.speed * options.walkReluctance;
-	}
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options) * options.walkReluctance;
+    }
+    
+    @Override
+    public double timeLowerBound(TraverseOptions options) {
+        return fromv.length / options.speed;
+    }
+    
 }

@@ -277,11 +277,16 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         return s1.makeState();
     }
 
-	@Override
-	public double weightLowerBound(TraverseOptions options) {
-		return this.length / options.speed * options.walkReluctance;
-	}
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options) * options.walkReluctance;
+    }
     
+    @Override
+    public double timeLowerBound(TraverseOptions options) {
+        return this.length / options.speed;
+    }
+        
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
         this.slopeSpeedEffectiveLength = slopeSpeedEffectiveLength;
     }
