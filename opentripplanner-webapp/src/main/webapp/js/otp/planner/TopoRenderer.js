@@ -103,8 +103,6 @@ otp.planner.TopoRenderer = {
             legInfo.firstElev = firstElev;
             legInfo.lastElev = lastElev;
         }
-        this.minElev = 100*Math.floor(this.minElev/100);
-        this.maxElev = 100*Math.ceil(this.maxElev/100);
         
     },
     
@@ -120,16 +118,32 @@ otp.planner.TopoRenderer = {
         this.markerLayer = null;
         this.locationPoint = null;
         this.locationMarker = null;
-        var res = 5; // resolution of the main terrain graph in ft per pixel
+        
+        // compute the resolution of the main terrain graph in ft per pixel
+        var res = Math.floor(this.totalDistance / 5000); 
+        if(res < 5) res = 5;
+        
+        // compute the width of the main elevation graphic in pixels
         var terrainWidth = (this.totalDistance*3.2808399)/res + this.nonBikeLegCount*this.nonBikeLegWidth;
+        
+        // if the graph is wider than what can be displayed without scrolling, 
+        // split the panel between the main graph and a "preview" strip 
         var showPreview = (terrainWidth > width);
         var terrainHeight = showPreview ? height * this.terrainPct : height;
         var previewHeight = height - terrainHeight;
-        var subDivisions = (this.maxElev-this.minElev)/100;
-        var subDivHeight = terrainHeight / subDivisions;
-                
-        this.createContainerDivs(width, height, terrainWidth, showPreview);
         
+        // determine the interval at which to show 
+        
+        var elevSpan = this.maxElev - this.minElev;        
+        var elevInterval = Math.floor((elevSpan/terrainHeight)*.5)*100;
+        if(elevInterval < 100) elevInterval = 100;
+        
+        // expand the min/max elevation range to align with interval multiples 
+        this.minElev = elevInterval*Math.floor(this.minElev/elevInterval);
+        this.maxElev = elevInterval*Math.ceil(this.maxElev/elevInterval);
+
+        // create the container div elements and associated Raphael canvases                     
+        this.createContainerDivs(width, height, terrainWidth, showPreview);  
         var axisCanvas = Raphael(this.axisDiv);
         var terrainCanvas = Raphael(this.terrainDiv);
                
@@ -154,6 +168,8 @@ otp.planner.TopoRenderer = {
         var d, rect;
         
         // draw the axis elevation labels
+        var subDivisions = (this.maxElev-this.minElev)/elevInterval;
+        var subDivHeight = terrainHeight / subDivisions;
         for (d = 0; d <= subDivisions; d++) {
             var textY = subDivHeight*d;
             axisCanvas.rect(0, textY, this.axisWidth, 1).attr({
@@ -167,7 +183,7 @@ otp.planner.TopoRenderer = {
             
             if(d == 0) textY += 6;
             if(d == subDivisions) textY -= 6;
-            axisCanvas.text(this.axisWidth-3, textY, (this.maxElev-d*100)+"'").attr({
+            axisCanvas.text(this.axisWidth-3, textY, (this.maxElev-d*elevInterval)+"'").attr({
                 fill: 'black',
                 'font-size' : '12px',
                 'font-weight' : 'bold',
