@@ -67,14 +67,19 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
+        if (s.getVertex() instanceof StreetLocation)
+            return 0;
+        if (s.getWeight() < 10 * 60)
+            return 0;
         int index = ((GenericVertex) s.getVertex()).getIndex();
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
             // return infinite heuristic values 
             // so transit boarding is not even attempted useless patterns
-            // return h == Double.POSITIVE_INFINITY ? 0 : h;
             return h;
+            //return h == Double.POSITIVE_INFINITY ? 0 : h;
+            
         } else
             return 0;
     }
@@ -82,7 +87,7 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
     private void recalculate(Vertex target, TraverseOptions options) {
         if (target != this.target) {
             this.target = target;
-            nVertices = GenericVertex.getMaxIndex();
+            this.nVertices = GenericVertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             BinHeap<Vertex> q = new BinHeap<Vertex>();
@@ -90,28 +95,32 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
 
             if (target instanceof StreetLocation) {
                 for (DirectEdge de : ((StreetLocation) target).getExtra()) {
-                    GenericVertex toVertex = (GenericVertex) (de.getToVertex());
-                    int toIndex = toVertex.getIndex();
-                    if (toVertex == target)
+                    GenericVertex gv;
+                    if (options.isArriveBy()) {
+                        gv = (GenericVertex) (de.getToVertex());
+                    } else {
+                        gv = (GenericVertex) (de.getFromVertex());
+                    }
+                    int gvi = gv.getIndex();
+                    if (gv == target)
                         continue;
-                    if (toIndex >= nVertices)
+                    if (gvi >= nVertices)
                         continue;
-                    weights[toIndex] = 0;
-                    q.insert(toVertex, 0);
+                    weights[gvi] = 0;
+                    q.insert(gv, 0);
                 }
             } else {
                 int i = ((GenericVertex) target).getIndex();
                 weights[i] = 0;
                 q.insert(target, 0);
             }
-
             while (!q.empty()) {
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
                 int ui = ((GenericVertex) u).getIndex();
                 if (uw > weights[ui])
                     continue;
-                // System.out.println("Extract " + u + " weight " + uw);
+                //LOG.debug("Extract {} weight {}",u ,uw);
                 GraphVertex gv = g.getGraphVertex(u);
                 if (gv == null)
                     continue;
