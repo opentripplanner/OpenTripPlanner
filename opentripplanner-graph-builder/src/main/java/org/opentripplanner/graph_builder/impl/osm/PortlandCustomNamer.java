@@ -39,6 +39,9 @@ public class PortlandCustomNamer implements CustomNamer {
 				return path(defaultName);
 			}
 		}
+		if ("pedestrian".equals(highway)) {
+		    return pedestrianStreet(defaultName);
+		}
 		return defaultName;
 	}
 
@@ -65,8 +68,15 @@ public class PortlandCustomNamer implements CustomNamer {
 			name = name + " (path)".intern();
 		}
 		return name;
-
 	}
+
+        private String pedestrianStreet(String name) {
+                if (!name.toLowerCase().contains("pedestrian street")) {
+                        name = name + " (pedestrian street)".intern();
+                }
+                return name;
+
+        }
 
 	private String sidewalk(String name) {
 		if (!name.toLowerCase().contains("sidewalk")) {
