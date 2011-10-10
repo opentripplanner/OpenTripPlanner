@@ -17,6 +17,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -62,16 +63,26 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return s1.makeState();
     }
 
-	@Override
-	public State optimisticTraverse(State s0) {
+    @Override
+    public State optimisticTraverse(State s0) {
         int dwellTime = pattern.getBestDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
         return s1.makeState();
-	}
+    }
+    
+    @Override
+    public double timeLowerBound(TraverseOptions options) {
+        return pattern.getBestDwellTime(stopIndex);
+    }
 
-	public Geometry getGeometry() {
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options);
+    }
+
+    public Geometry getGeometry() {
         return null;
     }
 
