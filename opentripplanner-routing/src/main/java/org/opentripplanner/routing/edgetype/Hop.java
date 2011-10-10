@@ -78,7 +78,11 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
     }
 
     public double weightLowerBound(TraverseOptions options) {
-    	return elapsed;
+    	return timeLowerBound(options);
+    }
+
+    public double timeLowerBound(TraverseOptions options) {
+        return elapsed;
     }
 
     public String toString() {

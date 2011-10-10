@@ -107,6 +107,16 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         return s1.makeState();
     }
     
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options);
+    }
+    
+    @Override
+    public double timeLowerBound(TraverseOptions options) {
+        return bestDwellTime;
+    }
+
     public State traverse(State state0) {
         TraverseOptions options = state0.getOptions();
 

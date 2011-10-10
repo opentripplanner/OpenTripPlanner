@@ -70,10 +70,15 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     	return s1.makeState();
     }
 
-	@Override
-	public double weightLowerBound(TraverseOptions options) {
-		return pattern.getBestRunningTime(stopIndex);
-	}
+    @Override
+    public double timeLowerBound(TraverseOptions options) {
+        return pattern.getBestRunningTime(stopIndex);
+    }
+    
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options);
+    }
     
     public State traverse(State state0) {
         int trip = state0.getTrip();
