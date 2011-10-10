@@ -94,10 +94,10 @@ otp.locale.English = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southeast:      "south east",
-        southwest:      "south west",
-        northeast:      "north east",
-        northwest:      "north west",
+        southeast:      "southeast",
+        southwest:      "southwest",
+        northeast:      "northeast",
+        northwest:      "northwest",
         north:          "north",
         west:           "west",
         south:          "south",
