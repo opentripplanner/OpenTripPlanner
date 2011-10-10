@@ -48,7 +48,6 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -640,20 +639,27 @@ public class PlanGenerator {
                     // intersection
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
+                    System.out.println("should we generate a continue instruction for " + edge);
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
-
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (DirectEdge alternative : pathService.getOutgoingEdges(currState
                                 .getBackState().getVertex())) {
                             if (alternative instanceof TinyTurnEdge) {
+                                //a tiny turn edge has no geometry, but the next
+                                //edge will be a TurnEdge or PSE and will have direction
                                 alternative = pathService.getOutgoingEdges(
                                         alternative.getToVertex()).get(0);
+                            }
+                            if (alternative.getName().equals(streetName)) {
+                                //alternatives that have the same name
+                                //are usually caused by street splits
+                                continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
                                     .getGeometry());
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
-                            if (altAngleDiff - angleDiff < Math.PI / 16) {
+                            if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
                                 break;
                             }
@@ -661,29 +667,30 @@ public class PlanGenerator {
                     } else if (edge instanceof TinyTurnEdge) {
                         // do nothing as this will be handled in other cases
                     } else {
-                        double newAngle;
-                        if (currState.getVertex() instanceof StreetVertex) {
-                            newAngle = DirectionUtils.getFirstAngle(((StreetVertex) currState
-                                    .getVertex()).getGeometry());
-                        } else {
-                            List<DirectEdge> outgoingEdges = pathService.getOutgoingEdges(currState
-                                    .getVertex());
-                            Edge oge = outgoingEdges.get(0);
-                            newAngle = DirectionUtils.getFirstAngle(((DirectEdge) oge)
-                                    .getGeometry());
-                        }
-                        double angleDiff = getAbsoluteAngleDiff(newAngle, thisAngle);
-                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState
-                                .getBackState().getVertex())) {
-                            if (alternative == edge) {
-                                continue;
-                            }
+                        double angleDiff = getAbsoluteAngleDiff(lastAngle, thisAngle);
+                        //in the case of a turn edge, we actually have to go back two steps to see where
+                        //else we might be, as once we are on the streetvertex leading into this edge,
+                        //we are stuck
+                        State backState = currState.getBackState();
+                        State twoStatesBack = backState.getBackState();
+                        Vertex backVertex = twoStatesBack.getVertex();
+                        for (DirectEdge alternative : pathService.getOutgoingEdges(backVertex)) {
+                            System.out.println("te alternative is " + alternative);
                             alternative = pathService.getOutgoingEdges(alternative.getToVertex())
                                     .get(0);
+                            System.out.println("te alternative becomes " + alternative);
+                            if (alternative.getName().equals(streetName)) {
+                                //alternatives that have the same name
+                                //are usually caused by street splits
+                                System.out.println("te alternative has same name as  " + streetName);
+                                continue;
+                            }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
                                     .getGeometry());
+                            System.out.println("angles are " + lastAngle + " vs this " + thisAngle + " vs alt " + altAngle);
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
-                            if (altAngleDiff - angleDiff < Math.PI / 16) {
+                            System.out.println("differences " + angleDiff + " vs " + altAngleDiff);
+                            if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
                                 break;
                             }
