@@ -57,6 +57,7 @@ public class WeightTable implements Serializable {
 	private Graph g;
 	Map<GenericVertex, Integer> stopIndices;
 	private double maxWalkSpeed;
+        private double maxWalkDistance;
 	private transient int count;
 
 	public WeightTable(Graph g) {
@@ -338,4 +339,12 @@ public class WeightTable implements Serializable {
 	public double getMaxWalkSpeed() {
 		return maxWalkSpeed;
 	}
+	
+	public void setMaxWalkDistance(double maxWalkDistance) {
+	    this.maxWalkDistance = maxWalkDistance;
+	}
+
+        public double getMaxWalkDistance(double maxWalkDistance) {
+            return this.maxWalkDistance;
+        }
 }

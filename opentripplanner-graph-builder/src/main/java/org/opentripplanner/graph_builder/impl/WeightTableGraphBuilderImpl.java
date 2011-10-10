@@ -25,12 +25,16 @@ import org.opentripplanner.routing.core.Graph;
  */
 public class WeightTableGraphBuilderImpl implements GraphBuilder {
 	private Double maxWalkSpeed = null;
+        private Double maxWalkDistance = null;
 
 	@Override
 	public void buildGraph(Graph graph) {
 		WeightTable wt = new WeightTable(graph);
 		if (maxWalkSpeed != null) {
 			wt.setMaxWalkSpeed(maxWalkSpeed);
+		}
+		if (maxWalkDistance != null) {
+		    wt.setMaxWalkDistance(maxWalkDistance);
 		}
 		wt.buildTable();
 		graph.putService(WeightTable.class, wt);
@@ -45,7 +49,23 @@ public class WeightTableGraphBuilderImpl implements GraphBuilder {
 		this.maxWalkSpeed = maxWalkSpeed;
 	}
 
-	public double getMaxWalkSpeed() {
+        /**
+         * The maximum walk distance that the weight table can support, in meters.  
+         * For trip planning requests with higher values than this, the weight table
+         * will be inaccurate and the search will fall back on a simpler heuristic.
+         * Building the weight table with a higher maxWalkDistance will take longer and
+         * the resulting tables will take up more memory.
+         * @param maxWalkDistance
+         */
+        public void setMaxWalkDistance(double maxWalkDistance) {
+                this.maxWalkDistance = maxWalkDistance;
+        }
+
+        public double getMaxWalkSpeed() {
 		return maxWalkSpeed;
 	}
+        
+        public double getMaxWalkDistance() {
+            return maxWalkDistance;
+        }
 }
