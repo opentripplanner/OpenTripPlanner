@@ -190,7 +190,12 @@ public class Shortcut implements DirectEdge, Serializable {
 	}
 
 	@Override
-	public double weightLowerBound(TraverseOptions options) {
+	public double timeLowerBound(TraverseOptions options) {
 		return weight == -1 ? 0 : weight;
 	}
+
+    @Override
+    public double weightLowerBound(TraverseOptions options) {
+        return timeLowerBound(options);
+    }
 }
