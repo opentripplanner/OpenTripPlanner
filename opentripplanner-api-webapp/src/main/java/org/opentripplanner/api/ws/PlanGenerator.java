@@ -568,6 +568,7 @@ public class PlanGenerator {
         for (State currState : states) {
             Edge edge = currState.getBackEdge();
             EdgeNarrative edgeNarrative = currState.getBackEdgeNarrative();
+            boolean createdNewStep = false;
             if (edge instanceof FreeEdge) {
                 continue;
             }
@@ -582,6 +583,8 @@ public class PlanGenerator {
             if (step == null) {
                 // first step
                 step = createWalkStep(currState);
+                createdNewStep = true;
+                
                 steps.add(step);
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
@@ -600,6 +603,8 @@ public class PlanGenerator {
                 }
                 /* start a new step */
                 step = createWalkStep(currState);
+                createdNewStep = true;
+                
                 steps.add(step);
                 if (edgeNarrative.isRoundabout()) {
                     // indicate that we are now on a roundabout
@@ -627,14 +632,7 @@ public class PlanGenerator {
                 if (edgeNarrative.isRoundabout() || direction == RelativeDirection.CONTINUE) {
                     // we are continuing almost straight, or continuing along a roundabout.
                     // just append elevation info onto the existing step.
-                    if (step.elevation != null) {
-                        String s = encodeElevationProfile(edge, distance);
-                        if (step.elevation.length() > 0 && s != null && s.length() > 0)
-                            step.elevation += ",";
-                        step.elevation += s;
-                    }
-                    // extending a step, increment the existing distance
-                    distance += edgeNarrative.getDistance();
+                	
                 } else {
                     // we are not on a roundabout, and not continuing straight through.
 
@@ -695,6 +693,7 @@ public class PlanGenerator {
                     if (shouldGenerateContinue) {
                         // turn to stay on same-named street
                         step = createWalkStep(currState);
+                        createdNewStep = true;
                         steps.add(step);
                         step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
@@ -703,6 +702,18 @@ public class PlanGenerator {
                     }
                 }
             }
+            
+            if(!createdNewStep) {
+            	if (step.elevation != null) {
+                    String s = encodeElevationProfile(edge, distance);
+                    if (step.elevation.length() > 0 && s != null && s.length() > 0)
+                        step.elevation += ",";
+                    step.elevation += s;
+                }
+                distance += edgeNarrative.getDistance();
+
+            }
+
             // increment the total length for this step
             step.distance += edgeNarrative.getDistance();
             step.addAlerts(edgeNarrative.getNotes());
