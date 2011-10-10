@@ -145,12 +145,15 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
      * If the search is proceeding forward, board cost is added at board edges. 
      * Otherwise it is added at alight edges.
      */
+    @Override
     public double weightLowerBound(TraverseOptions options) {
     	if (options.isArriveBy())
-    		return 0;
+            return 0;
     	else
-    		return options.boardCost;
+            return options.boardCost;
     }
+
+    /* use default (constant 0) timelowerbound */
 
     @Override
     public State optimisticTraverse(State s0) {

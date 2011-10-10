@@ -197,14 +197,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         return s1.makeState();
     }
 
-    /*
-     * If the main search is proceeding forward, board cost is added at board edges. 
-     * Otherwise it is added at alight edges.
-     * If the mode or serviceIds of this pattern make exploring it useless, 
-     * block traversal during the heuristic-producing search.This will leave a bunch 
-     * of INFs in the heuristic table and avoid exploration during the main search. 
-     */
-    public double weightLowerBound(TraverseOptions options) {
+    /* See weightLowerBound comment. */
+    public double timeLowerBound(TraverseOptions options) {
     	if (options.isArriveBy()) {
             if (!options.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
@@ -215,10 +209,26 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                     return 0;
             return Double.POSITIVE_INFINITY;
     	} else {
-            return options.boardCost;
+            return 0;
     	}
     }
 
+    /* 
+     * If the main search is proceeding backward, the lower bound search is proceeding forward.
+     * Check the mode or serviceIds of this pattern at board time to see whether this pattern 
+     * is worth exploring.
+     * If the main search is proceeding forward, board cost is added at board edges.
+     * The lower bound search is proceeding backward, and if it has reached a board edge the pattern
+     * was already deemed useful.
+     */
+    public double weightLowerBound(TraverseOptions options) {
+        if (options.isArriveBy())
+            return timeLowerBound(options);
+        else
+            return options.boardCost;
+    }
+
+    
     public int getStopIndex() {
         return stopIndex;
     }

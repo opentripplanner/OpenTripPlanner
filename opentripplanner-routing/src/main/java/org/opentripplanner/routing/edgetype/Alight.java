@@ -144,4 +144,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
     	else
     		return 0;
     }
+    
+    /* Use default (constant 0) timeLowerBound */
+
 }
