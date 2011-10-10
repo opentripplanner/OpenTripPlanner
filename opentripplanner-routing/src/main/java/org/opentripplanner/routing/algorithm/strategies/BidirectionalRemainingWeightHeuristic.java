@@ -34,7 +34,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeuristic {
+public class BidirectionalRemainingWeightHeuristic implements 
+    RemainingWeightHeuristic, RemainingTimeHeuristic {
 
     private static final long serialVersionUID = 20111002L;
 
@@ -48,7 +49,9 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
 
     Graph g;
 
-    // TraverseOptions opt;
+    /**
+     * RemainingWeightHeuristic interface
+     */
 
     public BidirectionalRemainingWeightHeuristic(Graph g) {
         this.g = g;
@@ -56,7 +59,7 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
 
     @Override
     public double computeInitialWeight(State s, Vertex target) {
-        recalculate(target, s.getOptions());
+        recalculate(target, s.getOptions(), false);
         return computeForwardWeight(s, target);
     }
 
@@ -84,7 +87,7 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
             return 0;
     }
 
-    private void recalculate(Vertex target, TraverseOptions options) {
+    private void recalculate(Vertex target, TraverseOptions options, boolean timeNotWeight) {
         if (target != this.target) {
             this.target = target;
             this.nVertices = GenericVertex.getMaxIndex();
@@ -131,12 +134,10 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
                     edges = gv.getIncoming();
                 for (Edge e : edges) {
                     if (e instanceof DirectEdge) {
-                        GenericVertex v;
-                        if (options.isArriveBy())
-                            v = (GenericVertex) ((DirectEdge) e).getToVertex();
-                        else
-                            v = (GenericVertex) ((DirectEdge) e).getFromVertex();
-                        double vw = uw + e.weightLowerBound(options);
+                        GenericVertex v = (GenericVertex) (options.isArriveBy() ? 
+                            ((DirectEdge) e).getToVertex() : ((DirectEdge) e).getFromVertex());
+                        double vw = uw + (timeNotWeight ? 
+                                e.timeLowerBound(options) : e.weightLowerBound(options));
                         int vi = v.getIndex();
                         if (weights[vi] > vw) {
                             weights[vi] = vw;
@@ -153,6 +154,19 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
 
     @Override
     public void reset() {
+    }
+
+    /**
+     * RemainingTimeHeuristic interface
+     */
+    @Override
+    public void timeInitialize(State s, Vertex target) {
+        recalculate(target, s.getOptions(), true);
+    }
+
+    @Override
+    public double timeLowerBound(State s) {
+        return computeReverseWeight(s, null);
     }
 
 }
