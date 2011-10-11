@@ -568,7 +568,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             StreetTraversalPermission permissionsFront = permissions;
             StreetTraversalPermission permissionsBack = permissions;
-            boolean oneWayBike = true;
+
             if (way.isTagTrue("oneway") || "roundabout".equals(tags.get("junction"))) {
             	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             } 
@@ -577,7 +577,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
             	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);	
-            	oneWayBike = true;
             }
             if (way.isTag("oneway:bicycle", "-1")) {
             	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
@@ -588,14 +587,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             		permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             	}
             }
-            if (way.isTag("cycleway", "opposite") ||
-            		way.isTag("cycleway", "opposite_lane") || 
-            		way.isTag("cycleway", "opposite_track")) {
-            
-            	if (oneWayBike) {
-            		_log.warn("conflicting tags oneway:bicycle and cycleway:opposite* on way " + way.getId() + ", assuming opposite");
-            	}
-            	permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+
+            //any cycleway which is opposite* allows contraflow biking
+            String cycleway = way.getTag("cycleway");
+            String cyclewayLeft = way.getTag("cycleway:left");
+            String cyclewayRight = way.getTag("cycleway:right");
+            if (cycleway.startsWith("opposite") || cyclewayLeft.startsWith("opposite") ||
+                    cyclewayRight.startsWith("opposite")) {
+
+                permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
             
             boolean noThruTraffic = way.isTag("access", "destination") ||
