@@ -93,7 +93,7 @@ otp.core.MapStatic = {
             this.map.addLayer(this.baseLayer);
         }
         this.map.setBaseLayer(this.baseLayer, true);
-        this.map.events.register('click', this, this.closeAllPopups);
+        this.map.events.register('click', this, this.closeAllPopupsCB);
 
         otp.core.MapSingleton = this;
         var self = this;
@@ -466,6 +466,12 @@ otp.core.MapStatic = {
         this.tooltipHide();
         this.streetviewHide();
         this.tooltipCleared = true;
+    },
+
+    /** event callback --- override to clear popups */
+    closeAllPopupsCB : function()
+    {
+        this.closeAllPopups();
     },
 
     /**
