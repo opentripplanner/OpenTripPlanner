@@ -67,39 +67,51 @@ otp.planner.BikeTriangle = {
         
         var labelSize = "18px";
 
-        var labelT = canvas.text(margin + tri_side/2, margin+24, "T");
-        labelT.attr({fill:"red", "font-size":labelSize, "font-weight":"bold"});	
+        var safeFill = "#2890AC"; 
+        var safeName = "Safest";
+        var safeSym  = "S";
 
-        var labelH = canvas.text(margin + 22, height-margin-14, "H");
-        labelH.attr({fill:"green", "font-size":labelSize, "font-weight":"bold"});	
+        var hillFill = "#6DB33F"; 
+        var hillName = "Flattest";
+        var hillSym  = "F";
+        
+        var timeFill = "#D59F0F";
+        var timeName = "Quickest";
+        var timeSym  = "Q";
 
-        var labelS = canvas.text(margin + tri_side - 22, height-margin-14, "S");
-        labelS.attr({fill:"blue", "font-size":labelSize, "font-weight":"bold"});	
+        var labelT = canvas.text(margin + tri_side/2, margin+24, timeSym);
+        labelT.attr({fill:timeFill, "font-size":labelSize, "font-weight":"bold"});	
+
+        var labelH = canvas.text(margin + 22, height-margin-14, hillSym);
+        labelH.attr({fill:hillFill, "font-size":labelSize, "font-weight":"bold"});	
+
+        var labelS = canvas.text(margin + tri_side - 22, height-margin-14, safeSym);
+        labelS.attr({fill:safeFill, "font-size":labelSize, "font-weight":"bold"});	
 
         var barLeft = margin*2 + tri_side; 
         var barWidth = width - margin*3 - tri_side;
         var barHeight = (height-margin*4)/3;
 
         var timeBar = canvas.rect(barLeft, margin, barWidth*.333, barHeight);
-        timeBar.attr({fill:"red", stroke:"none"});
+        timeBar.attr({fill:timeFill, stroke:"none"});
 
         var topoBar = canvas.rect(barLeft, margin*2+barHeight, barWidth*.333, barHeight);
-        topoBar.attr({fill:"green", stroke:"none"});
+        topoBar.attr({fill:hillFill, stroke:"none"});
 
         var safetyBar = canvas.rect(barLeft, margin*3 + barHeight*2, barWidth*.333, barHeight);
-        safetyBar.attr({fill:"blue", stroke:"none"});
+        safetyBar.attr({fill:safeFill, stroke:"none"});
 
-        var timeLabel = canvas.text(barLeft + barWidth/2, margin+barHeight/2, "Time: 33%");
+        var timeLabel = canvas.text(barLeft + barWidth/2, margin+barHeight/2, timeName + ": 33%");
         timeLabel.attr({"font-size":"16px", opacity:0});
 
-        var topoLabel = canvas.text(barLeft + barWidth/2, margin*2+barHeight+barHeight/2, "Hills: 33%");
+        var topoLabel = canvas.text(barLeft + barWidth/2, margin*2+barHeight+barHeight/2,  hillName + ": 33%");
         topoLabel.attr({"font-size":"16px", opacity:0});
 
-        var safetyLabel = canvas.text(barLeft + barWidth/2, margin*3+barHeight*2+barHeight/2, "Safety: 33%");
+        var safetyLabel = canvas.text(barLeft + barWidth/2, margin*3+barHeight*2+barHeight/2, safeName + ": 33%");
         safetyLabel.attr({"font-size":"16px", opacity:0});
 
         var cursor = canvas.circle(margin+tri_side/2, height-margin-(1/Math.sqrt(3))*(tri_side/2), this.cursor_size/2).attr({
-            fill: "rgb(0,0,128)",
+            fill: "rgb(0,0,0)",
             stroke: "none"
         });
 
@@ -135,9 +147,9 @@ otp.planner.BikeTriangle = {
             timeBar.attr({width: barWidth*time});
             topoBar.attr({width: barWidth*topo});
             safetyBar.attr({width: barWidth*safety});
-            timeLabel.attr("text", "Time: "+Math.round(time*100)+"%");
-            topoLabel.attr("text", "Hills: "+Math.round(topo*100)+"%");
-            safetyLabel.attr("text", "Safety: "+Math.round(safety*100)+"%");
+            timeLabel.attr("text",   timeName + ": "+Math.round(time*100)+"%");
+            topoLabel.attr("text",   hillName + ": " +Math.round(topo*100)+"%");
+            safetyLabel.attr("text", safeName + ": " +Math.round(safety*100)+"%");
     
             this.attr({cx: nx, cy: ny});
         },

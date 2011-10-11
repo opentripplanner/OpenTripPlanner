@@ -75,11 +75,11 @@ otp.planner.Templates = {
                 this.locale.labels.trip_details 
                 + ' {fromPlace} ' + this.locale.directions.to + ' {toPlace}'
                 + ' {arriveBy} {time} ' + this.locale.directions.on + ' {date}, '
-                + this.locale.directions.via + ' {[otp.util.Modes.translate(values["mode"])]}.'
+                + this.locale.directions.via + ' {[otp.util.Modes.translate(values["mode"])]}, '
                 + ' {opt}'
                 + '<tpl if="opt == \'TRIANGLE\'"> (tf={triangleTimeFactor}, sf={triangleSlopeFactor}, hf={triangleSafetyFactor})</tpl>'
-                + ','
-                + this.locale.labels.with_a_walk + ' {maxWalkDistance}m <br/>' 
+                + ', '
+                + this.locale.labels.with_a_walk + ' {maxWalkDistance}m ' 
             ).compile();
 
 

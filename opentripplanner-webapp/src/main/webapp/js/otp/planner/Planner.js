@@ -192,29 +192,24 @@ otp.planner.Planner = {
     },
 
     /** */
-    getTripInfo : function(mapURL, txtURL) {
+    getTripInfo : function(mapURL) {
         var retVal = {
             url : "",
             txt : "",
-            txtUrl : "",
             valid : false
         };
         if (mapURL == null) {
             mapURL = "http://plan.opentripplanner.org";
         }
 
-        if (txtURL == null) {
-            txtURL = "http://text.opentripplanner.org";
-        }
-
         var info   = this.getForms().getFormData(mapURL);
         retVal.txt = this.templates.tripFeedbackDetails.applyTemplate(info);
         retVal.url = this.templates.tripPrintTemplate.applyTemplate(info);
-        info.url   = txtURL;
-        retVal.txtUrl = this.templates.txtPlannerURL.applyTemplate(info);
         retVal.valid  = (
-                ((info.from != null && info.from.length > 0) || (info.fromPlace != null && info.fromPlace.length > 0)) 
-                && ((info.to != null && info.to.length > 0) || (info.toPlace != null && info.toPlace.length > 0)));
+                info.fromPlace != "0.0,0.0" && info.toPlace != "0.0,0.0"
+                && ((info.from != null && info.from.length > 0) || (info.fromPlace != null && info.fromPlace.length > 0)) 
+                && ((info.to   != null && info.to.length > 0)   || (info.toPlace   != null && info.toPlace.length   > 0))
+        );
 
         return retVal;
     },
