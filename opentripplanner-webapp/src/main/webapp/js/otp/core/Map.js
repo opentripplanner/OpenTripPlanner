@@ -148,6 +148,7 @@ otp.core.MapStatic = {
                     }
             });
 
+            // TODO: rethink this ... very hacky to do this, very fragile code
             var zoomOnFirstLoad = function() {
                 layerLoaded = true;
                 if (extentRetrieved) {
@@ -164,12 +165,19 @@ otp.core.MapStatic = {
             self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
         }
     },
-
+    
     /** */
     zoomToDefaultExtent : function() {
-        if (this.defaultExtent && this.defaultExtent !== 'automatic') {
-            this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+        try
+        {
+            if(this.defaultExtent && this.defaultExtent !== 'automatic')
+            {
+                this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+                this.map.zoomTo(this.CLOSE_ZOOM - 7)
+            }
         }
+        catch(e)
+        {}
     },
 
 
@@ -250,10 +258,7 @@ otp.core.MapStatic = {
     /** */
     clear : function()
     {
-        if (this.defaultExtent && this.defaultExtent !== 'automatic') {
-            this.updateSize();
-            otp.core.MapStatic.THIS.map.zoomToDefaultExtent();
-        }
+        this.zoomToDefaultExtent();
         this.cleanMap();
     },
 
