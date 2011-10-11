@@ -592,8 +592,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             String cycleway = way.getTag("cycleway");
             String cyclewayLeft = way.getTag("cycleway:left");
             String cyclewayRight = way.getTag("cycleway:right");
-            if (cycleway.startsWith("opposite") || cyclewayLeft.startsWith("opposite") ||
-                    cyclewayRight.startsWith("opposite")) {
+            if ((cycleway != null && cycleway.startsWith("opposite"))
+                    || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
+                    || (cyclewayRight != null && cyclewayRight.startsWith("opposite"))) {
 
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
