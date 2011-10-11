@@ -436,7 +436,7 @@ otp.core.MapStatic = {
         }
 
         var html = '<iframe width="95%" height="90%" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" '
-                 + ' src="http://maps.google.com/maps?output=svembed&layer=c&cbp=0,0,0,0,&cbll=' + y + ',' + x + '&ll=' + y + ',' + x + '&z=17"></iframe>';
+                 + ' src="http://maps.google.com/maps?ie=UTF8&t=m&vpsrc=0&layer=c&source=embed&output=svembed&cbp=13,,,,&cbll=' + y + ',' + x + '&ll=' + y + ',' + x + '&z=18"></iframe>';
 
         self.streetviewPopup.setContentHTML(html);
         self.streetviewPopup.lonlat = ll;
