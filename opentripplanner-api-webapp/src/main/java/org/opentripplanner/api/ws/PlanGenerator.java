@@ -639,7 +639,6 @@ public class PlanGenerator {
                     // intersection
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
-                    System.out.println("should we generate a continue instruction for " + edge);
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
@@ -675,21 +674,16 @@ public class PlanGenerator {
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (DirectEdge alternative : pathService.getOutgoingEdges(backVertex)) {
-                            System.out.println("te alternative is " + alternative);
                             alternative = pathService.getOutgoingEdges(alternative.getToVertex())
                                     .get(0);
-                            System.out.println("te alternative becomes " + alternative);
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
                                 //are usually caused by street splits
-                                System.out.println("te alternative has same name as  " + streetName);
                                 continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
                                     .getGeometry());
-                            System.out.println("angles are " + lastAngle + " vs this " + thisAngle + " vs alt " + altAngle);
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
-                            System.out.println("differences " + angleDiff + " vs " + altAngleDiff);
                             if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
                                 break;
