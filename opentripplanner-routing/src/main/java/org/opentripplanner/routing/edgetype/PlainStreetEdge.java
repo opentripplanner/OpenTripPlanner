@@ -221,7 +221,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                  * tuned these values to look good on a particular trip and I'll hope that they work
                  * everywhere. 
                  */
-                double safety = bicycleSafetyEffectiveLength * 0.2 + quick * 0.8;
+                double safety = bicycleSafetyEffectiveLength;// * 0.2 + quick * 0.8;
                 double slope = slopeWorkCost;
                 weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
                 weight /= options.speed;
