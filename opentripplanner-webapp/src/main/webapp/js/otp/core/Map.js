@@ -495,7 +495,11 @@ otp.core.MapStatic = {
             var layer = this.map.layers[i];
             if (!layer.isBaseLayer && layer.OTP_LAYER)
             {
-                if (typeof layer.removeFeatures === 'function') {
+                if (typeof layer.removeFeatures === 'function'
+                 && layer.features
+                 && layer.features.length > 0
+                ) 
+                {
                     layer.removeFeatures(layer.features);
                 }
             }

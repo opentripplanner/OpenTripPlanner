@@ -330,6 +330,20 @@ otp.planner.Utils = {
         });
     },
 
+    /** return either a 3 mile or 5 km value that works with the maxWalk form field values */
+    bikeMinimum : function() 
+    {
+        var retVal = 5000; // isEnglish ? 4828 : 5000; 
+        try
+        {
+            if(otp.config.metricsSystem == 'english')
+                retVal = 4828;
+        }
+        catch(e)
+        {}
+        return retVal;
+    },
+
     /**
      * Takes a distance in meters and returns a pretty string representation, including the units. For example:
      * 
