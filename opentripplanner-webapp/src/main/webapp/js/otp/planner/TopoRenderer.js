@@ -215,9 +215,12 @@ otp.planner.TopoRenderer = {
                 var prevElevY = (li == 0) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li-1].lastElev-this.minElev)/(this.maxElev-this.minElev);
                 var nextElevY = (li >= this.legInfoArr.length-1) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li+1].firstElev-this.minElev)/(this.maxElev-this.minElev);
                 
+                if(isNaN(prevElevY) || prevElevY < 0 || prevElevY >= terrainHeight) prevElevY = terrainHeight/2;
+                if(isNaN(nextElevY) || nextElevY < 0 || nextElevY >= terrainHeight) nextElevY = terrainHeight/2;
+                                
                 var midX = currentX + this.nonBikeLegWidth/2;
                 var midY = (prevElevY + nextElevY)/2;
-                
+                                
                 var curve = [["M",currentX+4, prevElevY],["C", midX, prevElevY, midX, prevElevY, midX, midY],["C", midX, nextElevY, midX, nextElevY, currentX+this.nonBikeLegWidth-16, nextElevY]];
                 terrainCanvas.path(curve).attr({
                     stroke : 'black', 
@@ -261,7 +264,6 @@ otp.planner.TopoRenderer = {
                 var terrainPoly = null;
 
                 if (step.elevation != undefined) {
-                    //console.log("elev="+step.elevation);
                     var elevArr = step.elevation.split(",");
                     if(elevArr.length > 2) {
                         var stepLenM = elevArr[elevArr.length-2]; 
