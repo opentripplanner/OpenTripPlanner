@@ -87,8 +87,9 @@ otp.planner.FormsOptionsManagerStatic = {
         // and we want to reset the optimize option too
         // because it's possible that it's no longer valid
         this.optimize.reset();
-        if(this.maxWalk)    this.showComboBox(this.maxWalk);
-        if(this.wheelchair) this.showComboBox(this.wheelchair);
+        if(this.maxWalk)      this.showComboBox(this.maxWalk);
+        if(this.wheelchair)   this.showComboBox(this.wheelchair);
+        if(this.lastDistance) otp.planner.StaticForms.setMaxDistance(this.lastDistance);
 
         if(this.isTransitOrBus(mode)) {
             if (this.isBike(mode)) {
@@ -105,6 +106,15 @@ otp.planner.FormsOptionsManagerStatic = {
         }
         if (this.isBike(mode)) {
             showBikeOptions = true;
+
+            // save off old walk distance value -- used to reset the system (see above)
+            var threeMiles = 4828;
+            var oldVal = otp.planner.StaticForms.getMaxDistance();
+            if(this.lastDistance != threeMiles && oldVal)
+                this.lastDistance = oldVal;
+
+            // set bike distance to 3 miles
+            otp.planner.StaticForms.setMaxDistance(threeMiles);
         }
 
         // we don't display the combo box at all in this case

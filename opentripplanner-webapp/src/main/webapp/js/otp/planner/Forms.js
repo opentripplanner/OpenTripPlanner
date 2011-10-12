@@ -616,7 +616,6 @@ otp.planner.StaticForms = {
                 }
             }
 
-
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
             if(params.wheelchair && this.showWheelchairForm)
@@ -655,6 +654,32 @@ otp.planner.StaticForms = {
         }
     },
 
+    /** */
+    getMaxDistance : function()
+    {
+        var retVal = null;
+        try
+        {
+            var self = otp.planner.StaticForms.THIS; 
+            retVal = self.m_maxWalkDistanceForm.getValue();
+        }
+        catch(e)
+        {}
+        return retVal;
+    },
+
+
+    /** */
+    setMaxDistance : function(val)
+    {
+        try
+        {
+            var self = otp.planner.StaticForms.THIS; 
+            retVal = self.m_maxWalkDistanceForm.setValue(val);
+        }
+        catch(e)
+        {}
+    },
 
     /**
      * returns current state (values) of the trip planner forms
