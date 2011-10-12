@@ -251,7 +251,7 @@ public class ElevationUtils {
                     Coordinate interpolatedStartCoordinate = new Coordinate(0, lastCoord.y + p * rise);
                     coordList.add(0, interpolatedStartCoordinate);
                 }
-            } else if (coord.x > end && !finished && started) {
+            } else if (coord.x > end && !finished && started && lastCoord != null) {
                 finished = true;
                 // interpolate end coordinate
                 double run = coord.x - lastCoord.x;
