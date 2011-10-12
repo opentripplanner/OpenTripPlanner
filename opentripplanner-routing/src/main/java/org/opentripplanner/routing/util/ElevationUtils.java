@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.slf4j.Logger;
@@ -208,6 +211,64 @@ public class ElevationUtils {
         }
 
         return temp;
+    }
+
+    public static PackedCoordinateSequence getPartialElevationProfile(
+            PackedCoordinateSequence elevationProfile, double start, double end) {
+        if (elevationProfile == null) {
+            return null;
+        }
+        List<Coordinate> coordList = new LinkedList<Coordinate>();
+
+        if (start < 0)
+            start = 0;
+
+        Coordinate[] coordinateArray = elevationProfile.toCoordinateArray();
+        double length = coordinateArray[coordinateArray.length - 1].x;
+        if (end > length)
+            end = length;
+
+        boolean started = false;
+        boolean finished = false;
+        Coordinate lastCoord = null;
+        for (Coordinate coord : coordinateArray) {
+            if (coord.x >= start && coord.x <= end) {
+                coordList.add(new Coordinate(coord.x - start, coord.y));
+                if (!started) {
+                    started = true;
+                    if (lastCoord == null) {
+                       //no need to interpolate as this is the first coordinate
+                        continue;
+                    }
+                    // interpolate start coordinate 
+                    double run = coord.x - lastCoord.x;
+                    if (run < 1) {
+                        //tiny runs are likely to lead to errors, so we'll skip them
+                        continue;
+                    }
+                    double p = (coord.x - start) / run;
+                    double rise = coord.y - lastCoord.y;
+                    Coordinate interpolatedStartCoordinate = new Coordinate(0, lastCoord.y + p * rise);
+                    coordList.add(0, interpolatedStartCoordinate);
+                }
+            } else if (coord.x > end && !finished && started) {
+                finished = true;
+                // interpolate end coordinate
+                double run = coord.x - lastCoord.x;
+                if (run < 1) {
+                    //tiny runs are likely to lead to errors, so we'll skip them
+                    continue;
+                }
+                double p = (end - lastCoord.x) / run;
+                double rise = coord.y - lastCoord.y;
+                Coordinate interpolatedEndCoordinate = new Coordinate(end, lastCoord.y + p * rise);
+                coordList.add(interpolatedEndCoordinate);
+            }
+            lastCoord = coord;
+        }
+
+        Coordinate coordArr[] = new Coordinate[coordList.size()];
+        return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
 
 }

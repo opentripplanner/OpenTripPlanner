@@ -354,24 +354,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        if (elevationProfile == null) {
-            return null;
-        }
-        List<Coordinate> coordList = new LinkedList<Coordinate>();
-
-        if (start < 0)
-            start = 0;
-        if (end > length)
-            end = length;
-
-        for (Coordinate coord : elevationProfile.toCoordinateArray()) {
-            if (coord.x >= start && coord.x <= end) {
-                coordList.add(new Coordinate(coord.x - start, coord.y));
-            }
-        }
-
-        Coordinate coordArr[] = new Coordinate[coordList.size()];
-        return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
+        return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
     }
 
     public void setSlopeOverride(boolean slopeOverride) {
