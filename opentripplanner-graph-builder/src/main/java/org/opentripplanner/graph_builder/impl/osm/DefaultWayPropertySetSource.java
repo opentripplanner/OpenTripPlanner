@@ -270,11 +270,13 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=footway;CCGIS:bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
 
-        /* sidewalk - footway=sidewalk and path=sidewalk */
+        /* sidewalk and crosswalk */
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=yes",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.5, 2.5);
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
+        setProperties(props, "highway=footway;footway=crossing",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.0, 2.0);
                 
         /* Portland area specific tags */
         setProperties(props, "footway=sidewalk;highway=footway;RLIS:bicycle=designated",
