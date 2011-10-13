@@ -51,11 +51,14 @@ otp.planner.TopoRenderer = {
     minElev :           null,
     maxElev :           null,
     totalDistance :     null,
-    
+    THIS          :     null,
+
     /** */
     initialize : function(config)
     {
         otp.configure(this, config);
+        otp.planner.TopoRendererStatic.THIS = this;
+        this.THIS = this;
     },
     
     processItinerary : function(itin) {
@@ -522,7 +525,7 @@ otp.planner.TopoRenderer = {
             this.previewDiv.style.top = upperHeight + 'px';
             this.previewDiv.style.left = '0px';
             this.previewDiv.style.height = lowerHeight + 'px';
-            this.previewDiv.style.width = width + 'px';        
+            this.previewDiv.style.width = width + 'px';
         }
 
         this.mainContainerDiv = document.createElement('div');
@@ -531,7 +534,6 @@ otp.planner.TopoRenderer = {
         this.terrainContainerDiv.appendChild(this.terrainDiv);
         if(showPreview) this.mainContainerDiv.appendChild(this.previewDiv);
 
-        
         // Remove all existing elements from the topo panel and add the new div
         var panelEl = this.panel.getEl();
         while (panelEl.first()) { 
@@ -539,12 +541,20 @@ otp.planner.TopoRenderer = {
         }
         panelEl.appendChild(this.mainContainerDiv);
     },
-    
-    removeFromPanel : function() {
-        try {
-    	    this.panel.getEl().dom.removeChild(this.mainContainerDiv);
-        } catch(e) { }
+
+
+    /** */
+    removeFromPanel : function()
+    {
+        try
+        {
+            var self = otp.planner.TopoRendererStatic.THIS;
+            self.panel.getEl().dom.removeChild(self.mainContainerDiv);
+        }
+        catch(e)
+        { }
     },
+
 
     pointAlongLineString : function(ls, d) {
         var points = ls.components;
