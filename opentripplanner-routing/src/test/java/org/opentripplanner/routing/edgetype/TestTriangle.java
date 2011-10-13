@@ -92,8 +92,7 @@ public class TestTriangle extends TestCase {
         double safetyWeight = result.getWeight();
         double slopeSafety = costs.slopeSafetyCost;
         double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / options.speed;
-        expectedSafetyWeight = expectedSafetyWeight * 0.2 + timeWeight * 0.8;
-        assertEquals(expectedSafetyWeight, safetyWeight);
+        assertTrue(expectedSafetyWeight - safetyWeight < 0.00001);
 
         final double ONE_THIRD = 1/3.0;
         options.setTriangleSafetyFactor(ONE_THIRD);
