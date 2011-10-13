@@ -443,6 +443,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=track", "track");
 
         createNames(props, "highway=footway;footway=sidewalk", "sidewalk");
+        createNames(props, "highway=path;path=sidewalk", "sidewalk");
 
         createNames(props, "highway=steps", "steps");
 
