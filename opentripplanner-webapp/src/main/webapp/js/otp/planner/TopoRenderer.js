@@ -23,7 +23,7 @@ otp.namespace("otp.planner");
   * TopoRenderer is created by Planner.
   */
 
-otp.planner.TopoRenderer = {
+otp.planner.TopoRendererStatic = {
     
     map :       null,
     panel :     null,
@@ -575,4 +575,4 @@ otp.planner.TopoRenderer = {
     CLASS_NAME: "otp.planner.TopoRenderer"
 };
 
-otp.planner.TopoRenderer = new otp.Class(otp.planner.TopoRenderer);
+otp.planner.TopoRenderer = new otp.Class(otp.planner.TopoRendererStatic);
