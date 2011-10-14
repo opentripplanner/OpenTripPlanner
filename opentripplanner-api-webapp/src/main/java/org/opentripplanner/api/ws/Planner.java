@@ -47,6 +47,7 @@ public class Planner {
     private static final Logger LOGGER = Logger.getLogger(Planner.class.getCanonicalName());
 
     private static final int MAX_ITINERARIES = 3;
+    private static final int MAX_TRANSFERS = 4;
 
     private PathServiceFactory pathServiceFactory;
 
@@ -151,7 +152,8 @@ public class Planner {
             @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
             @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes,
-            @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty)
+            @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty,
+            @DefaultValue("2") @QueryParam(RequestInf.MAX_TRANSFERS) Integer maxTransfers)
             throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -237,6 +239,12 @@ public class Planner {
         request.setModes(modes);
         request.setMinTransferTime(minTransferTime);
 
+        if (maxTransfers != null) {
+            if (maxTransfers > MAX_TRANSFERS) {
+                maxTransfers = MAX_TRANSFERS;
+            }
+            request.setMaxTransfers(maxTransfers);
+        }
         /* use request to generate trip */
         Response response = new Response(request);
         try {

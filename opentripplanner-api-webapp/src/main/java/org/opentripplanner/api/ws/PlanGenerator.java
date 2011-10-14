@@ -516,6 +516,9 @@ public class PlanGenerator {
         if (request.getMinTransferTime() != null) {
             options.minTransferTime = request.getMinTransferTime();
         }
+        if (request.getMaxTransfers() != null) {
+            options.maxTransfers = request.getMaxTransfers();
+        }
         if (request.getPreferredRoutes() != null) {
             for (String element : request.getPreferredRoutes()) {
                 String[] routeSpec = element.split("_", 2);

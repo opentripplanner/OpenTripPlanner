@@ -165,7 +165,7 @@ public class TestRequest extends TestCase {
                 new TraverseModeSet("WALK"),
                 1,
                 null, false,
-                "", "", "", 0);
+                "", "", "", 0, 2);
         
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
@@ -191,7 +191,7 @@ public class TestRequest extends TestCase {
 		Response response = planner.getItineraries(v1.getLabel(),
 				v2.getLabel(), null, "2009-01-01", "11:11:11", null, false,
 				false, 840.0, 1.33, null, null, null, OptimizeType.QUICK,
-				new TraverseModeSet("WALK"), 1, null, false, "", "", "", 0);
+				new TraverseModeSet("WALK"), 1, null, false, "", "", "", 0, 2);
 
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
