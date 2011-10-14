@@ -19,7 +19,24 @@
         <property name="firstPathTimeout" value="10.0" />
         <property name="multiPathTimeout" value="0.6" />
 	</bean>
-
+ 
+	<!-- Replacement pathService for testing multi-objective search -->
+	<!--
+	<bean id="pathService" class="org.opentripplanner.routing.impl.MultiObjectivePathServiceImpl">
+		<property name="remainingWeightHeuristicFactory" ref="heuristicFactory" />
+        <property name="timeouts">
+        	<list>
+    	    	<value> 2.0 </value>
+    	    	<value> 1.0 </value>
+    	    	<value> 0.5 </value>
+    	    	<value> 0.4 </value>
+    	    	<value> 0.3 </value>
+	        </list>
+       	</property>
+        <property name="maxPaths" value="5" />
+	</bean>
+	-->
+ 
 	<bean id="heuristicFactory" 
 	      class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl">
 		<!-- <constructor-arg ref="graphService" />  -->
