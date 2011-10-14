@@ -117,7 +117,7 @@ otp.core.UI = {
                     style: {
                       overflow: 'auto'      //otherwise IE won't scroll the elevation plot
                     },
-                    height:  140,
+                    height:  180,
                     border:  false,
                     split:   true,
                     useSplitTips:  true,

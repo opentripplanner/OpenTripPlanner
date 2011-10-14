@@ -308,11 +308,23 @@ otp.planner.TripTab = {
             }
         }
         
-        if(hasBikeLeg){
-            this.ui.innerSouth.getEl().setHeight(180);
-            this.ui.innerSouth.show();
-            this.ui.viewport.doLayout();
-            this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+        if(hasBikeLeg)
+        {
+            try
+            {
+                this.ui.innerSouth.getEl().setHeight(180);
+                this.ui.innerSouth.show();
+                this.ui.viewport.doLayout();
+
+                this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
+            }
+            catch(e)
+            {
+                this.ui.innerSouth.hide();
+                this.ui.viewport.doLayout();
+
+                console.log("EXCEPTION in topoRenderer.draw(): " + e);
+            }
         }
 
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
