@@ -141,7 +141,7 @@ public class ContractionPathServiceImpl implements PathService {
         if (fromVertex == null) {
             notFound.add("from");
         }
-        Vertex toVertex = getVertexForPlace(toPlace, options);
+        Vertex toVertex = getVertexForPlace(toPlace, options, fromVertex);
         if (toVertex == null) {
             notFound.add("to");
         }
@@ -360,6 +360,10 @@ public class ContractionPathServiceImpl implements PathService {
     }
 
     private Vertex getVertexForPlace(String place, TraverseOptions options) {
+        return getVertexForPlace(place, options, null);
+    }
+
+    private Vertex getVertexForPlace(String place, TraverseOptions options, Vertex other) {
 
         Matcher matcher = _latLonPattern.matcher(place);
 
@@ -367,7 +371,11 @@ public class ContractionPathServiceImpl implements PathService {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(location, options);
+            if (other instanceof StreetLocation) {
+                return _indexService.getClosestVertex(location, options, ((StreetLocation) other).getExtra());
+            } else {
+                return _indexService.getClosestVertex(location, options);
+            }
         }
 
         return _graphService.getContractionHierarchySet().getVertex(place);

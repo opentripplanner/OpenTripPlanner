@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphVertex;
@@ -36,6 +37,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,6 +181,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
      * splitting nearby edges (non-permanently).
      */
     public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options) {
+        return getClosestVertex(coordinate, options, null);
+    }
+
+    public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options, List<DirectEdge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
@@ -216,7 +222,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        Collection<StreetEdge> edges = getClosestEdges(coordinate, options);
+        Collection<StreetEdge> edges = getClosestEdges(coordinate, options, extraEdges);
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (edges != null) {
             StreetEdge bestStreet = edges.iterator().next();
@@ -259,8 +265,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return intersectionTree.query(envelope);
     }
 
-    @SuppressWarnings("unchecked")
     public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options) {
+        return getClosestEdges(coordinate, options, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<DirectEdge> extraEdges) {
+        ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
+        if (extraEdges != null) {
+            for (DirectEdge e : extraEdges) {
+                if (e instanceof StreetEdge) {
+                    extraStreets.add((StreetEdge) e);
+                }
+            }
+        }
         Envelope envelope = new Envelope(coordinate);
         int i = 0;
         double envelopeGrowthRate = 0.0002;
@@ -290,6 +308,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             bestDistance = Double.MAX_VALUE;
             StreetEdge bestEdge = null;
             List<StreetEdge> nearby = edgeTree.query(envelope);
+            if (extraEdges != null && nearby != null) {
+                nearby = new JoinedList<StreetEdge>(nearby, extraStreets);
+            }
             if (nearby != null) {
                 for (StreetEdge e : nearby) {
                     if (e == null || e instanceof OutEdge)
