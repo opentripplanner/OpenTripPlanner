@@ -109,6 +109,7 @@ public class Request implements RequestInf {
     private double triangleSafetyFactor;
     private double triangleSlopeFactor;
     private double triangleTimeFactor;
+    private Integer maxTransfers;
     
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
@@ -456,6 +457,16 @@ public class Request implements RequestInf {
 
     public double getTriangleTimeFactor() {
         return triangleTimeFactor;
+    }
+
+    @Override
+    public void setMaxTransfers(Integer maxTransfers) {
+        this.maxTransfers = maxTransfers;
+    }
+
+    @Override
+    public Integer getMaxTransfers() {
+        return maxTransfers;
     }
 
 }

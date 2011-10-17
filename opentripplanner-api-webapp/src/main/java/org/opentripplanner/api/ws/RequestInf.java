@@ -160,5 +160,9 @@ public interface RequestInf {
 	 *         transit legs
 	 */
 	public boolean getShowIntermediateStops();
+	
+	public void setMaxTransfers(Integer maxTransfers);
+            	    
+	public Integer getMaxTransfers();
 
 }
