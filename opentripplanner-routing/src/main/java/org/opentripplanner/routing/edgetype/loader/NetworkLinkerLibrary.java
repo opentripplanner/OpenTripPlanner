@@ -361,7 +361,7 @@ public class NetworkLinkerLibrary {
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
                 TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex, turnEdge.getPermission());
-                newTurn.setRestricted(turnEdge.isRestricted());
+                newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
                 newTurn.setTurnCost(turnEdge.turnCost);
                 graph.addEdge(newTurn);
             } else {
@@ -382,7 +382,7 @@ public class NetworkLinkerLibrary {
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
                 TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex, turnEdge.getPermission());
-                newTurn.setRestricted(turnEdge.isRestricted());
+                newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
                 newTurn.setTurnCost(turnEdge.turnCost);
                 graph.addEdge(newTurn);
             } else {

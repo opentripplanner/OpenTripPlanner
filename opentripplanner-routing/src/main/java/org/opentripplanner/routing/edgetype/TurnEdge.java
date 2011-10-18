@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -53,10 +54,10 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
 	private List<Patch> patches;
 
-	/**
-	 * If true, this turn is prohibited to vehicles (but permitted for walking). 
-	 */
-	private boolean restricted;
+    /**
+     * If not null, this turn is prohibited to the modes in the set.
+     */
+    private EnumSet<TraverseMode> restrictedModes;
 
     public TurnEdge(StreetVertex fromv, StreetVertex tov) {
         this.fromv = fromv;
@@ -116,8 +117,16 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
         return doTraverse(s0, s0.getOptions());
     }
 
+    private boolean turnRestricted(TraverseOptions options) {
+        if (restrictedModes == null)
+            return false;
+        else {
+            return restrictedModes.contains(options.getModes().getNonTransitMode());
+        }
+    }
+    
     private State doTraverse(State s0, TraverseOptions options) {
-    	if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
+    	if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
     		return null;
     	}
         if (!fromv.canTraverse(options)) {
@@ -192,7 +201,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     @Override
     public boolean canTraverse(TraverseOptions options) {
-    	if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
+    	if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
     		return false;
     	}
         return fromv.canTraverse(options);
@@ -258,9 +267,13 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 		return fromv.getNotes();
 	}
 
-	public void setRestricted(boolean restricted) {
-		this.restricted = restricted;
-	}
+    public void setRestrictedModes(EnumSet<TraverseMode> modes) {
+        this.restrictedModes = modes;
+    }
+
+    public EnumSet<TraverseMode> getRestrictedModes() {
+        return restrictedModes;
+    }
 
 	@Override
 	public boolean hasBogusName() {
@@ -272,9 +285,6 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 		return fromv.isNoThruTraffic();
 	}
 
-    public boolean isRestricted() {
-        return restricted;
-    }
 
     @Override
     public double weightLowerBound(TraverseOptions options) {

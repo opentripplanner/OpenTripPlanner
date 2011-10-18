@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.EnumSet;
+
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -29,7 +31,7 @@ public class TinyTurnEdge extends FreeEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
-    private boolean restricted = false;
+    private EnumSet<TraverseMode> restrictedModes;
 
     private int turnCost = 0;
     
@@ -70,8 +72,16 @@ public class TinyTurnEdge extends FreeEdge {
         return doTraverse(s0, options);
     }
     
+    private boolean turnRestricted(TraverseOptions options) {
+        if (restrictedModes == null)
+            return false;
+        else {
+            return restrictedModes.contains(options.getModes().getNonTransitMode());
+        }
+    }
+
     public State doTraverse(State s0, TraverseOptions options) {
-        if (restricted && !options.getModes().contains(TraverseMode.WALK)) {
+        if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
         double angleLength = turnCost / 20.0;
@@ -96,11 +106,16 @@ public class TinyTurnEdge extends FreeEdge {
         return "TinyTurnEdge(" + fromv + " -> " + tov + ")";
     }
 
-    public void setRestricted(boolean restricted) {
-        this.restricted = restricted;
-    }
-
     public void setTurnCost(int turnCost) {
         this.turnCost = turnCost;
     }
+
+    public void setRestrictedModes(EnumSet<TraverseMode> modes) {
+        this.restrictedModes = modes;
+    }
+
+    public EnumSet<TraverseMode> getRestrictedModes() {
+        return restrictedModes;
+    }
+
 }

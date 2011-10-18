@@ -76,9 +76,9 @@ public class StreetUtils {
                     TurnEdge turn = new TurnEdge(v1, v2);
                     if (restriction != null) {
                     	if (restriction.type == TurnRestrictionType.NO_TURN && restriction.to == e2) {
-                    		turn.setRestricted(true);
+                    	    turn.setRestrictedModes(restriction.modes);
                     	} else if (restriction.type == TurnRestrictionType.ONLY_TURN && restriction.to != e2) {
-                    		turn.setRestricted(true);
+                            turn.setRestrictedModes(restriction.modes);
                     	}
                     }
                     

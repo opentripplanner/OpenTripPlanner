@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandle
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -411,6 +413,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * Handle turn restrictions
          * @param relation
          */
+	// shared mode set for the most common case, where all vehicles are restricted
+	private final EnumSet<TraverseMode> ALL_VEHICLES = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR); 
         private void processRestriction(OSMRelation relation) {
             long from = -1, to = -1, via = -1;
             for (OSMRelationMember member : relation.getMembers()) {
@@ -426,6 +430,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (from == -1 || to == -1 || via == -1) {
                 _log.debug("Bad restriction " + relation.getId());
                 return;
+            }
+
+            EnumSet<TraverseMode> modes = ALL_VEHICLES;
+            String exceptModes = relation.getTag("except");
+            if (exceptModes != null) {
+                modes = EnumSet.copyOf(modes);
+                for (String m : exceptModes.split(";")) {
+                    if (m.equals("motorcar")) {
+                        modes.remove(TraverseMode.CAR);
+                    } else if (m.equals("bicycle")) {
+                        modes.remove(TraverseMode.BICYCLE);
+                    }
+                }
+                _log.trace("except={} set={}", exceptModes, modes);
             }
 
             TurnRestrictionTag tag;
@@ -449,6 +467,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             TurnRestriction restriction = new TurnRestriction();
             restriction.type = tag.type;
+            restriction.modes = modes;
             turnRestrictionsByTag.put(tag, restriction);
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
