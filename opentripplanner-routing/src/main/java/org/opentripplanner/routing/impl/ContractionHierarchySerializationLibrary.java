@@ -39,9 +39,9 @@ public class ContractionHierarchySerializationLibrary {
                 _log.error("Failed to create directories for graph bundle at " + graphPath);
             }
 
-        _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
         Graph g = hierarchy.getGraph();
         _log.info("Main graph size: |V|={} |E|={}", g.countVertices(), g.countEdges());
+        _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(graphPath)));
         out.writeObject(hierarchy);
         out.close();
