@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.EnumSet;
+import java.util.Set;
 
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
@@ -31,7 +31,7 @@ public class TinyTurnEdge extends FreeEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
-    private EnumSet<TraverseMode> restrictedModes;
+    private Set<TraverseMode> restrictedModes;
 
     private int turnCost = 0;
     
@@ -110,11 +110,11 @@ public class TinyTurnEdge extends FreeEdge {
         this.turnCost = turnCost;
     }
 
-    public void setRestrictedModes(EnumSet<TraverseMode> modes) {
+    public void setRestrictedModes(Set<TraverseMode> modes) {
         this.restrictedModes = modes;
     }
 
-    public EnumSet<TraverseMode> getRestrictedModes() {
+    public Set<TraverseMode> getRestrictedModes() {
         return restrictedModes;
     }
 

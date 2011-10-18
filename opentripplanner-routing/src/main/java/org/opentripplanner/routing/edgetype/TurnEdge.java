@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -57,7 +56,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     /**
      * If not null, this turn is prohibited to the modes in the set.
      */
-    private EnumSet<TraverseMode> restrictedModes;
+    private Set<TraverseMode> restrictedModes;
 
     public TurnEdge(StreetVertex fromv, StreetVertex tov) {
         this.fromv = fromv;
@@ -267,11 +266,11 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 		return fromv.getNotes();
 	}
 
-    public void setRestrictedModes(EnumSet<TraverseMode> modes) {
+    public void setRestrictedModes(Set<TraverseMode> modes) {
         this.restrictedModes = modes;
     }
 
-    public EnumSet<TraverseMode> getRestrictedModes() {
+    public Set<TraverseMode> getRestrictedModes() {
         return restrictedModes;
     }
 

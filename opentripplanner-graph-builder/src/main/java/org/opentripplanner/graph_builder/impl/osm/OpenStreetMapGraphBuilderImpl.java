@@ -413,9 +413,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * Handle turn restrictions
          * @param relation
          */
-	// shared mode set for the most common case, where all vehicles are restricted
-	private final EnumSet<TraverseMode> ALL_VEHICLES = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR); 
-        private void processRestriction(OSMRelation relation) {
+	private void processRestriction(OSMRelation relation) {
             long from = -1, to = -1, via = -1;
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
@@ -432,10 +430,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
             }
 
-            EnumSet<TraverseMode> modes = ALL_VEHICLES;
+            Set<TraverseMode> modes = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR);
             String exceptModes = relation.getTag("except");
             if (exceptModes != null) {
-                modes = EnumSet.copyOf(modes);
                 for (String m : exceptModes.split(";")) {
                     if (m.equals("motorcar")) {
                         modes.remove(TraverseMode.CAR);
@@ -443,8 +440,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         modes.remove(TraverseMode.BICYCLE);
                     }
                 }
-                _log.trace("except={} set={}", exceptModes, modes);
             }
+            modes = TraverseMode.internSet(modes);
 
             TurnRestrictionTag tag;
             if (relation.isTag("restriction", "no_right_turn")) {
