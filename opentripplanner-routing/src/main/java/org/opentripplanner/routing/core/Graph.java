@@ -22,6 +22,7 @@ import java.util.Map;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.model.GraphBundle;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -44,6 +45,13 @@ public class Graph implements Serializable {
     HashMap<String, GraphVertex> vertices;
 
     private TransferTable transferTable = new TransferTable();
+
+    private GraphBundle bundle;
+
+    public Graph(Graph basedOn) {
+        this();
+        this.bundle = basedOn.getBundle();
+    }
 
     public Graph() {
         this.vertices = new HashMap<String, GraphVertex>();
@@ -263,6 +271,14 @@ public class Graph implements Serializable {
             nEdges += gv.getDegreeOut();
         }
         return nEdges;
+    }
+
+    public GraphBundle getBundle() {
+        return bundle;
+    }
+
+    public void setBundle(GraphBundle bundle) {
+        this.bundle = bundle;
     }
 
 }

@@ -13,9 +13,17 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
+
+import javassist.bytecode.ClassFile;
+import javassist.util.proxy.FactoryHelper;
 
 import javax.annotation.PostConstruct;
 
@@ -53,8 +61,6 @@ public class GraphServiceImpl implements GraphService {
 	
   private GraphBundle _bundle;
 
-  private File _graphPath;
-
   private boolean _createEmptyGraphIfNotFound = false;
 
   private ContractionHierarchySet _contractionHierarchySet;
@@ -65,10 +71,6 @@ public class GraphServiceImpl implements GraphService {
 
   public void setBundle(GraphBundle bundle) {
     _bundle = bundle;
-  }
-
-  public void setGraphPath(File graphPath) {
-    _graphPath = graphPath;
   }
 
   /**
@@ -134,35 +136,42 @@ public class GraphServiceImpl implements GraphService {
 
   private void readGraph() {
 
-    File path = null;
+        File path = null;
+        if (_bundle == null) {
+            throw new RuntimeException("setBundle() mustbe called before readGraph()");
+        }
+        try {
 
-    if (_bundle != null)
-      path = _bundle.getGraphPath();
+            File extraClassPath = _bundle.getExtraClassPath();
+            URL[] url;
 
-    if (_graphPath != null)
-      path = _graphPath;
+            url = new URL[] { new URL("file://" + extraClassPath + "/") };
+            ClassLoader oldLoader = getClass().getClassLoader();
+            URLClassLoader loader = new URLClassLoader(url, oldLoader);
 
-    if (path == null || !path.exists()) {
-      if (!_createEmptyGraphIfNotFound) {
-    	  _log.error("Graph not found. Verify path to stored graph: " + path);
-    	  throw new IllegalStateException("graph path not found: " + path);
-      }
+            path = _bundle.getGraphPath();
 
-      /****
-       * Create an empty graph if not graph is found
-       */
-      Graph graph = new Graph();
-      List<TraverseOptions> modeList = Collections.emptyList();
-      setContractionHierarchySet(new ContractionHierarchySet(graph, modeList));
-      return;
-    }
+            if (path == null || !path.exists()) {
+                if (!_createEmptyGraphIfNotFound) {
+                    _log.error("Graph not found. Verify path to stored graph: " + path);
+                    throw new IllegalStateException("graph path not found: " + path);
+                }
 
-    try {
-      ContractionHierarchySet chs = ContractionHierarchySerializationLibrary.readGraph(path);
-      setContractionHierarchySet(chs);
-    } catch (Exception ex) {
-      throw new IllegalStateException("error loading graph from " + path, ex);
-    }
+                /****
+                 * Create an empty graph if not graph is found
+                 */
+                Graph graph = new Graph();
+                graph.setBundle(_bundle);
+                List<TraverseOptions> modeList = Collections.emptyList();
+                setContractionHierarchySet(new ContractionHierarchySet(graph, modeList));
+                return;
+            }
+
+            ContractionHierarchySet chs = new GraphSerializationLibrary(loader).readGraph(path);
+            setContractionHierarchySet(chs);
+        } catch (Exception ex) {
+            throw new IllegalStateException("error loading graph from " + path, ex);
+        }
   }
 
   private void notifyListeners() {

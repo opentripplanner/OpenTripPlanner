@@ -426,4 +426,8 @@ public class StateEditor {
         child.stateData.options = options;
         traversingBackward = options.isArriveBy();
     }
+
+    public void alightTransit() {
+        child.setWalkAtLastTransit(child.getWalkDistance());
+    }
 }

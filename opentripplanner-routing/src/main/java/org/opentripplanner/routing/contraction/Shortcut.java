@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.contraction;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -42,8 +43,8 @@ public class Shortcut implements DirectEdge, Serializable {
     int time;
     double weight = -1;
     private TraverseMode mode;
-	private double walkDistance;
-   
+    private double walkDistance;
+
     public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight, double walkDistance, TraverseMode mode) {
         this.startVertex = edge1.getFromVertex();
         this.endVertex = edge2.getToVertex();
@@ -146,7 +147,7 @@ public class Shortcut implements DirectEdge, Serializable {
 
 	@Override
 	public List<Patch> getPatches() {
-		return null;
+        return Collections.emptyList();
 	}
 
 	@Override

@@ -33,6 +33,11 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
 
     private static final long serialVersionUID = -4922790993642455605L;
 
+    /** No-arg constructor used only for customization -- do not call this unless
+     * you know what you are doing */
+    public OutEdge() {
+        super(null, null);
+    }
 
     public OutEdge(StreetVertex fromv, Vertex tov) {
         super(fromv, tov);

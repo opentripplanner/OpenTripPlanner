@@ -56,6 +56,7 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
         states = new IdentityHashMap<Vertex, State>(n);
     }
 
+    @Override
     public Collection<State> getAllStates() {
         return states.values();
     }

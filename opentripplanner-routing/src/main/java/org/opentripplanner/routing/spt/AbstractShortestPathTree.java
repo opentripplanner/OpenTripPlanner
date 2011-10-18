@@ -29,23 +29,27 @@ public abstract class AbstractShortestPathTree implements ShortestPathTree {
 
     @Override
     public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
-    	List<State> stateList = getStates(dest);
-    	if (stateList == null)
-    		return Collections.emptyList();
-    	List<GraphPath> ret = new LinkedList<GraphPath>();
+        List<? extends State> stateList = getStates(dest);
+        if (stateList == null)
+            return Collections.emptyList();
+        List<GraphPath> ret = new LinkedList<GraphPath>();
         for (State s : stateList) {
-        	ret.add(new GraphPath(s, optimize));
+            ret.add(new GraphPath(s, optimize));
         }
         return ret;
     }
-    
-	@Override
-	public GraphPath getPath(Vertex dest, boolean optimize) {
-		State s = getState(dest);
-		if (s==null)
-			return null;
-		else
-			return new GraphPath(s, optimize);
-	}
+
+    @Override
+    public GraphPath getPath(Vertex dest, boolean optimize) {
+        State s = getState(dest);
+        if (s == null)
+            return null;
+        else
+            return new GraphPath(s, optimize);
+    }
+
+    @Override
+    public void postVisit(State u) {
+    }
 
 }

@@ -130,8 +130,9 @@ public class PreAlightEdge extends FreeEdge {
             if (toVertex.isLocal()) {
                 s1.setAlightedLocal(true);
             }
+            s1.alightTransit();
             s1.incrementTimeInSeconds(options.minTransferTime / 2);
-	        return s1.makeState();
+            return s1.makeState();
     	}
     }
     

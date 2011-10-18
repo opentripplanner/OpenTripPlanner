@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -59,7 +58,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
-import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
+import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -311,11 +310,9 @@ public class TestContractionHeirarchies extends TestCase {
             vertices.add(v);
         }
 
-        int i = 0;
         int expansion = 1;
         for (GraphVertex gv : graph.getVertices()) {
             Vertex v = gv.vertex;
-            i++;
             final Coordinate c = v.getCoordinate();
             Envelope env = new Envelope(c);
             env.expandBy(50 * expansion);
@@ -505,9 +502,9 @@ public class TestContractionHeirarchies extends TestCase {
         chs.setGraph(graph);
         chs.build();
         
-        ContractionHierarchySerializationLibrary.writeGraph(chs, new File("/tmp/contracted"));
+        GraphSerializationLibrary.writeGraph(chs, new File("/tmp/contracted"));
 
-        chs = ContractionHierarchySerializationLibrary.readGraph(new File("/tmp/contracted"));
+        chs = new GraphSerializationLibrary().readGraph(new File("/tmp/contracted"));
         hierarchy = chs.getHierarchy(options);
         assertNotNull(hierarchy);
         

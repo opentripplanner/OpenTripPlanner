@@ -19,18 +19,29 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ContractionHierarchySerializationLibrary {
+public class GraphSerializationLibrary {
     
-    private static Logger _log = LoggerFactory.getLogger(ContractionHierarchySerializationLibrary.class);
+    private static Logger _log = LoggerFactory.getLogger(GraphSerializationLibrary.class);
+    private ClassLoader classLoader;
+
+    public GraphSerializationLibrary() {
+        classLoader =  getClass().getClassLoader();
+    }
+
+    public GraphSerializationLibrary(ClassLoader loader) {
+        classLoader = loader;
+    }
 
     public static void writeGraph(ContractionHierarchySet hierarchy, File graphPath) throws IOException {
 
@@ -48,8 +59,24 @@ public class ContractionHierarchySerializationLibrary {
         _log.info("Graph written");
     }
 
-    public static ContractionHierarchySet readGraph(File graphPath) throws IOException, ClassNotFoundException {
-        ObjectInputStream in = new ObjectInputStream(new BufferedInputStream (new FileInputStream(graphPath)));
+    class GraphObjectInputStream extends ObjectInputStream {
+
+        public GraphObjectInputStream(InputStream in) throws IOException {
+            super(in);
+        }
+        @Override
+        public Class<?> resolveClass(ObjectStreamClass osc) {
+            try {
+                return Class.forName(osc.getName(), false, classLoader);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        
+    }
+    
+    public ContractionHierarchySet readGraph(File graphPath) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new GraphObjectInputStream(new BufferedInputStream (new FileInputStream(graphPath)));
         _log.info("Reading graph " + graphPath.getAbsolutePath() + " ...");
         try {
         	ContractionHierarchySet hierarchy = (ContractionHierarchySet) in.readObject();

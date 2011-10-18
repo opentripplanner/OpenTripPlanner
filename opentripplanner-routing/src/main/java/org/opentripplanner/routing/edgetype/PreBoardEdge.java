@@ -45,15 +45,16 @@ public class PreBoardEdge extends FreeEdge {
     public State traverse(State s0) {
     	TraverseOptions options = s0.getOptions();
     	if (options.isArriveBy()) {
-    		/* Traverse backward: not much to do */
-	        StateEditor s1 = s0.edit(this);
-	        TransitStop fromVertex = (TransitStop) getFromVertex();
-	        if (fromVertex.isLocal()) {
-	            s1.setAlightedLocal(true);
-	        }
-	        
-	        s1.incrementTimeInSeconds(options.minTransferTime / 2);
-	        return s1.makeState();
+            /* Traverse backward: not much to do */
+            StateEditor s1 = s0.edit(this);
+            TransitStop fromVertex = (TransitStop) getFromVertex();
+            if (fromVertex.isLocal()) {
+                s1.setAlightedLocal(true);
+            }
+
+            s1.incrementTimeInSeconds(options.minTransferTime / 2);
+            s1.alightTransit();
+            return s1.makeState();
     	} else {
     		/* Traverse forward: apply stop(pair)-specific costs */
     		

@@ -32,7 +32,7 @@ public class SerializedGraphFactoryBean extends AbstractFactoryBean<ContractionH
 
     @Override
     protected ContractionHierarchySet createInstance() throws Exception {
-        return ContractionHierarchySerializationLibrary.readGraph(_graphBundle.getGraphPath());
+        return new GraphSerializationLibrary().readGraph(_graphBundle.getGraphPath());
     }
 
 }

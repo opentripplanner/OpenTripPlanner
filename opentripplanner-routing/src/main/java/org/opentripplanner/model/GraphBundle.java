@@ -44,4 +44,8 @@ public final class GraphBundle implements Serializable {
     public File getGraphPath() {
         return new File(_path,"Graph.obj");
     }
+
+    public File getExtraClassPath() {
+        return new File(_path, "extraClasses");
+    }
 }

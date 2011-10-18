@@ -351,7 +351,7 @@ public class ContractionHierarchy implements Serializable {
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
     public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
-        graph = new Graph();
+        graph = new Graph(orig);
         // clone graph
         for (GraphVertex gv : orig.getVertices()) {
             graph.addGraphVertex(new GraphVertex(gv));
@@ -382,8 +382,8 @@ public class ContractionHierarchy implements Serializable {
 
         createThreadPool();
 
-        up = new Graph();
-        down = new Graph();
+        up = new Graph(graph);
+        down = new Graph(graph);
 
         long start = System.currentTimeMillis();
 

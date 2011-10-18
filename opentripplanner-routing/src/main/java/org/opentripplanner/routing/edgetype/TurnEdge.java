@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -51,13 +52,17 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     StreetVertex tov;
 
-	private List<Patch> patches;
+    private List<Patch> patches;
 
     /**
      * If not null, this turn is prohibited to the modes in the set.
      */
     private Set<TraverseMode> restrictedModes;
 
+    /** No-arg constructor used only for customization -- do not call this unless
+     * you know what you are doing */
+    public TurnEdge() {}
+    
     public TurnEdge(StreetVertex fromv, StreetVertex tov) {
         this.fromv = fromv;
         this.tov = tov;
@@ -247,10 +252,13 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 		patches.add(patch);
 	}
 
-	@Override
-	public List<Patch> getPatches() {
-		return patches;
-	}
+    @Override
+    public List<Patch> getPatches() {
+        if (patches == null) {
+            return Collections.emptyList();
+        }
+        return patches;
+    }
 	
 	@Override
 	public void removePatch(Patch patch) {

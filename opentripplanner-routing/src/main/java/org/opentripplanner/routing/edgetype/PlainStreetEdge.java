@@ -15,8 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -78,15 +76,23 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
 
     private Set<Alert> notes;
 
-	private boolean hasBogusName;
+    private boolean hasBogusName;
 
-	private boolean noThruTraffic;
+    private boolean noThruTraffic;
 
-	/**
-	 * This street is a staircase
-	 */
-	private boolean stairs;
-    
+    /**
+     * This street is a staircase
+     */
+    private boolean stairs;
+
+    /**
+     * No-arg constructor used only for customization -- do not call this unless you know
+     * what you are doing
+     */
+    public PlainStreetEdge() {
+        super(null, null);
+    }
+
     public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
             StreetTraversalPermission permission, boolean back) {
         super(v1, v2);

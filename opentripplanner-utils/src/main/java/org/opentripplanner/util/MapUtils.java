@@ -23,7 +23,7 @@ public class MapUtils {
      * An extremely common pattern: add an item to a list in a hash value, creating that list if
      * necessary
      */
-    public static <T, U> void addToMapList(Map<T, List<U>> mapList, T key, U value) {
+    public static final <T, U> void addToMapList(Map<T, List<U>> mapList, T key, U value) {
         List<U> list = mapList.get(key);
         if (list == null) {
             list = new ArrayList<U>();
@@ -35,7 +35,7 @@ public class MapUtils {
     /**
      * Remove an item from a list in a hash, destroying that hash value if the list is empty
      */
-    public static <T, U> void removeFromMapList(Map<T, List<U>> mapList, T key, U value) {
+    public static final <T, U> void removeFromMapList(Map<T, List<U>> mapList, T key, U value) {
         List<U> list = mapList.get(key);
         if (list == null) {
             return;
@@ -44,5 +44,14 @@ public class MapUtils {
         if (list.isEmpty()) {
             mapList.remove(key);
         }
+    }
+
+    public static final <T> boolean addToMaxMap(Map<T, Double> map, T key, double value) {
+        Double oldValue = map.get(key);
+        if (oldValue == null || value > oldValue) {
+            map.put(key, value);
+            return true;
+        }
+        return false;
     }
 }

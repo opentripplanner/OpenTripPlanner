@@ -22,7 +22,7 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
+import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,10 +80,12 @@ public class GraphBuilderTask implements Runnable {
     public void run() {
         
         Graph graph = _graphService.getGraph();
-        
+
         if (_graphBundle == null) {
             throw new RuntimeException("graphBuilderTask has no attribute graphBundle.");
         }
+        graph.setBundle(_graphBundle);
+
         File graphPath = _graphBundle.getGraphPath();
         
         if( graphPath.exists() && ! _alwaysRebuild) {
@@ -97,7 +99,7 @@ public class GraphBuilderTask implements Runnable {
         ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
         chs.build();
         try {
-            ContractionHierarchySerializationLibrary.writeGraph(chs, graphPath);
+            GraphSerializationLibrary.writeGraph(chs, graphPath);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }

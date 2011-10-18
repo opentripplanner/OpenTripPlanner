@@ -11,33 +11,29 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.algorithm.strategies;
+package org.opentripplanner.graph_builder.impl.reach;
 
+import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
-/**
- * Strategy interface to provide additional logic to decide if a given traverse result should not be
- * considered further.
- * 
- * @author bdferris
- * 
- */
-public interface SkipTraverseResultStrategy {
+import com.vividsolutions.jts.geom.Coordinate;
 
-    /**
-     * 
-     * @param origin the origin vertex
-     * @param target the target vertex, may be null in an undirected search
-     * @param parent the parent shortest-path-tree vertex
-     * @param traverseResult the current traverse result to consider for skipping
-     * @param spt the shortest path tree
-     * @param traverseOptions the current traverse options
-     * @param remainingWeightEstimate the remaining weight estimate from the heuristic (or -1 if no heuristic)
-     * @return true if the given traverse result should not be considered further
-     */
+public class EdgeTreesSkipTraversalResultStrategy implements SkipTraverseResultStrategy {
+
+    private Coordinate skipCoordinate;
+
+    public EdgeTreesSkipTraversalResultStrategy(Vertex v) {
+        this.skipCoordinate = v.getCoordinate();
+    }
+
+    @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
-            State current, ShortestPathTree spt, TraverseOptions traverseOptions);
+            State current, ShortestPathTree spt, TraverseOptions traverseOptions) {
+
+        return current.getVertex().getCoordinate().equals(skipCoordinate);
+    }
+
 }

@@ -47,6 +47,8 @@ public class State implements Cloneable {
     /* StateData contains data which is unlikely to change as often */
     protected StateData stateData;
 
+    private double lastTransitWalk = 0;
+
     /* CONSTRUCTORS */
 
     /**
@@ -331,5 +333,17 @@ public class State implements Cloneable {
 
     public boolean similarTripSeq(State existing) {
         return this.stateData.tripSeqHash == existing.stateData.tripSeqHash;
+    }
+
+    public double getWalkSinceLastTransit() {
+        return stateData.walkDistance - lastTransitWalk ;
+    }
+
+    public double getWalkAtLastTransit() {
+        return lastTransitWalk;
+    }
+
+    public void setWalkAtLastTransit(double lastTransitWalk) {
+        this.lastTransitWalk = lastTransitWalk;
     }
 }

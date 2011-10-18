@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
 
     protected Vertex tov;
 
-	private List<Patch> patches;
+    private List<Patch> patches;
 
     public String toString() {
         return getClass().getName() + "(" + fromv + " -> " + tov + ")";
@@ -101,20 +102,24 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
     	}
     	patches.add(patch);
     }
-	public List<Patch> getPatches() {
-		return patches;
-	}
-	
-	@Override
-	public void removePatch(Patch patch) {
-		if (patches.size() == 1) {
-			patches = null;
-		} else {
-			patches.remove(patch);
-		}
-	}
 
-	public boolean hasBogusName() {
-		return false;
-	}
+    public List<Patch> getPatches() {
+        if (patches == null) {
+            return Collections.emptyList();
+        }
+        return patches;
+    }
+
+    @Override
+    public void removePatch(Patch patch) {
+        if (patches.size() == 1) {
+            patches = null;
+        } else {
+            patches.remove(patch);
+        }
+    }
+
+    public boolean hasBogusName() {
+        return false;
+    }
 }

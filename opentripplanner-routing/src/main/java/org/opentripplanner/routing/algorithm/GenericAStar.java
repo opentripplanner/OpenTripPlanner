@@ -130,16 +130,11 @@ public class GenericAStar {
             abortTime = Math.min(abortTime, options.searchAbortTime);
         if (options.maxComputationTime > 0)
             abortTime = Math.min(abortTime, System.currentTimeMillis() + options.maxComputationTime);
-        
-        boolean exit = false; // Unused?
 
         int nVisited = 0;
 
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
-
-            if (exit)
-                break; // unused?
 
             if (_verbose) {
                 double w = pq.peek_min_key();

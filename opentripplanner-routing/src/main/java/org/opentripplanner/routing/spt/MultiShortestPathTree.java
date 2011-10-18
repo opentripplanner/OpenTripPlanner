@@ -114,4 +114,13 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         }
     }
 
+    @Override
+    public Collection<State> getAllStates() {
+        ArrayList<State> allStates = new ArrayList<State>();
+        for (List<State> stateSet : stateSets.values()) {
+            allStates.addAll(stateSet);
+        }
+        return allStates;
+    }
+
 }

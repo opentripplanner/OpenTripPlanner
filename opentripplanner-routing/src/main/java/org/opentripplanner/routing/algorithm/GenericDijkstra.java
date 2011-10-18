@@ -89,7 +89,6 @@ public class GenericDijkstra {
     }
 
     public ShortestPathTree getShortestPathTree(State initialState) {
-
         ShortestPathTree spt = createShortestPathTree();
         OTPPriorityQueue<State> queue = createPriorityQueue();
 
@@ -103,13 +102,12 @@ public class GenericDijkstra {
         }
 
         while (!queue.empty()) { // Until the priority queue is empty:
-
             State u = queue.extract_min();
-            Vertex fromv = u.getVertex();
+            Vertex u_vertex = u.getVertex();
 
             if (_verbose) {
                 System.out.println("min," + u.getWeight());
-                System.out.println(fromv);
+                System.out.println(u_vertex);
             }
 
             if (_searchTerminationStrategy != null
@@ -117,9 +115,7 @@ public class GenericDijkstra {
                     null, u, spt, options))
                         break;
 
-            Collection<Edge> outgoing = GraphLibrary.getOutgoingEdges(graph, fromv, extraEdges);
-
-            for (Edge edge : outgoing) {
+            for (Edge edge : getEdgesForVertex(graph, extraEdges, u_vertex, options)) {
 
                 if (_skipEdgeStrategy != null
                         && _skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
@@ -147,8 +143,18 @@ public class GenericDijkstra {
 
                 }
             }
+            spt.postVisit(u);
         }
         return spt;
+    }
+
+    private Collection<Edge> getEdgesForVertex(Graph graph, Map<Vertex, List<Edge>> extraEdges,
+            Vertex vertex, TraverseOptions options) {
+
+        if (options.isArriveBy())
+            return GraphLibrary.getIncomingEdges(graph, vertex, extraEdges);
+        else
+            return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
     }
 
     protected OTPPriorityQueue<State> createPriorityQueue() {
