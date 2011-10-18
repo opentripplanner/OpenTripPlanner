@@ -135,6 +135,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
 
         public void buildGraph(Graph graph) {
+            // handle turn restrictions and road names in relations
+            processRelations();
+
             // Remove all simple islands
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
@@ -160,7 +163,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             for (OSMWay way : _ways.values()) {
 
-                if (wayIndex % 1000 == 0)
+                if (wayIndex % 10000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
 
@@ -366,9 +369,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         public void secondPhase() {
             int count = _ways.values().size();
-
-            processRelations();
-
             for (Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext();) {
                 OSMWay way = it.next();
                 if (!(way.hasTag("highway") || way.isTag("railway", "platform"))) {
@@ -384,7 +384,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            _log.debug("purged " + (count - _ways.values().size()) + " ways out of " + count);
+            _log.trace("purged " + (count - _ways.values().size()) + " ways out of " + count);
         }
 
         /**
@@ -447,6 +447,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         modes.remove(TraverseMode.CAR);
                     } else if (m.equals("bicycle")) {
                         modes.remove(TraverseMode.BICYCLE);
+                        _log.debug("turn restriction with bicycle exception at node {} from {}", via, from);
                     }
                 }
             }
