@@ -60,6 +60,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -269,7 +270,13 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         super();
  
         GraphServiceImpl graphService = new GraphServiceImpl();
-        graphService.setGraphPath(new File(graphName));
+        GraphBundle bundle = new GraphBundle();
+        File path = new File(graphName);
+        if (path.getName().equals("Graph.obj")) {
+            path = path.getParentFile();
+        }
+        bundle.setPath(path);
+        graphService.setBundle(bundle);
         graphService.refreshGraph();
             
         setGraph(graphService);
