@@ -280,7 +280,7 @@ public class GTFSPatternHopFactory {
 
         for (Trip trip : trips) {
 
-            if (index % 1000 == 0)
+            if (index % 10000 == 0)
                 _log.debug("trips=" + index + "/" + trips.size());
             index++;
 

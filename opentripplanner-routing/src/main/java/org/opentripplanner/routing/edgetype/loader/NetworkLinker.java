@@ -52,7 +52,7 @@ public class NetworkLinker {
 
         for (GraphVertex gv : vertices) {
             Vertex v = gv.vertex;
-            if (i % 10000 == 0)
+            if (i % 100000 == 0)
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;
 

@@ -56,7 +56,7 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
             int regionIndex = 0;
             for (Envelope region : _regionsSource.getRegions()) {
                 getDownloader().visitRegion(region, downloadHandler);
-                if (regionIndex % 100 == 0) {
+                if (regionIndex % 1000 == 0) {
                     _log.debug("regions=" + regionIndex);
                 }
                 regionIndex++;
