@@ -177,23 +177,23 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.incrementWeight(wait_cost + options.boardCost);
             return s1.makeState();
             
-    	} else {
-    		/* forward traversal: not so much to do */
+        } else {
+            /* forward traversal: not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
-    	    // this affects multi-itinerary searches
-    	    if (state0.getBackEdgeNarrative() instanceof PatternBoard) {
+            // this affects multi-itinerary searches
+            if (state0.getBackEdgeNarrative() instanceof PatternBoard) {
                 return null;
             }
             if (!pattern.canAlight(stopIndex + 1)) {
-    		    return null;
-    		}
-	        StateEditor s1 = state0.edit(this);
-	        s1.setTripId(null);
-	        s1.setLastAlightedTime(state0.getTime());
-	        s1.setPreviousStop(tov);
-	        return s1.makeState();
-    	}
-	}
+                return null;
+            }
+            StateEditor s1 = state0.edit(this);
+            s1.setTripId(null);
+            s1.setLastAlightedTime(state0.getTime());
+            s1.setPreviousStop(tov);
+            return s1.makeState();
+        }
+    }
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
