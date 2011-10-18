@@ -65,7 +65,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private CustomNamer customNamer;
 
     private double bikeSafetyFactor = 4.0;
-        
+
     /**
      * The source for OSM map data
      */
@@ -86,7 +86,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * @param source the way properties source
      */
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
-    	wayPropertySet = source.getWayPropertySet();
+        wayPropertySet = source.getWayPropertySet();
     }
 
     @Override
@@ -111,14 +111,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     }
 
     public void setWayPropertySet(WayPropertySet wayDataSet) {
-		this.wayPropertySet = wayDataSet;
-	}
+        this.wayPropertySet = wayDataSet;
+    }
 
-	public WayPropertySet getWayPropertySet() {
-		return wayPropertySet;
-	}
+    public WayPropertySet getWayPropertySet() {
+        return wayPropertySet;
+    }
 
-	private class Handler implements OpenStreetMapContentHandler {
+    private class Handler implements OpenStreetMapContentHandler {
 
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
@@ -128,10 +128,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
 
-		private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByFromWay = new HashMap<Long, List<TurnRestrictionTag>>();
-		private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByToWay = new HashMap<Long, List<TurnRestrictionTag>>();
-		
-		private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
+        private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByFromWay = new HashMap<Long, List<TurnRestrictionTag>>();
+
+        private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByToWay = new HashMap<Long, List<TurnRestrictionTag>>();
+
+        private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
 
         public void buildGraph(Graph graph) {
             // Remove all simple islands
@@ -153,7 +154,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
             GeometryFactory geometryFactory = new GeometryFactory();
-            
+
             /* build an ordinary graph, which we will convert to an edge-based graph */
             ArrayList<Vertex> endpoints = new ArrayList<Vertex>();
 
@@ -162,9 +163,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (wayIndex % 1000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
                 wayIndex++;
-                
-                WayProperties wayData = wayPropertySet.getDataForWay(way); 
-                
+
+                WayProperties wayData = wayPropertySet.getDataForWay(way);
+
                 if (!way.hasTag("name")) {
                     String creativeName = wayPropertySet.getCreativeNameForWay(way);
                     if (creativeName != null) {
@@ -172,8 +173,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 Set<Alert> note = wayPropertySet.getNoteForWay(way);
-                
-                StreetTraversalPermission permissions = getPermissionsForEntity(way, wayData.getPermission());
+
+                StreetTraversalPermission permissions = getPermissionsForEntity(way,
+                        wayData.getPermission());
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
 
@@ -224,7 +226,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     /* generate endpoints */
                     if (startEndpoint == null) {
-                        //first iteration on this way
+                        // first iteration on this way
                         String label = "osm node " + osmStartNode.getId();
 
                         startEndpoint = graph.getVertex(label);
@@ -251,13 +253,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, permissions, geometry);
 
-
                     PlainStreetEdge street = streets.getFirst();
 
                     if (street != null) {
                         graph.addEdge(street);
                         Double safety = wayData.getSafetyFeatures().getFirst();
-                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety * getBikeSafetyFactor());
+                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety
+                                * getBikeSafetyFactor());
                         if (note != null) {
                             street.setNote(note);
                         }
@@ -267,53 +269,54 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (backStreet != null) {
                         graph.addEdge(backStreet);
                         Double safety = wayData.getSafetyFeatures().getSecond();
-                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety * getBikeSafetyFactor());
+                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety
+                                * getBikeSafetyFactor());
                         if (note != null) {
                             backStreet.setNote(note);
                         }
                     }
 
-
                     /* Check if there are turn restrictions starting on this segment */
-                    List<TurnRestrictionTag> restrictionTags = turnRestrictionsByFromWay.get(way.getId());
+                    List<TurnRestrictionTag> restrictionTags = turnRestrictionsByFromWay.get(way
+                            .getId());
                     if (restrictionTags != null) {
-                    	for (TurnRestrictionTag tag : restrictionTags) {
-                    		if (tag.via == startNode) {
-                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                    			restriction.from = backStreet;
-                    		} else if (tag.via == endNode) {
-                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                    			restriction.from = street;
-                    		}
-                    	}
+                        for (TurnRestrictionTag tag : restrictionTags) {
+                            if (tag.via == startNode) {
+                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                                restriction.from = backStreet;
+                            } else if (tag.via == endNode) {
+                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                                restriction.from = street;
+                            }
+                        }
                     }
-                    
+
                     restrictionTags = turnRestrictionsByToWay.get(way.getId());
                     if (restrictionTags != null) {
-                    	for (TurnRestrictionTag tag : restrictionTags) {
-                    		if (tag.via == startNode) { 
-                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                    			restriction.to = street;
-                    		} else if (tag.via == endNode) {
-                    			TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                    			restriction.to = backStreet;
-                    		}
-                    	}
+                        for (TurnRestrictionTag tag : restrictionTags) {
+                            if (tag.via == startNode) {
+                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                                restriction.to = street;
+                            } else if (tag.via == endNode) {
+                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                                restriction.to = backStreet;
+                            }
+                        }
                     }
                     startNode = endNode;
                     osmStartNode = _nodes.get(startNode);
                 }
             }
-            
+
             /* unify turn restrictions */
             Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
             for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
-            	turnRestrictions.put(restriction.from, restriction);
+                turnRestrictions.put(restriction.from, restriction);
             }
-            
+
             StreetUtils.pruneFloatingIslands(graph);
-			StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
-            
+            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
@@ -321,7 +324,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addNode(OSMNode node) {
-            if(!_nodesWithNeighbors.contains(node.getId()))
+            if (!_nodesWithNeighbors.contains(node.getId()))
                 return;
 
             if (_nodes.containsKey(node.getId()))
@@ -348,9 +351,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             /* Currently only type=route;route=road relations are handled */
-            if (   !(relation.isTag("type", "restriction" ))             		
-            	&& !(relation.isTag("type", "route"       ) && relation.isTag("route", "road"))
-                && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
+            if (!(relation.isTag("type", "restriction"))
+                    && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
+                    && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
                 return;
             }
 
@@ -366,7 +369,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             processRelations();
 
-            for(Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext(); ) {
+            for (Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext();) {
                 OSMWay way = it.next();
                 if (!(way.hasTag("highway") || way.isTag("railway", "platform"))) {
                     it.remove();
@@ -381,39 +384,45 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            _log.debug("purged " + (count - _ways.values().size() ) + " ways out of " + count);
+            _log.debug("purged " + (count - _ways.values().size()) + " ways out of " + count);
         }
-        
-        /** Copies useful metadata from relations to the relavant ways/nodes.
+
+        /**
+         * Copies useful metadata from relations to the relavant ways/nodes.
          */
         private void processRelations() {
             _log.debug("Processing relations...");
 
-            for(OSMRelation relation : _relations.values()) {
-            	if (relation.isTag("type", "restriction" )) {
-            		processRestriction(relation);
-            	} else {
-            		processRoad(relation);
-            	}
+            for (OSMRelation relation : _relations.values()) {
+                if (relation.isTag("type", "restriction")) {
+                    processRestriction(relation);
+                } else {
+                    processRoad(relation);
+                }
             }
         }
 
-		/** A temporary holder for turn restrictions while we have only way/node ids but not yet edge objects */
-		class TurnRestrictionTag {
-			private long via;
-			private TurnRestrictionType type;
+        /**
+         * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
+         * objects
+         */
+        class TurnRestrictionTag {
+            private long via;
 
-			TurnRestrictionTag(long via, TurnRestrictionType type) {
-				this.via = via;
-				this.type = type;
-			}
-		}
+            private TurnRestrictionType type;
+
+            TurnRestrictionTag(long via, TurnRestrictionType type) {
+                this.via = via;
+                this.type = type;
+            }
+        }
 
         /**
          * Handle turn restrictions
+         * 
          * @param relation
          */
-	private void processRestriction(OSMRelation relation) {
+        private void processRestriction(OSMRelation relation) {
             long from = -1, to = -1, via = -1;
             for (OSMRelationMember member : relation.getMembers()) {
                 String role = member.getRole();
@@ -469,9 +478,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
             MapUtils.addToMapList(turnRestrictionsByToWay, to, tag);
-			
+
         }
-		
+
         private void processRoad(OSMRelation relation) {
             for (OSMRelationMember member : relation.getMembers()) {
                 if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
@@ -479,16 +488,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (way != null) {
                         if (relation.hasTag("name")) {
                             if (way.hasTag("otp:route_name")) {
-                                way.addTag("otp:route_name", addUniqueName(way
-                                        .getTag("otp:route_name"), relation.getTag("name")));
+                                way.addTag(
+                                        "otp:route_name",
+                                        addUniqueName(way.getTag("otp:route_name"),
+                                                relation.getTag("name")));
                             } else {
                                 way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
                             }
                         }
                         if (relation.hasTag("ref")) {
                             if (way.hasTag("otp:route_ref")) {
-                                way.addTag("otp:route_ref", addUniqueName(way
-                                        .getTag("otp:route_ref"), relation.getTag("ref")));
+                                way.addTag(
+                                        "otp:route_ref",
+                                        addUniqueName(way.getTag("otp:route_ref"),
+                                                relation.getTag("ref")));
                             } else {
                                 way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
                             }
@@ -503,15 +516,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private String addUniqueName(String routes, String name) {
-        	String[] names = routes.split(", ");
-        	for (String existing : names) {
-        		if (existing.equals(name)) {
-        			return routes;
-        		}
-        	}
-			return routes + ", " + name;
-		}
-
+            String[] names = routes.split(", ");
+            for (String existing : names) {
+                if (existing.equals(name)) {
+                    return routes;
+                }
+            }
+            return routes + ", " + name;
+        }
 
         /**
          * Handle oneway streets, cycleways, and whatnot. See
@@ -540,25 +552,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             PlainStreetEdge street = null, backStreet = null;
 
             /*
-            pedestrian rules: everything is two-way (assuming pedestrians
-            are allowed at all)
-            bicycle rules: default: permissions;
-
-            cycleway=dismount means walk your bike -- the engine will
-            automatically try walking bikes any time it is forbidden to
-            ride them, so the only thing to do here is to remove bike
-            permissions
-
-            oneway=... sets permissions for cars and bikes
-            oneway:bicycle overwrites these permissions for bikes only
-
-            now, cycleway=opposite_lane, opposite, opposite_track can allow
-            once oneway has been set by oneway:bicycle, but should give a
-            warning if it conflicts with oneway:bicycle
-
-            bicycle:backward=yes works like oneway:bicycle=no
-            bicycle:backwards=no works like oneway:bicycle=yes
-
+             * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all)
+             * bicycle rules: default: permissions;
+             * 
+             * cycleway=dismount means walk your bike -- the engine will automatically try walking
+             * bikes any time it is forbidden to ride them, so the only thing to do here is to
+             * remove bike permissions
+             * 
+             * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these
+             * permissions for bikes only
+             * 
+             * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been
+             * set by oneway:bicycle, but should give a warning if it conflicts with oneway:bicycle
+             * 
+             * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like
+             * oneway:bicycle=yes
              */
 
             if (way.isTag("foot", "yes") || way.isTag("foot", "designated")) {
@@ -578,7 +586,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (way.isTag("cycleway", "dismount") || way.isTag("bicycle", "dismount")) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
-                    _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way " + way.getId() + ", assuming dismount");
+                    _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way "
+                            + way.getId() + ", assuming dismount");
                 }
             }
 
@@ -586,25 +595,26 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetTraversalPermission permissionsBack = permissions;
 
             if (way.isTagTrue("oneway") || "roundabout".equals(tags.get("junction"))) {
-            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
-            } 
+                permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+            }
             if (way.isTag("oneway", "-1")) {
-            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+                permissionsFront = permissionsFront
+                        .remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             }
             if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
-            	permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);	
+                permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
             }
             if (way.isTag("oneway:bicycle", "-1")) {
-            	permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
+                permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
             }
             if (way.isTagFalse("oneway:bicycle") || way.isTagTrue("bicycle:backwards")) {
-            	if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
-            		permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
-            		permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
-            	}
+                if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
+                    permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
+                    permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
+                }
             }
 
-            //any cycleway which is opposite* allows contraflow biking
+            // any cycleway which is opposite* allows contraflow biking
             String cycleway = way.getTag("cycleway");
             String cyclewayLeft = way.getTag("cycleway:left");
             String cyclewayRight = way.getTag("cycleway:right");
@@ -614,27 +624,29 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
-            
-            boolean noThruTraffic = way.isTag("access", "destination") ||
-                way.isTag("access", "private") || way.isTag("access", "customers") ||
-                way.isTag("access", "delivery") || way.isTag("access", "forestry") ||
-                way.isTag("access", "agricultural");
+
+            boolean noThruTraffic = way.isTag("access", "destination")
+                    || way.isTag("access", "private") || way.isTag("access", "customers")
+                    || way.isTag("access", "delivery") || way.isTag("access", "forestry")
+                    || way.isTag("access", "agricultural");
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
-                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront, geometry,
-                        false);
+                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
+                        geometry, false);
                 street.setNoThruTraffic(noThruTraffic);
             }
             if (permissionsBack != StreetTraversalPermission.NONE) {
-                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack, backGeometry,
-                        true);
+                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack,
+                        backGeometry, true);
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
-            
+
             /* mark edges that are on roundabouts */
             if ("roundabout".equals(tags.get("junction"))) {
-            	if (street != null) street.setRoundabout(true);
-                if (backStreet != null) backStreet.setRoundabout(true);
+                if (street != null)
+                    street.setRoundabout(true);
+                if (backStreet != null)
+                    backStreet.setRoundabout(true);
             }
 
             return new P2<PlainStreetEdge>(street, backStreet);
@@ -649,9 +661,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             String name = way.getAssumedName();
 
-			if (customNamer != null) {
-				name = customNamer.name(way, name);
-			}
+            if (customNamer != null) {
+                name = customNamer.name(way, name);
+            }
 
             if (name == null) {
                 name = id;
@@ -659,8 +671,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             boolean steps = "steps".equals(way.getTag("highway"));
             if (steps) {
-            	//consider the elevation gain of stairs, roughly
-            	length *= 2;
+                // consider the elevation gain of stairs, roughly
+                length *= 2;
             }
 
             PlainStreetEdge street = new PlainStreetEdge(start, end, geometry, name, length,
@@ -673,7 +685,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             street.setStairs(steps);
 
             /* TODO: This should probably generalized somehow? */
-			if (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair"))) {
+            if (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair"))) {
                 street.setWheelchairAccessible(false);
             }
 
@@ -682,7 +694,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return street;
         }
 
-        private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity, StreetTraversalPermission def) {
+        private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity,
+                StreetTraversalPermission def) {
             Map<String, String> tags = entity.getTags();
             StreetTraversalPermission permission = null;
 
@@ -702,18 +715,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * rules perfectly ;-)
              */
             if (access != null) {
-            if ("no".equals(access) || "license".equals(access)) {
-            		//this can actually be overridden
-                	permission = StreetTraversalPermission.NONE;
-                	if (entity.doesTagAllowAccess("motorcar")) {
-                    	permission = permission.add(StreetTraversalPermission.CAR);
-            		}
-            		if (entity.doesTagAllowAccess("bicycle")) {
-                    	permission = permission.add(StreetTraversalPermission.BICYCLE);
-            		}
-            		if (entity.doesTagAllowAccess("foot")) {
-                    	permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-            		}
+                if ("no".equals(access) || "license".equals(access)) {
+                    // this can actually be overridden
+                    permission = StreetTraversalPermission.NONE;
+                    if (entity.doesTagAllowAccess("motorcar")) {
+                        permission = permission.add(StreetTraversalPermission.CAR);
+                    }
+                    if (entity.doesTagAllowAccess("bicycle")) {
+                        permission = permission.add(StreetTraversalPermission.BICYCLE);
+                    }
+                    if (entity.doesTagAllowAccess("foot")) {
+                        permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+                    }
                 } else {
                     permission = def;
                 }
@@ -722,7 +735,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (motorcar != null) {
-            	if ("no".equals(motorcar) || "license".equals(motorcar)) {
+                if ("no".equals(motorcar) || "license".equals(motorcar)) {
                     permission = permission.remove(StreetTraversalPermission.CAR);
                 } else {
                     permission = permission.add(StreetTraversalPermission.CAR);
@@ -730,7 +743,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (bicycle != null) {
-            	if ("no".equals(bicycle) || "license".equals(bicycle)) {
+                if ("no".equals(bicycle) || "license".equals(bicycle)) {
                     permission = permission.remove(StreetTraversalPermission.BICYCLE);
                 } else {
                     permission = permission.add(StreetTraversalPermission.BICYCLE);
@@ -738,7 +751,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             if (foot != null) {
-            	if ("no".equals(foot) || "license".equals(foot)) {
+                if ("no".equals(foot) || "license".equals(foot)) {
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
                 } else {
                     permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
@@ -765,7 +778,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     /**
      * How much safer transit is than biking along an ordinary street. The default is 4.0, which
      * probably does not reflect reality (especially for rail), but should generate plausible
-     * routes.  Do not lower this value below the reciprocal of the safety of the safest street
+     * routes. Do not lower this value below the reciprocal of the safety of the safest street
      * according to your bicycle safety settings, or you will break the default A* heuristic.
      * 
      * @param bikeSafetyFactor
@@ -778,11 +791,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         return bikeSafetyFactor;
     }
 
-	public CustomNamer getCustomNamer() {
-		return customNamer;
-	}
+    public CustomNamer getCustomNamer() {
+        return customNamer;
+    }
 
-	public void setCustomNamer(CustomNamer customNamer) {
-		this.customNamer = customNamer;
-	}
+    public void setCustomNamer(CustomNamer customNamer) {
+        this.customNamer = customNamer;
+    }
 }
