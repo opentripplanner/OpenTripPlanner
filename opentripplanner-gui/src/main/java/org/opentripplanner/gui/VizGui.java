@@ -56,12 +56,14 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.ListModel;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.DirectEdge;
@@ -84,6 +86,7 @@ import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.reach.ReachRemainingWeightHeuristic;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -265,6 +268,8 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     private HashSet<Vertex> open;
 
     private HashSet<Vertex> seen;
+
+    private JList metadataList;
 
     public VizGui(String graphName) {
         super();
@@ -522,7 +527,8 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                 }
                 c = c.getSuperclass();
                 }
-
+                metadataList.revalidate();
+                
                 // figure out the pattern, if any
                 TripPattern pattern = null;
                 int stopIndex = 0;
@@ -695,17 +701,17 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
         
         departurePattern = new JList();
-        departurePattern.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
         rightPanelTabs.addTab("trip pattern", dpScrollPane);
 
-        JList metadataList = new JList();
+        metadataList = new JList();
         metadataModel = new DefaultListModel();
         metadataList.setModel(metadataModel);
-        metadataList.setPrototypeCellValue("bicycleSafetyEffectiveLength : 10.42468803");
         JScrollPane mdScrollPane = new JScrollPane(metadataList);
+        mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
+        rightPanelTabs.setMaximumSize(new Dimension(200, 1600));
 
         showGraph.init();
         addWindowListener(new ExitListener());
@@ -888,7 +894,8 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     // the vizgui serves as its own remainingweightheuristicfactory
     // so ui elements could be used to select the heuristic
     public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target) {
-        return new BidirectionalRemainingWeightHeuristic(graph);
+        //return new BidirectionalRemainingWeightHeuristic(graph);
         //return new DefaultRemainingWeightHeuristic();
+        return new ReachRemainingWeightHeuristic();
     }
 }
