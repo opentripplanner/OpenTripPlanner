@@ -353,7 +353,7 @@ public class NetworkLinkerLibrary {
                 endVertex.getY());
         newEnd = graph.addVertex(newEnd);
 
-        for (DirectEdge e: filter(graph.getOutgoing(startVertex), DirectEdge.class)) {
+        for (DirectEdge e: filter(startVertex.getOutgoing(), DirectEdge.class)) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
                 continue;
@@ -374,7 +374,7 @@ public class NetworkLinkerLibrary {
                 startVertex.getX(), startVertex.getY());
         newStart = graph.addVertex(newStart);
 
-        for (DirectEdge e: filter(graph.getOutgoing(endVertex), DirectEdge.class)) {
+        for (DirectEdge e: filter(endVertex.getOutgoing(), DirectEdge.class)) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(startVertex.getCoordinate())) {
                 continue;
