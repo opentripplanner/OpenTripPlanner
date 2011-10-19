@@ -41,7 +41,7 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
 
@@ -115,14 +115,14 @@ public class LoadOTPGraphExtension extends Extension {
 			driverNodes.getTableModel().addColumn("Type");
 			Object[] row = new Object[2];
 			
-			Collection<GraphVertex> vertices = gg.getVertices();
-			Iterator<GraphVertex> it = vertices.iterator();
+			Collection<Vertex> vertices = gg.getVertices();
+			Iterator<Vertex> it = vertices.iterator();
 			FPoint2D editableFeatureP = null;
 			
 			Hashtable<Edge, Edge> edges = new Hashtable<Edge, Edge>(); 
 			
 			while (it.hasNext()) {
-				GraphVertex gv = it.next();
+				Vertex gv = it.next();
 				Vertex v = gv.vertex;
 				Iterator<Edge> out = gv.getOutgoing().iterator();
 				while (out.hasNext()) {

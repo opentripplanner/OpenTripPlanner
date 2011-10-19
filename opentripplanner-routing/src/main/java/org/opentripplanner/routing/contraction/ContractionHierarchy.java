@@ -187,11 +187,11 @@ public class ContractionHierarchy implements Serializable {
                         }
                     }
 
-                    GraphVertex ugv = graph.getGraphVertex(wsresult.vertex);
+                    Vertex ugv = graph.getVertex(wsresult.vertex);
 
                     for (DirectEdge e : toRemove) {
                         ugv.removeOutgoing(e);
-                        graph.getGraphVertex(e.getToVertex()).removeIncoming(e);
+                        graph.getVertex(e.getToVertex()).removeIncoming(e);
                     }
                 }
                 searchSpace += wsresult.searchSpace;
@@ -297,11 +297,11 @@ public class ContractionHierarchy implements Serializable {
      * @return
      */
     BinHeap<Vertex> initPriorityQueue(Graph graph) {
-        Collection<GraphVertex> vertices = graph.getVertices();
+        Collection<Vertex> vertices = graph.getVertices();
         BinHeap<Vertex> pq = new BinHeap<Vertex>(vertices.size());
 
         int i = 0;
-        for (GraphVertex gv : vertices) {
+        for (Vertex gv : vertices) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
         	
@@ -352,8 +352,8 @@ public class ContractionHierarchy implements Serializable {
     public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
         graph = new Graph(orig);
         // clone graph
-        for (GraphVertex gv : orig.getVertices()) {
-            graph.addGraphVertex(new GraphVertex(gv));
+        for (Vertex gv : orig.getVertices()) {
+            graph.addVertex(new Vertex(gv));
         }
 
         this.options = options;
@@ -369,10 +369,10 @@ public class ContractionHierarchy implements Serializable {
     }
 
     private void useCoreVerticesFrom(Graph orig) {
-        for (GraphVertex gv : graph.getVertices()) {
-            GraphVertex origgv = orig.getGraphVertex(gv.vertex.getLabel());
+        for (Vertex gv : graph.getVertices()) {
+            Vertex origgv = orig.getVertex(gv.vertex.getLabel());
             if (origgv.equals(gv)) {
-                graph.addGraphVertex(origgv);
+                graph.addVertex(origgv);
             }
         }
     }
@@ -468,13 +468,13 @@ public class ContractionHierarchy implements Serializable {
 
             // incoming, therefore downward
 
-            GraphVertex downVertex = down.getGraphVertex(down.addVertex(vertex));
+            Vertex downVertex = down.getVertex(down.addVertex(vertex));
 
             HashSet<Vertex> neighbors = new HashSet<Vertex>();
 
             for (Edge ee : graph.getIncoming(vertex)) {
                 nEdges--;
-                GraphVertex originalFromVertex = graph.getGraphVertex(ee.getFromVertex());
+                Vertex originalFromVertex = graph.getVertex(ee.getFromVertex());
                 down.addVertex(originalFromVertex.vertex);
 
                 originalFromVertex.removeOutgoing(ee);
@@ -484,11 +484,11 @@ public class ContractionHierarchy implements Serializable {
             }
 
             // outgoing, therefore upward
-            GraphVertex upVertex = up.getGraphVertex(up.addVertex(vertex));
+            Vertex upVertex = up.getVertex(up.addVertex(vertex));
 
             for (DirectEdge ee : filter(graph.getOutgoing(vertex),DirectEdge.class)) {
                 nEdges--;
-                GraphVertex originalToVertex = graph.getGraphVertex(ee.getToVertex());
+                Vertex originalToVertex = graph.getVertex(ee.getToVertex());
                 up.addVertex(originalToVertex.vertex);
 
                 originalToVertex.removeIncoming(ee);
@@ -569,7 +569,7 @@ public class ContractionHierarchy implements Serializable {
     	_log.debug("    rebuild priority queue, hoplimit is now {}", hopLimit);
     	BinHeap<Vertex> newpq = new BinHeap<Vertex>(graph.getVertices().size());
         int i = 0;
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
 
@@ -592,7 +592,7 @@ public class ContractionHierarchy implements Serializable {
 
     	_log.debug("removing non-optimal edges, hopLimit is {}", hopLimit);
         int removed = 0;
-        for (GraphVertex gu : graph.getVertices()) {
+        for (Vertex gu : graph.getVertices()) {
             Vertex u = gu.vertex;
             State su = new State(u, options);
             Dijkstra dijkstra = new Dijkstra(graph, u, options, null, hopLimit);
@@ -617,7 +617,7 @@ public class ContractionHierarchy implements Serializable {
             }
             for (DirectEdge e : toRemove) {
                 gu.removeOutgoing(e);
-                graph.getGraphVertex(e.getToVertex()).removeIncoming(e);
+                graph.getVertex(e.getToVertex()).removeIncoming(e);
             }
             removed += toRemove.size();
         }
@@ -626,7 +626,7 @@ public class ContractionHierarchy implements Serializable {
 
     private int countEdges(Graph graph) {
         int total = 0;
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
         	for (Edge e : gv.getOutgoing())
         		if (isContractable(e))
         			total++;
@@ -745,7 +745,7 @@ public class ContractionHierarchy implements Serializable {
                     continue;
                 }
 
-                GraphVertex gu = graph.getGraphVertex(u);
+                Vertex gu = graph.getVertex(u);
                 if (VERBOSE)
                 	_log.debug("    up main graph vertex {}", gu);
                 if (opt.isArriveBy() && gu != null) {
@@ -757,7 +757,7 @@ public class ContractionHierarchy implements Serializable {
                 if (gu != null) {
                     outgoing = gu.getOutgoing();
                 }
-                gu = up.getGraphVertex(u);
+                gu = up.getVertex(u);
                 if (VERBOSE)
                 	_log.debug("    up overlay graph vertex {}", gu);
                 if (gu != null) {
@@ -851,12 +851,12 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 downclosed.add(down_u);
-                GraphVertex maingu = graph.getGraphVertex(down_u);
+                Vertex maingu = graph.getVertex(down_u);
                 if (!opt.isArriveBy() && maingu != null) {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
-                GraphVertex downgu = down.getGraphVertex(down_u);
+                Vertex downgu = down.getVertex(down_u);
                 Collection<Edge> incoming = null; 
                 if (downgu != null) { 
                     incoming = downgu.getIncoming();

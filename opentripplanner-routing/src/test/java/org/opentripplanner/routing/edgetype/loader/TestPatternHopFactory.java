@@ -85,8 +85,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public void testBoardAlight() throws Exception {
-        GraphVertex stop_a_depart = graph.getGraphVertex("agency_A_depart");
-        GraphVertex stop_b_depart = graph.getGraphVertex("agency_B_depart");
+        Vertex stop_a_depart = graph.getVertex("agency_A_depart");
+        Vertex stop_b_depart = graph.getVertex("agency_B_depart");
         
         assertEquals(1, stop_a_depart.getDegreeOut());
         assertEquals(3, stop_b_depart.getDegreeOut());
@@ -96,7 +96,7 @@ public class TestPatternHopFactory extends TestCase {
         }
         
         PatternBoard pb = (PatternBoard) stop_a_depart.getOutgoing().iterator().next();
-        GraphVertex journey_a_1 = graph.getGraphVertex(pb.getToVertex());
+        Vertex journey_a_1 = graph.getVertex(pb.getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
@@ -296,8 +296,8 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue("expected to use much later trip due to min transfer time", path.getEndTime() - startTime > 4.5 * 60 * 60);
         
         /* cleanup */
-        graph.getGraphVertex(e_arrive).removeOutgoing(edge);
-        graph.getGraphVertex(f_depart).removeIncoming(edge);
+        graph.getVertex(e_arrive).removeOutgoing(edge);
+        graph.getVertex(f_depart).removeIncoming(edge);
     }
 
     public void testInterlining() throws Exception {

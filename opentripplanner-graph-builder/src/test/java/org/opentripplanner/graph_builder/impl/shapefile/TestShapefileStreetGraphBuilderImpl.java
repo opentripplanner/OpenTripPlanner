@@ -107,15 +107,15 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         loader.buildGraph(gg);
 
         //find start and end vertices
-        GraphVertex start = null;
-        GraphVertex end = null;
-        GraphVertex carlton = null;
+        Vertex start = null;
+        Vertex end = null;
+        Vertex carlton = null;
         
         Coordinate vanderbiltAtPark = new Coordinate(-73.969178, 40.676785);
         Coordinate grandAtLafayette = new Coordinate(-73.999095, 40.720005);
         Coordinate carltonAtPark = new Coordinate(-73.972347, 40.677447);
 
-        for (GraphVertex gv : gg.getVertices()) {
+        for (Vertex gv : gg.getVertices()) {
             Vertex v = gv.vertex;
             if (v.getCoordinate().distance(vanderbiltAtPark) < 0.00005) {
                 /* we need the correct vanderbilt at park.  In this case,

@@ -163,7 +163,7 @@ public class OverlayGraph implements Serializable {
 		return getVertices().size();
 	}
 	
-// need to make sure lists are never null - GraphVertex
+// need to make sure lists are never null - Vertex
 // beware concurrentModification of lists.
 //	public void removeVertex(Vertex vertex) {
 //		List<Edge> toRemove = outgoing.remove(vertex);

@@ -420,7 +420,7 @@ public class ContractionPathServiceImpl implements PathService {
 
 	public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
         Graph graph = _graphService.getGraph();
-        GraphVertex gv = graph.getGraphVertex(vertex);
+        Vertex gv = graph.getVertex(vertex);
         if (gv == null) {
             return Collections.emptyList();
         }

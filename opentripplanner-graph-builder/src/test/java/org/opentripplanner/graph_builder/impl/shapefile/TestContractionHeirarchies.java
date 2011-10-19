@@ -310,7 +310,7 @@ public class TestContractionHeirarchies extends TestCase {
         }
 
         int expansion = 1;
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
             Vertex v = gv.vertex;
             final Coordinate c = v.getCoordinate();
             Envelope env = new Envelope(c);
@@ -572,20 +572,20 @@ public class TestContractionHeirarchies extends TestCase {
         long now = System.currentTimeMillis();
         int i = 0;
         int notNull = 0;
-        Collection<GraphVertex> upVertices = hierarchy.up.getVertices();
-        ArrayList<GraphVertex> vertices = new ArrayList<GraphVertex>(upVertices);
+        Collection<Vertex> upVertices = hierarchy.up.getVertices();
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>(upVertices);
         vertices.addAll(hierarchy.down.getVertices());
         vertices.addAll(hierarchy.graph.getVertices());
                
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
-        for (GraphVertex gv : vertices) {
+        for (Vertex gv : vertices) {
             for (DirectEdge e: filter(gv.getOutgoing(), DirectEdge.class)) {
                 components.union(gv.vertex, e.getToVertex());
             }
         }
         
-        ArrayList<GraphVertex> verticesOut = new ArrayList<GraphVertex>();
-        for (GraphVertex gv : vertices) {
+        ArrayList<Vertex> verticesOut = new ArrayList<Vertex>();
+        for (Vertex gv : vertices) {
             Vertex v = gv.vertex;
             int componentSize = components.size(components.find(v));
             if (componentSize > upVertices.size() / 2) {
@@ -603,7 +603,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         Random random = new Random(0);
         
-        for (GraphVertex gv1 : vertices) {
+        for (Vertex gv1 : vertices) {
             Vertex v1 = gv1.vertex;
             if (++i == 100) {
                 //only look at 100 pairs of vertices
@@ -613,7 +613,7 @@ public class TestContractionHeirarchies extends TestCase {
                 --i;
                 continue;
             }
-            GraphVertex gv2 = null;
+            Vertex gv2 = null;
             Vertex v2 = null;
             while (v2 == null || gv2.getDegreeIn() == 0) {
                 int j = Math.abs(random.nextInt()) % vertices.size();

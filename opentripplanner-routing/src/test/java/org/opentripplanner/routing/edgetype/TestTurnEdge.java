@@ -157,7 +157,7 @@ public class TestTurnEdge extends TestCase {
         graph.addEdge(new MockTransfer(bottom, trIn, 99999));
         graph.addEdge(new MockTransfer(bottomBack, trIn, 99999));
 
-        for (GraphVertex gv : graph.getVertices()) {
+        for (Vertex gv : graph.getVertices()) {
             //set distance to nearest transit stop
             gv.vertex.setDistanceToNearestTransitStop(0);
         }

@@ -54,8 +54,8 @@ public class TestHopFactory extends TestCase {
 
     public void testBoardAlight() throws Exception {
 
-        GraphVertex stop_a = graph.getGraphVertex("agency_A_depart");
-        GraphVertex stop_b_depart = graph.getGraphVertex("agency_B_depart");
+        Vertex stop_a = graph.getVertex("agency_A_depart");
+        Vertex stop_b_depart = graph.getVertex("agency_B_depart");
 
         assertEquals(1, stop_a.getDegreeOut());
         assertEquals(3, stop_b_depart.getDegreeOut());
@@ -65,7 +65,7 @@ public class TestHopFactory extends TestCase {
         }
 
         PatternBoard pb = (PatternBoard) stop_a.getOutgoing().iterator().next();
-        GraphVertex journey_a_1 = graph.getGraphVertex(pb.getToVertex());
+        Vertex journey_a_1 = graph.getVertex(pb.getToVertex());
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
