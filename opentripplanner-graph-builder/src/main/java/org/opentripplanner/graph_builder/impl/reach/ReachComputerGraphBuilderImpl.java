@@ -54,7 +54,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     private double initialStreetEpsilon = 1200;
 
-    private double maxStreetEpsilon = 4800;
+    private double maxStreetEpsilon = 1200;
 
     private double streetEpsilonMultiplier = 2;
 
@@ -110,8 +110,8 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
         HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>> classMapping = new HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>>();
 
-        ArrayList<DirectEdge> edgesToRemove = new ArrayList<DirectEdge>();
-        ArrayList<DirectEdge> edgesToAdd = new ArrayList<DirectEdge>();
+        HashSet<DirectEdge> edgesToRemove = new HashSet<DirectEdge>();
+        HashSet<DirectEdge> edgesToAdd = new HashSet<DirectEdge>();
         for (GraphVertex gv : graph.getVertices()) {
             Vertex vertex = gv.vertex;
             for (Edge e : graph.getOutgoing(vertex)) {
@@ -122,6 +122,9 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 }
             }
             for (Edge e : graph.getIncoming(vertex)) {
+                if (edgesToRemove.contains(e)) {
+                    continue;
+                }
                 if (e instanceof StreetEdge) {
                     StreetEdge se = ((StreetEdge) e);
                     edgesToRemove.add(se);
