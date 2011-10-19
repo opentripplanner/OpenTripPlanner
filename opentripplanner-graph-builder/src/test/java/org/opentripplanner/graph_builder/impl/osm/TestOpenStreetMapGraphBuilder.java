@@ -72,7 +72,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         boolean v3EdgeExists = false;
         boolean v4EdgeExists = false;
         boolean v4BackEdgeExists = false;
-        for (Edge e : gg.getOutgoing(v2)) {
+        for (Edge e : v2.getOutgoing()) {
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 Vertex tov = t.getToVertex();
@@ -84,7 +84,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             }
         }
 
-        for (Edge e : gg.getOutgoing(v2back)) {
+        for (Edge e : v2back.getOutgoing()) {
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 Vertex tov = t.getToVertex();
@@ -95,7 +95,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             }
         }
 
-        for (Edge e : gg.getOutgoing(v3)) {
+        for (Edge e : v3.getOutgoing()) {
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 Vertex tov = t.getToVertex();
@@ -106,7 +106,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
             }
         }
 
-        for (Edge e : gg.getOutgoing(v4back)) {
+        for (Edge e : v4back.getOutgoing()) {
             if (e instanceof TurnEdge) {
                 TurnEdge t = (TurnEdge) e;
                 Vertex tov = t.getToVertex();

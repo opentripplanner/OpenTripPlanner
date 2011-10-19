@@ -159,7 +159,7 @@ public class TestTurnEdge extends TestCase {
 
         for (Vertex gv : graph.getVertices()) {
             //set distance to nearest transit stop
-            gv.vertex.setDistanceToNearestTransitStop(0);
+            gv.setDistanceToNearestTransitStop(0);
         }
         
         // with no maxWalkDistance, the transfer will not be taken

@@ -115,15 +115,14 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         Coordinate grandAtLafayette = new Coordinate(-73.999095, 40.720005);
         Coordinate carltonAtPark = new Coordinate(-73.972347, 40.677447);
 
-        for (Vertex gv : gg.getVertices()) {
-            Vertex v = gv.vertex;
+        for (Vertex v : gg.getVertices()) {
             if (v.getCoordinate().distance(vanderbiltAtPark) < 0.00005) {
                 /* we need the correct vanderbilt at park.  In this case,
                  * that's the one facing west on vanderbilt.
                  */
                 int numParks = 0;
                 int numCarltons = 0;
-                for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
+                for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
                     if (e.getToVertex().getName().contains("PARK")) {
                         numParks ++;
                     }
@@ -134,9 +133,9 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 if (numCarltons != 2 || numParks != 1) {
                     continue;
                 }
-                start = gv;
+                start = v;
             } else if (v.getCoordinate().distance(grandAtLafayette) < 0.0001) {
-                end = gv;
+                end = v;
             } else if (v.getCoordinate().distance(carltonAtPark) < 0.00005) {
                 /* we need the correct carlton at park.  In this case,
                  * that's the one facing west.
@@ -144,7 +143,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numFlatbushes = 0;
                 int numParks = 0;
 
-                for (DirectEdge e: filter(gv.getOutgoing(),DirectEdge.class)) {
+                for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
                     if (e.getToVertex().getName().contains("FLATBUSH")) {
                         numFlatbushes ++;
                     }
@@ -155,7 +154,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 if (numFlatbushes != 2 || numParks != 1) {
                     continue;
                 }
-                carlton = gv;
+                carlton = v;
             }
         }
         assertNotNull(start);
@@ -166,7 +165,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertEquals(3, start.getDegreeIn());
 
         TraverseOptions wo = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(gg, start.vertex, end.vertex, 0, wo);
+        ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, 0, wo);
         assertNotNull(spt);
 
         //test that the option to walk bikes on the first or last segment works
@@ -178,7 +177,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         //force a change in preferences.
         wo.speed = 2; 
         
-        spt = AStar.getShortestPathTree(gg, start.vertex, carlton.vertex, 0, wo);
+        spt = AStar.getShortestPathTree(gg, start, carlton, 0, wo);
         assertNotNull(spt);
         /* commented out as bike walking is not supported */
         /*

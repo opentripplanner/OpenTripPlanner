@@ -67,12 +67,12 @@ public class TestPatch extends TestCase {
              */
             @Override
             public Edge getPrealightEdge(AgencyAndId stop) {
-                return graph.getOutgoing("agency_A_arrive").iterator().next();
+                return graph.getVertex("agency_A_arrive").getOutgoing().iterator().next();
             }
 
             @Override
             public Edge getPreboardEdge(AgencyAndId stop) {
-                return graph.getIncoming("agency_A_depart").iterator().next();
+                return graph.getVertex("agency_A_depart").getIncoming().iterator().next();
             }
 
             @Override
@@ -86,10 +86,10 @@ public class TestPatch extends TestCase {
                 route.setId(routeId);
                 route.setShortName(routeId.getId());
 
-                PatternBoard somePatternBoard = (PatternBoard) graph.getOutgoing("agency_A_depart")
-                        .iterator().next();
-                PatternHop somePatternHop = (PatternHop) graph.getOutgoing(
-                        somePatternBoard.getToVertex()).iterator().next();
+                PatternBoard somePatternBoard = (PatternBoard) graph.getVertex("agency_A_depart")
+                        .getOutgoing().iterator().next();
+                PatternHop somePatternHop = (PatternHop) somePatternBoard.getToVertex()
+                        .getOutgoing().iterator().next();
 
                 Stop stopA = somePatternHop.getStartStop();
                 ArrayList<Stop> stops = new ArrayList<Stop>();

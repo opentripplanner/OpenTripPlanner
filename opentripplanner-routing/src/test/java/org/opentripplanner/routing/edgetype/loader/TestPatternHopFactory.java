@@ -96,7 +96,7 @@ public class TestPatternHopFactory extends TestCase {
         }
         
         PatternBoard pb = (PatternBoard) stop_a_depart.getOutgoing().iterator().next();
-        Vertex journey_a_1 = graph.getVertex(pb.getToVertex());
+        Vertex journey_a_1 = pb.getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
@@ -216,8 +216,8 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public PatternHop getHopOut(Vertex v) {
-        for (PatternBoard e : filter(graph.getOutgoing(v), PatternBoard.class)) {
-            for (PatternHop f : filter(graph.getOutgoing(e.getToVertex()), PatternHop.class)) {
+        for (PatternBoard e : filter(v.getOutgoing(), PatternBoard.class)) {
+            for (PatternHop f : filter(e.getToVertex().getOutgoing(), PatternHop.class)) {
                 return f;
             }
         }
@@ -250,7 +250,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_o = graph.getVertex("agency_O_depart");
         Vertex stop_p = graph.getVertex("agency_P");
         int i = 0;
-        for (@SuppressWarnings("unused") Edge e: graph.getOutgoing(stop_o)) {
+        for (@SuppressWarnings("unused") Edge e: stop_o.getOutgoing()) {
             ++i;
         }
         assertTrue(i == 3);
@@ -296,8 +296,8 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue("expected to use much later trip due to min transfer time", path.getEndTime() - startTime > 4.5 * 60 * 60);
         
         /* cleanup */
-        graph.getVertex(e_arrive).removeOutgoing(edge);
-        graph.getVertex(f_depart).removeIncoming(edge);
+        e_arrive.removeOutgoing(edge);
+        f_depart.removeIncoming(edge);
     }
 
     public void testInterlining() throws Exception {
@@ -413,7 +413,7 @@ public class TestPatternHopFactory extends TestCase {
 
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex split_d = null;
-        for (StreetTransitLink e : filter(graph.getOutgoing(stop_d), StreetTransitLink.class)) {
+        for (StreetTransitLink e : filter(stop_d.getOutgoing(), StreetTransitLink.class)) {
             split_d = e.getToVertex();
         }
         

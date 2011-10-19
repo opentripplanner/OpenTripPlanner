@@ -166,13 +166,13 @@ public class TestHalfEdges extends TestCase {
     	
     	TraverseOptions options = new TraverseOptions();
 
-        HashSet<Edge> turns = new HashSet<Edge>(graph.getOutgoing(left));
-        turns.addAll(graph.getOutgoing(leftBack));
+        HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
+        turns.addAll(leftBack.getOutgoing());
         
         StreetLocation start = StreetLocation.createStreetLocation("start", "start", cast(turns,StreetEdge.class), new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
-        HashSet<Edge> endTurns = new HashSet<Edge>(graph.getOutgoing(right));
-        endTurns.addAll(graph.getOutgoing(rightBack));
+        HashSet<Edge> endTurns = new HashSet<Edge>(right.getOutgoing());
+        endTurns.addAll(rightBack.getOutgoing());
         
         StreetLocation end = StreetLocation.createStreetLocation("end", "end", cast(endTurns,StreetEdge.class), new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
         
@@ -317,14 +317,14 @@ public class TestHalfEdges extends TestCase {
         nl.createLinkage();
         int numVerticesAfter = graph.getVertices().size();
         assertEquals (6, numVerticesAfter - numVerticesBefore);
-        Collection<Edge> outgoing = graph.getOutgoing(station1);
+        Collection<Edge> outgoing = station1.getOutgoing();
         assertTrue(outgoing.size() == 2);
         DirectEdge edge = (DirectEdge) outgoing.iterator().next();
         
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
         
-        outgoing = graph.getOutgoing(station2);
+        outgoing = station2.getOutgoing();
         assertTrue(outgoing.size() == 2);
         edge = (DirectEdge) outgoing.iterator().next();
         

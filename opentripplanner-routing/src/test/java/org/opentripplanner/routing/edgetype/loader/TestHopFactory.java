@@ -65,7 +65,7 @@ public class TestHopFactory extends TestCase {
         }
 
         PatternBoard pb = (PatternBoard) stop_a.getOutgoing().iterator().next();
-        Vertex journey_a_1 = graph.getVertex(pb.getToVertex());
+        Vertex journey_a_1 = pb.getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
