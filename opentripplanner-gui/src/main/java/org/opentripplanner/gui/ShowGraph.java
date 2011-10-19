@@ -254,16 +254,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         edgeIndex = new STRtree();
         Envelope env;
         // int xminx, xmax, ymin, ymax;
-        for (Vertex gv : graph.getVertices()) {
-        	Vertex v = gv;
-            if ((v instanceof TransitStop) ||
-            	(v instanceof StreetLocation) || 
-            	(v instanceof Vertex)) {
-            		Coordinate c = gv.getCoordinate();
-            		env = new Envelope(c);
-            		vertexIndex.insert(env, v);
-            }
-            for (DirectEdge e : IterableLibrary.filter(gv.getOutgoing(),DirectEdge.class)) {
+        for (Vertex v : graph.getVertices()) {
+            Coordinate c = v.getCoordinate();
+            env = new Envelope(c);
+            vertexIndex.insert(env, v);
+            for (DirectEdge e : IterableLibrary.filter(v.getOutgoing(),DirectEdge.class)) {
                 if (e.getGeometry() == null) continue;
                 if (e instanceof PatternEdge ||
                 	e instanceof StreetTransitLink ||
