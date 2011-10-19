@@ -53,11 +53,10 @@ public class OverlayGraph implements Serializable {
 	 */
 	public OverlayGraph(Graph g) {
 		this();
-		for (GraphVertex gv : g.getVertices()) {
-			Vertex v = gv.vertex;
-			for (Edge e : gv.getOutgoing())
+		for (Vertex v : g.getVertices()) {
+			for (Edge e : v.getOutgoing())
 				this.addOutgoing(v, e);
-			for (Edge e : gv.getIncoming())
+			for (Edge e : v.getIncoming())
 				this.addIncoming(v, e);
 		}
 	}
