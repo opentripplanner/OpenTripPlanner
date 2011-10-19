@@ -24,13 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-<<<<<<< HEAD
 import org.opentripplanner.routing.core.DirectEdge;
-=======
 import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TableRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
->>>>>>> fb0ce23... Adapt routing classes to GraphVertex refactor
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
