@@ -27,7 +27,6 @@ import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;

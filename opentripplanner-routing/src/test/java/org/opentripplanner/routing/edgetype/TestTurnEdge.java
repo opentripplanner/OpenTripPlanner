@@ -23,7 +23,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;

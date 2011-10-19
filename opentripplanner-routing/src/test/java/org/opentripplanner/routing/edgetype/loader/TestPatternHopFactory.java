@@ -13,7 +13,8 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.common.IterableLibrary.*;
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -24,15 +25,14 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.util.TestUtils;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -48,7 +48,7 @@ import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 
