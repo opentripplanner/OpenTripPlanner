@@ -122,15 +122,11 @@ public class BidirectionalRemainingWeightHeuristic implements
                 int ui = ((GenericVertex) u).getIndex();
                 if (uw > weights[ui])
                     continue;
-                //LOG.debug("Extract {} weight {}",u ,uw);
-                GraphVertex gv = g.getGraphVertex(u);
-                if (gv == null)
-                    continue;
                 Iterable<Edge> edges;
                 if (options.isArriveBy())
-                    edges = gv.getOutgoing();
+                    edges = u.getOutgoing();
                 else
-                    edges = gv.getIncoming();
+                    edges = u.getIncoming();
                 for (Edge e : edges) {
                     if (e instanceof DirectEdge) {
                         GenericVertex v = (GenericVertex) (options.isArriveBy() ? 

@@ -340,11 +340,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         Graph graph = _graphService.getGraph();
         boolean foundAlternatePaths = false;
         Vertex start = edge.getFromVertex();
-        GraphVertex gv = graph.getGraphVertex(start);
-        if (gv == null) {
-            return false;
-        }
-        for (Edge out : gv.getOutgoing()) {
+        for (Edge out : start.getOutgoing()) {
             if (out == edge) {
                 continue;
             }
@@ -361,14 +357,9 @@ public class MultiObjectivePathServiceImpl implements PathService {
         return foundAlternatePaths;
     }
 
-	public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
-        Graph graph = _graphService.getGraph();
-        GraphVertex gv = graph.getGraphVertex(vertex);
-        if (gv == null) {
-            return Collections.emptyList();
-        }
+    public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
-        for (Edge out : gv.getOutgoing()) {
+        for (Edge out : vertex.getOutgoing()) {
 
             if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
                 continue;
