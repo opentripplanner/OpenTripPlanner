@@ -331,7 +331,7 @@ public class Graph implements Serializable {
     
     private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         LOG.debug("Consolidating edges...");
-        List<Edge> edges = new ArrayList<Edge>(countVertices() * 2);
+        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
         for (Vertex v : vertices.values()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
