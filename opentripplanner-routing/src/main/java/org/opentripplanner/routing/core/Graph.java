@@ -167,6 +167,17 @@ public class Graph implements Serializable {
             throw new IllegalStateException("Saving an edge with the wrong vertex.");
         addEdge(a, b, ee);
     }
+    
+    /**
+     * this should really be in Edge, not Graph
+     * @param ee
+     */
+    public void removeEdge(DirectEdge ee) {
+        Vertex fromv = ee.getFromVertex();
+        Vertex tov = ee.getToVertex();
+        fromv.removeOutgoing(ee);
+        tov.removeIncoming(ee);
+    }
 
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
