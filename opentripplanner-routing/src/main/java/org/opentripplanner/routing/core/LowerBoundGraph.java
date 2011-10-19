@@ -44,7 +44,7 @@ public class LowerBoundGraph {
 
 	public LowerBoundGraph(Graph original, int kind) {
 		originalGraph = original;
-		nVertices = GenericVertex.maxIndex;
+		nVertices = Vertex.getMaxIndex();
 		LOG.info("Table size is: {}", nVertices);
 		vertex = new int   [nVertices][];
 		weight = new double[nVertices][];
@@ -54,8 +54,7 @@ public class LowerBoundGraph {
 			opt.setArriveBy(true);
 		LOG.info("Loading origial graph into compact representation...");
 		ArrayList<State> svs = new ArrayList<State>();
-		for (Vertex gv : original.getVertices()) {
-			GenericVertex u = (GenericVertex) (gv); 
+		for (Vertex u : original.getVertices()) {
 			State su = new State(u, opt);
 			svs.clear();
 			Iterable<Edge> edges;
@@ -77,7 +76,7 @@ public class LowerBoundGraph {
 			weight[ui] = new double[ne];
 			int ei = 0;
 			for (State sv : svs) {
-				vertex[ui][ei] = ((GenericVertex)(sv.getVertex())).index;
+				vertex[ui][ei] = ((Vertex)(sv.getVertex())).index;
 				weight[ui][ei] = sv.getWeight();
 				ei++;
 			}
@@ -148,7 +147,7 @@ public class LowerBoundGraph {
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
 		for (Vertex origin : origins) {
-			int originIndex = ((GenericVertex)origin).index;
+			int originIndex = ((Vertex)origin).index;
 			result[originIndex] = 0;
 			q.insert(originIndex, 0);
 		}
@@ -180,7 +179,7 @@ public class LowerBoundGraph {
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
 		for (DirectEdge de : origin.getExtra()) {
-			GenericVertex toVertex = (GenericVertex)(de.getToVertex());  
+			Vertex toVertex = de.getToVertex();  
 			int toIndex = toVertex.getIndex();
 			if (toVertex == origin) continue;
 			if (toIndex >= nVertices) continue;

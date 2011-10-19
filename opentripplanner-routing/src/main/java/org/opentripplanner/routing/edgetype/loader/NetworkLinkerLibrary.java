@@ -28,7 +28,7 @@ import java.util.Set;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -276,8 +276,8 @@ public class NetworkLinkerLibrary {
 
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.
-        Vertex e1midpoint = new GenericVertex("split 1 at " + label, midCoord, name);
-        Vertex e2midpoint = new GenericVertex("split 2 at " + label, midCoord, name);
+        Vertex e1midpoint = new Vertex("split 1 at " + label, midCoord, name);
+        Vertex e2midpoint = new Vertex("split 2 at " + label, midCoord, name);
 
         // We are replacing two edges with four edges
         PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
@@ -349,7 +349,7 @@ public class NetworkLinkerLibrary {
          * newEnd will be at the same location as origin of endVertex's outgoing edges,
          * and thus the same location as the destination of startVertex's outgoing edges.
          */
-        Vertex newEnd = new GenericVertex("replace " + endVertex.getLabel(), endVertex.getX(),
+        Vertex newEnd = new Vertex("replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
         newEnd = graph.addVertex(newEnd);
 
@@ -370,7 +370,7 @@ public class NetworkLinkerLibrary {
         }
 
         /* and likewise for start */
-        Vertex newStart = new GenericVertex("replace " + startVertex.getLabel(),
+        Vertex newStart = new Vertex("replace " + startVertex.getLabel(),
                 startVertex.getX(), startVertex.getY());
         newStart = graph.addVertex(newStart);
 

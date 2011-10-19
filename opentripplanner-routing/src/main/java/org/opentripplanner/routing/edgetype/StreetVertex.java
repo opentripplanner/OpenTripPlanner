@@ -19,7 +19,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
  * that direction.  It contains most of the data used for edges from the street.
  * 
  */
-public class StreetVertex extends GenericVertex {
+public class StreetVertex extends Vertex {
 
     private static final long serialVersionUID = -385126804908021091L;
 

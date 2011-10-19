@@ -34,7 +34,7 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
@@ -489,11 +489,11 @@ public class GTFSPatternHopFactory {
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
-                Vertex arrive = graph.addVertex(new GenericVertex(arrivalVertexId(id(stop.getId())), stop.getLon(),
+                Vertex arrive = graph.addVertex(new Vertex(arrivalVertexId(id(stop.getId())), stop.getLon(),
                         stop.getLat(), stop.getName(), stop.getId()));
 
                 //add a vertex representing departing from at the stop
-                Vertex depart = graph.addVertex(new GenericVertex(departureVertexId(id(stop.getId())), stop.getLon(),
+                Vertex depart = graph.addVertex(new Vertex(departureVertexId(id(stop.getId())), stop.getLon(),
                         stop.getLat(), stop.getName(), stop.getId()));
 
                 //add edges from arrive to stop and stop to depart
@@ -528,8 +528,8 @@ public class GTFSPatternHopFactory {
                 continue;
             }
 
-            GenericVertex v = (GenericVertex) dwell.getFromVertex();
-            v.mergeFrom(graph, (GenericVertex) dwell.getToVertex());
+            Vertex v = (Vertex) dwell.getFromVertex();
+            v.mergeFrom(graph, (Vertex) dwell.getToVertex());
             if (!notSimplePatterns.contains(pattern)) {
                 possiblySimplePatterns.add(pattern);
             }

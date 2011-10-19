@@ -92,12 +92,12 @@ public class Graph implements Serializable {
 
     /**
      * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-     * GenericVertex with the given label and coordinates, add it to the graph, and return it.
+     * Vertex with the given label and coordinates, add it to the graph, and return it.
      */
     public Vertex addVertex(String label, double x, double y) {
         Vertex gv = vertices.get(label);
         if (gv == null) {
-            Vertex vv = new GenericVertex(label, x, y);
+            Vertex vv = new Vertex(label, x, y);
             vertices.put(label, vv);
             return vv;
         }
@@ -106,12 +106,12 @@ public class Graph implements Serializable {
 
     /**
      * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-     * GenericVertex with the given parameters, add it to the graph, and return it.
+     * Vertex with the given parameters, add it to the graph, and return it.
      */
     public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
         Vertex gv = vertices.get(label);
         if (gv == null) {
-            Vertex vv = new GenericVertex(label, x, y, name, stopId);
+            Vertex vv = new Vertex(label, x, y, name, stopId);
             vertices.put(label, vv);
             return vv;
         }

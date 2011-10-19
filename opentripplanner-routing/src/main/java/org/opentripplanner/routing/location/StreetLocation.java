@@ -20,7 +20,7 @@ import java.util.List;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -41,7 +41,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * the first and last segments of a trip, for trips that start or end between two intersections.
  * Also for situating bus stops in the middle of street segments.
  */
-public class StreetLocation extends GenericVertex {
+public class StreetLocation extends Vertex {
 
     private ArrayList<DirectEdge> extra = new ArrayList<DirectEdge>();
 

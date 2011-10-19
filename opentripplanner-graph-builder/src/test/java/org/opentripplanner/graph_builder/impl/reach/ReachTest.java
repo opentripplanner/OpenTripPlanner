@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -118,8 +118,8 @@ public class ReachTest extends TestCase {
     }
     
 
-    private GenericVertex vertex(String label, double lat, double lon) {
-        GenericVertex v = new GenericVertex(label, lat, lon);
+    private Vertex vertex(String label, double lat, double lon) {
+        Vertex v = new Vertex(label, lat, lon);
         graph.addVertex(v);
         return v;
     }

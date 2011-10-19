@@ -13,11 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 
 /** Represents an ordinary location in space, typically an intersection */
 
-public class EndpointVertex extends GenericVertex {
+public class EndpointVertex extends Vertex {
 
     public EndpointVertex(String label, double x, double y, String name) {
         super(label, x, y, name);

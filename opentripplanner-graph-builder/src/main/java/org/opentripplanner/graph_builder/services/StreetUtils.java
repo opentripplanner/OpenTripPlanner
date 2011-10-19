@@ -23,7 +23,7 @@ import java.util.Queue;
 
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -151,7 +151,7 @@ public class StreetUtils {
     		}
         	State s0 = new State(gv, options);
     		for (Edge e: gv.getOutgoing()) {
-    			GenericVertex in = (GenericVertex) gv;
+    			Vertex in = (Vertex) gv;
     			if (!(e instanceof StreetEdge)) {
         			continue;
         		}
@@ -159,7 +159,7 @@ public class StreetUtils {
     			if (s1 == null) {
     				continue;
     			}
-    			GenericVertex out = (GenericVertex) s1.getVertex();
+    			Vertex out = (Vertex) s1.getVertex();
     			
     			ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
     			if (vertexList == null) {

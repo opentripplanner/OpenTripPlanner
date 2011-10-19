@@ -16,7 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.util.Arrays;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -73,7 +73,7 @@ public class BidirectionalRemainingWeightHeuristic implements
             return 0;
         if (s.getWeight() < 10 * 60)
             return 0;
-        int index = ((GenericVertex) s.getVertex()).getIndex();
+        int index = ((Vertex) s.getVertex()).getIndex();
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
@@ -89,7 +89,7 @@ public class BidirectionalRemainingWeightHeuristic implements
     private void recalculate(Vertex target, TraverseOptions options, boolean timeNotWeight) {
         if (target != this.target) {
             this.target = target;
-            this.nVertices = GenericVertex.getMaxIndex();
+            this.nVertices = Vertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             BinHeap<Vertex> q = new BinHeap<Vertex>();
@@ -97,11 +97,11 @@ public class BidirectionalRemainingWeightHeuristic implements
 
             if (target instanceof StreetLocation) {
                 for (DirectEdge de : ((StreetLocation) target).getExtra()) {
-                    GenericVertex gv;
+                    Vertex gv;
                     if (options.isArriveBy()) {
-                        gv = (GenericVertex) (de.getToVertex());
+                        gv = (Vertex) (de.getToVertex());
                     } else {
-                        gv = (GenericVertex) (de.getFromVertex());
+                        gv = (Vertex) (de.getFromVertex());
                     }
                     int gvi = gv.getIndex();
                     if (gv == target)
@@ -112,14 +112,14 @@ public class BidirectionalRemainingWeightHeuristic implements
                     q.insert(gv, 0);
                 }
             } else {
-                int i = ((GenericVertex) target).getIndex();
+                int i = ((Vertex) target).getIndex();
                 weights[i] = 0;
                 q.insert(target, 0);
             }
             while (!q.empty()) {
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
-                int ui = ((GenericVertex) u).getIndex();
+                int ui = ((Vertex) u).getIndex();
                 if (uw > weights[ui])
                     continue;
                 Iterable<Edge> edges;
@@ -129,7 +129,7 @@ public class BidirectionalRemainingWeightHeuristic implements
                     edges = u.getIncoming();
                 for (Edge e : edges) {
                     if (e instanceof DirectEdge) {
-                        GenericVertex v = (GenericVertex) (options.isArriveBy() ? 
+                        Vertex v = (Vertex) (options.isArriveBy() ? 
                             ((DirectEdge) e).getToVertex() : ((DirectEdge) e).getFromVertex());
                         double vw = uw + (timeNotWeight ? 
                                 e.timeLowerBound(options) : e.weightLowerBound(options));

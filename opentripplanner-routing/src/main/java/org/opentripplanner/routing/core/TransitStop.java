@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 
-public class TransitStop extends GenericVertex {
+public class TransitStop extends Vertex {
     private static final long serialVersionUID = 1L;
     private boolean wheelchairEntrance;
     private boolean isEntrance;

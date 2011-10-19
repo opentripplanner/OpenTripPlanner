@@ -25,11 +25,10 @@ public class VertexMap<T> {
 	}
 
 	public VertexMap() {
-		this(GenericVertex.maxIndex);
+		this(Vertex.getMaxIndex());
 	}
 	
-	// If GraphVertex is eliminated, then every vertex will be a GenericVertex
-	public void set(GenericVertex v, T elem) {
+	public void set(Vertex v, T elem) {
 		int index = v.index;
 		while (index > map.length)
 			map = Arrays.copyOf(map, (int) (map.length * 1.5));
@@ -37,7 +36,7 @@ public class VertexMap<T> {
 		map[v.index] = elem;
 	}
 	          
-	public T get(GenericVertex v) {
+	public T get(Vertex v) {
 		return map[v.index];
 	}
 	

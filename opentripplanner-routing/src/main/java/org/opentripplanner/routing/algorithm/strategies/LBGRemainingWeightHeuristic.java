@@ -16,7 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.util.HashMap;
 
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.LowerBoundGraph;
 import org.opentripplanner.routing.core.State;
@@ -81,7 +81,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
-        int index = ((GenericVertex) s.getVertex()).getIndex();
+        int index = ((Vertex) s.getVertex()).getIndex();
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());

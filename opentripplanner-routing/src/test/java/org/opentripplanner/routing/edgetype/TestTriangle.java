@@ -16,7 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -35,8 +35,8 @@ public class TestTriangle extends TestCase {
         Coordinate c1 = new Coordinate(-122.575033, 45.456773);
         Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-        Vertex v1 = new GenericVertex("v1", c1, null);
-        Vertex v2 = new GenericVertex("v2", c2, null);
+        Vertex v1 = new Vertex("v1", c1, null);
+        Vertex v2 = new Vertex("v2", c2, null);
 
         GeometryFactory factory = new GeometryFactory();
         LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

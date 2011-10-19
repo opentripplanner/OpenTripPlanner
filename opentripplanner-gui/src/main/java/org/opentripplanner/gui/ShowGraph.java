@@ -34,7 +34,7 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransitStop;
@@ -258,7 +258,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         	Vertex v = gv;
             if ((v instanceof TransitStop) ||
             	(v instanceof StreetLocation) || 
-            	(v instanceof GenericVertex)) {
+            	(v instanceof Vertex)) {
             		Coordinate c = gv.getCoordinate();
             		env = new Envelope(c);
             		vertexIndex.insert(env, v);

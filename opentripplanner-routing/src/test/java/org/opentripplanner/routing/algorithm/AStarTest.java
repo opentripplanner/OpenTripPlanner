@@ -21,7 +21,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -241,7 +241,7 @@ public class AStarTest {
         }
     }
 
-    private static class SimpleVertex extends GenericVertex {
+    private static class SimpleVertex extends Vertex {
 
         private static final long serialVersionUID = 1L;
 

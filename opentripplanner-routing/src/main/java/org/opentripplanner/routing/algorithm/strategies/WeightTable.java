@@ -34,7 +34,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.GenericVertex;
+import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -53,7 +53,7 @@ public class WeightTable implements Serializable {
 			.getLogger(WeightTable.class);
 	private float[][] table;
 	private Graph g;
-	Map<GenericVertex, Integer> stopIndices;
+	Map<Vertex, Integer> stopIndices;
 	private double maxWalkSpeed;
         private double maxWalkDistance;
 	private transient int count;
@@ -130,7 +130,7 @@ public class WeightTable implements Serializable {
 				stopVertices.add((TransitStop) gv);
 		int nStops = stopVertices.size();
 
-		stopIndices = new IdentityHashMap<GenericVertex, Integer>(nStops);
+		stopIndices = new IdentityHashMap<Vertex, Integer>(nStops);
 		for (int i = 0; i < nStops; i++)
 			stopIndices.put(stopVertices.get(i), i);
 		LOG.debug("Number of stops: " + nStops);
@@ -252,7 +252,7 @@ public class WeightTable implements Serializable {
 						Vertex v = ((PatternBoard) e).getToVertex();
 						// give onboard vertices same index as their
 						// corresponding station
-						stopIndices.put((GenericVertex) v, oi);
+						stopIndices.put((Vertex) v, oi);
 						StateEditor se = (new State(u, options)).edit(e);
 						se.incrementWeight(OPTIMISTIC_BOARD_COST);
 						s0 = se.makeState();
@@ -263,7 +263,7 @@ public class WeightTable implements Serializable {
 						Vertex v = ((FreeEdge) e).getToVertex();
 						// give onboard vertices same index as their
 						// corresponding station
-						stopIndices.put((GenericVertex) v, oi);
+						stopIndices.put((Vertex) v, oi);
 						q.add(v);
 					}
 				}

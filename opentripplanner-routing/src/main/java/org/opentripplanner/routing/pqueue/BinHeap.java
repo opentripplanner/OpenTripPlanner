@@ -28,7 +28,7 @@ public class BinHeap<T> implements OTPPriorityQueue<T> {
     private T[] elem;
     private int size; 
     private int capacity;
-    private int[] dir; // TODO: track element index by GenericVertex.index 
+    private int[] dir; // TODO: track element index by Vertex.index 
     
     public BinHeap() {
     	this(1000);
