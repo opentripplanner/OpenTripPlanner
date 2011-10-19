@@ -528,8 +528,8 @@ public class GTFSPatternHopFactory {
                 continue;
             }
 
-            Vertex v = (Vertex) dwell.getFromVertex();
-            v.mergeFrom(graph, (Vertex) dwell.getToVertex());
+            Vertex v = dwell.getFromVertex();
+            v.mergeFrom(graph, dwell.getToVertex());
             if (!notSimplePatterns.contains(pattern)) {
                 possiblySimplePatterns.add(pattern);
             }

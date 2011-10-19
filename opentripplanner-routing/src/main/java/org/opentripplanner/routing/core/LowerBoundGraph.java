@@ -76,7 +76,7 @@ public class LowerBoundGraph {
 			weight[ui] = new double[ne];
 			int ei = 0;
 			for (State sv : svs) {
-				vertex[ui][ei] = ((Vertex)(sv.getVertex())).index;
+				vertex[ui][ei] = sv.getVertex().index;
 				weight[ui][ei] = sv.getWeight();
 				ei++;
 			}
@@ -147,7 +147,7 @@ public class LowerBoundGraph {
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
 		for (Vertex origin : origins) {
-			int originIndex = ((Vertex)origin).index;
+			int originIndex = origin.index;
 			result[originIndex] = 0;
 			q.insert(originIndex, 0);
 		}

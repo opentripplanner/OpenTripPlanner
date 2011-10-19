@@ -151,7 +151,7 @@ public class StreetUtils {
     		}
         	State s0 = new State(gv, options);
     		for (Edge e: gv.getOutgoing()) {
-    			Vertex in = (Vertex) gv;
+    			Vertex in = gv;
     			if (!(e instanceof StreetEdge)) {
         			continue;
         		}
@@ -159,7 +159,7 @@ public class StreetUtils {
     			if (s1 == null) {
     				continue;
     			}
-    			Vertex out = (Vertex) s1.getVertex();
+    			Vertex out = s1.getVertex();
     			
     			ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
     			if (vertexList == null) {

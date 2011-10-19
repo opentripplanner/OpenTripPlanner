@@ -81,7 +81,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
-        int index = ((Vertex) s.getVertex()).getIndex();
+        int index = s.getVertex().getIndex();
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());

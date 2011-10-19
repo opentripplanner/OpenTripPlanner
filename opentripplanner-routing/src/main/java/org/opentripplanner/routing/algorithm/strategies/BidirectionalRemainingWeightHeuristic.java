@@ -73,7 +73,7 @@ public class BidirectionalRemainingWeightHeuristic implements
             return 0;
         if (s.getWeight() < 10 * 60)
             return 0;
-        int index = ((Vertex) s.getVertex()).getIndex();
+        int index = s.getVertex().getIndex();
         if (index < weights.length) {
             double h = weights[index];
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
@@ -99,9 +99,9 @@ public class BidirectionalRemainingWeightHeuristic implements
                 for (DirectEdge de : ((StreetLocation) target).getExtra()) {
                     Vertex gv;
                     if (options.isArriveBy()) {
-                        gv = (Vertex) (de.getToVertex());
+                        gv = de.getToVertex();
                     } else {
-                        gv = (Vertex) (de.getFromVertex());
+                        gv = de.getFromVertex();
                     }
                     int gvi = gv.getIndex();
                     if (gv == target)
@@ -112,14 +112,14 @@ public class BidirectionalRemainingWeightHeuristic implements
                     q.insert(gv, 0);
                 }
             } else {
-                int i = ((Vertex) target).getIndex();
+                int i = target.getIndex();
                 weights[i] = 0;
                 q.insert(target, 0);
             }
             while (!q.empty()) {
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
-                int ui = ((Vertex) u).getIndex();
+                int ui = u.getIndex();
                 if (uw > weights[ui])
                     continue;
                 Iterable<Edge> edges;
@@ -129,8 +129,8 @@ public class BidirectionalRemainingWeightHeuristic implements
                     edges = u.getIncoming();
                 for (Edge e : edges) {
                     if (e instanceof DirectEdge) {
-                        Vertex v = (Vertex) (options.isArriveBy() ? 
-                            ((DirectEdge) e).getToVertex() : ((DirectEdge) e).getFromVertex());
+                        Vertex v = options.isArriveBy() ? 
+                            ((DirectEdge) e).getToVertex() : e.getFromVertex();
                         double vw = uw + (timeNotWeight ? 
                                 e.timeLowerBound(options) : e.weightLowerBound(options));
                         int vi = v.getIndex();

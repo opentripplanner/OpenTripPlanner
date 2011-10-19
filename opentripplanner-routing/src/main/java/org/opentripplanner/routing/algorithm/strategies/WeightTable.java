@@ -252,7 +252,7 @@ public class WeightTable implements Serializable {
 						Vertex v = ((PatternBoard) e).getToVertex();
 						// give onboard vertices same index as their
 						// corresponding station
-						stopIndices.put((Vertex) v, oi);
+						stopIndices.put(v, oi);
 						StateEditor se = (new State(u, options)).edit(e);
 						se.incrementWeight(OPTIMISTIC_BOARD_COST);
 						s0 = se.makeState();
@@ -263,7 +263,7 @@ public class WeightTable implements Serializable {
 						Vertex v = ((FreeEdge) e).getToVertex();
 						// give onboard vertices same index as their
 						// corresponding station
-						stopIndices.put((Vertex) v, oi);
+						stopIndices.put(v, oi);
 						q.add(v);
 					}
 				}
