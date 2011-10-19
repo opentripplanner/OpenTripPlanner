@@ -306,6 +306,23 @@ public class Graph implements Serializable {
 
     public void setBundle(GraphBundle bundle) {
         this.bundle = bundle;
+    }    
+    
+    public int countVertices() {
+        return vertices.size();
+    }
+
+    /**
+     * Find the total number of edges in this Graph. There are assumed to be no Edges 
+     * in an incoming edge list that are not in an outgoing edge list. 
+     * @return number of outgoing edges in the graph
+     */
+    public int countEdges() {
+        int ne = 0;
+        for (Vertex v : vertices.values()) {
+            ne += v.getDegreeOut();
+        }
+        return ne;
     }
     
     /* (de) serialization */
@@ -351,4 +368,5 @@ public class Graph implements Serializable {
             }
         }
     }
+
 }
