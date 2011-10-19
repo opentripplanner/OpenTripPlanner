@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class GenericVertex implements Vertex, Serializable {
 
-    private static final long serialVersionUID = 364261663335739528L;
+    private static final long serialVersionUID = 20111019;
 
     public final String label;
     
