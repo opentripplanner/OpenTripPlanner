@@ -17,11 +17,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -329,11 +331,10 @@ public class Graph implements Serializable {
     
     private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
         LOG.debug("Consolidating edges...");
-        // could be a list, use getOutgoing only
-        Set<Edge> edges = new HashSet<Edge>();
+        List<Edge> edges = new ArrayList<Edge>(countVertices() * 2);
         for (Vertex v : vertices.values()) {
+            // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
-            edges.addAll(v.getIncoming());
         }
         LOG.debug("Writing graph...");
         out.defaultWriteObject();
@@ -344,13 +345,13 @@ public class Graph implements Serializable {
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         LOG.debug("Reading graph...");
         in.defaultReadObject();
-        Set<Edge> edges = (HashSet<Edge>) in.readObject();
+        List<Edge> edges = (ArrayList<Edge>) in.readObject();
         LOG.debug("Loading edges...");
         this.vertices = new HashMap<String, Vertex>();
         int count = 0;
         for (Edge e : edges) {
-            if (++count % 1000 == 0)
-                LOG.debug("loading edge {} : {}", count, e);
+            if (++count % 100000 == 0)
+                LOG.debug("loading edge {} / {}", count, edges.size());
             Vertex fromv = e.getFromVertex();
             Vertex tov = null;
             if (e instanceof AbstractEdge)
