@@ -66,7 +66,7 @@ public class ReachTest extends TestCase {
         
         List<TraverseOptions> optionlist = Arrays.asList(options);
         ContractionHierarchySet hierarchy = new ContractionHierarchySet(graph, optionlist);
-        GraphSerializationLibrary.writeGraph(hierarchy, new File("/home/novalis/otp/thegraph/Graph.obj"));
+        GraphSerializationLibrary.writeGraph(hierarchy, new File("/tmp/ReachTestGraph.obj"));
     }
     
     void makeGraph(Graph graph) {
