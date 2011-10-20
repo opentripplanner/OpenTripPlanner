@@ -622,8 +622,7 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
                         edgeNarrative.isRoundabout());
-                boolean optionsBefore = pathService.multipleOptionsBefore(edge, currState
-                        .getBackState());
+                boolean optionsBefore = currState.multipleOptionsBefore();
                 if (edgeNarrative.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {

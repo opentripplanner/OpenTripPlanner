@@ -336,27 +336,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
         return true;
     }
 
-    public boolean multipleOptionsBefore(Edge edge, State state) {
-        Graph graph = _graphService.getGraph();
-        boolean foundAlternatePaths = false;
-        Vertex start = edge.getFromVertex();
-        for (Edge out : start.getOutgoing()) {
-            if (out == edge) {
-                continue;
-            }
-            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
-                continue;
-            }
-            if (state != null && out.traverse(state) == null) {
-                continue;
-            }
-            // there were paths we didn't take.
-            foundAlternatePaths = true;
-            break;
-        }
-        return foundAlternatePaths;
-    }
-
     public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
         for (Edge out : vertex.getOutgoing()) {

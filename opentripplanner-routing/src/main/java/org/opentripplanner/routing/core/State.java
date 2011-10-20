@@ -18,6 +18,9 @@ import java.util.Date;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 
 public class State implements Cloneable {
 
@@ -346,4 +349,24 @@ public class State implements Cloneable {
     public void setWalkAtLastTransit(double lastTransitWalk) {
         this.lastTransitWalk = lastTransitWalk;
     }
+    
+    public boolean multipleOptionsBefore() {
+        boolean foundAlternatePaths = false;
+        for (Edge out : backState.vertex.getOutgoing()) {
+            if (out == backEdge) {
+                continue;
+            }
+            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+                continue;
+            }
+            if (out.traverse(this) == null) {
+                continue;
+            }
+            // there were paths we didn't take.
+            foundAlternatePaths = true;
+            break;
+        }
+        return foundAlternatePaths;
+    }
+    
 }

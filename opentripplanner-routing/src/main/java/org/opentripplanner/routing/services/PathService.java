@@ -59,7 +59,5 @@ public interface PathService {
 
     public boolean isAccessible(String place, TraverseOptions options);
 
-    public boolean multipleOptionsBefore(Edge edge, State state);
-
-	public List<DirectEdge> getOutgoingEdges(Vertex vertex);
+    public List<DirectEdge> getOutgoingEdges(Vertex vertex);
 }
