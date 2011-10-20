@@ -359,7 +359,7 @@ public class State implements Cloneable {
             if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
                 continue;
             }
-            if (out.traverse(this) == null) {
+            if (out.traverse(backState) == null) {
                 continue;
             }
             // there were paths we didn't take.
