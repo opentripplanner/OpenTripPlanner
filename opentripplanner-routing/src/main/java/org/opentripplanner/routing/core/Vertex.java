@@ -44,96 +44,22 @@ public class Vertex implements Cloneable, Serializable{
     
     protected String name;
 
-    /**
-     * For vertices that represent stops, the passenger-facing stop ID (for systems like TriMet that
-     * have this feature).
-     */
     private AgencyAndId stopId = null;
 
-    /**
-     * The latitude of the vertex
-     */
     private double y;
 
-    /**
-     * The longitude of the vertex
-     */
     private double x;
 
-    /**
-     * Each vertex has a unique index that serves as a hashcode or table index
-     */
-    int index;
+    private int index;
 
-    /**
-     * Distance to the closest transit stop in meters
-     */
     private double distanceToNearestTransitStop = 0;
 
     private transient ArrayList<Edge> incoming = new ArrayList<Edge>();
 
     private transient ArrayList<Edge> outgoing = new ArrayList<Edge>();
 
-    public void addOutgoing(Edge ee) {
-        outgoing.add(ee);
-    }
     
-    public void addIncoming(Edge ee) {
-        incoming.add(ee);
-    }
-    
-    public void removeOutgoing(Edge ee) {
-        outgoing.remove(ee);
-    }
-    
-    public void removeIncoming(Edge ee) {
-        incoming.remove(ee);
-    }
-    
-    public int getDegreeIn() {
-        return incoming.size();
-    }
-
-    public int getDegreeOut() {
-        return outgoing.size();
-    }
-
-    public Collection<Edge> getIncoming() {
-        return incoming;
-    }
-
-    public Collection<Edge> getOutgoing() {
-        return outgoing;
-    }
-
-    public void removeAllEdges() {
-        for (Edge e : outgoing) {
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
-                // this used to grab the graphvertex by label... now it could possibly be a vertex
-                // that is not in the graph
-                // Vertex target = vertices.get(edge.getToVertex().getLabel());
-                Vertex target = edge.getToVertex();
-                if (target != null) {
-                    target.removeIncoming(e);
-                }
-            }
-        }
-        for (Edge e : incoming) {
-            // why only directedges?
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
-                // Vertex source = vertices.get(edge.getFromVertex().getLabel());
-                Vertex source = edge.getFromVertex();
-                if (source != null) {
-                    // changed to removeOutgoing (AB)
-                    source.removeOutgoing(e);
-                }
-            }
-        }
-        incoming = new ArrayList<Edge>();
-        outgoing = new ArrayList<Edge>();
-    }
+    /* PUBLIC CONSTRUCTORS */
     
     public Vertex(String label, Coordinate coord, String name) {
         this(label, coord.x, coord.y, name);
@@ -157,6 +83,9 @@ public class Vertex implements Cloneable, Serializable{
         this.stopId = stopId;
     }
 
+
+    /* PUBLIC METHODS */
+    
     /**
      * Distance in meters to the coordinate
      */
@@ -178,33 +107,84 @@ public class Vertex implements Cloneable, Serializable{
         return DistanceLibrary.fastDistance(getY(), getX(), v.getY(), v.getX());
     }
 
-    public Coordinate getCoordinate() {
-        return new Coordinate(getX(), getY());
-    }
-
     public String toString() {
         return "<" + this.label + ">";
     }
 
+    public int hashCode() {
+        return index;
+    }
+
+
+    /* FIELD ACCESSOR METHODS : READ/WRITE */
+
+    public void addOutgoing(Edge ee) {
+        outgoing.add(ee);
+    }
+    
+    public void removeOutgoing(Edge ee) {
+        outgoing.remove(ee);
+    }
+
+    /** Get a collection containing all the edges leading from this vertex to other vertices. */
+    public Collection<Edge> getOutgoing() {
+        return outgoing;
+    }
+
+    public void addIncoming(Edge ee) {
+        incoming.add(ee);
+    }
+    
+    public void removeIncoming(Edge ee) {
+        incoming.remove(ee);
+    }
+
+    /** Get a collection containing all the edges leading from other vertices to this vertex. */
+    public Collection<Edge> getIncoming() {
+        return incoming;
+    }
+
+    public int getDegreeOut() {
+        return outgoing.size();
+    }
+
+    public int getDegreeIn() {
+        return incoming.size();
+    }
+    
+    public void setDistanceToNearestTransitStop(double distance) {
+        distanceToNearestTransitStop = distance;
+    }
+    
+    /** Get the distance from this vertex to the closest transit stop in meters. */
+    public double getDistanceToNearestTransitStop() {
+        return distanceToNearestTransitStop;
+    }
+
+    /** Set the longitude of the vertex */
     public void setX(double x) {
         this.x = x;
     }
 
+    /** Get the longitude of the vertex */
     public double getX() {
         return x;
     }
 
+    /** Set the latitude of the vertex */
     public void setY(double y) {
         this.y = y;
     }
 
+    /** Get the latitude of the vertex */
     public double getY() {
         return y;
     }
 
-    /**
-     * Every vertex has a label which is globally unique
-     */
+
+    /* FIELD ACCESSOR METHODS : READ ONLY */
+
+    /** Every vertex has a label which is globally unique. */
     public String getLabel() {
         return label;
     }
@@ -213,8 +193,56 @@ public class Vertex implements Cloneable, Serializable{
         return name;
     }
 
+    public Coordinate getCoordinate() {
+        return new Coordinate(getX(), getY());
+    }
+
+    /** For vertices that represent stops, the passenger-facing stop ID 
+     *  (for systems like TriMet that have this feature).  */
     public AgencyAndId getStopId() {
         return stopId;
+    }
+
+    /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
+    public int getIndex() {
+        return index;
+    }
+    
+    /** Get the highest unique index that has been assigned to a vertex.
+     *  Used for making tables big enough to contain all existing vertices. */
+    public static int getMaxIndex() {
+        return maxIndex;
+    }
+    
+    
+    /* SERIALIZATION METHODS */
+    
+    private void writeObject(ObjectOutputStream out) throws IOException {
+// Transient so no need to trim
+//        incoming.trimToSize();
+//        outgoing.trimToSize();
+        out.defaultWriteObject();
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.incoming = new ArrayList<Edge>(2);
+        this.outgoing = new ArrayList<Edge>(2);
+        index = maxIndex++;
+    }
+
+    
+    /* UTILITY METHODS FOR GRAPH BUILDING AND GENERATING WALKSTEPS */
+    
+    public List<DirectEdge> getOutgoingStreetEdges() {
+        List<DirectEdge> result = new ArrayList<DirectEdge>();
+        for (Edge out : this.getOutgoing()) {
+            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+                continue;
+            }
+            result.add((StreetEdge) out);
+        }
+        return result;
     }
 
     /**
@@ -261,51 +289,37 @@ public class Vertex implements Cloneable, Serializable{
         graph.removeVertex(other);
     }
     
-    public int hashCode() {
-        return index;
-    }
-
-    /* SERIALIZATION */
-    
-    private void writeObject(ObjectOutputStream out) throws IOException {
-// Transient so no need to trim
-//        incoming.trimToSize();
-//        outgoing.trimToSize();
-        out.defaultWriteObject();
-    }
-
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        this.incoming = new ArrayList<Edge>(2);
-        this.outgoing = new ArrayList<Edge>(2);
-        index = maxIndex++;
-    }
-
-    public void setDistanceToNearestTransitStop(double distance) {
-        distanceToNearestTransitStop = distance;
-    }
-
-    public double getDistanceToNearestTransitStop() {
-        return distanceToNearestTransitStop;
-    }
-
-    public int getIndex() {
-        return index;
-    }
-    
-    public static int getMaxIndex() {
-        return maxIndex;
-    }
-
-    public List<DirectEdge> getOutgoingStreetEdges() {
-        List<DirectEdge> result = new ArrayList<DirectEdge>();
-        for (Edge out : this.getOutgoing()) {
-            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
-                continue;
+    /**
+     * Clear this vertex's outgoing and incoming edge lists, and remove all the edges
+     * they contained from this vertex's neighbors.
+     */
+    public void removeAllEdges() {
+        for (Edge e : outgoing) {
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                // this used to grab the GraphVertex by label... now it could possibly be a vertex
+                // that is not in the graph
+                // Vertex target = vertices.get(edge.getToVertex().getLabel());
+                Vertex target = edge.getToVertex();
+                if (target != null) {
+                    target.removeIncoming(e);
+                }
             }
-            result.add((StreetEdge) out);
         }
-        return result;
+        for (Edge e : incoming) {
+            // why only DirectEdges?
+            if (e instanceof DirectEdge) {
+                DirectEdge edge = (DirectEdge) e;
+                // Vertex source = vertices.get(edge.getFromVertex().getLabel());
+                Vertex source = edge.getFromVertex();
+                if (source != null) {
+                    // changed to removeOutgoing (AB)
+                    source.removeOutgoing(e);
+                }
+            }
+        }
+        incoming = new ArrayList<Edge>();
+        outgoing = new ArrayList<Edge>();
     }
-
+    
 }
