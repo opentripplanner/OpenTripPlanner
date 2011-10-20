@@ -418,15 +418,9 @@ public class ContractionPathServiceImpl implements PathService {
         return foundAlternatePaths;
     }
 
-	public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
-        Graph graph = _graphService.getGraph();
-        Vertex gv = graph.getVertex(vertex);
-        if (gv == null) {
-            return Collections.emptyList();
-        }
+    public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
-        for (Edge out : gv.getOutgoing()) {
-
+        for (Edge out : vertex.getOutgoing()) {
             if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
                 continue;
             }
