@@ -397,14 +397,4 @@ public class ContractionPathServiceImpl implements PathService {
         return true;
     }
 
-    public List<DirectEdge> getOutgoingEdges(Vertex vertex) {
-        List<DirectEdge> result = new ArrayList<DirectEdge>();
-        for (Edge out : vertex.getOutgoing()) {
-            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
-                continue;
-            }
-            result.add((StreetEdge) out);
-        }
-        return result;
-	}
 }

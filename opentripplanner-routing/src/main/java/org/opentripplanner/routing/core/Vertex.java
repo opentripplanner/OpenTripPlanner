@@ -26,7 +26,12 @@ import static org.opentripplanner.common.IterableLibrary.cast;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.opentripplanner.routing.edgetype.OutEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
 public class Vertex implements Cloneable, Serializable{
@@ -292,5 +297,15 @@ public class Vertex implements Cloneable, Serializable{
         return maxIndex;
     }
 
+    public List<DirectEdge> getOutgoingStreetEdges() {
+        List<DirectEdge> result = new ArrayList<DirectEdge>();
+        for (Edge out : this.getOutgoing()) {
+            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+                continue;
+            }
+            result.add((StreetEdge) out);
+        }
+        return result;
+    }
 
 }

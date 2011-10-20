@@ -644,13 +644,12 @@ public class PlanGenerator {
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (DirectEdge alternative : pathService.getOutgoingEdges(currState
-                                .getBackState().getVertex())) {
+                        for (DirectEdge alternative : currState.getBackState()
+                                .getVertex().getOutgoingStreetEdges()) {
                             if (alternative instanceof TinyTurnEdge) {
                                 //a tiny turn edge has no geometry, but the next
                                 //edge will be a TurnEdge or PSE and will have direction
-                                alternative = pathService.getOutgoingEdges(
-                                        alternative.getToVertex()).get(0);
+                                alternative = alternative.getToVertex().getOutgoingStreetEdges().get(0);
                             }
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
@@ -675,9 +674,8 @@ public class PlanGenerator {
                         State backState = currState.getBackState();
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
-                        for (DirectEdge alternative : pathService.getOutgoingEdges(backVertex)) {
-                            alternative = pathService.getOutgoingEdges(alternative.getToVertex())
-                                    .get(0);
+                        for (DirectEdge alternative : backVertex.getOutgoingStreetEdges()) {
+                            alternative = alternative.getToVertex().getOutgoingStreetEdges().get(0);
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
                                 //are usually caused by street splits
