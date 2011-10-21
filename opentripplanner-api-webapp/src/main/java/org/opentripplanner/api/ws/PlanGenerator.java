@@ -108,8 +108,8 @@ public class PlanGenerator {
                     tooSloped = true;
                 }
             } else {
-                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates, request
-                        .getDateTime(), options);
+                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates,
+                        request.getIntermediatePlacesOrdered(), request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
             LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "

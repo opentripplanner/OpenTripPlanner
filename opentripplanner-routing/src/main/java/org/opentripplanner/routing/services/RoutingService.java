@@ -36,15 +36,16 @@ public interface RoutingService {
 
     /**
      * Here we wish to plan a trip that starts at "fromVertex", travels through the intermediate
-     * vertices in some arbitrary but hopefully optimal order, and eventually end up at "toVertex".
+     * vertices in either the optimal order or the specified order, and eventually end up at "toVertex".
      * 
      * @param fromPlace
      * @param toPlace
      * @param intermediatePlaces
      * @param dateTime
+     * @param ordered whether the ordering is optimal (false), or specified (true)
      * @param options
      * @return
      */
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediateVertices,
-            int time, TraverseOptions options);
+            boolean ordered, int dateTime, TraverseOptions options);
 }

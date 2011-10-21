@@ -134,6 +134,7 @@ public class Planner {
             @QueryParam(RequestInf.FROM) String fromPlace,
             @QueryParam(RequestInf.TO) String toPlace,
             @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
+            @DefaultValue("false") @QueryParam(RequestInf.INTERMEDAITE_PLACES_ORDERED) Boolean intermediatePlacesOrdered,
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId,
@@ -215,6 +216,9 @@ public class Planner {
         if (intermediatePlaces != null && intermediatePlaces.size() > 0
                 && !intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
+        }
+        if (intermediatePlacesOrdered != null) {
+            request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
         }
         if (preferredRoutes != null && !preferredRoutes.equals("")) {
             String[] table = preferredRoutes.split(",");
