@@ -43,6 +43,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -244,6 +245,10 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
                 } else {
                     System.out.println("UNEXPECTED STATE: " + mode);
                 }
@@ -263,6 +268,10 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
                 } else {
                     System.out.println("UNEXPECTED STATE: " + mode);
                 }
