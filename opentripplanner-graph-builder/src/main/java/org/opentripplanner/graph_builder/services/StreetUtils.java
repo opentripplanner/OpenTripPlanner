@@ -58,10 +58,10 @@ public class StreetUtils {
         ArrayList<DirectEdge> turns = new ArrayList<DirectEdge>(endpoints.size());
         
         for (Vertex v : endpoints) {
-        	GraphVertex gv = graph.getGraphVertex(v.getLabel());
-        	if (gv == null) {
-        		continue; // the vertex could have been removed from endpoints
-        	}
+            GraphVertex gv = graph.getGraphVertex(v.getLabel());
+            if (gv == null) {
+                continue; // the vertex could have been removed from endpoints
+            }
             for (Edge e : gv.getIncoming()) {
                 PlainStreetEdge pse = (PlainStreetEdge) e;
                 boolean replaced = false;

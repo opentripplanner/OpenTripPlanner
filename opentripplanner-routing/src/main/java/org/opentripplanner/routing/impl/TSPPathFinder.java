@@ -98,7 +98,7 @@ public class TSPPathFinder {
         
         HashMap<Vertex, GraphPath> pathsFromFV = paths.get(fromVertex);
         //get the path from the end of the first subpath
-		GraphPath newPath = new GraphPath(pathsFromFV.get(firstIntermediate).states.getLast(), false);
+        GraphPath newPath = new GraphPath(pathsFromFV.get(firstIntermediate).states.getLast(), false);
         Vertex lastVertex = firstIntermediate;
         for (Vertex v : shortestPath.vertices.subList(1, shortestPath.vertices.size())) {
                State lastState = newPath.states.getLast();
