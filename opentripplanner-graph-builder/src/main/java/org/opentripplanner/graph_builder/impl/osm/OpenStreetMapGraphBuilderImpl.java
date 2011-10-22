@@ -316,7 +316,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
                 turnRestrictions.put(restriction.from, restriction);
             }
-
+            if (customNamer != null) {
+                customNamer.postprocess(graph);
+            }
             StreetUtils.pruneFloatingIslands(graph);
             StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
 
@@ -691,6 +693,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             street.setSlopeOverride(wayPropertySet.getSlopeOverride(way));
+
+            if (customNamer != null) {
+                customNamer.nameWithEdge(way, street);
+            }
 
             return street;
         }

@@ -423,4 +423,8 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     public void setStairs(boolean stairs) {
         this.stairs = stairs;
     }
+
+    public void setName(String name) {
+       this.name = name;
+    }
 }
