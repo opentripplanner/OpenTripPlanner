@@ -476,6 +476,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(propset, spec, permission, 1.0, 1.0);
     }
 
+    /**
+     * Note that the safeties here will be adjusted such that the safest street has a safety value
+     * of 1, with all others scaled proportionately.
+     */
     private void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission, double safety, double safetyBack) {
         setProperties(propset, spec, permission, safety, safetyBack, false);
