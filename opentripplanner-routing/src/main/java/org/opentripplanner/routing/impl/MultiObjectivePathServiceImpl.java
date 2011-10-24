@@ -36,6 +36,7 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.SimplifiedLowerBoundGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
@@ -167,11 +168,10 @@ public class MultiObjectivePathServiceImpl implements PathService {
             throw new TransitTimesException();
         }
         Graph graph = _graphService.getGraph();
-        options.remainingWeightHeuristic = new BidirectionalRemainingWeightHeuristic(graph);
-        RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
         
-//                _remainingWeightHeuristicFactory.getInstanceForSearch(options, target);
-//        LOG.debug("Applied A* heuristic: {}", options.remainingWeightHeuristic);
+        RemainingWeightHeuristic heuristic = 
+                _remainingWeightHeuristicFactory.getInstanceForSearch(options, target);
+        LOG.debug("Applied A* heuristic: {}", options.remainingWeightHeuristic);
 
                 
         // the states that will eventually be turned into graphpaths and returned
