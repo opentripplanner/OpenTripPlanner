@@ -52,6 +52,8 @@ public class Vertex implements Cloneable, Serializable{
 
     private int index;
 
+    private transient int groupIndex = -1;
+    
     private double distanceToNearestTransitStop = 0;
 
     private transient ArrayList<Edge> incoming = new ArrayList<Edge>();
@@ -181,6 +183,14 @@ public class Vertex implements Cloneable, Serializable{
         return y;
     }
 
+    public void setGroupIndex(int groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+    
+    public int getGroupIndex() {
+        return groupIndex;
+    }
+    
 
     /* FIELD ACCESSOR METHODS : READ ONLY */
 
