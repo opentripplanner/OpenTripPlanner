@@ -39,7 +39,7 @@ public class LowerBoundGraph {
 	int   [][] vertex;
 	double[][] weight;
 	int nVertices = 0;
-    Vertex[] vertexByIndex;
+	Vertex[] vertexByIndex;
 	private int heaviest; // the last vertex that was pulled from the queue at the last search
 
 	public LowerBoundGraph(Graph original, int kind) {
@@ -70,13 +70,13 @@ public class LowerBoundGraph {
 					//System.out.println(sv.getWeight() + " " + e);
 				}
 			}
-			int ui = u.index;
+			int ui = u.getIndex();
 			int ne = svs.size(); 
 			vertex[ui] = new int[ne];
 			weight[ui] = new double[ne];
 			int ei = 0;
 			for (State sv : svs) {
-				vertex[ui][ei] = sv.getVertex().index;
+				vertex[ui][ei] = sv.getVertex().getIndex();
 				weight[ui][ei] = sv.getWeight();
 				ei++;
 			}
@@ -147,7 +147,7 @@ public class LowerBoundGraph {
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
 		for (Vertex origin : origins) {
-			int originIndex = origin.index;
+			int originIndex = origin.getIndex();
 			result[originIndex] = 0;
 			q.insert(originIndex, 0);
 		}
