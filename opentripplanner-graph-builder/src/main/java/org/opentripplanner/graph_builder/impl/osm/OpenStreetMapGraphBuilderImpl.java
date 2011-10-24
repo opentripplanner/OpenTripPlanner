@@ -615,21 +615,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * oneway:bicycle=yes
              */
 
-            if (way.isTag("foot", "yes") || way.isTag("foot", "designated")) {
+            String foot = way.getTag("foot");
+            if ("yes".equals(foot) || "designated".equals(foot)) {
                 permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
             }
 
-            if (way.isTagFalse("foot")) {
+            if (OSMWithTags.isFalse(foot)) {
                 permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
             }
 
             boolean forceBikes = false;
-            if (way.isTag("bicycle", "yes") || way.isTag("bicycle", "designated")) {
+            String bicycle = way.getTag("bicycle");
+            if ("yes".equals(bicycle) || "designated".equals(bicycle)) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
                 forceBikes = true;
             }
 
-            if (way.isTag("cycleway", "dismount") || way.isTag("bicycle", "dismount")) {
+            if (way.isTag("cycleway", "dismount") || "dismount".equals(bicycle)) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
                     _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way "
@@ -647,13 +649,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 permissionsFront = permissionsFront
                         .remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             }
-            if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
+            String oneWayBicycle = way.getTag("oneway:bicycle");
+            if (OSMWithTags.isTrue(oneWayBicycle) || way.isTagFalse("bicycle:backwards")) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
             }
-            if (way.isTag("oneway:bicycle", "-1")) {
+            if ("-1".equals(oneWayBicycle)) {
                 permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
             }
-            if (way.isTagFalse("oneway:bicycle") || way.isTagTrue("bicycle:backwards")) {
+            if (OSMWithTags.isFalse(oneWayBicycle) || way.isTagTrue("bicycle:backwards")) {
                 if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
                     permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
                     permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
@@ -671,10 +674,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
 
-            boolean noThruTraffic = way.isTag("access", "destination")
-                    || way.isTag("access", "private") || way.isTag("access", "customers")
-                    || way.isTag("access", "delivery") || way.isTag("access", "forestry")
-                    || way.isTag("access", "agricultural");
+            String access = way.getTag("access");
+            boolean noThruTraffic = "destination".equals(access)
+                    || "private".equals(access) || "customers".equals(access)
+                    || "delivery".equals(access) || "forestry".equals(access)
+                    || "agricultural".equals(access);
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
                 street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
