@@ -413,7 +413,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
     }
 
     public int hashCode() {
-        return (back ? 2 : 0) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
+        return (back ? 2 : 1) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
     }
 
     public boolean isStairs() {
