@@ -42,9 +42,6 @@
 		<!-- <constructor-arg ref="graphService" />  -->
 	</bean>
 
-	<bean id="patchService" class="org.opentripplanner.routing.impl.PatchServiceImpl">
-	</bean>
-
 	<bean id="pathServiceFactory" class="org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl">
 		<property name="pathService" ref="pathService" />
 	</bean>
