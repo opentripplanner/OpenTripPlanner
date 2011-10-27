@@ -711,6 +711,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
+        metadataList.setMaximumSize(new Dimension(200, 1600));
         rightPanelTabs.setMaximumSize(new Dimension(200, 1600));
 
         showGraph.init();
