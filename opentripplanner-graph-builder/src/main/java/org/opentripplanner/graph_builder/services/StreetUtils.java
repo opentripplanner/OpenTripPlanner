@@ -189,7 +189,7 @@ public class StreetUtils {
     	}
     	
     	/* remove all tiny subgraphs */
-
+/* removed 10/27/11, since it looks like PDX is fixed.
     	for (HashSet<Vertex> island : islands) {
     		if (island.size() < 20) {
     			_log.warn("Depedestrianizing or deleting floating island at " + island.iterator().next());
@@ -198,6 +198,7 @@ public class StreetUtils {
     			}
     		} 
     	}
+*/
     }
     
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
