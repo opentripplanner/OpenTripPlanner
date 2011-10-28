@@ -122,9 +122,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=tertiary_link;cycleway=lane", 
             StreetTraversalPermission.ALL, 0.87, 0.87);
         setProperties(props, "highway=secondary;cycleway=lane", 
-            StreetTraversalPermission.ALL, 0.93, 0.93);
+            StreetTraversalPermission.ALL, 0.96, 0.96);
         setProperties(props, "highway=secondary_link;cycleway=lane", 
-            StreetTraversalPermission.ALL, 0.93, 0.93);
+            StreetTraversalPermission.ALL, 0.96, 0.96);
         setProperties(props, "highway=primary;cycleway=lane", 
             StreetTraversalPermission.ALL, 1.15, 1.15);
         setProperties(props, "highway=primary_link;cycleway=lane", 
@@ -152,9 +152,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=tertiary_link;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 1, 0.87);
         setProperties(props, "highway=secondary;cycleway=opposite_lane",
-            StreetTraversalPermission.ALL, 1.5, 0.93);
+            StreetTraversalPermission.ALL, 1.5, 0.96);
         setProperties(props, "highway=secondary_link;cycleway=opposite_lane",
-            StreetTraversalPermission.ALL, 1.5, 0.93);
+            StreetTraversalPermission.ALL, 1.5, 0.96);
         setProperties(props, "highway=primary;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 2.06, 1.15);
         setProperties(props, "highway=primary_link;cycleway=opposite_lane",
@@ -220,7 +220,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=*;cycleway=shared_lane", 
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
         setProperties(props, "highway=service;cycleway=shared_lane",
-            StreetTraversalPermission.ALL, 0.77, 0.77);
+            StreetTraversalPermission.ALL, 0.73, 0.73);
         setProperties(props, "highway=residential;cycleway=shared_lane",
             StreetTraversalPermission.ALL, 0.77, 0.77);
         setProperties(props, "highway=residential_link;cycleway=shared_lane",
