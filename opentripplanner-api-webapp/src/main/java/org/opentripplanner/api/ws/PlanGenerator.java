@@ -219,6 +219,10 @@ public class PlanGenerator {
                     pgstate = PlanGenState.BICYCLE;
                     leg = makeLeg(itinerary, state);
                     startWalk = i;
+                } else if (mode == TraverseMode.CAR) {
+                    pgstate = PlanGenState.CAR;
+                    leg = makeLeg(itinerary, state);
+                    startWalk = i;                    
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
                     pgstate = PlanGenState.PRETRANSIT;
@@ -264,6 +268,24 @@ public class PlanGenerator {
                     leg = makeLeg(itinerary, state);
                     startWalk = i;
                     pgstate = PlanGenState.WALK;
+                } else if (mode == TraverseMode.STL) {
+                    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
+                } else {
+                    System.out.println("UNEXPECTED STATE: " + mode);
+                }
+                break;
+            case CAR:
+                if (leg == null) {
+                    leg = makeLeg(itinerary, state);
+                }
+                if (mode == TraverseMode.CAR) {
+                    // do nothing
                 } else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
@@ -686,7 +708,11 @@ public class PlanGenerator {
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (DirectEdge alternative : pathService.getOutgoingEdges(backVertex)) {
-                            alternative = pathService.getOutgoingEdges(alternative.getToVertex())
+                            List<DirectEdge> alternatives = pathService.getOutgoingEdges(alternative.getToVertex());
+                            if (alternatives.size() == 0) {
+                                continue; //this is not an alternative
+                            }
+                            alternative = alternatives
                                     .get(0);
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
