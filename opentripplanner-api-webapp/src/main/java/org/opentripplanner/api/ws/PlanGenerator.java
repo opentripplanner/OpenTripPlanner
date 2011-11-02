@@ -393,6 +393,7 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
         }
         leg.mode = en.getMode().toString();
+        leg.startTime = new Date(state.getBackState().getTimeInMillis());
     }
 
     private void finalizeLeg(Leg leg, State state, List<State> states, int start, int end,
