@@ -444,14 +444,23 @@ otp.planner.Itinerary = {
             type : 'toMarker'
         });
 
-        //create special marker for bike elevation
-        var bikeTopoMarker = otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, { // temp
+        //create special markers for bike/walk elevation
+        var bikeTopoMarker = otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, {
             type : 'fromBicycleMarker',
             mode : 'BICYCLE'
         });
-        bikeTopoMarker.id = 'bike-topo-marker';
+        bikeTopoMarker.id = 'bicycle-topo-marker';
         bikeTopoMarker.style = { display : 'none' };
         this.m_markers.push(bikeTopoMarker);
+
+        var walkTopoMarker = otp.util.OpenLayersUtils.makeMarker(fromP.x, fromP.y, {
+            type : 'fromWalkMarker',
+            mode : 'WALK'
+        });
+        walkTopoMarker.id = 'walk-topo-marker';
+        walkTopoMarker.style = { display : 'none' };
+        this.m_markers.push(walkTopoMarker);
+
     },
 
     /** */
