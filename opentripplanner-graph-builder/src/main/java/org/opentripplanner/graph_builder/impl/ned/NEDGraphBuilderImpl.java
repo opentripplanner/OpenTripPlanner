@@ -100,13 +100,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             return; /* already set up */
         }
         Vertex fromv = ee.getFromVertex();
-        if (fromv instanceof StreetVertex) {
-            StreetVertex sv = ((StreetVertex) fromv);
-            if (!sv.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
-                /* non-bikeable streets don't care about elevation */
-                return;
-            }
-        }
         Geometry g = ee.getGeometry();
         Coordinate[] coords = g.getCoordinates();
         
