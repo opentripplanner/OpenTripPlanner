@@ -27,15 +27,14 @@ import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
 
 /**
- * A graph that does not depend on Vertex labels.
- * Intended to add supplemental edges to existing vertices in another graph.
+ * Allows adding supplemental edges to existing vertices in another graph.
  * Useful for CH, and potentially for "extraEdges".
  * 
  * @author andrewbyrd
  */
 public class OverlayGraph implements Serializable {
 
-	private static final long serialVersionUID = 20110601L; //YYYYMMDD
+	private static final long serialVersionUID = 20111106L; //YYYYMMDD
 	private static final int INITIAL_EDGELIST_CAPACITY = 5;
 	private IdentityHashMap<Vertex, List<Edge>> outgoing;
 	private IdentityHashMap<Vertex, List<Edge>> incoming;
@@ -67,7 +66,8 @@ public class OverlayGraph implements Serializable {
 			fromOutgoing = new ArrayList<Edge>(INITIAL_EDGELIST_CAPACITY);
 			outgoing.put(fromv, fromOutgoing);
 		}
-		fromOutgoing.add(e);
+		if (!fromOutgoing.contains(e))
+		    fromOutgoing.add(e);
 	}
 
 	public void addIncoming(Vertex tov, Edge e) {
@@ -76,7 +76,8 @@ public class OverlayGraph implements Serializable {
 			toIncoming = new ArrayList<Edge>(INITIAL_EDGELIST_CAPACITY);
 			incoming.put(tov, toIncoming);
 		}
-		toIncoming.add(e);
+		if (!toIncoming.contains(e))
+		    toIncoming.add(e);
 	}
 	
 	public void removeOutgoing(Vertex fromv, Edge e) {
@@ -108,16 +109,14 @@ public class OverlayGraph implements Serializable {
 	}
 
 	public List<Edge> getOutgoing(Vertex v) {
-		List<Edge> ret;
-		ret = outgoing.get(v);
+		List<Edge> ret = outgoing.get(v);
 		if (ret == null) 
 			ret = Collections.emptyList();
 		return ret;
 	}
 
 	public List<Edge> getIncoming(Vertex v) {
-		List<Edge> ret;
-		ret = incoming.get(v);
+		List<Edge> ret = incoming.get(v);
 		if (ret == null) 
 			ret = Collections.emptyList();
 		return ret;
