@@ -51,7 +51,7 @@ public interface PathService {
      * @return
      */
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediatePlaces,
-            Date dateTime, TraverseOptions options);
+            boolean ordered, Date dateTime, TraverseOptions options);
 
     public void setGraphService(GraphService graphService);
 

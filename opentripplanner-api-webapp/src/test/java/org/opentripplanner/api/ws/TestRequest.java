@@ -151,6 +151,7 @@ public class TestRequest extends TestCase {
                 v1.getLabel(),
                 v2.getLabel(),
                 null,
+                null,
                 "2009-01-01", 
                 "11:11:11",
                 null,
@@ -189,7 +190,7 @@ public class TestRequest extends TestCase {
 		assertNotNull(v2);
 
 		Response response = planner.getItineraries(v1.getLabel(),
-				v2.getLabel(), null, "2009-01-01", "11:11:11", null, false,
+				v2.getLabel(), null, null, "2009-01-01", "11:11:11", null, false,
 				false, 840.0, 1.33, null, null, null, OptimizeType.QUICK,
 				new TraverseModeSet("WALK"), 1, null, false, "", "", "", 0, 2);
 
@@ -228,7 +229,7 @@ public class TestRequest extends TestCase {
         Date dateTime = DateUtils.toDate("2009-01-01", "10:00:00");
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         List<GraphPath> paths = pathService.plan(v1.getLabel(), v4.getLabel(),
-                intermediates, dateTime, options);
+                intermediates, false, dateTime, options);
         
         assertTrue(paths.size() > 0);
         GraphPath path = paths.get(0);

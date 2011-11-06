@@ -18,7 +18,7 @@ otp.planner.BikeTriangle = {
 
     container:    null,
     panel:        null,
-    cursor_size:  20,
+    cursor_size:  19,
 
     triangleTimeFactor:    null,
     triangleSlopeFactor:   null,
@@ -102,19 +102,29 @@ otp.planner.BikeTriangle = {
         safetyBar.attr({fill:safeFill, stroke:"none"});
 
         var timeLabel = canvas.text(barLeft + barWidth/2, margin+barHeight/2, timeName + ": 33%");
-        timeLabel.attr({"font-size":"16px", opacity:0});
+        timeLabel.attr({"font-size":"16px", opacity:1});
 
         var topoLabel = canvas.text(barLeft + barWidth/2, margin*2+barHeight+barHeight/2,  hillName + ": 33%");
-        topoLabel.attr({"font-size":"16px", opacity:0});
+        topoLabel.attr({"font-size":"16px", opacity:1});
 
         var safetyLabel = canvas.text(barLeft + barWidth/2, margin*3+barHeight*2+barHeight/2, safeName + ": 33%");
-        safetyLabel.attr({"font-size":"16px", opacity:0});
+        safetyLabel.attr({"font-size":"16px", opacity:1});
 
-        var cursor = canvas.circle(margin+tri_side/2, height-margin-(1/Math.sqrt(3))*(tri_side/2), this.cursor_size/2).attr({
+        var cx = margin+tri_side/2, cy = height-margin-(1/Math.sqrt(3))*(tri_side/2);
+        var cursorVert = canvas.rect(cx-.5, cy-this.cursor_size/2-2, 1, this.cursor_size+4).attr({
             fill: "rgb(0,0,0)",
             stroke: "none"
         });
-
+        var cursorHoriz = canvas.rect(cx-this.cursor_size/2-2, cy-.5, this.cursor_size+4, 1).attr({
+            fill: "rgb(0,0,0)",
+            stroke: "none"
+        });
+        var cursor = canvas.circle(cx, cy, this.cursor_size/2).attr({
+            fill: "rgb(128,128,128)",
+            stroke: "none",
+            opacity: 0.25
+        });
+            
         var time, topo, safety;
 
         var thisBT = this;
@@ -123,13 +133,12 @@ otp.planner.BikeTriangle = {
             // storing original coordinates
             this.ox = this.attr("cx");
             this.oy = this.attr("cy");
-            this.animate({opacity: .5}, animTime);
             timeBar.animate({opacity: .25}, animTime);
             topoBar.animateWith(timeBar, {opacity: .25}, animTime);
             safetyBar.animateWith(timeBar, {opacity: .25}, animTime);
-            timeLabel.animate({opacity: 1}, animTime);
-            topoLabel.animate({opacity: 1}, animTime);
-            safetyLabel.animate({opacity: 1}, animTime);
+            //timeLabel.animate({opacity: 1}, animTime);
+            //topoLabel.animate({opacity: 1}, animTime);
+            //safetyLabel.animate({opacity: 1}, animTime);
         },
         move = function (dx, dy) {
             // move will be called with dx and dy
@@ -152,16 +161,17 @@ otp.planner.BikeTriangle = {
             safetyLabel.attr("text", safeName + ": " +Math.round(safety*100)+"%");
     
             this.attr({cx: nx, cy: ny});
+            cursorVert.attr({x: nx-.5, y: ny-thisBT.cursor_size/2-2});
+            cursorHoriz.attr({x: nx-thisBT.cursor_size/2-2, y: ny-.5});
         },
         up = function () {
             // restoring state
-            this.animate({opacity: 1}, animTime);
             timeBar.animate({opacity: 1}, animTime);
             topoBar.animateWith(timeBar, {opacity: 1}, animTime);
             safetyBar.animateWith(timeBar, {opacity: 1}, animTime);
-            timeLabel.animate({opacity: 0}, animTime);
-            topoLabel.animate({opacity: 0}, animTime);
-            safetyLabel.animate({opacity: 0}, animTime);
+            //timeLabel.animate({opacity: 0}, animTime);
+            //topoLabel.animate({opacity: 0}, animTime);
+            //safetyLabel.animate({opacity: 0}, animTime);
 
             // was seeing really odd small numbers in scientific notation when topo neared zero so added this
             if(topo < 0.005) {
@@ -174,6 +184,13 @@ otp.planner.BikeTriangle = {
         };
 
         cursor.drag(move, start, up);
+        cursor.mouseover(function() {
+            this.animate({opacity: 0.5}, animTime);
+        });
+        cursor.mouseout(function() {
+            this.animate({opacity: 0.25}, animTime);
+        });
+        
     },
 
     enable : function() {

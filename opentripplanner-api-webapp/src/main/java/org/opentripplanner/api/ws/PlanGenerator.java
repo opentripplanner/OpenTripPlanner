@@ -43,6 +43,7 @@ import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -107,8 +108,8 @@ public class PlanGenerator {
                     tooSloped = true;
                 }
             } else {
-                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates, request
-                        .getDateTime(), options);
+                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates,
+                        request.getIntermediatePlacesOrdered(), request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
             LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
@@ -218,6 +219,10 @@ public class PlanGenerator {
                     pgstate = PlanGenState.BICYCLE;
                     leg = makeLeg(itinerary, state);
                     startWalk = i;
+                } else if (mode == TraverseMode.CAR) {
+                    pgstate = PlanGenState.CAR;
+                    leg = makeLeg(itinerary, state);
+                    startWalk = i;                    
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
                     pgstate = PlanGenState.PRETRANSIT;
@@ -244,6 +249,10 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
                 } else {
                     System.out.println("UNEXPECTED STATE: " + mode);
                 }
@@ -263,6 +272,28 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
+                } else {
+                    System.out.println("UNEXPECTED STATE: " + mode);
+                }
+                break;
+            case CAR:
+                if (leg == null) {
+                    leg = makeLeg(itinerary, state);
+                }
+                if (mode == TraverseMode.CAR) {
+                    // do nothing
+                } else if (mode == TraverseMode.STL) {
+                    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.PRETRANSIT;
+                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
+                    leg = null;
+                    pgstate = PlanGenState.START;
                 } else {
                     System.out.println("UNEXPECTED STATE: " + mode);
                 }
@@ -362,6 +393,7 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
         }
         leg.mode = en.getMode().toString();
+        leg.startTime = new Date(state.getBackState().getTimeInMillis());
     }
 
     private void finalizeLeg(Leg leg, State state, List<State> states, int start, int end,
@@ -675,7 +707,11 @@ public class PlanGenerator {
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (DirectEdge alternative : backVertex.getOutgoingStreetEdges()) {
-                            alternative = alternative.getToVertex().getOutgoingStreetEdges().get(0);
+                            List<DirectEdge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
+                            if (alternatives.size() == 0) {
+                                continue; //this is not an alternative
+                            }
+                            alternative = alternatives.get(0);
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
                                 //are usually caused by street splits

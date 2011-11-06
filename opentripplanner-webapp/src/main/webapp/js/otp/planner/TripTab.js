@@ -300,15 +300,16 @@ otp.planner.TripTab = {
         
         /* draw topographic map */
         
-        var hasBikeLeg = false;
+        var hasBikeWalkLeg = false;
         for(var i=0; i<this.m_activeItinerary.m_legStore.getTotalCount(); i++) {
-            if(this.m_activeItinerary.m_legStore.getAt(i).get("mode")=="BICYCLE") {
-                hasBikeLeg = true;
+            if(this.m_activeItinerary.m_legStore.getAt(i).get("mode")=="BICYCLE" ||
+               this.m_activeItinerary.m_legStore.getAt(i).get("mode")=="WALK") {
+                hasBikeWalkLeg = true;
                 break;
             }
         }
         
-        if(hasBikeLeg)
+        if(hasBikeWalkLeg)
         {
             try
             {

@@ -29,15 +29,15 @@ public class VertexMap<T> {
 	}
 	
 	public void set(Vertex v, T elem) {
-		int index = v.index;
+		int index = v.getIndex();
 		while (index > map.length)
 			map = Arrays.copyOf(map, (int) (map.length * 1.5));
 		// T old = map[v.index];
-		map[v.index] = elem;
+		map[v.getIndex()] = elem;
 	}
 	          
 	public T get(Vertex v) {
-		return map[v.index];
+		return map[v.getIndex()];
 	}
 	
 }

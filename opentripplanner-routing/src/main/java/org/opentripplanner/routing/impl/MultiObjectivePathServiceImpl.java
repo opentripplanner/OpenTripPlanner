@@ -300,7 +300,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
-            Date targetTime, TraverseOptions options) {
+            boolean ordered, Date targetTime, TraverseOptions options) {
         return null;
     }
     

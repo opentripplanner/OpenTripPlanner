@@ -110,6 +110,7 @@ public class Request implements RequestInf {
     private double triangleSlopeFactor;
     private double triangleTimeFactor;
     private Integer maxTransfers;
+    private boolean intermediatePlacesOrdered;
     
     public Request() {
         modes = new TraverseModeSet("TRANSIT,WALK");
@@ -469,4 +470,12 @@ public class Request implements RequestInf {
         return maxTransfers;
     }
 
+    public void setIntermediatePlacesOrdered(boolean intermediatePlacesOrdered) {
+        this.intermediatePlacesOrdered = intermediatePlacesOrdered;
+    }
+
+    @Override
+    public boolean getIntermediatePlacesOrdered() {
+        return intermediatePlacesOrdered;
+    }
 }
