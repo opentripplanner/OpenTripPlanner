@@ -13,15 +13,11 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
@@ -40,6 +36,8 @@ import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 public class GenericDijkstra {
 
     private Graph graph;
+    
+    private OverlayGraph replacementEdges;
 
     private TraverseOptions options;
 
@@ -57,11 +55,13 @@ public class GenericDijkstra {
 
     private boolean _verbose = false;
 
-    /**
-     */
-    public GenericDijkstra(Graph graph, TraverseOptions options) {
-        this.graph = graph;
+    public GenericDijkstra(TraverseOptions options) {
         this.options = options;
+    }
+
+    public GenericDijkstra(TraverseOptions options, OverlayGraph replacementEdges) {
+        this.options = options;
+        this.replacementEdges = replacementEdges;
     }
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
@@ -95,10 +95,10 @@ public class GenericDijkstra {
         spt.add(initialState);
         queue.insert(initialState, initialState.getWeight());
 
-        Map<Vertex, List<Edge>> extraEdges = null;
+        OverlayGraph extraEdges = null;
         if (_extraEdgesStrategy != null) {
-            extraEdges = new HashMap<Vertex, List<Edge>>();
-            _extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, initialState.getVertex());
+            extraEdges = new OverlayGraph();
+            _extraEdgesStrategy.addEdgesFor(extraEdges, initialState.getVertex());
         }
 
         while (!queue.empty()) { // Until the priority queue is empty:
@@ -115,7 +115,7 @@ public class GenericDijkstra {
                     null, u, spt, options))
                         break;
 
-            for (Edge edge : getEdgesForVertex(graph, extraEdges, u_vertex, options)) {
+            for (Edge edge : u_vertex.getEdges(extraEdges, replacementEdges, options.isArriveBy())) {
 
                 if (_skipEdgeStrategy != null
                         && _skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
@@ -148,19 +148,10 @@ public class GenericDijkstra {
         return spt;
     }
 
-    private Collection<Edge> getEdgesForVertex(Graph graph, Map<Vertex, List<Edge>> extraEdges,
-            Vertex vertex, TraverseOptions options) {
-
-        if (options.isArriveBy())
-            return GraphLibrary.getIncomingEdges(graph, vertex, extraEdges);
-        else
-            return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
-    }
-
     protected OTPPriorityQueue<State> createPriorityQueue() {
         if (_priorityQueueFactory != null)
             return _priorityQueueFactory.create(graph.getVertices().size());
-        return new BinHeap<State>(graph.getVertices().size() / 2);
+        return new BinHeap<State>();
     }
 
     protected ShortestPathTree createShortestPathTree() {
