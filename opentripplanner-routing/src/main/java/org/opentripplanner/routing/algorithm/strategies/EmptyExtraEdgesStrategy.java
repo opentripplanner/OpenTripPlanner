@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -49,5 +50,10 @@ public class EmptyExtraEdgesStrategy implements ExtraEdgesStrategy {
     @Override
     public void addOutgoingEdgesForTarget(Map<Vertex, List<Edge>> extraEdges, Vertex target) {
 
+    }
+
+    @Override
+    public void addEdgesFor(OverlayGraph extraEdges, Vertex vertex) {
+        
     }
 }

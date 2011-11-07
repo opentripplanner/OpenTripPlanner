@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
@@ -84,6 +85,16 @@ public class DefaultExtraEdgesStrategy implements ExtraEdgesStrategy {
                     extraEdges.put(fromv, edges);
                 }
                 edges.add(edge);
+            }
+        }
+    }
+
+    @Override
+    public void addEdgesFor(OverlayGraph extraEdges, Vertex vertex) {
+        if (vertex instanceof StreetLocation) {
+            Iterable<DirectEdge> extra = ((StreetLocation) vertex).getExtra();
+            for (DirectEdge edge : extra) {
+                extraEdges.addDirectEdge(edge);
             }
         }
     }
