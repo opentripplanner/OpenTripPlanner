@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -242,7 +243,7 @@ public class Vertex implements Cloneable, Serializable{
     }
 
     
-    /* UTILITY METHODS FOR GRAPH BUILDING AND GENERATING WALKSTEPS */
+    /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
     
     public List<DirectEdge> getOutgoingStreetEdges() {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
@@ -332,4 +333,24 @@ public class Vertex implements Cloneable, Serializable{
         outgoing = new ArrayList<Edge>();
     }
     
+    public Collection<Edge> getEdges(OverlayGraph extraEdges, OverlayGraph replacementEdges, boolean incoming) {
+
+        Collection<Edge> ret;
+        if (replacementEdges != null) {
+            ret = incoming ? replacementEdges.getIncoming(this) : replacementEdges.getOutgoing(this);
+        } else {
+            ret = incoming ? this.getIncoming() : this.getOutgoing();
+        }
+
+        if (extraEdges != null) {
+            Collection<Edge> extra = incoming ? extraEdges.getIncoming(this) : extraEdges.getOutgoing(this);
+            if (extra != null) {
+                ret = new ArrayList<Edge>(ret); // copy list
+                ret.addAll(extra);
+                return ret;
+            }
+        }
+        return ret;
+    }
+
 }
