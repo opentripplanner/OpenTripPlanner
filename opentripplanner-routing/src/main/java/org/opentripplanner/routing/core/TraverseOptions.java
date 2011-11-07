@@ -95,7 +95,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /**
      * How much less bad is waiting at the beginning of the trip
      */
-    public double waitAtBeginningFactor = 0.8;
+    public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int boardCost = 60 * 5;
