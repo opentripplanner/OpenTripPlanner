@@ -192,4 +192,8 @@ public class OverlayGraph implements Serializable {
             return l.size();
     }
 
+    public boolean containsVertex(Vertex vertex) {
+        return outgoing.containsKey(vertex) || incoming.containsKey(vertex);
+    }
+
 }
