@@ -41,7 +41,7 @@ class IntArrayIterator implements Iterator<Integer> {
 
     @Override
     public boolean hasNext() {
-        return nextPosition == array.length;
+        return nextPosition < array.length;
     }
 
     @Override
