@@ -239,6 +239,29 @@ otp.util.ParseUrlParams = {
         return retVal;
     },
 
+    /**
+     * Trip Geocoder URL can be set via GET PARAM: gurl=/test/file/path.xml
+     */
+    getGeocoderUrl : function(geoConfig)
+    {
+        var retVal = null;
+        try
+        {
+            retVal = this.getParamValue('gurl');
+            geoConfig.enabled = true;
+        }
+        catch(exp)
+        {
+        }
+        finally
+        {
+            if(retVal == null && geoConfig != null && geoConfig.url != null)
+                retVal = geoConfig.url;
+        }
+
+        return retVal;
+    },
+
     CLASS_NAME: "otp.util.ParseUrlParams"
 };
 

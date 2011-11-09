@@ -174,7 +174,14 @@ Ext.extend(Ext.ux.form.Spinner, Ext.form.TriggerField, {
 			return;
 		}
 		var middle = this.getMiddle();
-		var ud = (Ext.EventObject.getPageY() < middle) ? 'Up' : 'Down';
+
+        // FRANK HACK to avoid double clicking of the time slider
+        var ee = Ext.EventObject;
+        if(ee.type == 'click')
+            return;
+
+        var e = ee.getPageY();
+		var ud = (e < middle) ? 'Up' : 'Down';
 		this['onSpin'+ud]();
 	},
 
