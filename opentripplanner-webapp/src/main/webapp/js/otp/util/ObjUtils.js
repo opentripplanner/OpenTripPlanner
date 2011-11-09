@@ -27,6 +27,54 @@ otp.util.ObjUtils = {
     m_fixNameSpacing       : true,
     m_capitolize           : true,
 
+    /**
+     * predicate to check if string looks like a lat,lon string
+     */
+    isCoordinate : function(value) {
+        var lat, lon;
+
+        try
+        {
+            lat = parseFloat(otp.util.ObjUtils.getLat(value));
+            lon = parseFloat(otp.util.ObjUtils.getLon(value));
+        }
+        catch(e)
+        {
+        }
+
+        return !isNaN(lat) && !isNaN(lon);
+    },
+
+    /** returns the second value from a comma separated string eg: 0.0,0.returnMe*/
+    getLon : function(coord) {
+        var retVal = null;
+
+        try
+        {
+            retVal = coord.substring(coord.indexOf(',') + 1); 
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
+    /** returns the first value from a comma separated string eg: 0.returnMe,0.0 */
+    getLat : function(coord) {
+        var retVal = null;
+
+        try
+        {
+            retVal = coord.substring(0, coord.indexOf(',')); 
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
     /** string & sub-string search of an array (slightly different than array.indexOf) */
     isInArray : function (str, array)
     {

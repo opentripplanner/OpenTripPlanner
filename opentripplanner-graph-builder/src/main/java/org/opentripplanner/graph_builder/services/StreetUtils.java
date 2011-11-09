@@ -57,14 +57,13 @@ public class StreetUtils {
         ArrayList<DirectEdge> turns = new ArrayList<DirectEdge>(endpoints.size());
         
         for (Vertex v : endpoints) {
-        	Vertex gv = graph.getVertex(v.getLabel());
-        	if (gv == null) {
-        		continue; // the vertex could have been removed from endpoints
-        	}
-                if (gv != v) {
-                    throw new IllegalStateException("Vertex in graph is not the same one at endpoint."); 
-                }
-
+            Vertex gv = graph.getVertex(v.getLabel());
+            if (gv == null) {
+                continue; // the vertex could have been removed from endpoints
+            }
+            if (gv != v) {
+                throw new IllegalStateException("Vertex in graph is not the same one at endpoint."); 
+            }
             for (Edge e : gv.getIncoming()) {
                 PlainStreetEdge pse = (PlainStreetEdge) e;
                 boolean replaced = false;
@@ -198,7 +197,7 @@ public class StreetUtils {
     	}
     	
     	/* remove all tiny subgraphs */
-
+/* removed 10/27/11, since it looks like PDX is fixed.
     	for (HashSet<Vertex> island : islands) {
     		if (island.size() < 20) {
     			_log.warn("Depedestrianizing or deleting floating island at " + island.iterator().next());
@@ -207,6 +206,7 @@ public class StreetUtils {
     			}
     		} 
     	}
+*/
     }
     
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {

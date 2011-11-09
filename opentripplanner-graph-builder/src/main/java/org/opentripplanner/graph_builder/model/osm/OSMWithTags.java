@@ -162,4 +162,12 @@ public class OSMWithTags {
 
         return null;
     }
+
+    public static boolean isFalse(String tagValue) {
+        return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
+      }
+
+    public static boolean isTrue(String tagValue) {
+        return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    }
 }

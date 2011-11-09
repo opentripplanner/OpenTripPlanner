@@ -37,6 +37,7 @@ otp.core.ComboBox = {
     m_store      : null,
     m_template   : null,
     m_lastValue  : null,
+    m_forceDirty : false,
 
     /**
      * constructor of sorts
@@ -105,6 +106,11 @@ otp.core.ComboBox = {
         {
             // and the existing form content doesn't match what was in the form previously
             retVal = (v != this.m_lastValue);
+            if(this.m_forceDirty)
+            {
+                retVal = true;
+                this.m_forceDirty = false;
+            }
         }
         return retVal;
     },

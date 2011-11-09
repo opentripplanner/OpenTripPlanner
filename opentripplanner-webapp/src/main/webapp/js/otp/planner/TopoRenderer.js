@@ -47,7 +47,7 @@ otp.planner.TopoRendererStatic = {
     locationMarker :    null,
     
     legInfoArr :        null,
-    nonBikeLegCount :   null,
+    nonBikeWalkLegCount :   null,
     minElev :           null,
     maxElev :           null,
     totalDistance :     null,
@@ -63,7 +63,7 @@ otp.planner.TopoRendererStatic = {
     
     processItinerary : function(itin) {
         this.legInfoArr = new Array();
-        this.nonBikeLegCount = 0;
+        this.nonBikeWalkLegCount = 0;
         this.minElev = 100000;
         this.maxElev = -1000;
         
@@ -78,8 +78,8 @@ otp.planner.TopoRendererStatic = {
             
             legInfo.leg = leg;
             
-            if(leg.get('mode') != "BICYCLE") {
-                this.nonBikeLegCount++;
+            if(leg.get('mode') != "BICYCLE" && leg.get('mode') != "WALK") {
+                this.nonBikeWalkLegCount++;
                 continue;
             }
             
@@ -127,7 +127,7 @@ otp.planner.TopoRendererStatic = {
         if(res < 5) res = 5;
         
         // compute the width of the main elevation graphic in pixels
-        var terrainWidth = (this.totalDistance*3.2808399)/res + this.nonBikeLegCount*this.nonBikeLegWidth;
+        var terrainWidth = (this.totalDistance*3.2808399)/res + this.nonBikeWalkLegCount*this.nonBikeLegWidth;
         
         // if the graph is wider than what can be displayed without scrolling, 
         // split the panel between the main graph and a "preview" strip 
@@ -211,9 +211,9 @@ otp.planner.TopoRendererStatic = {
             leg.topoGraphSpan = 0;
             var legStartX = currentX;
             
-            // for non-bike legs, insert fixed-width arrow graphic into
+            // for non-bike/walk legs, insert fixed-width arrow graphic into
             // topo graph indicating a "jump"
-            if(leg.get('mode') != "BICYCLE") {
+            if(leg.get('mode') != "BICYCLE" && leg.get('mode') != "WALK") {
 
                 var prevElevY = (li == 0) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li-1].lastElev-this.minElev)/(this.maxElev-this.minElev);
                 var nextElevY = (li >= this.legInfoArr.length-1) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li+1].firstElev-this.minElev)/(this.maxElev-this.minElev);
@@ -255,7 +255,7 @@ otp.planner.TopoRendererStatic = {
                 continue;
             }
                         
-            // for bike legs, iterate through each step of the leg geometry
+            // for bike/walk legs, iterate through each step of the leg geometry
             var steps = leg.data.steps;
             var legXCoords = new Array(), legYCoords = new Array();
             for (si = 0; si < steps.length; si++) {
@@ -370,8 +370,10 @@ otp.planner.TopoRendererStatic = {
                     if(thisTR.markerLayer == null) {                        
                         thisTR.markerLayer = thisTR.map.getMap().getLayersByName('trip-marker-layer')[0];
                     }
-                    if(thisTR.locationMarker == null) {
-                        thisTR.locationMarker = thisTR.markerLayer.getFeatureById('bike-topo-marker');
+                    
+                    if(thisTR.locationMarker == null || thisTR.locationMarker.attributes.mode != this.leg.get('mode')) {
+                        var topoMarkerID = this.leg.get('mode').toLowerCase()+'-topo-marker';
+                        thisTR.locationMarker = thisTR.markerLayer.getFeatureById(topoMarkerID);
                     }
                     thisTR.locationMarker.style = null;
                     thisTR.locationMarker.move(new OpenLayers.LonLat(thisTR.locationPoint.x, thisTR.locationPoint.y));
@@ -398,7 +400,7 @@ otp.planner.TopoRendererStatic = {
             polyStr += "L "+ legXCoords[0] + " " + terrainHeight + " z";
 
             terrainPoly = terrainCanvas.path(polyStr).attr({
-                fill : "url(images/ui/topo/bg_bicycle.png)", //'rgb(34, 139, 34)', 
+                fill : "url(images/ui/topo/bg_"+leg.get("mode").toLowerCase()+".png)", //'rgb(34, 139, 34)', 
                 opacity : .5,
                 stroke : 'none'
             });

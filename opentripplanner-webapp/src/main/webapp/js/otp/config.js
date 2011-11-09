@@ -54,12 +54,19 @@ otp.config_defaults = {
         {
             enabled : false,
             url     : "/geocoder/geocode",  
-            // debug-url : '/js/otp/planner/test/geo-zoo.xml',
-            // debug-url : '/js/otp/planner/test/geo-multi.xml', 
-            // debug-enabled : true,
             addressParamName : "address"
         },
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
+
+        /* debug */
+        /* *
+        geocoder  :
+        {
+            enabled : true,
+            url     : "/js/otp/planner/test/geo-multi.xml",
+            addressParamName : "address"
+        }
+        /* */
     },
 
     map : {

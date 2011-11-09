@@ -33,6 +33,7 @@ import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandle
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
@@ -63,8 +64,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private WayPropertySet wayPropertySet = new WayPropertySet();
 
     private CustomNamer customNamer;
-
-    private double bikeSafetyFactor = 4.0;
 
     /**
      * The source for OSM map data
@@ -133,6 +132,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByToWay = new HashMap<Long, List<TurnRestrictionTag>>();
 
         private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
+
+        /** The bike safety factor of the safest street */
+        private double bestBikeSafety = 1;
 
         public void buildGraph(Graph graph) {
             // handle turn restrictions and road names in relations
@@ -260,9 +262,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     if (street != null) {
                         graph.addEdge(street);
-                        Double safety = wayData.getSafetyFeatures().getFirst();
-                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety
-                                * getBikeSafetyFactor());
+                        double safety = wayData.getSafetyFeatures().getFirst();
+                        street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
+                        if (safety < bestBikeSafety) {
+                            bestBikeSafety = safety;
+                        }
                         if (note != null) {
                             street.setNote(note);
                         }
@@ -271,9 +275,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     PlainStreetEdge backStreet = streets.getSecond();
                     if (backStreet != null) {
                         graph.addEdge(backStreet);
-                        Double safety = wayData.getSafetyFeatures().getSecond();
-                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety
-                                * getBikeSafetyFactor());
+                        double safety = wayData.getSafetyFeatures().getSecond();
+                        if (safety < bestBikeSafety) {
+                            bestBikeSafety = safety;
+                        }
+                        backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
                         if (note != null) {
                             backStreet.setNote(note);
                         }
@@ -316,10 +322,49 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
                 turnRestrictions.put(restriction.from, restriction);
             }
-
+            if (customNamer != null) {
+                customNamer.postprocess(graph);
+            }
+            applyBikeSafetyFactor(graph);
             StreetUtils.pruneFloatingIslands(graph);
             StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
 
+        }
+
+        /**
+         * The safest bike lane should have a safety weight no lower than the time weight of a flat
+         * street.  This method divides the safety lengths by the length ratio of the safest street,
+         * ensuring this property.
+         * @param graph
+         */
+        private void applyBikeSafetyFactor(Graph graph) {
+            _log.info("Multiplying all bike safety values by " + (1 / bestBikeSafety));
+            HashSet<Edge> seenEdges = new HashSet<Edge>();
+            for (GraphVertex gv : graph.getVertices()) {
+                Vertex vertex = gv.vertex;
+                for (Edge e : graph.getOutgoing(vertex)) {
+                    if (!(e instanceof PlainStreetEdge)) {
+                        continue;
+                    }
+                    PlainStreetEdge pse = (PlainStreetEdge) e;
+
+                    if (!seenEdges.contains(e)) {
+                        seenEdges.add(e);
+                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength() / bestBikeSafety);
+                    }
+                }
+                for (Edge e : graph.getIncoming(vertex)) {
+                    if (!(e instanceof PlainStreetEdge)) {
+                        continue;
+                    }
+                    PlainStreetEdge pse = (PlainStreetEdge) e;
+
+                    if (!seenEdges.contains(e)) {
+                        seenEdges.add(e);
+                        pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength() / bestBikeSafety);
+                    }
+                }
+            }
         }
 
         private Coordinate getCoordinate(OSMNode osmNode) {
@@ -570,21 +615,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * oneway:bicycle=yes
              */
 
-            if (way.isTag("foot", "yes") || way.isTag("foot", "designated")) {
+            String foot = way.getTag("foot");
+            if ("yes".equals(foot) || "designated".equals(foot)) {
                 permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
             }
 
-            if (way.isTagFalse("foot")) {
+            if (OSMWithTags.isFalse(foot)) {
                 permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
             }
 
             boolean forceBikes = false;
-            if (way.isTag("bicycle", "yes") || way.isTag("bicycle", "designated")) {
+            String bicycle = way.getTag("bicycle");
+            if ("yes".equals(bicycle) || "designated".equals(bicycle)) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
                 forceBikes = true;
             }
 
-            if (way.isTag("cycleway", "dismount") || way.isTag("bicycle", "dismount")) {
+            if (way.isTag("cycleway", "dismount") || "dismount".equals(bicycle)) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
                     _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way "
@@ -602,13 +649,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 permissionsFront = permissionsFront
                         .remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             }
-            if (way.isTagTrue("oneway:bicycle") || way.isTagFalse("bicycle:backwards")) {
+            String oneWayBicycle = way.getTag("oneway:bicycle");
+            if (OSMWithTags.isTrue(oneWayBicycle) || way.isTagFalse("bicycle:backwards")) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
             }
-            if (way.isTag("oneway:bicycle", "-1")) {
+            if ("-1".equals(oneWayBicycle)) {
                 permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
             }
-            if (way.isTagFalse("oneway:bicycle") || way.isTagTrue("bicycle:backwards")) {
+            if (OSMWithTags.isFalse(oneWayBicycle) || way.isTagTrue("bicycle:backwards")) {
                 if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
                     permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
                     permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
@@ -626,10 +674,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
 
-            boolean noThruTraffic = way.isTag("access", "destination")
-                    || way.isTag("access", "private") || way.isTag("access", "customers")
-                    || way.isTag("access", "delivery") || way.isTag("access", "forestry")
-                    || way.isTag("access", "agricultural");
+            String access = way.getTag("access");
+            boolean noThruTraffic = "destination".equals(access)
+                    || "private".equals(access) || "customers".equals(access)
+                    || "delivery".equals(access) || "forestry".equals(access)
+                    || "agricultural".equals(access);
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
                 street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
@@ -691,6 +740,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             street.setSlopeOverride(wayPropertySet.getSlopeOverride(way));
+
+            if (customNamer != null) {
+                customNamer.nameWithEdge(way, street);
+            }
 
             return street;
         }
@@ -774,22 +827,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             return permission;
         }
-    }
-
-    /**
-     * How much safer transit is than biking along an ordinary street. The default is 4.0, which
-     * probably does not reflect reality (especially for rail), but should generate plausible
-     * routes. Do not lower this value below the reciprocal of the safety of the safest street
-     * according to your bicycle safety settings, or you will break the default A* heuristic.
-     * 
-     * @param bikeSafetyFactor
-     */
-    public void setBikeSafetyFactor(double bikeSafetyFactor) {
-        this.bikeSafetyFactor = bikeSafetyFactor;
-    }
-
-    public double getBikeSafetyFactor() {
-        return bikeSafetyFactor;
     }
 
     public CustomNamer getCustomNamer() {

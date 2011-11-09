@@ -63,7 +63,29 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
-
+/**
+ * Implements a multi-objective goal-directed search algorithm like the one in Sec. 4.2 of: 
+ * Perny and Spanjaard. Near Admissible Algorithms for Multiobjective Search.
+ * 
+ * The ideas being tested here are:
+ * Pruning search based on paths already found 
+ * Near-admissible search / relaxed dominance 
+ * Allow resource constraints on transfers and walking
+ * 
+ * This approach seems to need a very accurate heuristic to achieve reasonable run times, 
+ * so for now it is hard-coded to use the Bidirectional heuristic. 
+ * 
+ * It will return a list of paths in order of increasing weight, starting at a weight very
+ * close to that of the optimum path. These paths can vary quite a bit in terms of transfers, 
+ * walk distance, and trips taken.
+ * 
+ * Because the number of boardings and walk distance are considered incomparable
+ * to other weight components, including aggregate weight itself, paths can be 
+ * pruned due to excessive walking distance or excessive number of transfers 
+ * without compromising other paths. 
+ * 
+ * @author andrewbyrd
+ */
 @Component
 public class MultiObjectivePathServiceImpl implements PathService {
 
@@ -300,7 +322,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
-            Date targetTime, TraverseOptions options) {
+            boolean ordered, Date targetTime, TraverseOptions options) {
         return null;
     }
     

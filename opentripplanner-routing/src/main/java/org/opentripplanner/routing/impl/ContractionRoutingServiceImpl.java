@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,10 +26,12 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -105,62 +108,104 @@ public class ContractionRoutingServiceImpl implements RoutingService {
 
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediates,
-            int time, TraverseOptions options) {
+            boolean ordered, int time, TraverseOptions options) {
 
-        Map<Vertex, HashMap<Vertex, GraphPath>> paths = new HashMap<Vertex, HashMap<Vertex, GraphPath>>();
-
-        HashMap<Vertex, GraphPath> firstLegPaths = new HashMap<Vertex, GraphPath>();
-        paths.put(fromVertex, firstLegPaths);
-
-        // compute shortest paths between each pair of vertices
-        for (Vertex v : intermediates) {
-
-            /**
-             * Find initial paths from the source vertex to the intermediate vertex
-             */
-            List<GraphPath> firstPaths = route(new State(time,fromVertex,options), v);
-            if (!firstPaths.isEmpty()) {
-                firstLegPaths.put(v, firstPaths.get(0));
-            }
-
-            /**
-             * Find paths from this intermediate vertex to each other intermediate
-             */
-            HashMap<Vertex, GraphPath> outPaths = new HashMap<Vertex, GraphPath>();
-            paths.put(v, outPaths);
-
-            State intermediateState = new State(time,v,options);
-            
-            for (Vertex tv : intermediates) {
-                /**
-                 * We probably don't need to compute paths where the source and target vertex are
-                 * the same
-                 */
-                if (v == tv)
-                    continue;
-
-                List<GraphPath> morePaths = route(intermediateState, tv);
-                if (!morePaths.isEmpty()) {
-                    outPaths.put(tv, morePaths.get(0));
+        if (ordered) {
+            List<GraphPath> paths = new ArrayList<GraphPath>();
+            Vertex previousVertex = fromVertex;
+            for (Vertex v : intermediates) {
+                List<GraphPath> partialPaths = route(new State(time, previousVertex, options), v);
+                if (partialPaths == null || partialPaths.size() == 0) {
+                    return null;
                 }
+                GraphPath path = partialPaths.get(0);
+                paths.add(path);
+                previousVertex = v;
+                time = (int) path.getEndTime();
+            }
+            List<GraphPath> partialPaths = route(new State(time, previousVertex, options), toVertex);
+            if (partialPaths == null || partialPaths.size() == 0) {
+                return null;
+            }
+            paths.add(partialPaths.get(0));
+            return joinPaths(paths);
+        } else {
+            Map<Vertex, HashMap<Vertex, GraphPath>> paths = new HashMap<Vertex, HashMap<Vertex, GraphPath>>();
+
+            HashMap<Vertex, GraphPath> firstLegPaths = new HashMap<Vertex, GraphPath>();
+            paths.put(fromVertex, firstLegPaths);
+
+            // compute shortest paths between each pair of vertices
+            for (Vertex v : intermediates) {
+
+                /**
+                 * Find initial paths from the source vertex to the intermediate vertex
+                 */
+                List<GraphPath> firstPaths = route(new State(time, fromVertex, options), v);
+                if (!firstPaths.isEmpty()) {
+                    firstLegPaths.put(v, firstPaths.get(0));
+                }
+
+                /**
+                 * Find paths from this intermediate vertex to each other intermediate
+                 */
+                HashMap<Vertex, GraphPath> outPaths = new HashMap<Vertex, GraphPath>();
+                paths.put(v, outPaths);
+
+                State intermediateState = new State(time, v, options);
+
+                for (Vertex tv : intermediates) {
+                    /**
+                     * We probably don't need to compute paths where the source and target vertex
+                     * are the same
+                     */
+                    if (v == tv)
+                        continue;
+
+                    List<GraphPath> morePaths = route(intermediateState, tv);
+                    if (!morePaths.isEmpty()) {
+                        outPaths.put(tv, morePaths.get(0));
+                    }
+                }
+
+                /**
+                 * Find paths from the intermediate vertex to the target vertex
+                 */
+                List<GraphPath> lastPaths = route(intermediateState, toVertex);
+                if (!lastPaths.isEmpty())
+                    outPaths.put(toVertex, lastPaths.get(0));
             }
 
-            /**
-             * Find paths from the intermediate vertex to the target vertex
-             */
-            List<GraphPath> lastPaths = route(intermediateState, toVertex);
-            if (!lastPaths.isEmpty())
-                outPaths.put(toVertex, lastPaths.get(0));
+            // compute shortest path overall
+            HashSet<Vertex> vertices = new HashSet<Vertex>();
+            vertices.addAll(intermediates);
+            return TSPPathFinder.findShortestPath(toVertex, fromVertex, paths, vertices, time,
+                    options);
         }
-
-        // compute shortest path overall
-        HashSet<Vertex> vertices = new HashSet<Vertex>();
-        vertices.addAll(intermediates);
-        GraphPath shortestPath = TSPPathFinder.findShortestPath(toVertex, fromVertex, paths,
-                vertices, time, options);
-        return shortestPath;
     }
-    
+
+    private GraphPath joinPaths(List<GraphPath> paths) {
+        State lastState = paths.get(0).states.getLast();
+        GraphPath newPath = new GraphPath(lastState, false);
+        Vertex lastVertex = lastState.getVertex();
+        for (GraphPath path : paths.subList(1, paths.size())) {
+            lastState = newPath.states.getLast();
+            // add a leg-switching state
+            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
+            lastState = legSwitchingEdge.traverse(lastState);
+            newPath.edges.add(legSwitchingEdge);
+            newPath.states.add(lastState);
+            // add the next subpath
+            for (Edge e : path.edges) {
+                lastState = e.traverse(lastState);
+                newPath.edges.add(e);
+                newPath.states.add(lastState);
+            }
+            lastVertex = path.getEndVertex();
+        }
+        return newPath;
+    }
+
     /****
      * Private Methods
      ****/

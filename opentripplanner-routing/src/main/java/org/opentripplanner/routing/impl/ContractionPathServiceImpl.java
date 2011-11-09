@@ -318,8 +318,8 @@ public class ContractionPathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
-            Date targetTime, TraverseOptions options) {
+    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates, 
+            boolean ordered, Date targetTime, TraverseOptions options) {
 
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
             throw new UnsupportedOperationException("TSP is not supported for transit trips");
@@ -355,7 +355,7 @@ public class ContractionPathServiceImpl implements PathService {
             options.setCalendarService(_graphService.getCalendarService());
 
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices,
+        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, ordered,
                 (int)(targetTime.getTime() / 1000), options);
 
         return Arrays.asList(path);

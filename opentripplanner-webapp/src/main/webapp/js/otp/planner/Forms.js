@@ -14,14 +14,6 @@
 
 otp.namespace("otp.planner");
 
-/** TODO: this code needs refactoring
- *   1. the geocode code is really awful ... very hard to follow, has from & to branches everywhere, no docs, all over the place, etc...
- *   2. geocode -- hate the use of delagates here (maybe because I don't understand them, but they seem convoluted ... and it seems they're an Ext-ism, which is not supported in 4.0)
- *   3  geocode (and a lot of other stuff) feels like it could use a bit of OOP ... reduce the number of from/to branches, etc...
- *   4. documentation is lacking in many parts 
- *   5. this class is reaching 1500 lines (and a bit of redundancy / cut-paste)
- */
-
 /**
   * otp/planner/Forms.js 
   * 
@@ -30,7 +22,7 @@ otp.namespace("otp.planner");
   */
 otp.planner.StaticForms = {
 
-    FIELD_ANCHOR     : '95%',
+    FIELD_ANCHOR          : '95%',
 
     // external (config) objects
     routerId              : null,
@@ -42,56 +34,48 @@ otp.planner.StaticForms = {
     showWheelchairForm    : true,
     useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
-    geocoder              : {},    // geocoder config
+    geocoder              : null,
 
     // forms & stores
-    m_panel          : null,
+    m_panel               : null,
 
-    m_fromErrorStore : null,
-    m_toErrorStore   : null,
-    m_geoErrorPopup  : null,
-
-    m_routerIdForm   : null,
+    m_routerIdForm        : null,
     
-    m_fromForm       : null,
-    m_toForm         : null,
-    m_toPlace        : null,
-    m_fromPlace      : null,
-    m_intermediatePlaces : null,
+    m_fromForm            : null,
+    m_toForm              : null,
+    m_toPlace             : null,
+    m_fromPlace           : null,
+    m_intermediatePlaces  : null,
 
-    m_date           : null,
-    m_time           : null,
-    m_arriveByStore     : null,
-    m_arriveByForm      : null,
+    m_date                : null,
+    m_time                : null,
+    m_arriveByStore       : null,
+    m_arriveByForm        : null,
 
-    m_maxWalkDistanceStore      : null,
-    m_maxWalkDistanceForm       : null,
-    m_optimizeStore  : null,
-    m_optimizeForm   : null,
-    m_modeStore      : null,
-    m_modeForm       : null,
-    m_wheelchairForm : null,
-    m_optionsManager : null,
+    m_maxWalkDistanceStore: null,
+    m_maxWalkDistanceForm : null,
+    m_optimizeStore       : null,
+    m_optimizeForm        : null,
+    m_modeStore           : null,
+    m_modeForm            : null,
+    m_wheelchairForm      : null,
+    m_optionsManager      : null,
 
     m_bikeTriangle          : null,
     m_bikeTriangleContainer : null,
 
     // buttons
-    m_submitButton   : null,
+    m_submitButton        : null,
 
-    m_fromCoord      : otp.util.Constants.BLANK_LAT_LON,
-    m_toCoord        : otp.util.Constants.BLANK_LAT_LON,
+    m_fromCoord           : otp.util.Constants.BLANK_LAT_LON,
+    m_toCoord             : otp.util.Constants.BLANK_LAT_LON,
 
-    m_xmlRespRecord  : null,
+    m_xmlRespRecord       : null,
 
     // to enable masking of the from/to fields
-    m_fromToFP       : null,
+    m_fromToFP            : null,
 
-    // hold state for whether geocoding is currently active
-    m_fromGeocoding  : false,
-    m_toGeocoding    : false,
-
-    THIS             : null,
+    THIS                  : null,
 
 
     /**
@@ -115,6 +99,8 @@ otp.planner.StaticForms = {
             ['date', 'time', 'from', 'to', 'locations', 'fromList', 'toList']
         );
 
+        config.form = this;
+        this.geocoder = new otp.planner.Geocoder(config); 
         this.makeMainPanel();
 
         // step 3: set the singleton & status stuff to this 
@@ -136,16 +122,15 @@ otp.planner.StaticForms = {
     enter : function()
     {
         // when GEOCODER is active on the forms, we must make sure to geocode prior submitting with the enter key
-        if (this.geocoder.enabled) {
+        if (this.haveGeocoder()) {
             if(this.m_fromForm.isDirty())
-                this.fromChanged(this, this.m_fromForm.getRawValue());
+                this.geocoder.fromChanged(this, this.m_fromForm.getRawValue());
             if(this.m_toForm.isDirty())
-                this.toChanged(this, this.m_toForm.getRawValue());
+                this.geocoder.toChanged(this, this.m_toForm.getRawValue());
         }
 
         this.submit();
     },
-
 
     /**
      * called when submitting the form
@@ -156,7 +141,8 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
-        if (this.m_fromGeocoding || this.m_toGeocoding) {
+        if(this.geocoderEnabled())
+        {
             // if we are currently waiting for a geocoder response,
             // then let's wait until we get a response before we submit
             // the form
@@ -246,7 +232,7 @@ otp.planner.StaticForms = {
         var options  = null;
         var fromGrid = null;
         var toGrid   = null;
-        
+
         // load xml to see what errors we have
         try
         {
@@ -264,7 +250,7 @@ otp.planner.StaticForms = {
                     dataIndex: 'areaValue'
                 }
             ];
-            
+
             // try to populate the from & to form stores (in case of ambiguous results of geocoding)
             var to = Ext.DomQuery.selectNode('toList', xml);
             if(to != null)
@@ -530,13 +516,13 @@ otp.planner.StaticForms = {
                 this.m_bikeTriangle.setSHT(params.triangleSafetyFactor, params.triangleSlopeFactor, params.triangleTimeFactor);
 
             if (params.fromPlace && params.fromPlace.length > 2 && params.fromPlace.indexOf(",") > 0) {
-                var lat = this.getLat(params.fromPlace);
-                var lon = this.getLon(params.fromPlace);
+                var lat = otp.util.ObjUtils.getLat(params.fromPlace);
+                var lon = otp.util.ObjUtils.getLon(params.fromPlace);
                 this.setFrom(params.fromPlace, lat, lon, false, false);
             }
             if (params.toPlace && params.toPlace.length > 2 && params.toPlace.indexOf(",") > 0) {
-                var lat = this.getLat(params.toPlace);
-                var lon = this.getLon(params.toPlace);
+                var lat = otp.util.ObjUtils.getLat(params.toPlace);
+                var lon = otp.util.ObjUtils.getLon(params.toPlace);
                 this.setTo(params.toPlace, lat, lon, false, false);
             }
 
@@ -713,49 +699,19 @@ otp.planner.StaticForms = {
         var coord = this.m_fromCoord;
         if(coord == otp.util.Constants.BLANK_LAT_LON)
             coord = retVal.fromPlace;
-        retVal.fromLat = this.getLat(coord);
-        retVal.fromLon = this.getLon(coord);
+        retVal.fromLat = otp.util.ObjUtils.getLat(coord);
+        retVal.fromLon = otp.util.ObjUtils.getLon(coord);
 
         // break up the to coordinate into lat & lon
         coord = this.m_toCoord;
         if(coord == otp.util.Constants.BLANK_LAT_LON)
             coord = retVal.toPlace;
-        retVal.toLat   = this.getLat(coord);
-        retVal.toLon   = this.getLon(coord);
+        retVal.toLat   = otp.util.ObjUtils.getLat(coord);
+        retVal.toLon   = otp.util.ObjUtils.getLon(coord);
 
         try
         {
             retVal.time = retVal.time.replace(/\./g, "");
-        }
-        catch(e)
-        {
-        }
-
-        return retVal;
-    },
-
-    /** returns the second value from a comma separated string eg: 0.0,0.returnMe*/
-    getLon : function(coord) {
-        var retVal = null;
-
-        try
-        {
-            retVal = coord.substring(coord.indexOf(',') + 1); 
-        }
-        catch(e)
-        {
-        }
-
-        return retVal;
-    },
-
-    /** returns the first value from a comma separated string eg: 0.returnMe,0.0 */
-    getLat : function(coord) {
-        var retVal = null;
-
-        try
-        {
-            retVal = coord.substring(0, coord.indexOf(',')); 
         }
         catch(e)
         {
@@ -927,15 +883,15 @@ otp.planner.StaticForms = {
             return;
         }
         if (this.m_fromCoord && this.m_fromCoord.length > 2) {
-            var x = this.getLat(this.m_fromCoord);
-            var y = this.getLon(this.m_fromCoord);
+            var x = otp.util.ObjUtils.getLat(this.m_fromCoord);
+            var y = otp.util.ObjUtils.getLon(this.m_fromCoord);
             if (x != 0 && y != 0) {
                 this.poi.setFrom(y, x, this.m_fromCoord);
             }
         }
         if (this.m_toCoord && this.m_toCoord.length > 2) {
-            var x = this.getLat(this.m_toCoord);
-            var y = this.getLon(this.m_toCoord);
+            var x = otp.util.ObjUtils.getLat(this.m_toCoord);
+            var y = otp.util.ObjUtils.getLon(this.m_toCoord);
             if (x != 0 && y != 0) {
                 this.poi.setTo(y, x, this.m_toCoord);
             }
@@ -957,9 +913,9 @@ otp.planner.StaticForms = {
         var comboBoxOptions = {layout: 'anchor', label: '', cls: 'nudgeRight', msgTarget: "under"};
         var fromFormOptions = Ext.apply({}, {id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
         var toFormOptions = Ext.apply({}, {id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to}, comboBoxOptions);
-        if (this.geocoder.enabled) {
-            fromFormOptions.changeHandler = this.fromChanged.createDelegate(this);
-            toFormOptions.changeHandler = this.toChanged.createDelegate(this);
+        if(this.geocoderEnabled()) {
+            fromFormOptions.changeHandler = this.geocoder.fromChanged.createDelegate(this.geocoder);
+            toFormOptions.changeHandler   = this.geocoder.toChanged.createDelegate(this.geocoder);
         }
         this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
         this.m_toForm   = new otp.core.ComboBox(toFormOptions);
@@ -988,7 +944,7 @@ otp.planner.StaticForms = {
         });
 
         // change events will clear out the from/to coordinate forms (don't want coords from old places getting confused with new requests)
-        if (!this.geocoder.enabled) {
+        if (this.geocoderEnabled()) {
             // but we only do this when the geocoder isn't enabled, because the forms have a separate change listener
             // that manages this state when the geocoder is enabled
             this.m_fromForm.getComboBox().on({scope: this, focus  : this.clearFrom  });
@@ -1023,174 +979,6 @@ otp.planner.StaticForms = {
         };
 
         return inputPanel;
-    },
-    
-    _makeGeocoderRequest : function(address, successFn, failureFn, comboBoxIdentifier) {
-        if (!address || address.length < 1) {
-            return;
-        }
-        var loadMask = new Ext.LoadMask(this.m_fromToFP.getEl(), {msg: this.locale.tripPlanner.geocoder.working});
-        loadMask.show();
-
-        if (comboBoxIdentifier === "from") {
-            this.m_fromGeocoding = true;
-        } else if (comboBoxIdentifier === "to") {
-            this.m_toGeocoding = true;
-        }
-
-        var params = {};
-        params[this.geocoder.addressParamName] = address;
-        if (this.routerId)
-            params["routerId"] = this.routerId;
-        var self = this;
-        Ext.Ajax.request( {
-            url: this.geocoder.url,
-            method: "GET",
-            success: successFn,
-            failure: failureFn,
-            callback: function() {
-                loadMask.hide();
-                if (comboBoxIdentifier === "from") {
-                    self.m_fromGeocoding = false;
-                } else if (comboBoxIdentifier === "to") {
-                    self.m_toGeocoding = false;
-                }
-            },
-            params: params
-        });
-        ;
-    },
-
-    fromChanged : function(comboBox, value) {
-        if (this.isCoordinate(value)) {
-            var lat = this.getLat(value);
-            var lng = this.getLon(value);
-            this.setFrom(value, lat, lng, true, false);
-        } else {
-            this._makeGeocoderRequest(value,
-                    this.handleGeocoderResponse.createDelegate(this, ['from'], true),
-                    this.handleGeocoderFailure.createDelegate(this, ['from'], true),
-                    "from"
-            );
-        }
-    },
-    
-    toChanged : function(comboBox, value) {
-        if (this.isCoordinate(value)) {
-            var lat = this.getLat(value);
-            var lng = this.getLon(value);
-            this.setTo(value, lat, lng, true, false);
-        } else {
-            this._makeGeocoderRequest(value,
-                    this.handleGeocoderResponse.createDelegate(this, ['to'], true),
-                    this.handleGeocoderFailure.createDelegate(this, ['to'], true),
-                    "to"
-            );
-        }
-    },
-    
-    /**
-     * predicate to check if string looks like a lat,lon string
-     */
-    isCoordinate : function(value) {
-        var lat = parseFloat(this.getLat(value));
-        var lon = parseFloat(this.getLon(value));
-        return !isNaN(lat) && !isNaN(lon);
-    },
-
-    /** TODO refactor and clean this up */
-    handleGeocoderResponse: function(response, ajaxOptions, comboBoxIdentifier) {
-        var xml = response.responseXML;
-        var errorNode = Ext.DomQuery.selectNode("error", xml);
-        if (errorNode) {
-            var errMsg = "error geocoding: " + errorNode.firstChild.nodeValue;
-            if (comboBoxIdentifier === "from") {
-                this.m_fromForm.getComboBox().markInvalid(errMsg);
-            } else if (comboBoxIdentifier === "to") {
-                this.m_toForm.getComboBox().markInvalid(errMsg);
-            }
-            return;
-        }
-
-        var countNode = Ext.DomQuery.selectNode("count", xml);
-
-        if (!countNode) {
-            var errMsg = "error parsing geocoder response";
-            if (comboBoxIdentifier === "from") {
-                this.m_fromForm.getComboBox().markInvalid(errMsg);
-            } else if (comboBoxIdentifier === "to") {
-                this.m_toForm.getComboBox().markInvalid(errMsg);
-            }
-            return;
-        }
-        
-        var count = parseInt(countNode.firstChild.nodeValue);
-        
-        if (isNaN(count) || count < 1) {
-            var errMsg = this.locale.tripPlanner.geocoder.error;
-            if (comboBoxIdentifier === "from") {
-                this.m_fromForm.getComboBox().markInvalid(errMsg);
-            } else if (comboBoxIdentifier === "to") {
-                this.m_toForm.getComboBox().markInvalid(errMsg);
-            }
-            return;
-        }
-        
-        if (count > 1) {
-            // ambiguous geocoder results
-            // ask the user to pick one
-            var self = this;
-            var xmlNodes = Ext.DomQuery.jsSelect("result", xml);
-            var resultsSelector = new otp.planner.GeocoderResultsSelector({
-                locale: this.locale,
-                callback: function(lat, lng, description) {
-                  // TODO refactor all of this ... these from/to conditionals can go away with a lil OOP
-                  if (comboBoxIdentifier === "from") {
-                      self.setFrom(description, lat, lng, true, false);
-                  } else if (comboBoxIdentifier === "to") {
-                      self.setTo(description, lat, lng, true, false);
-                  }
-                },
-                geocoderResults: this.parseGeocoderResultXml(xmlNodes)
-            });
-            resultsSelector.displayDialog();
-        } else {
-            // should have only 1 result
-            // parse that result and set appropriately
-            var lat = Ext.DomQuery.selectNode("lat", xml).firstChild.nodeValue;
-            var lng = Ext.DomQuery.selectNode("lng", xml).firstChild.nodeValue;
-            var description = Ext.DomQuery.selectNode("description", xml).firstChild.nodeValue;
-            var latlng = lat + "," + lng;
-            
-            if (comboBoxIdentifier === "from") {
-                this.m_fromForm.getComboBox().clearInvalid();
-                this.setFrom(description, lat, lng, true, false);
-            } else if (comboBoxIdentifier === "to") {
-                this.m_toForm.getComboBox().clearInvalid();
-                this.setTo(description, lat, lng, true, false);
-            }
-        }        
-    },
-    
-    handleGeocoderFailure: function(response, ajaxOptions, comboBoxIdentifier) {
-        console.log("geocoder failure");
-        console.log(response);
-        console.log("geocoder failure options");
-        console.log(ajaxOptions);
-        console.log("geocoding for combobox: " + comboBoxIdentifier);
-    },
-
-    // parse xml nodes returned from geocoder into an array of arrays
-    // suitable to pass into the geocoder results selector
-    parseGeocoderResultXml : function(xmlNodes) {
-        var result = [];
-        Ext.each(xmlNodes, function(node) {
-            var lat = Ext.DomQuery.selectNode("lat", node).firstChild.nodeValue;
-            var lng = Ext.DomQuery.selectNode("lng", node).firstChild.nodeValue;
-            var description = Ext.DomQuery.selectNode("description", node).firstChild.nodeValue;
-            result.push([lat, lng, description]);
-        });
-        return result;
     },
 
     /**
@@ -1398,6 +1186,40 @@ otp.planner.StaticForms = {
         return retVal;
 
     },
+
+    /** utility to */
+    geocoderEnabled : function()
+    {
+        return this.geocoder && this.geocoder.enabled;
+    },
+
+    /** utility to see if we're geocoding at the moment...*/
+    isBusyGeocoding : function()
+    {
+        var retVal = false;
+        try
+        {
+            if(this.geocode.m_fromGeocoding || this.geocode.m_toGeocoding)
+                retVal = true;
+        }
+        catch(e) {}
+        return retVal;
+    },
+
+    /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
+    setFormErrorMessage : function(comboBoxIdentifier, message)
+    {
+        var errMsg = this.form.locale.tripPlanner.geocoder.error;
+        if(message)
+            errMsg = message;
+
+        if (comboBoxIdentifier === "from") {
+            this.m_fromForm.getComboBox().markInvalid(errMsg);
+        } else if (comboBoxIdentifier === "to") {
+            this.m_toForm.getComboBox().markInvalid(errMsg);
+        }
+    },
+
 
     CLASS_NAME: "otp.planner.Forms"
 };

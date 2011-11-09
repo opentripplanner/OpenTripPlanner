@@ -74,7 +74,14 @@ public class OSMDownloader {
             for (double x = minX; x < maxX; x += _lonXStep) {
                 String key = getKey(x, y);
                 File path = getPathToUpToDateMapTile(y, x, key);
-                listener.handleMapTile(key, y, x, path);
+                try {
+                    listener.handleMapTile(key, y, x, path);
+                } catch (IllegalStateException e) {
+                    _log.debug("trying to re-download");
+                    path.delete();
+                    path = getPathToUpToDateMapTile(y, x, key);
+                    listener.handleMapTile(key, y, x, path);
+                }
             }
         }
     }
@@ -110,17 +117,24 @@ public class OSMDownloader {
             _log.debug(url.toString());
 
             InputStream in = url.openStream();
-            FileOutputStream out = new FileOutputStream(path);            
-            byte[] data = new byte[4096];
-            while (true) {
-                int numBytes = in.read(data);
-                if (numBytes == -1) {
-                    break;
+            FileOutputStream out = new FileOutputStream(path);
+            try {
+                byte[] data = new byte[4096];
+                while (true) {
+                    int numBytes = in.read(data);
+                    if (numBytes == -1) {
+                        break;
+                    }
+                    out.write(data, 0, numBytes);
                 }
-                out.write(data, 0, numBytes);
+                in.close();
+                out.close();
+            } catch (RuntimeException e) {
+                out.close();
+                _log.info("Removing half-written file " + path);
+                path.delete(); //clean up any half-written files
+                throw e;
             }
-            in.close();
-            out.close();
         }
 
         return path;

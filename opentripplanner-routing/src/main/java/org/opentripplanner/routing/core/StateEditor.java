@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
@@ -88,7 +89,7 @@ public class StateEditor {
                         .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
             }
-            if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT) {
+            if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT && !(e instanceof FreeEdge)) {
                 setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
             }
         }
