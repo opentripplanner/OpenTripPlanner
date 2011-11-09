@@ -712,7 +712,6 @@ public class PlanGenerator {
                                 continue; //this is not an alternative
                             }
                             alternative = alternatives.get(0);
-
                             if (alternative.getName().equals(streetName)) {
                                 //alternatives that have the same name
                                 //are usually caused by street splits
