@@ -33,7 +33,6 @@ import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandle
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.GraphVertex;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
@@ -340,9 +339,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void applyBikeSafetyFactor(Graph graph) {
             _log.info("Multiplying all bike safety values by " + (1 / bestBikeSafety));
             HashSet<Edge> seenEdges = new HashSet<Edge>();
-            for (GraphVertex gv : graph.getVertices()) {
-                Vertex vertex = gv.vertex;
-                for (Edge e : graph.getOutgoing(vertex)) {
+            for (Vertex vertex : graph.getVertices()) {
+                for (Edge e : vertex.getOutgoing()) {
                     if (!(e instanceof PlainStreetEdge)) {
                         continue;
                     }
@@ -353,7 +351,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         pse.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength() / bestBikeSafety);
                     }
                 }
-                for (Edge e : graph.getIncoming(vertex)) {
+                for (Edge e : vertex.getIncoming()) {
                     if (!(e instanceof PlainStreetEdge)) {
                         continue;
                     }
