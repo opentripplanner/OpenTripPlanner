@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
 
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
 
@@ -61,4 +62,9 @@ public interface ExtraEdgesStrategy extends Serializable {
      * @param target
      */
     public void addOutgoingEdgesForTarget(Map<Vertex, List<Edge>> extraEdges, Vertex target);
+
+    /**
+     * Add all incoming and outgoing edges to an OverlayGraph.
+     */
+    public void addEdgesFor(OverlayGraph extraEdges, Vertex vertex);
 }

@@ -14,47 +14,29 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.algorithm.GraphLibrary;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.SimplifiedLowerBoundGraph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransitStop;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
@@ -100,8 +82,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     private StreetVertexIndexService _indexService;
     
-    private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
-    
     private double[] _timeouts = new double[] {4, 2, 0.6, 0.4}; // seconds
     
     private double _maxPaths = 4;
@@ -121,15 +101,11 @@ public class MultiObjectivePathServiceImpl implements PathService {
     }
 
     @Autowired
-    public void setRemainingWeightHeuristicFactory(RemainingWeightHeuristicFactory hf) {
-        _remainingWeightHeuristicFactory = hf;
-    }
-
-    @Autowired
     public void setGraphService(GraphService graphService) {
         _graphService = graphService;
     }
 
+    @Override
     public GraphService getGraphService() {
         return _graphService;
     }
@@ -176,82 +152,63 @@ public class MultiObjectivePathServiceImpl implements PathService {
     @Override
     public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
 
-        Date targetTime = new Date(origin.getTime() * 1000);
         TraverseOptions options = origin.getOptions();
 
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        options.setServiceDays(targetTime.getTime() / 1000);
+
+        options.setServiceDays(origin.getTime());
         if (options.getModes().getTransit()
-                && !_graphService.getGraph().transitFeedCovers(targetTime)) {
+            && !_graphService.getGraph().transitFeedCovers(new Date(origin.getTime() * 1000))) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
         }
-        Graph graph = _graphService.getGraph();
         
-        RemainingWeightHeuristic heuristic = 
-                _remainingWeightHeuristicFactory.getInstanceForSearch(options, target);
-        LOG.debug("Applied A* heuristic: {}", options.remainingWeightHeuristic);
-
+        // always use the bidirectional heuristic because the others are not precise enough
+        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(_graphService.getGraph());
                 
-        // the states that will eventually be turned into graphpaths and returned
+        // the states that will eventually be turned into paths and returned
         List<State> returnStates = new LinkedList<State>();
-//        options.setMaxWalkDistance(Double.MAX_VALUE);
 
         // Populate any extra edges
         final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
-        Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
-        if (options.isArriveBy()) {
-            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
-        } else {
-            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
-        }
-        if (extraEdges.isEmpty())
-            extraEdges = Collections.emptyMap();
+        OverlayGraph extraEdges = new OverlayGraph();
+        extraEdgesStrategy.addEdgesFor(extraEdges, origin.getVertex());
+        extraEdgesStrategy.addEdgesFor(extraEdges, target);
         
         BinHeap<State> pq = new BinHeap<State>();
-        HashSet<Vertex> closed = new HashSet<Vertex>();
         List<State> boundingStates = new ArrayList<State>();
-        
         HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
+
         pq.reset();
         pq.insert(origin, 0);
         heuristic.computeInitialWeight(origin, target);
         long startTime = System.currentTimeMillis();
         long endTime = startTime + (int)(_timeouts[0] * 1000);
         QUEUE: while ( ! pq.empty()) {
+            
             if (System.currentTimeMillis() > endTime) {
                 LOG.debug("timeout at {} msec", System.currentTimeMillis() - startTime);
                 break QUEUE;
             }
-            Double su_hweight = pq.peek_min_key();
+
             State su = pq.extract_min();
-//                if (returnStates.size() > 0)
-//                    if (su.getWalkDistance() > maxWalk)
-//                        continue;
 
             for (State bs : boundingStates) {
-                if (eDominates(bs, su))
+                if (eDominates(bs, su)) {
                     continue QUEUE;
-//                    if (su_hweight > bs.getWeight() * 1.5)
-//                        break QUEUE;
+                }
             }
+
             Vertex u = su.getVertex();
-            // check for dominated states 
-            // (is this important? seems to make insignificant diff. are there the "hidden states"?)
-//                List<State> u_states = states.get(u);
-//                if (u_states != null && ! u_states.contains(su))
-//                    continue;
             if (u.equals(target)) {
                 boundingStates.add(su);
                 returnStates.add(su);
-                // options should contain max itineraries
                 if ( ! options.getModes().getTransit())
                     break QUEUE;
+                // options should contain max itineraries
                 if (returnStates.size() >= _maxPaths)
                     break QUEUE;
                 if (returnStates.size() < _timeouts.length) {
@@ -263,20 +220,15 @@ public class MultiObjectivePathServiceImpl implements PathService {
                 continue QUEUE;
             }
             
-            Collection<Edge> edges;
-            if (options.isArriveBy())
-                edges = GraphLibrary.getIncomingEdges(graph, u, extraEdges);
-            else
-                edges = GraphLibrary.getOutgoingEdges(graph, u, extraEdges);
-
-            EDGE: for (Edge e : edges) {
+            EDGE: for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
                 State new_sv = e.traverse(su);
                 if (new_sv == null)
                     continue;
                 double h = heuristic.computeForwardWeight(new_sv, target);
                 for (State bs : boundingStates) {
-                    if (eDominates(bs, new_sv))
-                        continue;
+                    if (eDominates(bs, new_sv)) {
+                        continue EDGE;
+                    }
                 }
                 Vertex v = new_sv.getVertex();
                 List<State> old_states = states.get(v);
@@ -285,8 +237,9 @@ public class MultiObjectivePathServiceImpl implements PathService {
                     states.put(v, old_states);
                 } else {
                     for (State old_sv : old_states) {
-                        if (eDominates(old_sv, new_sv))
+                        if (eDominates(old_sv, new_sv)) {
                             continue EDGE;
+                        }
                     }
                     Iterator<State> iter = old_states.iterator();
                     while (iter.hasNext()) {
@@ -310,10 +263,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     private boolean eDominates(State s0, State s1) {
         final double EPSILON = 0.05;
-     // intended to avoid alternate options that use the same trips, but compromises results
-//        if (s0.similarTripSeq(s1)) { 
-//            return s0.getWeight() <= s1.getWeight() * (1 + EPSILON);
-//        }
         return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
                s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
                s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
@@ -322,7 +271,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
-            boolean ordered, Date targetTime, TraverseOptions options) {
+           boolean ordered, Date targetTime, TraverseOptions options) {
         return null;
     }
     
@@ -330,6 +279,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     
     /* MOVE THESE METHODS TO A LIBRARY CLASS */
     
+    // this should probably be in the indexService
     private Vertex getVertexForPlace(String place, TraverseOptions options) {
 
         Matcher matcher = _latLonPattern.matcher(place);

@@ -24,6 +24,7 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.customize.ClassCustomizer;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -90,16 +91,17 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
         addReachToGraph(graph);
 
-        graph = makeWalkingGraph(graph, options);
+        OverlayGraph walkGraph = makeWalkingGraph(graph, options);
 
-        Set<Vertex> streetVertices = getWalkingVertices(graph, options);
+        Set<Vertex> streetVertices = getWalkingVertices(walkGraph, options);
 
         options.setArriveBy(true);
-        removeEdgeTrees(graph, streetVertices, options);
-        options.setArriveBy(false);
-        removeEdgeTrees(graph, streetVertices, options);
+        removeEdgeTrees(walkGraph, streetVertices, options);
 
-        partialTreesForStreets(graph, streetVertices, options);
+        options.setArriveBy(false);
+        removeEdgeTrees(walkGraph, streetVertices, options);
+
+        partialTreesForStreets(walkGraph, streetVertices, options);
 
         // clean up to save memory
         inPenalty = outPenalty = null;
@@ -111,16 +113,15 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
         HashSet<DirectEdge> edgesToRemove = new HashSet<DirectEdge>();
         HashSet<DirectEdge> edgesToAdd = new HashSet<DirectEdge>();
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex vertex = gv.vertex;
-            for (Edge e : graph.getOutgoing(vertex)) {
+        for (Vertex vertex : graph.getVertices()) {
+            for (Edge e : vertex.getOutgoing()) {
                 if (e instanceof StreetEdge) {
                     StreetEdge se = ((StreetEdge) e);
                     edgesToRemove.add(se);
                     edgesToAdd.add(reachifyEdge(graph, classMapping, se));
                 }
             }
-            for (Edge e : graph.getIncoming(vertex)) {
+            for (Edge e : vertex.getIncoming()) {
                 if (edgesToRemove.contains(e)) {
                     continue;
                 }
@@ -128,7 +129,6 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                     StreetEdge se = ((StreetEdge) e);
                     edgesToRemove.add(se);
                     edgesToAdd.add(reachifyEdge(graph, classMapping, se));
-
                 }
             }
         }
@@ -168,29 +168,22 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
      * @param options a set of TraverseOptions with modes containing TraverseMode.WALK or BICYCLE or CAR 
      * @return
      */
-    private Graph makeWalkingGraph(Graph graph, TraverseOptions options) {
-        Graph newGraph = new Graph();
-        HashSet<Edge> edges = new HashSet<Edge>();
-        for (GraphVertex gv : graph.getVertices()) {
-            Vertex vertex = gv.vertex;
-            newGraph.addVertex(vertex);
+    private OverlayGraph makeWalkingGraph(Graph graph, TraverseOptions options) {
+        OverlayGraph newGraph = new OverlayGraph(graph);
+        for (Vertex vertex : graph.getVertices()) {
             options.setArriveBy(false);
-            for (Edge e : graph.getOutgoing(vertex)) {
+            for (Edge e : vertex.getOutgoing()) {
                 if (e instanceof StreetEdge || e instanceof StreetTransitLink) {
                     if (e.traverse(new State(vertex, options)) != null) {
-                        if (!edges.contains(e)) {
-                            newGraph.addEdge((DirectEdge) e);
-                        }
+                        newGraph.addOutgoing(vertex, e);
                     }
                 }
             }
             options.setArriveBy(true);
-            for (Edge e : graph.getIncoming(vertex)) {
+            for (Edge e : vertex.getIncoming()) {
                 if (e instanceof StreetEdge || e instanceof StreetTransitLink) {
                     if (e.traverse(new State(vertex, options)) != null) {
-                        if (!edges.contains(e)) {
-                            newGraph.addEdge((DirectEdge) e);
-                        }
+                        newGraph.addIncoming(vertex, e);
                     }
                 }
             }
@@ -211,8 +204,8 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
      * @param streetVertices
      * @param options
      */
-    private void removeEdgeTrees(Graph graph, Set<Vertex> streetVertices, TraverseOptions options) {
-        GenericDijkstra dijkstra = new GenericDijkstra(graph, options);
+    private void removeEdgeTrees(OverlayGraph ograph, Set<Vertex> streetVertices, TraverseOptions options) {
+        GenericDijkstra dijkstra = new GenericDijkstra(options);
         dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
             @Override
             public ShortestPathTree create() {
@@ -246,9 +239,9 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
             Collection<Edge> edges;
             if (options.isArriveBy()) {
-                edges = graph.getIncoming(v);
+                edges = ograph.getIncoming(v);
             } else {
-                edges = graph.getOutgoing(v);
+                edges = ograph.getOutgoing(v);
             }
 
             for (EdgeWithReach e : IterableLibrary.filter(edges, EdgeWithReach.class)) {
@@ -259,54 +252,54 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 edgesToRemove.add(e);
             }
             for (EdgeWithReach e : edgesToRemove) {
-                graph.removeEdge(e);
+                ograph.removeDirectEdge(e);
                 removed++;
             }
         }
     }
 
-    void partialTreesForStreets(Graph graph, Collection<Vertex> streetVertices,
+    void partialTreesForStreets(OverlayGraph ograph, Collection<Vertex> streetVertices,
             TraverseOptions options) {
 
         /* compute the walking graph */
 
         HashSet<Edge> added = new HashSet<Edge>();
-        Graph workingGraph = new Graph();
+        OverlayGraph workingGraph = new OverlayGraph();
         for (Vertex v : streetVertices) {
-            for (Edge e : graph.getOutgoing(v)) {
+            for (Edge e : v.getOutgoing()) {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addEdge((DirectEdge) e);
+                        workingGraph.addDirectEdge((DirectEdge) e);
                     }
                 }
             }
-            for (Edge e : graph.getIncoming(v)) {
+            for (Edge e : v.getIncoming()) {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addEdge((DirectEdge) e);
+                        workingGraph.addDirectEdge((DirectEdge) e);
                     }
                 }
             }
         }
         added.clear();
-        graph = workingGraph;
+        ograph = workingGraph;
 
         /* compute reach over all walking paths */
         epsilon = initialStreetEpsilon;
         while (epsilon <= maxStreetEpsilon) {
-            graph = partialTreesPhase(graph, streetVertices, options, false);
+            ograph = partialTreesPhase(ograph, streetVertices, options, false);
             epsilon *= streetEpsilonMultiplier;
         }
     }
 
-    private Set<Vertex> getWalkingVertices(Graph graph, TraverseOptions options) {
+    private Set<Vertex> getWalkingVertices(OverlayGraph ograph, TraverseOptions options) {
         Set<Vertex> streetVertices = new HashSet<Vertex>();
-        for (GraphVertex v : graph.getVertices()) {
-            if (v.vertex instanceof StreetVertex) {
-                GenericDijkstra dijkstra = new GenericDijkstra(graph, options);
-                ShortestPathTree spt = dijkstra.getShortestPathTree(new State(v.vertex, options));
+        for (Vertex vertex : ograph.getVertices()) {
+            if (vertex instanceof StreetVertex) {
+                GenericDijkstra dijkstra = new GenericDijkstra(options, ograph);
+                ShortestPathTree spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
                     if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
@@ -314,7 +307,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 options.setArriveBy(true);
-                spt = dijkstra.getShortestPathTree(new State(v.vertex, options));
+                spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
                     if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
@@ -328,11 +321,12 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         return streetVertices;
     }
 
-    Graph partialTreesPhase(final Graph graph, Collection<Vertex> streetVertices,
-            final TraverseOptions options, boolean transitStops) {
+    OverlayGraph partialTreesPhase(final OverlayGraph oGraph, Collection<Vertex> streetVertices,
+        final TraverseOptions options, boolean transitStops) {
+        
         log.info("Partial trees phase at epsilon = " + epsilon);
 
-        GenericDijkstra dijkstra = new GenericDijkstra(graph, options);
+        GenericDijkstra dijkstra = new GenericDijkstra(options, oGraph);
         if (!transitStops) {
             dijkstra.setSearchTerminationStrategy(new PartialTreesPhaseTerminationCondition());
         }
@@ -348,7 +342,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             @SuppressWarnings("unchecked")
             public OTPPriorityQueue<State> create(int maxSize) {
                 int size = (int) epsilon;
-                int graphSize = graph.getVertices().size();
+                int graphSize = oGraph.getVertices().size();
                 if (graphSize < size) {
                     size = graphSize;
                 }
@@ -413,11 +407,11 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
         // eliminate edges which have reach less than epsilon
 
-        Graph newGraph = new Graph();
+        OverlayGraph newGraph = new OverlayGraph();
 
         int edgesRemoved = 0;
         HashSet<Edge> edges = new HashSet<Edge>();
-        for (GraphVertex v : graph.getVertices()) {
+        for (Vertex v : oGraph.getVertices()) {
             for (EdgeWithReach edge : IterableLibrary.filter(v.getOutgoing(),
                     EdgeWithReach.class)) {
                 if (!edges.contains(edge)) {
@@ -437,16 +431,16 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         return newGraph;
     }
 
-    private int processEdge(Graph newGraph, EdgeWithReach edge,
+    private int processEdge(OverlayGraph newGraph, EdgeWithReach edge,
             HashMap<Edge, Double> reachEstimateForEdge, boolean transitStops) {
         Double reach = reachEstimateForEdge.get(edge);
         if (reach == null) {
-            newGraph.addEdge(edge);
+            newGraph.addDirectEdge(edge);
             return 0;
         }
 
         if (reach >= epsilon) {
-            newGraph.addEdge(edge);
+            newGraph.addDirectEdge(edge);
             return 0;
         }
 
