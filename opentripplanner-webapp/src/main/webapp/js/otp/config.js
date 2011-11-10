@@ -59,7 +59,7 @@ otp.config_defaults = {
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
         /* debug */
-        /* *
+        /* * /
         geocoder  :
         {
             enabled : true,

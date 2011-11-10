@@ -43,6 +43,7 @@ otp.planner.GeocoderResultsSelector = {
     
     initialize : function(config) {
         otp.configure(this, config);
+        var self = this;
         
         if (typeof config.callback === "function") {
             this.callback = config.callback;
@@ -63,30 +64,34 @@ otp.planner.GeocoderResultsSelector = {
         this.grid = new Ext.grid.GridPanel({
             store: this.store,
             columns: [{
-                id: "address", 
                 header: this.locale.tripPlanner.geocoder.address_header,
+                id:        "address", 
                 dataIndex: "address",
                 width: 200}],
             stripeRows: true,
             autoExpandColumn: "address",
             height: 150,
             width: 300,
-            title: this.locale.tripPlanner.geocoder.select_result_title,
             selModel: selectionModel
         });
-        this.grid.on({viewready: function() {
-            selectionModel.selectFirstRow();
-        }});
+        this.grid.on({
+            viewready   : function() {selectionModel.selectFirstRow();},
+            rowdblclick : function(g, i, e) {self.resultSelected();},
+            rowclick    : function(g, i, e) {self.previewSelected();}
+        });
         this.win = new Ext.Window({
+            title: this.locale.tripPlanner.geocoder.select_result_title,
             layout: "fit",
-            width: 500,
+            width:  500,
             height: 300,
+            x:      50,
+            y:      170,
             items: this.grid,
-            closable: false,
-            buttons: [{
-                text: "Ok",
-                handler: this.resultSelected.createDelegate(this)
-            }]
+            closable: true,
+            buttons: [
+                {text: this.locale.buttons.ok,     handler: this.resultSelected.createDelegate(this) },
+                {text: this.locale.buttons.cancel, handler: this.hideDialog.createDelegate(this) }
+            ]
         });
     },
     
@@ -98,20 +103,29 @@ otp.planner.GeocoderResultsSelector = {
         this.win.focus();
     },
     
-    /**
-     * when the user has selected the geocoded result, retrieve the lat/lng
-     * and call the callback function with the values
-     */
-    resultSelected : function() {
+    /** */
+    hideDialog : function() {
+        this.win.close();
+    },
+
+    /** */
+    previewSelected : function() {
         var record = this.grid.getSelectionModel().getSelected();
 
         var lat = record.get("lat");
         var lng = record.get("lng");
         var address = record.get("address");
-        
-        this.win.close();
 
         this.callback(lat, lng, address);
+    },
+
+    /**
+     * when the user has selected the geocoded result, retrieve the lat/lng
+     * and call the callback function with the values
+     */
+    resultSelected : function() {
+        this.previewSelected();
+        this.win.close();
     },
     
     CLASS_NAME: "otp.planner.GeocoderResultsSelector"

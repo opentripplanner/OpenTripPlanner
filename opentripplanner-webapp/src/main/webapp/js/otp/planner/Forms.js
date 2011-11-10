@@ -122,7 +122,7 @@ otp.planner.StaticForms = {
     enter : function()
     {
         // when GEOCODER is active on the forms, we must make sure to geocode prior submitting with the enter key
-        if (this.haveGeocoder()) {
+        if (this.geocoderEnabled()) {
             if(this.m_fromForm.isDirty())
                 this.geocoder.fromChanged(this, this.m_fromForm.getRawValue());
             if(this.m_toForm.isDirty())
@@ -141,7 +141,7 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
-        if(this.geocoderEnabled())
+        if(this.isBusyGeocoding())
         {
             // if we are currently waiting for a geocoder response,
             // then let's wait until we get a response before we submit
@@ -1187,6 +1187,20 @@ otp.planner.StaticForms = {
 
     },
 
+    /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
+    setFormErrorMessage : function(comboBoxIdentifier, message)
+    {
+        var errMsg = this.form.locale.tripPlanner.geocoder.error;
+        if(message)
+            errMsg = message;
+
+        if (comboBoxIdentifier === "from") {
+            this.m_fromForm.getComboBox().markInvalid(errMsg);
+        } else if (comboBoxIdentifier === "to") {
+            this.m_toForm.getComboBox().markInvalid(errMsg);
+        }
+    },
+
     /** utility to */
     geocoderEnabled : function()
     {
@@ -1205,21 +1219,6 @@ otp.planner.StaticForms = {
         catch(e) {}
         return retVal;
     },
-
-    /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
-    setFormErrorMessage : function(comboBoxIdentifier, message)
-    {
-        var errMsg = this.form.locale.tripPlanner.geocoder.error;
-        if(message)
-            errMsg = message;
-
-        if (comboBoxIdentifier === "from") {
-            this.m_fromForm.getComboBox().markInvalid(errMsg);
-        } else if (comboBoxIdentifier === "to") {
-            this.m_toForm.getComboBox().markInvalid(errMsg);
-        }
-    },
-
 
     CLASS_NAME: "otp.planner.Forms"
 };
