@@ -28,7 +28,10 @@ otp.planner.GeocoderResultsSelector = {
     // a callback function gets called after the user has made his selection
     // this function takes a lat, lng, description
     callback: null,
-    
+
+    // grid panel icon (e.g., from / to icons)
+    iconCls:  null,
+
     // the format here should be an array of arrays
     // each element should be an array of the form: [lat, lng, description]
     geocoderResults: null,
@@ -62,7 +65,9 @@ otp.planner.GeocoderResultsSelector = {
         
         var selectionModel = new Ext.grid.RowSelectionModel({singleSelect: true});
         this.grid = new Ext.grid.GridPanel({
-            store: this.store,
+            title          : this.locale.tripPlanner.geocoder.select_result_title,
+            iconCls        : this.iconCls,
+            store          : this.store,
             columns: [{
                 header: this.locale.tripPlanner.geocoder.address_header,
                 id:        "address", 
@@ -80,14 +85,13 @@ otp.planner.GeocoderResultsSelector = {
             rowclick    : function(g, i, e) {self.previewSelected();}
         });
         this.win = new Ext.Window({
-            title: this.locale.tripPlanner.geocoder.select_result_title,
+            closable: false,
             layout: "fit",
             width:  500,
             height: 300,
             x:      50,
             y:      170,
             items: this.grid,
-            closable: true,
             buttons: [
                 {text: this.locale.buttons.ok,     handler: this.resultSelected.createDelegate(this) },
                 {text: this.locale.buttons.cancel, handler: this.hideDialog.createDelegate(this) }

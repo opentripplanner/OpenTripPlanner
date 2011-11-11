@@ -310,16 +310,20 @@ otp.util.ExtUtils = {
     /**
      * within an exception block because if the form is hidden, Ext throws an error
      */
-    formSetRawValue : function(form, value, defValue)
+    formSetRawValue : function(form, value, defValue, dirty)
     {
-        if(form && form.setRawValue)
+        try
         {
             var v = defValue;
             if(value)
                 v = value;
             if(v)
                 form.setRawValue(v);
+            if(dirty && form.setDirty)
+                form.setDirty();
         }
+        catch(e)
+        {}
     },
 
     /** 
