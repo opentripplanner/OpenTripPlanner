@@ -323,8 +323,6 @@ public class PlanGenerator {
                 String route = backEdgeNarrative.getName();
                 if (mode == TraverseMode.ALIGHTING) {
                     if (showIntermediateStops && leg.stop != null && leg.stop.size() > 0) {
-                        // Remove the last stop -- it's the alighting one
-                        leg.stop.remove(leg.stop.size() - 1);
                         if (leg.stop.isEmpty()) {
                             leg.stop = null;
                         }
@@ -339,7 +337,7 @@ public class PlanGenerator {
                          * any further transit edge, add "from" vertex to intermediate stops
                          */
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
-                            Place stop = makePlace(state);
+                            Place stop = makePlace(state.getBackState());
                             leg.stop.add(stop);
                         } else {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
