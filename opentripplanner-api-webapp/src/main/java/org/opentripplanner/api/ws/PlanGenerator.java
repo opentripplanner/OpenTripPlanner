@@ -191,7 +191,7 @@ public class PlanGenerator {
         int startWalk = -1;
         int i = -1;
         PlanGenState pgstate = PlanGenState.START;
-
+        String nextName = null;
         for (State state : path.states) {
             i += 1;
             Edge backEdge = state.getBackEdge();
@@ -221,19 +221,23 @@ public class PlanGenerator {
                 if (mode == TraverseMode.WALK) {
                     pgstate = PlanGenState.WALK;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;
                 } else if (mode == TraverseMode.BICYCLE) {
                     pgstate = PlanGenState.BICYCLE;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;
                 } else if (mode == TraverseMode.CAR) {
                     pgstate = PlanGenState.CAR;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;                    
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
                     pgstate = PlanGenState.PRETRANSIT;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
@@ -257,6 +261,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
                 } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    nextName = state.getBackState().getBackState().getBackState().getVertex().getName();
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
