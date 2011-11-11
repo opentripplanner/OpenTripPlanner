@@ -10,7 +10,7 @@ public class NamedPlace {
     }
 
     public NamedPlace(String place) {
-        this.name = this.place = place;
+        this.place = place;
     }
     
     public String toString() {
