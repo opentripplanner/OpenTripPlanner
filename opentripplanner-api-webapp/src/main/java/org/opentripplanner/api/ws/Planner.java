@@ -252,7 +252,7 @@ public class Planner {
         /* use request to generate trip */
         Response response = new Response(request);
         try {
-        	PlanGenerator generator = new PlanGenerator(request, pathServiceFactory);
+            PlanGenerator generator = new PlanGenerator(request, pathServiceFactory);
             TripPlan plan = generator.generate();
             response.setPlan(plan);
         } catch (VertexNotFoundException e) {

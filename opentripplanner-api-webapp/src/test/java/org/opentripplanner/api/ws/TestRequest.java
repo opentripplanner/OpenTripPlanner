@@ -24,6 +24,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.ws.RequestInf;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
@@ -223,12 +224,12 @@ public class TestRequest extends TestCase {
         assertNotNull(v3);
         assertNotNull(v4);
         
-        ArrayList<String> intermediates = new ArrayList<String>();
-        intermediates.add(v3.getLabel());
-        intermediates.add(v2.getLabel());
+        ArrayList<NamedPlace> intermediates = new ArrayList<NamedPlace>();
+        intermediates.add(new NamedPlace(v3.getLabel()));
+        intermediates.add(new NamedPlace(v2.getLabel()));
         Date dateTime = DateUtils.toDate("2009-01-01", "10:00:00");
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-        List<GraphPath> paths = pathService.plan(v1.getLabel(), v4.getLabel(),
+        List<GraphPath> paths = pathService.plan(new NamedPlace(v1.getLabel()), new NamedPlace(v4.getLabel()),
                 intermediates, false, dateTime, options);
         
         assertTrue(paths.size() > 0);

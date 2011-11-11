@@ -166,5 +166,5 @@ public interface RequestInf {
             	    
 	public Integer getMaxTransfers();
 
-	public boolean getIntermediatePlacesOrdered();
+	public boolean isIntermediatePlacesOrdered();
 }

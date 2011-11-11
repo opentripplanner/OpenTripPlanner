@@ -180,17 +180,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
      * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by
      * splitting nearby edges (non-permanently).
      */
-    public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options) {
-        return getClosestVertex(coordinate, options, null);
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options) {
+        return getClosestVertex(coordinate, name, options, null);
     }
 
-    public Vertex getClosestVertex(final Coordinate coordinate, TraverseOptions options, List<DirectEdge> extraEdges) {
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<DirectEdge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
         List<Vertex> vertices = getIntersectionAt(coordinate);
         if (vertices != null && !vertices.isEmpty()) {
-            StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, "");
+            StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, name);
             for (Vertex v : vertices) {
                 FreeEdge e = new FreeEdge(closest, v);
                 closest.getExtra().add(e);
@@ -233,7 +233,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             closest_street_distance = DistanceLibrary.distance(coordinate, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closest_street_distance);
             closest_street = StreetLocation.createStreetLocation(bestStreet.getName() + "_"
-                    + coordinate.toString(), bestStreet.getName(), edges, nearestPoint);
+                    + coordinate.toString(), name, edges, nearestPoint);
         }
 
         // decide whether to return stop, street, or street + stop
