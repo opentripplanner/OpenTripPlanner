@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -39,13 +40,21 @@ public class Request implements RequestInf {
      */
     private String from;
     /**
+     * The start location's user-visible name
+     */
+    private String fromName;
+    /**
      * The end location (see the from field for format).
      */
     private String to;
     /**
+     * The end location's user-visible name
+     */
+    private String toName;
+    /**
      * An unordered list of intermediate locations to be visited (see the from field for format).
      */
-    private List<String> intermediatePlaces;
+    private List<NamedPlace> intermediatePlaces;
     /**
      * The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile.
      */
@@ -156,7 +165,13 @@ public class Request implements RequestInf {
      */
     public void setFrom(String from) {
         paramPush(FROM, from);
-        this.from = from;
+        if (from.contains("::")) {
+            String[] parts = from.split("::");
+            this.fromName = parts[0];
+            this.from = parts[1];
+        } else {
+            this.from = from;
+        }
     }
 
     /**
@@ -172,7 +187,13 @@ public class Request implements RequestInf {
      */
     public void setTo(String to) {
         paramPush(TO, to);
-        this.to = to;
+        if (to.contains("::")) {
+            String[] parts = to.split("::");
+            this.toName = parts[0];
+            this.to = parts[1];
+        } else {
+            this.to = to;
+        }
     }
 
     /**
@@ -347,14 +368,24 @@ public class Request implements RequestInf {
     /**
      * @param intermediatePlaces the intermediatePlaces to set
      */
-    public void setIntermediatePlaces(List<String> intermediatePlaces) {
-        this.intermediatePlaces = intermediatePlaces;
+    public void setIntermediatePlaces(List<String> intermediates) {
+        this.intermediatePlaces = new ArrayList<NamedPlace>(intermediates.size());
+        for (String place : intermediates) {
+            String name = place;
+            if (place.contains("::")) {
+                String[] parts = place.split("::");
+                name = parts[0];
+                place = parts[1];
+            }
+            NamedPlace intermediate = new NamedPlace(name, place);
+            intermediatePlaces.add(intermediate);
+        }
     }
 
     /**
      * @return the intermediatePlaces
      */
-    public List<String> getIntermediatePlaces() {
+    public List<NamedPlace> getIntermediatePlaces() {
         return intermediatePlaces;
     }
 
@@ -475,7 +506,23 @@ public class Request implements RequestInf {
     }
 
     @Override
-    public boolean getIntermediatePlacesOrdered() {
+    public boolean isIntermediatePlacesOrdered() {
         return intermediatePlacesOrdered;
+    }
+
+    public String getFromName() {
+        return fromName;
+    }
+
+    public String getToName() {
+        return toName;
+    }
+
+    public NamedPlace getFromPlace() {
+        return new NamedPlace(fromName, from);
+    }
+
+    public NamedPlace getToPlace() {
+        return new NamedPlace(toName, to);
     }
 }

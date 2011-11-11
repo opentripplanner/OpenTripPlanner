@@ -61,6 +61,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
@@ -838,7 +839,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
 
-    	List<GraphPath> paths = pathservice.plan(from, to, when, options, 1);
+    	List<GraphPath> paths = pathservice.plan(new NamedPlace(from), new NamedPlace(to), when, options, 1);
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);

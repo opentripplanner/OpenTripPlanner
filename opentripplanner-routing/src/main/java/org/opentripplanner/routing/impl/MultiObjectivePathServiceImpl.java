@@ -29,6 +29,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.GraphLibrary;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
@@ -140,7 +141,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
+    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
             TraverseOptions options, int nItineraries) {
 
         ArrayList<String> notFound = new ArrayList<String>();
@@ -322,7 +323,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediates,
+    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates,
             boolean ordered, Date targetTime, TraverseOptions options) {
         return null;
     }
@@ -331,22 +332,22 @@ public class MultiObjectivePathServiceImpl implements PathService {
     
     /* MOVE THESE METHODS TO A LIBRARY CLASS */
     
-    private Vertex getVertexForPlace(String place, TraverseOptions options) {
+    private Vertex getVertexForPlace(NamedPlace place, TraverseOptions options) {
 
-        Matcher matcher = _latLonPattern.matcher(place);
+        Matcher matcher = _latLonPattern.matcher(place.place);
 
         if (matcher.matches()) {
             double lat = Double.parseDouble(matcher.group(1));
             double lon = Double.parseDouble(matcher.group(4));
             Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(location, options);
+            return _indexService.getClosestVertex(location, place.name, options);
         }
 
-        return _graphService.getContractionHierarchySet().getVertex(place);
+        return _graphService.getContractionHierarchySet().getVertex(place.place);
     }
 
     @Override
-    public boolean isAccessible(String place, TraverseOptions options) {
+    public boolean isAccessible(NamedPlace place, TraverseOptions options) {
         /* fixme: take into account slope for wheelchair accessibility */
         Vertex vertex = getVertexForPlace(place, options);
         if (vertex instanceof TransitStop) {

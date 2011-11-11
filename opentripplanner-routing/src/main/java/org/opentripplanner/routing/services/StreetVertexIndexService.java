@@ -26,9 +26,9 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public interface StreetVertexIndexService {
 
-    public Vertex getClosestVertex(final Coordinate location, TraverseOptions options);
+    public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options);
 
-    public Vertex getClosestVertex(final Coordinate location, TraverseOptions options,
+    public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options,
             List<DirectEdge> extraEdges);
 
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);

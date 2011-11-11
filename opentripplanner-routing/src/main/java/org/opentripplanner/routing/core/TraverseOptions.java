@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TraverseOptions implements Cloneable, Serializable {
+    private static final long serialVersionUID = 1L;
 
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
@@ -80,7 +81,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
-	public double stairsReluctance = 2.0;
+    public double stairsReluctance = 2.0;
 
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
@@ -90,7 +91,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      * often find this kind of preferences among riders) but the planner will take this literally 
      * and walk down a transit line to avoid waiting at a stop.
      */
-    public double waitReluctance = 1.0;
+    public double waitReluctance = 0.95;
 
     /**
      * How much less bad is waiting at the beginning of the trip

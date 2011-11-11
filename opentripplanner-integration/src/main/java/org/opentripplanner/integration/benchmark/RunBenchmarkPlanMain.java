@@ -31,6 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -103,7 +104,7 @@ public class RunBenchmarkPlanMain {
 
         try {
           long t0 = System.currentTimeMillis();
-          service.plan(from, to, plan.time, new TraverseOptions(), 1);
+          service.plan(new NamedPlace(from), new NamedPlace(to), plan.time, new TraverseOptions(), 1);
           long t1 = System.currentTimeMillis();
 
           System.out.println("t=" + (t1 - t0));
