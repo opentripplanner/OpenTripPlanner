@@ -232,6 +232,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             Coordinate nearestPoint = location.getCoordinate(g);
             closest_street_distance = DistanceLibrary.distance(coordinate, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closest_street_distance);
+            if (name == null) {
+                name = bestStreet.getName();
+            }
             closest_street = StreetLocation.createStreetLocation(bestStreet.getName() + "_"
                     + coordinate.toString(), name, edges, nearestPoint);
         }
