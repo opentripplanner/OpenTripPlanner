@@ -4,7 +4,7 @@
   <parent>
     <artifactId>opentripplanner</artifactId>
     <groupId>org.opentripplanner</groupId>
-    <version>0.4.3-SNAPSHOT</version>
+    <version>0.4.3</version>
   </parent>
   <artifactId>opentripplanner-utils</artifactId>
   <name>opentripplanner-utils</name>
