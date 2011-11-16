@@ -38,7 +38,6 @@ public class GraphMetadata {
      */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
-    @XmlElement
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
     public GraphMetadata() {
@@ -60,7 +59,7 @@ public class GraphMetadata {
         for (GraphVertex gv : graph.getVertices()) {
             for (Edge e: gv.getOutgoing()) {
                 if (e instanceof PatternHop) {
-                    modes.add(((PatternHop) e).getMode());
+                    transitModes.add(((PatternHop) e).getMode());
                 }
             }
             Coordinate c = gv.vertex.getCoordinate();
@@ -207,6 +206,7 @@ public class GraphMetadata {
         return upperRightLongitude;
     }
 
+    @XmlElement
     public HashSet<TraverseMode> getTransitModes() {
         return transitModes;
     }
