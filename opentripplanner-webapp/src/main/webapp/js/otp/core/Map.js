@@ -30,7 +30,7 @@ otp.core.MapStatic = {
     map               : null,
     baseLayer         : null,
     mapDiv            : "map",
-    
+
     // list of functions that will be called before/after all features on the map are removed
     beforeAllFeaturesRemoved: [],
     allFeaturesRemoved: [],

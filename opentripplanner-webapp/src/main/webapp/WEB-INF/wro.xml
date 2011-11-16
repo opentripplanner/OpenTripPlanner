@@ -26,6 +26,7 @@
     <js>/js/lib/ext/SpinnerStrategy.js</js>
     <js>/js/lib/ext/TabCloseMenu.js</js>
     <js>/js/lib/geoext/GeoExt.js</js>
+    <js>/js/lib/raphael/raphael-min.js</js>
   </group>
 
 </groups>

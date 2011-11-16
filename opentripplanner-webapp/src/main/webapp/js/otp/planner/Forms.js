@@ -219,22 +219,27 @@ otp.planner.StaticForms = {
     /** */
     submitFailure : function(form, action)
     {
+        var xml = null;
+        if(action && action.response && action.response.responseXML)
+            xml = action.response.responseXML;
+
         this.m_submitButton.focus();
-        this.tripRequestError(action.response.responseXML);
+        this.tripRequestError(xml);
     },
 
     /** error handler */
-    tripRequestError : function(xml)
+    tripRequestError : function(xml) 
     {
         var message  = null;
 
         // load xml to see what errors we have
         try
         {
+            var e = Ext.DomQuery.select('error', xml);
             var err  = Ext.DomQuery.selectNode('error', xml);
             var code = Ext.DomQuery.selectValue('id', err);
             message  = Ext.DomQuery.selectValue('msg', err);
-            if (!message && code)
+            if(!message && code)
             {
                 try
                 {
@@ -251,31 +256,29 @@ otp.planner.StaticForms = {
         catch(e) 
         {
             console.log("exception with somethingorother: " + e);
-            if(message == null || message == '')
-                message = this.locale.tripPlanner.error.deadMsg;
         }
 
-        if(message != null && message.length > 0)
+        if(message == null || message == '')
+           message = this.locale.tripPlanner.error.deadMsg;
+
+        // show the error
+        Ext.MessageBox.show({
+            title:    this.locale.tripPlanner.error.title,
+            msg:      message,
+            buttons:  Ext.Msg.OK,
+            icon:     Ext.MessageBox.ERROR,
+            animEl:   'tp-error-message',
+            minWidth: 170,
+            maxWidth: 270
+        });
+
+        // kill the message box after 5 seconds
+        setTimeout(function()
         {
-            // show the error
-            Ext.MessageBox.show({
-                title:    this.locale.tripPlanner.error.title,
-                msg:      message,
-                buttons:  Ext.Msg.OK,
-                icon:     Ext.MessageBox.ERROR,
-                animEl:   'tp-error-message',
-                minWidth: 170,
-                maxWidth: 270
-            });
-
-            // kill the message box after 5 seconds
-            setTimeout(function()
-            {
-                try {
-                    Ext.MessageBox.hide();
-                } catch(e) {}
-            }, 5000);
-        }
+            try {
+                Ext.MessageBox.hide();
+            } catch(e) {}
+        }, 5000);
     },
 
 

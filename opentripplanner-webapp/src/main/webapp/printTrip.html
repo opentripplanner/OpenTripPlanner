@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <title>OpenTripPlanner Print Map</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="description" content="The Open Trip Planner provides step-by-step directions for using multiple modes of travel, including transit, biking and walking. Find out more about this open source project at http://opentripplanner.org." />
+    <meta name="keywords" content="interactive map, map, trip planner, bus, rail, transit, max, tripplanner, plan, trip, plans, itinerary, schedule planner, planning, planner, scheduler, assistant, wizard, travel, schedule, guide, map, route, times, plan a trip" />
+    <meta content="tripplanner v0.5 - November 2011 (FXP)"/>
+
+    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/ext-all-notheme.css" />
+    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/xtheme-transit-extend.css" />
+    <link rel="stylesheet" type="text/css" href="js/lib/openlayers/theme/default/style.css" />
+    <link rel="stylesheet" type="text/css" href="js/lib/geoext/css/geoext-all.css" />
+    <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
+    <link rel="stylesheet" type="text/css" href="planner.css" />
+
+    <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
+    <script src="js/lib-min.js"></script>
+    <script src="js/otp-min.js"></script>
+    <script src="js/otp/planner/Print.js"></script>
+</head>
+
+<body>
+    <div class="logo" id="logo"> 
+        <a href="http://opentripplanner.org" title="OpenTripPlanner Home"></a>
+    </div>
+    <div id="map-print" style="width: 800px; height: 400px"></div>
+    <div id="tripLeg"   style="width: 800px"></div>
+
+    <script>otp.util.AnalyticsUtils.importGoogleAnalytics();</script>
+    <script type="text/javascript">
+    Ext.onReady(function()
+    {
+        otp.util.AnalyticsUtils.initGoogleAnalytics();
+        new otp.planner.Print();
+    });
+    </script>
+</body>
+</html>

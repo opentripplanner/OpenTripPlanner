@@ -24,13 +24,13 @@ otp.namespace("otp.planner");
   */
 otp.planner.Planner = {
 
-    locale        : null,
+    locale                  : null,
 
     // pointer to the map / components
-    map           : null,
-    planner       : null,
-    controller    : null,
-    ui            : null,
+    map                     : null,
+    planner                 : null,
+    controller              : null,
+    ui                      : null,
 
     // configuration
     url                     : null,

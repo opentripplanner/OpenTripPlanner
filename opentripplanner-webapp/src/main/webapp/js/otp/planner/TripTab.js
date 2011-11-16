@@ -26,7 +26,6 @@ otp.planner.PrintTripWin = null;
 otp.planner.TripTab = {
 
     // config
-    map           : null,
     ui            : null,
     locale        : null,
     templates     : null,
@@ -37,6 +36,7 @@ otp.planner.TripTab = {
     topoRenderer  : null,
     xml           : null,
     request       : null,
+    printUrl      : '/printTrip.html',
 
     id            : 0,
 
@@ -233,7 +233,13 @@ otp.planner.TripTab = {
     /** */
     printCB : function(b, e)
     {
-        console.log("TripTab.print: close request object");
+        otp.planner.PrintStatic.map         = this.planner.map;
+        otp.planner.PrintStatic.options     = this.planner.map.options;
+        otp.planner.PrintStatic.current_map = this.planner.map.getMap();
+        otp.planner.PrintStatic.itinerary   = this.m_activeItinerary;
+        otp.planner.PrintStatic.tripTab     = this;
+
+        console.log("TripTab.print: clone request object");
         var req    = otp.clone(this.request);
         req.url    = this.printUrl;
 
