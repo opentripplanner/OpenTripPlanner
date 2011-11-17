@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
 
-import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.Vertex;
 
 /**

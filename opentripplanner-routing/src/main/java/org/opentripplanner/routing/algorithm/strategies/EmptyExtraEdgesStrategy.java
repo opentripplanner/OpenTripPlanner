@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
-import org.opentripplanner.routing.contraction.OverlayGraph;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.Vertex;
 
 /**

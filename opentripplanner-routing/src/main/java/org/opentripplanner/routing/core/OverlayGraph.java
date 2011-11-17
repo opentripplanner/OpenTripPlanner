@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.contraction;
+package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,10 +21,6 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 
 /**
  * Allows adding supplemental edges to existing vertices in another graph. Useful for CH, and
