@@ -25,6 +25,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
+import org.opentripplanner.routing.pqueue.IntBinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -149,7 +150,7 @@ public class SimplifiedLowerBoundGraph {
     public double[] sssp(StreetLocation origin, TraverseOptions options) {
         double[] result = new double[max_gindex];
         Arrays.fill(result, Double.POSITIVE_INFINITY);
-        BinHeap<Integer> q = new BinHeap<Integer>();
+        IntBinHeap q = new IntBinHeap(max_gindex / 2);
         for (DirectEdge de : origin.getExtra()) {
             Vertex toVertex = de.getToVertex();
             int toGroup = toVertex.getGroupIndex();
@@ -165,7 +166,7 @@ public class SimplifiedLowerBoundGraph {
         long t0 = System.currentTimeMillis();
         while (!q.empty()) {
             double   uw = q.peek_min_key();
-            int      ui = q.extract_min();
+            int      ui = q.p_extract_min();
             int[]    vs = vertex[ui];
             double[] ws = weight[ui];
             LOG.trace("extract {}", uw);
