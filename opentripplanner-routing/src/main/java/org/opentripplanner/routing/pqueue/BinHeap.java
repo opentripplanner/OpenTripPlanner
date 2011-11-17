@@ -14,21 +14,16 @@
 package org.opentripplanner.routing.pqueue;
 
 import java.util.Arrays;
-import java.util.List;
 
 public class BinHeap<T> implements OTPPriorityQueue<T> {
     
     public static OTPPriorityQueueFactory FACTORY = new BinHeapFactory();
-    // keep pools of arrays to reuse? multithreading?
-    public static List<double[]> prioPool;
-    public static List<Object[]> elemPool;
     private static final double GROW_FACTOR = 2.0;
     
     private double[] prio;
     private T[] elem;
     private int size; 
     private int capacity;
-    private int[] dir; // TODO: track element index by Vertex.index 
     
     public BinHeap() {
     	this(1000);
