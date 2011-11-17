@@ -23,18 +23,21 @@ import junit.framework.TestCase;
  * priority queue implementations.
  */
 public class TestPQueues extends TestCase { 
-    private static final int N = 100000;
-    private static final int ITER = 3;
+    private static final int N = 200000;
+    private static final int ITER = 2;
+    private static final int INNER_ITER = 10;
     
     public void doQueue(OTPPriorityQueue<Integer> q, 
                         List<Integer> input, List<Integer> expected) {
         List<Integer> result = new ArrayList<Integer>(N);
-        long t0 = System.currentTimeMillis();
-        for (Integer i : input) 
+        int expectedSum = 0;
+        for (Integer i : input) {
             q.insert(i, i * 0.5);
-        while (!q.empty()) 
+            expectedSum += i;
+        }
+        while (!q.empty()) {
             result.add(q.extract_min());
-        long t1 = System.currentTimeMillis();
+        }
         assertEquals(result, expected);
         // check behavior when queue is empty
         assertEquals(q.size(), 0);
@@ -47,31 +50,76 @@ public class TestPQueues extends TestCase {
         assertNotNull(q.extract_min());
         assertNull(q.extract_min());
         assertEquals(q.size(), 0);
-        System.out.println(q.getClass() + " time " + (t1-t0)/1000.0 + " sec");
+        // fill and empty the queue a few times
+        long t0 = System.currentTimeMillis();
+        for (int iter = 0; iter < INNER_ITER; iter++) {
+            int sum = 0;        
+            for (Integer i : input) 
+                q.insert(i, i);
+            while (!q.empty()) 
+                sum += q.extract_min();
+            // keep compiler from optimizing out extract
+            assertTrue(sum == expectedSum);
+        }
+        long t1 = System.currentTimeMillis();
+        System.out.println(q.getClass() + " \ttime " + (t1-t0)/1000.0 + " sec");
     }
     
+    public void fillQueue(OTPPriorityQueue<Integer> q, List<Integer> input) {
+        long t0 = System.currentTimeMillis();
+        for (Integer i : input) {
+            q.insert(i, i * 0.5);
+        }
+        int sum = 0;
+        for (int i=0; i<INNER_ITER; i++) {
+            for (Integer j : input) {
+                sum += q.extract_min();
+                q.insert(j, j * 0.5);
+            }
+        }
+        while (!q.empty()) {
+            sum += q.extract_min();
+        }
+        // keep compiler from optimizing out extract
+        assertTrue(sum != 0);
+
+        long t1 = System.currentTimeMillis();
+        System.out.println(q.getClass() + " time " + (t1 - t0) / 1000.0 + " sec");
+    }
+
+    private List<OTPPriorityQueue<Integer>> makeQueues() {
+        List<OTPPriorityQueue<Integer>> queues = new ArrayList<OTPPriorityQueue<Integer>>();
+        queues.add(new PriorityQueueImpl<Integer>());
+        // commented out to avoid slow testing
+        // queues.add(new FibHeap<Integer>(N));
+        queues.add(new BinHeap<Integer>(N));            
+        queues.add(new IntBinHeap(N));
+        queues.add(new BinHeap<Integer>(10));
+        queues.add(new IntBinHeap(10));
+        return queues;
+    }
+
     public void testCompareHeaps() throws InterruptedException {
         List<Integer> input, expected;
         input = new ArrayList<Integer>(N);
         for (int i=0; i<N; i++) input.add((int) (Math.random() * 10000));
-
+        
+        System.out.println("\ninsert/extract " + N + " Integers " + INNER_ITER + " times");
+        expected = new ArrayList<Integer>(N);
+        PriorityQueue<Integer> q = new PriorityQueue<Integer>(N);
+        for (Integer j : input) 
+            q.add(j);
+        while (!q.isEmpty()) 
+            expected.add(q.remove());
+        System.out.println(q.getClass() + " (expected results)");
         for (int i=0; i<ITER; i++) {
-            System.out.println("\nIteration " + i + " insert/extract " + N);
-            expected = new ArrayList<Integer>(N);
-            PriorityQueue<Integer> q = new PriorityQueue<Integer>(N);
-            long t0 = System.currentTimeMillis();
-            for (Integer j : input) 
-                q.add(j);
-            while (!q.isEmpty()) 
-                expected.add(q.remove());
-            long t1 = System.currentTimeMillis();
-            System.out.println(q.getClass() + " time " + (t1-t0)/1000.0 + " sec");
-            
-            doQueue(new PriorityQueueImpl<Integer>(),  input, expected);
-            doQueue(new FibHeap<Integer>(N), input, expected);
-            doQueue(new BinHeap<Integer>(N), input, expected);            
-            System.out.println("BinHeap initial capacity set to 10 (force grow)");
-            doQueue(new BinHeap<Integer>(10), input, expected);            
+            for (OTPPriorityQueue<Integer> queue : makeQueues()) {
+                doQueue(queue, input, expected);
+            }            
+        }
+        System.out.println("\nmaintain queue at size " + N);            
+        for (OTPPriorityQueue<Integer> queue : makeQueues()) {
+            fillQueue(queue, input);
         }
     }    
 
