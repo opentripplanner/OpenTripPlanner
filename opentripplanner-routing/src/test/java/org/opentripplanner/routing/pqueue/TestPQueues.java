@@ -30,10 +30,23 @@ public class TestPQueues extends TestCase {
                         List<Integer> input, List<Integer> expected) {
         List<Integer> result = new ArrayList<Integer>(N);
         long t0 = System.currentTimeMillis();
-        for (Integer i : input) q.insert(i, i * 0.5);
-        while (!q.empty()) result.add(q.extract_min());
+        for (Integer i : input) 
+            q.insert(i, i * 0.5);
+        while (!q.empty()) 
+            result.add(q.extract_min());
         long t1 = System.currentTimeMillis();
         assertEquals(result, expected);
+        // check behavior when queue is empty
+        assertEquals(q.size(), 0);
+        assertNull(q.peek_min());
+        assertNull(q.extract_min());
+        q.insert(100, 10);
+        q.insert(200, 20);
+        assertEquals(q.size(), 2);
+        assertNotNull(q.extract_min());
+        assertNotNull(q.extract_min());
+        assertNull(q.extract_min());
+        assertEquals(q.size(), 0);
         System.out.println(q.getClass() + " time " + (t1-t0)/1000.0 + " sec");
     }
     
@@ -47,14 +60,15 @@ public class TestPQueues extends TestCase {
             expected = new ArrayList<Integer>(N);
             PriorityQueue<Integer> q = new PriorityQueue<Integer>(N);
             long t0 = System.currentTimeMillis();
-            for (Integer j : input) q.add(j);
-            while (!q.isEmpty()) expected.add(q.remove());
+            for (Integer j : input) 
+                q.add(j);
+            while (!q.isEmpty()) 
+                expected.add(q.remove());
             long t1 = System.currentTimeMillis();
             System.out.println(q.getClass() + " time " + (t1-t0)/1000.0 + " sec");
             
             doQueue(new PriorityQueueImpl<Integer>(),  input, expected);
             doQueue(new FibHeap<Integer>(N), input, expected);
-            doQueue(new TLHeap<Integer>(N),  input, expected);
             doQueue(new BinHeap<Integer>(N), input, expected);            
             System.out.println("BinHeap initial capacity set to 10 (force grow)");
             doQueue(new BinHeap<Integer>(10), input, expected);            

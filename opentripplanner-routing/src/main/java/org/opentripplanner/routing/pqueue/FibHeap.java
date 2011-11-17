@@ -177,7 +177,8 @@ public class FibHeap<T> implements OTPPriorityQueue<T> {
     @Override
     public T extract_min() {
         FibNode<T> z = this.min;
-
+        if (z == null)
+            return null;
         // System.out.println( "going to return "+z+"; cleaning up" );
 
         ListIterator<FibNode<T>> e = z.children.listIterator();
@@ -294,7 +295,10 @@ public class FibHeap<T> implements OTPPriorityQueue<T> {
 
     @Override
     public T peek_min() {
-        return min.payload;
+        if (min != null)
+            return min.payload;
+        else
+            return null;
     }
     
     private static class FibHeapFactory implements OTPPriorityQueueFactory {

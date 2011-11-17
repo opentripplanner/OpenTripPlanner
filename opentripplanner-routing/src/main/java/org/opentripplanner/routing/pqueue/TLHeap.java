@@ -75,7 +75,10 @@ public class TLHeap<T> implements OTPPriorityQueue<T> {
             }
         }
         size -= 1;
-        return bestHeap.extract_min();
+        if (bestHeap == null)
+            return null;
+        else
+            return bestHeap.extract_min();
     }
 
     @Override
@@ -104,7 +107,7 @@ public class TLHeap<T> implements OTPPriorityQueue<T> {
     
     @Override
     public T peek_min() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     private static class TLHeapFactory implements OTPPriorityQueueFactory {
