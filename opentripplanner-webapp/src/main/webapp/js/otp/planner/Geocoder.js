@@ -145,10 +145,19 @@ otp.planner.GeocoderStatic = {
         // step 5: process the geocoded location / process ambiguous locations 
         if (count > 1)
         {
+            // show an icon on the grid to identify what form is being geocoded
+            var icon = null;
+            if (comboBoxIdentifier === "from") {
+                 icon = 'start-icon';
+            } else if (comboBoxIdentifier === "to") {
+                 icon = 'end-icon';
+            }
+
             // step 5a: ambiguous geocoder results...ask the user to pick one
             var xmlNodes = Ext.DomQuery.jsSelect("result", xml);
             var resultsSelector = new otp.planner.GeocoderResultsSelector({
-                locale: this.form.locale,
+                locale  : this.form.locale,
+                iconCls : icon, 
                 callback: function(lat, lng, description) {
                   // TODO refactor all of this ... these from/to conditionals can go away with a lil OOP
                   if (comboBoxIdentifier === "from") {
@@ -166,7 +175,7 @@ otp.planner.GeocoderStatic = {
             var lng = Ext.DomQuery.selectNode("lng", xml).firstChild.nodeValue;
             var description = Ext.DomQuery.selectNode("description", xml).firstChild.nodeValue;
             var latlng = lat + "," + lng;
-            
+
             if (comboBoxIdentifier === "from") {
                 self.form.m_fromForm.getComboBox().clearInvalid();
                 self.form.setFrom(description, lat, lng, true, false);

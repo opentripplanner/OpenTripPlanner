@@ -115,21 +115,19 @@ otp.planner.StaticForms = {
         return this.m_panel;
     },
 
-    /** 
-     * called when someone hit's enter on the form
-     * we need to check the from & to form (if the geocode is active) for a dirty state
+    /** IMPORTANT FUNCTION: 
+     *  will make sure the forms are not in a dirty state, and will trigger the geocoder (via onBlur event on the form)
+     *  NOTE: add more forms here with intermediate places
      */
-    enter : function()
+    blurForms : function()
     {
-        // when GEOCODER is active on the forms, we must make sure to geocode prior submitting with the enter key
-        if (this.haveGeocoder()) {
-            if(this.m_fromForm.isDirty())
-                this.geocoder.fromChanged(this, this.m_fromForm.getRawValue());
-            if(this.m_toForm.isDirty())
-                this.geocoder.toChanged(this, this.m_toForm.getRawValue());
+        try
+        {
+            this.m_fromForm.blur();
+            this.m_toForm.blur();
         }
-
-        this.submit();
+        catch(e)
+        {}
     },
 
     /**
@@ -141,12 +139,14 @@ otp.planner.StaticForms = {
      */
     submit : function()
     {
-        if(this.geocoderEnabled())
+        this.blurForms();
+
+        if(this.isBusyGeocoding())
         {
             // if we are currently waiting for a geocoder response,
             // then let's wait until we get a response before we submit
             // the form
-            setTimeout(this.submit.createDelegate(this), 5);
+            setTimeout(this.submit.createDelegate(this), 250);
             return;
         }
 
@@ -223,126 +223,30 @@ otp.planner.StaticForms = {
         this.tripRequestError(action.response.responseXML);
     },
 
-
     /** error handler */
     tripRequestError : function(xml)
     {
         var message  = null;
-        var code     = -111;
-        var options  = null;
-        var fromGrid = null;
-        var toGrid   = null;
 
         // load xml to see what errors we have
         try
         {
-            var gridCols = [
+            var err  = Ext.DomQuery.selectNode('error', xml);
+            var code = Ext.DomQuery.selectValue('id', err);
+            message  = Ext.DomQuery.selectValue('msg', err);
+            if (!message && code)
+            {
+                try
                 {
-                    header:    'Name',
-                    width:     .75,
-                    sortable:   true,
-                    dataIndex: 'description'
-                },
-                {
-                    header:    'City',
-                    width:     .25,
-                    sortable:true,
-                    dataIndex: 'areaValue'
+                    code = parseInt(code);
                 }
-            ];
-
-            // try to populate the from & to form stores (in case of ambiguous results of geocoding)
-            var to = Ext.DomQuery.selectNode('toList', xml);
-            if(to != null)
-            {
-                var toStore = otp.util.ExtUtils.makeLocationStore();
-                toStore.loadData(to);
-                toGrid   = otp.util.ExtUtils.makeGridView(toStore, gridCols, {title:this.locale.tripPlanner.error.geoToMsg, iconCls:'end-icon'});
-                toGrid.on(
-                        'rowclick', function(g, i, e)
-                        {
-                            var n = otp.util.ExtUtils.gridClick(g, i, {description:'', x:'', y:''});
-                            this.setTo(n.description, n.x, n.y, true);
-                        },
-                        this);
-                toGrid.on(
-                        'rowdblclick', function(g, i, e)
-                        {
-                            var n = otp.util.ExtUtils.gridClick(g, i, {description:'', x:'', y:''});
-                            this.setTo(n.description, n.x, n.y, true);
-                            this.m_geoErrorPopup.close();
-                        },
-                        this);
-                options = true;
-            }
-
-            var from = Ext.DomQuery.selectNode('fromList', xml);
-            if(from != null)
-            {
-                var fStore = otp.util.ExtUtils.makeLocationStore();
-                fStore.loadData(from);
-                fromGrid = otp.util.ExtUtils.makeGridView(fStore, gridCols, {title:this.locale.tripPlanner.error.geoFromMsg, iconCls:'start-icon'});
-                fromGrid.on(
-                        'rowclick', function(g, i, e)
-                        {
-                            var n = otp.util.ExtUtils.gridClick(g, i, {description:'', x:'', y:''});
-                            this.setFrom(n.description, n.x, n.y, true);
-                        },
-                        this);
-                fromGrid.on(
-                        'rowdblclick', function(g, i, e)
-                        {
-                            var n = otp.util.ExtUtils.gridClick(g, i, {description:'', x:'', y:''});
-                            this.setFrom(n.description, n.x, n.y, true);
-                            this.m_geoErrorPopup.close();
-                        },
-                        this);
-                options = true;
-            }
-
-            // if not ambiguous results, then show a dialog
-            if(options)
-            {
-                // put the panel(s) into an array for the parent panel
-                var errorWindowHeight = 0;
-                var e  = new Array();
-                if(fromGrid)
+                catch(e)
                 {
-                    errorWindowHeight += 185;
-                    e.push(fromGrid);
-                } 
-                if(toGrid) 
-                {
-                    errorWindowHeight += 185;
-                    e.push(toGrid);
+                    code = 500;
                 }
-                if(errorWindowHeight < 200) errorWindowHeight = 220;
-
-                // create the geo error popup
-                var zz = new Ext.Panel({layout:'anchor', items:e});
-                this.m_geoErrorPopup = otp.util.ExtUtils.makePopup({layout:'anchor',items:[zz]}, this.locale.tripPlanner.error.title, true, 360, errorWindowHeight, true, false, 50, 170);
-                message = null;
-                otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_GEO_ERROR);
+                message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
             }
-            else
-            {
-                var err  = Ext.DomQuery.selectNode('error', xml);
-                message  = Ext.DomQuery.selectValue('msg', err);
-                code     = Ext.DomQuery.selectValue('id', err);
-                if (!message && code)
-                {
-                    try
-                    {
-                        code = parseInt(code);
-                    }
-                    catch (e)
-                    {
-                        code = 500;
-                    }
-                    message = this.locale.tripPlanner.msgcodes[code] || this.locale.tripPlanner.msgcodes[500];
-                }
-                otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_ERROR);
-            }
+            otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_ERROR);
         } 
         catch(e) 
         {
@@ -350,7 +254,7 @@ otp.planner.StaticForms = {
             if(message == null || message == '')
                 message = this.locale.tripPlanner.error.deadMsg;
         }
-        
+
         if(message != null && message.length > 0)
         {
             // show the error
@@ -410,6 +314,7 @@ otp.planner.StaticForms = {
         try {this.m_geoErrorPopup.close();  } catch(e){}
     },
 
+    /** */
     focus : function()
     {
         this.THIS.planner.focus();
@@ -471,18 +376,18 @@ otp.planner.StaticForms = {
     },
 
 
-    /** a simple helper class to set data in a form */
-    setRawInput : function(p, f, d)
+    /** a simple helper class to set data in a form ... note we also set a dirty flag on said form */
+    setDirtyRawInput : function(p, f, d)
     {
         var retVal = false;
 
-        if(p != null 
-        && p !== true 
-        && p != "true" 
-        && p.match('Address, .*Stop ID') == null
+        if( p != null 
+         && p !== true 
+         && p != "true" 
+         && p.match('Address, .*Stop ID') == null
         )
         {
-            otp.util.ExtUtils.formSetRawValue(f, p, d);
+            otp.util.ExtUtils.formSetRawValue(f, p, d, true);
             retVal = true;
         }
 
@@ -498,18 +403,18 @@ otp.planner.StaticForms = {
             this.clearFrom();
             this.clearTo();
 
-            this.setRawInput(params.Orig,      forms.m_fromForm);
-            this.setRawInput(params.Orig,      forms.m_fromPlace);
-            this.setRawInput(params.Dest,      forms.m_toForm);
-            this.setRawInput(params.Dest,      forms.m_toPlace);
-            this.setRawInput(params.from,      forms.m_fromForm);
-            this.setRawInput(params.from,      forms.m_fromPlace);
-            this.setRawInput(params.to,        forms.m_toForm);
-            this.setRawInput(params.to,        forms.m_toPlace);
-            this.setRawInput(params.fromPlace, forms.m_fromForm);
-            this.setRawInput(params.fromPlace, forms.m_fromPlace);
-            this.setRawInput(params.toPlace,   forms.m_toForm);
-            this.setRawInput(params.toPlace,   forms.m_toPlace);
+            this.setDirtyRawInput(params.Orig,      forms.m_fromForm);
+            this.setDirtyRawInput(params.Orig,      forms.m_fromPlace);
+            this.setDirtyRawInput(params.Dest,      forms.m_toForm);
+            this.setDirtyRawInput(params.Dest,      forms.m_toPlace);
+            this.setDirtyRawInput(params.from,      forms.m_fromForm);
+            this.setDirtyRawInput(params.from,      forms.m_fromPlace);
+            this.setDirtyRawInput(params.to,        forms.m_toForm);
+            this.setDirtyRawInput(params.to,        forms.m_toPlace);
+            this.setDirtyRawInput(params.fromPlace, forms.m_fromForm);
+            this.setDirtyRawInput(params.fromPlace, forms.m_fromPlace);
+            this.setDirtyRawInput(params.toPlace,   forms.m_toForm);
+            this.setDirtyRawInput(params.toPlace,   forms.m_toPlace);
 
             // triangleSafetyFactor=0.409&triangleSlopeFactor=0.0974&triangleTimeFactor=0.493
             if(this.m_bikeTriangle)
@@ -607,8 +512,8 @@ otp.planner.StaticForms = {
             if(params.wheelchair && this.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
-            this.setRawInput(params.routerId, forms.m_routerIdForm);
-            
+            this.setDirtyRawInput(params.routerId, forms.m_routerIdForm);
+
             // stupid trip planner form processing...
 
             // Hour=7&Minute=02&AmPm=pm
@@ -795,7 +700,8 @@ otp.planner.StaticForms = {
     /**
      * from & to form creation
      */
-    makeMainPanel : function() {
+    makeMainPanel : function()
+    {
         var fromToForms = this.makeFromToForms();
         var dateTime    = this.makeDateTime();
         var fromToArray = [fromToForms, dateTime];
@@ -843,7 +749,7 @@ otp.planner.StaticForms = {
             id:          'form-tab',
             buttonAlign: 'center',
             border:      false,
-            keys:        {key: [10, 13], scope: this, handler: this.enter},
+            keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
                             this.m_routerIdForm,
@@ -1187,6 +1093,20 @@ otp.planner.StaticForms = {
 
     },
 
+    /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
+    setFormErrorMessage : function(comboBoxIdentifier, message)
+    {
+        var errMsg = this.form.locale.tripPlanner.geocoder.error;
+        if(message)
+            errMsg = message;
+
+        if (comboBoxIdentifier === "from") {
+            this.m_fromForm.getComboBox().markInvalid(errMsg);
+        } else if (comboBoxIdentifier === "to") {
+            this.m_toForm.getComboBox().markInvalid(errMsg);
+        }
+    },
+
     /** utility to */
     geocoderEnabled : function()
     {
@@ -1205,21 +1125,6 @@ otp.planner.StaticForms = {
         catch(e) {}
         return retVal;
     },
-
-    /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
-    setFormErrorMessage : function(comboBoxIdentifier, message)
-    {
-        var errMsg = this.form.locale.tripPlanner.geocoder.error;
-        if(message)
-            errMsg = message;
-
-        if (comboBoxIdentifier === "from") {
-            this.m_fromForm.getComboBox().markInvalid(errMsg);
-        } else if (comboBoxIdentifier === "to") {
-            this.m_toForm.getComboBox().markInvalid(errMsg);
-        }
-    },
-
 
     CLASS_NAME: "otp.planner.Forms"
 };

@@ -30,6 +30,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
@@ -72,7 +73,7 @@ public class PlanGenerator {
 
     private FareService fareService;
 
-	private GeometryFactory geometryFactory = new GeometryFactory();
+    private GeometryFactory geometryFactory = new GeometryFactory();
 
     public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
         this.request = request;
@@ -95,21 +96,21 @@ public class PlanGenerator {
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
-            List<String> intermediates = request.getIntermediatePlaces();
+            List<NamedPlace> intermediates = request.getIntermediatePlaces();
             if (intermediates.size() == 0) {
-                paths = pathService.plan(request.getFrom(), request.getTo(), request.getDateTime(),
+                paths = pathService.plan(request.getFromPlace(), request.getToPlace(), request.getDateTime(),
                         options, request.getNumItineraries());
                 if (paths == null && request.getWheelchair()) {
                     // There are no paths that meet the user's slope restrictions.
                     // Try again without slope restrictions (and warn user).
                     options.maxSlope = Double.MAX_VALUE;
-                    paths = pathService.plan(request.getFrom(), request.getTo(), request
+                    paths = pathService.plan(request.getFromPlace(), request.getToPlace(), request
                             .getDateTime(), options, request.getNumItineraries());
                     tooSloped = true;
                 }
             } else {
-                paths = pathService.plan(request.getFrom(), request.getTo(), intermediates,
-                        request.getIntermediatePlacesOrdered(), request.getDateTime(), options);
+                paths = pathService.plan(request.getFromPlace(), request.getToPlace(), intermediates,
+                        request.isIntermediatePlacesOrdered(), request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
             LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
@@ -128,8 +129,14 @@ public class PlanGenerator {
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
+                /* fix up from/to on first/last legs */
+                Leg firstLeg = i.legs.get(0);
+                firstLeg.from.orig = request.getFromName();
+                Leg lastLeg = i.legs.get(i.legs.size() - 1);
+                lastLeg.to.orig = request.getToName();
             }
         }
+
         return plan;
     }
 
@@ -184,7 +191,7 @@ public class PlanGenerator {
         int startWalk = -1;
         int i = -1;
         PlanGenState pgstate = PlanGenState.START;
-
+        String nextName = null;
         for (State state : path.states) {
             i += 1;
             Edge backEdge = state.getBackEdge();
@@ -214,19 +221,23 @@ public class PlanGenerator {
                 if (mode == TraverseMode.WALK) {
                     pgstate = PlanGenState.WALK;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;
                 } else if (mode == TraverseMode.BICYCLE) {
                     pgstate = PlanGenState.BICYCLE;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;
                 } else if (mode == TraverseMode.CAR) {
                     pgstate = PlanGenState.CAR;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = i;                    
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
                     pgstate = PlanGenState.PRETRANSIT;
                     leg = makeLeg(itinerary, state);
+                    leg.from.orig = nextName;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
@@ -250,6 +261,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
                 } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                    nextName = state.getBackState().getBackState().getBackState().getVertex().getName();
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
@@ -316,8 +328,6 @@ public class PlanGenerator {
                 String route = backEdgeNarrative.getName();
                 if (mode == TraverseMode.ALIGHTING) {
                     if (showIntermediateStops && leg.stop != null && leg.stop.size() > 0) {
-                        // Remove the last stop -- it's the alighting one
-                        leg.stop.remove(leg.stop.size() - 1);
                         if (leg.stop.isEmpty()) {
                             leg.stop = null;
                         }
@@ -332,7 +342,7 @@ public class PlanGenerator {
                          * any further transit edge, add "from" vertex to intermediate stops
                          */
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
-                            Place stop = makePlace(state);
+                            Place stop = makePlace(state.getBackState());
                             leg.stop.add(stop);
                         } else {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
@@ -512,8 +522,8 @@ public class PlanGenerator {
     private void checkLocationsAccessible(Request request, TraverseOptions options) {
         if (request.getWheelchair()) {
             // check if the start and end locations are accessible
-            if (!pathService.isAccessible(request.getFrom(), options)
-                    || !pathService.isAccessible(request.getTo(), options)) {
+            if (!pathService.isAccessible(request.getFromPlace(), options)
+                    || !pathService.isAccessible(request.getToPlace(), options)) {
                 throw new LocationNotAccessible();
             }
 

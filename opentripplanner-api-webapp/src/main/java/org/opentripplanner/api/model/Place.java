@@ -16,6 +16,7 @@ package org.opentripplanner.api.model;
 import java.util.Date;
 import java.util.logging.Logger; 
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -57,6 +58,9 @@ public class Place {
      * The time the rider will depart the place.
      */
     public Date departure = null;
+
+    @XmlAttribute
+    public String orig;
 
     /**
      * Returns the geometry in GeoJSON format

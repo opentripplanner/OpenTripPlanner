@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Date;
 import java.util.List;
 
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
@@ -25,7 +26,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
 
-    public List<GraphPath> plan(String fromPlace, String toPlace, Date targetTime,
+    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
             TraverseOptions options, int nItineraries);
 
     /**
@@ -50,13 +51,13 @@ public interface PathService {
      * @param options
      * @return
      */
-    public List<GraphPath> plan(String fromPlace, String toPlace, List<String> intermediatePlaces,
+    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediatePlaces,
             boolean ordered, Date dateTime, TraverseOptions options);
 
     public void setGraphService(GraphService graphService);
 
     public GraphService getGraphService();
 
-    public boolean isAccessible(String place, TraverseOptions options);
+    public boolean isAccessible(NamedPlace place, TraverseOptions options);
 
 }

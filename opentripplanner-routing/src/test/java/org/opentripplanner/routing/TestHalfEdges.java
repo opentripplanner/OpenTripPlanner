@@ -266,12 +266,12 @@ public class TestHalfEdges extends TestCase {
         assertTrue(finder.getLocalTransitStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
 
         //test that the closest vertex finder returns the closest vertex
-        StreetLocation some = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.00, 40.00), null);
+        StreetLocation some = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.00, 40.00), null, null);
         assertNotNull(some);
         assertTrue("wheelchair accessibility is correctly set (vertices)", some.isWheelchairAccessible());
         
         //test that the closest vertex finder correctly splits streets
-        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01, 40.004), null);
+        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01, 40.004), null, null);
         assertNotNull(start);
         assertTrue("wheelchair accessibility is correctly set (splitting)", start.isWheelchairAccessible());
 
@@ -279,7 +279,7 @@ public class TestHalfEdges extends TestCase {
         assertEquals(10, extras.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
-        StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), biking);
+        StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, biking);
         assertNotNull(end);
         
         extras = end.getExtra();
@@ -288,7 +288,7 @@ public class TestHalfEdges extends TestCase {
         // test that the closest vertex finder also adds an edge to transit
         // stops (if you are really close to the transit stop relative to the
         // street)
-        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), new TraverseOptions());
+        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), null, new TraverseOptions());
         assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
@@ -300,8 +300,8 @@ public class TestHalfEdges extends TestCase {
 
         // test that it is possible to travel between two splits on the same street
         TraverseOptions walking = new TraverseOptions(TraverseMode.WALK);
-        start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.004), walking);
-        end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), walking,
+        start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.004), null, walking);
+        end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, walking,
                 start.getExtra());
         assertNotNull(end);
         ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, 0, walking);

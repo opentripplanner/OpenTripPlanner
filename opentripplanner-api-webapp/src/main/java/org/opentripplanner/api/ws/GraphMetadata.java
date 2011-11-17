@@ -13,10 +13,16 @@
 
 package org.opentripplanner.api.ws;
 
+import java.util.HashSet;
+
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,6 +37,8 @@ public class GraphMetadata {
      * The bounding box of the graph, in decimal degrees.
      */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
+
+    private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
     public GraphMetadata() {
     }
@@ -48,8 +56,13 @@ public class GraphMetadata {
         Envelope leftEnv = new Envelope();
         Envelope rightEnv = new Envelope();
         double aRightCoordinate = 0;
-        for (Vertex gv : graph.getVertices()) {
-            Coordinate c = gv.getCoordinate();
+        for (Vertex v : graph.getVertices()) {
+            for (Edge e: v.getOutgoing()) {
+                if (e instanceof PatternHop) {
+                    transitModes.add(((PatternHop) e).getMode());
+                }
+            }
+            Coordinate c = v.getCoordinate();
             if (c.x < 0) {
                 leftEnv.expandToInclude(c);
             } else {
@@ -191,5 +204,14 @@ public class GraphMetadata {
      */
     public double getMaxLongitude() {
         return upperRightLongitude;
+    }
+
+    @XmlElement
+    public HashSet<TraverseMode> getTransitModes() {
+        return transitModes;
+    }
+
+    public void setTransitModes(HashSet<TraverseMode> transitModes) {
+        this.transitModes = transitModes;
     }
 }

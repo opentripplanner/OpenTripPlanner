@@ -115,6 +115,11 @@ otp.core.ComboBox = {
         return retVal;
     },
 
+    /** */
+    setDirty : function()
+    {
+        this.m_forceDirty = true;
+    },
 
     /**
      * persist Ext ComboBox's text field content into a Cookie
@@ -191,10 +196,18 @@ otp.core.ComboBox = {
     {
     },
 
+    /** */
     clear : function()
     {
         this.m_form.collapse();
         this.m_form.reset();
+    },
+
+    /** */
+    blur : function()
+    {
+        if(this.isDirty())
+            this.m_form.triggerBlur();
     },
 
     collapse : function()
