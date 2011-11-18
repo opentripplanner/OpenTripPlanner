@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 public class ContractionHierarchy implements Serializable {
 
     /* contraction parameters */
-	private static final int HOP_LIMIT_SIMULATE = 10;
+    private static final int HOP_LIMIT_SIMULATE = 10;
     private static final int HOP_LIMIT_CONTRACT = Integer.MAX_VALUE;
     private static final int NODE_LIMIT_SIMULATE = 500;
     private static final int NODE_LIMIT_CONTRACT = Integer.MAX_VALUE;
@@ -75,13 +75,13 @@ public class ContractionHierarchy implements Serializable {
 
     private static final long serialVersionUID = 20111118L;
 
-    public OverlayGraph graph;
+    public OverlayGraph core;
 
     public OverlayGraph updown;  // outgoing is up, incoming is down
 
     private double contractionFactor;
 
-    private transient TraverseOptions options, backOptions;
+    private transient TraverseOptions fwdOptions, backOptions;
 
     private transient TraverseMode mode;
 
@@ -100,11 +100,11 @@ public class ContractionHierarchy implements Serializable {
      */
     public WitnessSearchResult getShortcuts(Vertex u, boolean simulate) {
 
-        State su = new State(u, backOptions); // search backward
-
         /* Compute the cost from each vertex with an incoming edge to the target */
+        State su = new State(u, backOptions); // search backward
         int searchSpace = 0;
-        ArrayList<VertexIngress> vs = new ArrayList<VertexIngress>();
+        
+        ArrayList<State> vs = new ArrayList<State>();
         for (Edge e : u.getIncoming()) {
             if (!isContractable(e)) {
                 continue;
@@ -113,16 +113,15 @@ public class ContractionHierarchy implements Serializable {
             if (sv == null) {
                 continue;
             }
-            // could just use keep states instead of making vertexIngress
-            vs.add(new VertexIngress(sv.getVertex(), (DirectEdge)e, sv.getWeight(), sv.getAbsTimeDeltaSec(), sv.getWalkDistance()));
+            vs.add(sv);
         }
 
         /* Compute the cost to each vertex with an outgoing edge from the target */
-        su = new State(u, options); // search forward
+        su = new State(u, fwdOptions); // search forward
         double maxWWeight = 0;
 
-        HashSet<Vertex> wSet = new HashSet<Vertex>();
-        ArrayList<VertexIngress> ws = new ArrayList<VertexIngress>();
+        HashSet<Vertex> wvSet = new HashSet<Vertex>();
+        ArrayList<State> ws = new ArrayList<State>();
         for (DirectEdge e : filter(u.getOutgoing(), DirectEdge.class)) {
             if (!isContractable(e)) {
                 continue;
@@ -131,9 +130,8 @@ public class ContractionHierarchy implements Serializable {
             if (sw == null) {
                 continue;
             }
-            Vertex w = sw.getVertex();
-            wSet.add(w);
-            ws.add(new VertexIngress(w, e, sw.getWeight(), sw.getTimeDeltaSec(), sw.getWalkDistance()));
+            wvSet.add(sw.getVertex());
+            ws.add(sw);
             if (sw.exceedsWeightLimit(maxWWeight)) {
                 maxWWeight = sw.getWeight();
             }
@@ -142,19 +140,19 @@ public class ContractionHierarchy implements Serializable {
         /* figure out which shortcuts are needed */
         List<Shortcut> shortcuts = new ArrayList<Shortcut>();
 
-        ArrayList<Callable<WitnessSearchResult>> tasks = new ArrayList<Callable<WitnessSearchResult>>(
-                vs.size());
+        ArrayList<Callable<WitnessSearchResult>> tasks = 
+                new ArrayList<Callable<WitnessSearchResult>>(vs.size());
         
         int nodeLimit = simulate ? NODE_LIMIT_SIMULATE : NODE_LIMIT_CONTRACT;
         int hopLimit = simulate ? HOP_LIMIT_SIMULATE : HOP_LIMIT_CONTRACT;
 
         // FOR EACH V
-        for (VertexIngress v : vs) {
+        for (State v : vs) {
             //allow about a second of inefficiency in routes in the name of planning
             //efficiency (+ 1)
-            double weightLimit = v.weight + maxWWeight + 1;
+            double weightLimit = v.getWeight() + maxWWeight + 1;
             WitnessSearch task = new WitnessSearch(u, hopLimit, nodeLimit, 
-                    weightLimit, wSet, ws, v);
+                    weightLimit, wvSet, ws, v);
             tasks.add(task);
         }
         if (threadPool == null) {
@@ -168,7 +166,7 @@ public class ContractionHierarchy implements Serializable {
                     /* while we're here, remove some non-optimal edges */
                     ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
                     // starting from each v
-                    State sv0 = new State(wsresult.vertex, options);
+                    State sv0 = new State(wsresult.vertex, fwdOptions);
                     for (DirectEdge e : filter(wsresult.vertex.getOutgoing(), DirectEdge.class)) {
                         State sSpt = spt.getState(e.getToVertex());
                         if (sSpt == null) {
@@ -208,60 +206,63 @@ public class ContractionHierarchy implements Serializable {
     	private Vertex u;
         private double weightLimit;
         private int hopLimit;
-        private HashSet<Vertex> wSet;
-        private List<VertexIngress> ws;
-        private VertexIngress v;
+        private HashSet<Vertex> wvSet;
+        private List<State> ws;
+        private State v;
         private int nodeLimit;
 
         public WitnessSearch(Vertex u, int hopLimit, int nodeLimit,
                 double weightLimit, HashSet<Vertex> wSet, 
-                List<VertexIngress> ws, VertexIngress v) {
+                List<State> ws, State v) {
             this.u = u;
             this.hopLimit = hopLimit;
             this.nodeLimit = nodeLimit;
             this.weightLimit = weightLimit;
-            this.wSet = wSet;
+            this.wvSet = wSet;
             this.ws = ws;
             this.v = v;
         }
 
         public WitnessSearchResult call() {
-            return searchWitnesses(u, hopLimit, nodeLimit, weightLimit, wSet,
+            return searchWitnesses(u, hopLimit, nodeLimit, weightLimit, wvSet,
                     ws, v);
         }
     }
 
     private WitnessSearchResult searchWitnesses(Vertex u, int hopLimit, 
-    		int nodeLimit, double weightLimit, HashSet<Vertex> wSet, 
-    		List<VertexIngress> ws, VertexIngress v) {
+    		int nodeLimit, double weightLimit, HashSet<Vertex> wvSet, 
+    		List<State> ws, State v) {
 
-    	Dijkstra dijkstra = new Dijkstra(graph, v.vertex, options, u, hopLimit);
-        dijkstra.setTargets(wSet); // set is now cloned inside dijkstra, since it is used destructively (AMB)
+    	Dijkstra dijkstra = new Dijkstra(core, v.getVertex(), fwdOptions, u, hopLimit);
+    	// set is now cloned inside dijkstra, since it is used destructively (AMB)
+    	// could just be derived from ws
+        dijkstra.setTargets(wvSet); 
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(weightLimit, nodeLimit);
 
         ArrayList<Shortcut> shortcuts = new ArrayList<Shortcut>();
 
         // FOR EACH W
-        for (VertexIngress w : ws) {
+        for (State w : ws) {
 
-            if (v.vertex == w.vertex) {
+            if (v.getVertex() == w.getVertex()) {
                 continue;
             }
 
-            double weightThroughU = v.weight + w.weight;
-            State pathAroundU = spt.getState(w.vertex);
+            double weightThroughU = v.getWeight() + w.getWeight();
+            State pathAroundU = spt.getState(w.getVertex());
 
             // if the path around the vertex is longer than the path through,
             // add the path through to the shortcuts
             if (pathAroundU == null || pathAroundU.exceedsWeightLimit(weightThroughU + .01)) {
-                int timeThroughU = (int) ((w.time + v.time) / 1000);
-                double walkDistance = v.walkDistance + w.walkDistance;
-                Shortcut vuw = new Shortcut(v.edge, w.edge, timeThroughU, weightThroughU, walkDistance, mode);
+                int timeThroughU = (int) (w.getAbsTimeDeltaSec() + v.getAbsTimeDeltaSec());
+                double walkDistance = v.getWalkDistance() + w.getWalkDistance();
+                Shortcut vuw = new Shortcut((DirectEdge)v.getBackEdge(), (DirectEdge)w.getBackEdge(), 
+                        timeThroughU, weightThroughU, walkDistance, mode);
                 shortcuts.add(vuw);
             }
         }
         
-        return new WitnessSearchResult(shortcuts, spt, v.vertex, spt.getVertexCount());
+        return new WitnessSearchResult(shortcuts, spt, v.getVertex(), spt.getVertexCount());
     }
 
     /**
@@ -347,16 +348,16 @@ public class ContractionHierarchy implements Serializable {
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
     public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
-        // rename to workingGraph?
-        graph = new OverlayGraph(orig);
+        
+        core = new OverlayGraph(orig);
 
-        this.options = options;
-        this.options.setMaxWalkDistance(Double.MAX_VALUE);
-        backOptions = this.options.clone();
+        this.fwdOptions = options;
+        this.fwdOptions.setMaxWalkDistance(Double.MAX_VALUE);
+        backOptions = this.fwdOptions.clone();
         backOptions.setArriveBy(true);
         this.contractionFactor = contractionFactor;
 
-        this.mode = this.options.getModes().getNonTransitMode();
+        this.mode = this.fwdOptions.getModes().getNonTransitMode();
 
         init();
         //useCoreVerticesFrosm(orig);
@@ -384,14 +385,14 @@ public class ContractionHierarchy implements Serializable {
         _log.debug("Preparing contraction hierarchy -- this may take quite a while");
         _log.debug("Initializing priority queue");
 
-        BinHeap<Vertex> pq = initPriorityQueue(graph);
+        BinHeap<Vertex> pq = initPriorityQueue(core);
 
         _log.debug("Contracting");
         long lastNotified = System.currentTimeMillis();
         int i = 0;
         int nContractableVertices, totalContractableVertices;
         totalContractableVertices = nContractableVertices = pq.size();
-        int nContractableEdges = countContractableEdges(graph);
+        int nContractableEdges = countContractableEdges(core);
         boolean edgesRemoved = false;
 
         while (!pq.empty()) {
@@ -464,20 +465,20 @@ public class ContractionHierarchy implements Serializable {
             HashSet<Vertex> neighbors = new HashSet<Vertex>();
 
             // outgoing, therefore upward
-            for (DirectEdge de : filter(graph.getOutgoing(vertex), DirectEdge.class)) {
+            for (DirectEdge de : filter(core.getOutgoing(vertex), DirectEdge.class)) {
                 // do not use removedirectedge 
                 // to avoid erasing the edge list out from under iteration
                 Vertex toVertex = de.getToVertex();
-                graph.removeIncoming(toVertex, de);
+                core.removeIncoming(toVertex, de);
                 updown.addOutgoing(vertex, de);
                 neighbors.add(toVertex);
                 nContractableEdges--;
             }
 
             // incoming, therefore downward
-            for (DirectEdge de : filter(graph.getIncoming(vertex), DirectEdge.class)) {
+            for (DirectEdge de : filter(core.getIncoming(vertex), DirectEdge.class)) {
                 Vertex fromVertex = de.getFromVertex();
-                graph.removeOutgoing(fromVertex, de);
+                core.removeOutgoing(fromVertex, de);
                 updown.addIncoming(vertex, de);
                 neighbors.add(fromVertex);
                 nContractableEdges--;
@@ -485,7 +486,7 @@ public class ContractionHierarchy implements Serializable {
 
             // remove vertex from working overlay graph,
             // along with its outgoing and incoming edge lists
-            graph.removeVertex(vertex);
+            core.removeVertex(vertex);
 
             /* update neighbors' priority and deleted neighbors */
             for (Vertex n : neighbors) {
@@ -504,7 +505,7 @@ public class ContractionHierarchy implements Serializable {
             List<Shortcut> shortcuts = shortcutsAndSearchSpace.shortcuts;
             // Add shortcuts to graph
             for (Shortcut shortcut : shortcuts) {
-                graph.addDirectEdge(shortcut);
+                core.addDirectEdge(shortcut);
             }
 
             nContractableVertices--;
@@ -551,9 +552,9 @@ public class ContractionHierarchy implements Serializable {
             HashMap<Vertex, Integer> deletedNeighbors) {
 
     	_log.debug("    rebuild priority queue, hoplimit is now {}", hopLimit);
-    	BinHeap<Vertex> newpq = new BinHeap<Vertex>(graph.getVertices().size());
+    	BinHeap<Vertex> newpq = new BinHeap<Vertex>(core.getVertices().size());
         int i = 0;
-        for (Vertex v : graph.getVertices()) {
+        for (Vertex v : core.getVertices()) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
 
@@ -575,13 +576,13 @@ public class ContractionHierarchy implements Serializable {
 
     	_log.debug("removing non-optimal edges, hopLimit is {}", hopLimit);
         int removed = 0;
-        for (Vertex u : graph.getVertices()) {
-            State su = new State(u, options);
-            Dijkstra dijkstra = new Dijkstra(graph, u, options, null, hopLimit);
+        for (Vertex u : core.getVertices()) {
+            State su = new State(u, fwdOptions);
+            Dijkstra dijkstra = new Dijkstra(core, u, fwdOptions, null, hopLimit);
             BasicShortestPathTree spt = dijkstra.getShortestPathTree(Double.POSITIVE_INFINITY,
                     Integer.MAX_VALUE);
             ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
-            for (DirectEdge e : filter(graph.getOutgoing(u),DirectEdge.class)) {
+            for (DirectEdge e : filter(core.getOutgoing(u),DirectEdge.class)) {
                 if (!isContractable(e)) {
                     continue;
                 }
@@ -598,7 +599,7 @@ public class ContractionHierarchy implements Serializable {
                 }
             }
             for (DirectEdge e : toRemove) {
-                graph.removeDirectEdge(e);
+                core.removeDirectEdge(e);
             }
             removed += toRemove.size();
         }
@@ -611,8 +612,8 @@ public class ContractionHierarchy implements Serializable {
         	for (Edge e : gv.getOutgoing())
         		if (isContractable(e))
         			total++;
-// don't count all edges, just contractable ones
-//            total += gv.getDegreeOut();
+                        // don't count all edges, just contractable ones
+                        //            total += gv.getDegreeOut();
         }
         return total;
     }
@@ -630,8 +631,8 @@ public class ContractionHierarchy implements Serializable {
     	TraverseOptions downOptions = opt.clone();
 
         /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = origin.getDistanceToNearestTransitStop() + 
-        						 target.getDistanceToNearestTransitStop();
+        double minWalkDistance = 
+                origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
         upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
         downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
 
@@ -726,7 +727,7 @@ public class ContractionHierarchy implements Serializable {
                     continue;
                 }
 
-                Vertex gu = graph.getVertex(u);
+                Vertex gu = core.getVertex(u);
                 if (VERBOSE)
                 	_log.debug("    up main graph vertex {}", gu);
                 if (opt.isArriveBy() && gu != null) {
