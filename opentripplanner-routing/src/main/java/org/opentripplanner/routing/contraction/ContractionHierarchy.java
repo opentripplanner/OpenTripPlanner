@@ -34,6 +34,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -72,13 +73,11 @@ public class ContractionHierarchy implements Serializable {
 
     private static final Logger _log = LoggerFactory.getLogger(ContractionHierarchy.class);
 
-    private static final long serialVersionUID = 6651191142274381518L;
+    private static final long serialVersionUID = 20111118L;
 
-    public Graph graph;
+    public OverlayGraph graph;
 
-    public Graph up;
-
-    public Graph down;
+    public OverlayGraph updown;  // outgoing is up, incoming is down
 
     private double contractionFactor;
 
@@ -106,7 +105,7 @@ public class ContractionHierarchy implements Serializable {
         /* Compute the cost from each vertex with an incoming edge to the target */
         int searchSpace = 0;
         ArrayList<VertexIngress> vs = new ArrayList<VertexIngress>();
-        for (Edge e : graph.getIncoming(u)) {
+        for (Edge e : u.getIncoming()) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -124,7 +123,7 @@ public class ContractionHierarchy implements Serializable {
 
         HashSet<Vertex> wSet = new HashSet<Vertex>();
         ArrayList<VertexIngress> ws = new ArrayList<VertexIngress>();
-        for (DirectEdge e : filter(graph.getOutgoing(u),DirectEdge.class)) {
+        for (DirectEdge e : filter(u.getOutgoing(), DirectEdge.class)) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -170,7 +169,7 @@ public class ContractionHierarchy implements Serializable {
                     ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
                     // starting from each v
                     State sv0 = new State(wsresult.vertex, options);
-                    for (DirectEdge e : filter(graph.getOutgoing(wsresult.vertex),DirectEdge.class)) {
+                    for (DirectEdge e : filter(wsresult.vertex.getOutgoing(), DirectEdge.class)) {
                         State sSpt = spt.getState(e.getToVertex());
                         if (sSpt == null) {
                             continue;
@@ -187,11 +186,10 @@ public class ContractionHierarchy implements Serializable {
                         }
                     }
 
-                    Vertex ugv = graph.getVertex(wsresult.vertex);
-
+                    Vertex uv = wsresult.vertex;
                     for (DirectEdge e : toRemove) {
-                        ugv.removeOutgoing(e);
-                        graph.getVertex(e.getToVertex()).removeIncoming(e);
+                        uv.removeOutgoing(e);
+                        e.getToVertex().removeIncoming(e);
                     }
                 }
                 searchSpace += wsresult.searchSpace;
@@ -282,8 +280,8 @@ public class ContractionHierarchy implements Serializable {
      */
     private int getImportance(Vertex v, WitnessSearchResult shortcutsAndSearchSpace,
             int deletedNeighbors) {
-        int degree_in = graph.getDegreeIn(v);
-        int degree_out = graph.getDegreeOut(v);
+        int degree_in = v.getDegreeIn();
+        int degree_out = v.getDegreeOut();
         int edge_difference = shortcutsAndSearchSpace.shortcuts.size() - (degree_in + degree_out);
         int searchSpace = shortcutsAndSearchSpace.searchSpace;
 
@@ -296,20 +294,19 @@ public class ContractionHierarchy implements Serializable {
      * 
      * @return
      */
-    BinHeap<Vertex> initPriorityQueue(Graph graph) {
-        Collection<Vertex> vertices = graph.getVertices();
+    BinHeap<Vertex> initPriorityQueue(OverlayGraph og) {
+        Collection<Vertex> vertices = og.getVertices();
         BinHeap<Vertex> pq = new BinHeap<Vertex>(vertices.size());
 
         int i = 0;
-        for (Vertex gv : vertices) {
+        for (Vertex v : vertices) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
         	
-            Vertex v = gv.vertex;
             if (!isContractable(v)) {
                 continue;
             }
-            if (gv.getDegreeIn() > 7 || gv.getDegreeOut() > 7) {
+            if (v.getDegreeIn() > 7 || v.getDegreeOut() > 7) {
                 continue;
             }
             WitnessSearchResult shortcuts = getShortcuts(v, true);
@@ -327,7 +324,7 @@ public class ContractionHierarchy implements Serializable {
      */
     private boolean isContractable(Vertex v) {
         if (v instanceof StreetVertex || v instanceof EndpointVertex) {
-            for (Edge e : graph.getOutgoing(v)) {
+            for (Edge e : v.getOutgoing()) {
                 if( ! (e instanceof DirectEdge))
                     return false;
                 DirectEdge de = (DirectEdge) e;
@@ -350,11 +347,8 @@ public class ContractionHierarchy implements Serializable {
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
     public ContractionHierarchy(Graph orig, TraverseOptions options, double contractionFactor) {
-        graph = new Graph(orig);
-        // clone graph
-        for (Vertex gv : orig.getVertices()) {
-            graph.addVertex(new Vertex(gv));
-        }
+        // rename to workingGraph?
+        graph = new OverlayGraph(orig);
 
         this.options = options;
         this.options.setMaxWalkDistance(Double.MAX_VALUE);
@@ -365,46 +359,47 @@ public class ContractionHierarchy implements Serializable {
         this.mode = this.options.getModes().getNonTransitMode();
 
         init();
-        useCoreVerticesFrom(orig);
+        //useCoreVerticesFrosm(orig);
     }
 
-    private void useCoreVerticesFrom(Graph orig) {
-        for (Vertex gv : graph.getVertices()) {
-            Vertex origgv = orig.getVertex(gv.vertex.getLabel());
-            if (origgv.equals(gv)) {
-                graph.addVertex(origgv);
-            }
-        }
-    }
+// duplicates the graphvertices from the original graph rather than duplicating them
+//    private void useCoreVerticesFrom(Graph orig) {
+//        for (Vertex gv : graph.getVertices()) {
+//            Vertex origgv = orig.getVertex(gv.vertex.getLabel());
+//            if (origgv.equals(gv)) {
+//                graph.addVertex(origgv);
+//            }
+//        }
+//    }
 
     void init() {
 
         createThreadPool();
 
-        up = new Graph(graph);
-        down = new Graph(graph);
+        updown = new OverlayGraph();
 
         long start = System.currentTimeMillis();
 
         HashMap<Vertex, Integer> deletedNeighbors = new HashMap<Vertex, Integer>();
         _log.debug("Preparing contraction hierarchy -- this may take quite a while");
-        _log.debug("init prio queue");
+        _log.debug("Initializing priority queue");
 
         BinHeap<Vertex> pq = initPriorityQueue(graph);
 
-        _log.debug("contract");
+        _log.debug("Contracting");
         long lastNotified = System.currentTimeMillis();
         int i = 0;
-        int nVertices = pq.size();
-        int totalVertices = nVertices;
-        int nEdges = countEdges(graph);
+        int nContractableVertices, totalContractableVertices;
+        totalContractableVertices = nContractableVertices = pq.size();
+        int nContractableEdges = countContractableEdges(graph);
         boolean edgesRemoved = false;
 
         while (!pq.empty()) {
             // stop contracting once a core is reached
-            if (i++ > Math.ceil(totalVertices * contractionFactor)) {
-                break;
-            }
+//            if (i > Math.ceil(totalContractableVertices * contractionFactor)) {
+//                break;
+//            }
+            i += 1;
 
 /*         "Keeping the cost of contraction up-to-date in the priority queue is quite costly. The contraction of a 
  			node in a search tree of the local search can aﬀect the cost of contraction. So after
@@ -425,12 +420,11 @@ public class ContractionHierarchy implements Serializable {
 //            }
             
             Vertex vertex = pq.extract_min();
-
+            _log.trace("contracting vertex " + vertex);
             WitnessSearchResult shortcutsAndSearchSpace;
             // make sure priority of current vertex
             if (pq.empty()) {
                 shortcutsAndSearchSpace = getShortcuts(vertex, false);
-
             } else {
                 // resort the priority queue as necessary
                 while (true) {
@@ -454,10 +448,11 @@ public class ContractionHierarchy implements Serializable {
 
             long now = System.currentTimeMillis();
             if (now - lastNotified > 5000) {
-                _log.debug("contracted: " + i + " / " + totalVertices + " (" + i / (double)totalVertices 
-                		+ ") total time "
+                _log.debug("contracted: " + i + " / " + totalContractableVertices 
+                        + " (" + i / (double)totalContractableVertices 
+                        + ") total time "
                         + (now - start) / 1000.0 + "sec, average degree "
-                        + nEdges / (nVertices + 0.00001));
+                        + nContractableEdges / (nContractableVertices + 0.00001));
                 lastNotified = now;
             }
 
@@ -466,44 +461,33 @@ public class ContractionHierarchy implements Serializable {
             // the one currently being plucked from the graph. Edges that go out are upward edges.
             // Edges that are coming in are downward edges.
 
-            // incoming, therefore downward
-
-            Vertex downVertex = down.getVertex(down.addVertex(vertex));
-
             HashSet<Vertex> neighbors = new HashSet<Vertex>();
 
-            for (Edge ee : graph.getIncoming(vertex)) {
-                nEdges--;
-                Vertex originalFromVertex = graph.getVertex(ee.getFromVertex());
-                down.addVertex(originalFromVertex.vertex);
-
-                originalFromVertex.removeOutgoing(ee);
-
-                downVertex.addIncoming(ee);
-                neighbors.add(originalFromVertex.vertex);
-            }
-
             // outgoing, therefore upward
-            Vertex upVertex = up.getVertex(up.addVertex(vertex));
-
-            for (DirectEdge ee : filter(graph.getOutgoing(vertex),DirectEdge.class)) {
-                nEdges--;
-                Vertex originalToVertex = graph.getVertex(ee.getToVertex());
-                up.addVertex(originalToVertex.vertex);
-
-                originalToVertex.removeIncoming(ee);
-
-                upVertex.addOutgoing(ee);
-                neighbors.add(originalToVertex.vertex);
+            for (DirectEdge de : filter(graph.getOutgoing(vertex), DirectEdge.class)) {
+                // do not use removedirectedge 
+                // to avoid erasing the edge list out from under iteration
+                Vertex toVertex = de.getToVertex();
+                graph.removeIncoming(toVertex, de);
+                updown.addOutgoing(vertex, de);
+                neighbors.add(toVertex);
+                nContractableEdges--;
             }
 
-            /*
-             * remove vertex from original graph.
-             */
+            // incoming, therefore downward
+            for (DirectEdge de : filter(graph.getIncoming(vertex), DirectEdge.class)) {
+                Vertex fromVertex = de.getFromVertex();
+                graph.removeOutgoing(fromVertex, de);
+                updown.addIncoming(vertex, de);
+                neighbors.add(fromVertex);
+                nContractableEdges--;
+            }
+
+            // remove vertex from working overlay graph,
+            // along with its outgoing and incoming edge lists
             graph.removeVertex(vertex);
 
             /* update neighbors' priority and deleted neighbors */
-
             for (Vertex n : neighbors) {
                 int deleted = 0;
                 if (deletedNeighbors.containsKey(n)) {
@@ -511,7 +495,7 @@ public class ContractionHierarchy implements Serializable {
                 }
                 deleted += 1;
                 deletedNeighbors.put(n, deleted);
-                //update prio queue
+                //update priority queue
                 WitnessSearchResult nwsr = getShortcuts(n, true);
                 double new_prio = getImportance(n, nwsr, deleted);
                 pq.rekey(n, new_prio);
@@ -520,12 +504,12 @@ public class ContractionHierarchy implements Serializable {
             List<Shortcut> shortcuts = shortcutsAndSearchSpace.shortcuts;
             // Add shortcuts to graph
             for (Shortcut shortcut : shortcuts) {
-                graph.addEdge(shortcut.getFromVertex(), shortcut.getToVertex(), shortcut);
+                graph.addDirectEdge(shortcut);
             }
 
-            nVertices--;
-            nEdges += shortcuts.size();
-            if (nVertices == 0) {
+            nContractableVertices--;
+            nContractableEdges += shortcuts.size();
+            if (nContractableVertices == 0) {
                 continue;
             }
 
@@ -569,11 +553,10 @@ public class ContractionHierarchy implements Serializable {
     	_log.debug("    rebuild priority queue, hoplimit is now {}", hopLimit);
     	BinHeap<Vertex> newpq = new BinHeap<Vertex>(graph.getVertices().size());
         int i = 0;
-        for (Vertex gv : graph.getVertices()) {
+        for (Vertex v : graph.getVertices()) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
 
-            Vertex v = gv.vertex;
             if (!isContractable(v)) {
                 continue;
             }
@@ -592,8 +575,7 @@ public class ContractionHierarchy implements Serializable {
 
     	_log.debug("removing non-optimal edges, hopLimit is {}", hopLimit);
         int removed = 0;
-        for (Vertex gu : graph.getVertices()) {
-            Vertex u = gu.vertex;
+        for (Vertex u : graph.getVertices()) {
             State su = new State(u, options);
             Dijkstra dijkstra = new Dijkstra(graph, u, options, null, hopLimit);
             BasicShortestPathTree spt = dijkstra.getShortestPathTree(Double.POSITIVE_INFINITY,
@@ -616,17 +598,16 @@ public class ContractionHierarchy implements Serializable {
                 }
             }
             for (DirectEdge e : toRemove) {
-                gu.removeOutgoing(e);
-                graph.getVertex(e.getToVertex()).removeIncoming(e);
+                graph.removeDirectEdge(e);
             }
             removed += toRemove.size();
         }
         return removed;
     }
 
-    private int countEdges(Graph graph) {
+    private int countContractableEdges(OverlayGraph graph2) {
         int total = 0;
-        for (Vertex gv : graph.getVertices()) {
+        for (Vertex gv : graph2.getVertices()) {
         	for (Edge e : gv.getOutgoing())
         		if (isContractable(e))
         			total++;
