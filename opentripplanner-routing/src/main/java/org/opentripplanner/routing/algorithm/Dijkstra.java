@@ -18,6 +18,7 @@ import java.util.HashSet;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
@@ -35,16 +36,16 @@ public class Dijkstra {
     private HashSet<Vertex> targets = null; // why was this a set of String not Vertex?
     
     private int hopLimit;
-    private Graph graph;
+    private OverlayGraph graph;
     
-    public Dijkstra(Graph graph, Vertex origin, TraverseOptions options, Vertex taboo) {
+    public Dijkstra(OverlayGraph graph, Vertex origin, TraverseOptions options, Vertex taboo) {
         this(graph, origin, options, taboo, Integer.MAX_VALUE);
     }
     /**
      * 
      * @param taboo Do not consider any paths passing through this vertex
      */
-    public Dijkstra(Graph graph, Vertex origin, TraverseOptions options, Vertex taboo, int hopLimit) {
+    public Dijkstra(OverlayGraph graph, Vertex origin, TraverseOptions options, Vertex taboo, int hopLimit) {
         this.graph = graph;
         this.taboo = taboo;
         this.hopLimit = hopLimit;
@@ -80,8 +81,7 @@ public class Dijkstra {
     public BasicShortestPathTree getShortestPathTree(Vertex target, double weightLimit) {
         
         while (!queue.empty()) { 
-            
-        	State su = queue.extract_min(); 
+            State su = queue.extract_min(); 
             if ( ! spt.visit(su)) 
             	continue;
             
@@ -92,7 +92,7 @@ public class Dijkstra {
             if (u == target)
                 break;
 
-            Iterable<Edge> outgoing = u.getOutgoing();
+            Iterable<Edge> outgoing = graph.getOutgoing(u);
             for (Edge edge : outgoing) {
             	State sv = edge.traverse(su);
                 if (sv != null
@@ -101,7 +101,6 @@ public class Dijkstra {
                 	&& spt.add(sv))
                         queue.insert(sv, sv.getWeight());
             }
-            
         }
         return spt;
     }
@@ -137,7 +136,7 @@ public class Dijkstra {
                 	break;
             }
             
-            Iterable<Edge> outgoing = u.getOutgoing();
+            Iterable<Edge> outgoing = graph.getOutgoing(u);
             for (Edge edge : outgoing) {
 //                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
 //                    //only consider street edges when contracting
@@ -156,7 +155,6 @@ public class Dijkstra {
                 	&& !sv.exceedsWeightLimit(weightLimit))
                         queue.insert(sv, sv.getWeight());
             }
-
         }
         return spt;
     }
