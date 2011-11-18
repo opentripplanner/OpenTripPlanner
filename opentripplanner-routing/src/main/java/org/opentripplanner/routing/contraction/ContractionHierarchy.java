@@ -675,34 +675,26 @@ public class ContractionHierarchy implements Serializable {
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
         
-        // try goal-directed CH
-        RemainingWeightHeuristic h = opt.remainingWeightHeuristic;
-        if (opt.isArriveBy())
-        	h.computeInitialWeight(downInit, origin);
-        else
-        	h.computeInitialWeight(upInit, target);
-
-        
         Vertex meeting = null;
         double bestMeetingCost = Double.POSITIVE_INFINITY;
 
         boolean done_up = false;
         boolean done_down = false;
         
-        while (!(done_up && done_down)) { // Until the priority queue is empty:
-        	// up and down steps could be a single method with parameters changed
+        while (!(done_up && done_down)) { 
+            // up and down steps could be a single method with parameters changed
+            // if ( ! done_up) treeStep(queue, options, thisClosed, thatClosed, thisSpt, thatSpt, bestMeeting);
+            
+            /* one step on the up tree */
             if (!done_up) {
-                /*
-                 * one step on the up tree
-                 */
                 if (upqueue.empty()) {
                     done_up = true;
                     continue;
                 }
                 
                 State up_su = upqueue.extract_min(); // get the lowest-weightSum
-                if ( ! upspt.visit(up_su))
-                	continue;
+//                if ( ! upspt.visit(up_su))
+//                	continue;
                 
                 if (up_su.exceedsWeightLimit(bestMeetingCost)) {
                     if (VERBOSE)
@@ -727,26 +719,17 @@ public class ContractionHierarchy implements Serializable {
                     continue;
                 }
 
-                Vertex gu = core.getVertex(u);
-                if (VERBOSE)
-                	_log.debug("    up main graph vertex {}", gu);
-                if (opt.isArriveBy() && gu != null) {
+                Collection<Edge> outgoing = core.getOutgoing(u);
+                if (opt.isArriveBy() && !outgoing.isEmpty()) {
                     // up path can only explore until core vertices on reverse paths
                     continue;
                 }
 
-                Collection<Edge> outgoing = null;
-                if (gu != null) {
-                    outgoing = gu.getOutgoing();
-                }
-                gu = up.getVertex(u);
-                if (VERBOSE)
-                	_log.debug("    up overlay graph vertex {}", gu);
-                if (gu != null) {
-                    if (outgoing == null) {
-                        outgoing = gu.getOutgoing();
+                Collection<Edge> upOutgoing = updown.getOutgoing(u);
+                if (!upOutgoing.isEmpty()) {
+                    if (outgoing.isEmpty()) {
+                        outgoing = upOutgoing;
                     } else {
-                        Collection<Edge> upOutgoing = gu.getOutgoing();
                         ArrayList<Edge> newOutgoing = new ArrayList<Edge>(outgoing.size()
                                 + upOutgoing.size());
                         newOutgoing.addAll(outgoing);
@@ -757,8 +740,7 @@ public class ContractionHierarchy implements Serializable {
                 
                 if (extraEdges.containsKey(u)) {
                     List<Edge> newOutgoing = new ArrayList<Edge>();
-                    if (outgoing != null)
-                            newOutgoing.addAll(outgoing);
+                    newOutgoing.addAll(outgoing);
                     newOutgoing.addAll(extraEdges.get(u));
                     outgoing = newOutgoing;
                 }
@@ -792,17 +774,14 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
                     if (upspt.add(up_sv)) {
-                    	double weightEstimate = up_sv.getWeight();
-                    	if ( ! opt.isArriveBy())
-                    		weightEstimate += h.computeForwardWeight(up_sv, target);
-                    	if (weightEstimate < bestMeetingCost)
-                    		upqueue.insert(up_sv, weightEstimate);
+                    	double weight = up_sv.getWeight();
+                    	if (weight < bestMeetingCost)
+                    		upqueue.insert(up_sv, weight);
                     }
                 }
             }
-            /*
-             * one step on the down tree
-             */
+            
+            /* one step on the down tree */
             if (!done_down) {
                 if (downqueue.empty()) {
                     done_down = true;
@@ -833,34 +812,29 @@ public class ContractionHierarchy implements Serializable {
                 }
 
                 downclosed.add(down_u);
-                Vertex maingu = graph.getVertex(down_u);
-                if (!opt.isArriveBy() && maingu != null) {
+                
+                Collection<Edge> incoming = core.getIncoming(down_u);
+                if (!opt.isArriveBy() && !incoming.isEmpty()) {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
-                Vertex downgu = down.getVertex(down_u);
-                Collection<Edge> incoming = null; 
-                if (downgu != null) { 
-                    incoming = downgu.getIncoming();
-                }
-                if (maingu != null) {
-                    if (incoming == null) {
-                        incoming = maingu.getIncoming();
+
+                Collection<Edge> downIncoming = updown.getIncoming(down_u); 
+                if (!downIncoming.isEmpty()) {
+                    if (incoming.isEmpty()) {
+                        incoming = downIncoming;
                     } else {
-                        Collection<Edge> mainIncoming = maingu.getIncoming();
                         ArrayList<Edge> newIncoming = new ArrayList<Edge>(incoming.size()
-                                + mainIncoming.size());
+                                + downIncoming.size());
                         newIncoming.addAll(incoming);
-                        newIncoming.addAll(mainIncoming);
+                        newIncoming.addAll(downIncoming);
                         incoming = newIncoming;
                     }
                 }
 
                 if (extraEdges.containsKey(down_u)) {
                     List<Edge> newIncoming = new ArrayList<Edge>();
-                    if (incoming != null)
-                    	newIncoming.addAll(incoming);
-
+                    newIncoming.addAll(incoming);
                     newIncoming.addAll(extraEdges.get(down_u));
                     incoming = newIncoming;
                 }
@@ -901,11 +875,9 @@ public class ContractionHierarchy implements Serializable {
                         continue;
                     }
                     if (downspt.add(down_sv)) {
-                    	double weightEstimate = down_sv.getWeight();
-                    	if (opt.isArriveBy())
-                    		weightEstimate += h.computeReverseWeight(down_sv, origin);
-                    	if (weightEstimate < bestMeetingCost)
-                    		downqueue.insert(down_sv, weightEstimate);
+                    	double weight = down_sv.getWeight();
+                    	if (weight < bestMeetingCost)
+                    		downqueue.insert(down_sv, weight);
                     }
                 }
             }
