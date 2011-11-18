@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -190,6 +192,14 @@ public class OverlayGraph implements Serializable {
 
     public boolean containsVertex(Vertex vertex) {
         return outgoing.containsKey(vertex) || incoming.containsKey(vertex);
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        for (List<Edge> le : outgoing.values())
+            ((ArrayList<Edge>)le).trimToSize();
+        for (List<Edge> le : incoming.values())
+            ((ArrayList<Edge>)le).trimToSize();
+        out.defaultWriteObject();
     }
 
 }
