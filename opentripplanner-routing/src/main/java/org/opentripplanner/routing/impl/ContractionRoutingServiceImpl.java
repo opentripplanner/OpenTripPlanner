@@ -73,6 +73,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         	tries += 1;
         	LOG.debug("try number {} ; max walk distance = {}", tries, options.getMaxWalkDistance());
         	if (hierarchy == null) {
+        	        LOG.debug("No contraction hierarchies for this mode, falling back on A*.");
 
         		GenericAStar aStar = getAStarInstance(options);
 
@@ -91,6 +92,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         		    return paths;
         		}
         	}
+                LOG.debug("Contraction hierarchies exist for this mode, using them.");
 
         	Vertex fromVertex = options.isArriveBy() ? target : origin.getVertex();
         	Vertex toVertex = options.isArriveBy() ? origin.getVertex() : target;
