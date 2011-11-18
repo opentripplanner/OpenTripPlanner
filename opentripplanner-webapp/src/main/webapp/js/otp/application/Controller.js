@@ -31,9 +31,7 @@ otp.application.Controller = {
     /** */
     initialize : function(config)
     {
-        this.config = config;
-        if(this.config == null || this.config.map == null)
-            this.config = otp.config;
+        this.config = otp.util.ObjUtils.getConfig(config);
 
         // set defaults on the config.map if things don't already exist
         otp.inherit(this.config.map, {
@@ -50,14 +48,8 @@ otp.application.Controller = {
         this.map  = new otp.core.Map(this.config.map);
         this.ui   = new otp.core.UI({map:this.map, locale:this.config.locale});
 
-        // create logo image, using a custom logo if specified
-        var customLogo = this.config.logo;
-        var logoPath = (typeof customLogo === 'string') ? customLogo : 'images/ui/logoSmall.png';
-        var logoAnchorWrapper = Ext.get('logo').query('a')[0];
-        Ext.DomHelper.append(logoAnchorWrapper, {tag: 'img',
-                                                 alt: "OpenTripPlanner home",
-                                                 src: logoPath
-                                                });
+        // do things like localize HTML strings, and custom icons, etc...
+        otp.util.HtmlUtils.fixHtml(this.config);
 
         // initialize utilities
         otp.util.imagePathManager.addCustomAgencies(this.config.useCustomIconsForAgencies);

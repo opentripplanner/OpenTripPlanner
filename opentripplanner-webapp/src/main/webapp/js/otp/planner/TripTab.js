@@ -36,7 +36,6 @@ otp.planner.TripTab = {
     topoRenderer  : null,
     xml           : null,
     request       : null,
-    printUrl      : '/printTrip.html',
 
     id            : 0,
 
@@ -141,8 +140,8 @@ otp.planner.TripTab = {
                     text:    this.locale.buttons.print,
                     iconCls: 'print-button',
                     tooltip: this.locale.buttons.printTip,
-                    scope:   this,
-                    handler: this.printCB
+                    scope:   this.planner,
+                    handler: this.planner.printCB
                 });
                 buttons.push(p);
             }
@@ -228,34 +227,6 @@ otp.planner.TripTab = {
 
         // make and show the link dialog
         this.linkDialog = otp.util.ExtUtils.makePopup({'html':html}, this.locale.buttons.link, true, 300, win_y, true, 100, 200);
-    },
-
-    /** */
-    printCB : function(b, e)
-    {
-        otp.planner.PrintStatic.map         = this.planner.map;
-        otp.planner.PrintStatic.options     = this.planner.map.options;
-        otp.planner.PrintStatic.current_map = this.planner.map.getMap();
-        otp.planner.PrintStatic.itinerary   = this.m_activeItinerary;
-        otp.planner.PrintStatic.tripTab     = this;
-
-        console.log("TripTab.print: clone request object");
-        var req    = otp.clone(this.request);
-        req.url    = this.printUrl;
-
-        // get the itin
-        if(this.m_activeItinerary && this.m_activeItinerary.id)
-            req.itinID = this.m_activeItinerary.id;
-
-        var url    = this.templates.tripPrintTemplate.apply(req);
-        console.log("TripTab.print: url " + req.url);
-
-        console.log("TripTab.print: open window");
-        otp.planner.PrintTripWin = window.open(url,'WORKING','width=800,height=600,resizable=1,scrollbars=1,left=100,top=100,screenX=100,screenY=100');
-        console.log("TripTab.print: window focus");
-        otp.planner.PrintTripWin.focus();
-
-        otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_PRINT);
     },
 
     /** */

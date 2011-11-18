@@ -306,7 +306,7 @@ otp.configure = function(destination, source, getAll) {
  */
 otp.clone = function(obj, dest)
 {
-    if(obj == null || typeof(obj) != 'object')
+    if(obj == null || typeof(obj) != 'object' || obj.contentType == "application/xml") 
         return obj;
     
     var copied = dest || {};

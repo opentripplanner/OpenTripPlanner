@@ -34,6 +34,7 @@ otp.planner.Planner = {
 
     // configuration
     url                     : null,
+    printUrl                : '/printTrip.html',
     poi                     : null,
     fromToOverride          : null,
     linkTemplates           : null,
@@ -110,9 +111,8 @@ otp.planner.Planner = {
         var thisObj = this;
         this.m_forms.submitSuccess = function(){ thisObj.formSuccessCB(); };
         this.m_forms.submitFailure = function(){ thisObj.formFailureCB(); };
-
         m = this.map.getMap();
-        m.events.register('click', m, function (e) {
+            m.events.register('click', m, function (e) {
         });
     },
 
@@ -214,13 +214,28 @@ otp.planner.Planner = {
         return retVal;
     },
 
-    /** */
-    getActiveItinerary : function() {
+    /** active itinerary from TripTab object, or null if Form tab */
+    getActiveItinerary : function()
+    {
         var retVal = null;
 
         var tt = this.m_tabs[this.m_activeTabID];
         if (tt) {
             retVal = tt.getActiveItinerary();
+        }
+
+        return retVal;
+    },
+
+
+    /** return either empty obj or request object */
+    getActiveRequest : function()
+    {
+        var retVal = {};
+
+        var tt = this.m_tabs[this.m_activeTabID];
+        if(tt && tt.request) {
+            retVal = tt.request;
         }
 
         return retVal;
@@ -293,6 +308,23 @@ otp.planner.Planner = {
         return true;
     },
 
+    /** */
+    printCB : function(button, event)
+    {
+        otp.planner.PrintStatic.itinerary   = this.getActiveItinerary();
+        otp.planner.PrintStatic.map         = this.map;
+        otp.planner.PrintStatic.options     = this.map.options;
+        otp.planner.PrintStatic.current_map = this.map.getMap();
+
+        console.log("Planner.print: clone trip request object");
+        var req    = otp.clone(this.getActiveRequest());
+        req.url    = this.printUrl;
+
+        console.log("Planner.print: url " + req.url);
+        var url    = this.templates.tripPrintTemplate.apply(req);
+        otp.planner.PrintStatic.print(url);
+    },
+
     /**
      *  changing tabs (both forms / trip plans) triggers events to clear the map, etc...   
      */
@@ -310,7 +342,7 @@ otp.planner.Planner = {
         // draw the new tab, if applicable
         if (newTab != null) {
             this.m_activeTabID = activeTab.id;
-            newTab.draw();            
+            newTab.draw();
         } else {
             this.m_activeTabID = 0;
             this.controller.deactivate(this.CLASS_NAME);
@@ -322,7 +354,6 @@ otp.planner.Planner = {
             this.ui.innerSouth.hide();
             this.ui.viewport.doLayout();
         }
-        
     },
 
 

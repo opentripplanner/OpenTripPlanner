@@ -8,12 +8,15 @@
     <meta name="keywords" content="interactive map, map, trip planner, bus, rail, transit, max, tripplanner, plan, trip, plans, itinerary, schedule planner, planning, planner, scheduler, assistant, wizard, travel, schedule, guide, map, route, times, plan a trip" />
     <meta content="tripplanner v0.5 - November 2011 (FXP)"/>
 
-    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/ext-all-notheme.css" />
-    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/xtheme-transit-extend.css" />
-    <link rel="stylesheet" type="text/css" href="js/lib/openlayers/theme/default/style.css" />
-    <link rel="stylesheet" type="text/css" href="js/lib/geoext/css/geoext-all.css" />
     <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
     <link rel="stylesheet" type="text/css" href="planner.css" />
+    <style type="text/css" >
+        #print-screen-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+        }
+    </style>
 
     <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
     <script src="js/lib-min.js"></script>
@@ -24,10 +27,13 @@
 <body>
     <div class="logo" id="logo"> 
         <a href="http://opentripplanner.org" title="OpenTripPlanner Home"></a>
+        <div id="print-screen-button"><input name="print" type="button" value="Print" onClick="javascript:window.print();" class="noprint"></input></div>
     </div>
+
     <div id="map-print" style="width: 800px; height: 400px"></div>
     <div id="tripLeg"   style="width: 800px"></div>
 
+    <!-- TODO: have a localized string replacment that gets activated by the constructor for html elements ... title, print button, etc...  ALSO configed logo replacement --> 
     <script>otp.util.AnalyticsUtils.importGoogleAnalytics();</script>
     <script type="text/javascript">
     Ext.onReady(function()

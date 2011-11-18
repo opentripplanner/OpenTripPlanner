@@ -25,21 +25,35 @@ otp.planner.PrintStatic = {
     options     : null,
     current_map : null,
     itinerary   : null,
-    tripTab     : null,
+    planner     : null,
  
     // created  
     config      : null,
     params      : null,
     print_map   : null,
+    dialog      : null,
 
-    /** */
+    /** CONTROLLER for print dialog */
     initialize : function(config)
     {
         otp.configure(this, config);
         otp.configure(this, window.opener.otp.planner.PrintStatic);
+        this.config = otp.util.ObjUtils.getConfig(config);
+
+        // do things like localize HTML strings, and custom icons, etc...
+        otp.util.HtmlUtils.fixHtml(this.config);
 
         this._makeMap();
         this._renderTrip();
+    },
+
+    /** static method to open printing dialog */
+    print : function(url)
+    {
+        console.log("Print.print: open window & bring it to the front");
+        otp.planner.PrintStatic.dialog = window.open(url,'WORKING','width=820,height=600,resizable=1,scrollbars=1,left=100,top=100,screenX=100,screenY=100');
+        otp.planner.PrintStatic.dialog.focus();
+        otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_PRINT);
     },
 
 
@@ -65,8 +79,8 @@ otp.planner.PrintStatic = {
         // debug (mouse control) when on localhost
         if(otp.isLocalHost())
         {
-            var n = new OpenLayers.Control.Navigation({zoomWheelEnabled:true, handleRightClicks:true});
-            this.print_map.addControl(n);
+//            var n = new OpenLayers.Control.Navigation({zoomWheelEnabled:true, handleRightClicks:true});
+//            this.print_map.addControl(n);
         }
 
         // NOTE: have to add all markers in a separate new layer (as opposed to vector layers, which are added directly)
