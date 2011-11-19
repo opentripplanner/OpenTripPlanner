@@ -22,10 +22,12 @@ otp.planner.PrintStatic = {
 
     // passed
     map         : null,
+    locale      : null,
     options     : null,
     current_map : null,
     itinerary   : null,
     planner     : null,
+    url         : 'print.html',
  
     // created  
     config      : null,
@@ -43,45 +45,39 @@ otp.planner.PrintStatic = {
         // do things like localize HTML strings, and custom icons, etc...
         otp.util.HtmlUtils.fixHtml(this.config);
 
-        this._makeMap();
-        this._renderTrip();
+        this.renderMap();
+        this.writeItinerary();
     },
 
     /** static method to open printing dialog */
     print : function(url)
     {
         console.log("Print.print: open window & bring it to the front");
-        otp.planner.PrintStatic.dialog = window.open(url,'WORKING','width=820,height=600,resizable=1,scrollbars=1,left=100,top=100,screenX=100,screenY=100');
+        otp.planner.PrintStatic.dialog = window.open(url,'WORKING','width=850,height=630,resizable=1,scrollbars=1,left=100,top=100,screenX=100,screenY=100');
         otp.planner.PrintStatic.dialog.focus();
         otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_PRINT);
-    },
-
-
-    /** render trip on map */
-    _renderTrip : function()
-    {
-        if(this.itinerary != null)
-        {
-            this.drawItineraryIntoPrintMap(this.itinerary, this.print_map);
-        }
     },
 
    /**
     * will call map & trip planner form routines in order to populate based on URL params
     */
-    _makeMap : function()
+    renderMap : function()
     {
-        // step 1: make a new print map
-        var options = {div:'map-print', controls:[]}; 
-        otp.extend(options, this.options);
-        this.print_map = new OpenLayers.Map(options);
+        var controls = [];
 
-        // debug (mouse control) when on localhost
+        // step 0: debug (mouse control) when on localhost
         if(otp.isLocalHost())
         {
-//            var n = new OpenLayers.Control.Navigation({zoomWheelEnabled:true, handleRightClicks:true});
-//            this.print_map.addControl(n);
+            var n = new OpenLayers.Control.Navigation({zoomWheelEnabled:true, handleRightClicks:true});
+            controls.push(n);
         }
+
+        // step 1: make a new print map
+        var options = {}; 
+        otp.extend(options, this.options);
+        options.div='map-print';
+        options.controls=controls;
+        this.print_map = new OpenLayers.Map(options);
 
         // NOTE: have to add all markers in a separate new layer (as opposed to vector layers, which are added directly)
         var markers = new OpenLayers.Layer.Markers( "print-markers" );
@@ -111,7 +107,177 @@ otp.planner.PrintStatic = {
                 console.log("Print._makeMap Layer: " + lyr.name +  "  " + lyr.visibility + " " + lyr.getZIndex()); 
             }
         }
+
+        // step 3: zoom to our map location
+        this.print_map.zoomToExtent(this.current_map.getExtent());
     },
+
+    /**  */
+    writeItinerary : function()
+    {
+        // TODO:  refactor this to use same code as in Itinerary.js makeTreeNodes() -- line 600 
+        
+        
+        var itin = this.itinerary;
+        var map  = this.print_map;
+
+        var tpl = new otp.planner.Templates(this);
+        var fromTXT    = this.getFromTXT(tpl, itin.from.data);
+        var toTXT      = this.getToTXT(tpl, itin.to.data);
+
+        var containsBikeMode    = false;
+        var containsCarMode     = false;
+        var containsTransitMode = false;
+
+        var headerDIV  = Ext.get("header");
+        var detailsDIV = Ext.get("details");
+        var legsDIV    = Ext.get("legs");
+        headerDIV.update(fromTXT + toTXT);
+
+        var reportText = fromTXT;
+        for(var i = 0; i < itin.m_legStore.getCount(); i++)
+        {
+            var leg = itin.m_legStore.getAt(i);
+            leg.data.showStopIds = this.showStopIds;
+
+            var text;
+            var hasKids = true;
+            var sched = null;
+
+            var routeName = leg.get('routeName');
+            var agencyId = leg.get('agencyId');
+            var mode = this.getMode(leg);
+
+            if(mode === 'walk' || mode === 'bicycle')
+            {
+                var verb = (mode === 'bicycle') ? 'Bike' : 'Walk';
+                hasKids = false;
+
+                var steps = leg.data.steps;
+                var stepText = "";
+                var noStepsYet = true;
+
+                for (var j = 0; j < steps.length; j++)
+                {
+                    step = steps[j];
+                    if (step.streetName == "street transit link")
+                    {
+                        // TODO: Include explicit instruction about entering/exiting transit station or stop?
+                        continue;
+                    }
+                    stepText = "<li>";
+                    var relativeDirection = step.relativeDirection;
+                    if (relativeDirection == null || noStepsYet == true)
+                    {
+                        stepText += itin.locale.directions[verb] + ' ' + itin.locale.directions['to'] 
+                                     + ' <strong>' + itin.locale.directions[step.absoluteDirection.toLowerCase()] 
+                                     + '</strong> ' + itin.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
+                        noStepsYet = false;
+                    }
+                    else
+                    {
+                        relativeDirection = relativeDirection.toLowerCase();
+                        var directionText = itin.locale.directions[relativeDirection];
+                        directionText = directionText.substr(0,1).toUpperCase() + directionText.substr(1);
+                        if (relativeDirection == "continue")
+                        {
+                            stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
+                        }
+                        else if (step.stayOn == true)
+                        {
+                            stepText += directionText + " " + itin.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
+                        }
+                        else if (step.becomes == true)
+                        {
+                            stepText += directionText + ' <strong>' + steps[j-1].streetName + '</strong> ' +  itin.locale.directions['becomes'] + ' <strong>' + step.streetName + '</strong>';
+                        }
+                        else
+                        {
+                            stepText += directionText + " " + itin.locale.directions['at'] + ' <strong>' + step.streetName + '</strong>';
+                        }
+                    }
+                    stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
+                } // for
+
+                if (leg.data.toDescription == '')
+                    leg.data.toDescription = null;
+
+                // TODO: refactor see Itinerary.js line 600
+                if(mode === 'bicycle') 
+                    containsBikeMode = true;
+
+                var template = mode === 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
+                text = tpl[template].applyTemplate(leg.data);
+            }
+            else
+            {
+                var order = leg.get('order');
+                if (order == 'thru-route')
+                {
+                    text = tpl.getInterlineLeg().applyTemplate(leg.data);
+                }
+                else 
+                {
+                    leg.data.mode = OpenLayers.Lang.translate(leg.data.mode);
+                    text = tpl.getTransitLeg().applyTemplate(leg.data);
+                }
+            }
+            icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
+            reportText = reportText + '<img src="' + icon + '"/> ' + text;
+        }
+
+        // step 3: build details node's content
+        var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
+        if(containsBikeMode)
+            tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
+        else if(containsCarMode) 
+            tripDetailsDistanceVerb = this.locale.instructions.car_verb;
+        var tripDetailsData = Ext.apply({}, itin.xml.data, {distanceVerb: tripDetailsDistanceVerb});
+        var detailsTXT = tpl.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
+        detailsDIV.update(detailsTXT);
+
+        // TODO Itin note  Itinerary.js line 683
+
+        reportText = reportText + toTXT;
+        legsDIV.update(reportText);
+    },
+
+    getFromTXT : function(tpl, data)
+    {
+        var img = '<img class="start-icon" unselectable="on" src="images/ui/s.gif"/>'
+        var txt = tpl.TP_START.applyTemplate(data);
+        return img + txt;
+    },
+
+    getToTXT : function(tpl, data)
+    {
+        var img = '<img class="end-icon" unselectable="on" src="images/ui/s.gif"/>'
+        var txt = tpl.TP_END.applyTemplate(data);
+        return img + txt;
+    },
+
+    /** return mode string */
+    getMode : function(leg)
+    {
+        return leg.get('mode').toLowerCase();
+    },
+
+    /** 1/2 thought out show/hide link */
+    makeLink : function(linkDiv, xx)
+    {
+        var linkOpts    = Ext.get("link-options");
+        var linkOptions = '<span class="span_hide_options" id="linklogo" onclick="showHideMap(\'logo\')">' + loc.buttons.hideBanner + '</span>'
+                        + '<div style="clear:both"></div>';
+        linkOpts.update(linkOptions);
+    },
+
+    CLASS_NAME : "otp.planner.Print"
+};
+
+otp.planner.Print = new otp.Class(otp.planner.PrintStatic);
+
+
+/** 
 
     drawItineraryIntoPrintMap : function(itin, map)
     {
@@ -137,19 +303,6 @@ otp.planner.PrintStatic = {
         this.m_itinerary=itin;
         this.m_vectorLayer.features=itin.m_vectors;
         this.m_markerLayer.features=itin.m_markers;
-        map.zoomToExtent(itin.map.getMap().getExtent())
     },
 
-    /** 1/2 thought out show/hide link */
-    makeLink : function(linkDiv, xx)
-    {
-        var linkOpts    = Ext.get("link-options");
-        var linkOptions = '<span class="span_hide_options" id="linklogo" onclick="showHideMap(\'logo\')">' + loc.buttons.hideBanner + '</span>'
-                        + '<div style="clear:both"></div>';
-        linkOpts.update(linkOptions);
-    },
-
-    CLASS_NAME : "otp.planner.Print"
-};
-
-otp.planner.Print = new otp.Class(otp.planner.PrintStatic);
+ */

@@ -339,7 +339,7 @@ otp.util.OpenLayersUtils = {
     getMarkerStyle: function() {
         var template = {
             externalGraphic: "${getExternalGraphic}",
-            graphicOpacity: 0.92
+            graphicOpacity: 1
         };
         var graphicMapping = this.markerGraphicMapping;
         var olutils = this;

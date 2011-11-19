@@ -34,7 +34,6 @@ otp.planner.Planner = {
 
     // configuration
     url                     : null,
-    printUrl                : '/printTrip.html',
     poi                     : null,
     fromToOverride          : null,
     linkTemplates           : null,
@@ -314,11 +313,12 @@ otp.planner.Planner = {
         otp.planner.PrintStatic.itinerary   = this.getActiveItinerary();
         otp.planner.PrintStatic.map         = this.map;
         otp.planner.PrintStatic.options     = this.map.options;
+        otp.planner.PrintStatic.locale      = this.locale;
         otp.planner.PrintStatic.current_map = this.map.getMap();
 
         console.log("Planner.print: clone trip request object");
         var req    = otp.clone(this.getActiveRequest());
-        req.url    = this.printUrl;
+        req.url    = otp.planner.PrintStatic.url;
 
         console.log("Planner.print: url " + req.url);
         var url    = this.templates.tripPrintTemplate.apply(req);

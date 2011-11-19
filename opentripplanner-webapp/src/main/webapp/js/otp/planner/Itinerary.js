@@ -138,7 +138,6 @@ otp.planner.Itinerary = {
         }
 
         vLayer.addFeatures(this.m_vectors);
-
         mLayer.addFeatures(this.m_markers);
         this.m_extent = mLayer.getDataExtent();
         this.m_extent.extend(vLayer.getDataExtent());
@@ -591,7 +590,7 @@ otp.planner.Itinerary = {
         var fmId  = this.id + '-' + otp.planner.Utils.FROM_ID;
         var toId  = this.id + '-' + otp.planner.Utils.TO_ID;
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
-        
+
         var containsBikeMode    = false;
         var containsCarMode     = false;
         var containsTransitMode = false;
@@ -671,7 +670,7 @@ otp.planner.Itinerary = {
             retVal.push(node);
         }
 
-        // step 3: build details node's content 
+        // step 3: build details node's content
         var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
         if(containsBikeMode)
             tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
