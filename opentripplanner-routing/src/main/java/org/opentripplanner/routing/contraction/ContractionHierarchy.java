@@ -66,10 +66,10 @@ import org.slf4j.LoggerFactory;
 public class ContractionHierarchy implements Serializable {
 
     /* contraction parameters */
-    private static final int HOP_LIMIT_SIMULATE = 10;
-    private static final int HOP_LIMIT_CONTRACT = Integer.MAX_VALUE;
+    private static final int HOP_LIMIT_SIMULATE = 5; //10;
+    private static final int HOP_LIMIT_CONTRACT = 5; //Integer.MAX_VALUE;
     private static final int NODE_LIMIT_SIMULATE = 500;
-    private static final int NODE_LIMIT_CONTRACT = Integer.MAX_VALUE;
+    private static final int NODE_LIMIT_CONTRACT = 500; //Integer.MAX_VALUE;
 
     private static final Logger _log = LoggerFactory.getLogger(ContractionHierarchy.class);
 
@@ -105,7 +105,7 @@ public class ContractionHierarchy implements Serializable {
         int searchSpace = 0;
         
         ArrayList<State> vs = new ArrayList<State>();
-        for (Edge e : u.getIncoming()) {
+        for (Edge e : core.getIncoming(u)) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -120,9 +120,8 @@ public class ContractionHierarchy implements Serializable {
         su = new State(u, fwdOptions); // search forward
         double maxWWeight = 0;
 
-        HashSet<Vertex> wvSet = new HashSet<Vertex>();
         ArrayList<State> ws = new ArrayList<State>();
-        for (DirectEdge e : filter(u.getOutgoing(), DirectEdge.class)) {
+        for (DirectEdge e : filter(core.getOutgoing(u), DirectEdge.class)) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -130,7 +129,6 @@ public class ContractionHierarchy implements Serializable {
             if (sw == null) {
                 continue;
             }
-            wvSet.add(sw.getVertex());
             ws.add(sw);
             if (sw.exceedsWeightLimit(maxWWeight)) {
                 maxWWeight = sw.getWeight();
@@ -152,7 +150,7 @@ public class ContractionHierarchy implements Serializable {
             //efficiency (+ 1)
             double weightLimit = v.getWeight() + maxWWeight + 1;
             WitnessSearch task = new WitnessSearch(u, hopLimit, nodeLimit, 
-                    weightLimit, wvSet, ws, v);
+                    weightLimit, ws, v);
             tasks.add(task);
         }
         if (threadPool == null) {
@@ -167,7 +165,7 @@ public class ContractionHierarchy implements Serializable {
                     ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
                     // starting from each v
                     State sv0 = new State(wsresult.vertex, fwdOptions);
-                    for (DirectEdge e : filter(wsresult.vertex.getOutgoing(), DirectEdge.class)) {
+                    for (DirectEdge e : filter(core.getOutgoing(wsresult.vertex), DirectEdge.class)) {
                         State sSpt = spt.getState(e.getToVertex());
                         if (sSpt == null) {
                             continue;
@@ -206,37 +204,30 @@ public class ContractionHierarchy implements Serializable {
     	private Vertex u;
         private double weightLimit;
         private int hopLimit;
-        private HashSet<Vertex> wvSet;
         private List<State> ws;
         private State v;
         private int nodeLimit;
 
         public WitnessSearch(Vertex u, int hopLimit, int nodeLimit,
-                double weightLimit, HashSet<Vertex> wSet, 
-                List<State> ws, State v) {
+                double weightLimit, List<State> ws, State v) {
             this.u = u;
             this.hopLimit = hopLimit;
             this.nodeLimit = nodeLimit;
             this.weightLimit = weightLimit;
-            this.wvSet = wSet;
             this.ws = ws;
             this.v = v;
         }
 
         public WitnessSearchResult call() {
-            return searchWitnesses(u, hopLimit, nodeLimit, weightLimit, wvSet,
-                    ws, v);
+            return searchWitnesses(u, hopLimit, nodeLimit, weightLimit, ws, v);
         }
     }
 
     private WitnessSearchResult searchWitnesses(Vertex u, int hopLimit, 
-    		int nodeLimit, double weightLimit, HashSet<Vertex> wvSet, 
-    		List<State> ws, State v) {
+    		int nodeLimit, double weightLimit, List<State> ws, State v) {
 
     	Dijkstra dijkstra = new Dijkstra(core, v.getVertex(), fwdOptions, u, hopLimit);
-    	// set is now cloned inside dijkstra, since it is used destructively (AMB)
-    	// could just be derived from ws
-        dijkstra.setTargets(wvSet); 
+        dijkstra.setTargets(ws); 
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(weightLimit, nodeLimit);
 
         ArrayList<Shortcut> shortcuts = new ArrayList<Shortcut>();
@@ -281,8 +272,8 @@ public class ContractionHierarchy implements Serializable {
      */
     private int getImportance(Vertex v, WitnessSearchResult shortcutsAndSearchSpace,
             int deletedNeighbors) {
-        int degree_in = v.getDegreeIn();
-        int degree_out = v.getDegreeOut();
+        int degree_in = core.getDegreeIn(v);
+        int degree_out = core.getDegreeOut(v);
         int edge_difference = shortcutsAndSearchSpace.shortcuts.size() - (degree_in + degree_out);
         int searchSpace = shortcutsAndSearchSpace.searchSpace;
 
@@ -303,15 +294,18 @@ public class ContractionHierarchy implements Serializable {
         for (Vertex v : vertices) {
         	if (++i % 100000 == 0)
         		_log.debug("    vertex {}", i);
-        	
+                //System.out.print(" vertex " + v);
             if (!isContractable(v)) {
+                //System.out.println(" not contractable");
                 continue;
             }
-            if (v.getDegreeIn() > 7 || v.getDegreeOut() > 7) {
+            if (og.getDegreeIn(v) > 7 || og.getDegreeOut(v) > 7) {
+                //System.out.println(" degree too high");
                 continue;
             }
             WitnessSearchResult shortcuts = getShortcuts(v, true);
             int imp = getImportance(v, shortcuts, 0);
+            //System.out.println(" contractable " + imp);
             pq.insert(v, imp);
         }
         return pq;
@@ -325,7 +319,7 @@ public class ContractionHierarchy implements Serializable {
      */
     private boolean isContractable(Vertex v) {
         if (v instanceof StreetVertex || v instanceof EndpointVertex) {
-            for (Edge e : v.getOutgoing()) {
+            for (Edge e : core.getOutgoing(v)) {
                 if( ! (e instanceof DirectEdge))
                     return false;
                 DirectEdge de = (DirectEdge) e;
@@ -397,9 +391,9 @@ public class ContractionHierarchy implements Serializable {
 
         while (!pq.empty()) {
             // stop contracting once a core is reached
-//            if (i > Math.ceil(totalContractableVertices * contractionFactor)) {
-//                break;
-//            }
+            if (i > Math.ceil(totalContractableVertices * contractionFactor)) {
+                break;
+            }
             i += 1;
 
 /*         "Keeping the cost of contraction up-to-date in the priority queue is quite costly. The contraction of a 
@@ -606,10 +600,10 @@ public class ContractionHierarchy implements Serializable {
         return removed;
     }
 
-    private int countContractableEdges(OverlayGraph graph2) {
+    private int countContractableEdges(OverlayGraph og) {
         int total = 0;
-        for (Vertex gv : graph2.getVertices()) {
-        	for (Edge e : gv.getOutgoing())
+        for (Vertex v : og.getVertices()) {
+        	for (Edge e : og.getOutgoing(v))
         		if (isContractable(e))
         			total++;
                         // don't count all edges, just contractable ones
@@ -724,9 +718,13 @@ public class ContractionHierarchy implements Serializable {
                     // up path can only explore until core vertices on reverse paths
                     continue;
                 }
+                if (VERBOSE)
+                    _log.debug("        {} edges in core", outgoing.size());
 
                 Collection<Edge> upOutgoing = updown.getOutgoing(u);
                 if (!upOutgoing.isEmpty()) {
+                    if (VERBOSE)
+                        _log.debug("        {} edges in overlay", upOutgoing.size());
                     if (outgoing.isEmpty()) {
                         outgoing = upOutgoing;
                     } else {
@@ -740,8 +738,10 @@ public class ContractionHierarchy implements Serializable {
                 
                 if (extraEdges.containsKey(u)) {
                     List<Edge> newOutgoing = new ArrayList<Edge>();
-                    newOutgoing.addAll(outgoing);
                     newOutgoing.addAll(extraEdges.get(u));
+                    if (VERBOSE)
+                        _log.debug("        {} edges in extra", newOutgoing.size());
+                    newOutgoing.addAll(outgoing);
                     outgoing = newOutgoing;
                 }
 
@@ -818,6 +818,8 @@ public class ContractionHierarchy implements Serializable {
                     // down path can only explore until core vertices on forward paths
                     continue;
                 }
+                if (VERBOSE)
+                    _log.debug("        {} edges in core", incoming.size());
 
                 Collection<Edge> downIncoming = updown.getIncoming(down_u); 
                 if (!downIncoming.isEmpty()) {
@@ -831,6 +833,8 @@ public class ContractionHierarchy implements Serializable {
                         incoming = newIncoming;
                     }
                 }
+                if (VERBOSE)
+                    _log.debug("        {} edges with overlay", incoming.size());
 
                 if (extraEdges.containsKey(down_u)) {
                     List<Edge> newIncoming = new ArrayList<Edge>();
@@ -838,6 +842,8 @@ public class ContractionHierarchy implements Serializable {
                     newIncoming.addAll(extraEdges.get(down_u));
                     incoming = newIncoming;
                 }
+                if (VERBOSE)
+                    _log.debug("        {} edges with overlay and extra", incoming.size());
 
                 for (Edge edge : incoming) {
                     if (VERBOSE)

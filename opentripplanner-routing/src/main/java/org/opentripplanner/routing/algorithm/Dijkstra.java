@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Collection;
 import java.util.HashSet;
 
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
@@ -162,4 +163,12 @@ public class Dijkstra {
     public void setTargets(HashSet<Vertex> targets) {
         this.targets = targets;
     }
+    
+    public void setTargets(Collection<State> targets) {
+        this.targets = new HashSet<Vertex>(targets.size());
+        for (State s : targets) {
+            this.targets.add(s.getVertex());
+        }
+    }
+
 }
