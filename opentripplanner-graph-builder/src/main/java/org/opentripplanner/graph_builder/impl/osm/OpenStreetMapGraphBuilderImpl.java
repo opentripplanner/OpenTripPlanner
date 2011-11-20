@@ -404,9 +404,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
 
             /* Currently only type=route;route=road relations are handled */
-            if (!(relation.isTag("type", "restriction"))
-                    && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
-                    && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
+            if (   !(relation.isTag("type", "restriction" ))
+                && !(relation.isTag("type", "route"       ) && relation.isTag("route", "road"))
+                && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
                 return;
             }
 
@@ -419,6 +419,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         public void secondPhase() {
             int count = _ways.values().size();
+
+            // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
+            // the way purging keeps the needed way around.
+            // Multipolygons may be processed more than once, which may be needed since
+            // some member might be in different files for the same multipolygon.
+            processMultipolygons();
+
             for (Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext();) {
                 OSMWay way = it.next();
                 if (!(way.hasTag("highway") || way.isTag("railway", "platform"))) {
@@ -426,7 +433,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 } else if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed")) {
                     it.remove();
                 } else {
-                    // Since the way is kept, update nodes-with-neighbots
+                    // Since the way is kept, update nodes-with-neighbors
                     List<Long> nodes = way.getNodeRefs();
                     if (nodes.size() > 1) {
                         _nodesWithNeighbors.addAll(nodes);
@@ -438,7 +445,43 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Copies useful metadata from relations to the relavant ways/nodes.
+         * Copies useful metadata from multipolygon relations to the relevant ways.
+         *
+         * This is done at a different time than processRelations(), so that way purging doesn't
+         * remove the used ways.
+         */
+        private void processMultipolygons() {
+            for (OSMRelation relation : _relations.values()) {
+                if(!(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
+                    continue;
+                }
+
+                for (OSMRelationMember member : relation.getMembers()) {
+                    if (!("way".equals(member.getType()) && _ways.containsKey(member.getRef()))) {
+                        continue;
+                    }
+
+                    OSMWay way = _ways.get(member.getRef());
+                    if (way == null) {
+                        continue;
+                    }
+
+                    if (relation.hasTag("highway") && !way.hasTag("highway")) {
+                        way.addTag("highway", relation.getTag("highway"));
+                    }
+                    if (relation.hasTag("name") && !way.hasTag("name")) {
+                        way.addTag("name", relation.getTag("name"));
+                    }
+                    if (relation.hasTag("ref") && !way.hasTag("ref")) {
+                        way.addTag("ref", relation.getTag("ref"));
+                    }
+                }
+            }
+        }
+
+
+        /**
+         * Copies useful metadata from relations to the relevant ways/nodes.
          */
         private void processRelations() {
             _log.debug("Processing relations...");
@@ -446,9 +489,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (OSMRelation relation : _relations.values()) {
                 if (relation.isTag("type", "restriction")) {
                     processRestriction(relation);
-                } else {
+                } else if (relation.isTag("type", "route")) {
                     processRoad(relation);
                 }
+                // multipolygons were already processed in secondPhase()
             }
         }
 
@@ -535,35 +579,40 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         }
 
+        /**
+         * Handle route=road relations.
+         * 
+         * @param relation
+         */
         private void processRoad(OSMRelation relation) {
             for (OSMRelationMember member : relation.getMembers()) {
-                if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
-                    OSMWay way = _ways.get(member.getRef());
-                    if (way != null) {
-                        if (relation.hasTag("name")) {
-                            if (way.hasTag("otp:route_name")) {
-                                way.addTag(
-                                        "otp:route_name",
-                                        addUniqueName(way.getTag("otp:route_name"),
-                                                relation.getTag("name")));
-                            } else {
-                                way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
-                            }
-                        }
-                        if (relation.hasTag("ref")) {
-                            if (way.hasTag("otp:route_ref")) {
-                                way.addTag(
-                                        "otp:route_ref",
-                                        addUniqueName(way.getTag("otp:route_ref"),
-                                                relation.getTag("ref")));
-                            } else {
-                                way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
-                            }
-                        }
-                        if (relation.hasTag("highway") && relation.isTag("type", "multipolygon")
-                                && !way.hasTag("highway")) {
-                            way.addTag("highway", relation.getTag("highway"));
-                        }
+                if (!("way".equals(member.getType()) && _ways.containsKey(member.getRef()))) {
+                    continue;
+                }
+
+                OSMWay way = _ways.get(member.getRef());
+                if (way == null) {
+                    continue;
+                }
+
+                if (relation.hasTag("name")) {
+                    if (way.hasTag("otp:route_name")) {
+                        way.addTag(
+                                "otp:route_name",
+                                addUniqueName(way.getTag("otp:route_name"),
+                                        relation.getTag("name")));
+                    } else {
+                        way.addTag(new OSMTag("otp:route_name", relation.getTag("name")));
+                    }
+                }
+                if (relation.hasTag("ref")) {
+                    if (way.hasTag("otp:route_ref")) {
+                        way.addTag(
+                                "otp:route_ref",
+                                addUniqueName(way.getTag("otp:route_ref"),
+                                        relation.getTag("ref")));
+                    } else {
+                        way.addTag(new OSMTag("otp:route_ref", relation.getTag("ref")));
                     }
                 }
             }
