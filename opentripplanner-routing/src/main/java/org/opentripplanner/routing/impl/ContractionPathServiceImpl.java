@@ -426,7 +426,7 @@ public class ContractionPathServiceImpl implements PathService {
                 boolean found = false;
                 for (Edge out2 : graph.getOutgoing(tov)) {
                     State outState2 = out2.traverse(outState);
-                    if (!outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                    if (outState2 != null && !outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
                         //walking a bike, so, not really an exit
                         continue;
                     }
