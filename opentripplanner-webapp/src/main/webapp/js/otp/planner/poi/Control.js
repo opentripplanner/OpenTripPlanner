@@ -36,6 +36,7 @@ otp.planner.poi.Control = {
     m_fromTrip   : null,
     m_toTrip     : null,
     m_features   : [],
+    m_intermediates : [],
 
     initialize: function(config)
     {
@@ -161,18 +162,44 @@ otp.planner.poi.Control = {
         if(move) otp.util.OpenLayersUtils.setCenter(this.map, x, y);
         this.drag.activate();
     },
+    
+    addIntermediate: function(x, y, text, move) {
+        if(x == null || y == null) return;
+        var inter = this.makeFeature(x, y, {m_text:text}, otp.planner.poi.Style.intermediatePlace);
+        this.show();
+        if(move) otp.util.OpenLayersUtils.setCenter(this.map, x, y);
+        this.drag.activate();   
+        this.m_intermediates.push(inter);
+        return inter;
+    },
+    
+    removeIntermediate: function(inter) {
+        this._destroyFeature(inter);
+        for(var i=0; i < this.m_intermediates.length; i++) { 
+            if(this.m_intermediates[i]==inter) this.m_intermediates.splice(i,1); 
+        }
+    },
+    
+    removeAllIntermediates: function() {
+        for(var i=0; i < this.m_intermediates.length; i++) { 
+            this._destroyFeature(this.m_intermediates[i]); 
+        }
+        this.m_intermediates = new Array();
+    },
 
     /** */
     clearTrip : function()
     {
         this._destroyFeature(this.m_toTrip);
         this._destroyFeature(this.m_fromTrip);
+        this.removeAllIntermediates();
     },
 
     /** */
     clear : function()
     {
         this._destroyFeatures(this.m_features);
+        this.removeAllIntermediates();
         this.m_features = new Array();
         this.hide();
         this.drag.deactivate();

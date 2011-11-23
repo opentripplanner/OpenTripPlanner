@@ -21,36 +21,93 @@ import static org.junit.Assert.assertNull;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.io.File;
 import java.util.zip.GZIPInputStream;
 
 import org.junit.Test;
+
+import org.opentripplanner.graph_builder.impl.osm.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.graph_builder.impl.osm.StreamedFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.graph_builder.impl.osm.BinaryFileBasedOpenStreetMapProviderImpl;
+
+import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+
+import org.opentripplanner.graph_builder.model.osm.OSMMap;
 import org.opentripplanner.graph_builder.model.osm.OSMMap;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
 
 public class OpenStreetMapParserTest {
     @Test
-    public void testParser() throws Exception {
+    public void testAFBinaryParser() throws Exception {
+        AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.pbf").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testAFXMLParser() throws Exception {
+        AnyFileBasedOpenStreetMapProviderImpl pr = new AnyFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testBinaryParser() throws Exception {
+        BinaryFileBasedOpenStreetMapProviderImpl pr = new BinaryFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.pbf").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testXMLParser() throws Exception {
+        FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testStreamedXMLParser() throws Exception {
+        StreamedFileBasedOpenStreetMapProviderImpl pr = new StreamedFileBasedOpenStreetMapProviderImpl();
+        OSMMap map = new OSMMap();
+        pr.setPath(new File(getClass().getResource("map.osm.gz").getPath()));
+        pr.readOSM(map);
+        testParser(map);
+    }
+
+    @Test
+    public void testBasicParser() throws Exception {
         InputStream in = new GZIPInputStream(getClass().getResourceAsStream("map.osm.gz"));
         OpenStreetMapParser parser = new OpenStreetMapParser();
         OSMMap map = new OSMMap();
         parser.parseMap(in, map);
+        testParser(map);
+    }
 
+    public void testParser(OSMMap map) throws Exception {
         Map<Long, OSMNode> nodes = map.getNodes();
         assertEquals(7197, nodes.size());
 
         OSMNode nodeA = map.getNodeForId(27308461);
         assertEquals(27308461, nodeA.getId());
-        assertEquals(52.3887673, nodeA.getLat(), 0.0);
-        assertEquals(16.8506243, nodeA.getLon(), 0.0);
+        assertEquals(52.3887673, nodeA.getLat(), 0.0000001);
+        assertEquals(16.8506243, nodeA.getLon(), 0.0000001);
         Map<String, String> tags = nodeA.getTags();
         assertEquals("JOSM", tags.get("created_by"));
         assertEquals("survey", tags.get("source"));
 
         OSMNode nodeB = map.getNodeForId(27308457);
         assertEquals(27308457, nodeB.getId());
-        assertEquals(52.3850672, nodeB.getLat(), 0.0);
-        assertEquals(16.8396962, nodeB.getLon(), 0.0);
+        assertEquals(52.3850672, nodeB.getLat(), 0.0000001);
+        assertEquals(16.8396962, nodeB.getLon(), 0.0000001);
         tags = nodeB.getTags();
         assertEquals("Wieruszowska", tags.get("name"));
         assertEquals("tram_stop", tags.get("railway"));

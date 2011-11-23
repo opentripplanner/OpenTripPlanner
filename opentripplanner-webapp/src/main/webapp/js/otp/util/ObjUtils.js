@@ -75,6 +75,15 @@ otp.util.ObjUtils = {
         return retVal;
     },
 
+    /**  */
+    getConfig : function(config)
+    {
+        var retVal = otp.config;
+        if(config != null && config.map != null)
+            retVal = config;
+        return retVal;
+    },
+
     /** string & sub-string search of an array (slightly different than array.indexOf) */
     isInArray : function (str, array)
     {

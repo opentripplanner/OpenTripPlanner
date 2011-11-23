@@ -136,6 +136,16 @@ otp.Class = function() {
     return Class;
 };
 
+/** useful for debugging */
+otp.isLocalHost = function() {
+    try {
+        return document.location.href.indexOf('localhost') > 0;
+    } catch(e) {
+    }
+    return false;
+};
+
+
 /**
  * APIFunction: extend
  * 
@@ -294,12 +304,12 @@ otp.configure = function(destination, source, getAll) {
  * 
  * @param {Object} obj
  */
-otp.clone = function(obj)
+otp.clone = function(obj, dest)
 {
-    if(obj == null || typeof(obj) != 'object')
+    if(obj == null || typeof(obj) != 'object' || obj.contentType == "application/xml") 
         return obj;
     
-    var copied = copied || {};
+    var copied = dest || {};
     var temp = new obj.constructor(); // changed (twice)
     copied[obj] = temp;
     for(var key in obj)

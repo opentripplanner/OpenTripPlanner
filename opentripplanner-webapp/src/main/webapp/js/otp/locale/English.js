@@ -34,6 +34,7 @@ otp.locale.English = {
     {
         fromHere         : "Start a trip here",
         toHere           : "End a trip here",
+        intermediateHere : "Add intermediate point",
 
         centerHere       : "Center map here",
         zoomInHere       : "Zoom in",
@@ -229,6 +230,7 @@ otp.locale.English = {
             when          : "When",
             from          : "From",
             fromHere      : "From here",
+            intermediate  : "Intermediate Place",
             to            : "To",
             toHere        : "To here",
             minimize      : "Show me the",

@@ -46,6 +46,7 @@ otp.planner.StaticForms = {
     m_toPlace             : null,
     m_fromPlace           : null,
     m_intermediatePlaces  : null,
+    m_interPlacesPanel    : null,
 
     m_date                : null,
     m_time                : null,
@@ -171,6 +172,18 @@ otp.planner.StaticForms = {
         if(this.m_bikeTriangle && this.m_optimizeForm.getValue() == "TRIANGLE")
             triParams = this.m_bikeTriangle.getFormData();
 
+        var intPlacesItems = this.m_interPlacesPanel.items; 
+        if(intPlacesItems != null) {
+            var intPlacesArr = [];
+            for (var i=0; i<intPlacesItems.getCount(); i++) { 
+                var comp = intPlacesItems.itemAt(i); 
+                intPlacesArr.push(comp.field.getValue());
+            }
+            if(intPlacesArr.length > 0) {
+                triParams['intermediatePlaces'] = intPlacesArr;            
+            }
+        }
+        
         this.m_panel.form.submit( {
             method  : 'GET',
             url     : this.url,
@@ -219,22 +232,27 @@ otp.planner.StaticForms = {
     /** */
     submitFailure : function(form, action)
     {
+        var xml = null;
+        if(action && action.response && action.response.responseXML)
+            xml = action.response.responseXML;
+
         this.m_submitButton.focus();
-        this.tripRequestError(action.response.responseXML);
+        this.tripRequestError(xml);
     },
 
     /** error handler */
-    tripRequestError : function(xml)
+    tripRequestError : function(xml) 
     {
         var message  = null;
 
         // load xml to see what errors we have
         try
         {
+            var e = Ext.DomQuery.select('error', xml);
             var err  = Ext.DomQuery.selectNode('error', xml);
             var code = Ext.DomQuery.selectValue('id', err);
             message  = Ext.DomQuery.selectValue('msg', err);
-            if (!message && code)
+            if(!message && code)
             {
                 try
                 {
@@ -251,31 +269,29 @@ otp.planner.StaticForms = {
         catch(e) 
         {
             console.log("exception with somethingorother: " + e);
-            if(message == null || message == '')
-                message = this.locale.tripPlanner.error.deadMsg;
         }
 
-        if(message != null && message.length > 0)
+        if(message == null || message == '')
+           message = this.locale.tripPlanner.error.deadMsg;
+
+        // show the error
+        Ext.MessageBox.show({
+            title:    this.locale.tripPlanner.error.title,
+            msg:      message,
+            buttons:  Ext.Msg.OK,
+            icon:     Ext.MessageBox.ERROR,
+            animEl:   'tp-error-message',
+            minWidth: 170,
+            maxWidth: 270
+        });
+
+        // kill the message box after 5 seconds
+        setTimeout(function()
         {
-            // show the error
-            Ext.MessageBox.show({
-                title:    this.locale.tripPlanner.error.title,
-                msg:      message,
-                buttons:  Ext.Msg.OK,
-                icon:     Ext.MessageBox.ERROR,
-                animEl:   'tp-error-message',
-                minWidth: 170,
-                maxWidth: 270
-            });
-
-            // kill the message box after 5 seconds
-            setTimeout(function()
-            {
-                try {
-                    Ext.MessageBox.hide();
-                } catch(e) {}
-            }, 5000);
-        }
+            try {
+                Ext.MessageBox.hide();
+            } catch(e) {}
+        }, 5000);
     },
 
 
@@ -692,6 +708,15 @@ otp.planner.StaticForms = {
                 this.m_toForm.getComboBox().clearInvalid();
             }
         }
+        ,
+        {
+            text    : this.locale.contextMenu.intermediateHere,
+            scope   : this,
+            handler : function () {
+                var ll = this.contextMenu.getYOffsetMapCoordinate();
+                this.addIntermediatePlace(ll);
+            }
+        }
         ];
         return retVal;
     },
@@ -742,7 +767,7 @@ otp.planner.StaticForms = {
 
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
-        this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
+        //this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
 
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,
@@ -755,7 +780,7 @@ otp.planner.StaticForms = {
                             this.m_routerIdForm,
                             this.m_toPlace,
                             this.m_fromPlace,
-                            this.m_intermediatePlaces,
+                            //this.m_intermediatePlaces,
                             this.m_submitButton
                          ],
 
@@ -811,6 +836,8 @@ otp.planner.StaticForms = {
      */
     makeFromToForms : function()
     {
+        //var thisForms = this;
+        
         // step 1: these give the from & to forms 'memory' -- all submitted strings are saved off in the cookie for latter use
         Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
         Ext.state.Manager.getProvider();
@@ -825,6 +852,58 @@ otp.planner.StaticForms = {
         }
         this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
         this.m_toForm   = new otp.core.ComboBox(toFormOptions);
+
+        this.m_interPlacesPanel = new Ext.Panel({  
+            name:       'interPlacesPanel',
+            columnWidth: 1.0,
+            layout:     'form',
+            style: {
+                padding : '5px'
+            }
+        });
+        var addPlaceBtn  = new Ext.Button({
+            text:       'Add',
+            scope:      this,
+            handler : function(obj) {
+                this.addIntermediatePlace(null);
+            }
+        });
+        var clearPlacesBtn  = new Ext.Button({
+            text:       'Clear',
+            scope:      this,
+            handler : function(obj) {
+                this.m_interPlacesPanel.removeAll();
+                this.m_interPlacesPanel.doLayout();
+                this.poi.removeAllIntermediates();
+            }                
+        });
+        
+        var buttonRow = new Ext.Panel({
+            layout: 'hbox',
+            layoutConfig: {
+                pack: 'center',
+                align: 'middle'
+            },
+            items: [ clearPlacesBtn ]
+        });
+        
+        var interPlacesController = new Ext.Panel({  
+            name:           'interPlacesController',
+            title:          'Intermediate Places',
+            anchor:         '95%',
+            layout:         'column',
+            collapsible:    true,
+            style: {
+                paddingBottom: '4px',
+                marginBottom: '4px',
+                border: '1px solid gray'
+            },            
+            items: [   
+                this.m_interPlacesPanel
+            ],
+            bbar: buttonRow 
+        });
+
         var rev  = new Ext.Button({
             tooltip:   this.locale.buttons.reverseMiniTip,
             id:        "form.reverse.id",
@@ -870,6 +949,7 @@ otp.planner.StaticForms = {
                     border: false,
                     items: [
                         this.m_fromForm.getComboBox(),
+                        interPlacesController,
                         this.m_toForm.getComboBox()
                     ]
                 }
@@ -885,6 +965,48 @@ otp.planner.StaticForms = {
         };
 
         return inputPanel;
+    },
+    
+    addIntermediatePlace : function(ll) {
+        /*var comboBoxOptions = {label: '', cls: 'nudgeRight', msgTarget: "under", columnWidth: 0.80};
+        var intFormOptions = Ext.apply({}, {id: 'intPlace.id', name: 'intPlace', emptyText: this.locale.tripPlanner.labels.intermediate}, comboBoxOptions);                
+        var intPlaceForm = new otp.core.ComboBox(intFormOptions);*/
+        
+        var intPlaceField = new Ext.form.TextField({
+            text: "hello",
+            columnWidth: 0.75
+        });
+
+        var forms = this;
+        
+        var removeButton = new Ext.Button({
+            text: "X",
+            columnWidth: 0.20,
+            handler: function() {
+                forms.m_interPlacesPanel.remove(this.row);
+                forms.poi.removeIntermediate(this.row.marker);
+            }
+        });
+        
+        var intPlaceRow = new Ext.Panel({   
+            layout: 'column',
+            style: { marginBottom: '4px' },
+            //items: [ removeButton ]
+            items: [ intPlaceField, { xtype: 'panel', html: '&nbsp;', columnWidth: 0.05 }, removeButton ]
+        });
+        removeButton.row = intPlaceRow;
+        intPlaceRow.field = intPlaceField;
+        
+        this.m_interPlacesPanel.add(intPlaceRow);
+        this.m_interPlacesPanel.doLayout();
+        
+        if(ll != null) {
+            var latlon = ll.lat + "," + ll.lon;
+            intPlaceField.setValue(latlon);
+            
+            var marker = this.poi.addIntermediate(ll.lon, ll.lat, latlon); 
+            intPlaceRow.marker = marker;
+        }
     },
 
     /**

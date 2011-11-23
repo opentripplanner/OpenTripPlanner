@@ -45,6 +45,16 @@ otp.planner.poi.Style = {
         fillOpacity:     "1.0"
     },
 
+    intermediatePlace : {
+        graphicWidth:     21,
+        graphicHeight:    39,
+        graphicXOffset:  -11,
+        graphicYOffset:  -39,
+        externalGraphic: "images/map/trip/intermediate.png",
+        cursor:          "pointer", 
+        fillOpacity:     "1.0"
+    },
+    
     CLASS_NAME: "otp.planner.poi.Style"
 };
 
