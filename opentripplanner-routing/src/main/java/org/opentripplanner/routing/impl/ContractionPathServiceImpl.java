@@ -404,6 +404,7 @@ public class ContractionPathServiceImpl implements PathService {
         if (gv == null) {
             return false;
         }
+        TraverseMode requestedMode = state.getOptions().getModes().getNonTransitMode();
         for (Edge out : gv.getOutgoing()) {
             if (out == edge) {
                 continue;
@@ -411,8 +412,30 @@ public class ContractionPathServiceImpl implements PathService {
             if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
                 continue;
             }
-            if (state != null && out.traverse(state) == null) {
-                continue;
+            if (state != null) {
+                State outState = out.traverse(state);
+                if (outState == null) {
+                    continue;
+                }
+                if (!outState.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                    //walking a bike, so, not really an exit
+                    continue;
+                }
+                //now, from here, try a continuing path.
+                Vertex tov = outState.getVertex();
+                boolean found = false;
+                for (Edge out2 : graph.getOutgoing(tov)) {
+                    State outState2 = out2.traverse(outState);
+                    if (!outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                        //walking a bike, so, not really an exit
+                        continue;
+                    }
+                    found = true;
+                    break;
+                }
+                if (!found) {
+                    continue;
+                }
             }
             // there were paths we didn't take.
             foundAlternatePaths = true;
