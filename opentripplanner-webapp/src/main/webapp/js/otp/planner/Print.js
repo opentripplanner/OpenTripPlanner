@@ -14,6 +14,7 @@
 
 otp.namespace("otp.planner");
 
+
 /**
  * responsible for building and wiring together the trip planner application
  * will also parse any command line parameters, and execute any commands therein
@@ -27,6 +28,7 @@ otp.planner.PrintStatic = {
     current_map : null,
     itinerary   : null,
     planner     : null,
+    templates   : null,
     url         : 'print.html',
  
     // created  
@@ -113,7 +115,7 @@ otp.planner.PrintStatic = {
     },
 
     /**  */
-    writeItinerary : function()
+    xwriteItinerary : function()
     {
         // TODO:  refactor this to use same code as in Itinerary.js makeTreeNodes() -- line 600 
         
@@ -271,38 +273,22 @@ otp.planner.PrintStatic = {
         linkOpts.update(linkOptions);
     },
 
-    CLASS_NAME : "otp.planner.Print"
-};
+/************ ITIN REFACTOR *******************/
 
-otp.planner.Print = new otp.Class(otp.planner.PrintStatic);
-
-
-/** 
-
-    drawItineraryIntoPrintMap : function(itin, map)
+    writeItinerary : function()
     {
-        // create vector & marker layers
-        if(this.m_vectorLayer==null)
-        {
-            // step a: create vector layer
-            var vrconfig = {isBaseLayer:false,isFixed:false,visibility:true,projection:new OpenLayers.Projection("EPSG:4326")};
-            this.m_vectorLayer=new OpenLayers.Layer.Vector("trip-vector-layer", vrconfig);
-            map.addLayer(this.m_vectorLayer);
+        var cfg  = {templates:this.templates, locale:this.locale, store:this.itinerary.m_legStore, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
+        var itin = otp.planner.ItineraryDataFactoryStatic.factory(cfg);
+        var headerDIV  = Ext.get("header");
+        var detailsDIV = Ext.get("details");
+        var legsDIV    = Ext.get("legs");
 
-            // step b: create marker layer
-            var s=otp.util.OpenLayersUtils.getMarkerStyle();
-            var sm=new OpenLayers.StyleMap(s);
-            var mr=otp.util.OpenLayersUtils.getMarkerUniqueValueRules();
-            sm.addUniqueValueRules("default","type",mr);
-    
-            var mrconfig={isBaseLayer:false,rendererOptions:{yOrdering:true},projection:new OpenLayers.Projection("EPSG:4326"),styleMap:sm};
-            this.m_markerLayer=new OpenLayers.Layer.Vector("trip-marker-layer",mrconfig);
-            map.addLayer(this.m_markerLayer)
-        }
-    
-        this.m_itinerary=itin;
-        this.m_vectorLayer.features=itin.m_vectors;
-        this.m_markerLayer.features=itin.m_markers;
+        var from = itin.from.makeImg(true) + ' ' +  itin.from.text;
+        var to   = itin.to.makeImg(true)   + ' ' + itin.to.text;
+        headerDIV.update(from + to);
+
     },
 
- */
+    CLASS_NAME : "otp.planner.Print"
+};
+otp.planner.Print = new otp.Class(otp.planner.PrintStatic);

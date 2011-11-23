@@ -312,6 +312,7 @@ otp.planner.Planner = {
     {
         otp.planner.PrintStatic.itinerary   = this.getActiveItinerary();
         otp.planner.PrintStatic.map         = this.map;
+        otp.planner.PrintStatic.templates   = this.templates;
         otp.planner.PrintStatic.options     = this.map.options;
         otp.planner.PrintStatic.locale      = this.locale;
         otp.planner.PrintStatic.current_map = this.map.getMap();
