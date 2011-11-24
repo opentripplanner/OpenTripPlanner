@@ -25,8 +25,8 @@ otp.planner.ItineraryData = {
 
     from    : null,
     to      : null,
-    steps   : null,
     details : null,
+    steps   : null,
     notes   : null,
 
     initialize : function(config)
@@ -66,9 +66,26 @@ otp.planner.StepData = {
         var cls  = this.iconCls   ? ' class="' + this.iconCls + '" ' : '';
         var sel  = isUnselectable ? ' unselectable="on" ' : '';
 
-        return '<img src="' + icon + '" ' + cls + sel + '/> ';
+        return '<img src="' + icon + '" ' + cls + sel + '/>';
     },
-    
+
+    makeDiv : function(content, dontClose)
+    {
+        var id   = this.id    ? ' id="'    + this.id    + '" ' : ' ';
+        var cls  = this.elCls ? ' class="' + this.elCls + '" ' : ' ';
+
+        var retVal = '<div ' + cls + id + '>';
+        if (content)
+        {
+            retVal += content;
+
+            // when content is present, close the div by default, unless told otherwise
+            if(!dontClose)
+                retVal += '</div>';
+        }
+
+        return retVal;
+    },
 
     CLASS_NAME : "otp.planner.StepData"
 };
@@ -86,11 +103,13 @@ otp.planner.ItineraryDataFactoryStatic = {
     // requried params 
     id           : null,
     store        : null,
-    details      : null,
-    from         : null,
-    to           : null,
     templates    : null,
     locale       : null,
+
+    from         : null,
+    to           : null,
+    details      : null,
+    modes        : null,  // otp.util.ItineraryModes (Modes.js line 126) ... requires an Itinerary object, and From store...
 
     // optional 
     dontEditStep     : false,
@@ -98,13 +117,13 @@ otp.planner.ItineraryDataFactoryStatic = {
     LEG_ID           : '-leg-',
 
     // the thing this factory creates
-    data : null,
+    data    : null,
 
     /** constructor */
     initialize : function(config)
     {
         otp.configure(this, config);
-        this.data = this.makeItineraryData();
+        this.data    = this.makeItineraryData();
     },
 
     /** static factory returns @otp.planner.ItineraryData object */
@@ -210,15 +229,15 @@ otp.planner.ItineraryDataFactoryStatic = {
 
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
-        itinData.trip = new otp.planner.StepData({id:tpId, elCls: 'trip-details-shell', iconCls:'no-icon', text:tpTxt, num:num++});
+        itinData.details = new otp.planner.StepData({id:tpId, elCls: 'trip-details-shell', iconCls:'no-icon', text:tpTxt, num:num++});
 
         // step 5: mode note
-        if(this.m_modes && this.m_modes.getMessage())
+        if(this.modes && this.modes.getMessage())
         {
-            var m = this.m_modes.getMessage();
+            var m = this.modes.getMessage();
             var i = "images/ui/trip/caution.gif";
-            if(this.m_modes.itineraryMessages && this.m_modes.itineraryMessages.icon)
-                i = this.m_modes.itineraryMessages.icon;
+            if(this.modes.itineraryMessages && this.modes.itineraryMessages.icon)
+                i = this.modes.itineraryMessages.icon;
 
             itinData.notes = new otp.planner.StepData({id:tpId+'-modeinfo', elCls: 'itiny-note', iconCls:'itiny-inline-icon', icon:i, text:m, num:num++});
         }

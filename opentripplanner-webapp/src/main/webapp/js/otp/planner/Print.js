@@ -114,155 +114,60 @@ otp.planner.PrintStatic = {
         this.print_map.zoomToExtent(this.current_map.getExtent());
     },
 
+
     /**  */
-    xwriteItinerary : function()
+    writeItinerary : function()
     {
-        // TODO:  refactor this to use same code as in Itinerary.js makeTreeNodes() -- line 600 
-        
-        
-        var itin = this.itinerary;
-        var map  = this.print_map;
+        // step 1: get itinerary data
+        var cfg  = {templates:this.templates, locale:this.locale, store:this.itinerary.m_legStore, modes:this.itinerary.m_modes, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
+        var itin = otp.planner.ItineraryDataFactoryStatic.factory(cfg);
 
-        var tpl = new otp.planner.Templates(this);
-        var fromTXT    = this.getFromTXT(tpl, itin.from.data);
-        var toTXT      = this.getToTXT(tpl, itin.to.data);
-
-        var containsBikeMode    = false;
-        var containsCarMode     = false;
-        var containsTransitMode = false;
-
+        // step 2: get divs that we'll write into
         var headerDIV  = Ext.get("header");
         var detailsDIV = Ext.get("details");
         var legsDIV    = Ext.get("legs");
-        headerDIV.update(fromTXT + toTXT);
 
-        var reportText = fromTXT;
-        for(var i = 0; i < itin.m_legStore.getCount(); i++)
+        // step 3: write the header
+        var from = itin.from.makeDiv(itin.from.makeImg(true) + ' ' + itin.from.text);
+        var to   = itin.to.makeDiv(  itin.to.makeImg(true)   + ' ' + itin.to.text);
+        headerDIV.update(from + to);
+
+
+        // step 4: write the itinerary
+        var text = '';
+        text += from;
+
+        if(itin.steps)
+        for(var i = 0; i < itin.steps.length; i++)
         {
-            var leg = itin.m_legStore.getAt(i);
-            leg.data.showStopIds = this.showStopIds;
+            // step 4a: make the leg div
+            var step = itin.steps[i];
+            text += step.makeDiv(step.makeImg(true) + step.text);
 
-            var text;
-            var hasKids = true;
-            var sched = null;
-
-            var routeName = leg.get('routeName');
-            var agencyId = leg.get('agencyId');
-            var mode = this.getMode(leg);
-
-            if(mode === 'walk' || mode === 'bicycle')
+            // step 4b: iterate any sub-leg instructions (walking, biking)
+            if(step.instructions && step.instructions.length > 0)
             {
-                var verb = (mode === 'bicycle') ? 'Bike' : 'Walk';
-                hasKids = false;
-
-                var steps = leg.data.steps;
-                var stepText = "";
-                var noStepsYet = true;
-
-                for (var j = 0; j < steps.length; j++)
+                text += '<div class="instructions">';
+                for(var j = 0; j < step.instructions.length; j++)
                 {
-                    step = steps[j];
-                    if (step.streetName == "street transit link")
-                    {
-                        // TODO: Include explicit instruction about entering/exiting transit station or stop?
-                        continue;
-                    }
-                    stepText = "<li>";
-                    var relativeDirection = step.relativeDirection;
-                    if (relativeDirection == null || noStepsYet == true)
-                    {
-                        stepText += itin.locale.directions[verb] + ' ' + itin.locale.directions['to'] 
-                                     + ' <strong>' + itin.locale.directions[step.absoluteDirection.toLowerCase()] 
-                                     + '</strong> ' + itin.locale.directions['on'] + ' <strong>' + step.streetName + '</strong>';
-                        noStepsYet = false;
-                    }
-                    else
-                    {
-                        relativeDirection = relativeDirection.toLowerCase();
-                        var directionText = itin.locale.directions[relativeDirection];
-                        directionText = directionText.substr(0,1).toUpperCase() + directionText.substr(1);
-                        if (relativeDirection == "continue")
-                        {
-                            stepText += directionText + ' <strong>' + steps[j].streetName + '</strong>';
-                        }
-                        else if (step.stayOn == true)
-                        {
-                            stepText += directionText + " " + itin.locale.directions['to_continue'] + ' <strong>' + step.streetName + '</strong>';
-                        }
-                        else if (step.becomes == true)
-                        {
-                            stepText += directionText + ' <strong>' + steps[j-1].streetName + '</strong> ' +  itin.locale.directions['becomes'] + ' <strong>' + step.streetName + '</strong>';
-                        }
-                        else
-                        {
-                            stepText += directionText + " " + itin.locale.directions['at'] + ' <strong>' + step.streetName + '</strong>';
-                        }
-                    }
-                    stepText += ' (' + otp.planner.Utils.prettyDistance(step.distance) + ')';
-                } // for
-
-                if (leg.data.toDescription == '')
-                    leg.data.toDescription = null;
-
-                // TODO: refactor see Itinerary.js line 600
-                if(mode === 'bicycle') 
-                    containsBikeMode = true;
-
-                var template = mode === 'walk' ? 'TP_WALK_LEG' : 'TP_BICYCLE_LEG';
-                text = tpl[template].applyTemplate(leg.data);
-            }
-            else
-            {
-                var order = leg.get('order');
-                if (order == 'thru-route')
-                {
-                    text = tpl.getInterlineLeg().applyTemplate(leg.data);
+                    var inst = step.instructions[j];
+                    text += inst.makeDiv(inst.makeImg(true) + inst.text);
                 }
-                else 
-                {
-                    leg.data.mode = OpenLayers.Lang.translate(leg.data.mode);
-                    text = tpl.getTransitLeg().applyTemplate(leg.data);
-                }
+                text += '</div>';
             }
-            icon = otp.util.imagePathManager.imagePath({agencyId: agencyId, mode: mode, route: routeName});
-            reportText = reportText + '<img src="' + icon + '"/> ' + text;
         }
 
-        // step 3: build details node's content
-        var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
-        if(containsBikeMode)
-            tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
-        else if(containsCarMode) 
-            tripDetailsDistanceVerb = this.locale.instructions.car_verb;
-        var tripDetailsData = Ext.apply({}, itin.xml.data, {distanceVerb: tripDetailsDistanceVerb});
-        var detailsTXT = tpl.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
-        detailsDIV.update(detailsTXT);
+        // step 4c: close the itinerary
+        text += to;
+        legsDIV.update(text);
 
-        // TODO Itin note  Itinerary.js line 683
-
-        reportText = reportText + toTXT;
-        legsDIV.update(reportText);
+        // step 5: write the trip details
+        var details = "";
+        if(itin.notes)   details += itin.notes.makeDiv(itin.notes.makeImg(true) + itin.notes.text);
+        if(itin.details) details += itin.details.text;
+        detailsDIV.update(details);
     },
 
-    getFromTXT : function(tpl, data)
-    {
-        var img = '<img class="start-icon" unselectable="on" src="images/ui/s.gif"/>'
-        var txt = tpl.TP_START.applyTemplate(data);
-        return img + txt;
-    },
-
-    getToTXT : function(tpl, data)
-    {
-        var img = '<img class="end-icon" unselectable="on" src="images/ui/s.gif"/>'
-        var txt = tpl.TP_END.applyTemplate(data);
-        return img + txt;
-    },
-
-    /** return mode string */
-    getMode : function(leg)
-    {
-        return leg.get('mode').toLowerCase();
-    },
 
     /** 1/2 thought out show/hide link */
     makeLink : function(linkDiv, xx)
@@ -271,22 +176,6 @@ otp.planner.PrintStatic = {
         var linkOptions = '<span class="span_hide_options" id="linklogo" onclick="showHideMap(\'logo\')">' + loc.buttons.hideBanner + '</span>'
                         + '<div style="clear:both"></div>';
         linkOpts.update(linkOptions);
-    },
-
-/************ ITIN REFACTOR *******************/
-
-    writeItinerary : function()
-    {
-        var cfg  = {templates:this.templates, locale:this.locale, store:this.itinerary.m_legStore, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
-        var itin = otp.planner.ItineraryDataFactoryStatic.factory(cfg);
-        var headerDIV  = Ext.get("header");
-        var detailsDIV = Ext.get("details");
-        var legsDIV    = Ext.get("legs");
-
-        var from = itin.from.makeImg(true) + ' ' +  itin.from.text;
-        var to   = itin.to.makeImg(true)   + ' ' + itin.to.text;
-        headerDIV.update(from + to);
-
     },
 
     CLASS_NAME : "otp.planner.Print"
