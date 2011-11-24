@@ -32,8 +32,8 @@ otp.locale.English = {
 
     contextMenu : 
     {
-        fromHere         : "Start a trip here",
-        toHere           : "End a trip here",
+        fromHere         : "Começar uma viagem aqui",
+        toHere           : "Acabar uma viagem aqui",
         intermediateHere : "Add intermediate point",
 
         centerHere       : "Center map here",
