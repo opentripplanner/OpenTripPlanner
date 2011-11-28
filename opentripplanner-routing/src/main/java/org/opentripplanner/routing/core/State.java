@@ -352,6 +352,7 @@ public class State implements Cloneable {
     
     public boolean multipleOptionsBefore() {
         boolean foundAlternatePaths = false;
+        TraverseMode requestedMode = getOptions().getModes().getNonTransitMode();
         for (Edge out : backState.vertex.getOutgoing()) {
             if (out == backEdge) {
                 continue;
@@ -362,6 +363,30 @@ public class State implements Cloneable {
             if (out.traverse(backState) == null) {
                 continue;
             }
+            State outState = out.traverse(this);
+            if (outState == null) {
+                continue;
+            }
+            if (!outState.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                //walking a bike, so, not really an exit
+                continue;
+            }
+            //now, from here, try a continuing path.
+            Vertex tov = outState.getVertex();
+            boolean found = false;
+            for (Edge out2 : tov.getOutgoing()) {
+                State outState2 = out2.traverse(outState);
+                if (outState2 != null && !outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                    //walking a bike, so, not really an exit
+                    continue;
+                }
+                found = true;
+                break;
+            }
+            if (!found) {
+                continue;
+            }
+
             // there were paths we didn't take.
             foundAlternatePaths = true;
             break;

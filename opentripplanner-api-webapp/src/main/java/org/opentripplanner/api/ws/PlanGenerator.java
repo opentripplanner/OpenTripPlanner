@@ -608,8 +608,10 @@ public class PlanGenerator {
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
+        String roundaboutPreviousStreet = null;
 
         for (State currState : states) {
+            State backState = currState.getBackState();
             Edge edge = currState.getBackEdge();
             EdgeNarrative edgeNarrative = currState.getBackEdgeNarrative();
             boolean createdNewStep = false;
@@ -642,6 +644,9 @@ public class PlanGenerator {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
                     step.exit = Integer.toString(roundaboutExit); // ordinal numbers from
+                    if (streetName.equals(roundaboutPreviousStreet)) {
+                        step.stayOn = true;
+                    }
                     // localization
                     roundaboutExit = 0;
                 }
@@ -654,6 +659,7 @@ public class PlanGenerator {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
+                    roundaboutPreviousStreet = backState.getBackEdgeNarrative().getName();
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle, edgeNarrative.isRoundabout());
@@ -664,7 +670,7 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
                         edgeNarrative.isRoundabout());
-                boolean optionsBefore = currState.multipleOptionsBefore();
+                boolean optionsBefore = backState.multipleOptionsBefore();
                 if (edgeNarrative.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {
@@ -686,8 +692,7 @@ public class PlanGenerator {
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (DirectEdge alternative : currState.getBackState()
-                                .getVertex().getOutgoingStreetEdges()) {
+                        for (DirectEdge alternative : backState.getVertex().getOutgoingStreetEdges()) {
                             if (alternative instanceof TinyTurnEdge) {
                                 //a tiny turn edge has no geometry, but the next
                                 //edge will be a TurnEdge or PSE and will have direction
@@ -713,7 +718,6 @@ public class PlanGenerator {
                         //in the case of a turn edge, we actually have to go back two steps to see where
                         //else we might be, as once we are on the streetvertex leading into this edge,
                         //we are stuck
-                        State backState = currState.getBackState();
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (DirectEdge alternative : backVertex.getOutgoingStreetEdges()) {

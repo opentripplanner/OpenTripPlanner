@@ -57,7 +57,11 @@ public class DisjointSet<T> {
         }
         return compact(i);
     }
-    
+
+    public boolean exists(T element) {
+        return setMapping.containsKey(element);
+    }
+
     private int compact(int i) {
         int key = sets.get(i);
         if (key < 0) {
