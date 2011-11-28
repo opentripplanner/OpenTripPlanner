@@ -369,6 +369,10 @@ public class State implements Cloneable {
                 //walking a bike, so, not really an exit
                 continue;
             }
+            // this section handles the case of an option which is only an option if you walk your
+            // bike. It is complicated because you will not need to walk your bike until one
+            // edge after the current edge.
+
             //now, from here, try a continuing path.
             Vertex tov = outState.getVertex();
             boolean found = false;
