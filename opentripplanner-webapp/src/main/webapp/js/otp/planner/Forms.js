@@ -31,16 +31,18 @@ otp.planner.StaticForms = {
     contextMenu           : null,
     poi                   : null,
     url                   : '/opentripplanner-api-webapp/ws/plan',
+
+    // things overridden by config.js
     showWheelchairForm    : true,
+    showIntermediateForms : true, 
     useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
     geocoder              : null,
 
     // forms & stores
     m_panel               : null,
-
     m_routerIdForm        : null,
-    
+
     m_fromForm            : null,
     m_toForm              : null,
     m_toPlace             : null,
@@ -180,7 +182,7 @@ otp.planner.StaticForms = {
                 intPlacesArr.push(comp.field.getValue());
             }
             if(intPlacesArr.length > 0) {
-                triParams['intermediatePlaces'] = intPlacesArr;            
+                triParams['intermediatePlaces'] = intPlacesArr;
             }
         }
         
@@ -614,7 +616,8 @@ otp.planner.StaticForms = {
         retVal.mode            = this.m_modeForm.getValue();
         if(this.showWheelchairForm)
             retVal.wheelchair      = this.m_wheelchairForm.getValue();
-        retVal.intermediate_places = ''; //TODO: intermediate stops
+        if(this.showIntermediateForms)
+            retVal.intermediate_places = ''; //TODO: intermediate stops
 
         // break up the from coordinate into lat & lon
         var coord = this.m_fromCoord;
@@ -708,16 +711,23 @@ otp.planner.StaticForms = {
                 this.m_toForm.getComboBox().clearInvalid();
             }
         }
-        ,
-        {
-            text    : this.locale.contextMenu.intermediateHere,
-            scope   : this,
-            handler : function () {
-                var ll = this.contextMenu.getYOffsetMapCoordinate();
-                this.addIntermediatePlace(ll);
-            }
-        }
         ];
+
+        // config option to turn on/off itermediate stuff
+        if(this.showIntermediateForms)
+        {
+            var inter = {
+                text    : this.locale.contextMenu.intermediateHere,
+                scope   : this,
+                handler : function () {
+                    var ll = this.contextMenu.getYOffsetMapCoordinate();
+                    this.addIntermediatePlace(ll);
+                }
+            };
+            retVal.push(inter);
+        }
+
+        
         return retVal;
     },
 
@@ -853,6 +863,7 @@ otp.planner.StaticForms = {
         this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
         this.m_toForm   = new otp.core.ComboBox(toFormOptions);
 
+        // intermediate places form
         this.m_interPlacesPanel = new Ext.Panel({  
             name:       'interPlacesPanel',
             columnWidth: 1.0,
@@ -875,9 +886,8 @@ otp.planner.StaticForms = {
                 this.m_interPlacesPanel.removeAll();
                 this.m_interPlacesPanel.doLayout();
                 this.poi.removeAllIntermediates();
-            }                
+            }
         });
-        
         var buttonRow = new Ext.Panel({
             layout: 'hbox',
             layoutConfig: {
@@ -886,7 +896,7 @@ otp.planner.StaticForms = {
             },
             items: [ clearPlacesBtn ]
         });
-        
+
         var interPlacesController = new Ext.Panel({  
             name:           'interPlacesController',
             title:          'Intermediate Places',
@@ -938,6 +948,17 @@ otp.planner.StaticForms = {
             this.m_toForm.getComboBox().on(  {scope: this, select : this.selectTo   });
         }
 
+        // make the from & to panel array ... optionally add the intermediate form 
+        var inputForms = [];
+        var revButtonStyle = 'padding-top:15px';
+        inputForms.push(this.m_fromForm.getComboBox());
+        if(this.showIntermediateForms)
+        {
+            inputForms.push(interPlacesController);
+            revButtonStyle = 'padding-top:50px'; // push rev button down
+        }
+        inputForms.push(this.m_toForm.getComboBox());
+
         var inputPanel = {
             xtype:    'panel',
             border:    false,
@@ -947,15 +968,11 @@ otp.planner.StaticForms = {
                     columnWidth: 0.90,
                     layout: 'form',
                     border: false,
-                    items: [
-                        this.m_fromForm.getComboBox(),
-                        interPlacesController,
-                        this.m_toForm.getComboBox()
-                    ]
+                    items:  inputForms
                 }
                 ,
                 {
-                    bodyStyle: 'padding-top:15px',
+                    bodyStyle: revButtonStyle,
                     columnWidth: 0.07,
                     layout: 'anchor',
                     border: false,
@@ -1182,11 +1199,12 @@ otp.planner.StaticForms = {
         });
         
         this.m_bikeTriangleContainer = new Ext.Panel({  
-            name:           'bikeTriangleContainer'
+            name    :           'bikeTriangleContainer'
         });
 
         this.m_bikeTriangle = new otp.planner.BikeTriangle({
-            container:      this.m_bikeTriangleContainer
+            container : this.m_bikeTriangleContainer,
+            locale    : this.locale
         }); 
 
         // default transit true filter
@@ -1204,6 +1222,7 @@ otp.planner.StaticForms = {
 
             if(this.showWheelchairForm)
                 usecfg.wheelchair = this.m_wheelchairForm;
+
             this.m_optionsManager = new otp.planner.FormsOptionsManager(usecfg);
         }
 

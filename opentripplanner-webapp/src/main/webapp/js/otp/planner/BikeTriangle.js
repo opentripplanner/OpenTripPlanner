@@ -16,9 +16,10 @@ otp.namespace("otp.planner");
 
 otp.planner.BikeTriangle = {
 
-    container:    null,
-    panel:        null,
-    cursor_size:  19,
+    container    : null,
+    locale       : null, 
+    panel        : null,
+    cursor_size  : 19,
 
     triangleTimeFactor:    null,
     triangleSlopeFactor:   null,
@@ -41,15 +42,15 @@ otp.planner.BikeTriangle = {
             title:    null
        });
 
-        var thisBT = this;
+        var THIS = this;
         this.panel.on({
               render: function(obj) {
-                  thisBT.render(thisBT.container.getWidth(), 120);
+                  THIS.render(THIS.container.getWidth(), 120, THIS.locale);
               }
         });
     },
     
-    render : function(width, height) {
+    render : function(width, height, locale) {
         var tri_side = 2 * (height - this.cursor_size) * 1/Math.sqrt(3);
         var margin = this.cursor_size/2;	
 
@@ -68,16 +69,16 @@ otp.planner.BikeTriangle = {
         var labelSize = "18px";
 
         var safeFill = "#2890AC"; 
-        var safeName = "Safest";
-        var safeSym  = "S";
+        var safeName = locale.bikeTriangle.safeName;
+        var safeSym  = locale.bikeTriangle.safeSym;
 
         var hillFill = "#6DB33F"; 
-        var hillName = "Flattest";
-        var hillSym  = "F";
+        var hillName = locale.bikeTriangle.hillName;
+        var hillSym  = locale.bikeTriangle.hillSym;
         
         var timeFill = "#D59F0F";
-        var timeName = "Quickest";
-        var timeSym  = "Q";
+        var timeName = locale.bikeTriangle.timeName;
+        var timeSym  = locale.bikeTriangle.timeSym;
 
         var labelT = canvas.text(margin + tri_side/2, margin+24, timeSym);
         labelT.attr({fill:timeFill, "font-size":labelSize, "font-weight":"bold"});	

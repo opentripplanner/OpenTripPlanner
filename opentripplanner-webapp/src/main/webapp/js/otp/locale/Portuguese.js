@@ -18,22 +18,22 @@ otp.namespace("otp.locale");
   * @class
   */
 
-otp.locale.English = {
+otp.locale.Portuguese = {
 
-    config :
+    config : 
     {
-        metricsSystem : "english",
-        rightClickMsg : "Right-click on the map to designate the start and end of your trip.",
+        metricsSystem : "international",
+        rightClickMsg : "Haz click con el bot\xF3n derecho sobre el mapa para elegir los puntos de origen y destino.",
         attribution   : {
             title   : "License Attribution",
-            content : "Disclaimer goes here"
+            content : "Disclaimer goes here"  // TODO localize
         }
     },
 
     contextMenu : 
     {
-        fromHere         : "Start a trip here",
-        toHere           : "End a trip here",
+        fromHere         : "Começar uma viagem aqui",
+        toHere           : "Acabar uma viagem aqui",
         intermediateHere : "Add intermediate point",
 
         centerHere       : "Center map here",
@@ -169,7 +169,7 @@ otp.locale.English = {
         stop_id      : "Stop ID",
         trip_details : "Trip details",
         fare         : "Fare",
-        fare_symbol  : "$",
+        fare_symbol  : "\u20ac",
         travel       : "Travel",
         valid        : "Valid",
         trip_length  : "Time",
@@ -209,14 +209,14 @@ otp.locale.English = {
 
     time:
     {
-        minute         : "minute",
-        minutes        : "minutes",
+        minute         : "minuto",
+        minutes        : "minutos",
         minute_abbrev  : "min",
         minutes_abbrev : "mins",
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
-        format         : "F jS, Y @ g:ia",
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        format         : "D, j M H:i",
+        months         : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     },
 
     systemmap :
@@ -322,27 +322,16 @@ otp.locale.English = {
           ['false', 'Depart'], 
           ['true',  'Arrive']
         ],
-    
+
         maxWalkDistance : 
         [
-            ['160',   '1/10 mile'],
-            ['420',   '1/4 mile'],
-            ['840',   '1/2 mile'],
-            ['1260',  '3/4 mile'],
-            ['1609',  '1 mile'],
-            ['3219',  '2 miles'],
-            ['4828',  '3 miles'],
-            ['6437',  '4 miles'],
-            ['8047',  '5 miles'],
-            ['16093',  '10 miles'],
-            ['24140',  '15 miles'],
-            ['32187',  '20 miles'],
-            ['48280',  '30 miles'],
-            ['64374',  '40 miles'],
-            ['80467',  '50 miles'],
-            ['160934',  '100 miles']
+            ['500',   '500 metros'],
+            ['1000',   '1 km'],
+            ['5000',   '5 km'],
+            ['10000',  '10 km'],
+            ['20000',  '20 km']
         ],
-    
+
         mode : 
         [
             ['TRANSIT,WALK', 'Transit'],
@@ -362,5 +351,5 @@ otp.locale.English = {
         ]
     },
 
-    CLASS_NAME : "otp.locale.English"
+    CLASS_NAME : "otp.locale.Portuguese"
 };

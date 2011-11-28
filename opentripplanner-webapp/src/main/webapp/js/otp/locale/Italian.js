@@ -34,12 +34,26 @@ otp.locale.Italian = {
     {
         fromHere         : "Punto di partenza",
         toHere           : "Punto di arrivo",
+        intermediateHere : "Add intermediate point",  // TODO localize
 
         centerHere       : "Centra la mappa",
         zoomInHere       : "Zoom su questa zona",
         zoomOutHere      : "Zoom out da questa zona",
         previous         : "Posizione precedente sulla mappa",
         next             : "Posizione successiva sulla mappa"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -297,7 +311,8 @@ otp.locale.Italian = {
         [
           ['TRANSFERS', 'Minori cambi di mezzo'],
           ['QUICK',     'Percorso piu\' veloce'],
-          ['SAFE',      'percorso piu\' sicuro']
+          ['SAFE',      'percorso piu\' sicuro'],
+          ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
         arriveDepart: 

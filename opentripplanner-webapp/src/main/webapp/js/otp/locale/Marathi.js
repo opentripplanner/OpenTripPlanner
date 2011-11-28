@@ -25,7 +25,7 @@ otp.locale.Marathi = {
         rightClickMsg : "प्रवास कुठून कुठपर्यंत करायचा आहे ते स्थान निवडण्याकरिता नकाशावर राईट क्लिक करा.",
         attribution   : {
             title   : "License Attribution",
-            content : "Disclaimer goes here"
+            content : "Disclaimer goes here"  
         }
     },
 
@@ -33,12 +33,26 @@ otp.locale.Marathi = {
     {
         fromHere         : "कुठे बस पकडणार?",
         toHere           : "कुठे ऊतरणार?",
+        intermediateHere : "Add intermediate point", // TODO localize
 
         centerHere       : "नकाशा बघण्यासाठी",
         zoomInHere       : "जुम इन करण्यासाठी(चित्र मोठे करण्यासाठी)",
         zoomOutHere      : "जुम आउट करण्यासाठी(चित्र लहान करण्यासाठी)",
         previous         : "आधी या ठिकाणी होतात",
         next             : "नंतरची जागा"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -302,7 +316,8 @@ otp.locale.Marathi = {
         [
           ['TRANSFERS', 'कमीत कमी बस बदलुन'],
           ['QUICK',     'कमी वेळेत'],
-          ['SAFE',      'सुरक्षित मार्ग']
+          ['SAFE',      'सुरक्षित मार्ग'],
+          ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
         arriveDepart: 

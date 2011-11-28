@@ -39,15 +39,8 @@ otp.planner.Planner = {
     linkTemplates           : null,
     geocoder                : null,
     templates               : null,
-
-    // see config.js to override these options
-    showWheelchairForm      : null,
-    showStopIds             : null,
-    showPrintButton         : null,
-    showLinksButton         : null,
-    useOptionDependencies   : null,
-    useRouteLongName        : null,
-    itineraryMessages       : null,
+    routerId                : null,
+    options                 : null,  // see config.js - planner.options
 
     // new tab (itineraries tabs) management
     m_tabs        : null,
@@ -64,8 +57,8 @@ otp.planner.Planner = {
     initialize : function(config)
     {
         this.planner = this;
-        this.routerId = config.routerId;
         otp.configure(this, config);
+        otp.inherit(this, this.options);
 
         if(this.templates == null)
             this.templates = new otp.planner.Templates({locale : this.locale});
@@ -276,11 +269,10 @@ otp.planner.Planner = {
 
                   xml : xml,
                   id  : ++this.m_tabCount, 
-                  request:request,
+                  request:request
+            };
+            otp.inherit(cfg, this.options);
 
-                  showPrintButton : this.showPrintButton,
-                  showLinksButton : this.showLinksButton
-            }; 
             var trip = new otp.planner.TripTab(cfg);
             var newTab = trip.getPanel();
             if(newTab && trip.isValid())
