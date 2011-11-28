@@ -33,12 +33,26 @@ otp.locale.Polish = {
     {
         fromHere         : "Rozpocznij podróż tutaj",
         toHere           : "Zakoñcz podróż tutaj",
+        intermediateHere : "Add intermediate point",  // TODO localize
 
         centerHere       : "Centruj mapê tutaj",
         zoomInHere       : "Przybliż tutaj",
         zoomOutHere      : "Oddal st¹d",
         previous         : "Poprzednia pozycja na mapie",
         next             : "Nastêpna pozycja na mapie"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -302,7 +316,8 @@ otp.locale.Polish = {
         [
           ['TRANSFERS', 'Ma³o przesiadek'],
           ['QUICK',     'Najszybsza podróż'],
-          ['SAFE',      'Najbezpieczniejsza podróż']
+          ['SAFE',      'Najbezpieczniejsza podróż'],
+          ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
         arriveDepart: 

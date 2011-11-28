@@ -23,7 +23,7 @@ otp.locale.French = {
         metricsSystem : "international",
         rightClickMsg : "Cliquez avec le bouton droit de la souris sur la carte pour désigner le départ et l'arrivée de votre parcours.",
         attribution : {
-            title : "License Attribution",
+            title : "License Attribution",  // TODO localize
             content : "Disclaimer goes here"
         }
     },
@@ -31,12 +31,26 @@ otp.locale.French = {
     contextMenu : {
         fromHere : "Partir d'ici",
         toHere : "Arriver ici",
+        intermediateHere : "Add intermediate point",  // TODO localize
 
         centerHere : "Centrer la carte ici",
         zoomInHere : "Zoomer ici",
         zoomOutHere : "Dézoomer ici",
         previous : "position précédente",
         next : "position suivante"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : {
@@ -274,8 +288,12 @@ otp.locale.French = {
             360 : "Adresses de départ et destination ambigües"
         },
 
-        options : [ [ 'TRANSFERS', 'Le plus direct' ],
-                [ 'QUICK', 'Le plus rapide' ], [ 'SAFE', 'Le plus sûr' ] ],
+        options : [ 
+                [ 'TRANSFERS', 'Le plus direct' ],
+                [ 'QUICK', 'Le plus rapide' ], 
+                [ 'SAFE', 'Le plus sûr' ],
+                ['TRIANGLE',  'Custom trip...']  // TODO: localize 
+        ],
 
         arriveDepart : [ [ 'false', 'Départ' ], [ 'true', 'Arriver' ] ],
 

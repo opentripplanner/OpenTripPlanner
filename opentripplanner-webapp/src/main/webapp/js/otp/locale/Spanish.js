@@ -26,7 +26,7 @@ otp.locale.Spanish = {
         rightClickMsg : "Haz click con el bot\xF3n derecho sobre el mapa para elegir los puntos de origen y destino.",
         attribution   : {
             title   : "License Attribution",
-            content : "Disclaimer goes here"
+            content : "Disclaimer goes here"  // TODO localize
         }
     },
 
@@ -34,12 +34,26 @@ otp.locale.Spanish = {
     {
         fromHere         : "Salir desde aqu\xED",
         toHere           : "Llegar hasta aqu\xED",
+        intermediateHere : "Add intermediate point",
 
         centerHere       : "Centrar mapa aqu\xED",
         zoomInHere       : "Acercar",
         zoomOutHere      : "Alejar",
         previous         : "\xDAltimo encuadre",
         next             : "Siguiente encuadre"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -295,8 +309,9 @@ otp.locale.Spanish = {
         options: 
         [
           ['TRANSFERS', 'M\xEDnimo n\xFAmero de transbordos'],
-          ['QUICK',     'Viaje m\xE1s corto']//,
-          //['SAFE',      'Viaje m\xE1s seguro']
+          ['QUICK',     'Viaje m\xE1s corto'],
+          ['SAFE',      'Viaje m\xE1s seguro'],
+          ['TRIANGLE',  'Custom trip...'] // TODO localize
         ],
     
         arriveDepart: 

@@ -34,12 +34,26 @@ otp.locale.Gaelic = {
     {
         fromHere         : "Tosaigh turas anseo",
         toHere           : "Críochnaigh turas anseo",
+        intermediateHere : "Add intermediate point",  // TODO localize
 
         centerHere       : "Cur lár an léarscáil anseo",
         zoomInHere       : "Zúmáil amach anseo",
         zoomOutHere      : "Zúmáil isteach anseo",
         previous         : "Áit ar an léarscáil níos déanaí",
         next             : "Céad áit eile ar an léarscáil"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -304,7 +318,8 @@ otp.locale.Gaelic = {
         [
           ['TRANSFERS', 'Aistrithe is lú'],
           ['QUICK',     'Turas is tapúla'],
-          ['SAFE',      'Turas is sabháilte']
+          ['SAFE',      'Turas is sabháilte'],
+          ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
         arriveDepart: 

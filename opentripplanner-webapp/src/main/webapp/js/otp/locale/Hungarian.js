@@ -34,12 +34,26 @@ otp.locale.Hungarian = {
     {
         fromHere         : "Útvonal kezdete itt",
         toHere           : "Útvonal vége itt",
+        intermediateHere : "Add intermediate point",  // TODO localize
 
         centerHere       : "Térkép középre helyezése ide",
         zoomInHere       : "Közelítés ide",
         zoomOutHere      : "Távolítás innen",
         previous         : "Legutóbbi térképpozíció",
         next             : "Következő térképpozíció"
+    },
+
+    // TODO Localize Me
+    bikeTriangle : 
+    {
+        safeName : "Safest",
+        safeSym  : "S",
+
+        hillName : "Flattest",
+        hillSym  : "F",
+
+        timeName : "Quickest",
+        timeSym  : "Q"
     },
 
     service : 
@@ -303,7 +317,8 @@ otp.locale.Hungarian = {
         [
           ['TRANSFERS', 'Legkevesebb átszállással'],
           ['QUICK',     'Leggyorsabb útvonal'],
-          ['SAFE',      'Legbiztonságosabb útvonal']
+          ['SAFE',      'Legbiztonságosabb útvonal'],
+          ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
         arriveDepart: 
