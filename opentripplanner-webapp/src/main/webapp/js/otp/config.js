@@ -22,16 +22,20 @@ otp.config_defaults = {
         url            : null,
 
         // options to turn stuff on / off on the planner
-        showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
-        showStopIds           : true,   // show stop ids as part of the itinerary
-        showPrintButton       : true,   // turn on/off itinerary print button
-        showLinksButton       : true,   // turn on/off itinerary links button
-        useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
-        useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
+        options        : {
+            showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
+            showIntermediateForms : true,   // turn on/off the ability to plan routes with intermediate points 
+            showStopIds           : true,   // show stop ids as part of the itinerary
+            showPrintButton       : true,   // turn on/off itinerary print button
+            showLinksButton       : true,   // turn on/off itinerary links button
+            useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
+            useRouteLongName      : false   // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
+        },
 
         // will add a tree node to the bottom of the itinerary with this message
         itineraryMessages : {
             icon            : null,
+            transit         : "This is an Itinerary Message test...",
             transit         : null,
             bus             : null,
             train           : null,
@@ -58,7 +62,7 @@ otp.config_defaults = {
         },
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
-        /* debug */
+        /* debug geocoder */
         /* *
         geocoder  :
         {
