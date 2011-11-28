@@ -45,6 +45,7 @@ import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -171,17 +172,17 @@ public class TestContractionHeirarchies extends TestCase {
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N; ++x) {
                 Vertex vertexIn = verticesIn[y][x];
-                for (DirectEdge e1: filter(graph.getIncoming(vertexIn),DirectEdge.class)) {
+                for (DirectEdge e1: filter(vertexIn.getIncoming(),DirectEdge.class)) {
                     Vertex vertexOut = verticesOut[y][x];
                     StreetVertex fromv = (StreetVertex) e1.getFromVertex();
-                    for (DirectEdge e2: filter(graph.getOutgoing(vertexOut),DirectEdge.class)) {
+                    for (DirectEdge e2: filter(vertexOut.getOutgoing(),DirectEdge.class)) {
                         StreetVertex tov = (StreetVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
                         }
                         graph.addEdge(new TurnEdge(fromv, tov));
                     }
-                    assertTrue(graph.getDegreeOut(fromv) <= 4);
+                    assertTrue(fromv.getDegreeOut() <= 4);
                 }
             }
         }
@@ -189,30 +190,32 @@ public class TestContractionHeirarchies extends TestCase {
         final int graphSize = N * N * 2 + (N * (N - 1) * 4);
         assertEquals(graphSize, graph.getVertices().size());
         
+        
         // test Dijkstra
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
+        OverlayGraph og = new OverlayGraph(graph);
 
         // test hop limit
-        Dijkstra dijkstra = new Dijkstra(graph, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
+        Dijkstra dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(verticesIn[0][2], 4);
         State v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(graph, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
+        dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 500);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
 
         // test distance limit
-        dijkstra = new Dijkstra(graph, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 20);
         v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(graph, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 130);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
@@ -232,9 +235,8 @@ public class TestContractionHeirarchies extends TestCase {
         // test hierarchy construction
         ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
-        assertTrue(hierarchy.down.getVertices().size() == graphSize);
-        assertTrue(hierarchy.up.getVertices().size() == graphSize);
-        assertTrue(hierarchy.graph.getVertices().size() == 0);
+        assertTrue(hierarchy.updown.getVertices().size() == graphSize);
+        assertTrue(hierarchy.core.getVertices().size() == 0);
 
         System.out.println("Contracted");
 
@@ -310,8 +312,7 @@ public class TestContractionHeirarchies extends TestCase {
         }
 
         int expansion = 1;
-        for (Vertex gv : graph.getVertices()) {
-            Vertex v = gv.vertex;
+        for (Vertex v : graph.getVertices()) {
             final Coordinate c = v.getCoordinate();
             Envelope env = new Envelope(c);
             env.expandBy(50 * expansion);
@@ -338,7 +339,7 @@ public class TestContractionHeirarchies extends TestCase {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         Vertex last = null;
         for (Vertex v : vertices) {
-            for (DirectEdge e: filter(graph.getOutgoing(v),DirectEdge.class)) {
+            for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
                 components.union(v, e.getToVertex());
             }
             last = v;
@@ -511,16 +512,9 @@ public class TestContractionHeirarchies extends TestCase {
         Vertex start = null;
         Vertex end = null;
 
-        start = hierarchy.up.getVertex("0072480");
-        end = hierarchy.up.getVertex("0032341");
-        if (start == null) start = hierarchy.down.getVertex("0072480");
-        if (start == null) start = hierarchy.graph.getVertex("0072480");
-        if (end == null) end = hierarchy.down.getVertex("0032341");
-        if (end == null) end = hierarchy.graph.getVertex("0032341");
-        
-        assertNotNull(start);
-        assertNotNull(end);
-        
+        start = graph.getVertex("0072480");
+        end = graph.getVertex("0032341");
+
         path = hierarchy.getShortestPath(start, end, 0, options);
         assertNotNull(path);
 
@@ -572,25 +566,24 @@ public class TestContractionHeirarchies extends TestCase {
         long now = System.currentTimeMillis();
         int i = 0;
         int notNull = 0;
-        Collection<Vertex> upVertices = hierarchy.up.getVertices();
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>(upVertices);
-        vertices.addAll(hierarchy.down.getVertices());
-        vertices.addAll(hierarchy.graph.getVertices());
+        Collection<Vertex> updownVertices = hierarchy.updown.getVertices();
+        Collection<Vertex> vertices = graph.getVertices();
                
+        
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
-        for (Vertex gv : vertices) {
-            for (DirectEdge e: filter(gv.getOutgoing(), DirectEdge.class)) {
-                components.union(gv.vertex, e.getToVertex());
+        for (Vertex v : vertices) {
+            for (DirectEdge e: filter(v.getOutgoing(), DirectEdge.class)) {
+                components.union(v, e.getToVertex());
             }
         }
         
+        // verticesOut will be the largest connected component
         ArrayList<Vertex> verticesOut = new ArrayList<Vertex>();
-        for (Vertex gv : vertices) {
-            Vertex v = gv.vertex;
+        for (Vertex v : vertices) {
             int componentSize = components.size(components.find(v));
-            if (componentSize > upVertices.size() / 2) {
-                if (gv.getDegreeOut() != 0) {
-                    verticesOut.add(gv);
+            if (componentSize > updownVertices.size() / 2) {
+                if (v.getDegreeOut() != 0) {
+                    verticesOut.add(v);
                 }
             }
         }
@@ -603,35 +596,34 @@ public class TestContractionHeirarchies extends TestCase {
         
         Random random = new Random(0);
         
-        for (Vertex gv1 : vertices) {
-            Vertex v1 = gv1.vertex;
+        // find 100 origin-destination pairs
+        for (Vertex orig : vertices) {
             if (++i == 100) {
                 //only look at 100 pairs of vertices
                 break; 
             }
-            if (hierarchy.up.getVertex(v1.getLabel()) == null) {
+            // make sure origin is on the up graph
+            if (hierarchy.updown.getOutgoing(orig).size() == 0) {
                 --i;
                 continue;
             }
-            Vertex gv2 = null;
-            Vertex v2 = null;
-            while (v2 == null || gv2.getDegreeIn() == 0) {
+            Vertex dest = null;
+            while (dest == null) {
                 int j = Math.abs(random.nextInt()) % vertices.size();
-                gv2 = vertices.get(j);
-                v2 = gv2.vertex;
-                if (v1.getLabel() == v2.getLabel()) {
+                // make sure origin and destination are different
+                if (orig.getLabel() == dest.getLabel()) {
                     continue;
                 }
-                
-                if (hierarchy.down.getVertex(v2.getLabel()) == null) {
-                    v2 = null;
+                // make sure destination is on the down graph
+                if (hierarchy.updown.getIncoming(dest).size() == 0) {
+                    dest = null;
                     continue;
                 }
             }
             options.setArriveBy(i % 2 == 0); //half of all trips will be reverse trips just for fun
-            assertNotNull(v1);
-            assertNotNull(v2);
-            GraphPath path2 = hierarchy.getShortestPath(v1, v2, startTime, options);
+            assertNotNull(orig);
+            assertNotNull(dest);
+            GraphPath path2 = hierarchy.getShortestPath(orig, dest, startTime, options);
             //assertNotNull(path2);
             if (path2 != null) {
                 notNull += 1;
