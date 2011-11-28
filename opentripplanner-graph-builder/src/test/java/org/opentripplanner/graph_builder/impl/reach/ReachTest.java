@@ -24,11 +24,11 @@ import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
@@ -57,10 +57,11 @@ public class ReachTest extends TestCase {
         Vertex vertex = graph.getVertex("56th_24th");
         Collection<Vertex> streetVertices = Arrays.asList(vertex);
         
-        computer.partialTreesPhase(graph, streetVertices,
+        OverlayGraph ograph = new OverlayGraph(graph);
+        computer.partialTreesPhase(ograph, streetVertices,
                 options, false);
         
-        for (EdgeWithReach e : IterableLibrary.filter(graph.getOutgoing(vertex), EdgeWithReach.class)) {
+        for (EdgeWithReach e : IterableLibrary.filter(vertex.getOutgoing(), EdgeWithReach.class)) {
             assertTrue(e.getReach() < 400);
         }
         

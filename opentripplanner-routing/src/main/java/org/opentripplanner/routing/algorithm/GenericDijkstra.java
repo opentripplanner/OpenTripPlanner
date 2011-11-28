@@ -18,7 +18,6 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -35,8 +34,6 @@ import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
  */
 public class GenericDijkstra {
 
-    private Graph graph;
-    
     private OverlayGraph replacementEdges;
 
     private TraverseOptions options;
@@ -150,7 +147,7 @@ public class GenericDijkstra {
 
     protected OTPPriorityQueue<State> createPriorityQueue() {
         if (_priorityQueueFactory != null)
-            return _priorityQueueFactory.create(graph.getVertices().size());
+            return _priorityQueueFactory.create(10);
         return new BinHeap<State>();
     }
 
