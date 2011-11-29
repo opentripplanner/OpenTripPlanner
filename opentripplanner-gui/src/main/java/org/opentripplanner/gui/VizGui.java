@@ -895,8 +895,8 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     // the vizgui serves as its own remainingweightheuristicfactory
     // so ui elements could be used to select the heuristic
     public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target) {
-        //return new BidirectionalRemainingWeightHeuristic(graph);
+        return new BidirectionalRemainingWeightHeuristic(graph);
         //return new DefaultRemainingWeightHeuristic();
-        return new ReachRemainingWeightHeuristic();
+        //return new ReachRemainingWeightHeuristic();
     }
 }

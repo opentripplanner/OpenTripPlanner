@@ -20,35 +20,26 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.RoutingService;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 @Component
-public class ContractionPathServiceImpl implements PathService {
+public class ContractionPathServiceImpl extends GenericPathService {
 
     private static final int MAX_TIME_FACTOR = 2;
 
@@ -56,17 +47,8 @@ public class ContractionPathServiceImpl implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ContractionPathServiceImpl.class);
 
-    private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
-
-    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
-            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
-
-    private GraphService _graphService;
-
     private RoutingService _routingService;
 
-    private StreetVertexIndexService _indexService;
-    
     private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
     
     private double _firstPathTimeout = 0; // seconds
@@ -106,23 +88,9 @@ public class ContractionPathServiceImpl implements PathService {
         _remainingWeightHeuristicFactory = hf;
     }
 
-    public GraphService getGraphService() {
-        return _graphService;
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        _graphService = graphService;
-    }
-
     @Autowired
     public void setRoutingService(RoutingService routingService) {
         _routingService = routingService;
-    }
-
-    @Autowired
-    public void setIndexService(StreetVertexIndexService indexService) {
-        _indexService = indexService;
     }
 
     @Override
@@ -350,42 +318,6 @@ public class ContractionPathServiceImpl implements PathService {
                 (int)(targetTime.getTime() / 1000), options);
 
         return Arrays.asList(path);
-    }
-
-    private Vertex getVertexForPlace(NamedPlace place, TraverseOptions options) {
-        return getVertexForPlace(place, options, null);
-    }
-
-    private Vertex getVertexForPlace(NamedPlace place, TraverseOptions options, Vertex other) {
-
-        Matcher matcher = _latLonPattern.matcher(place.place);
-
-        if (matcher.matches()) {
-            double lat = Double.parseDouble(matcher.group(1));
-            double lon = Double.parseDouble(matcher.group(4));
-            Coordinate location = new Coordinate(lon, lat);
-            if (other instanceof StreetLocation) {
-                return _indexService.getClosestVertex(location, place.name, options, ((StreetLocation) other).getExtra());
-            } else {
-                return _indexService.getClosestVertex(location, place.name, options);
-            }
-        }
-
-        return _graphService.getContractionHierarchySet().getVertex(place.place);
-    }
-
-    @Override
-    public boolean isAccessible(NamedPlace place, TraverseOptions options) {
-        /* fixme: take into account slope for wheelchair accessibility */
-        Vertex vertex = getVertexForPlace(place, options);
-        if (vertex instanceof TransitStop) {
-            TransitStop ts = (TransitStop) vertex;
-            return ts.hasWheelchairEntrance();
-        } else if (vertex instanceof StreetLocation) {
-            StreetLocation sl = (StreetLocation) vertex;
-            return sl.isWheelchairAccessible();
-        }
-        return true;
     }
 
 }

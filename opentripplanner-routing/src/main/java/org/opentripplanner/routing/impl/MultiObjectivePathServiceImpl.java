@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
@@ -29,23 +27,15 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import com.vividsolutions.jts.geom.Coordinate;
 /**
  * Implements a multi-objective goal-directed search algorithm like the one in Sec. 4.2 of: 
  * Perny and Spanjaard. Near Admissible Algorithms for Multiobjective Search.
@@ -70,19 +60,10 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author andrewbyrd
  */
 @Component
-public class MultiObjectivePathServiceImpl implements PathService {
+public class MultiObjectivePathServiceImpl extends GenericPathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 
-    private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
-
-    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
-            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
-
-    private GraphService _graphService;
-
-    private StreetVertexIndexService _indexService;
-    
     private double[] _timeouts = new double[] {4, 2, 0.6, 0.4}; // seconds
     
     private double _maxPaths = 4;
@@ -99,21 +80,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     public void setMaxPaths(double numPaths) {
         _maxPaths = numPaths;
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        _graphService = graphService;
-    }
-
-    @Override
-    public GraphService getGraphService() {
-        return _graphService;
-    }
-
-    @Autowired
-    public void setIndexService(StreetVertexIndexService indexService) {
-        _indexService = indexService;
     }
 
     @Override
@@ -274,38 +240,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
     public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates,
             boolean ordered, Date targetTime, TraverseOptions options) {
         return null;
-    }
-    
-    
-    
-    /* MOVE THESE METHODS TO A LIBRARY CLASS */
-    
-    private Vertex getVertexForPlace(NamedPlace place, TraverseOptions options) {
-
-        Matcher matcher = _latLonPattern.matcher(place.place);
-
-        if (matcher.matches()) {
-            double lat = Double.parseDouble(matcher.group(1));
-            double lon = Double.parseDouble(matcher.group(4));
-            Coordinate location = new Coordinate(lon, lat);
-            return _indexService.getClosestVertex(location, place.name, options);
-        }
-
-        return _graphService.getContractionHierarchySet().getVertex(place.place);
-    }
-
-    @Override
-    public boolean isAccessible(NamedPlace place, TraverseOptions options) {
-        /* fixme: take into account slope for wheelchair accessibility */
-        Vertex vertex = getVertexForPlace(place, options);
-        if (vertex instanceof TransitStop) {
-            TransitStop ts = (TransitStop) vertex;
-            return ts.hasWheelchairEntrance();
-        } else if (vertex instanceof StreetLocation) {
-            StreetLocation sl = (StreetLocation) vertex;
-            return sl.isWheelchairAccessible();
-        }
-        return true;
     }
 
 }
