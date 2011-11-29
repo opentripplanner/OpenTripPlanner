@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -57,6 +58,8 @@ import org.springframework.stereotype.Component;
  * pruned due to excessive walking distance or excessive number of transfers 
  * without compromising other paths. 
  * 
+ * This path service cannot be used with edges that return multiple (chained) states.
+ *
  * @author andrewbyrd
  */
 @Component
@@ -67,6 +70,8 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
     private double[] _timeouts = new double[] {4, 2, 0.6, 0.4}; // seconds
     
     private double _maxPaths = 4;
+
+    private TraverseVisitor traverseVisitor;
 
     /**
      * Give up on searching for itineraries after this many seconds have elapsed.
@@ -80,6 +85,10 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
 
     public void setMaxPaths(double numPaths) {
         _maxPaths = numPaths;
+    }
+
+    public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
+        this.traverseVisitor = traverseVisitor;
     }
 
     @Override
@@ -170,6 +179,11 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             }
 
             Vertex u = su.getVertex();
+
+            if (traverseVisitor != null) {
+                traverseVisitor.visitVertex(su);
+            }
+
             if (u.equals(target)) {
                 boundingStates.add(su);
                 returnStates.add(su);
@@ -189,6 +203,10 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             
             EDGE: for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
                 State new_sv = e.traverse(su);
+                if (traverseVisitor != null) {
+                    traverseVisitor.visitEdge(e, new_sv);
+                }
+
                 if (new_sv == null)
                     continue;
                 double h = heuristic.computeForwardWeight(new_sv, target);
@@ -216,6 +234,9 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                         }
                     }
                 }
+                if (traverseVisitor != null)
+                    traverseVisitor.visitEnqueue(new_sv);
+
                 old_states.add(new_sv);
                 pq.insert(new_sv, new_sv.getWeight() + h);    
             }
