@@ -41,6 +41,7 @@ otp.planner.Planner = {
     geocoder                : null,
     templates               : null,
     routerId                : null,
+    itineraryMessages       : null,
     options                 : null,  // see config.js - planner.options
 
     // new tab (itineraries tabs) management

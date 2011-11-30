@@ -37,7 +37,7 @@ otp.config_defaults = {
         itineraryMessages : {
             icon            : null,
             transit         : "This is an Itinerary Message test...",
-            transit         : null,
+            transit         : null, 
             bus             : null,
             train           : null,
             bicycle         : null,
