@@ -285,7 +285,7 @@
 
   <properties>
     <geotools.version>2.6.4</geotools.version>
-    <jersey.version>1.1.2-ea</jersey.version>
+    <jersey.version>1.9.1</jersey.version>
     <spring.version>3.0.5.RELEASE</spring.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <distribution_id>opengeo</distribution_id>
