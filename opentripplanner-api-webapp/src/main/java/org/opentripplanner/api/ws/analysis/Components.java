@@ -75,11 +75,11 @@ public class Components {
 
         TraverseOptions options = new TraverseOptions(modes);
         long dateTime = DateUtils.toDate(date, time).getTime();
-        options.setServiceDays(dateTime);
         Graph graph = graphService.getGraph();
         if (graphService.getCalendarService() != null) {
             options.setCalendarService(graphService.getCalendarService());
         }
+        options.setServiceDays(dateTime);
         List<Geometry> polygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
 
         GraphComponentPolygons out = new GraphComponentPolygons();
