@@ -20,6 +20,7 @@ otp.config_defaults = {
 
     planner : {
         url            : null,
+        printUrl       : null,
 
         // options to turn stuff on / off on the planner
         options        : {

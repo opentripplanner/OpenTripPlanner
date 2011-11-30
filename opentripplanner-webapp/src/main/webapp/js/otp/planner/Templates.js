@@ -131,7 +131,7 @@ otp.planner.Templates = {
             this.TP_LEG_BASE_STR = ''
                 + '<p class="leg-info">'
                 + '<span class="time">{startTimeDisplayShort}</span> ' + this.locale.instructions.depart + ' {fromName}'
-                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds">'
+                + '<tpl if="fromStopId != null && fromStopId.length &gt; 0 && showStopIds == true">'
                 +   '<br/>'
                 +   '<span class="stopid">' + this.locale.labels.stop_id + ' {fromStopId}</span>'
                 + '</tpl>'
@@ -141,7 +141,7 @@ otp.planner.Templates = {
                 + '</tpl>'
                 + '<p class="leg-info">'
                 + '<span class="time">{endTimeDisplayShort}</span> ' + this.locale.instructions.arrive + ' {toName}'
-                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds">'
+                + '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds == true">'
                 +   '<br/>'
                 +   '<span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span>'
                 + '</tpl>'
@@ -180,7 +180,7 @@ otp.planner.Templates = {
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
                     this.locale.directions.to + ' {toName}',
                   '</h4>',
-                  '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds">',
+                  '<tpl if="toStopId != null && toStopId.length &gt; 0 && showStopIds == true">',
                     '<p class="leg-info"><span class="stopid">' + this.locale.labels.stop_id + ' {toStopId}</span></p>',
                   '</tpl>',
                   '<tpl if="duration != null && duration &gt; 0">',

@@ -47,13 +47,13 @@ otp.planner.StepData = {
     num          : null,   // number count of this type of data
     instructions : null,   // sub-array of StepData elements (often null), used for 'indented' instructions, like walk & bike instructions
 
-    lat          : null,  
-    lon          : null,
+    originalData : null,
 
     text         : null,   // content 
-    elCls        : null,   // element css style
+    cls          : null,   // element css style
     iconCls      : null,   // icon css style
     icon         : null,   // icon url
+    leaf         : true,   // ext tree thang (can be ignored)
 
     initialize : function(config)
     {
@@ -71,8 +71,8 @@ otp.planner.StepData = {
 
     makeDiv : function(content, dontClose)
     {
-        var id   = this.id    ? ' id="'    + this.id    + '" ' : ' ';
-        var cls  = this.elCls ? ' class="' + this.elCls + '" ' : ' ';
+        var id   = this.id  ? ' id="'    + this.id    + '" ' : ' ';
+        var cls  = this.cls ? ' class="' + this.cls + '" ' : ' ';
 
         var retVal = '<div ' + cls + id + '>';
         if (content)
@@ -105,6 +105,7 @@ otp.planner.ItineraryDataFactoryStatic = {
     store        : null,
     templates    : null,
     locale       : null,
+    showStopIds  : false,
 
     from         : null,
     to           : null,
@@ -153,7 +154,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         // step 1: start node
         var fmTxt = this.templates.TP_START.applyTemplate(this.from.data);
         var fmId  = this.id + '-' + otp.planner.Utils.FROM_ID;
-        itinData.from = new otp.planner.StepData({id:fmId, elCls: 'itiny magnify', iconCls:'start-icon', icon:blankImg, text:fmTxt, num:num++, lat:1, lon:1});
+        itinData.from = new otp.planner.StepData({id:fmId, cls:'itiny magnify', iconCls:'start-icon', icon:blankImg, text:fmTxt, num:num++, originalData:this.from});
 
         // step 2: leg (and sub-leg) instruction nodes
         var containsBikeMode    = false;
@@ -163,7 +164,9 @@ otp.planner.ItineraryDataFactoryStatic = {
         var numLegs = this.store.getCount();
         for(var i = 0; i < numLegs; i++)
         {
-            var leg          = this.store.getAt(i);
+            var leg              = this.store.getAt(i);
+            leg.data.showStopIds = this.showStopIds;
+
             var text         = null;
             var verb         = null;
             var sched        = null;
@@ -171,6 +174,7 @@ otp.planner.ItineraryDataFactoryStatic = {
             var agencyId     = leg.get('agencyId');
             var routeId      = leg.get('routeShortName');
             var instructions = null;
+            var isLeaf       = true;
             var legId = this.id + this.LEG_ID + i;
 
             // step 2a: build either a transit leg node, or the non-transit turn-by-turn instruction nodes
@@ -201,6 +205,8 @@ otp.planner.ItineraryDataFactoryStatic = {
                 if (!leg.data.formattedSteps)
                 {
                     instructions = this.makeInstructionStepsNodes(leg.data.steps, verb, legId, this.dontEditStep);
+                    if(instructions && instructions.length >= 1)
+                        isLeaf = false;
                     leg.data.formattedSteps = "";
                 }
                 text = this.templates[template].applyTemplate(leg.data);
@@ -208,7 +214,7 @@ otp.planner.ItineraryDataFactoryStatic = {
 
             // step 2b: make this leg (tree) node
             var icon = otp.util.imagePathManager.imagePath({mode:mode, agencyId:agencyId, route:routeId});
-            var step = new otp.planner.StepData({id:legId, elCls: 'itiny magnify', iconCls:'itiny-inline-icon', icon:icon, text:text, num:num++, instructions:instructions, lat:1, lon:1});
+            var step = new otp.planner.StepData({id:legId, cls:'itiny magnify', iconCls:'itiny-inline-icon', icon:icon, text:text, num:num++, instructions:instructions, originalData:leg, leaf:isLeaf});
 
             // step 2c: push new step to return...
             steps.push(step);
@@ -217,7 +223,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         // step 3: to node content
         var toTxt = this.templates.TP_END.applyTemplate(this.to.data);
         var toId  = this.id + '-' + otp.planner.Utils.TO_ID;
-        itinData.to = new otp.planner.StepData({id:toId, elCls: 'itiny magnify', iconCls:'end-icon', text:toTxt, num:num++, lat:1, lon:1});
+        itinData.to = new otp.planner.StepData({id:toId, cls:'itiny magnify', iconCls:'end-icon', text:toTxt, num:num++, originalData:this.to});
 
         // step 4: build details node's content
         var tripDetailsDistanceVerb = this.locale.instructions.walk_verb;
@@ -229,7 +235,7 @@ otp.planner.ItineraryDataFactoryStatic = {
 
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
-        itinData.details = new otp.planner.StepData({id:tpId, elCls: 'trip-details-shell', iconCls:'no-icon', text:tpTxt, num:num++});
+        itinData.details = new otp.planner.StepData({id:tpId, cls:'trip-details-shell', iconCls:'no-icon', text:tpTxt, num:num++});
 
         // step 5: mode note
         if(this.modes && this.modes.getMessage())
@@ -239,7 +245,7 @@ otp.planner.ItineraryDataFactoryStatic = {
             if(this.modes.itineraryMessages && this.modes.itineraryMessages.icon)
                 i = this.modes.itineraryMessages.icon;
 
-            itinData.notes = new otp.planner.StepData({id:tpId+'-modeinfo', elCls: 'itiny-note', iconCls:'itiny-inline-icon', icon:i, text:m, num:num++});
+            itinData.notes = new otp.planner.StepData({id:tpId+'-modeinfo', cls:'itiny-note', iconCls:'itiny-inline-icon', icon:i, text:m, num:num++});
         }
 
         return itinData;
@@ -290,7 +296,7 @@ otp.planner.ItineraryDataFactoryStatic = {
             }
 
             var text = this.addNarrativeToStep(step, verb, stepNum);
-            var cfg = {id:legId + "-" + i, text:step.narrative, elCls:'itiny-steps', iconCls:'itiny-inline-icon', icon:step.iconURL, text:text, num:stepNum++};
+            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny-steps', iconCls:'itiny-inline-icon', icon:step.iconURL, text:text, num:stepNum++, originalData:step};
             var node = new otp.planner.StepData(cfg);
             retVal.push(node);
         }

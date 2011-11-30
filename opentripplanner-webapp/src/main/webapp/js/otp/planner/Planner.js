@@ -34,6 +34,7 @@ otp.planner.Planner = {
 
     // configuration
     url                     : null,
+    printUrl                : null,
     poi                     : null,
     fromToOverride          : null,
     linkTemplates           : null,
@@ -311,7 +312,7 @@ otp.planner.Planner = {
 
         console.log("Planner.print: clone trip request object");
         var req    = otp.clone(this.getActiveRequest());
-        req.url    = otp.planner.PrintStatic.url;
+        req.url    = this.printUrl || otp.planner.PrintStatic.url;
 
         console.log("Planner.print: url " + req.url);
         var url    = this.templates.tripPrintTemplate.apply(req);
