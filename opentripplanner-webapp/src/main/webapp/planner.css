@@ -512,6 +512,11 @@ vertical-align: middle;
 margin: 0;
 }
 
+.itiny .x-tree-ec-icon {
+display: none;
+}
+
+
 .itiny-steps {
 font-size: 11px;
 padding-left: 10px;
@@ -522,11 +527,14 @@ vertical-align: middle;
 margin: 0;
 }
 
-.itiny .x-tree-ec-icon {
-display: none;
+.itiny-inline-icon {
+float: left;
+width: 21px !important;
+height: 21px !important;
 }
 
-.itiny-inline-icon {
+/* IMPORTANT (don't delete: itiny-step-icon is a duplicate to inline here, but not so for printing */
+.itiny-step-icon {
 float: left;
 width: 21px !important;
 height: 21px !important;

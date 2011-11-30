@@ -27,7 +27,8 @@ otp.util.HtmlUtils = {
     {
         try
         {
-            this.drawCustomLogo(config.logo);
+            if(!this.hasLogoLinkImg())
+                this.drawCustomLogo(config.logo);
         }
         catch(e)
         {
@@ -49,13 +50,15 @@ otp.util.HtmlUtils = {
     /** create logo image, using a custom logo if specified */
     drawCustomLogo : function(logo, alt)
     {
+        
+        
         try
         {
             var logoPath = (typeof logo === 'string') ? logo : this.defaultLogo;
             var altStr   = (typeof logo === 'string') ? alt  : this.defaultAlt;
 
             // TODO: refactor w/out Extjs ???
-            var logoAnchorWrapper = Ext.get('logo').query('a')[0];
+            var logoAnchorWrapper = this.getLogoLink(); 
             Ext.DomHelper.append(logoAnchorWrapper, {tag: 'img',
                                                      alt: altStr,
                                                      src: logoPath
@@ -65,6 +68,29 @@ otp.util.HtmlUtils = {
         {
             console.log("GA EXCEPTION: AnalyticsUtils.importGoogleAnalytics threw exception " + e);
         }
+    },
+    
+    /** */
+    getLogoLink : function(path)
+    {
+        if(!path)
+            path='a';
+        return Ext.get('logo').query(path)[0];
+    },
+
+    /** check whether the logo link has an img tag */
+    hasLogoLinkImg : function()
+    {
+        var retVal = false;
+        try 
+        {
+            var x = this.getLogoLink('a/img');
+            if(x)
+                retVal = true;
+        }
+        catch(e)
+        {}
+        return retVal;
     },
 
     CLASS_NAME : "otp.util.HtmlUtils"

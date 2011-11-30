@@ -296,7 +296,7 @@ otp.planner.ItineraryDataFactoryStatic = {
             }
 
             var text = this.addNarrativeToStep(step, verb, stepNum);
-            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny-steps', iconCls:'itiny-inline-icon', icon:step.iconURL, text:text, num:stepNum++, originalData:step};
+            var cfg = {id:legId + "-" + i, text:step.narrative, cls:'itiny-steps', iconCls:'itiny-step-icon', icon:step.iconURL, text:text, num:stepNum++, originalData:step};
             var node = new otp.planner.StepData(cfg);
             retVal.push(node);
         }

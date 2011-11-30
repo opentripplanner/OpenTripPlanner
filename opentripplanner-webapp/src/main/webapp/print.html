@@ -11,16 +11,29 @@
     <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
     <link rel="stylesheet" type="text/css" href="planner.css" />
     <style type="text/css" >
+        body {
+            font: 13px/13px normal Arial,Helvetica,sans-serif;
+        }
         #print-screen-button {
             position: absolute;
             right: 10px;
             top: 10px;
         }
+        h4 {
+            padding-left:25px;
+        }
+        .itiny {
+            margin-top:10px;
+        }
+        .itiny-step-icon {
+            float:none !important;
+        } 
     </style>
 
     <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
     <script src="js/lib-min.js"></script>
     <script src="js/otp-min.js"></script>
+    <script src="js/otp/util/HtmlUtils.js"></script>
     <script src="js/otp/planner/Templates.js"></script>
     <script src="js/otp/planner/Planner.js"></script>
     <script src="js/otp/planner/ItineraryData.js"></script>
@@ -33,10 +46,10 @@
         <div id="print-screen-button"><input name="print" type="button" value="Print" onClick="javascript:window.print();" class="noprint"></input></div>
     </div>
 
-    <div id="header"    style="width: 800px"></div>
-    <div id="map-print" style="width: 800px; height: 400px"></div>
-    <div id="legs"      style="width: 800px"></div>
-    <div id="details"   style="width: 800px"></div>
+    <div id="header"    style="width:800px;"></div>
+    <div id="map-print" style="width:800px; height:400px;"></div>
+    <div id="legs"      style="width:800px; padding-top:10px;"></div>
+    <div id="details"   style="width:750px; padding-left:20px;"></div>
 
     <!-- TODO: have a localized string replacment that gets activated by the constructor for html elements ... title, print button, etc...  ALSO configed logo replacement --> 
     <script>otp.util.AnalyticsUtils.importGoogleAnalytics();</script>
