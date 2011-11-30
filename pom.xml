@@ -195,6 +195,11 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
+      <artifactId>gt-geojson</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
       <artifactId>gt-geotiff</artifactId>
       <version>${geotools.version}</version>
     </dependency>
@@ -284,7 +289,7 @@
   </dependencyManagement>
 
   <properties>
-    <geotools.version>2.6.4</geotools.version>
+    <geotools.version>2.7.1</geotools.version>
     <jersey.version>1.9.1</jersey.version>
     <spring.version>3.0.5.RELEASE</spring.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

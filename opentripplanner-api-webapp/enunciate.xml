@@ -18,4 +18,5 @@
     <docs title="OpenTripPlanner API"
           base="src/main/resources/docs-theme"/>
   </modules> 
+  <disable-rule id="jaxb.noarg.constructor"/>
 </enunciate> 

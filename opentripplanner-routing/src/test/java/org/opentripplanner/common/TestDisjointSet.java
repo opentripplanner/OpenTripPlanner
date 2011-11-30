@@ -11,11 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+package org.opentripplanner.common;
+
 import java.util.HashMap;
 import java.util.Random;
 
 import org.junit.Test;
-import org.opentripplanner.graph_builder.services.DisjointSet;
+import org.opentripplanner.common.DisjointSet;
 
 import junit.framework.TestCase;
 

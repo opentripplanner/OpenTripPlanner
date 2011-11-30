@@ -31,7 +31,21 @@ public class MapUtils {
         }
         list.add(value);
     }
-
+    
+    /**
+     * A common pattern: add some items to a list in a hash value, creating that list if
+     * necessary
+     */
+    public static final <T, U> void addToMapList(Map<T, List<U>> mapList,
+            T key, List<U> values) {
+        List<U> list = mapList.get(key);
+        if (list == null) {
+            list = new ArrayList<U>(values.size());
+            mapList.put(key, list);
+        }
+        list.addAll(values);
+    }
+    
     /**
      * Remove an item from a list in a hash, destroying that hash value if the list is empty
      */
@@ -54,4 +68,5 @@ public class MapUtils {
         }
         return false;
     }
+
 }
