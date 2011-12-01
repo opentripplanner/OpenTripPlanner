@@ -21,6 +21,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.services.GraphService;
@@ -98,12 +99,12 @@ public class GraphBuilderTask implements Runnable {
         
         ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
         chs.build();
+        GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
         try {
             GraphSerializationLibrary.writeGraph(chs, graphPath);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
-        
         _graphService.refreshGraph();
     }
 }

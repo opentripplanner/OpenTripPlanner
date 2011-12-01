@@ -17,6 +17,8 @@ import java.util.ArrayList;
 
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -49,8 +51,7 @@ public class NetworkLinker {
         int i = 0;
         ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
 
-        for (Vertex gv : vertices) {
-            Vertex v = gv;
+        for (Vertex v : vertices) {
             if (i % 100000 == 0)
                 _log.debug("vertices=" + i + "/" + vertices.size());
             i++;
@@ -62,7 +63,7 @@ public class NetworkLinker {
                 if (!ts.isEntrance()) {
                     boolean hasEntrance = false;
 
-                    for (Edge e : gv.getOutgoing()) {
+                    for (Edge e : v.getOutgoing()) {
                         if (e instanceof PathwayEdge) {
                             hasEntrance = true;
                             break;
@@ -76,7 +77,7 @@ public class NetworkLinker {
 
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(v, wheelchairAccessible)) {
-                    _log.warn("Stop " + ts + " not near any streets; it will not be usable");
+                	graph.addBuilderAnnotation(new GraphBuilderAnnotation(Variety.UNLINKED_STOP, ts));
                 }
             }
         }
