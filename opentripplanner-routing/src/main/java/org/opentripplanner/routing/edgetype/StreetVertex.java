@@ -220,8 +220,7 @@ public class StreetVertex extends Vertex {
                 break;
             case TRIANGLE:
                 double quick = slopeSpeedEffectiveLength;
-                // see comment in PlainStreetEdge explaining this
-                double safety = bicycleSafetyEffectiveLength;// * 0.2 + quick * 0.8;
+                double safety = bicycleSafetyEffectiveLength;
                 double slope = slopeWorkCost;
                 weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
                 weight /= options.speed;

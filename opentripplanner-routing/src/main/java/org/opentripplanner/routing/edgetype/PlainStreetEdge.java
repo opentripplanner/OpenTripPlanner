@@ -220,14 +220,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
                 break;
             case TRIANGLE:
                 double quick = slopeSpeedEffectiveLength;
-                /*
-                 * Ideally, weight would be a pure affine combination of the safety, slope, and 
-                 * speed costs.  Unfortunately, this leads to speed being undervalued, since it has
-                 * less extreme values.  Since the triangle is basically a UI gimmick, I have finely
-                 * tuned these values to look good on a particular trip and I'll hope that they work
-                 * everywhere. 
-                 */
-                double safety = bicycleSafetyEffectiveLength;// * 0.2 + quick * 0.8;
+                double safety = bicycleSafetyEffectiveLength;
                 double slope = slopeWorkCost;
                 weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
                 weight /= options.speed;
