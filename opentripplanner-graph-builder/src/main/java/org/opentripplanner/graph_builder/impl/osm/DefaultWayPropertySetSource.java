@@ -138,6 +138,36 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=motorway_link;cycleway=lane",
             StreetTraversalPermission.BICYCLE_AND_CAR, 1.15, 1.15);
 
+        /* cycleway=share_busway */
+        setProperties(props, "highway=*;cycleway=share_busway", 
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.92, 0.92);
+        setProperties(props, "highway=service;cycleway=share_busway",
+            StreetTraversalPermission.ALL, 0.85, 0.85);
+        setProperties(props, "highway=residential;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.85, 0.85);
+        setProperties(props, "highway=residential_link;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.85, 0.85);
+        setProperties(props, "highway=tertiary;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.92, 0.92);
+        setProperties(props, "highway=tertiary_link;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.92, 0.92);
+        setProperties(props, "highway=secondary;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.99, 0.99);
+        setProperties(props, "highway=secondary_link;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 0.99, 0.99);
+        setProperties(props, "highway=primary;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 1.25, 1.25);
+        setProperties(props, "highway=primary_link;cycleway=share_busway", 
+            StreetTraversalPermission.ALL, 1.25, 1.25);
+        setProperties(props, "highway=trunk;cycleway=share_busway", 
+            StreetTraversalPermission.BICYCLE_AND_CAR, 1.75, 1.75);
+        setProperties(props, "highway=trunk_link;cycleway=share_busway", 
+            StreetTraversalPermission.BICYCLE_AND_CAR, 1.25, 1.25);
+        setProperties(props, "highway=motorway;cycleway=share_busway", 
+            StreetTraversalPermission.BICYCLE_AND_CAR, 2.5, 2.5);
+        setProperties(props, "highway=motorway_link;cycleway=share_busway",
+            StreetTraversalPermission.BICYCLE_AND_CAR, 1.25, 1.25);
+
         /* cycleway=opposite_lane */
         setProperties(props, "highway=*;cycleway=opposite_lane", 
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 0.87);
@@ -160,7 +190,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=primary_link;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 2.06, 1.15);
         setProperties(props, "highway=trunk;cycleway=opposite_lane", 
-            StreetTraversalPermission.ALL, 7.47, 1.45);
+            StreetTraversalPermission.ALL, 7.47, 1.5);
         setProperties(props, "highway=trunk_link;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 2.06, 1.15);
 
@@ -266,9 +296,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         /* Portland area specific tags */
         setProperties(props, "highway=footway;RLIS:bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
         setProperties(props, "highway=footway;CCGIS:bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
 
         /* sidewalk and crosswalk */
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=yes",
@@ -276,7 +306,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "footway=sidewalk;highway=footway;bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
         setProperties(props, "highway=footway;footway=crossing",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.0, 2.0);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 2.1, 2.1);
         setProperties(props, "highway=footway;footway=crossing;bicycle=yes",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
         setProperties(props, "highway=footway;footway=crossing;bicycle=designated",
