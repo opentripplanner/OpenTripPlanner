@@ -17,6 +17,9 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
+/*
+ * Read safety factors directly from shapefiles (contributed by Guillaume Barreau)
+ */
 public class DirectSafetyReader implements SimpleFeatureConverter<P2<Double>> {
     private String safetyAttributeName;
 
