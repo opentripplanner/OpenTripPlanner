@@ -270,6 +270,18 @@ public class MultiObjectivePathServiceImpl implements PathService {
                s0.getNumBoardings() <= s1.getNumBoardings();
     }
 
+//    private boolean eDominates(State s0, State s1) {
+//        final double EPSILON = 0.05;
+//        if (s0.similarTripSeq(s1)) {
+//            return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
+//                    s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
+//                    s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
+//                    s0.getNumBoardings() <= s1.getNumBoardings();
+//        } else {
+//            return false;
+//        }
+//    }
+    
     @Override
     public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates,
             boolean ordered, Date targetTime, TraverseOptions options) {
