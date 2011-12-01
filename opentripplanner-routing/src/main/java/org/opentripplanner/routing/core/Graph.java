@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -63,6 +64,8 @@ public class Graph implements Serializable {
     private TransferTable transferTable = new TransferTable();
 
     private GraphBundle bundle;
+    
+    private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
     public Graph(Graph basedOn) {
         this();
@@ -291,7 +294,7 @@ public class Graph implements Serializable {
         return transferTable;
     }
 
-    // Infer the time period covered by the trasit feed
+    // Infer the time period covered by the transit feed
     public void updateTransitFeedValidity(CalendarServiceData data) {
         final long SEC_IN_DAY = 24 * 60 * 60;
         for (AgencyAndId sid : data.getServiceIds()) {
@@ -381,4 +384,11 @@ public class Graph implements Serializable {
         }
     }
 
+    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
+    	this.graphBuilderAnnotations.add(gba);
+    }
+
+    public List<GraphBuilderAnnotation> getBuilderAnnotations() {
+    	return this.graphBuilderAnnotations;
+    }
 }
