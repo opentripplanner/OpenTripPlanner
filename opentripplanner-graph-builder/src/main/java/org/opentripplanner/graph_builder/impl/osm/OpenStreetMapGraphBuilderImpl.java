@@ -35,6 +35,8 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -132,10 +134,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag = new HashMap<TurnRestrictionTag, TurnRestriction>();
 
+        private Graph graph;
+        
         /** The bike safety factor of the safest street */
         private double bestBikeSafety = 1;
 
         public void buildGraph(Graph graph) {
+        	this.graph = graph;
+        	
             // handle turn restrictions and road names in relations
             processRelations();
 
@@ -478,7 +484,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
             if (from == -1 || to == -1 || via == -1) {
-                _log.debug("Bad restriction " + relation.getId());
+            	_log.warn(GraphBuilderAnnotation.register(
+            			graph, Variety.TURN_RESTRICTION_BAD, relation.getId()));
                 return;
             }
 
@@ -490,7 +497,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         modes.remove(TraverseMode.CAR);
                     } else if (m.equals("bicycle")) {
                         modes.remove(TraverseMode.BICYCLE);
-                        _log.debug("turn restriction with bicycle exception at node {} from {}", via, from);
+                    	_log.warn(GraphBuilderAnnotation.register(
+                    			graph, Variety.TURN_RESTRICTION_EXCEPTION, via, from));
                     }
                 }
             }
@@ -512,7 +520,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } else if (relation.isTag("restriction", "only_left_turn")) {
                 tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
             } else {
-                _log.debug("unknown restriction type " + relation.getTag("restriction"));
+            	_log.warn(GraphBuilderAnnotation.register(
+            			graph, Variety.TURN_RESTRICTION_UNKNOWN, relation.getTag("restriction")));
                 return;
             }
             TurnRestriction restriction = new TurnRestriction();
@@ -632,8 +641,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (way.isTag("cycleway", "dismount") || "dismount".equals(bicycle)) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
-                    _log.warn("conflicting tags bicycle:[yes|designated] and cycleway:dismount on way "
-                            + way.getId() + ", assuming dismount");
+                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.CONFLICTING_BIKE_TAGS, way.getId()));
                 }
             }
 

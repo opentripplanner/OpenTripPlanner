@@ -21,8 +21,8 @@ public class TripOvertakingException extends RuntimeException {
      * Thrown when a trip overtakes another trip on the same pattern. 
      */
     private static final long serialVersionUID = 1L;
-    private Trip overtaker, overtaken;
-    private int stopIndex;
+    public Trip overtaker, overtaken;
+    public int stopIndex;
     
     public TripOvertakingException(Trip overtaker, Trip overtaken, int stopIndex) {
         this.overtaker = overtaker;

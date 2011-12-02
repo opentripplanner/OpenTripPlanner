@@ -77,7 +77,7 @@ public class NetworkLinker {
 
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(v, wheelchairAccessible)) {
-                	graph.addBuilderAnnotation(new GraphBuilderAnnotation(Variety.UNLINKED_STOP, ts));
+                	_log.warn(GraphBuilderAnnotation.register(graph, Variety.STOP_UNLINKED, ts));
                 }
             }
         }

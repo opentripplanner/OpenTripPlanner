@@ -34,12 +34,14 @@ import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
@@ -287,10 +289,7 @@ public class GTFSPatternHopFactory {
             List<StopTime> originalStopTimes = getNonduplicateStopTimesForTrip(trip);
             interpolateStopTimes(originalStopTimes);
             if (originalStopTimes.size() < 2) {
-                _log
-                        .warn("Trip "
-                                + trip
-                                + " has fewer than two stops.  We will not use it for routing.  This is probably an error in your data");
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DEGENERATE, trip));
                 continue;
             }
 
@@ -350,16 +349,15 @@ public class GTFSPatternHopFactory {
                         // will be a duplicate of it, or (b) it will have different stops, and thus
                         // break the assumption that trips are non-overlapping.
                         if (! tripPattern.stopTimesIdentical(stopTimes, insertionPoint)) {
-                            _log.warn("Possible GTFS feed error: Duplicate first departure time. New trip: " 
-                                    + trip.getId()
-                                    + " Existing trip: " + tripPattern.getTrip(insertionPoint) 
-                                    + " This will be handled correctly but inefficiently.");                       
+                            _log.warn(GraphBuilderAnnotation.register(graph, 
+                            		Variety.TRIP_DUPLICATE_DEPARTURE, 
+                            		trip.getId(), tripPattern.getTrip(insertionPoint)));
                             simple = true;
                             createSimpleHops(graph, trip, stopTimes);   
                         } else {
-                            _log.warn("Possible GTFS feed error: Duplicate trip (skipping). New: " 
-                                    + trip.getId()
-                                    + " Existing: " + tripPattern.getTrip(insertionPoint));
+                        	_log.warn(GraphBuilderAnnotation.register(graph, 
+                            		Variety.TRIP_DUPLICATE, 
+                            		trip.getId(), tripPattern.getTrip(insertionPoint)));
                             break; // not continue - for frequency case
                         }
                     } else {
@@ -376,7 +374,9 @@ public class GTFSPatternHopFactory {
                                         runningTime, st1.getArrivalTime(), dwellTime, st0.getStopHeadsign(),
                                         trip);
                             } catch (TripOvertakingException e) {
-                                _log.warn(e.getMessage());
+                                _log.warn(GraphBuilderAnnotation.register(graph, 
+                                		Variety.TRIP_DUPLICATE_DEPARTURE,
+                                		e.overtaker, e.overtaken, e.stopIndex));
                                 // back out trips and revert to the simple method
                                 for (i = i - 1; i >= 0; --i) {
                                     tripPattern.removeHop(i, insertionPoint);
