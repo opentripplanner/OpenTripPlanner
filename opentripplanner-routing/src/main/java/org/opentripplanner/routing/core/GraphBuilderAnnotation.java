@@ -56,7 +56,7 @@ public class GraphBuilderAnnotation implements Serializable {
 	}
 
 	public enum Variety {
-		GRAPHWIDE_INFO ("Graph-wide: %s"),
+		GRAPHWIDE ("Graph-wide: %s"),
 		TRIP_DEGENERATE ("Trip %s has fewer than two stops.  We will not use it for routing.  This is probably an error in your data"),
 		TRIP_OVERTAKING ("Possible GTFS feed error: Trip %s overtakes trip %s (which has the same stops) at stop index %i. This will be handled correctly but inefficiently."),
 		TRIP_DUPLICATE ("Possible GTFS feed error: Duplicate trip (skipping). New: %s Existing: %s"),

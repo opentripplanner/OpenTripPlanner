@@ -343,7 +343,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param graph
          */
         private void applyBikeSafetyFactor(Graph graph) {
-            _log.info("Multiplying all bike safety values by " + (1 / bestBikeSafety));
+            _log.info(GraphBuilderAnnotation.register(graph, Variety.GRAPHWIDE, 
+            		"Multiplying all bike safety values by " + (1 / bestBikeSafety)));
             HashSet<Edge> seenEdges = new HashSet<Edge>();
             for (Vertex vertex : graph.getVertices()) {
                 for (Edge e : vertex.getOutgoing()) {
