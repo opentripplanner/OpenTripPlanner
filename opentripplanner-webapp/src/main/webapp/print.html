@@ -8,11 +8,13 @@
     <meta name="keywords" content="interactive map, map, trip planner, bus, rail, transit, max, tripplanner, plan, trip, plans, itinerary, schedule planner, planning, planner, scheduler, assistant, wizard, travel, schedule, guide, map, route, times, plan a trip" />
     <meta content="tripplanner v0.5 - November 2011 (FXP)"/>
 
-    <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
+    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/ext-all-notheme.css" />
+    <link rel="stylesheet" type="text/css" href="js/lib/ext/resources/css/xtheme-transit-extend.css" />
     <link rel="stylesheet" type="text/css" href="planner.css" />
+    <!--[if lte IE 6]> <link rel="stylesheet" href="/js/openlayers/theme/default/ie6-style.css" type="text/css" /> <![endif]-->
     <style type="text/css" >
-        body {
-            font: 13px/13px normal Arial,Helvetica,sans-serif;
+        div {
+            font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
         }
         #print-screen-button {
             position: absolute;
@@ -30,14 +32,8 @@
         } 
     </style>
 
-    <!--[if IE]><script type="text/javascript" src="js/lib/excanvas.min.js"></script><![endif]-->
     <script src="js/lib-min.js"></script>
     <script src="js/otp-min.js"></script>
-    <script src="js/otp/util/HtmlUtils.js"></script>
-    <script src="js/otp/planner/Templates.js"></script>
-    <script src="js/otp/planner/Planner.js"></script>
-    <script src="js/otp/planner/ItineraryData.js"></script>
-    <script src="js/otp/planner/Print.js"></script>
 </head>
 
 <body>
@@ -60,5 +56,6 @@
         new otp.planner.Print();
     });
     </script>
+
 </body>
 </html>

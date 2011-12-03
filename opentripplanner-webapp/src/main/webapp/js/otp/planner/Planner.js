@@ -304,16 +304,11 @@ otp.planner.Planner = {
     /** */
     printCB : function(button, event)
     {
-        otp.planner.PrintStatic.itinerary   = this.getActiveItinerary();
-        otp.planner.PrintStatic.map         = this.map;
-        otp.planner.PrintStatic.templates   = this.templates;
-        otp.planner.PrintStatic.options     = this.map.options;
-        otp.planner.PrintStatic.locale      = this.locale;
-        otp.planner.PrintStatic.current_map = this.map.getMap();
+        otp.planner.PrintStatic.configViaPlanner(this);
 
         console.log("Planner.print: clone trip request object");
         var req    = otp.clone(this.getActiveRequest());
-        req.url    = this.printUrl || otp.planner.PrintStatic.url;
+        req.url    = this.printUrl || 'print.html';
 
         console.log("Planner.print: url " + req.url);
         var url    = this.templates.tripPrintTemplate.apply(req);

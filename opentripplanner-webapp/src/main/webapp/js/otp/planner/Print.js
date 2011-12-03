@@ -21,15 +21,13 @@ otp.namespace("otp.planner");
  */
 otp.planner.PrintStatic = {
 
-    // passed
-    map         : null,
-    locale      : null,
-    options     : null,
-    current_map : null,
-    itinerary   : null,
+    // passed via global variable set in Planner.js (TODO: if no planner, create with new itinerary via url params)
     planner     : null,
     templates   : null,
-    url         : 'print.html',
+    locale      : null,
+    itinerary   : null,
+    options     : null,
+    current_map : null,
  
     // created  
     config      : null,
@@ -37,18 +35,37 @@ otp.planner.PrintStatic = {
     print_map   : null,
     dialog      : null,
 
+    MAP_DIV     : 'map-print',
+
     /** CONTROLLER for print dialog */
     initialize : function(config)
     {
         otp.configure(this, config);
-        otp.configure(this, window.opener.otp.planner.PrintStatic);
         this.config = otp.util.ObjUtils.getConfig(config);
+
+        var p = window.opener.otp.planner.PrintStatic.planner;
+        if(p)
+            this.configViaPlanner(p);
 
         // do things like localize HTML strings, and custom icons, etc...
         otp.util.HtmlUtils.fixHtml(this.config);
 
-        this.renderMap();
+        if(Ext.isIE)         // TODO: fix OL errors on IE
+            otp.util.HtmlUtils.hideShowElement(this.MAP_DIV);
+        else
+            this.renderMap();  
         this.writeItinerary();
+    },
+
+    /** takes in a Planner.js object, and assigns important objects to this object */
+    configViaPlanner : function(planner)
+    {
+        this.planner     = planner;
+        this.templates   = planner.templates;
+        this.locale      = planner.locale;
+        this.itinerary   = planner.getActiveItinerary();
+        this.options     = planner.map.options;
+        this.current_map = planner.map.getMap();
     },
 
     /** static method to open printing dialog */
@@ -77,7 +94,7 @@ otp.planner.PrintStatic = {
         // step 1: make a new print map
         var options = {}; 
         otp.extend(options, this.options);
-        options.div='map-print';
+        options.div=this.MAP_DIV;
         options.controls=controls;
         this.print_map = new OpenLayers.Map(options);
 
@@ -105,32 +122,47 @@ otp.planner.PrintStatic = {
                 var lyr = lyrs[i].clone(); 
                 if (lyrs[i].visibility == true)
                     lyr.visibility = true;
-                this.print_map.addLayer(lyr);
+                try {
+                    this.print_map.addLayer(lyr);
+                }
+                catch(e) {}
                 console.log("Print._makeMap Layer: " + lyr.name +  "  " + lyr.visibility + " " + lyr.getZIndex()); 
             }
         }
 
         // step 3: zoom to our map location
-        this.print_map.zoomToExtent(this.current_map.getExtent());
+        try {
+            this.print_map.zoomToExtent(this.current_map.getExtent());
+        }
+        catch(e) {}
     },
 
 
     /**  */
     writeItinerary : function()
     {
+        console.log('enter writeItinerary');
+
         // step 1: get itinerary data
+        console.log('writeItinerary - step 1: get itinerary data');
         var cfg  = {templates:this.templates, locale:this.locale, store:this.itinerary.m_legStore, modes:this.itinerary.m_modes, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
         var itin = otp.planner.ItineraryDataFactoryStatic.factory(cfg);
 
-        // step 2: get divs that we'll write into
-        var headerDIV  = Ext.get("header");
-        var detailsDIV = Ext.get("details");
-        var legsDIV    = Ext.get("legs");
+        // step 2: get divs that we will write into
+        console.log('writeItinerary - step 2: get divs that we will write into');
+        var headerDIV  = otp.util.HtmlUtils.getElement("header");
+        var detailsDIV = otp.util.HtmlUtils.getElement("details");
+        var legsDIV    = otp.util.HtmlUtils.getElement("legs");
+
+        console.log(headerDIV);
+        console.log(detailsDIV);
+        console.log(legsDIV);
 
         // step 3: write the header
+        console.log('writeItinerary - step 3: write the header'); 
         var from = itin.from.makeDiv(itin.from.makeImg(true) + ' ' + itin.from.text);
         var to   = itin.to.makeDiv(  itin.to.makeImg(true)   + ' ' + itin.to.text);
-        headerDIV.update(from + to);
+        headerDIV.innerHTML = from + to;
 
 
         // step 4: write the itinerary
@@ -159,13 +191,13 @@ otp.planner.PrintStatic = {
 
         // step 4c: close the itinerary
         text += to;
-        legsDIV.update(text);
+        legsDIV.innerHTML = text;
 
         // step 5: write the trip details
         var details = "";
         if(itin.notes)   details += itin.notes.makeDiv(itin.notes.makeImg(true) + itin.notes.text);
         if(itin.details) details += itin.details.text;
-        detailsDIV.update(details);
+        detailsDIV.innerHTML = details;
     },
 
 

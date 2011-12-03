@@ -36,22 +36,10 @@ otp.util.HtmlUtils = {
         }
     },
 
-    hideShowElement : function(elem)
-    {
-        var node = me.parentNode.parentNode.className;
-        if(node.indexOf(' expanded') > 0)
-            me.parentNode.parentNode.className = node.replace(' expanded', '');
-        else
-            me.parentNode.parentNode.className = node + ' expanded';
-    
-        return false;
-    },
 
     /** create logo image, using a custom logo if specified */
     drawCustomLogo : function(logo, alt)
     {
-        
-        
         try
         {
             var logoPath = (typeof logo === 'string') ? logo : this.defaultLogo;
@@ -69,7 +57,58 @@ otp.util.HtmlUtils = {
             console.log("GA EXCEPTION: AnalyticsUtils.importGoogleAnalytics threw exception " + e);
         }
     },
-    
+
+    getElement : function(el, doc)
+    {
+        var retVal = null;
+        try
+        {
+            if(doc == null)
+                doc = document;
+            retVal = doc.getElementById(el);
+        }
+        catch(e)
+        {
+            console.log('HtmlUtils.getElement: no element ' + el + ' in doc ' + doc);
+        }
+
+        if(retVal == null)
+        {
+            try
+            {
+                retVal = document.getElementById(el);
+            }
+            catch(e)
+            {
+                console.log('HtmlUtils.getElement: no element ' + el + ' in doc ' + doc);
+            }
+        }
+
+        return retVal;
+    },
+
+    /** */
+    hideShowElement : function(el, doc, disp)
+    {
+        try
+        {
+            var e = this.getElement(el, doc);
+            var s = e.style.display;
+
+            // default display is 'block', could also be 'inline', etc...
+            if(disp == null)
+                disp = 'block';
+
+            if(s && s == 'none')
+                e.style.display = disp;
+            else 
+                e.style.display = 'none';
+        }
+        catch(e)
+        {
+        }
+    },
+
     /** */
     getLogoLink : function(path)
     {

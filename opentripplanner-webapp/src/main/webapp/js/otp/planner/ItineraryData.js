@@ -245,7 +245,7 @@ otp.planner.ItineraryDataFactoryStatic = {
             if(this.modes.itineraryMessages && this.modes.itineraryMessages.icon)
                 i = this.modes.itineraryMessages.icon;
 
-            itinData.notes = new otp.planner.StepData({id:tpId+'-modeinfo', cls:'itiny-note', iconCls:'itiny-inline-icon', icon:i, text:m, num:num++});
+            itinData.notes = new otp.planner.StepData({id:tpId+'-modeinfo', cls:'itiny-note', iconCls:'itiny-step-icon', icon:i, text:m, num:num++});
         }
 
         return itinData;
