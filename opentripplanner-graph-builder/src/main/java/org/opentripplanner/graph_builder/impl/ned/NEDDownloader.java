@@ -51,10 +51,12 @@ import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 
 import org.opentripplanner.graph_builder.impl.osm.OSMDownloader;
+import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.core.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -67,7 +69,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author novalis
  *
  */
-public class NEDDownloader {
+@Component
+public class NEDDownloader implements NEDTileSource {
 
     private static Logger log = LoggerFactory.getLogger(NEDDownloader.class);
 
@@ -81,17 +84,13 @@ public class NEDDownloader {
 
     private double _lonXStep = 0.16;
 
+    @Override
     @Autowired
     public void setGraph(Graph graph) {
         this.graph = graph;
     }
 
-    /**
-     * The cache directory stores NED tiles.  It is crucial that this be somewhere permanent
-     * with plenty of disk space.  Don't use /tmp -- the downloading process takes a long time
-     * and you don't want to repeat it if at all possible.
-     * @param cacheDirectory
-     */
+    @Override
     public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
@@ -325,10 +324,8 @@ public class NEDDownloader {
         return lft + "_" + rgt + "_" + top + "_" + bot;
     }
 
-    /** 
-     * Download all the NED tiles into the cache.
-     */
-    public List<File> downloadNED() {
+    @Override
+    public List<File> getNEDTiles() {
         log.debug("Downloading NED");
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();

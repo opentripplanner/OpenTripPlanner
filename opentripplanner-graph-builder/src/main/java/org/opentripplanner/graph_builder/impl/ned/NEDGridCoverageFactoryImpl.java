@@ -22,11 +22,12 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
+import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * A coverage factory that works off of the NED caches from {@link NEDDownloader}. 
+ * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
  */
 public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
@@ -36,8 +37,11 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private File cacheDirectory;
 
+    private NEDTileSource tileSource;
+
     /**
      * Set the graph that will be used to determine the extent of the NED.
+     *
      * @param graphService
      */
     @Autowired
@@ -47,22 +51,27 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     /**
      * Set the directory where NED will be cached.
+     *
      * @param cacheDirectory
      */
     public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
 
+    public void setTileSource(NEDTileSource source) {
+        this.tileSource = source;
+    }
+
     public Coverage getGridCoverage() {
         if (coverage == null) {
-            NEDDownloader downloader = new NEDDownloader();
-            downloader.setGraph(graphService.getGraph());
-            downloader.setCacheDirectory(cacheDirectory);
-            List<File> paths = downloader.downloadNED();
+            tileSource.setGraph(graphService.getGraph());
+            tileSource.setCacheDirectory(cacheDirectory);
+            List<File> paths = tileSource.getNEDTiles();
             for (File path : paths) {
                 GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl();
                 factory.setPath(path);
-                GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(), new InterpolationBilinear());
+                GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
+                        new InterpolationBilinear());
                 if (coverage == null) {
                     coverage = new UnifiedGridCoverage("unified", regionCoverage);
                 } else {
