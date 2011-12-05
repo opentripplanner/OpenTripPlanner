@@ -17,8 +17,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
