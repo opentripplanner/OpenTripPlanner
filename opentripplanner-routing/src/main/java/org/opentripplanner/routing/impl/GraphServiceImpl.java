@@ -13,17 +13,11 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Collections;
 import java.util.List;
-
-import javassist.bytecode.ClassFile;
-import javassist.util.proxy.FactoryHelper;
 
 import javax.annotation.PostConstruct;
 
