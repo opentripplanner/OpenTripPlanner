@@ -29,8 +29,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -118,14 +118,15 @@ public class RunBenchmarkPlanMain {
   }
 
   private List<Plan> readPlans() throws FileNotFoundException, IOException,
-      JSONException, ParseException {
+      ParseException {
     BufferedReader reader = new BufferedReader(new FileReader(_benchmarkPlan));
     String line = null;
     List<Plan> plans = new ArrayList<Plan>();
 
     while ((line = reader.readLine()) != null) {
-      JSONObject obj = new JSONObject(line);
-      plans.add(getJsonObjectAsPlan(obj));
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode obj = mapper.readTree(line);
+        plans.add(getJsonObjectAsPlan(obj));
     }
     return plans;
   }
@@ -161,20 +162,19 @@ public class RunBenchmarkPlanMain {
     return additionalBeans;
   }
 
-  private Plan getJsonObjectAsPlan(JSONObject obj) throws JSONException,
-      ParseException {
+  private Plan getJsonObjectAsPlan(JsonNode obj) throws ParseException {
 
     Plan plan = new Plan();
 
-    JSONObject from = obj.getJSONObject("from");
-    plan.latFrom = from.getDouble("lat");
-    plan.lonFrom = from.getDouble("lon");
+    JsonNode from = obj.get("from");
+    plan.latFrom = from.get("lat").getValueAsDouble();
+    plan.lonFrom = from.get("lon").getValueAsDouble();
 
-    JSONObject to = obj.getJSONObject("to");
-    plan.latTo = to.getDouble("lat");
-    plan.lonTo = to.getDouble("lon");
+    JsonNode to = obj.get("to");
+    plan.latTo = to.get("lat").getValueAsDouble();
+    plan.lonTo = to.get("lon").getValueAsDouble();
 
-    plan.time = DateLibrary.getIso8601StringAsDate(obj.getString("time"));
+    plan.time = DateLibrary.getIso8601StringAsDate(obj.get("time").getValueAsText());
     return plan;
   }
 

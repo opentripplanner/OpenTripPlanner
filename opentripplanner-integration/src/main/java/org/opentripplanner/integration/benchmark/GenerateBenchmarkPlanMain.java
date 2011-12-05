@@ -26,8 +26,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ObjectNode;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
@@ -127,6 +127,8 @@ public class GenerateBenchmarkPlanMain {
 
   private Envelope _envelope = null;
 
+  ObjectMapper mapper = new ObjectMapper();
+
   public void setInputPath(File file) {
     _inputPath = file;
   }
@@ -155,7 +157,7 @@ public class GenerateBenchmarkPlanMain {
     _envelope = envelope;
   }
 
-  public void run() throws IOException, JSONException {
+  public void run() throws IOException {
 
     List<Stop> stops = readStopsFromGtfs();
 
@@ -164,9 +166,9 @@ public class GenerateBenchmarkPlanMain {
     PrintWriter out = new PrintWriter(_outputPath);
 
     for (int i = 0; i < _samples; i++) {
-      JSONObject from = getRandomLocationNearTransitStop(stops);
-      JSONObject to = getRandomLocationNearTransitStop(stops);
-      JSONObject row = new JSONObject();
+      ObjectNode from = getRandomLocationNearTransitStop(stops);
+      ObjectNode to = getRandomLocationNearTransitStop(stops);
+      ObjectNode row = mapper.createObjectNode();
       row.put("from", from);
       row.put("to", to);
       row.put("time", timeAsString);
@@ -205,8 +207,7 @@ public class GenerateBenchmarkPlanMain {
     return stopsToInclude;
   }
 
-  private JSONObject getRandomLocationNearTransitStop(List<Stop> stops)
-      throws JSONException {
+  private ObjectNode getRandomLocationNearTransitStop(List<Stop> stops) {
 
     int index = _random.nextInt(stops.size());
     Stop stop = stops.get(index);
@@ -214,7 +215,7 @@ public class GenerateBenchmarkPlanMain {
     double lat = stop.getLat() + _random.nextGaussian() * _latNoise;
     double lon = stop.getLon() + _random.nextGaussian() * _lonNoise;
 
-    JSONObject obj = new JSONObject();
+    ObjectNode obj = mapper.createObjectNode();
     obj.put("lat", lat);
     obj.put("lon", lon);
     return obj;
