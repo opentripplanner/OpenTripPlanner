@@ -1,7 +1,18 @@
 package org.opentripplanner.common.model;
 
+/**
+ * A starting/ending location for a trip.
+ * @author novalis
+ *
+ */
 public class NamedPlace {
+    /** 
+     * some human-readable text string e.g. W 34th St 
+     * */
     public String name;
+    /**  
+     * "latitude,longitude", or the name of a graph vertex
+     */
     public String place;
     
     public NamedPlace(String name, String place) {
