@@ -58,6 +58,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         this.cacheDirectory = cacheDirectory;
     }
 
+    @Autowired
     public void setTileSource(NEDTileSource source) {
         this.tileSource = source;
     }
