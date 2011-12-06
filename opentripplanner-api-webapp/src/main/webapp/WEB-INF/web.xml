@@ -14,8 +14,18 @@
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
-	<!-- Enables Spring Security -->
+	
+	<filter>
+		<filter-name>jsonpCallbackFilter</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
 
+	<filter-mapping>
+		<filter-name>jsonpCallbackFilter</filter-name>
+		<url-pattern>/ws/*</url-pattern>
+	</filter-mapping>
+	
+	<!-- Enables Spring Security -->
 	<filter>
 		<filter-name>springSecurityFilterChain</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
