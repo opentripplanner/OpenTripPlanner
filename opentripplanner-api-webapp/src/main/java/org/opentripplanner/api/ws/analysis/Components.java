@@ -52,6 +52,13 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Components {
     private GraphService graphService;
 
+    /**
+     * cache for component geometry (for a specific query)
+     */
+    private List<Geometry> cachedPolygons;
+    private TraverseOptions cachedOptions;
+    private long cachedDateTime;
+
     @Required
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
@@ -74,19 +81,23 @@ public class Components {
             @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time) {
 
         TraverseOptions options = new TraverseOptions(modes);
+
         long dateTime = DateUtils.toDate(date, time).getTime();
-        Graph graph = graphService.getGraph();
-        if (graphService.getCalendarService() != null) {
-            options.setCalendarService(graphService.getCalendarService());
+        if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {
+            cachedOptions = options;
+            cachedDateTime = dateTime;
+            Graph graph = graphService.getGraph();
+            if (graphService.getCalendarService() != null) {
+                options.setCalendarService(graphService.getCalendarService());
+            }
+            options.setServiceDays(dateTime);
+            cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
-        options.setServiceDays(dateTime);
-        List<Geometry> polygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
-
+        
         GraphComponentPolygons out = new GraphComponentPolygons();
-
         out.components = new ArrayList<GraphComponent>();
 
-        for (Geometry geometry : polygons) {
+        for (Geometry geometry : cachedPolygons) {
             GraphComponent component = new GraphComponent();
             component.polygon = geometry;
             out.components.add(component);
@@ -94,5 +105,4 @@ public class Components {
 
         return out;
     }
-
 }
