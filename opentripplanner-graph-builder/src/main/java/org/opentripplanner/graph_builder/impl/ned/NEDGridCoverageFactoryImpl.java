@@ -37,7 +37,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private File cacheDirectory;
 
-    private NEDTileSource tileSource;
+    private NEDTileSource tileSource = new NEDDownloader();
 
     /**
      * Set the graph that will be used to determine the extent of the NED.
