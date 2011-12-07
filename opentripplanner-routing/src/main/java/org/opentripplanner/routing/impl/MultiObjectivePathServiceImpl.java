@@ -156,92 +156,111 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
         
         BinHeap<State> pq = new BinHeap<State>();
         List<State> boundingStates = new ArrayList<State>();
-        HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
 
-        pq.reset();
-        pq.insert(origin, 0);
+        // initialize heuristic outside loop so table can be reused
         heuristic.computeInitialWeight(origin, target);
-        long startTime = System.currentTimeMillis();
-        long endTime = startTime + (int)(_timeouts[0] * 1000);
-        QUEUE: while ( ! pq.empty()) {
-            
-            if (System.currentTimeMillis() > endTime) {
-                LOG.debug("timeout at {} msec", System.currentTimeMillis() - startTime);
-                break QUEUE;
-            }
-
-            State su = pq.extract_min();
-
-            for (State bs : boundingStates) {
-                if (eDominates(bs, su)) {
-                    continue QUEUE;
+        
+        // increase maxWalk repeatedly in case hard limiting is in use 
+        WALK: for (double maxWalk = options.getMaxWalkDistance();
+                          maxWalk < 100000 && returnStates.isEmpty();
+                          maxWalk *= 2) {
+            LOG.debug("try search with max walk {}", maxWalk);
+            // increase maxWalk if settings make trip impossible
+            if (maxWalk < Math.min(origin.getVertex().distance(target), 
+                origin.getVertex().getDistanceToNearestTransitStop() +
+                target.getDistanceToNearestTransitStop())) 
+                continue WALK;
+            options.setMaxWalkDistance(maxWalk);
+            // reinitialize states for each retry
+            HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
+            pq.reset();
+            pq.insert(origin, 0);
+            long startTime = System.currentTimeMillis();
+            long endTime = startTime + (int)(_timeouts[0] * 1000);
+            LOG.debug("starttime {} endtime {}", startTime, endTime); 
+            QUEUE: while ( ! pq.empty()) {
+                
+                if (System.currentTimeMillis() > endTime) {
+                    LOG.debug("timeout at {} msec", System.currentTimeMillis() - startTime);
+                    if (returnStates.isEmpty())
+                        continue WALK;
+                    else
+                        break WALK;
                 }
-            }
-
-            Vertex u = su.getVertex();
-
-            if (traverseVisitor != null) {
-                traverseVisitor.visitVertex(su);
-            }
-
-            if (u.equals(target)) {
-                boundingStates.add(su);
-                returnStates.add(su);
-                if ( ! options.getModes().getTransit())
-                    break QUEUE;
-                // options should contain max itineraries
-                if (returnStates.size() >= _maxPaths)
-                    break QUEUE;
-                if (returnStates.size() < _timeouts.length) {
-                    endTime = startTime + (int)(_timeouts[returnStates.size()] * 1000);
-                    LOG.debug("{} path, set timeout to {}", 
-                              returnStates.size(), 
-                              _timeouts[returnStates.size()] * 1000);
-                }
-                continue QUEUE;
-            }
-            
-            EDGE: for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
-                State new_sv = e.traverse(su);
-                if (traverseVisitor != null) {
-                    traverseVisitor.visitEdge(e, new_sv);
-                }
-
-                if (new_sv == null)
-                    continue;
-                double h = heuristic.computeForwardWeight(new_sv, target);
+    
+                State su = pq.extract_min();
+    
                 for (State bs : boundingStates) {
-                    if (eDominates(bs, new_sv)) {
-                        continue EDGE;
+                    if (eDominates(bs, su)) {
+                        continue QUEUE;
                     }
                 }
-                Vertex v = new_sv.getVertex();
-                List<State> old_states = states.get(v);
-                if (old_states == null) {
-                    old_states = new LinkedList<State>();
-                    states.put(v, old_states);
-                } else {
-                    for (State old_sv : old_states) {
-                        if (eDominates(old_sv, new_sv)) {
+    
+                Vertex u = su.getVertex();
+    
+                if (traverseVisitor != null) {
+                    traverseVisitor.visitVertex(su);
+                }
+    
+                if (u.equals(target)) {
+                    boundingStates.add(su);
+                    returnStates.add(su);
+                    if ( ! options.getModes().getTransit())
+                        break QUEUE;
+                    // options should contain max itineraries
+                    if (returnStates.size() >= _maxPaths)
+                        break QUEUE;
+                    if (returnStates.size() < _timeouts.length) {
+                        endTime = startTime + (int)(_timeouts[returnStates.size()] * 1000);
+                        LOG.debug("{} path, set timeout to {}", 
+                                  returnStates.size(), 
+                                  _timeouts[returnStates.size()] * 1000);
+                    }
+                    continue QUEUE;
+                }
+                
+                EDGE: for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
+                    State new_sv = e.traverse(su);
+                    if (traverseVisitor != null) {
+                        traverseVisitor.visitEdge(e, new_sv);
+                    }
+    
+                    if (new_sv == null)
+                        continue;
+                    double h = heuristic.computeForwardWeight(new_sv, target);
+                    for (State bs : boundingStates) {
+                        if (eDominates(bs, new_sv)) {
                             continue EDGE;
                         }
                     }
-                    Iterator<State> iter = old_states.iterator();
-                    while (iter.hasNext()) {
-                        State old_sv = iter.next();
-                        if (eDominates(new_sv, old_sv)) {
-                            iter.remove();
+                    Vertex v = new_sv.getVertex();
+                    List<State> old_states = states.get(v);
+                    if (old_states == null) {
+                        old_states = new LinkedList<State>();
+                        states.put(v, old_states);
+                    } else {
+                        for (State old_sv : old_states) {
+                            if (eDominates(old_sv, new_sv)) {
+                                continue EDGE;
+                            }
+                        }
+                        Iterator<State> iter = old_states.iterator();
+                        while (iter.hasNext()) {
+                            State old_sv = iter.next();
+                            if (eDominates(new_sv, old_sv)) {
+                                iter.remove();
+                            }
                         }
                     }
+                    if (traverseVisitor != null)
+                        traverseVisitor.visitEnqueue(new_sv);
+    
+                    old_states.add(new_sv);
+                    pq.insert(new_sv, new_sv.getWeight() + h);    
                 }
-                if (traverseVisitor != null)
-                    traverseVisitor.visitEnqueue(new_sv);
-
-                old_states.add(new_sv);
-                pq.insert(new_sv, new_sv.getWeight() + h);    
             }
         }
-        
+    
         // Make the states into paths and return them
         List<GraphPath> paths = new LinkedList<GraphPath>();
         for (State s : returnStates)
