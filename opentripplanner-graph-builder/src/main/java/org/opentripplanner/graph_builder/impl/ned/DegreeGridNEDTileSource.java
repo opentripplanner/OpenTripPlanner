@@ -51,8 +51,8 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
         Envelope extent = graph.getExtent();
         List<File> paths = new ArrayList<File>();
-        for (int y = (int) extent.getMinY(); y <= (int) extent.getMaxY(); ++y) {
-            for (int x = (int) extent.getMinX() - 1; x <= (int) extent.getMaxY() - 1; ++x) {
+        for (int y = (int) extent.getMinY() + 1; y <= (int) extent.getMaxY() + 1; ++y) {
+            for (int x = (int) extent.getMinX() - 1; x <= (int) extent.getMaxX() - 1; ++x) {
                 paths.add(getPathToTile(x, y));
             }
         }
@@ -77,9 +77,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     }
 
     private File getPathToTile(int x, int y) {
-        File path = new File(cacheDirectory, formatLatLon(x, y));
-        path = new File(path, "grd" + formatLatLon(x, y));
-        path = new File(path, "w001001x.adf");
+        File path = new File(cacheDirectory, formatLatLon(x, y) + ".tiff");
         if (path.exists()) {
             return path;
         } else {
@@ -92,7 +90,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
             try {
                 S3Service s3Service = new RestS3Service(awsCredentials);
-                String key = formatLatLon(x, y) + "/grd" + formatLatLon(x, y) + "/w001001x.adf";
+                String key = formatLatLon(x, y) + ".tiff";
                 S3Object object = s3Service.getObject("ned13", key);
 
                 InputStream istream = object.getDataInputStream();
