@@ -107,7 +107,10 @@ otp.planner.PrintStatic = {
         var lyrs = this.current_map.layers;
         for (var i = 0; i < lyrs.length; i++ )
         {
-            // step 2a: handle marker data in a special layer
+            // step 2a: ignore specially marked layers
+            if (lyrs[i].DONT_PRINT) continue;
+
+            // step 2b: handle marker data in a special layer
             if (lyrs[i].CLASS_NAME == "OpenLayers.Layer.Markers")
             {
                 for (var j = 0; j < lyrs[i].markers.length; j++){
@@ -115,7 +118,7 @@ otp.planner.PrintStatic = {
                 }
                 console.log("Print._makeMap Markers: " + lyrs[i].name);
             }
-            // step 2b: clone other layers and add them to our map
+            // step 2c: clone other layers and add them to our map
             else
             {
                 // NOTE: cloning vector layers seems to change the visibility
