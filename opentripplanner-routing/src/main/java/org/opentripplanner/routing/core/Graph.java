@@ -139,11 +139,6 @@ public class Graph implements Serializable {
         return vertices.get(label);
     }
 
-    // DEPRECATED
-    // public GraphVertex getGraphVertex(String label) {
-    // return vertices.get(label);
-    // }
-
     public Collection<Vertex> getVertices() {
         return vertices.values();
     }
@@ -264,42 +259,6 @@ public class Graph implements Serializable {
         }
         return env;
     }
-
-// DEPRECATED
-//
-//    public Collection<Edge> getOutgoing(Vertex v) {
-//        return v.getOutgoing();
-//    }
-//
-//    public Collection<Edge> getIncoming(Vertex v) {
-//        return v.getIncoming();
-//    }
-//
-//    public int getDegreeOut(Vertex v) {
-//        return v.getDegreeOut();
-//    }
-//
-//    public int getDegreeIn(Vertex v) {
-//        return v.getDegreeIn();
-//    }
-//
-//    public Collection<Edge> getIncoming(String label) {
-//        return vertices.get(label).getIncoming();
-//    }
-//
-//    public Collection<Edge> getOutgoing(String label) {
-//        return vertices.get(label).getOutgoing();
-//    }
-
-    // DEPRECATED
-    // public GraphVertex getGraphVertex(Vertex vertex) {
-    // return getGraphVertex(vertex.getLabel());
-    // }
-
-    // DEPRECATED
-    // public void addGraphVertex(GraphVertex graphVertex) {
-    // vertices.put(graphVertex.vertex.getLabel(), graphVertex);
-    // }
 
     public TransferTable getTransferTable() {
         return transferTable;
