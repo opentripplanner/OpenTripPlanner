@@ -50,7 +50,7 @@ public class Vertex implements Cloneable, Serializable{
 
     private double x;
 
-    private int index;
+    protected int index;
 
     private transient int groupIndex = -1;
     
@@ -350,6 +350,11 @@ public class Vertex implements Cloneable, Serializable{
             }
         }
         return ret;
+    }
+
+    public void trimEdgeLists() {
+        this.outgoing.trimToSize();
+        this.incoming.trimToSize();
     }
 
 }

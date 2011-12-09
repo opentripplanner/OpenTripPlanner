@@ -17,6 +17,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +25,10 @@ import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
+import java.io.PrintStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,7 +75,7 @@ public class Graph implements Serializable {
     
     private transient List<Vertex> vertexById;
 
-    private transient List<Edge> edgeById;
+    private transient Map<Integer, Edge> edgeById;
     
     private transient Map<Edge, Integer> idForEdge;
     
@@ -311,6 +314,39 @@ public class Graph implements Serializable {
         return ne;
     }
     
+    /* this will require a rehash of any existing hashtables keyed on vertices */
+    private void renumberVerticesAndEdges() {
+        this.vertexById = new ArrayList<Vertex>(this.getVertices());
+        Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
+        this.edgeById = new HashMap<Integer, Edge>();
+        this.idForEdge = new HashMap<Edge, Integer>();
+        int i = 0;
+        for (Vertex v : this.vertexById) {
+            v.index = i;
+            int j = 0;
+            for (Edge e : v.getOutgoing()) {
+                int eid = (i*100) + j;
+                // check for non-null?
+                this.edgeById.put(eid, e);
+                this.idForEdge.put(e, eid);
+                ++j;
+            }
+            ++i;
+        }
+        PrintStream pos = null;
+        try {
+            pos = new PrintStream(new File("/home/syncopate/otp_data/zorder.csv"));
+        } catch (FileNotFoundException e1) {
+            e1.printStackTrace();
+        }
+        int n = 0;
+        for (Vertex v : this.vertexById) {
+            if (n++ % 10 == 0)
+                pos.printf("%f;%f;%d \n", v.getX(), v.getY(), v.getIndex());
+        }               
+        pos.close();
+    }
+    
     public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
     	this.graphBuilderAnnotations.add(gba);
     }
@@ -371,6 +407,8 @@ public class Graph implements Serializable {
                     tov.addIncoming(e);
                 }
             }
+            for (Vertex v : graph.vertices.values())
+                v.trimEdgeLists();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             if (level == LoadLevel.NO_HIERARCHIES)
                 return graph;
@@ -380,7 +418,7 @@ public class Graph implements Serializable {
             if (level == LoadLevel.FULL)
                 return graph;
             graph.vertexById = (List<Vertex>) in.readObject();
-            graph.edgeById = (List<Edge>) in.readObject();
+            graph.edgeById = (Map<Integer, Edge>) in.readObject();
             graph.idForEdge = (Map<Edge, Integer>) in.readObject();
             LOG.debug("Debug info read.");
             return graph;
@@ -405,10 +443,13 @@ public class Graph implements Serializable {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
         }
+        LOG.debug("Assigning vertex/edge ID numbers...");
+        this.renumberVerticesAndEdges();
         LOG.debug("Writing edges...");
         out.writeObject(this);
         out.writeObject(edges);
         out.writeObject(this.hierarchies);
+        LOG.debug("Writing debug data...");
         out.writeObject(this.vertexById);
         out.writeObject(this.edgeById);
         out.writeObject(this.idForEdge);
@@ -416,7 +457,7 @@ public class Graph implements Serializable {
         LOG.info("Graph written.");
     }
     
-    /* for org.opentripplanner.customize */
+    /* deserialization for org.opentripplanner.customize */
     private static class GraphObjectInputStream extends ObjectInputStream {
         ClassLoader classLoader;
         public GraphObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
