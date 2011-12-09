@@ -111,12 +111,16 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
                 ostream.close();
                 istream.close();
             } catch (S3ServiceException e) {
+                path.deleteOnExit();
                 throw new RuntimeException(e);
             } catch (ServiceException e) {
+                path.deleteOnExit();
                 throw new RuntimeException(e);
             } catch (FileNotFoundException e) {
+                path.deleteOnExit();
                 throw new RuntimeException(e);
             } catch (IOException e) {
+                path.deleteOnExit();
                 throw new RuntimeException(e);
             }
             return path;
