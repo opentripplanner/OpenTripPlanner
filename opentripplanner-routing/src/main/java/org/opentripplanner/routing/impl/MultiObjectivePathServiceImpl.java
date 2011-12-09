@@ -190,11 +190,11 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
     
                 State su = pq.extract_min();
     
-                for (State bs : boundingStates) {
-                    if (eDominates(bs, su)) {
-                        continue QUEUE;
-                    }
-                }
+//                for (State bs : boundingStates) {
+//                    if (eDominates(bs, su)) {
+//                        continue QUEUE;
+//                    }
+//                }
     
                 Vertex u = su.getVertex();
     
@@ -203,7 +203,7 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                 }
     
                 if (u.equals(target)) {
-                    boundingStates.add(su);
+//                    boundingStates.add(su);
                     returnStates.add(su);
                     if ( ! options.getModes().getTransit())
                         break QUEUE;
@@ -228,11 +228,11 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                     if (new_sv == null)
                         continue;
                     double h = heuristic.computeForwardWeight(new_sv, target);
-                    for (State bs : boundingStates) {
-                        if (eDominates(bs, new_sv)) {
-                            continue EDGE;
-                        }
-                    }
+//                    for (State bs : boundingStates) {
+//                        if (eDominates(bs, new_sv)) {
+//                            continue EDGE;
+//                        }
+//                    }
                     Vertex v = new_sv.getVertex();
                     List<State> old_states = states.get(v);
                     if (old_states == null) {
@@ -263,31 +263,40 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
     
         // Make the states into paths and return them
         List<GraphPath> paths = new LinkedList<GraphPath>();
-        for (State s : returnStates)
+        for (State s : returnStates) {
+            LOG.debug(s.toStringVerbose());
             paths.add(new GraphPath(s, true));
+        }
         return paths;
-    }
-
-    private boolean eDominates(State s0, State s1) {
-        final double EPSILON = 0.05;
-        return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
-               s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
-               s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
-               s0.getNumBoardings() <= s1.getNumBoardings();
     }
 
 //    private boolean eDominates(State s0, State s1) {
 //        final double EPSILON = 0.05;
-//        if (s0.similarTripSeq(s1)) {
-//            return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
-//                    s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
-//                    s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
-//                    s0.getNumBoardings() <= s1.getNumBoardings();
-//        } else {
-//            return false;
-//        }
+//        return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
+//               s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
+//               s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
+//               s0.getNumBoardings() <= s1.getNumBoardings();
 //    }
-    
+
+    private boolean eDominates(State s0, State s1) {
+        final double EPSILON = 0.05;
+        if (s0.similarTripSeq(s1)) {
+            return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
+                    s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
+                    s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
+                    s0.getNumBoardings() <= s1.getNumBoardings();
+        } else {
+            return false;
+        }
+    }
+
+//    private boolean eDominates(State s0, State s1) {
+//        final double EPSILON = 0.1;
+//        return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
+//                s0.getTime() <= s1.getTime() * (1 + EPSILON) && 
+//               s0.getNumBoardings() <= s1.getNumBoardings();
+//    }
+
     @Override
     public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates,
             boolean ordered, Date targetTime, TraverseOptions options) {
