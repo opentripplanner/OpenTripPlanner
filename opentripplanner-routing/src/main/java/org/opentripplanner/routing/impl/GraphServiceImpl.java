@@ -57,7 +57,7 @@ public class GraphServiceImpl implements GraphService {
 
   private boolean _createEmptyGraphIfNotFound = false;
 
-  private ContractionHierarchySet _contractionHierarchySet;
+  private Graph _graph;
 
   private CalendarServiceImpl _calendarService;
 
@@ -77,11 +77,10 @@ public class GraphServiceImpl implements GraphService {
     _createEmptyGraphIfNotFound = createEmptyGraphIfNotFound;
   }
 
-  public void setContractionHierarchySet(
-      ContractionHierarchySet contractionHierarchySet) {
-    _contractionHierarchySet = contractionHierarchySet;
+  public void setGraph(Graph graph) {
+    _graph = graph;
 
-    CalendarServiceData data = _contractionHierarchySet.getService(CalendarServiceData.class);
+    CalendarServiceData data = _graph.getService(CalendarServiceData.class);
     if (data != null) {
       CalendarServiceImpl calendarService = new CalendarServiceImpl();
       calendarService.setData(data);
@@ -111,12 +110,12 @@ public class GraphServiceImpl implements GraphService {
 
   @Override
   public ContractionHierarchySet getContractionHierarchySet() {
-    return _contractionHierarchySet;
+    return _graph.getHierarchies();
   }
 
   @Override
   public Graph getGraph() {
-    return _contractionHierarchySet.getGraph();
+    return _graph;
   }
 
   @Override
@@ -150,19 +149,15 @@ public class GraphServiceImpl implements GraphService {
                     _log.error("Graph not found. Verify path to stored graph: " + path);
                     throw new IllegalStateException("graph path not found: " + path);
                 }
-
-                /****
-                 * Create an empty graph if not graph is found
-                 */
+                /* Create an empty graph if not graph is found */
                 Graph graph = new Graph();
                 graph.setBundle(_bundle);
-                List<TraverseOptions> modeList = Collections.emptyList();
-                setContractionHierarchySet(new ContractionHierarchySet(graph, modeList));
+                setGraph(graph);
                 return;
             }
 
-            ContractionHierarchySet chs = new GraphSerializationLibrary(loader).readGraph(path);
-            setContractionHierarchySet(chs);
+            Graph graph = new GraphSerializationLibrary(loader).readGraph(path);
+            setGraph(graph);
         } catch (Exception ex) {
             throw new IllegalStateException("error loading graph from " + path, ex);
         }

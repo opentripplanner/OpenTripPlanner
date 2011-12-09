@@ -60,7 +60,7 @@ public abstract class GenericPathService implements PathService {
             }
         }
 
-        return _graphService.getContractionHierarchySet().getVertex(place.place);
+        return _graphService.getGraph().getVertex(place.place);
     }
 
     @Override

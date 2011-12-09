@@ -92,18 +92,6 @@ public class ContractionHierarchySet implements Serializable {
         contractionFactor = factor;
     }
 
-    public boolean hasService(Class<CalendarServiceData> serviceType) {
-        return getGraph().hasService(serviceType);
-    }
-
-    public <T> T getService(Class<T> serviceType) {
-        return getGraph().getService(serviceType);
-    }
-
-    public Vertex getVertex(String label) {
-        return getGraph().getVertex(label);
-    }
-
     public Graph getGraph() {
         return graph;
     }

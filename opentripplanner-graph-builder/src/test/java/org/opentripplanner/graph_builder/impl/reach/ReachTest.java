@@ -66,8 +66,9 @@ public class ReachTest extends TestCase {
         }
         
         List<TraverseOptions> optionlist = Arrays.asList(options);
-        ContractionHierarchySet hierarchy = new ContractionHierarchySet(graph, optionlist);
-        GraphSerializationLibrary.writeGraph(hierarchy, new File("/tmp/ReachTestGraph.obj"));
+//        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, optionlist);
+//        graph.setHierarchies(hierarchies);
+        GraphSerializationLibrary.writeGraph(graph, new File("/tmp/ReachTestGraph.obj"));
     }
     
     void makeGraph(Graph graph) {

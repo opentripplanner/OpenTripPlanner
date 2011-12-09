@@ -124,9 +124,8 @@ public class TestRequest extends TestCase {
 
         builder.setSchema(schema );
         builder.buildGraph(graph);
-        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, null);
         GraphServiceImpl graphService = new GraphServiceImpl();
-        graphService.setContractionHierarchySet(hierarchies);
+        graphService.setGraph(graph);
         
         pathService.setGraphService(graphService);
         ContractionRoutingServiceImpl routingService = new ContractionRoutingServiceImpl();

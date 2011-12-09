@@ -502,10 +502,12 @@ public class TestContractionHeirarchies extends TestCase {
         chs.setContractionFactor(0.50);
         chs.setGraph(graph);
         chs.build();
+        graph.setHierarchies(chs);
         
-        GraphSerializationLibrary.writeGraph(chs, new File("/tmp/contracted"));
+        GraphSerializationLibrary.writeGraph(graph, new File("/tmp/contracted"));
 
-        chs = new GraphSerializationLibrary().readGraph(new File("/tmp/contracted"));
+        graph = new GraphSerializationLibrary().readGraph(new File("/tmp/contracted"));
+        chs = graph.getHierarchies();
         hierarchy = chs.getHierarchy(options);
         assertNotNull(hierarchy);
         
