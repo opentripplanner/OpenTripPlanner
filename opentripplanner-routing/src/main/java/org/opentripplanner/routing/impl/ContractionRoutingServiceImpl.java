@@ -61,7 +61,8 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         ContractionHierarchySet hierarchies = _graphService.getContractionHierarchySet();
 
         ContractionHierarchy hierarchy = null;
-        hierarchy = hierarchies.getHierarchy(options);
+        if (hierarchies != null)
+            hierarchy = hierarchies.getHierarchy(options);
         
         int tries = 0;
         
@@ -77,7 +78,7 @@ public class ContractionRoutingServiceImpl implements RoutingService {
 
         		GenericAStar aStar = getAStarInstance(options);
 
-        		Graph _graph = hierarchies.getGraph();
+        		Graph _graph = _graphService.getGraph();
         		ShortestPathTree spt = aStar.getShortestPathTree(_graph, origin, target);
         		if (spt == null) {
         		    // search failed, likely due to timeout
