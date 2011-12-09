@@ -4,9 +4,9 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * A Comparator implementation that will sort a 1D list of Vertex objects, preserving
- * 2D spatial locality. It implicitly compares the Morton code for a crude equal-area 
- * projection of the vertex's lon/lat coordinates. 
+ * A Comparator implementation that will sort a 1D list of Vertex objects such that
+ * 2D spatial locality is mostly preserved. It implicitly compares the Morton code for 
+ * the vertex's coordinates in a roughly area-preserving (sinusoidal) projection. 
  *
  * @author andrewbyrd
  */
