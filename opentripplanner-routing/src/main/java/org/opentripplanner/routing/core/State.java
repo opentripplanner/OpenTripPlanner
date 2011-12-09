@@ -366,10 +366,7 @@ public class State implements Cloneable {
             if (!(out instanceof StreetEdge)) {
                 continue;
             }
-            if (out.traverse(backState) == null) {
-                continue;
-            }
-            State outState = out.traverse(this);
+            State outState = out.traverse(backState);
             if (outState == null) {
                 continue;
             }
