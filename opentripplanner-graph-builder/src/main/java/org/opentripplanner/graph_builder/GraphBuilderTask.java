@@ -97,11 +97,14 @@ public class GraphBuilderTask implements Runnable {
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph);
         
-        ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
-        chs.build();
+        if (_modeList != null) {
+            ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
+            chs.build();
+            graph.setHierarchies(chs);
+        }
         GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
         try {
-            GraphSerializationLibrary.writeGraph(chs, graphPath);
+            GraphSerializationLibrary.writeGraph(graph, graphPath);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }

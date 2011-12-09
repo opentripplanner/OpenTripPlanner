@@ -39,26 +39,27 @@ public class GraphSerializationLibrary {
         classLoader =  getClass().getClassLoader();
     }
 
+    /* for org.opentripplanner.customize */
     public GraphSerializationLibrary(ClassLoader loader) {
         classLoader = loader;
     }
 
-    public static void writeGraph(ContractionHierarchySet hierarchy, File graphPath) throws IOException {
+    public static void writeGraph(Graph graph, File graphPath) throws IOException {
 
         if (!graphPath.getParentFile().exists())
             if (!graphPath.getParentFile().mkdirs()) {
                 _log.error("Failed to create directories for graph bundle at " + graphPath);
             }
 
-        Graph g = hierarchy.getGraph();
-        _log.info("Main graph size: |V|={} |E|={}", g.countVertices(), g.countEdges());
+        _log.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
         _log.info("Writing graph " + graphPath.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(graphPath)));
-        out.writeObject(hierarchy);
+        out.writeObject(graph);
         out.close();
-        _log.info("Graph written");
+        _log.info("Graph written.");
     }
 
+    /* for org.opentripplanner.customize */
     class GraphObjectInputStream extends ObjectInputStream {
 
         public GraphObjectInputStream(InputStream in) throws IOException {
@@ -75,15 +76,14 @@ public class GraphSerializationLibrary {
         
     }
     
-    public ContractionHierarchySet readGraph(File graphPath) throws IOException, ClassNotFoundException {
+    public Graph readGraph(File graphPath) throws IOException, ClassNotFoundException {
         ObjectInputStream in = new GraphObjectInputStream(new BufferedInputStream (new FileInputStream(graphPath)));
         _log.info("Reading graph " + graphPath.getAbsolutePath() + " ...");
         try {
-        	ContractionHierarchySet hierarchy = (ContractionHierarchySet) in.readObject();
+        	Graph graph= (Graph) in.readObject();
     		_log.info("Graph read");
-    	        Graph g = hierarchy.getGraph();
-    	        _log.info("Main graph size: |V|={} |E|={}", g.countVertices(), g.countEdges());
-    		return hierarchy;
+    	        _log.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+    		return graph;
     	} catch (InvalidClassException ex) {
     		_log.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
     		throw new IllegalStateException("Stored Graph version error", ex);

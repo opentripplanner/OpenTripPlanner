@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
@@ -64,6 +65,12 @@ public class Graph implements Serializable {
     private TransferTable transferTable = new TransferTable();
 
     private GraphBundle bundle;
+    
+    ContractionHierarchySet hierarchies;
+    
+    Vertex[] vertexByID;
+
+    Edge[] edgeByID;
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
@@ -390,5 +397,13 @@ public class Graph implements Serializable {
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {
     	return this.graphBuilderAnnotations;
+    }
+
+    public void setHierarchies(ContractionHierarchySet chs) {
+        this.hierarchies = chs;
+    }
+
+    public ContractionHierarchySet getHierarchies() {
+        return hierarchies;
     }
 }
