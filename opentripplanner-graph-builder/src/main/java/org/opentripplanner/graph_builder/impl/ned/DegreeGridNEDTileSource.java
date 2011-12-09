@@ -16,6 +16,8 @@ import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.core.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -27,6 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  */
 public class DegreeGridNEDTileSource implements NEDTileSource {
+    private static Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
     private Graph graph;
 
@@ -86,6 +89,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             if (awsAccessKey == null || awsSecretKey == null) {
                 throw new RuntimeException("Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
             }
+            log.debug("Downloading NED degree tile " + path);
             // download the file from S3.
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
             try {
