@@ -13,32 +13,33 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -49,7 +50,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Graph implements Serializable {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20111019L;
+    private static final long serialVersionUID = 20111209L;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
@@ -60,17 +61,20 @@ public class Graph implements Serializable {
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
 
-    private transient HashMap<String, Vertex> vertices = new HashMap<String, Vertex>();
-
     private TransferTable transferTable = new TransferTable();
 
     private GraphBundle bundle;
     
-    ContractionHierarchySet hierarchies;
-    
-    Vertex[] vertexByID;
+    /* vertex index by name is reconstructed from edges */
+    private transient HashMap<String, Vertex> vertices = new HashMap<String, Vertex>();
 
-    Edge[] edgeByID;
+    private transient ContractionHierarchySet hierarchies;
+    
+    private transient List<Vertex> vertexById;
+
+    private transient List<Edge> edgeById;
+    
+    private transient Map<Edge, Integer> idForEdge;
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
@@ -348,51 +352,6 @@ public class Graph implements Serializable {
         return ne;
     }
     
-    /* (de) serialization */
-    
-    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
-        LOG.debug("Consolidating edges...");
-        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : vertices.values()) {
-            // there are assumed to be no edges in an incoming list that are not in an outgoing list
-            edges.addAll(v.getOutgoing());
-        }
-        LOG.debug("Writing graph...");
-        out.defaultWriteObject();
-        // vertex edgelists are transient to avoid excessive recursion depth 
-        out.writeObject(edges);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        LOG.debug("Reading graph...");
-        in.defaultReadObject();
-        List<Edge> edges = (ArrayList<Edge>) in.readObject();
-        // vertex edgelists are transient to avoid excessive recursion depth 
-        LOG.debug("Loading edges...");
-        this.vertices = new HashMap<String, Vertex>();
-        int count = 0;
-        for (Edge e : edges) {
-            if (++count % 100000 == 0)
-                LOG.debug("loading edge {} / {}", count, edges.size());
-            Vertex fromv = e.getFromVertex();
-            Vertex tov = null;
-            if (e instanceof AbstractEdge)
-                tov = ((AbstractEdge)e).getToVertex();
-            else if (e instanceof TurnEdge)
-                tov = ((TurnEdge)e).getToVertex();
-            else
-                LOG.warn("Edge with no to-vertex: " + e);
-            
-            vertices.put(fromv.getLabel(), fromv);
-            fromv.addOutgoing(e);
-            if (tov != null) {
-                vertices.put(tov.getLabel(), tov);
-                tov.addIncoming(e);
-            }
-        }
-    }
-
     public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
     	this.graphBuilderAnnotations.add(gba);
     }
@@ -407,5 +366,111 @@ public class Graph implements Serializable {
 
     public ContractionHierarchySet getHierarchies() {
         return hierarchies;
+    }
+
+    /* (de) serialization */
+    
+    public enum LoadLevel {
+        BASIC, FULL, NO_HIERARCHIES, DEBUG;
+    }
+    
+    public static Graph load(File file, LoadLevel level) 
+        throws IOException, ClassNotFoundException {
+        // cannot use getClassLoader() in static context
+        return load(ClassLoader.getSystemClassLoader(), file, level);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Graph load(ClassLoader classLoader, File file, LoadLevel level) 
+        throws IOException, ClassNotFoundException {
+        ObjectInputStream in = new GraphObjectInputStream(
+                new BufferedInputStream (new FileInputStream(file)), classLoader);
+        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
+        try {
+            Graph graph= (Graph) in.readObject();
+            LOG.debug("Basic graph info and annotations read.");
+            if (level == LoadLevel.BASIC)
+                return graph;
+            // vertex edge lists are transient to avoid excessive recursion depth 
+            LOG.debug("Loading edges...");
+            List<Edge> edges = (ArrayList<Edge>) in.readObject();
+            graph.vertices = new HashMap<String, Vertex>();
+            LOG.debug("Reconnecting graph...");
+            for (Edge e : edges) {
+                Vertex fromv = e.getFromVertex();
+                Vertex tov = null;
+                if (e instanceof AbstractEdge)
+                    tov = ((AbstractEdge)e).getToVertex();
+                else if (e instanceof TurnEdge)
+                    tov = ((TurnEdge)e).getToVertex();
+                else
+                    LOG.warn("Edge with no to-vertex: " + e);
+                graph.vertices.put(fromv.getLabel(), fromv);
+                fromv.addOutgoing(e);
+                if (tov != null) {
+                    graph.vertices.put(tov.getLabel(), tov);
+                    tov.addIncoming(e);
+                }
+            }
+            LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            if (level == LoadLevel.NO_HIERARCHIES)
+                return graph;
+            graph.hierarchies = (ContractionHierarchySet) in.readObject();
+            if (graph.hierarchies != null)
+                LOG.debug("Contraction hierarchies read.");
+            if (level == LoadLevel.FULL)
+                return graph;
+            graph.vertexById = (List<Vertex>) in.readObject();
+            graph.edgeById = (List<Edge>) in.readObject();
+            graph.idForEdge = (Map<Edge, Integer>) in.readObject();
+            LOG.debug("Debug info read.");
+            return graph;
+        } catch (InvalidClassException ex) {
+            LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
+            throw new IllegalStateException("Stored Graph version error", ex);
+        }
+    }
+    
+    public void save(File file) throws IOException {
+        if (!file.getParentFile().exists())
+            if (!file.getParentFile().mkdirs())
+                LOG.error("Failed to create directories for graph bundle at " + file);
+        LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
+        LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
+        ObjectOutputStream out = new ObjectOutputStream(
+                new BufferedOutputStream(new FileOutputStream(file)));
+        LOG.debug("Consolidating edges...");
+        // this is not space efficient
+        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
+        for (Vertex v : vertices.values()) {
+            // there are assumed to be no edges in an incoming list that are not in an outgoing list
+            edges.addAll(v.getOutgoing());
+        }
+        LOG.debug("Writing edges...");
+        out.writeObject(this);
+        out.writeObject(edges);
+        out.writeObject(this.hierarchies);
+        out.writeObject(this.vertexById);
+        out.writeObject(this.edgeById);
+        out.writeObject(this.idForEdge);
+        out.close();
+        LOG.info("Graph written.");
+    }
+    
+    /* for org.opentripplanner.customize */
+    private static class GraphObjectInputStream extends ObjectInputStream {
+        ClassLoader classLoader;
+        public GraphObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
+            super(in);
+            this.classLoader = classLoader;
+        }
+        @Override
+        public Class<?> resolveClass(ObjectStreamClass osc) {
+            try {
+                return Class.forName(osc.getName(), false, classLoader);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

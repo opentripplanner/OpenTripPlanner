@@ -32,7 +32,7 @@ public class SerializedGraphFactoryBean extends AbstractFactoryBean<Graph> {
 
     @Override
     protected Graph createInstance() throws Exception {
-        return new GraphSerializationLibrary().readGraph(_graphBundle.getGraphPath());
+        return Graph.load(_graphBundle.getGraphPath(), Graph.LoadLevel.FULL);
     }
 
 }

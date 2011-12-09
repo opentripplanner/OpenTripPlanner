@@ -58,7 +58,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
-import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -504,9 +503,9 @@ public class TestContractionHeirarchies extends TestCase {
         chs.build();
         graph.setHierarchies(chs);
         
-        GraphSerializationLibrary.writeGraph(graph, new File("/tmp/contracted"));
+        graph.save(new File("/tmp/contracted"));
 
-        graph = new GraphSerializationLibrary().readGraph(new File("/tmp/contracted"));
+        graph = Graph.load(new File("/tmp/contracted"), Graph.LoadLevel.FULL);
         chs = graph.getHierarchies();
         hierarchy = chs.getHierarchy(options);
         assertNotNull(hierarchy);

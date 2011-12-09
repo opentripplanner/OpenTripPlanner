@@ -22,7 +22,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.Vertex;
@@ -32,7 +31,6 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
-import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -68,7 +66,7 @@ public class ReachTest extends TestCase {
         List<TraverseOptions> optionlist = Arrays.asList(options);
 //        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, optionlist);
 //        graph.setHierarchies(hierarchies);
-        GraphSerializationLibrary.writeGraph(graph, new File("/tmp/ReachTestGraph.obj"));
+        graph.save(new File("/tmp/ReachTestGraph.obj"));
     }
     
     void makeGraph(Graph graph) {

@@ -23,7 +23,6 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.impl.GraphSerializationLibrary;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,7 +103,7 @@ public class GraphBuilderTask implements Runnable {
         }
         GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
         try {
-            GraphSerializationLibrary.writeGraph(graph, graphPath);
+            graph.save(graphPath);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }

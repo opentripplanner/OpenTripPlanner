@@ -140,7 +140,7 @@ public class GraphServiceImpl implements GraphService {
 
             url = new URL[] { new URL("file://" + extraClassPath + "/") };
             ClassLoader oldLoader = getClass().getClassLoader();
-            URLClassLoader loader = new URLClassLoader(url, oldLoader);
+            URLClassLoader classLoader = new URLClassLoader(url, oldLoader);
 
             path = _bundle.getGraphPath();
 
@@ -155,9 +155,7 @@ public class GraphServiceImpl implements GraphService {
                 setGraph(graph);
                 return;
             }
-
-            Graph graph = new GraphSerializationLibrary(loader).readGraph(path);
-            setGraph(graph);
+            setGraph(Graph.load(classLoader, path, Graph.LoadLevel.FULL));
         } catch (Exception ex) {
             throw new IllegalStateException("error loading graph from " + path, ex);
         }
