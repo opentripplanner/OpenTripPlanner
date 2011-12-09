@@ -48,13 +48,9 @@ public class NetworkLinker {
     public void createLinkage() {
 
         _log.debug("creating linkages...");
-        int i = 0;
         ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
 
         for (Vertex v : vertices) {
-            if (i % 100000 == 0)
-                _log.debug("vertices=" + i + "/" + vertices.size());
-            i++;
 
             if (v instanceof TransitStop) {
                 // only connect transit stops that (a) are entrances, or (b) have no associated
