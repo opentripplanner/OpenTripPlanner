@@ -132,7 +132,15 @@ public class State implements Cloneable {
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " + vertex + ">";
     }
-
+    
+    public String toStringVerbose() {
+        return "<State " + new Date(getTimeInMillis()) + 
+                " w=" + this.getWeight() + 
+                " t=" + this.getElapsedTime() + 
+                " d=" + this.getWalkDistance() + 
+                " b=" + this.getNumBoardings();
+    }
+    
     public long getTime() {
         return this.time;
     }
@@ -395,5 +403,5 @@ public class State implements Cloneable {
         }
         return foundAlternatePaths;
     }
-    
+
 }
