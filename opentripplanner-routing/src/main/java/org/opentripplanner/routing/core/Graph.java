@@ -359,6 +359,7 @@ public class Graph implements Serializable {
         }
         LOG.debug("Writing graph...");
         out.defaultWriteObject();
+        // vertex edgelists are transient to avoid excessive recursion depth 
         out.writeObject(edges);
     }
 
@@ -367,6 +368,7 @@ public class Graph implements Serializable {
         LOG.debug("Reading graph...");
         in.defaultReadObject();
         List<Edge> edges = (ArrayList<Edge>) in.readObject();
+        // vertex edgelists are transient to avoid excessive recursion depth 
         LOG.debug("Loading edges...");
         this.vertices = new HashMap<String, Vertex>();
         int count = 0;
