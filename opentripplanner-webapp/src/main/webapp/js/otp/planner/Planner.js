@@ -304,14 +304,23 @@ otp.planner.Planner = {
     /** */
     printCB : function(button, event)
     {
+        // step 1: put some Planner variables in the static Print space (to share with window we're about to open up)
         otp.planner.PrintStatic.configViaPlanner(this);
 
-        console.log("Planner.print: clone trip request object");
-        var req    = otp.clone(this.getActiveRequest());
-        req.url    = this.printUrl || 'print.html';
+        // step 2: url to the print page
+        var url = this.printUrl || 'print.html';
 
-        console.log("Planner.print: url " + req.url);
-        var url    = this.templates.tripPrintTemplate.apply(req);
+        // step 3: add active itinerary paraters to that url (if we've got an itinerary that's active)
+        if(this.getActiveItinerary())
+        {
+            console.log("Planner.print: clone trip request object");
+            var req = otp.clone(this.getActiveRequest());
+            req.url = url;
+            url = this.templates.tripPrintTemplate.apply(req);
+        }
+
+        // step 4: call print to open new window
+        console.log("Planner.print: url " + url);
         otp.planner.PrintStatic.print(url);
     },
 

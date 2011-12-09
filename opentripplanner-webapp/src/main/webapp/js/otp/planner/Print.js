@@ -53,8 +53,8 @@ otp.planner.PrintStatic = {
         if(Ext.isIE)         // TODO: fix OL errors on IE
             otp.util.HtmlUtils.hideShowElement(this.MAP_DIV);
         else
-            this.renderMap();  
-        this.writeItinerary();
+            this.safeRenderMap();  
+        this.safeWriteItinerary();
     },
 
     /** takes in a Planner.js object, and assigns important objects to this object */
@@ -140,6 +140,16 @@ otp.planner.PrintStatic = {
         catch(e) {}
     },
 
+    /** */
+    safeRenderMap : function()
+    {
+        try
+        {
+            this.renderMap();
+        }
+        catch(e)
+        {}
+    },
 
     /**  */
     writeItinerary : function()
@@ -201,6 +211,17 @@ otp.planner.PrintStatic = {
         if(itin.notes)   details += itin.notes.makeDiv(itin.notes.makeImg(true) + itin.notes.text);
         if(itin.details) details += itin.details.text;
         detailsDIV.innerHTML = details;
+    },
+
+    /** */
+    safeWriteItinerary : function()
+    {
+        try
+        {
+            this.writeItinerary();
+        }
+        catch(e)
+        {}
     },
 
 
