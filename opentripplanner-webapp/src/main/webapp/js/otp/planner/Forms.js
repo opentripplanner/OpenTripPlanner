@@ -38,6 +38,7 @@ otp.planner.StaticForms = {
     useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
     geocoder              : null,
+    appendGeocodeName     : true,  // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP 
 
     // forms & stores
     m_panel               : null,
@@ -338,6 +339,24 @@ otp.planner.StaticForms = {
         this.THIS.planner.focus();
     },
 
+    /** builds the 'place' parameter that gets sent down to OTP routing */
+    getGeoParam : function(name, lat, lon)
+    {
+        var retVal = null;
+
+        if (lat && lat > -181.1 && lon && lon > -181.1)
+        {
+            retVal = lat + ',' + lon;
+
+            // append geocoder string, which OTP will pass back to us in the response
+            if(name && name.length > 0 && this.appendGeocodeName)
+                retVal = name + '::' + retVal;
+        }
+
+        return retVal;
+    },
+
+
     /**
      * set from form with either/both a string and X/Y
      * NOTE: x & y are reversed -- really are lat,lon
@@ -346,9 +365,10 @@ otp.planner.StaticForms = {
     setFrom : function(fString, lat, lon, moveMap, noPoi)
     {
         this.THIS.focus();
-        if(lat && lat > -181.1 && lon && lon > -181.1) 
+        var param = this.getGeoParam(fString, lat, lon);
+        if(param)
         {
-            this.THIS.m_fromCoord = lat + ',' + lon;
+            this.THIS.m_fromCoord = param;
             if(this.THIS.poi && !noPoi)
                 this.THIS.poi.setFrom(lon, lat, fString, moveMap);
 
@@ -364,9 +384,11 @@ otp.planner.StaticForms = {
     setTo : function(tString, lat, lon, moveMap, noPoi)
     {
         this.THIS.focus();
-        if(lat && lat > -181.1 && lon && lon > -181.1) 
+
+        var param = this.getGeoParam(tString, lat, lon);
+        if(param)
         {
-            this.THIS.m_toCoord = lat + ',' + lon;
+            this.THIS.m_toCoord = param;
             if(this.THIS.poi && !noPoi)
                 this.THIS.poi.setTo(lon, lat, tString, moveMap);
 
