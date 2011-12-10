@@ -333,18 +333,6 @@ public class Graph implements Serializable {
             }
             ++i;
         }
-        PrintStream pos = null;
-        try {
-            pos = new PrintStream(new File("/home/syncopate/otp_data/zorder.csv"));
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-        }
-        int n = 0;
-        for (Vertex v : this.vertexById) {
-            if (n++ % 10 == 0)
-                pos.printf("%f;%f;%d \n", v.getX(), v.getY(), v.getIndex());
-        }               
-        pos.close();
     }
     
     public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
