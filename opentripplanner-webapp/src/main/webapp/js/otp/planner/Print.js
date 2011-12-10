@@ -98,19 +98,19 @@ otp.planner.PrintStatic = {
         options.controls=controls;
         this.print_map = new OpenLayers.Map(options);
 
-        // NOTE: have to add all markers in a separate new layer (as opposed to vector layers, which are added directly)
+        // step 2: have to add all markers in a separate new layer (as opposed to vector layers, which are added directly)
         var markers = new OpenLayers.Layer.Markers( "print-markers" );
         this.print_map.addLayer(markers);
         markers.setZIndex(400);
 
-        // step 2: add layer data to the map
+        // step 3: add layer data to the map
         var lyrs = this.current_map.layers;
         for (var i = 0; i < lyrs.length; i++ )
         {
-            // step 2a: ignore specially marked layers
+            // step 3a: ignore specially marked layers
             if (lyrs[i].DONT_PRINT) continue;
 
-            // step 2b: handle marker data in a special layer
+            // step 3b: handle marker data in a special layer
             if (lyrs[i].CLASS_NAME == "OpenLayers.Layer.Markers")
             {
                 for (var j = 0; j < lyrs[i].markers.length; j++){
@@ -118,7 +118,7 @@ otp.planner.PrintStatic = {
                 }
                 console.log("Print._makeMap Markers: " + lyrs[i].name);
             }
-            // step 2c: clone other layers and add them to our map
+            // step 3c: clone other layers and add them to our map
             else
             {
                 // NOTE: cloning vector layers seems to change the visibility
@@ -135,7 +135,7 @@ otp.planner.PrintStatic = {
 
         // step 3: zoom to our map location
         try {
-            this.print_map.zoomToExtent(this.current_map.getExtent());
+            this.print_map.setCenter(this.current_map.getCenter(), this.current_map.getZoom());
         }
         catch(e) {}
     },

@@ -339,6 +339,26 @@ otp.planner.StaticForms = {
         this.THIS.planner.focus();
     },
 
+    /** parse a geo param that has :: separation */
+    parseGeoParam : function(p)
+    {
+        var retVal = null;
+
+        var s = p.indexOf("::");
+        if(s && s > 0)
+        {
+            retVal = {};
+            retVal.name = p.substr(0, s);
+            var ll = p.substr(s+2);
+            retVal.ll  = ll; 
+            retVal.lat = otp.util.ObjUtils.getLat(ll);
+            retVal.lon = otp.util.ObjUtils.getLon(ll);
+        }
+
+        return retVal;
+    },
+
+
     /** builds the 'place' parameter that gets sent down to OTP routing */
     getGeoParam : function(name, lat, lon)
     {
@@ -427,7 +447,15 @@ otp.planner.StaticForms = {
          && p.match('Address, .*Stop ID') == null
         )
         {
-            otp.util.ExtUtils.formSetRawValue(f, p, d, true);
+            var dirty = true;
+            var gp = this.parseGeoParam(p);
+            if(gp && gp.name)
+            {
+                p = gp.name;
+                if(gp.ll)
+                    dirty = false;
+            }
+            otp.util.ExtUtils.formSetRawValue(f, p, d, dirty);
             retVal = true;
         }
 
@@ -460,15 +488,17 @@ otp.planner.StaticForms = {
             if(this.m_bikeTriangle)
                 this.m_bikeTriangle.setSHT(params.triangleSafetyFactor, params.triangleSlopeFactor, params.triangleTimeFactor);
 
-            if (params.fromPlace && params.fromPlace.length > 2 && params.fromPlace.indexOf(",") > 0) {
-                var lat = otp.util.ObjUtils.getLat(params.fromPlace);
-                var lon = otp.util.ObjUtils.getLon(params.fromPlace);
-                this.setFrom(params.fromPlace, lat, lon, false, false);
+            // special handling of the fromPlace & toPlace parameters because of the "::" geoParams
+            var gp = this.parseGeoParam(params.fromPlace);
+            if(gp)
+            {
+                this.setFrom(gp.name, gp.lat, gp.lon, false, false);
             }
-            if (params.toPlace && params.toPlace.length > 2 && params.toPlace.indexOf(",") > 0) {
-                var lat = otp.util.ObjUtils.getLat(params.toPlace);
-                var lon = otp.util.ObjUtils.getLon(params.toPlace);
-                this.setTo(params.toPlace, lat, lon, false, false);
+
+            var gp = this.parseGeoParam(params.toPlace);
+            if(gp)
+            {
+                this.setTo(gp.name, gp.lat, gp.lon, false, false);
             }
 
             if(params.fromCoord && params.fromCoord.indexOf('0.0') != 0)
