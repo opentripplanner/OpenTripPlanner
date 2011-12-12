@@ -344,15 +344,18 @@ otp.planner.StaticForms = {
     {
         var retVal = null;
 
-        var s = p.indexOf("::");
-        if(s && s > 0)
+        if(p)
         {
-            retVal = {};
-            retVal.name = p.substr(0, s);
-            var ll = p.substr(s+2);
-            retVal.ll  = ll; 
-            retVal.lat = otp.util.ObjUtils.getLat(ll);
-            retVal.lon = otp.util.ObjUtils.getLon(ll);
+            var s = p.indexOf("::");
+            if(s && s > 0)
+            {
+                retVal = {};
+                retVal.name = p.substr(0, s);
+                var ll = p.substr(s+2);
+                retVal.ll  = ll; 
+                retVal.lat = otp.util.ObjUtils.getLat(ll);
+                retVal.lon = otp.util.ObjUtils.getLon(ll);
+            }
         }
 
         return retVal;
