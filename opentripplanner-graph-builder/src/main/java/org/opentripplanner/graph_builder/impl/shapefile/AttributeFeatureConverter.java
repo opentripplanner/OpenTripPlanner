@@ -13,6 +13,9 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
+
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 
@@ -21,6 +24,7 @@ import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConvert
 public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
 
     private String _attributeName;
+    private boolean decodeUTF8 = true;
 
     public AttributeFeatureConverter(String attributeName) {
         _attributeName = attributeName;
@@ -38,10 +42,29 @@ public class AttributeFeatureConverter<T> implements SimpleFeatureConverter<T> {
         return _attributeName;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     @Override
     public T convert(SimpleFeature feature) {
-        return (T) feature.getAttribute(_attributeName);
+        T value = (T) feature.getAttribute(_attributeName);
+        if (value instanceof String && decodeUTF8) {
+            String str = (String) value;
+            //decode UTF-8, irritatingly
+            Charset charset = Charset.forName("UTF-8");
+            byte[] bytes = new byte[str.length()];
+            //we have to use a deprecated method because it's the only one that works.
+            str.getBytes(0, str.length(), bytes, 0);
+            ByteBuffer bb = ByteBuffer.wrap(bytes);
+            value = (T) charset.decode(bb).toString();
+        }
+        return value;
+    }
+
+    public boolean isDecodeUTF8() {
+        return decodeUTF8;
+    }
+
+    public void setDecodeUTF8(boolean decodeUTF8) {
+        this.decodeUTF8 = decodeUTF8;
     }
 
 }
