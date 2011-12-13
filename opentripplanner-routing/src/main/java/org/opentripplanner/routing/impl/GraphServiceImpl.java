@@ -16,7 +16,6 @@ package org.opentripplanner.routing.impl;
 import java.io.File;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -27,7 +26,6 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
