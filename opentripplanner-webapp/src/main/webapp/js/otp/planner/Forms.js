@@ -372,7 +372,7 @@ otp.planner.StaticForms = {
             retVal = lat + ',' + lon;
 
             // append geocoder string, which OTP will pass back to us in the response
-            if(name && name.length > 0 && this.appendGeocodeName)
+            if(this.appendGeocodeName && name && name.length > 0 && !otp.util.ObjUtils.isCoordinate(name))
                 retVal = name + '::' + retVal;
         }
 

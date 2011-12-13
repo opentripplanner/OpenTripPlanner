@@ -134,8 +134,20 @@ otp.planner.PrintStatic = {
         }
 
         // step 3: zoom to our map location
-        try {
-            this.print_map.setCenter(this.current_map.getCenter(), this.current_map.getZoom());
+        try
+        {
+            console.log('PRINT = map zoom: ' + this.current_map.getZoom());
+            if (this.current_map.getZoom() > 14)
+            {
+                // step 3a: if we're close in, then zoom the map as-is 
+                this.print_map.setCenter(this.current_map.getCenter(), this.current_map.getZoom());
+            }
+            else
+            {
+                // step 3b: if we're father out, then zoom with extents, which will probably make the smaller 
+                //          print map appear as a zoom one level further out 
+                this.print_map.zoomToExtent(this.current_map.getExtent());
+            }
         }
         catch(e) {}
     },
