@@ -28,13 +28,4 @@ public class EndpointVertex extends Vertex {
     }
 
     private static final long serialVersionUID = 1L;
-
-    public StreetTraversalPermission getPermission() {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean isWheelchairAccessible() {
-        throw new UnsupportedOperationException();
-    }
-
 }
