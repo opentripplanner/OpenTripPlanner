@@ -76,7 +76,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         } else {
             eastWest = "e";
         }
-        return String.format("%s%d%s%d", northSouth, y, eastWest, x);
+        return String.format("%s%d%s%03d", northSouth, y, eastWest, x);
     }
 
     private File getPathToTile(int x, int y) {
