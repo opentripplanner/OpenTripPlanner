@@ -6,13 +6,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.opentripplanner.api.model.json_serializers.EdgeSetJSONSerializer;
 import org.opentripplanner.api.model.json_serializers.WithGraph;
 import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Edge;
-
 
 public class EdgeSet {
-    public List<Edge> edges;
+    public List<WrappedEdge> edges;
 
-    @JsonSerialize(using=EdgeSetJSONSerializer.class)
+    @JsonSerialize(using = EdgeSetJSONSerializer.class)
     class EdgeSetWithGraph extends WithGraph {
         EdgeSetWithGraph(Graph graph, EdgeSet edgeSet) {
             super(graph, edgeSet);

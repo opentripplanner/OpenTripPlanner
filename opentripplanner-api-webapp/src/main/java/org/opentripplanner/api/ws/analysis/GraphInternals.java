@@ -1,5 +1,6 @@
 package org.opentripplanner.api.ws.analysis;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -11,7 +12,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.analysis.EdgeSet;
 import org.opentripplanner.api.model.analysis.FeatureCount;
+import org.opentripplanner.api.model.analysis.SimpleVertex;
+import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
+import org.opentripplanner.api.model.analysis.WrappedEdge;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Graph;
@@ -85,23 +89,55 @@ public class GraphInternals {
      */
     @Secured({ "ROLE_USER" })
     @GET
+    @Path("/vertex")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Object getVertex(
+            @QueryParam("label") String label) {
+        Graph graph = graphService.getGraph();
+        Vertex vertex = graph.getVertex(label);
+        if (vertex == null) {
+            return null;
+        }
+        return new WrappedVertex(vertex).withGraph(graph);
+    }
+    
+    /**
+     * Get vertices inside a bbox.
+     * 
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
     @Path("/vertices")
     @Produces({ MediaType.APPLICATION_JSON })
     public Object getVertices(
             @QueryParam("lowerLeft") String lowerLeft,
-            @QueryParam("upperRight") String upperRight) {
+            @QueryParam("upperRight") String upperRight,
+            @QueryParam("pointsOnly") boolean pointsOnly) {
 
         initIndexes();
 
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
 
-        VertexSet out = new VertexSet();
-        Graph graph = graphService.getGraph();
-
         @SuppressWarnings("unchecked")
         List<Vertex> query = vertexIndex.query(envelope);
-        out.vertices = query;   
+        
+        if (pointsOnly) {
+            SimpleVertexSet out = new SimpleVertexSet();
+            out.vertices = new ArrayList<SimpleVertex>(query.size());
+            for (Vertex v : query) {
+                out.vertices.add(new SimpleVertex(v));
+            }
+            return out;
+        } else {
+            
+        VertexSet out = new VertexSet();
+        out.vertices = query;
+
+        Graph graph = graphService.getGraph();
         return out.withGraph(graph);
+
+        }
     }
 
 
@@ -127,7 +163,10 @@ public class GraphInternals {
 
         @SuppressWarnings("unchecked")
         List<Edge> query = edgeIndex.query(envelope);
-        out.edges = query;   
+        out.edges = new ArrayList<WrappedEdge>();
+        for (Edge e : query) {
+            out.edges.add(new WrappedEdge(e, graph.getIdForEdge(e)));
+        }
         return out.withGraph(graph);
     }
 
