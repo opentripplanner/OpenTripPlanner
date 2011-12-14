@@ -27,7 +27,7 @@ import org.opentripplanner.routing.core.Graph;
 
 /**
  * This serializes an object containing Vertex objects, replacing any edges with integer edge ids.
- * @see EdgeJSONSerializer
+ * @see EdgeSetJSONSerializer
  * @author novalis
  *
  */
@@ -69,38 +69,4 @@ public class VertexSetJSONSerializer extends JsonSerializer<WithGraph> {
         }
         
     }
-
-    /*
-     * // a vertex is serialized as a set of fields, including a superclass field pointing to //
-     * fields from its superclass if (object instanceof List<?>) { jgen.writeStartArray(); for
-     * (Object element : ((List<?>) object)) { serialize(element, jgen, provider); }
-     * jgen.writeEndArray(); return; }
-     * 
-     * int openObjects = 1;
-     * 
-     * Class<?> c = object.getClass(); Field[] fields; while (c != null && c != Object.class) {
-     * jgen.writeStartObject();
-     * 
-     * openObjects += 1; fields = c.getDeclaredFields(); for (int i = 0; i < fields.length; i++) {
-     * Field field = fields[i]; int modifiers = field.getModifiers(); if ((modifiers &
-     * Modifier.STATIC) != 0) { continue; } field.setAccessible(true); String name =
-     * field.getName(); Object value = "(unknown)"; try { value = field.get(object); } catch
-     * (IllegalArgumentException e1) { e1.printStackTrace(); } catch (IllegalAccessException e1) {
-     * e1.printStackTrace(); } jgen.writeFieldName(name); writeValue(jgen, value); } c =
-     * c.getSuperclass(); if (c != null && c != Object.class) { jgen.writeFieldName("superclass");
-     * ++openObjects; } }
-     * 
-     * for (int i = 0; i < openObjects; ++i) { jgen.writeEndObject(); } }
-     * 
-     * private void writeValue(JsonGenerator jgen, Object value) throws JsonGenerationException,
-     * IOException {
-     * 
-     * if (value instanceof Geometry) { GeometryJSON json = new GeometryJSON();
-     * jgen.writeRawValue(json.toString((Geometry) value)); } else { if (value instanceof Edge) { //
-     * FIXME: need to get the edge ID from the graph value = "removed edge (for now)"; } else if
-     * (value instanceof List) { jgen.writeStartArray(); for (Object o: (List<?>) value) {
-     * writeValue(jgen, value); } jgen.writeEndArray(); } else if (value instanceof Number || value
-     * instanceof String || value instanceof Boolean) { jgen.writeObject(value); } else { //compound
-     * object, need to deconstruct it ourselves... this is nuts } } }
-     */
 }

@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -146,10 +148,12 @@ public class Vertex implements Cloneable, Serializable{
         return incoming;
     }
 
+    @XmlTransient
     public int getDegreeOut() {
         return outgoing.size();
     }
 
+    @XmlTransient
     public int getDegreeIn() {
         return incoming.size();
     }
@@ -187,6 +191,7 @@ public class Vertex implements Cloneable, Serializable{
         this.groupIndex = groupIndex;
     }
     
+    @XmlTransient
     public int getGroupIndex() {
         return groupIndex;
     }
@@ -203,6 +208,7 @@ public class Vertex implements Cloneable, Serializable{
         return name;
     }
 
+    @XmlTransient
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
@@ -214,6 +220,7 @@ public class Vertex implements Cloneable, Serializable{
     }
 
     /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
+    @XmlTransient
     public int getIndex() {
         return index;
     }
@@ -243,7 +250,7 @@ public class Vertex implements Cloneable, Serializable{
 
     
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
-    
+    @XmlTransient
     public List<DirectEdge> getOutgoingStreetEdges() {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
         for (Edge out : this.getOutgoing()) {
@@ -332,6 +339,7 @@ public class Vertex implements Cloneable, Serializable{
         outgoing = new ArrayList<Edge>();
     }
     
+    @XmlTransient
     public Collection<Edge> getEdges(OverlayGraph extraEdges, OverlayGraph replacementEdges, boolean incoming) {
 
         Collection<Edge> ret;

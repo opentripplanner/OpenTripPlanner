@@ -1,6 +1,5 @@
 package org.opentripplanner.api.ws.analysis;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -10,10 +9,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
+import org.opentripplanner.api.model.analysis.EdgeSet;
+import org.opentripplanner.api.model.analysis.FeatureCount;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.Edge;
@@ -86,9 +83,7 @@ public class GraphInternals {
      * 
      * @return
      */
-    @Secured({ "ROLE_USER" 
-        
-    })
+    @Secured({ "ROLE_USER" })
     @GET
     @Path("/vertices")
     @Produces({ MediaType.APPLICATION_JSON })
@@ -106,34 +101,65 @@ public class GraphInternals {
         @SuppressWarnings("unchecked")
         List<Vertex> query = vertexIndex.query(envelope);
         out.vertices = query;   
-        for (Vertex v : query) {
-            if (!envelope.contains(v.getCoordinate())) {
-                System.out.println("doomx");
-            }
-        }
         return out.withGraph(graph);
     }
 
-    class EdgeSerializer extends JsonSerializer<Edge> {
 
-        private Graph graph;
+    /**
+     * Get edges inside a bbox.
+     * 
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/edges")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Object getEdges(
+            @QueryParam("lowerLeft") String lowerLeft,
+            @QueryParam("upperRight") String upperRight) {
 
-        public EdgeSerializer(Graph graph) {
-            this.graph = graph;
-        }
+        initIndexes();
 
-        @Override
-        public void serialize(Edge value, JsonGenerator jgen, SerializerProvider provider)
-                throws IOException, JsonProcessingException {
-            Integer edgeId = graph.getIdForEdge(value);
-            jgen.writeObject(edgeId);
-        }
+        Envelope envelope = getEnvelope(lowerLeft, upperRight);
+
+        EdgeSet out = new EdgeSet();
+        Graph graph = graphService.getGraph();
+
+        @SuppressWarnings("unchecked")
+        List<Edge> query = edgeIndex.query(envelope);
+        out.edges = query;   
+        return out.withGraph(graph);
+    }
+
+
+    /**
+     * Count vertices and edges inside a bbox.
+     * 
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/countFeatures")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public FeatureCount countVertices(
+            @QueryParam("lowerLeft") String lowerLeft,
+            @QueryParam("upperRight") String upperRight) {
+
+        initIndexes();
+
+        Envelope envelope = getEnvelope(lowerLeft, upperRight);
+
+        FeatureCount out = new FeatureCount();
+
+        @SuppressWarnings("unchecked")
+        List<Vertex> vertexQuery = vertexIndex.query(envelope);
+        out.vertices = vertexQuery.size();
         
-        @Override
-        public Class<Edge> handledType() {
-            return Edge.class;
-        }
+        @SuppressWarnings("unchecked")
+        List<Edge> edgeQuery = edgeIndex.query(envelope);
+        out.edges = edgeQuery.size();
         
+        return out;
     }
 
     private Envelope getEnvelope(String lowerLeft, String upperRight) {

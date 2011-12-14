@@ -15,8 +15,8 @@ package org.opentripplanner.api.model.analysis;
 
 import org.codehaus.jackson.map.annotate.JsonDeserialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.opentripplanner.api.model.GeoJSONDeserializer;
-import org.opentripplanner.api.model.GeoJSONSerializer;
+import org.opentripplanner.api.model.json_serializers.GeoJSONDeserializer;
+import org.opentripplanner.api.model.json_serializers.GeoJSONSerializer;
 
 import com.vividsolutions.jts.geom.Geometry;
 

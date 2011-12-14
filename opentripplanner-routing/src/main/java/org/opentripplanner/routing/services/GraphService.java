@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Graph.LoadLevel;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -37,6 +38,8 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public interface GraphService {
 
+        public void setLoadLevel(LoadLevel level);
+    
 	/**
 	 * Refresh the graph. Depending on the underlying implementation, this may
 	 * involve reloading the graph from a file.

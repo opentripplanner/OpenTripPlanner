@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 
 /**
@@ -75,5 +76,10 @@ public class GraphServiceBeanImpl implements GraphService {
     @Override
     public CalendarService getCalendarService() {
         return calendarService;
+    }
+
+    @Override
+    public void setLoadLevel(LoadLevel level) {
+
     }
 }

@@ -26,6 +26,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -60,6 +61,8 @@ public class GraphServiceImpl implements GraphService {
   private CalendarServiceImpl _calendarService;
 
   private List<GraphRefreshListener> _graphRefreshListeners;
+
+  private LoadLevel loadLevel;
 
   public void setBundle(GraphBundle bundle) {
     _bundle = bundle;
@@ -153,7 +156,7 @@ public class GraphServiceImpl implements GraphService {
                 setGraph(graph);
                 return;
             }
-            setGraph(Graph.load(classLoader, path, Graph.LoadLevel.FULL));
+            setGraph(Graph.load(classLoader, path, loadLevel));
         } catch (Exception ex) {
             throw new IllegalStateException("error loading graph from " + path, ex);
         }
@@ -165,5 +168,13 @@ public class GraphServiceImpl implements GraphService {
     for( GraphRefreshListener listener : _graphRefreshListeners)
       listener.handleGraphRefresh(this);
   }
+
+    @Override
+    public void setLoadLevel(LoadLevel level) {
+        if (level != loadLevel) {
+            loadLevel = level;
+            refreshGraph();
+        }
+    }
 
 }
