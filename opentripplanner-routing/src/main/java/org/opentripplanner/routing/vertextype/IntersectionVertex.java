@@ -11,30 +11,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.core.Vertex;
+import com.vividsolutions.jts.geom.Coordinate;
 
 /** Represents an ordinary location in space, typically an intersection */
 
-public class EndpointVertex extends Vertex {
-
-    public EndpointVertex(String label, double x, double y, String name) {
-        super(label, x, y, name);
-    }
-    
-    public EndpointVertex(String label, double x, double y) {
-        super(label, x, y, label);
-    }
+public class IntersectionVertex extends StreetVertex {
 
     private static final long serialVersionUID = 1L;
 
-    public StreetTraversalPermission getPermission() {
-        throw new UnsupportedOperationException();
+    public IntersectionVertex(String label, double x, double y, String name) {
+        super(label, x, y, name);
+    }
+    
+    public IntersectionVertex(String label, double x, double y) {
+        super(label, x, y, label);
     }
 
-    public boolean isWheelchairAccessible() {
-        throw new UnsupportedOperationException();
+    public IntersectionVertex(String label, Coordinate c, String name) {
+        super(label, c.x, c.y, name);
     }
+
+	public IntersectionVertex newLike() {
+		return new IntersectionVertex(getLabel() + " COPY", getX(), getY(), getName());
+	}
 
 }

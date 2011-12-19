@@ -11,7 +11,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.edgetype;
+
+import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 public interface DirectEdge extends Edge, EdgeNarrative {
 

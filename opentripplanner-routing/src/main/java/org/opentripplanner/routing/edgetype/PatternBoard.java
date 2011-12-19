@@ -24,7 +24,10 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +50,9 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     private int modeMask;
 
-    public PatternBoard(Vertex startStation, Vertex startJourney, TripPattern pattern, int stopIndex, TraverseMode mode) {
-        super(startStation, startJourney, pattern);
+    public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
+            TripPattern pattern, int stopIndex, TraverseMode mode) {
+        super(fromStopVertex, toPatternVertex, pattern);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
     }

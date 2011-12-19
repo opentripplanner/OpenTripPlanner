@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
  * An edge which has an elevation profile -- a street, basically.
  *
  */
-public interface EdgeWithElevation extends EdgeNarrative {
+public interface EdgeWithElevation extends DirectEdge {
     public PackedCoordinateSequence getElevationProfile();
     public PackedCoordinateSequence getElevationProfile(double from, double to);
     public void setElevationProfile(PackedCoordinateSequence elevPCS);

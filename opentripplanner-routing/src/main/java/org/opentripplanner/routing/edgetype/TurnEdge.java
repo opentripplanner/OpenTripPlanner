@@ -23,25 +23,24 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * An edge between two StreetVertices. This is the most common edge type in the edge-based street
  * graph.
- * 
  */
-public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
+public class TurnEdge extends StreetEdge {
 
     public static final String[] DIRECTIONS = { "north", "northeast", "east", "southeast", "south",
             "southwest", "west", "northwest" };
@@ -50,9 +49,9 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
 
     public int turnCost;
 
-    StreetVertex fromv;
+    TurnVertex fromv;
 
-    StreetVertex tov;
+    TurnVertex tov;
 
     private List<Patch> patches;
 
@@ -61,11 +60,13 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
      */
     private Set<TraverseMode> restrictedModes;
 
-    /** No-arg constructor used only for customization -- do not call this unless
-     * you know what you are doing */
-    public TurnEdge() {}
+/* enforce initialization */
+//    /** No-arg constructor used only for customization -- do not call this unless
+//     * you know what you are doing */
+//    public TurnEdge() {}
     
-    public TurnEdge(StreetVertex fromv, StreetVertex tov) {
+    public TurnEdge(TurnVertex fromv, TurnVertex tov) {
+        super(fromv, tov);
         this.fromv = fromv;
         this.tov = tov;
         turnCost = Math.abs(fromv.outAngle - tov.inAngle);
@@ -301,7 +302,7 @@ public class TurnEdge implements DirectEdge, StreetEdge, Serializable {
     
     @Override
     public double timeLowerBound(TraverseOptions options) {
-        return (fromv.length + turnCost/20) / options.speed;
+        return (fromv.getLength() + turnCost/20) / options.speed;
     }
     
 	    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {

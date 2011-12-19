@@ -11,48 +11,43 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.graph;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.Collection;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-
 import com.vividsolutions.jts.geom.Coordinate;
-import static org.opentripplanner.common.IterableLibrary.cast;
-
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.opentripplanner.routing.core.OverlayGraph;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 
-public class Vertex implements Cloneable, Serializable{
+public abstract class AbstractVertex implements Vertex {
 
-    private static final long serialVersionUID = 20111019;
+    private static final long serialVersionUID = 20111212;
     
     private static int maxIndex = 0;
 
-    public final String label;
+    private int index;
     
-    protected String name;
+    private transient int groupIndex = -1;
 
-    private AgencyAndId stopId = null;
-
-    private double y;
+    /* short name */
+    private final String label;
+    
+    private String streetName = "(no name)";
 
     private double x;
 
-    protected int index;
-
-    private transient int groupIndex = -1;
+    private double y;
     
     private double distanceToNearestTransitStop = 0;
 
@@ -63,52 +58,40 @@ public class Vertex implements Cloneable, Serializable{
     
     /* PUBLIC CONSTRUCTORS */
     
-    public Vertex(String label, Coordinate coord, String name) {
-        this(label, coord.x, coord.y, name);
-    }
-
-    public Vertex(String label, double x, double y) {
+    protected AbstractVertex(String label, double x, double y) {
         this.label = label;
         this.x = x;
         this.y = y;
         this.index = maxIndex  ++;
     }
 
-    public Vertex(String label, double x, double y, String name) {
+    protected AbstractVertex(String label, double x, double y, String name) {
         this(label, x, y);
-        this.name = name;
+        this.streetName = name;
     }
+
     
-    public Vertex(String label, double x, double y, String name, AgencyAndId stopId) {
-        this(label, x, y);
-        this.name = name;
-        this.stopId = stopId;
-    }
-
-
     /* PUBLIC METHODS */
     
-    /**
-     * Distance in meters to the coordinate
-     */
+    /** Distance in meters to the coordinate */
+    @Override
     public double distance(Coordinate c) {
         return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
     }
 
-    /**
-     * Distance in meters to the vertex
-     */
+    /** Distance in meters to the vertex */
+    @Override
     public double distance(Vertex v) {
         return DistanceLibrary.distance(getY(), getX(), v.getY(), v.getX());
     }
     
-    /**
-     * Fast, slightly approximated, under-estimated distance in meters to the vertex
-     */
+    /** Fast, slightly approximated, under-estimated distance in meters to the vertex */
+    @Override
     public double fastDistance(Vertex v) {
         return DistanceLibrary.fastDistance(getY(), getX(), v.getY(), v.getX());
     }
 
+    @Override
     public String toString() {
         return "<" + this.label + ">";
     }
@@ -120,106 +103,154 @@ public class Vertex implements Cloneable, Serializable{
 
     /* FIELD ACCESSOR METHODS : READ/WRITE */
 
+    @Override
     public void addOutgoing(Edge ee) {
         outgoing.add(ee);
     }
     
+    /*
+     *  Copy-on-write modification of edgelist to avoid concurrent modification during search.
+     *  Could be used instead of extraEdges OverlayGraph.
+     *  As of Java 6 intrinsic locks are apparently just as fast as an explicit reentrantlock.
+     */
+    protected synchronized void addOutgoingConcurrent(Edge ee) { // create TemporaryEdge type?
+        @SuppressWarnings("unchecked")
+        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
+        newOutgoing.add(ee);
+        outgoing = newOutgoing;
+    }
+
+    @Override
     public void removeOutgoing(Edge ee) {
         outgoing.remove(ee);
     }
 
+    protected synchronized void removeOutgoingConcurrent(Edge ee) {
+        @SuppressWarnings("unchecked")
+        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
+        newOutgoing.remove(ee);
+        outgoing = newOutgoing;
+    }
+
     /** Get a collection containing all the edges leading from this vertex to other vertices. */
+    @Override
     public Collection<Edge> getOutgoing() {
         return outgoing;
     }
 
+    @Override
     public void addIncoming(Edge ee) {
         incoming.add(ee);
     }
     
+    protected synchronized void addIncomingConcurrent(Edge ee) {
+        @SuppressWarnings("unchecked")
+        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
+        newIncoming.add(ee);
+        outgoing = newIncoming;
+    }
+
+    @Override
     public void removeIncoming(Edge ee) {
         incoming.remove(ee);
     }
 
+    protected synchronized void removeIncomingConcurrent(Edge ee) {
+        @SuppressWarnings("unchecked")
+        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
+        newIncoming.remove(ee);
+        outgoing = newIncoming;
+    }
+
     /** Get a collection containing all the edges leading from other vertices to this vertex. */
+    @Override
     public Collection<Edge> getIncoming() {
         return incoming;
     }
 
+    @Override
     public int getDegreeOut() {
         return outgoing.size();
     }
 
+    @Override
     public int getDegreeIn() {
         return incoming.size();
     }
     
+    @Override
     public void setDistanceToNearestTransitStop(double distance) {
         distanceToNearestTransitStop = distance;
     }
     
-    /** Get the distance from this vertex to the closest transit stop in meters. */
+    @Override
     public double getDistanceToNearestTransitStop() {
         return distanceToNearestTransitStop;
     }
 
-    /** Set the longitude of the vertex */
-    public void setX(double x) {
-        this.x = x;
-    }
+//    @Override
+//    public void setX(double x) {
+//        this.x = x;
+//    }
 
-    /** Get the longitude of the vertex */
+    @Override
     public double getX() {
         return x;
     }
 
-    /** Set the latitude of the vertex */
-    public void setY(double y) {
-        this.y = y;
-    }
+//    @Override
+//    public void setY(double y) {
+//        this.y = y;
+//    }
 
-    /** Get the latitude of the vertex */
+    @Override
     public double getY() {
         return y;
     }
 
+    @Override
     public void setGroupIndex(int groupIndex) {
         this.groupIndex = groupIndex;
     }
     
+    @Override
     public int getGroupIndex() {
         return groupIndex;
     }
     
+    @Override
+    public String getName() {
+        return this.streetName;
+    }
+
+    @Override
+    public void setStreetName(String streetName) {
+        this.streetName = streetName;
+    }
+
 
     /* FIELD ACCESSOR METHODS : READ ONLY */
 
-    /** Every vertex has a label which is globally unique. */
+    @Override
     public String getLabel() {
         return label;
     }
 
-    public String getName() {
-        return name;
-    }
-
+    @Override
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
 
-    /** For vertices that represent stops, the passenger-facing stop ID 
-     *  (for systems like TriMet that have this feature).  */
-    public AgencyAndId getStopId() {
-        return stopId;
-    }
-
-    /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
+    @Override
     public int getIndex() {
         return index;
     }
     
-    /** Get the highest unique index that has been assigned to a vertex.
-     *  Used for making tables big enough to contain all existing vertices. */
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
+    
     public static int getMaxIndex() {
         return maxIndex;
     }
@@ -228,9 +259,7 @@ public class Vertex implements Cloneable, Serializable{
     /* SERIALIZATION METHODS */
     
     private void writeObject(ObjectOutputStream out) throws IOException {
-// Transient so no need to trim
-//        incoming.trimToSize();
-//        outgoing.trimToSize();
+        // edge lists are transient 
         out.defaultWriteObject();
     }
 
@@ -241,9 +270,16 @@ public class Vertex implements Cloneable, Serializable{
         index = maxIndex++;
     }
 
+    @Override
+    public void compact() {
+        this.outgoing.trimToSize();
+        this.incoming.trimToSize();
+    }
     
+
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
     
+    @Override
     public List<DirectEdge> getOutgoingStreetEdges() {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
         for (Edge out : this.getOutgoing()) {
@@ -255,61 +291,36 @@ public class Vertex implements Cloneable, Serializable{
         return result;
     }
 
-    /**
-     * Merge another vertex into this one.  Useful during graph construction for handling 
-     * sequential non-branching streets, and empty dwells.
-     */
+    @Override
     public void mergeFrom(Graph graph, Vertex other) {
-        // We only support Vertices that are direct edges when merging
-        Iterable<DirectEdge> incoming = cast(this.incoming);
-        Iterable<DirectEdge> outgoing = cast(this.outgoing);
+        // copy edgelists to avoid concurrent modification
+        List<Edge> edges = new ArrayList<Edge>();
+        edges.addAll(this.getIncoming());
+        edges.addAll(this.getOutgoing());
+        edges.addAll(other.getIncoming());
+        edges.addAll(other.getOutgoing());
 
-        //remove incoming edges from other to this
-        Iterator<DirectEdge> it = incoming.iterator();
-        while(it.hasNext()) {
-            DirectEdge edge = it.next();
-            if (edge.getFromVertex() == other) {
-                it.remove();
+        for (Edge e : edges) {
+            // We only support Vertices that are direct edges when merging
+            DirectEdge de = (DirectEdge) e;
+            Vertex from = de.getFromVertex();
+            Vertex to = de.getToVertex();
+            if ((from==this && to==other) || (from==other && to==this)) {
+                e.detach();
+            } else if (from == other) {
+                e.attach(this, to);
+            } else if (to == other) {
+                e.attach(from, this);
             }
-        }
-        //remove outgoing edges from this to other
-        it = outgoing.iterator();
-        while(it.hasNext()) {
-            DirectEdge edge = it.next();
-            if (edge.getToVertex() == other) {
-                it.remove();
-            }
-        }
-        //make incoming edges to other point to this
-        for (AbstractEdge edge : cast(other.getIncoming(), AbstractEdge.class)) {
-            if (edge.getFromVertex() == this) {
-                continue;
-            }
-            edge.setToVertex(this);
-            this.addIncoming(edge);
-        }
-        //add outgoing edges from other to outgoing from this
-        for (AbstractEdge edge : cast(other.getOutgoing(), AbstractEdge.class)) {
-            if (edge.getToVertex() == this) {
-                continue;
-            }
-            edge.setFromVertex(this);
-            this.addOutgoing(edge);
         }
         graph.removeVertex(other);
     }
     
-    /**
-     * Clear this vertex's outgoing and incoming edge lists, and remove all the edges
-     * they contained from this vertex's neighbors.
-     */
+    @Override
     public void removeAllEdges() {
         for (Edge e : outgoing) {
             if (e instanceof DirectEdge) {
                 DirectEdge edge = (DirectEdge) e;
-                // this used to grab the GraphVertex by label... now it could possibly be a vertex
-                // that is not in the graph
-                // Vertex target = vertices.get(edge.getToVertex().getLabel());
                 Vertex target = edge.getToVertex();
                 if (target != null) {
                     target.removeIncoming(e);
@@ -317,30 +328,23 @@ public class Vertex implements Cloneable, Serializable{
             }
         }
         for (Edge e : incoming) {
-            // why only DirectEdges?
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
-                // Vertex source = vertices.get(edge.getFromVertex().getLabel());
-                Vertex source = edge.getFromVertex();
-                if (source != null) {
-                    // changed to removeOutgoing (AB)
-                    source.removeOutgoing(e);
-                }
+            Vertex source = e.getFromVertex();
+            if (source != null) {
+                source.removeOutgoing(e);
             }
         }
         incoming = new ArrayList<Edge>();
         outgoing = new ArrayList<Edge>();
     }
     
+    @Override
     public Collection<Edge> getEdges(OverlayGraph extraEdges, OverlayGraph replacementEdges, boolean incoming) {
-
         Collection<Edge> ret;
         if (replacementEdges != null) {
             ret = incoming ? replacementEdges.getIncoming(this) : replacementEdges.getOutgoing(this);
         } else {
             ret = incoming ? this.getIncoming() : this.getOutgoing();
         }
-
         if (extraEdges != null) {
             Collection<Edge> extra = incoming ? extraEdges.getIncoming(this) : extraEdges.getOutgoing(this);
             if (extra != null) {
@@ -352,9 +356,54 @@ public class Vertex implements Cloneable, Serializable{
         return ret;
     }
 
-    public void trimEdgeLists() {
-        this.outgoing.trimToSize();
-        this.incoming.trimToSize();
+    
+    /* GRAPH COHERENCY AND TYPE CHECKING */
+   
+    // Parameterized Class<? extends Edge) gets ugly fast here
+    @SuppressWarnings("unchecked")
+    private static final ValidEdgeTypes VALID_EDGE_TYPES = new ValidEdgeTypes(Edge.class);
+    
+    @Override
+    public ValidEdgeTypes getValidOutgoingEdgeTypes() {
+        return VALID_EDGE_TYPES;
+    }
+
+    @Override
+    public ValidEdgeTypes getValidIncomingEdgeTypes() {
+        return VALID_EDGE_TYPES ;
+    }
+
+    /*
+     * This may not be necessary if edge constructor types are strictly specified
+     * and addOutgoing is protected
+     */
+    @Override
+    public boolean edgeTypesValid() {
+        ValidEdgeTypes validOutgoingTypes = getValidOutgoingEdgeTypes();
+        for (Edge e : getOutgoing())
+            if (!validOutgoingTypes.isValid(e))
+                return false;
+        ValidEdgeTypes validIncomingTypes = getValidIncomingEdgeTypes();
+        for (Edge e : getIncoming())
+            if (!validIncomingTypes.isValid(e))
+                return false;
+        return true;
+    }
+    
+    public static final class ValidEdgeTypes {
+        private final Class<? extends Edge>[] classes;
+        // varargs constructor: 
+        // a loophole in the law against arrays/collections of parameterized generics
+        public ValidEdgeTypes (Class<? extends Edge>... classes) {
+            this.classes = classes;
+        }
+        public boolean isValid (Edge e) {
+            for (Class<? extends Edge> c : classes) {
+                if (c.isInstance(e)) 
+                    return true;
+            }
+            return false;
+        }
     }
 
 }

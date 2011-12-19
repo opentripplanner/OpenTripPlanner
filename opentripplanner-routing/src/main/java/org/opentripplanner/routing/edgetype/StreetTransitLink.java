@@ -14,12 +14,14 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -38,8 +40,13 @@ public class StreetTransitLink extends AbstractEdge {
     private static GeometryFactory _geometryFactory = new GeometryFactory();
     private boolean wheelchairAccessible;
         
-    public StreetTransitLink(Vertex fromv, Vertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(StreetVertex fromv, TransitVertex tov, boolean wheelchairAccessible) {
     	super(fromv, tov);
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
+
+    public StreetTransitLink(TransitVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+        super(fromv, tov);
         this.wheelchairAccessible = wheelchairAccessible;
     }
 

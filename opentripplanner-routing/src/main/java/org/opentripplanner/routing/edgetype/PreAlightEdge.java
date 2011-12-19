@@ -16,10 +16,11 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
 
 /**
  * PreBoard edges connect a TransitStop to its agency_stop_depart vertices; PreAlight edges connect
@@ -34,7 +35,7 @@ public class PreAlightEdge extends FreeEdge {
 
     private static final long serialVersionUID = -8046937388471651897L;
 
-    public PreAlightEdge(Vertex from, Vertex to) {
+    public PreAlightEdge(TransitStopArrive from, TransitStop to) {
         super(from, to);
         if (!(to instanceof TransitStop))
             throw new IllegalStateException("Pre-alight edges must lead to a transit stop.");
