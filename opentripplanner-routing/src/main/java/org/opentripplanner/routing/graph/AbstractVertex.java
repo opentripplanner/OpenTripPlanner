@@ -47,9 +47,9 @@ public abstract class AbstractVertex implements Vertex {
     
     private String streetName = "(no name)";
 
-    private double x;
+    private final double x;
 
-    private double y;
+    private final double y;
     
     private double distanceToNearestTransitStop = 0;
 
@@ -60,15 +60,18 @@ public abstract class AbstractVertex implements Vertex {
     
     /* PUBLIC CONSTRUCTORS */
     
-    protected AbstractVertex(String label, double x, double y) {
+    protected AbstractVertex(Graph g, String label, double x, double y) {
         this.label = label;
         this.x = x;
         this.y = y;
         this.index = maxIndex  ++;
+        // null graph means temporary vertex
+        if (g != null)
+            g.addVertex(this);
     }
 
-    protected AbstractVertex(String label, double x, double y, String name) {
-        this(label, x, y);
+    protected AbstractVertex(Graph g, String label, double x, double y, String name) {
+        this(g, label, x, y);
         this.streetName = name;
     }
 
@@ -192,20 +195,10 @@ public abstract class AbstractVertex implements Vertex {
         return distanceToNearestTransitStop;
     }
 
-//    @Override
-//    public void setX(double x) {
-//        this.x = x;
-//    }
-
     @Override
     public double getX() {
         return x;
     }
-
-//    @Override
-//    public void setY(double y) {
-//        this.y = y;
-//    }
 
     @Override
     public double getY() {

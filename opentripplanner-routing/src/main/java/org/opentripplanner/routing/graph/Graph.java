@@ -99,7 +99,7 @@ public class Graph implements Serializable {
      * 
      * @param vv the vertex to add
      */
-    public void addVertex(Vertex v) {
+    protected void addVertex(Vertex v) {
         // vertex labels must be unique
         Vertex gv = vertices.get(v.getLabel());
         if (gv != null) {

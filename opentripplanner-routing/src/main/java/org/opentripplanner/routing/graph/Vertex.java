@@ -45,17 +45,11 @@ public interface Vertex extends Serializable, Cloneable {
     
     /** Get the distance from this vertex to the closest transit stop in meters. */
     public abstract double getDistanceToNearestTransitStop();
-    // TODO: this is a candidate for message-passing style
+    // TODO: this is a candidate for no-arg message-passing style
     public abstract void setDistanceToNearestTransitStop(double distance);
-
-//    /** Set the longitude of the vertex */
-//    public abstract void setX(double x);
 
     /** Get the longitude of the vertex */
     public abstract double getX();
-
-//    /** Set the latitude of the vertex */
-//    public abstract void setY(double y);
 
     /** Get the latitude of the vertex */
     public abstract double getY();
