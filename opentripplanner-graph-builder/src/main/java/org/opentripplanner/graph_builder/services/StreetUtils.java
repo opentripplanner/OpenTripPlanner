@@ -18,7 +18,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -97,7 +96,7 @@ public class StreetUtils {
             return (TurnVertex) v;
         }
 
-        TurnVertex newv = new TurnVertex(id, e.getGeometry(), e.getName(), e.getLength(), back, e.getNotes());
+        TurnVertex newv = new TurnVertex(graph, id, e.getGeometry(), e.getName(), e.getLength(), back, e.getNotes());
         newv.setWheelchairAccessible(e.isWheelchairAccessible());
         newv.setBicycleSafetyEffectiveLength(e.getBicycleSafetyEffectiveLength());
         newv.setCrossable(e.isCrossable());
@@ -108,7 +107,6 @@ public class StreetUtils {
         newv.setBogusName(e.hasBogusName());
         newv.setNoThruTraffic(e.isNoThruTraffic());
         newv.setStairs(e.isStairs());
-        graph.addVertex(newv);
         return newv;
     }
 

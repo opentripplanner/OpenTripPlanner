@@ -226,8 +226,7 @@ public class AStarTest {
      ****/
 
     private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(label, lat, lon);
-        _graph.addVertex(v);
+        SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
         return v;
     }
 
@@ -245,8 +244,8 @@ public class AStarTest {
 
         private static final long serialVersionUID = 1L;
 
-        public SimpleVertex(String label, double lat, double lon) {
-            super(label, lon, lat);
+        public SimpleVertex(Graph g, String label, double lat, double lon) {
+            super(g, label, lon, lat);
         }
     }
 

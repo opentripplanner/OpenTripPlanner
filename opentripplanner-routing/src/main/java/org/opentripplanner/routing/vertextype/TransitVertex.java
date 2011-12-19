@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Graph;
 
 /** Abstract base class for vertices in the GTFS layer of the graph. */
 public abstract class TransitVertex extends AbstractVertex {
@@ -10,8 +11,8 @@ public abstract class TransitVertex extends AbstractVertex {
 
     private final AgencyAndId stopId;
     
-    public TransitVertex(String label, double x, double y, AgencyAndId stopId) {
-        super(label, x, y);
+    public TransitVertex(Graph g, String label, double x, double y, AgencyAndId stopId) {
+        super(g, label, x, y);
         this.stopId = stopId;
     }
 

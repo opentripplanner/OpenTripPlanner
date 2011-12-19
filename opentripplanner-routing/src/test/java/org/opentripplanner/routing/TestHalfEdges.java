@@ -88,76 +88,64 @@ public class TestHalfEdges extends TestCase {
     public void setUp() {
         graph = new Graph();
         // a 0.1 degree x 0.1 degree square
-        top = new TurnVertex("top", GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500, false, null);
-        bottom = new TurnVertex("bottom", GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500, false, null);
-        left = new TurnVertex("left", GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500, false, null);
-        right = new TurnVertex("right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500, false, null);
+        top = new TurnVertex(graph, "top", GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500, false, null);
+        bottom = new TurnVertex(graph, "bottom", GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500, false, null);
+        left = new TurnVertex(graph, "left", GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500, false, null);
+        right = new TurnVertex(graph, "right", GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500, false, null);
         
-        TurnVertex topBack = new TurnVertex("topBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.01, 40.01), "topBack", 1500, true, null);
-        TurnVertex bottomBack = new TurnVertex("bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.01, 40.0), "bottomBack", 1500, true, null);
-        leftBack = new TurnVertex("leftBack", GeometryUtils.makeLineString(-74.01, 40.01, -74.01, 40.0), "leftBack", 1500, true, null);
-        rightBack = new TurnVertex("rightBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.0, 40.0), "rightBack", 1500, true, null);
+        TurnVertex topBack = new TurnVertex(graph, "topBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.01, 40.01), "topBack", 1500, true, null);
+        TurnVertex bottomBack = new TurnVertex(graph, "bottomBack", GeometryUtils.makeLineString(-74.0, 40.0, -74.01, 40.0), "bottomBack", 1500, true, null);
+        leftBack = new TurnVertex(graph, "leftBack", GeometryUtils.makeLineString(-74.01, 40.01, -74.01, 40.0), "leftBack", 1500, true, null);
+        rightBack = new TurnVertex(graph, "rightBack", GeometryUtils.makeLineString(-74.0, 40.01, -74.0, 40.0), "rightBack", 1500, true, null);
 
         right.setPermission(StreetTraversalPermission.PEDESTRIAN);
         
-        graph.addVertex(top);
-        graph.addVertex(bottom);
-        graph.addVertex(left);
-        graph.addVertex(right);
-        
-        graph.addVertex(topBack);
-        graph.addVertex(bottomBack);
-        graph.addVertex(leftBack);
-        graph.addVertex(rightBack);
-        
-        IntersectionVertex tlIn = (IntersectionVertex) graph.addVertex(new IntersectionVertex("tl in", -74.01, 40.01));
-        IntersectionVertex trIn = (IntersectionVertex) graph.addVertex(new IntersectionVertex("tr in", -74.0, 40.01));
-        IntersectionVertex blIn = (IntersectionVertex) graph.addVertex(new IntersectionVertex("bl in", -74.0, 40.0));
-        IntersectionVertex brIn = (IntersectionVertex) graph.addVertex(new IntersectionVertex("br in", -74.01, 40.0));
+        IntersectionVertex tlIn = new IntersectionVertex(graph, "tl in", -74.01, 40.01);
+        IntersectionVertex trIn = new IntersectionVertex(graph, "tr in", -74.0, 40.01);
+        IntersectionVertex blIn = new IntersectionVertex(graph, "bl in", -74.0, 40.0);
+        IntersectionVertex brIn = new IntersectionVertex(graph, "br in", -74.01, 40.0);
 
-        Vertex tlOut = graph.addVertex(new IntersectionVertex("tl out", -74.01, 40.01));
-        trOut = graph.addVertex(new IntersectionVertex("tr out", -74.0, 40.01));
-        Vertex blOut = graph.addVertex(new IntersectionVertex("bl out", -74.0, 40.0));
-        brOut = graph.addVertex(new IntersectionVertex("br out", -74.01, 40.0));
+        Vertex tlOut = new IntersectionVertex(graph, "tl out", -74.01, 40.01);
+        trOut = new IntersectionVertex(graph, "tr out", -74.0, 40.01);
+        Vertex blOut = new IntersectionVertex(graph, "bl out", -74.0, 40.0);
+        brOut = new IntersectionVertex(graph, "br out", -74.01, 40.0);
         
-        graph.addVerticesFromEdge(new FreeEdge(tlOut, top));
-        graph.addVerticesFromEdge(new FreeEdge(tlOut, leftBack));
+        new FreeEdge(tlOut, top);
+        new FreeEdge(tlOut, leftBack);
         
-        graph.addVerticesFromEdge(new FreeEdge(trOut, topBack));
-        graph.addVerticesFromEdge(new FreeEdge(trOut, rightBack));
+        new FreeEdge(trOut, topBack);
+        new FreeEdge(trOut, rightBack);
         
-        graph.addVerticesFromEdge(new FreeEdge(blOut, bottom));
-        graph.addVerticesFromEdge(new FreeEdge(blOut, left));
+        new FreeEdge(blOut, bottom);
+        new FreeEdge(blOut, left);
         
-        graph.addVerticesFromEdge(new FreeEdge(brOut, bottomBack));
-        graph.addVerticesFromEdge(new FreeEdge(brOut, right));
+        new FreeEdge(brOut, bottomBack);
+        new FreeEdge(brOut, right);
         
-        graph.addVerticesFromEdge(new OutEdge(topBack, tlIn));
-        graph.addVerticesFromEdge(new OutEdge(left, tlIn));
+        new OutEdge(topBack, tlIn);
+        new OutEdge(left, tlIn);
         
-        graph.addVerticesFromEdge(new OutEdge(top, trIn));
-        graph.addVerticesFromEdge(new OutEdge(right, trIn));
+        new OutEdge(top, trIn);
+        new OutEdge(right, trIn);
         
-        graph.addVerticesFromEdge(new OutEdge(bottomBack, blIn));
-        graph.addVerticesFromEdge(new OutEdge(leftBack, blIn));
+        new OutEdge(bottomBack, blIn);
+        new OutEdge(leftBack, blIn);
         
-        graph.addVerticesFromEdge(new OutEdge(bottom, brIn));
-        graph.addVerticesFromEdge(new OutEdge(rightBack, brIn));      
+        new OutEdge(bottom, brIn);
+        new OutEdge(rightBack, brIn);      
         
-        graph.addVerticesFromEdge(new TurnEdge(top, rightBack));
-        graph.addVerticesFromEdge(new TurnEdge(rightBack, bottomBack));
-        graph.addVerticesFromEdge(new TurnEdge(bottomBack, left));
-        graph.addVerticesFromEdge(new TurnEdge(left, top));
+        new TurnEdge(top, rightBack);
+        new TurnEdge(rightBack, bottomBack);
+        new TurnEdge(bottomBack, left);
+        new TurnEdge(left, top);
         
-        graph.addVerticesFromEdge(new TurnEdge(topBack, leftBack));
-        graph.addVerticesFromEdge(new TurnEdge(leftBack, bottom));
-        graph.addVerticesFromEdge(new TurnEdge(bottom, right));
-        graph.addVerticesFromEdge(new TurnEdge(right, topBack));
+        new TurnEdge(topBack, leftBack);
+        new TurnEdge(leftBack, bottom);
+        new TurnEdge(bottom, right);
+        new TurnEdge(right, topBack);
         
-        station1 = new TransitStop("transitVertex 1", -74.005, 40.0099999, "transitVertex 1", new AgencyAndId("A", "fleem station"), null);
-        graph.addVertex(station1);
-        station2 = new TransitStop("transitVertex 2", -74.002, 40.0099999, "transitVertex 2", new AgencyAndId("A", "morx station"), null);
-        graph.addVertex(station2);
+        station1 = new TransitStop(graph, "transitVertex 1", -74.005, 40.0099999, "transitVertex 1", new AgencyAndId("A", "fleem station"), null);
+        station2 = new TransitStop(graph, "transitVertex 2", -74.002, 40.0099999, "transitVertex 2", new AgencyAndId("A", "morx station"), null);
     }
 
     public void testHalfEdges() {

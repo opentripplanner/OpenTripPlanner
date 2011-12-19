@@ -32,14 +32,14 @@ public class TestStreetVertex extends TestCase {
                 new Coordinate(0, 0)
                 });
 
-        TurnVertex leftV = new TurnVertex("morx", geometry, "morx", 10.0, true, null);
+        TurnVertex leftV = new TurnVertex(null, "morx", geometry, "morx", 10.0, true, null);
 
         LineString geometry2 = gf.createLineString(new Coordinate[] {
                 new Coordinate(0, 0),
                 new Coordinate(-10, 0)
                 });
 
-        TurnVertex rightV = new TurnVertex("fleem", geometry2, "fleem", 10.0, false, null);
+        TurnVertex rightV = new TurnVertex(null, "fleem", geometry2, "fleem", 10.0, false, null);
 
         assertEquals(180, Math.abs(leftV.outAngle - rightV.outAngle));
 

@@ -159,22 +159,16 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 IntersectionVertex startIntersection = intersectionsByLocation.get(startCoordinate);
                 if (startIntersection == null) {
-                    startIntersection = new IntersectionVertex(startIntersectionName, startCoordinate.x,
+                    startIntersection = new IntersectionVertex(graph, startIntersectionName, startCoordinate.x,
                             startCoordinate.y, startIntersectionName);
-                    
-                    graph.addVertex(startIntersection);                  
-                    graph.addVertex(startIntersection);
                     intersectionsByLocation.put(startCoordinate, startIntersection);
-                    graph.addVertex(startIntersection);
                 }
 
                 IntersectionVertex endIntersection = intersectionsByLocation.get(endCoordinate);
                 if (endIntersection == null) {
-                    endIntersection = new IntersectionVertex(endIntersectionName, endCoordinate.x,
+                    endIntersection = new IntersectionVertex(graph, endIntersectionName, endCoordinate.x,
                             endCoordinate.y, endIntersectionName);
-                    graph.addVertex(endIntersection);
                     intersectionsByLocation.put(endCoordinate, endIntersection);
-                    graph.addVertex(endIntersection);
                 }
 
                 double length = 0;

@@ -70,14 +70,11 @@ public class TestPatternHopFactory extends TestCase {
         for (int i = 0; i < stops.length; ++i) {
             TransitStop stop = (TransitStop) (graph.getVertex(stops[i]));
             
-            TurnVertex front = (TurnVertex) graph.addVertex(new TurnVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false, null));
-            TurnVertex back = (TurnVertex) graph.addVertex(new TurnVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true, null));
+            TurnVertex front = new TurnVertex(graph, "near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false, null);
+            TurnVertex back =  new TurnVertex(graph, "near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true, null);
             
-            TurnEdge street = new TurnEdge(front, back);
-            graph.addVerticesFromEdge(street);
-            
+            TurnEdge street1 = new TurnEdge(front, back);
             TurnEdge street2 = new TurnEdge(back, front);
-            graph.addVerticesFromEdge(street2);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);

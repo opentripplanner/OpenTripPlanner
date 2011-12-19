@@ -36,8 +36,8 @@ public class TestTriangle extends TestCase {
         Coordinate c1 = new Coordinate(-122.575033, 45.456773);
         Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-        StreetVertex v1 = new IntersectionVertex("v1", c1, null);
-        StreetVertex v2 = new IntersectionVertex("v2", c2, null);
+        StreetVertex v1 = new IntersectionVertex(null, "v1", c1, null);
+        StreetVertex v2 = new IntersectionVertex(null, "v2", c2, null);
 
         GeometryFactory factory = new GeometryFactory();
         LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

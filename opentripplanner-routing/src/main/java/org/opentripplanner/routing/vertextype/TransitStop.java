@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 
 public class TransitStop extends OffboardVertex {
     private static final long serialVersionUID = 1L;
@@ -30,8 +31,8 @@ public class TransitStop extends OffboardVertex {
      */
     private boolean local = false;
 
-    public TransitStop(String id, double lon, double lat, String name, AgencyAndId stopId, Stop stop) {
-        super(id, lon, lat, stopId);
+    public TransitStop(Graph g, String id, double lon, double lat, String name, AgencyAndId stopId, Stop stop) {
+        super(g, id, lon, lat, stopId);
         if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
         }

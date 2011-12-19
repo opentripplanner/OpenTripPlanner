@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Graph;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -10,13 +11,13 @@ public abstract class StreetVertex extends AbstractVertex {
 
     String streetName;
 
-    public StreetVertex(String label, Coordinate coord, String streetName) {
-        this(label, coord.x, coord.y, streetName);
+    public StreetVertex(Graph g, String label, Coordinate coord, String streetName) {
+        this(g, label, coord.x, coord.y, streetName);
         this.streetName = streetName; 
     }
 
-    public StreetVertex(String label, double x, double y, String streetName) {
-        super(label, x, y);
+    public StreetVertex(Graph g, String label, double x, double y, String streetName) {
+        super(g, label, x, y);
         this.streetName = streetName; 
     }
     

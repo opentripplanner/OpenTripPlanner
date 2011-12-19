@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
@@ -87,8 +88,9 @@ public class TurnVertex extends StreetVertex {
 
     private boolean noThruTraffic = false;
 
-    public TurnVertex(String id, LineString geometry, String name, double length, boolean back, Set<Alert> notes) {
-        super(id + (back ? " back" : ""), getCoord(geometry), name);
+    public TurnVertex(Graph g, String id, LineString geometry, String name, double length, 
+    	              boolean back, Set<Alert> notes) {
+        super(g, id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
         this.length = length;

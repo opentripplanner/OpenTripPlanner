@@ -242,9 +242,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         startEndpoint = (IntersectionVertex) graph.getVertex(label);
                         if (startEndpoint == null) {
                             Coordinate coordinate = getCoordinate(osmStartNode);
-                            startEndpoint = new IntersectionVertex(label, coordinate.x, coordinate.y,
+                            startEndpoint = new IntersectionVertex(graph, label, coordinate.x, coordinate.y,
                                     label);
-                            graph.addVertex(startEndpoint);
                             endpoints.add(startEndpoint);
                         }
                     } else {
@@ -255,8 +254,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     endEndpoint = (IntersectionVertex) graph.getVertex(label);
                     if (endEndpoint == null) {
                         Coordinate coordinate = getCoordinate(osmEndNode);
-                        endEndpoint = new IntersectionVertex(label, coordinate.x, coordinate.y, label);
-                        graph.addVertex(endEndpoint);
+                        endEndpoint = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
                         endpoints.add(endEndpoint);
                     }
 

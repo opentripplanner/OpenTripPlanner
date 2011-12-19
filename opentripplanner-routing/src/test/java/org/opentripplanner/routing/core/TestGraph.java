@@ -22,29 +22,28 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 public class TestGraph extends TestCase {
     public void testBasic() throws Exception {
-        Graph gg = new Graph();
-        assertNotNull(gg);
+        Graph g = new Graph();
+        assertNotNull(g);
     }
 
     public void testAddVertex() throws Exception {
-        Graph gg = new Graph();
-        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
+        Graph g = new Graph();
+        Vertex a = new IntersectionVertex(g, "A", 5, 5);
         assertEquals(a.getLabel(), "A");
     }
 
     public void testGetVertex() throws Exception {
-        Graph gg = new Graph();
-        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
-        Vertex b = gg.getVertex("A");
+        Graph g = new Graph();
+        Vertex a = new IntersectionVertex(g, "A", 5, 5);
+        Vertex b = g.getVertex("A");
         assertEquals(a, b);
     }
 
     public void testAddEdge() throws Exception {
-        Graph gg = new Graph();
-        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
-        Vertex b = gg.addVertex(new IntersectionVertex("B", 6, 6));
+        Graph g = new Graph();
+        Vertex a = new IntersectionVertex(g, "A", 5, 5);
+        Vertex b = new IntersectionVertex(g, "B", 6, 6);
         FreeEdge ee = new FreeEdge(a,b);
-        gg.addVerticesFromEdge(ee);
         assertNotNull(ee);
     }
 }

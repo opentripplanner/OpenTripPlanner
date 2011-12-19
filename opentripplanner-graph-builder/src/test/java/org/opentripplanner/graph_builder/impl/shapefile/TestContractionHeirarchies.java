@@ -107,12 +107,10 @@ public class TestContractionHeirarchies extends TestCase {
             for (int x = 0; x < N; ++x) {
                 double xc = x * STEP + LON0;
                 double yc = y * STEP + LAT0;
-                Vertex in = new IntersectionVertex("(" + x + ", " + y + ") in", xc, yc);
-                graph.addVertex(in);
+                Vertex in = new IntersectionVertex(graph, "(" + x + ", " + y + ") in", xc, yc);
                 verticesIn[y][x] = in;
 
-                Vertex out = new IntersectionVertex("(" + x + ", " + y + ") out", xc, yc);
-                graph.addVertex(out);
+                Vertex out = new IntersectionVertex(graph, "(" + x + ", " + y + ") out", xc, yc);
                 verticesOut[y][x] = out;
             }
         }
@@ -133,38 +131,32 @@ public class TestContractionHeirarchies extends TestCase {
                 double lat = i * STEP + LAT0;
                 double d = 111.111;
                 LineString geometry = GeometryUtils.makeLineString(lon, lat, lon + STEP, lat);
-                TurnVertex we = new TurnVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
-                TurnVertex ew = new TurnVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex we = new TurnVertex(graph, "a(" + j + ", " + i + ")", geometry, "", d, false, null);
+                TurnVertex ew = new TurnVertex(graph, "a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
                 
-                graph.addVertex(we);
-                graph.addVertex(ew);
-
                 lon = i * STEP + LON0;
                 lat = j * STEP + LAT0;
                 d = 111.111;
                 geometry = GeometryUtils.makeLineString(lon, lat, lon, lat + STEP);
-                TurnVertex sn = new TurnVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
-                TurnVertex ns = new TurnVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex sn = new TurnVertex(graph, "d(" + i + ", " + j + ")", geometry, "", d, false, null);
+                TurnVertex ns = new TurnVertex(graph, "d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
 
-                graph.addVertex(sn);
-                graph.addVertex(ns);
+                new FreeEdge(verticesOut[i][j], we);
+                new FreeEdge(verticesOut[j][i], sn);
                 
-                graph.addVerticesFromEdge(new FreeEdge(verticesOut[i][j], we));
-                graph.addVerticesFromEdge(new FreeEdge(verticesOut[j][i], sn));
+                new FreeEdge(verticesOut[i][j + 1], ew);
+                new FreeEdge(verticesOut[j + 1][i], ns);
                 
-                graph.addVerticesFromEdge(new FreeEdge(verticesOut[i][j + 1], ew));
-                graph.addVerticesFromEdge(new FreeEdge(verticesOut[j + 1][i], ns));
-                
-                graph.addVerticesFromEdge(new FreeEdge(ew, verticesIn[i][j]));
-                graph.addVerticesFromEdge(new FreeEdge(ns, verticesIn[j][i]));
+                new FreeEdge(ew, verticesIn[i][j]);
+                new FreeEdge(ns, verticesIn[j][i]);
             
-                graph.addVerticesFromEdge(new FreeEdge(we, verticesIn[i][j + 1]));
-                graph.addVerticesFromEdge(new FreeEdge(sn, verticesIn[j + 1][i]));
+                new FreeEdge(we, verticesIn[i][j + 1]);
+                new FreeEdge(sn, verticesIn[j + 1][i]);
                 
-                assertEquals(we, graph.addVertex(we));
-                assertEquals(ew, graph.addVertex(ew));
-                assertEquals(sn, graph.addVertex(sn));
-                assertEquals(ns, graph.addVertex(ns));
+                assertEquals(we, graph.getVertex(we.getLabel()));
+                assertEquals(ew, graph.getVertex(ew.getLabel()));
+                assertEquals(sn, graph.getVertex(sn.getLabel()));
+                assertEquals(ns, graph.getVertex(ns.getLabel()));
             }
         }
 
@@ -179,7 +171,7 @@ public class TestContractionHeirarchies extends TestCase {
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
                         }
-                        graph.addVerticesFromEdge(new TurnEdge(fromv, tov));
+                        new TurnEdge(fromv, tov);
                     }
                     assertTrue(fromv.getDegreeOut() <= 4);
                 }
@@ -304,8 +296,7 @@ public class TestContractionHeirarchies extends TestCase {
         for (int i = 0; i < N; ++i) {
             double x = random.nextDouble() * 1000;
             double y = random.nextDouble() * 1000;
-            Vertex v = new IntersectionVertex("(" + x + ", " + y + ")", x, y);
-            graph.addVertex(v);
+            Vertex v = new IntersectionVertex(graph, "(" + x + ", " + y + ")", x, y);
             Envelope env = new Envelope(v.getCoordinate());
             tree.insert(env, v);
             vertices.add(v);
@@ -328,11 +319,11 @@ public class TestContractionHeirarchies extends TestCase {
                 }
             });
             for (Vertex n : nearby.subList(1, 6)) {
-                graph.addVerticesFromEdge(new FreeEdge(v, n));
-                graph.addVerticesFromEdge(new FreeEdge(n, v));
+                new FreeEdge(v, n);
+                new FreeEdge(n, v);
             }
             Vertex badTarget = nearby.get(6);
-            graph.addVerticesFromEdge(new ForbiddenEdge(badTarget, v));
+            new ForbiddenEdge(badTarget, v);
         }
 
         // ensure that graph is connected
@@ -351,8 +342,8 @@ public class TestContractionHeirarchies extends TestCase {
                 lastKey = components.union(v, last);
                 last = v;
                 Coordinate c = v.getCoordinate();
-                graph.addVerticesFromEdge(new SimpleEdge(v, last, last.distance(c), 0));
-                graph.addVerticesFromEdge(new SimpleEdge(last, v, last.distance(c), 0));
+                new SimpleEdge(v, last, last.distance(c), 0);
+                new SimpleEdge(last, v, last.distance(c), 0);
             }
         }
 

@@ -27,10 +27,10 @@ public class TestOverlayGraph extends TestCase {
     
     public void testBasic() throws Exception {
         Graph g = new Graph();
-        Vertex a = new IntersectionVertex("a", 5, 5);
-        Vertex b = new IntersectionVertex("b", 6, 5);
-        Vertex c = new IntersectionVertex("c", 7, 5);
-        Vertex d = new IntersectionVertex("d", 8, 5);
+        Vertex a = new IntersectionVertex(g, "a", 5, 5);
+        Vertex b = new IntersectionVertex(g, "b", 6, 5);
+        Vertex c = new IntersectionVertex(g, "c", 7, 5);
+        Vertex d = new IntersectionVertex(g, "d", 8, 5);
         // vary weights so edges are not considered equal
         DirectEdge ab = new SimpleEdge(a, b, 1, 1);
         DirectEdge bc1 = new SimpleEdge(b, c, 1, 1);
@@ -39,13 +39,6 @@ public class TestOverlayGraph extends TestCase {
         DirectEdge cd1 = new SimpleEdge(c, d, 1, 1);
         DirectEdge cd2 = new SimpleEdge(c, d, 2, 2);
         DirectEdge cd3 = new SimpleEdge(c, d, 3, 3);
-        g.addVerticesFromEdge(ab);
-        g.addVerticesFromEdge(bc1);
-        g.addVerticesFromEdge(bc2);
-        g.addVerticesFromEdge(bc3);
-        g.addVerticesFromEdge(cd1);
-        g.addVerticesFromEdge(cd2);
-        g.addVerticesFromEdge(cd3);
         OverlayGraph og = new OverlayGraph(g);
         assertEquals(g.countVertices(), og.countVertices());
         assertEquals(g.countEdges(), og.countEdges());

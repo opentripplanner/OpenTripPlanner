@@ -122,8 +122,7 @@ public class ReachTest extends TestCase {
     
 
     private IntersectionVertex vertex(String label, double lat, double lon) {
-        IntersectionVertex v = new IntersectionVertex(label, lat, lon);
-        graph.addVertex(v);
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 

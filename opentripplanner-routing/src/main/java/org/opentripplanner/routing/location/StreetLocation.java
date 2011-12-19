@@ -26,7 +26,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
@@ -50,7 +49,8 @@ public class StreetLocation extends AbstractVertex {
 
     // maybe name should just be pulled from street being split
     public StreetLocation(String id, Coordinate nearestPoint, String name) {
-        super(id, nearestPoint.x, nearestPoint.y, name);
+        // calling constructor with null graph means this vertex is temporary
+        super(null, id, nearestPoint.x, nearestPoint.y, name);
     }
 
     private static final long serialVersionUID = 1L;
@@ -137,13 +137,13 @@ public class StreetLocation extends AbstractVertex {
             double lengthIn = street.getLength() * lengthRatioIn;
             double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-            newFrom = new TurnVertex(label + " (vertex going in to splitter)", geometries.getFirst(), name,
+            newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), name,
                     lengthIn, false, street.getNotes());
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn));
             newFrom.setPermission(street.getPermission());
             newFrom.setNoThruTraffic(street.isNoThruTraffic());
 
-            location = new TurnVertex(label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
+            location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
                     false, street.getNotes());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut));
             location.setPermission(street.getPermission());
