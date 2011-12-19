@@ -33,8 +33,4 @@ public class IntersectionVertex extends StreetVertex {
         super(label, c.x, c.y, name);
     }
 
-	public IntersectionVertex newLike() {
-		return new IntersectionVertex(getLabel() + " COPY", getX(), getY(), getName());
-	}
-
 }

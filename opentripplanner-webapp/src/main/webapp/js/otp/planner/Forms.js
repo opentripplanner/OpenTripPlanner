@@ -339,17 +339,26 @@ otp.planner.StaticForms = {
         this.THIS.planner.focus();
     },
 
-    /** parse a geo param that has :: separation */
+    /** parse a string param -- lookng to separate any name :: separation from coordinate data */
     parseGeoParam : function(p)
     {
         var retVal = null;
 
-        var s = p.indexOf("::");
-        if(s && s > 0)
+        if(p)
         {
             retVal = {};
-            retVal.name = p.substr(0, s);
-            var ll = p.substr(s+2);
+
+            var ll = p; 
+
+            // process named coordinates, ala NAME::lat,lon
+            var s  = p.indexOf("::");
+            if(s && s > 0)
+            {
+                retVal.name = p.substr(0, s);
+                ll = p.substr(s+2);
+            }
+
+            // process coordinates part of the string
             retVal.ll  = ll; 
             retVal.lat = otp.util.ObjUtils.getLat(ll);
             retVal.lon = otp.util.ObjUtils.getLon(ll);
@@ -369,7 +378,7 @@ otp.planner.StaticForms = {
             retVal = lat + ',' + lon;
 
             // append geocoder string, which OTP will pass back to us in the response
-            if(name && name.length > 0 && this.appendGeocodeName)
+            if(this.appendGeocodeName && name && name.length > 0 && !otp.util.ObjUtils.isCoordinate(name))
                 retVal = name + '::' + retVal;
         }
 

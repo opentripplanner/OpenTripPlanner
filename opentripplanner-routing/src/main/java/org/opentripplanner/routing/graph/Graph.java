@@ -448,4 +448,12 @@ public class Graph implements Serializable {
             }
         }
     }
+
+    public Integer getIdForEdge(Edge edge) {
+        return idForEdge.get(edge);
+    }
+
+    public Edge getEdgeById(int id) {
+        return edgeById.get(id);
+    }
 }

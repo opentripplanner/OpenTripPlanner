@@ -14,6 +14,7 @@
 package org.opentripplanner.api.ws.analysis;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.DefaultValue;
@@ -24,19 +25,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.opentripplanner.analysis.AnalysisUtils;
 import org.opentripplanner.api.model.analysis.GraphComponent;
 import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
 import org.opentripplanner.api.ws.RequestInf;
-import org.opentripplanner.analysis.AnalysisUtils;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.access.annotation.Secured;
 
 import com.sun.jersey.api.spring.Autowire;
+import com.sun.jersey.spi.resource.Singleton;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -49,6 +52,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @Path("/components")
 @XmlRootElement
 @Autowire
+@Singleton
 public class Components {
     private GraphService graphService;
 
@@ -78,9 +82,19 @@ public class Components {
     @Produces({ MediaType.APPLICATION_JSON })
     public GraphComponentPolygons getComponentPolygons(
             @DefaultValue("TRANSIT,WALK") @QueryParam("modes") TraverseModeSet modes,
-            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time) {
+            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time,
+            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes) {
 
         TraverseOptions options = new TraverseOptions(modes);
+        options.bannedRoutes = new HashSet<RouteSpec>();
+        for (String element : bannedRoutes.split(",")) {
+            String[] routeSpec = element.split("_", 2);
+            if (routeSpec.length != 2) {
+                throw new IllegalArgumentException(
+                        "AgencyId or routeId not set in bannedRoutes list");
+            }
+            options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
+        }
 
         long dateTime = DateUtils.toDate(date, time).getTime();
         if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {

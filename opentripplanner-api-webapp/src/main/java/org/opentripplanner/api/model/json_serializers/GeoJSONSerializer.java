@@ -11,27 +11,31 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model;
+package org.opentripplanner.api.model.json_serializers;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonParser;
+import org.codehaus.jackson.JsonGenerator;
 import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.DeserializationContext;
-import org.codehaus.jackson.map.JsonDeserializer;
+import org.codehaus.jackson.map.JsonSerializer;
+import org.codehaus.jackson.map.SerializerProvider;
 import org.geotools.geojson.geom.GeometryJSON;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class GeoJSONDeserializer extends JsonDeserializer<Geometry> {
+public class GeoJSONSerializer extends JsonSerializer<Geometry> {
 
     @Override
-    public Geometry deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException,
-            JsonProcessingException {
+    public void serialize(Geometry value, JsonGenerator jgen, SerializerProvider provider)
+            throws IOException, JsonProcessingException {
+        
         GeometryJSON json = new GeometryJSON();
-        String text = jp.getText();
-        ByteArrayInputStream stream = new ByteArrayInputStream(text.getBytes());
-        return json.read(stream);
+        
+        jgen.writeRawValue(json.toString(value));
+    }
+
+    @Override
+    public Class<Geometry> handledType() {
+        return Geometry.class;
     }
 }

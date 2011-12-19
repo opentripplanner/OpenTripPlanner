@@ -22,7 +22,6 @@ import java.util.logging.Logger;
  * The purpose of Properties is to easily read a ResourceBundel (set of localized .properties files), and get the named contents.
  * Goes really well with an enumerated type (@see org.opentripplanner.api.ws.Message)
  */
-@SuppressWarnings("unchecked")
 public class Properties {
 
     public static final Logger LOGGER = Logger.getLogger(Properties.class.getCanonicalName());
@@ -33,7 +32,7 @@ public class Properties {
         this(Properties.class);
     }
 
-    public Properties(Class c) {
+    public Properties(Class<?> c) {
         _bundle = c.getSimpleName();
     }
 

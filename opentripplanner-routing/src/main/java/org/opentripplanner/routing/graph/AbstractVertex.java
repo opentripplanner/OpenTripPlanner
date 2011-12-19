@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.edgetype.DirectEdge;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -169,11 +171,13 @@ public abstract class AbstractVertex implements Vertex {
     }
 
     @Override
+    @XmlTransient
     public int getDegreeOut() {
         return outgoing.size();
     }
 
     @Override
+    @XmlTransient
     public int getDegreeIn() {
         return incoming.size();
     }
@@ -214,6 +218,7 @@ public abstract class AbstractVertex implements Vertex {
     }
     
     @Override
+    @XmlTransient
     public int getGroupIndex() {
         return groupIndex;
     }
@@ -236,12 +241,13 @@ public abstract class AbstractVertex implements Vertex {
         return label;
     }
 
-    @Override
+    @XmlTransient
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
 
-    @Override
+    /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
+    @XmlTransient
     public int getIndex() {
         return index;
     }
@@ -280,6 +286,7 @@ public abstract class AbstractVertex implements Vertex {
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
     
     @Override
+    @XmlTransient
     public List<DirectEdge> getOutgoingStreetEdges() {
         List<DirectEdge> result = new ArrayList<DirectEdge>();
         for (Edge out : this.getOutgoing()) {
@@ -338,6 +345,7 @@ public abstract class AbstractVertex implements Vertex {
     }
     
     @Override
+    @XmlTransient
     public Collection<Edge> getEdges(OverlayGraph extraEdges, OverlayGraph replacementEdges, boolean incoming) {
         Collection<Edge> ret;
         if (replacementEdges != null) {

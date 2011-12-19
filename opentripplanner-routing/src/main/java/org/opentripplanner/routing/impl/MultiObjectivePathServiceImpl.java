@@ -155,7 +155,7 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
         extraEdgesStrategy.addEdgesFor(extraEdges, target);
         
         BinHeap<State> pq = new BinHeap<State>();
-        List<State> boundingStates = new ArrayList<State>();
+//        List<State> boundingStates = new ArrayList<State>();
 
         // initialize heuristic outside loop so table can be reused
         heuristic.computeInitialWeight(origin, target);
@@ -219,44 +219,43 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                     continue QUEUE;
                 }
                 
-                EDGE: for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
-                    State new_sv = e.traverse(su);
-                    if (traverseVisitor != null) {
-                        traverseVisitor.visitEdge(e, new_sv);
-                    }
-    
-                    if (new_sv == null)
-                        continue;
-                    double h = heuristic.computeForwardWeight(new_sv, target);
+                for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
+                    STATE: for (State new_sv = e.traverse(su); new_sv != null; new_sv = new_sv.getNextResult()) {
+                        if (traverseVisitor != null) {
+                            traverseVisitor.visitEdge(e, new_sv);
+                        }
+
+                        double h = heuristic.computeForwardWeight(new_sv, target);
 //                    for (State bs : boundingStates) {
 //                        if (eDominates(bs, new_sv)) {
-//                            continue EDGE;
+//                            continue STATE;
 //                        }
 //                    }
-                    Vertex v = new_sv.getVertex();
-                    List<State> old_states = states.get(v);
-                    if (old_states == null) {
-                        old_states = new LinkedList<State>();
-                        states.put(v, old_states);
-                    } else {
-                        for (State old_sv : old_states) {
-                            if (eDominates(old_sv, new_sv)) {
-                                continue EDGE;
+                        Vertex v = new_sv.getVertex();
+                        List<State> old_states = states.get(v);
+                        if (old_states == null) {
+                            old_states = new LinkedList<State>();
+                            states.put(v, old_states);
+                        } else {
+                            for (State old_sv : old_states) {
+                                if (eDominates(old_sv, new_sv)) {
+                                    continue STATE;
+                                }
+                            }
+                            Iterator<State> iter = old_states.iterator();
+                            while (iter.hasNext()) {
+                                State old_sv = iter.next();
+                                if (eDominates(new_sv, old_sv)) {
+                                    iter.remove();
+                                }
                             }
                         }
-                        Iterator<State> iter = old_states.iterator();
-                        while (iter.hasNext()) {
-                            State old_sv = iter.next();
-                            if (eDominates(new_sv, old_sv)) {
-                                iter.remove();
-                            }
-                        }
-                    }
-                    if (traverseVisitor != null)
-                        traverseVisitor.visitEnqueue(new_sv);
+                        if (traverseVisitor != null)
+                            traverseVisitor.visitEnqueue(new_sv);
     
-                    old_states.add(new_sv);
-                    pq.insert(new_sv, new_sv.getWeight() + h);    
+                        old_states.add(new_sv);
+                        pq.insert(new_sv, new_sv.getWeight() + h);
+                    }
                 }
             }
         }
