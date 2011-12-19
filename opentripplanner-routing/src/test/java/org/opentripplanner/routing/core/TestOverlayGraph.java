@@ -15,17 +15,22 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 public class TestOverlayGraph extends TestCase {
     
     public void testBasic() throws Exception {
         Graph g = new Graph();
-        Vertex a = new Vertex("a", 5, 5);
-        Vertex b = new Vertex("b", 6, 5);
-        Vertex c = new Vertex("c", 7, 5);
-        Vertex d = new Vertex("d", 8, 5);
+        Vertex a = new IntersectionVertex("a", 5, 5);
+        Vertex b = new IntersectionVertex("b", 6, 5);
+        Vertex c = new IntersectionVertex("c", 7, 5);
+        Vertex d = new IntersectionVertex("d", 8, 5);
         // vary weights so edges are not considered equal
         DirectEdge ab = new SimpleEdge(a, b, 1, 1);
         DirectEdge bc1 = new SimpleEdge(b, c, 1, 1);
@@ -34,13 +39,13 @@ public class TestOverlayGraph extends TestCase {
         DirectEdge cd1 = new SimpleEdge(c, d, 1, 1);
         DirectEdge cd2 = new SimpleEdge(c, d, 2, 2);
         DirectEdge cd3 = new SimpleEdge(c, d, 3, 3);
-        g.addEdge(ab);
-        g.addEdge(bc1);
-        g.addEdge(bc2);
-        g.addEdge(bc3);
-        g.addEdge(cd1);
-        g.addEdge(cd2);
-        g.addEdge(cd3);
+        g.addVerticesFromEdge(ab);
+        g.addVerticesFromEdge(bc1);
+        g.addVerticesFromEdge(bc2);
+        g.addVerticesFromEdge(bc3);
+        g.addVerticesFromEdge(cd1);
+        g.addVerticesFromEdge(cd2);
+        g.addVerticesFromEdge(cd3);
         OverlayGraph og = new OverlayGraph(g);
         assertEquals(g.countVertices(), og.countVertices());
         assertEquals(g.countEdges(), og.countEdges());

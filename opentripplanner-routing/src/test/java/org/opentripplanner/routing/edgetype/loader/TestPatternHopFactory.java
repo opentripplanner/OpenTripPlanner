@@ -26,28 +26,28 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -68,16 +68,16 @@ public class TestPatternHopFactory extends TestCase {
 
         String[] stops = {"agency_A", "agency_B", "agency_C", "agency_D", "agency_E"};
         for (int i = 0; i < stops.length; ++i) {
-            Vertex stop = graph.getVertex(stops[i]);
+            TransitStop stop = (TransitStop) (graph.getVertex(stops[i]));
             
-            StreetVertex front = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false, null));
-            StreetVertex back = (StreetVertex) graph.addVertex(new StreetVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true, null));
+            TurnVertex front = (TurnVertex) graph.addVertex(new TurnVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() + 0.0001, stop.getY() + 0.0001, stop.getX() - 0.0001, stop.getY() - 0.0001), "near " + stop.getStopId(), 100, false, null));
+            TurnVertex back = (TurnVertex) graph.addVertex(new TurnVertex("near_" + stop.getStopId(), GeometryUtils.makeLineString(stop.getX() - 0.0001, stop.getY() - 0.0001, stop.getX() + 0.0001, stop.getY() + 0.0001), "near " + stop.getStopId(), 100, true, null));
             
             TurnEdge street = new TurnEdge(front, back);
-            graph.addEdge(street);
+            graph.addVerticesFromEdge(street);
             
             TurnEdge street2 = new TurnEdge(back, front);
-            graph.addEdge(street2);
+            graph.addVerticesFromEdge(street2);
         }
 
         NetworkLinker nl = new NetworkLinker(graph);
@@ -280,7 +280,6 @@ public class TestPatternHopFactory extends TestCase {
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");
         Edge edge = new SimpleEdge(e_arrive, f_depart, 10000, 10000);
-        graph.addEdge(e_arrive, f_depart, edge);
         
         long startTime = TestUtils.dateInSeconds(2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex("agency_B_depart");

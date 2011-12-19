@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * An interface for classes that track which graph vertices are visited and their associated states,

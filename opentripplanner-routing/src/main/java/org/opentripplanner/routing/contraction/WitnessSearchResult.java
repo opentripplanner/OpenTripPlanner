@@ -15,7 +15,7 @@ package org.opentripplanner.routing.contraction;
 
 import java.util.List;
 
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 
 public class WitnessSearchResult {

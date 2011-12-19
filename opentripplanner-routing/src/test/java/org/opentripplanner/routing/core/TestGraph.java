@@ -16,6 +16,9 @@ package org.opentripplanner.routing.core;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 public class TestGraph extends TestCase {
     public void testBasic() throws Exception {
@@ -25,23 +28,23 @@ public class TestGraph extends TestCase {
 
     public void testAddVertex() throws Exception {
         Graph gg = new Graph();
-        Vertex a = gg.addVertex("A", 5, 5);
+        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
         assertEquals(a.getLabel(), "A");
     }
 
     public void testGetVertex() throws Exception {
         Graph gg = new Graph();
-        Vertex a = gg.addVertex("A", 5, 5);
+        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
         Vertex b = gg.getVertex("A");
         assertEquals(a, b);
     }
 
     public void testAddEdge() throws Exception {
         Graph gg = new Graph();
-        Vertex a = gg.addVertex("A", 5, 5);
-        Vertex b = gg.addVertex("B", 6, 6);
+        Vertex a = gg.addVertex(new IntersectionVertex("A", 5, 5));
+        Vertex b = gg.addVertex(new IntersectionVertex("B", 6, 6));
         FreeEdge ee = new FreeEdge(a,b);
-        gg.addEdge(ee);
+        gg.addVerticesFromEdge(ee);
         assertNotNull(ee);
     }
 }

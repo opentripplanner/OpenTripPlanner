@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;

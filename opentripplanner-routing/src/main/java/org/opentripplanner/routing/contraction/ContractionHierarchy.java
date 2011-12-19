@@ -30,28 +30,27 @@ import java.util.concurrent.TimeUnit;
 
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.VertexIngress;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.util.NullExtraEdges;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -318,13 +317,13 @@ public class ContractionHierarchy implements Serializable {
      * @return
      */
     private boolean isContractable(Vertex v) {
-        if (v instanceof StreetVertex || v instanceof EndpointVertex) {
+        if (v instanceof TurnVertex || v instanceof IntersectionVertex) {
             for (Edge e : core.getOutgoing(v)) {
                 if( ! (e instanceof DirectEdge))
                     return false;
                 DirectEdge de = (DirectEdge) e;
                 Vertex tov = de.getToVertex();
-                if (!(tov instanceof StreetVertex || tov instanceof EndpointVertex)) {
+                if (!(tov instanceof TurnVertex || tov instanceof IntersectionVertex)) {
                     return false;
                 }
             }

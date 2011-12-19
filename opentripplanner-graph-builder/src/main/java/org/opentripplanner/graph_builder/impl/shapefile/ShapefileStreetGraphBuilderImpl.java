@@ -35,12 +35,11 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +101,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                     .getPermissionConverter();
             SimpleFeatureConverter<String> noteConverter = _schema.getNoteConverter();
 
-            HashMap<Coordinate, Vertex> intersectionsByLocation = new HashMap<Coordinate, Vertex>();
+            HashMap<Coordinate, IntersectionVertex> intersectionsByLocation = 
+                    new HashMap<Coordinate, IntersectionVertex>();
 
             SimpleFeatureConverter<P2<Double>> safetyConverter = _schema.getBicycleSafetyConverter();
 
@@ -157,22 +157,24 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String endIntersectionName = getIntersectionName(coordinateToStreetNames,
                         intersectionNameToId, endCoordinate);
 
-                Vertex startIntersection = intersectionsByLocation.get(startCoordinate);
+                IntersectionVertex startIntersection = intersectionsByLocation.get(startCoordinate);
                 if (startIntersection == null) {
-                    startIntersection = new EndpointVertex(startIntersectionName, startCoordinate.x,
+                    startIntersection = new IntersectionVertex(startIntersectionName, startCoordinate.x,
                             startCoordinate.y, startIntersectionName);
                     
-                    startIntersection = graph.addVertex(startIntersection);                  
-                    startIntersection = graph.addVertex(startIntersection);
+                    graph.addVertex(startIntersection);                  
+                    graph.addVertex(startIntersection);
                     intersectionsByLocation.put(startCoordinate, startIntersection);
+                    graph.addVertex(startIntersection);
                 }
 
-                Vertex endIntersection = intersectionsByLocation.get(endCoordinate);
+                IntersectionVertex endIntersection = intersectionsByLocation.get(endCoordinate);
                 if (endIntersection == null) {
-                    endIntersection = new EndpointVertex(endIntersectionName, endCoordinate.x,
+                    endIntersection = new IntersectionVertex(endIntersectionName, endCoordinate.x,
                             endCoordinate.y, endIntersectionName);
-                    endIntersection = graph.addVertex(endIntersection);
+                    graph.addVertex(endIntersection);
                     intersectionsByLocation.put(endCoordinate, endIntersection);
+                    graph.addVertex(endIntersection);
                 }
 
                 double length = 0;
@@ -184,12 +186,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
                 PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
                 street.setId(id);
-                graph.addEdge(street);
 
                 LineString reversed = (LineString) geom.reverse();
                 PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
                 backStreet.setId(id);
-                graph.addEdge(backStreet);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
     private static final long serialVersionUID = 20110608L; //YYYYMMDDL

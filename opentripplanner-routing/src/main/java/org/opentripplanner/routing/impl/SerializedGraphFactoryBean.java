@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 
 public class SerializedGraphFactoryBean extends AbstractFactoryBean<Graph> {

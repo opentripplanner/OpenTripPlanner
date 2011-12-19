@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often

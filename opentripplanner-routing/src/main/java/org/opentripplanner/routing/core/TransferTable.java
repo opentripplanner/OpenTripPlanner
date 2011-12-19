@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class TransferTable implements Serializable {
 

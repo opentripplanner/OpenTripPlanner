@@ -15,7 +15,7 @@ package org.opentripplanner.routing.services;
 
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

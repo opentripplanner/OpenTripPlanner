@@ -17,8 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
 public interface TransitIndexService {

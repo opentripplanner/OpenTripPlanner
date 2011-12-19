@@ -15,9 +15,9 @@ package org.opentripplanner.routing.patch;
 
 import java.io.Serializable;
 
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.graph.Graph;
 
 public interface Patch extends Serializable {
     public Alert getAlert();

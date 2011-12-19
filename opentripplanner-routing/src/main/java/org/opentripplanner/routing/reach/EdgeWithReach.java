@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.reach;
 
-import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 
 public interface EdgeWithReach extends DirectEdge {
     public void setReach(double reach);
