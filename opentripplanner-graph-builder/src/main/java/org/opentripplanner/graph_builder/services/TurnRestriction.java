@@ -15,8 +15,8 @@ package org.opentripplanner.graph_builder.services;
 
 import java.util.Set;
 
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.Edge;
 
 public class TurnRestriction {
 	public TurnRestrictionType type;

@@ -41,26 +41,26 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.Shortcut;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -107,11 +107,11 @@ public class TestContractionHeirarchies extends TestCase {
             for (int x = 0; x < N; ++x) {
                 double xc = x * STEP + LON0;
                 double yc = y * STEP + LAT0;
-                Vertex in = new EndpointVertex("(" + x + ", " + y + ") in", xc, yc);
+                Vertex in = new IntersectionVertex("(" + x + ", " + y + ") in", xc, yc);
                 graph.addVertex(in);
                 verticesIn[y][x] = in;
 
-                Vertex out = new EndpointVertex("(" + x + ", " + y + ") out", xc, yc);
+                Vertex out = new IntersectionVertex("(" + x + ", " + y + ") out", xc, yc);
                 graph.addVertex(out);
                 verticesOut[y][x] = out;
             }
@@ -133,8 +133,8 @@ public class TestContractionHeirarchies extends TestCase {
                 double lat = i * STEP + LAT0;
                 double d = 111.111;
                 LineString geometry = GeometryUtils.makeLineString(lon, lat, lon + STEP, lat);
-                StreetVertex we = new StreetVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
-                StreetVertex ew = new StreetVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex we = new TurnVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
+                TurnVertex ew = new TurnVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
                 
                 graph.addVertex(we);
                 graph.addVertex(ew);
@@ -143,23 +143,23 @@ public class TestContractionHeirarchies extends TestCase {
                 lat = j * STEP + LAT0;
                 d = 111.111;
                 geometry = GeometryUtils.makeLineString(lon, lat, lon, lat + STEP);
-                StreetVertex sn = new StreetVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
-                StreetVertex ns = new StreetVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex sn = new TurnVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
+                TurnVertex ns = new TurnVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
 
                 graph.addVertex(sn);
                 graph.addVertex(ns);
                 
-                graph.addEdge(new FreeEdge(verticesOut[i][j], we));
-                graph.addEdge(new FreeEdge(verticesOut[j][i], sn));
+                graph.addVerticesFromEdge(new FreeEdge(verticesOut[i][j], we));
+                graph.addVerticesFromEdge(new FreeEdge(verticesOut[j][i], sn));
                 
-                graph.addEdge(new FreeEdge(verticesOut[i][j + 1], ew));
-                graph.addEdge(new FreeEdge(verticesOut[j + 1][i], ns));
+                graph.addVerticesFromEdge(new FreeEdge(verticesOut[i][j + 1], ew));
+                graph.addVerticesFromEdge(new FreeEdge(verticesOut[j + 1][i], ns));
                 
-                graph.addEdge(new FreeEdge(ew, verticesIn[i][j]));
-                graph.addEdge(new FreeEdge(ns, verticesIn[j][i]));
+                graph.addVerticesFromEdge(new FreeEdge(ew, verticesIn[i][j]));
+                graph.addVerticesFromEdge(new FreeEdge(ns, verticesIn[j][i]));
             
-                graph.addEdge(new FreeEdge(we, verticesIn[i][j + 1]));
-                graph.addEdge(new FreeEdge(sn, verticesIn[j + 1][i]));
+                graph.addVerticesFromEdge(new FreeEdge(we, verticesIn[i][j + 1]));
+                graph.addVerticesFromEdge(new FreeEdge(sn, verticesIn[j + 1][i]));
                 
                 assertEquals(we, graph.addVertex(we));
                 assertEquals(ew, graph.addVertex(ew));
@@ -173,13 +173,13 @@ public class TestContractionHeirarchies extends TestCase {
                 Vertex vertexIn = verticesIn[y][x];
                 for (DirectEdge e1: filter(vertexIn.getIncoming(),DirectEdge.class)) {
                     Vertex vertexOut = verticesOut[y][x];
-                    StreetVertex fromv = (StreetVertex) e1.getFromVertex();
+                    TurnVertex fromv = (TurnVertex) e1.getFromVertex();
                     for (DirectEdge e2: filter(vertexOut.getOutgoing(),DirectEdge.class)) {
-                        StreetVertex tov = (StreetVertex) e2.getToVertex();
+                        TurnVertex tov = (TurnVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
                         }
-                        graph.addEdge(new TurnEdge(fromv, tov));
+                        graph.addVerticesFromEdge(new TurnEdge(fromv, tov));
                     }
                     assertTrue(fromv.getDegreeOut() <= 4);
                 }
@@ -304,7 +304,7 @@ public class TestContractionHeirarchies extends TestCase {
         for (int i = 0; i < N; ++i) {
             double x = random.nextDouble() * 1000;
             double y = random.nextDouble() * 1000;
-            Vertex v = new EndpointVertex("(" + x + ", " + y + ")", x, y);
+            Vertex v = new IntersectionVertex("(" + x + ", " + y + ")", x, y);
             graph.addVertex(v);
             Envelope env = new Envelope(v.getCoordinate());
             tree.insert(env, v);
@@ -328,11 +328,11 @@ public class TestContractionHeirarchies extends TestCase {
                 }
             });
             for (Vertex n : nearby.subList(1, 6)) {
-                graph.addEdge(new FreeEdge(v, n));
-                graph.addEdge(new FreeEdge(n, v));
+                graph.addVerticesFromEdge(new FreeEdge(v, n));
+                graph.addVerticesFromEdge(new FreeEdge(n, v));
             }
             Vertex badTarget = nearby.get(6);
-            graph.addEdge(new ForbiddenEdge(badTarget, v));
+            graph.addVerticesFromEdge(new ForbiddenEdge(badTarget, v));
         }
 
         // ensure that graph is connected
@@ -351,8 +351,8 @@ public class TestContractionHeirarchies extends TestCase {
                 lastKey = components.union(v, last);
                 last = v;
                 Coordinate c = v.getCoordinate();
-                graph.addEdge(new SimpleEdge(v, last, last.distance(c), 0));
-                graph.addEdge(new SimpleEdge(last, v, last.distance(c), 0));
+                graph.addVerticesFromEdge(new SimpleEdge(v, last, last.distance(c), 0));
+                graph.addVerticesFromEdge(new SimpleEdge(last, v, last.distance(c), 0));
             }
         }
 

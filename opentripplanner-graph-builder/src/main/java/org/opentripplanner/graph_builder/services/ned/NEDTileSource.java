@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.services.ned;
 import java.io.File;
 import java.util.List;
 
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -14,7 +14,7 @@
 package org.opentripplanner.graph_builder.services;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * This is a special type of graph builder that needs access to the GTFS data

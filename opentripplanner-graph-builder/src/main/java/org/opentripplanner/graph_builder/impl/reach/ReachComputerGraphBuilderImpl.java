@@ -24,24 +24,24 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.customize.ClassCustomizer;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,12 +133,13 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             }
         }
         for (DirectEdge e: edgesToRemove) {
-            graph.removeEdge(e);
+            e.detach();
         }
 
-        for (DirectEdge e: edgesToAdd) {
-            graph.addEdge(e);
-        }
+// should no longer be necessary        
+//        for (DirectEdge e: edgesToAdd) {
+//            graph.addVerticesFromEdge(e);
+//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -297,12 +298,12 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     private Set<Vertex> getWalkingVertices(OverlayGraph ograph, TraverseOptions options) {
         Set<Vertex> streetVertices = new HashSet<Vertex>();
         for (Vertex vertex : ograph.getVertices()) {
-            if (vertex instanceof StreetVertex) {
+            if (vertex instanceof TurnVertex) {
                 GenericDijkstra dijkstra = new GenericDijkstra(options, ograph);
                 ShortestPathTree spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
-                    if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
+                    if (v2 instanceof TurnVertex || v2 instanceof IntersectionVertex) {
                         streetVertices.add(s.getVertex());
                     }
                 }
@@ -310,7 +311,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
-                    if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
+                    if (v2 instanceof TurnVertex || v2 instanceof IntersectionVertex) {
                         streetVertices.add(s.getVertex());
                     }
                 }

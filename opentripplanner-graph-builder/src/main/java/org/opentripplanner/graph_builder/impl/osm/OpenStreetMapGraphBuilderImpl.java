@@ -31,17 +31,17 @@ import org.opentripplanner.graph_builder.services.TurnRestrictionType;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,7 +166,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             GeometryFactory geometryFactory = new GeometryFactory();
 
             /* build an ordinary graph, which we will convert to an edge-based graph */
-            ArrayList<Vertex> endpoints = new ArrayList<Vertex>();
+            ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
 
             for (OSMWay way : _ways.values()) {
 
@@ -191,7 +191,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 List<Long> nodes = way.getNodeRefs();
 
-                Vertex startEndpoint = null, endEndpoint = null;
+                IntersectionVertex startEndpoint = null, endEndpoint = null;
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
 
@@ -239,10 +239,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // first iteration on this way
                         String label = "osm node " + osmStartNode.getId();
 
-                        startEndpoint = graph.getVertex(label);
+                        startEndpoint = (IntersectionVertex) graph.getVertex(label);
                         if (startEndpoint == null) {
                             Coordinate coordinate = getCoordinate(osmStartNode);
-                            startEndpoint = new EndpointVertex(label, coordinate.x, coordinate.y,
+                            startEndpoint = new IntersectionVertex(label, coordinate.x, coordinate.y,
                                     label);
                             graph.addVertex(startEndpoint);
                             endpoints.add(startEndpoint);
@@ -252,10 +252,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
 
                     String label = "osm node " + osmEndNode.getId();
-                    endEndpoint = graph.getVertex(label);
+                    endEndpoint = (IntersectionVertex) graph.getVertex(label);
                     if (endEndpoint == null) {
                         Coordinate coordinate = getCoordinate(osmEndNode);
-                        endEndpoint = new EndpointVertex(label, coordinate.x, coordinate.y, label);
+                        endEndpoint = new IntersectionVertex(label, coordinate.x, coordinate.y, label);
                         graph.addVertex(endEndpoint);
                         endpoints.add(endEndpoint);
                     }
@@ -266,7 +266,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     PlainStreetEdge street = streets.getFirst();
 
                     if (street != null) {
-                        graph.addEdge(street);
                         double safety = wayData.getSafetyFeatures().getFirst();
                         street.setBicycleSafetyEffectiveLength(street.getLength() * safety);
                         if (safety < bestBikeSafety) {
@@ -279,7 +278,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     PlainStreetEdge backStreet = streets.getSecond();
                     if (backStreet != null) {
-                        graph.addEdge(backStreet);
                         double safety = wayData.getSafetyFeatures().getSecond();
                         if (safety < bestBikeSafety) {
                             bestBikeSafety = safety;
@@ -385,7 +383,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             _nodes.put(node.getId(), node);
 
-            if (_nodes.size() % 10000 == 0)
+            if (_nodes.size() % 100000 == 0)
                 _log.debug("nodes=" + _nodes.size());
         }
 
@@ -395,7 +393,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             _ways.put(way.getId(), way);
 
-            if (_ways.size() % 1000 == 0)
+            if (_ways.size() % 10000 == 0)
                 _log.debug("ways=" + _ways.size());
         }
 
@@ -587,8 +585,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param end
          * @param start
          */
-        private P2<PlainStreetEdge> getEdgesForStreet(Vertex start, Vertex end, OSMWay way,
-                long startNode, StreetTraversalPermission permissions, LineString geometry) {
+        private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start, IntersectionVertex end, 
+                OSMWay way, long startNode, StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length in meters, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
@@ -709,8 +707,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<PlainStreetEdge>(street, backStreet);
         }
 
-        private PlainStreetEdge getEdgeForStreet(Vertex start, Vertex end, OSMWay way,
-                long startNode, double length, StreetTraversalPermission permissions,
+        private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end, 
+                OSMWay way, long startNode, double length, StreetTraversalPermission permissions,
                 LineString geometry, boolean back) {
 
             String id = "way " + way.getId() + " from " + startNode;

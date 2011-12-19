@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class GraphLibrary {
 

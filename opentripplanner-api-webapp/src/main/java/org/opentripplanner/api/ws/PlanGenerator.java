@@ -31,16 +31,13 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.Hop;
@@ -53,11 +50,15 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -495,9 +496,12 @@ public class PlanGenerator {
      * @return
      */
     private Place makePlace(State state) {
-        Coordinate endCoord = state.getVertex().getCoordinate();
-        String name = state.getVertex().getName();
-        AgencyAndId stopId = state.getVertex().getStopId();
+        Vertex v = state.getVertex();
+        Coordinate endCoord = v.getCoordinate();
+        String name = v.getName();
+        AgencyAndId stopId = null;
+        if (v instanceof TransitVertex)
+            stopId = ((TransitVertex)v).getStopId();
         Date timeAtState = new Date(state.getTimeInMillis());
         Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
         return place;
@@ -511,7 +515,8 @@ public class PlanGenerator {
     private Place makePlace(Vertex vertex) {
         Coordinate endCoord = vertex.getCoordinate();
         Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
-        place.stopId = vertex.getStopId();
+        if (vertex instanceof TransitVertex)
+            place.stopId = ((TransitVertex)vertex).getStopId();
         return place;
     }
 

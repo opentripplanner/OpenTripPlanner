@@ -17,10 +17,10 @@ import java.util.HashMap;
 
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.SimplifiedLowerBoundGraph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
