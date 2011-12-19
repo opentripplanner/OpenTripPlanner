@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model.json_serializers;
 
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 
 public class WithGraph {
     private Graph graph;

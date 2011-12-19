@@ -3,8 +3,8 @@ package org.opentripplanner.api.ws.analysis;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.opentripplanner.api.model.json_serializers.VertexSetJSONSerializer;
 import org.opentripplanner.api.model.json_serializers.WithGraph;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class WrappedVertex {
 
