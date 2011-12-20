@@ -107,6 +107,9 @@ private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
                         if (t == p)
                             continue;
                         double distance = p.fastDistance(t);
+                        // bins may contain distant colliding objects
+                        if (distance > radiusMeters)
+                            continue;
                         if (distance < closestDistance) {
                             closestT = t;
                             closestDistance = distance;
