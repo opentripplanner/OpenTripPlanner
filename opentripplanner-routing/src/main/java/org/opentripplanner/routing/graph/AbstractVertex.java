@@ -22,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.edgetype.DirectEdge;
 import javax.xml.bind.annotation.XmlTransient;
@@ -86,14 +87,14 @@ public abstract class AbstractVertex implements Vertex {
 
     /** Distance in meters to the vertex */
     @Override
-    public double distance(Vertex v) {
-        return DistanceLibrary.distance(getY(), getX(), v.getY(), v.getX());
+    public double distance(Pointlike p) {
+        return DistanceLibrary.distance(getLat(), getLon(), p.getLat(), p.getLon());
     }
     
     /** Fast, slightly approximated, under-estimated distance in meters to the vertex */
     @Override
-    public double fastDistance(Vertex v) {
-        return DistanceLibrary.fastDistance(getY(), getX(), v.getY(), v.getX());
+    public double fastDistance(Pointlike p) {
+        return DistanceLibrary.fastDistance(getLat(), getLon(), p.getLat(), p.getLon());
     }
 
     @Override
@@ -202,6 +203,16 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public double getY() {
+        return y;
+    }
+
+    @Override
+    public double getLon() {
+        return x;
+    }
+
+    @Override
+    public double getLat() {
         return y;
     }
 

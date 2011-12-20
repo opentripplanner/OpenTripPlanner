@@ -4,25 +4,16 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.graph.AbstractVertex.ValidEdgeTypes;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public interface Vertex extends Serializable, Cloneable {
-
-    /** Distance in meters to the coordinate */
-    public abstract double distance(Coordinate c);
-
-    /** Distance in meters to the vertex */
-    public abstract double distance(Vertex v);
-
-    /** Fast, slightly approximated, under-estimated distance in meters to the vertex */
-    public abstract double fastDistance(Vertex v);
+public interface Vertex extends Serializable, Cloneable, Pointlike {
 
     public abstract String toString();
-
     
     /* EDGE LISTS */
     
