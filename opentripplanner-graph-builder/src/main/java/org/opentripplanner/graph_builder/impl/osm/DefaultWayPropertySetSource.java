@@ -190,9 +190,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=primary_link;cycleway=opposite_lane",
             StreetTraversalPermission.ALL, 2.06, 1.15);
         setProperties(props, "highway=trunk;cycleway=opposite_lane", 
-            StreetTraversalPermission.ALL, 7.47, 1.5);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 7.47, 1.5);
         setProperties(props, "highway=trunk_link;cycleway=opposite_lane",
-            StreetTraversalPermission.ALL, 2.06, 1.15);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 1.15);
 
         /* cycleway=track */
         setProperties(props, "highway=*;cycleway=track", 
@@ -216,9 +216,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=primary_link;cycleway=track", 
             StreetTraversalPermission.ALL, 0.85, 0.85);
         setProperties(props, "highway=trunk;cycleway=track", 
-            StreetTraversalPermission.ALL, 0.9, 0.9);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 0.9, 0.9);
         setProperties(props, "highway=trunk_link;cycleway=track", 
-            StreetTraversalPermission.ALL, 0.85, 0.85);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 0.85, 0.85);
 
         /* cycleway=opposite_track */
         setProperties(props, "highway=*;cycleway=opposite_track", 
@@ -242,9 +242,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=primary_link;cycleway=opposite_track",
             StreetTraversalPermission.ALL, 2.06, 0.85);
         setProperties(props, "highway=trunk;cycleway=opposite_track",
-            StreetTraversalPermission.ALL, 7.47, 0.9);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 7.47, 0.9);
         setProperties(props, "highway=trunk_link;cycleway=opposite_track",
-            StreetTraversalPermission.ALL, 2.06, 0.85);
+            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 0.85);
 
         /* cycleway=shared_lane */
         setProperties(props, "highway=*;cycleway=shared_lane", 
