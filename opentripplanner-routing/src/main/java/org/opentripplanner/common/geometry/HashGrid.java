@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class HashGrid<T extends Pointlike> {
 
-private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
+    private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
     private static final double PROJECTION_MERIDIAN = -100;
     private final double binSizeMeters;
     private final int nBinsX, nBinsY;
@@ -85,6 +85,10 @@ private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
         if (y < 0)
             y += nBinsY;
         return y;
+    }
+    
+    public T closest(double x, double y, double radiusMeters) {
+        return closest(new Point(x, y), radiusMeters);
     }
         
     public T closest(Pointlike p, double radiusMeters) {
