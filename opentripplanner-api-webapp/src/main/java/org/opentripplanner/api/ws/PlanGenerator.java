@@ -350,7 +350,7 @@ public class PlanGenerator {
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
                             Place stop = makePlace(state.getBackState());
                             leg.stop.add(stop);
-                        } else {
+                        } else if(leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
                                     state.getTimeInMillis());
                         }
