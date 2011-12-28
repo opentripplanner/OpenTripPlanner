@@ -407,6 +407,8 @@ public class PlanGenerator {
             leg.tripShortName = trip.getTripShortName();
             leg.routeShortName = trip.getRoute().getShortName();
             leg.routeLongName = trip.getRoute().getLongName();
+            leg.routeColor = trip.getRoute().getColor();
+            leg.routeTextColor = trip.getRoute().getTextColor();
         }
         leg.mode = en.getMode().toString();
         leg.startTime = new Date(state.getBackState().getTimeInMillis());
