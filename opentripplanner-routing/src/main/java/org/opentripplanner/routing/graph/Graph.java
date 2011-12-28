@@ -357,16 +357,23 @@ public class Graph implements Serializable {
     
     public static Graph load(File file, LoadLevel level) 
         throws IOException, ClassNotFoundException {
+        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
-        return load(ClassLoader.getSystemClassLoader(), file, level);
+        ObjectInputStream in = new ObjectInputStream (new FileInputStream(file));
+        return load(in, level);
     }
     
-    @SuppressWarnings("unchecked")
     public static Graph load(ClassLoader classLoader, File file, LoadLevel level) 
         throws IOException, ClassNotFoundException {
+        LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
         ObjectInputStream in = new GraphObjectInputStream(
                 new BufferedInputStream (new FileInputStream(file)), classLoader);
-        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
+        return load(in, level);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Graph load(ObjectInputStream in, LoadLevel level) 
+        throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info and annotations read.");
