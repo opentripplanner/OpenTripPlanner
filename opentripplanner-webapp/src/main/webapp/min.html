@@ -21,19 +21,14 @@
 
     <!--
        NOTE: this is another way to override the default language ... espcially useful when using the minimized otp-min.js library
-       (just uncomment the "//otp.config = " line below...
+       (just close the comment 2 lines below to switch langs to Marathi)
      -->
-    <!--
-    <script src="js/otp/otp.js"></script>
-    <script src="js/otp/locale/Marathi.js"></script>
-    <script src="js/otp/locale/French.js"></script>
-    
+    <!-- - ->
     <script>
-        otp.config = {locale : otp.locale.Marathi}
-        otp.config = {locale : otp.locale.French}
-        otp.config.planner={}; // overrides the default planner configuration (object ... see config.js) 
+        otp.config.locale = otp.locale.Marathi;
     </script>
-    -->
+    <script src="js/otp/config.js"></script>
+    <!-- -->
 </head>
 
 <body>
