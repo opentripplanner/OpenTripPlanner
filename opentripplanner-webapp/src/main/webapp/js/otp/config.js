@@ -54,7 +54,7 @@ otp.config_defaults = {
             {name:otp.config.locale.tripPlanner.link.walk_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_walk,    url:otp.config.locale.tripPlanner.link.google_domain + '/maps?daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=w'}
         ],
-/*
+
         geocoder  :
         {
             enabled : false,
@@ -64,7 +64,7 @@ otp.config_defaults = {
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
         /* debug geocoder */
-        /* */
+        /* *
         geocoder  :
         {
             enabled : true,
