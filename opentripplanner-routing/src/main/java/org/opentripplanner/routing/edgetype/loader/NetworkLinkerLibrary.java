@@ -31,7 +31,6 @@ import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -169,7 +168,7 @@ public class NetworkLinkerLibrary {
         String vertexLabel = "link for " + v.getStopId();
         Coordinate coordinate = v.getCoordinate();
         /* is the stop right at an intersection? */
-        List<Vertex> atIntersection = index.getIntersectionAt(coordinate);
+        List<Vertex> atIntersection = index.getIntersectionAt(coordinate, StreetVertexIndexServiceImpl.DISTANCE_ERROR);
         if (atIntersection != null) {
             // if so, the stop can be linked directly to all vertices at the intersection
             return atIntersection;

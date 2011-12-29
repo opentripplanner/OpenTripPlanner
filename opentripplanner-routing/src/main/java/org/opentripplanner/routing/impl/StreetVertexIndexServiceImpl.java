@@ -80,7 +80,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.05;
 
-    private static final double DISTANCE_ERROR = 0.00005;
+    public static final double DISTANCE_ERROR = 0.00005;
+
+    //if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
+    private static final double MAX_CORNER_DISTANCE = 0.00010;
 
     private static final double DIRECTION_ERROR = 0.05;
 
@@ -191,7 +194,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
-        List<Vertex> vertices = getIntersectionAt(coordinate);
+        List<Vertex> vertices = getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
         if (vertices != null && !vertices.isEmpty()) {
             // coordinate is at a street corner or endpoint
             if (name == null) {
@@ -427,13 +430,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     @SuppressWarnings("unchecked")
-    public List<Vertex> getIntersectionAt(Coordinate coordinate) {
+    public List<Vertex> getIntersectionAt(Coordinate coordinate, double distanceError) {
         Envelope envelope = new Envelope(coordinate);
-        envelope.expandBy(DISTANCE_ERROR * 2);
+        envelope.expandBy(distanceError * 2);
         List<Vertex> nearby = intersectionTree.query(envelope);
         List<Vertex> atIntersection = new ArrayList<Vertex>(nearby.size());
         for (Vertex v : nearby) {
-            if (coordinate.distance(v.getCoordinate()) < DISTANCE_ERROR) {
+            if (coordinate.distance(v.getCoordinate()) < distanceError) {
                 atIntersection.add(v);
             }
         }
