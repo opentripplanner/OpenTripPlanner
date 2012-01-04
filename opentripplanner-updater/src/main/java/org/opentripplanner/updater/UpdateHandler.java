@@ -30,6 +30,9 @@ public class UpdateHandler {
     private Set<String> patchIds = new HashSet<String>();
 
     private PatchService patchService;
+
+    /** How long before the posted start of an event it should be displayed to users */
+    private long earlyStart;
     
     public UpdateHandler(FeedMessage message) {
         this.message = message;
@@ -55,7 +58,7 @@ public class UpdateHandler {
         alertText.alertUrl = deBuffer(alert.getUrl());
         ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         for (TimeRange activePeriod : alert.getActivePeriodList()) {
-            final long start = activePeriod.hasStart() ? activePeriod.getStart() : 0;
+            final long start = activePeriod.hasStart() ? activePeriod.getStart() - earlyStart : 0;
             final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
             periods.add(new TimePeriod(start, end));
         }
@@ -118,6 +121,14 @@ public class UpdateHandler {
 
     public void setPatchService(PatchService patchService) {
         this.patchService = patchService;
+    }
+
+    public long getEarlyStart() {
+        return earlyStart;
+    }
+
+    public void setEarlyStart(long earlyStart) {
+        this.earlyStart = earlyStart;
     }
 
 }
