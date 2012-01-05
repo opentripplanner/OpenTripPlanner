@@ -57,21 +57,20 @@ public class PatchServiceImpl implements PatchService {
     @Override
     public synchronized void apply(Patch patch) {
         Graph graph = graphService.getGraph();
-        if (!patches.containsKey(patch.getId())) {
-            patch.apply(graph);
-            patches.put(patch.getId(), patch);
-            if (patch instanceof AlertPatch) {
-                AlertPatch alertPatch = (AlertPatch) patch;
-                AgencyAndId stop = alertPatch.getStop();
-                if (stop != null) {
-                    MapUtils.addToMapList(patchesByStop, stop, patch);
-                }
-                AgencyAndId route = alertPatch.getRoute();
-                if (route != null) {
-                    MapUtils.addToMapList(patchesByRoute, stop, patch);
-                }
+        patch.apply(graph);
+        patches.put(patch.getId(), patch);
+        if (patch instanceof AlertPatch) {
+            AlertPatch alertPatch = (AlertPatch) patch;
+            AgencyAndId stop = alertPatch.getStop();
+            if (stop != null) {
+                MapUtils.addToMapList(patchesByStop, stop, patch);
+            }
+            AgencyAndId route = alertPatch.getRoute();
+            if (route != null) {
+                MapUtils.addToMapList(patchesByRoute, stop, patch);
             }
         }
+
     }
 
     @Override

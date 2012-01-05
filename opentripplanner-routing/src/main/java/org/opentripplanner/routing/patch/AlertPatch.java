@@ -133,4 +133,39 @@ public class AlertPatch extends AbstractPatch {
     public void setStop(AgencyAndId stop) {
         this.stop = stop;
     }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof AlertPatch)) {
+            return false;
+        }
+        AlertPatch other = (AlertPatch) o;
+        if (direction == null) {
+            if (other.direction != null) {
+                return false;
+            }
+        } else {
+            if (!direction.equals(other.direction)) {
+                return false;
+            }
+        }
+        if (stop == null) {
+            if (other.stop != null) {
+                return false;
+            }
+        } else {
+            if (!stop.equals(other.stop)) {
+                return false;
+            }
+        }
+        if (route == null) {
+            if (other.route != null) {
+                return false;
+            }
+        } else {
+            if (!route.equals(other.route)) {
+                return false;
+            }
+        }
+        return other.alert.equals(alert) && super.equals(other);
+    }
 }

@@ -15,7 +15,6 @@ package org.opentripplanner.routing.core;
 
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -110,10 +109,12 @@ public abstract class AbstractEdge implements DirectEdge, Serializable {
 
     @Override
     public void addPatch(Patch patch) {
-    	if (patches == null) {
-    		patches = new ArrayList<Patch>();
-    	}
-    	patches.add(patch);
+        if (patches == null) {
+            patches = new ArrayList<Patch>();
+        }
+        if (!patches.contains(patch)) {
+            patches.add(patch);
+        }
     }
 
     public List<Patch> getPatches() {

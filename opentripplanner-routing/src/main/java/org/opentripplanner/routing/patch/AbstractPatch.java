@@ -10,13 +10,13 @@ import javax.xml.bind.annotation.XmlElement;
 import org.opentripplanner.routing.core.TraverseOptions;
 
 public abstract class AbstractPatch implements Patch {
+    private static final long serialVersionUID = 1371103825857750564L;
+
     protected String id;
 
     protected Alert alert;
 
-    private static final long serialVersionUID = 1371103825857750564L;
-
-    private List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
+    protected List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
 
     @Override
     public boolean activeDuring(TraverseOptions options, long start, long end) {
@@ -62,5 +62,13 @@ public abstract class AbstractPatch implements Patch {
     
     public void setTimePeriods(List<TimePeriod> periods) {
         timePeriods = periods;
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof AbstractPatch)) {
+            return false;
+        }
+        AbstractPatch other = (AbstractPatch) o;
+        return id.equals(other.id) && timePeriods.equals(other.timePeriods);
     }
 }
