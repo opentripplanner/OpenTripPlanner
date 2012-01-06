@@ -134,7 +134,7 @@ public class Planner {
             @QueryParam(RequestInf.FROM) String fromPlace,
             @QueryParam(RequestInf.TO) String toPlace,
             @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
-            @DefaultValue("false") @QueryParam(RequestInf.INTERMEDAITE_PLACES_ORDERED) Boolean intermediatePlacesOrdered,
+            @DefaultValue("false") @QueryParam(RequestInf.INTERMEDIATE_PLACES_ORDERED) Boolean intermediatePlacesOrdered,
             @QueryParam(RequestInf.DATE) String date,
             @QueryParam(RequestInf.TIME) String time,
             @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId,
