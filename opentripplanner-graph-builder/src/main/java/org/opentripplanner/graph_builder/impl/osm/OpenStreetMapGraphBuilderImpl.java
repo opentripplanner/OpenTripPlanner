@@ -40,7 +40,10 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.ElevatorEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.patch.Alert;
@@ -371,28 +374,82 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		// subscript it so we can loop over it in twos. Assumedly, it will stay
 		// sorted when we convert it to an Array.
 		// The objects are Integers, but toArray returns Object[]
-		// TODO: #reviewthis
 		Object[] levels = multiLevelNodesLevels.get(nodeId).toArray();
 
+		/* first, build FreeEdges to disconnect from the graph,
+		   GenericVertices to serve as attachment points,
+		   and ElevatorBoard and ElevatorAlight edges
+		   to connect future ElevatorHop edges to.
+		   After this iteration, graph will look like (side view):
+		   +==+~~X
+		   
+		   +==+~~X
+		   
+		   +==+~~X
+		   + GenericVertex, X EndpointVertex, ~~ FreeEdge, == ElevatorBoardEdge/
+		     ElevatorAlightEdge
+		   the next iteration will fill in the ElevatorHopEdges.
+		*/
+
+		ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
+
+		for (Object level : levels) {
+		    // get the source node to hang all this stuff off of.
+		    String sourceVertLabel = "osm node " + nodeId + "_" + level;
+		    EndpointVertex sourceVert = 
+			(EndpointVertex) graph.getVertex(sourceVertLabel);
+		    
+		    // create a Vertex to connect the FreeNode to.
+		    Vertex middleVert = new Vertex(sourceVertLabel + "_middle", 
+						   sourceVert.getX(), sourceVert.getY());
+		    graph.addVertex(middleVert);
+
+		    // I am of the understanding that edges are unidirectional
+		    FreeEdge free = new FreeEdge(sourceVert, middleVert);
+		    FreeEdge back = new FreeEdge(middleVert, sourceVert);
+		    graph.addEdge(free);
+		    graph.addEdge(back);
+
+		    // Create a vertex to connect the ElevatorAlight, ElevatorBoard, and ElevatorHop
+		    // edges to.
+		    Vertex onboardVert = new Vertex(sourceVertLabel + "_onboard",
+						   sourceVert.getX(), sourceVert.getY());
+		    graph.addVertex(onboardVert);
+
+		    ElevatorBoardEdge board = new ElevatorBoardEdge(middleVert, onboardVert);
+		    graph.addEdge(board);
+
+		    ElevatorAlightEdge alight = new ElevatorAlightEdge(onboardVert, middleVert);
+		    graph.addEdge(alight);
+
+		    // add it to the array so it can be connected later
+		    onboardVertices.add(onboardVert);
+		}
+
+		    
+
 		// -1 because we loop over it two at a time
-		Integer levelSize = levels.length - 1;
+		Integer vSize = onboardVertices.size() - 1;
 		
-		for (Integer i = 0; i < levelSize; i++) {
+		for (Integer i = 0; i < vSize; i++) {
 		    _log.debug("building elevator edge on node " + nodeId + " from level " +
 			       levels[i] + " to level " + levels[i + 1]);
 
-		    // TODO: abstract label generation?
-		    String fromVertLabel = "osm node " + nodeId + "_" + levels[i];
-		    String toVertLabel   = "osm node " + nodeId + "_" + levels[i + 1];
-		    Vertex from = graph.getVertex(fromVertLabel);
-		    Vertex to   = graph.getVertex(toVertLabel);
+		    Vertex from = onboardVertices.get(i);
+		    Vertex to   = onboardVertices.get(i + 1);
 
 		    // for now, assume only walking is permitted.
-		    // TODO: if we assign bicycle, that generally mean you can ride.
+		    // TODO: if we assign bicycle, that generally means you can ride.
 		    // how do we prevent the engine from walking bicycles in elevators?
-		    //ElevatorEdge theEdge = new ElevatorEdge(from, to, 
-		    //StreetTraversalPermission.PEDESTRIAN);
-		    //graph.addEdge(theEdge); // TODO: do I need a reverse-edge?
+		    ElevatorHopEdge theEdge = 
+			new ElevatorHopEdge(from, to, 
+					    StreetTraversalPermission.PEDESTRIAN);
+		    ElevatorHopEdge backEdge = 
+			new ElevatorHopEdge(to, from, 
+					    StreetTraversalPermission.PEDESTRIAN);
+
+		    graph.addEdge(theEdge);
+		    graph.addEdge(backEdge);
 		}
 	    }
 
