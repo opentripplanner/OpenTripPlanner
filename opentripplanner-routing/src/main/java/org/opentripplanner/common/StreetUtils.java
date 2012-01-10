@@ -134,7 +134,7 @@ public class StreetUtils {
 		    }
 		    
 		    // TODO: turn restrictions to FreeEdges?
-		    else if (e2 instanceof FreeEdge) {
+		    else {
 			if (v1 != v2) {
 			    // Use a FreeEdge to model the turn since TurnEdges are
 			    // StreetVertex only
