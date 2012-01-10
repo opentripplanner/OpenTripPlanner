@@ -65,86 +65,90 @@ public class StreetUtils {
             if (gv != v) {
                 throw new IllegalStateException("Vertex in graph is not the same one at endpoint."); 
             }
-            for (Edge eraw : gv.getIncoming()) {
-		AbstractEdge e = (AbstractEdge) eraw; // Need AbstractEdge for getToVertex
-		boolean replaced = false;
-		Vertex v1;
-		PlainStreetEdge pse = null; 
+            for (Edge e : gv.getIncoming()) {
+                // TODO: how exactly does this work? Should creating a FreeEdge also set this to 
+                // true?
+                boolean replaced = false;
 
-		// if we're using a PlainStreetEdge, convert to a StreetVertex
-		if (e instanceof PlainStreetEdge) {
-		    pse = (PlainStreetEdge) e;
-		    v1 = getStreetVertexForEdge(graph, pse);
-		}
-		else {
-		    // the to vertex is v
-		    v1 = e.getFromVertex();
-		}
+                TurnRestriction restriction = null;
+                if (restrictions != null && e instanceof PlainStreetEdge) {
+                    restriction = restrictions.get((PlainStreetEdge) e);
+                }
+                for (Edge e2 : v.getOutgoing()) {
+                    if (e2 instanceof PlainStreetEdge && e instanceof PlainStreetEdge) {
+                        // cast to streetvertex so that we can compare edge IDs
+                        // if e and e2 are PSEs, v1 and v2 come from getStreetVertexForEdge and
+                        // therefore are StreetVertices
+                        StreetVertex v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
+                        StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
 
-		TurnRestriction restriction = null;
-		if (restrictions != null && e instanceof PlainStreetEdge) {
-		    restriction = restrictions.get(pse);
-		}
-		for (Edge e2raw : v.getOutgoing()) {
-		    AbstractEdge e2 = (AbstractEdge) e2raw;
-		    Vertex v2;
-			
-		    if (e2 instanceof PlainStreetEdge) {
-			v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
-		    }
-		    else {
-			v2 = e2.getToVertex();
-		    }
-			
-		    if (e2 instanceof PlainStreetEdge && e instanceof PlainStreetEdge) {
-			// cast to streetvertex so that we can compare edge IDs
-			// if e and e2 are PSEs, v1 and v2 come from getStreetVertexForEdge and
-			// therefore are StreetVertices
-			StreetVertex v1sv = (StreetVertex) v1;
-			StreetVertex v2sv = (StreetVertex) v2;
+                        TurnEdge turn = new TurnEdge(v1, v2);
 
-			TurnEdge turn = new TurnEdge(v1sv, v2sv);
+                        if (restriction != null) {
+                            if (restriction.type == TurnRestrictionType.NO_TURN && 
+                                restriction.to == e2) {
+                                turn.setRestrictedModes(restriction.modes);
+                            } else if (restriction.type == TurnRestrictionType.ONLY_TURN && 
+                                       restriction.to != e2) {
+                                turn.setRestrictedModes(restriction.modes);
+                            }
+                        }
+                            
+                        if (v1 != v2 && !v1.getEdgeId().equals(v2.getEdgeId())) {
+                            turns.add(turn);
+                            replaced = true;
+                        }
+                        
+                        if (!replaced) {
+                            /*
+                             * NOTE that resetting the from-vertex only works because all of the
+                             * endpoint vertices will soon have their edgelists reinitialized, 
+                             * and then all these edges will be re-added to the graph.
+                             * This can and does have rather unpredictable behavior, and should 
+                             * eventually be changed.
+                             */
+                            PlainStreetEdge pse = (PlainStreetEdge) e;
+                            pse.setFromVertex(v1);
+                            turns.add(pse);
+                        }
+                    }
+                    
+                    // TODO: turn restrictions to FreeEdges?
+                    else {
+                        Vertex v1;
+                        Vertex v2;
 
-			if (restriction != null) {
-			    if (restriction.type == TurnRestrictionType.NO_TURN && 
-				restriction.to == e2) {
-				turn.setRestrictedModes(restriction.modes);
-			    } else if (restriction.type == TurnRestrictionType.ONLY_TURN && 
-				       restriction.to != e2) {
-				turn.setRestrictedModes(restriction.modes);
-			    }
+                        // get the appropriate vertices: StreetVertex if PlainStreetEdge, existing 
+                        // opposite vertex otherwise
+                        if (e instanceof PlainStreetEdge) {
+                            v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
+                        } else {
+                            v1 = e.getFromVertex(); // e is an incoming edge, so get the From vertex
+                        }
+
+                        // opposite vertex otherwise
+                        if (e2 instanceof PlainStreetEdge) {
+                            v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
+                        } else {
+			    // e is an outgoing edge, so get the To vertex
+			    // getToVertex is not in Edge, only in AbstractEdge
+			    // TODO: is this a bug, or can there be single-vertex edges?
+                            v2 = ((AbstractEdge) e2).getToVertex(); 
+                        }
+
+			if (v1 == null || v2 == null) {
+			    throw new IllegalStateException("Null vertex when building FreeEdge!");
 			}
-			    
-			if (v1sv != v2sv && !v1sv.getEdgeId().equals(v2sv.getEdgeId())) {
-			    turns.add(turn);
-			    replaced = true;
-			}
-			
-			if (!replaced) {
-			    /*
-			     * NOTE that resetting the from-vertex only works because all of the
-			     * endpoint vertices will soon have their edgelists reinitialized, 
-			     * and then all these edges will be re-added to the graph.
-			     * This can and does have rather unpredictable behavior, and should 
-			     * eventually be changed.
-			     */
-			    pse.setFromVertex(v1);
-			    turns.add(pse);
-			}
-		    }
-		    
-		    // TODO: turn restrictions to FreeEdges?
-		    else {
-			if (v1 != v2) {
-			    // Use a FreeEdge to model the turn since TurnEdges are
-			    // StreetVertex only
-			    FreeEdge turn = new FreeEdge(v1, v2);
-			    turns.add(turn);
-			}
-		    }			
-		}
-	    }
-	}
+                        else if (v1 != v2) {
+                            // Use a FreeEdge to model the turn since TurnEdges are
+                            // StreetVertex only
+                            FreeEdge turn = new FreeEdge(v1, v2);
+                            turns.add(turn);
+                        }
+                    }                   
+                }
+            }
+        }
     
         /* remove standard graph */
         for (Vertex v : endpoints) {
