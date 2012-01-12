@@ -242,7 +242,7 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                    System.out.println("STATE START: UNEXPECTED MODE: " + mode);
                 }
                 break;
             case WALK:
@@ -266,7 +266,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                    System.out.println("STATE WALK: UNEXPECTED MODE: " + mode);
                 }
                 break;
             case BICYCLE:
@@ -289,7 +289,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                    System.out.println("STATE BICYCLE: UNEXPECTED MODE: " + mode);
                 }
                 break;
             case CAR:
@@ -307,7 +307,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                    System.out.println("STATE CAR: UNEXPECTED MODE: " + mode);
                 }
                 break;
             case PRETRANSIT:
