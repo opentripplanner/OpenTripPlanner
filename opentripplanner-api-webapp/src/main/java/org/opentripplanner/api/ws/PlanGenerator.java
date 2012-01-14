@@ -190,6 +190,11 @@ public class PlanGenerator {
         double previousElevation = Double.MAX_VALUE;
         int startWalk = -1;
         int i = -1;
+	
+	// elevator narrative generation must be done using the last elevator state, not the
+	// following state
+	State previousElevatorState = null;
+
         PlanGenState pgstate = PlanGenState.START;
         String nextName = null;
         for (State state : path.states) {
@@ -257,10 +262,12 @@ public class PlanGenerator {
                     leg = makeLeg(itinerary, state);
                     pgstate = PlanGenState.BICYCLE;   
                 } else if (mode == TraverseMode.ELEVATOR) {
+		    System.out.println("Finalizing walk leg");
 		    // I think this puts an end to the previous leg
 		    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
 		    startWalk = i;
 		    leg = makeLeg(itinerary, state);
+		    previousElevatorState = state;
 		    pgstate = PlanGenState.ELEVATOR;		    
 		} else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
@@ -368,21 +375,30 @@ public class PlanGenerator {
                 break;
 	    case ELEVATOR:
 		System.out.println("Elevator mode");
+
                 if (leg == null) {
                     leg = makeLeg(itinerary, state);
                 }
                 if (mode == TraverseMode.WALK) {
-		    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
+		    if (previousElevatorState != null) {
+			finalizeLeg(leg, previousElevatorState, null, -1, -1, coordinates);
+			// So we don't inadvertently generate the same plan for another elevator.
+			previousElevatorState = null;
+		    }
+		    else {
+			System.out.println("WARNING: NOT GENERATING ELEVATOR NARRATIVE BECAUSE " +
+					   "THERE IS NO PREVIOUS STATE");
+		    }
 		    leg = makeLeg(itinerary, state);
-                    startWalk = i;
-                    pgstate = PlanGenState.WALK;
+		    startWalk = i;
+		    pgstate = PlanGenState.WALK;
                 } else if (mode == TraverseMode.BICYCLE) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     startWalk = i;
                     leg = makeLeg(itinerary, state);
                     pgstate = PlanGenState.BICYCLE;   
                 } else if (mode == TraverseMode.ELEVATOR) {
-		    // do nothing
+		    previousElevatorState = state;
 		} else if (mode == TraverseMode.STL) {
 		    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
