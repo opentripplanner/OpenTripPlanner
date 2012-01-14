@@ -190,7 +190,8 @@ otp.locale.English = {
         FERRY:          "Ferry",
         CABLE_CAR:      "Cable Car",
         GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular"
+        FUNICULAR:      "Funicular",
+	ELEVATOR:       "Elevator"
     },
 
     ordinal_exit:

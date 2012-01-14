@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.Iterator;
+import java.lang.Float;
 
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
@@ -419,7 +420,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		    ElevatorBoardEdge board = new ElevatorBoardEdge(middleVert, onboardVert);
 		    graph.addEdge(board);
 
-		    ElevatorAlightEdge alight = new ElevatorAlightEdge(onboardVert, middleVert);
+		    // level is a float for future expansion (floor 0.5 is valid in OSM)
+		    ElevatorAlightEdge alight = new ElevatorAlightEdge(onboardVert, middleVert, 
+								       new Float ((Integer) level));
 		    graph.addEdge(alight);
 
 		    // add it to the array so it can be connected later

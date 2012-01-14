@@ -24,21 +24,32 @@ import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
+ * All narrative generation is done by the ElevatorAlightEdge (other edges are silent), because
+ * it is the only edge that knows where the user is to get off.
  * @author mattwigway
  *
  */
-public class ElevatorAlightEdge extends AbstractEdge {
+public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
-    public ElevatorAlightEdge(Vertex from, Vertex to) {
+    /**
+     * This is the level of this elevator exit, used in narrative generation.
+     */
+    private Float level;
+
+    /**
+     * @param level It's a float for future expansion.
+     */
+    public ElevatorAlightEdge(Vertex from, Vertex to, Float level) {
         super(from, to);
+	this.level = level;
     }
     
     @Override
     public State traverse(State s0) {
-    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
-    	StateEditor s1 = s0.edit(this, en);
+	// we are our own edge narrative
+    	StateEditor s1 = s0.edit(this, this);
     	s1.incrementWeight(1);
         return s1.makeState();
     }
@@ -50,17 +61,29 @@ public class ElevatorAlightEdge extends AbstractEdge {
 
     @Override
     public Geometry getGeometry() {
-        return null;
+	return null;
     }
 
     @Override
     public TraverseMode getMode() {
-        return TraverseMode.WALK;
+        return TraverseMode.ELEVATOR;
     }
 
+    /** 
+     * The level from OSM is the name
+     */
     @Override
     public String getName() {
-        return null;
+        return level.toString();
+    }
+
+    /**
+     * The name is not bogus; it's level n from OSM.
+     * @author mattwigway
+     */
+    @Override 
+    public boolean hasBogusName() {
+	return false;
     }
     
     public boolean equals(Object o) {

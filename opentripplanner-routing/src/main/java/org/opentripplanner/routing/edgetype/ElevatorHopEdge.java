@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -41,8 +42,11 @@ public class ElevatorHopEdge extends AbstractEdge {
     @Override
     public State traverse(State s0) {
     	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+	TraverseOptions options = s0.getOptions();
+
     	StateEditor s1 = s0.edit(this, en);
-    	s1.incrementWeight(1);
+    	s1.incrementWeight(options.elevatorHopCost);
+	s1.incrementTimeInSeconds(options.elevatorHopTime);
         return s1.makeState();
     }
 
@@ -58,7 +62,7 @@ public class ElevatorHopEdge extends AbstractEdge {
 
     @Override
     public TraverseMode getMode() {
-        return TraverseMode.WALK;
+        return TraverseMode.ELEVATOR;
     }
 
     @Override
