@@ -190,11 +190,6 @@ public class PlanGenerator {
         double previousElevation = Double.MAX_VALUE;
         int startWalk = -1;
         int i = -1;
-	
-	// elevator narrative generation must be done using the last elevator state, not the
-	// following state
-	State previousElevatorState = null;
-
         PlanGenState pgstate = PlanGenState.START;
         String nextName = null;
         for (State state : path.states) {
@@ -247,7 +242,7 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
                 } else {
-                    System.out.println("STATE START: UNEXPECTED MODE: " + mode);
+                    System.out.println("UNEXPECTED STATE: " + mode);
                 }
                 break;
             case WALK:
@@ -260,16 +255,8 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     startWalk = i;
                     leg = makeLeg(itinerary, state);
-                    pgstate = PlanGenState.BICYCLE;   
-                } else if (mode == TraverseMode.ELEVATOR) {
-		    System.out.println("Finalizing walk leg");
-		    // I think this puts an end to the previous leg
-		    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
-		    startWalk = i;
-		    leg = makeLeg(itinerary, state);
-		    previousElevatorState = state;
-		    pgstate = PlanGenState.ELEVATOR;		    
-		} else if (mode == TraverseMode.STL) {
+                    pgstate = PlanGenState.BICYCLE;
+                } else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
@@ -279,7 +266,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("STATE WALK: UNEXPECTED MODE: " + mode);
+                    System.out.println("UNEXPECTED STATE: " + mode);
                 }
                 break;
             case BICYCLE:
@@ -302,7 +289,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("STATE BICYCLE: UNEXPECTED MODE: " + mode);
+                    System.out.println("UNEXPECTED STATE: " + mode);
                 }
                 break;
             case CAR:
@@ -320,7 +307,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("STATE CAR: UNEXPECTED MODE: " + mode);
+                    System.out.println("UNEXPECTED STATE: " + mode);
                 }
                 break;
             case PRETRANSIT:
@@ -370,48 +357,9 @@ public class PlanGenerator {
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
-                    System.out.println("STATE TRANSIT: UNEXPECTED STATE: " + mode);
+                    System.out.println("UNEXPECTED STATE: " + mode);
                 }
                 break;
-	    case ELEVATOR:
-		System.out.println("Elevator mode");
-
-                if (leg == null) {
-                    leg = makeLeg(itinerary, state);
-                }
-                if (mode == TraverseMode.WALK) {
-		    if (previousElevatorState != null) {
-			finalizeLeg(leg, previousElevatorState, null, -1, -1, coordinates);
-			// So we don't inadvertently generate the same plan for another elevator.
-			previousElevatorState = null;
-		    }
-		    else {
-			System.out.println("WARNING: NOT GENERATING ELEVATOR NARRATIVE BECAUSE " +
-					   "THERE IS NO PREVIOUS STATE");
-		    }
-		    leg = makeLeg(itinerary, state);
-		    startWalk = i;
-		    pgstate = PlanGenState.WALK;
-                } else if (mode == TraverseMode.BICYCLE) {
-                    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
-                    startWalk = i;
-                    leg = makeLeg(itinerary, state);
-                    pgstate = PlanGenState.BICYCLE;   
-                } else if (mode == TraverseMode.ELEVATOR) {
-		    previousElevatorState = state;
-		} else if (mode == TraverseMode.STL) {
-		    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
-                    leg = null;
-                    pgstate = PlanGenState.PRETRANSIT;
-                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
-                    nextName = state.getBackState().getBackState().getBackState().getVertex().getName();
-                    finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
-                    leg = null;
-                    pgstate = PlanGenState.START;
-                } else {
-                    System.out.println("STATE ELEVATOR: UNEXPECTED MODE: " + mode);
-                }
-                break;		
             }
             if (leg != null) {
                 leg.distance += backEdgeNarrative.getDistance();
