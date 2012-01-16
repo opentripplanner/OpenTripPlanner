@@ -166,6 +166,7 @@ otp.planner.Utils = {
             }
             step.absoluteDirection = Ext.DomQuery.selectValue('absoluteDirection', node);
             step.relativeDirection = Ext.DomQuery.selectValue('relativeDirection', node);
+            step.specialDirection = Ext.DomQuery.selectValue('specialDirection', node);
             step.stayOn = (Ext.DomQuery.selectValue('stayOn', node).toLowerCase() === 'true');
             step.lon = Ext.DomQuery.selectNumber('lon', node);
             step.lat = Ext.DomQuery.selectNumber('lat', node);

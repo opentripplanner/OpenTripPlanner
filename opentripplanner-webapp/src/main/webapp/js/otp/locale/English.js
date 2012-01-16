@@ -190,8 +190,14 @@ otp.locale.English = {
         FERRY:          "Ferry",
         CABLE_CAR:      "Cable Car",
         GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular",
-	ELEVATOR:       "Elevator"
+        FUNICULAR:      "Funicular"
+    },
+   
+    // special directions for various things
+    // they should all be lower case
+    specialDirections : 
+    {
+        elevator: "Take elevator to level"
     },
 
     ordinal_exit:
