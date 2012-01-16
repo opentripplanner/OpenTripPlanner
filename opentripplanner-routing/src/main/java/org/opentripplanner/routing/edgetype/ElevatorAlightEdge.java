@@ -66,7 +66,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
 
     @Override
     public TraverseMode getMode() {
-        return TraverseMode.ELEVATOR;
+        return TraverseMode.WALK;
     }
 
     /** 

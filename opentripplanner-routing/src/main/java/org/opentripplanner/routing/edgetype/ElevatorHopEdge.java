@@ -62,7 +62,7 @@ public class ElevatorHopEdge extends AbstractEdge {
 
     @Override
     public TraverseMode getMode() {
-        return TraverseMode.ELEVATOR;
+        return TraverseMode.WALK;
     }
 
     @Override
