@@ -22,6 +22,9 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Coordinate;
+
 
 /**
  * A relatively high cost edge for boarding an elevator.
@@ -32,8 +35,22 @@ public class ElevatorBoardEdge extends AbstractEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
+    /**
+     * The polyline geometry of this edge.
+     * It's generally a polyline with two coincident points, but some elevators have horizontal
+     * dimension, e.g. the ones on the Eiffel Tower.
+     */
+    private Geometry the_geom;
+
     public ElevatorBoardEdge(Vertex from, Vertex to) {
         super(from, to);
+
+	// set up the geometry
+	Coordinate[] coords = new Coordinate[2];
+	coords[0] = new Coordinate(from.getX(), from.getY());
+	coords[1] = new Coordinate(to.getX(), to.getY());
+	// TODO: SRID?
+	the_geom = new GeometryFactory().createLineString(coords);
     }
     
     @Override
@@ -54,7 +71,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
 
     @Override
     public Geometry getGeometry() {
-        return null;
+	return null;
     }
 
     @Override
