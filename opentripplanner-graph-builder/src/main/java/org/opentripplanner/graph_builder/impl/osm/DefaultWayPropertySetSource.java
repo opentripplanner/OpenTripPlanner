@@ -370,6 +370,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=pebblestone", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
+        setProperties(props, "surface=gravel",
+            StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=ground", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=dirt", 
