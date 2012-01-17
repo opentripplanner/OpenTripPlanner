@@ -452,7 +452,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		for (Integer level : levelKeys) {
 		    // get the source node to hang all this stuff off of.
 		    String humanLevel = levels.get(level);
-		    String sourceVertLabel = "osm node " + nodeId + "_" + humanLevel;
+		    String sourceVertLabel = "osm node " + nodeId + "_" + level;
 		    EndpointVertex sourceVert = 
 			(EndpointVertex) graph.getVertex(sourceVertLabel);
 		    
@@ -1186,9 +1186,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 	String label;
 
 	// If the node should be decomposed to multiple levels, append _level to the id
+	// use the numeric level because it is unique, the human level may not be (although
+	// it will likely lead to some head-scratching if it is not).
 	if (isMultiLevelNode(node)) {
 	    label = "osm node " + node.getId() + "_" + 
-		way.getTag("otp:human_level");
+		way.getTag("otp:numeric_level");
 	} else {
 	    // assume all other ways are connected if they share a node
 	    label = "osm node " + node.getId();
