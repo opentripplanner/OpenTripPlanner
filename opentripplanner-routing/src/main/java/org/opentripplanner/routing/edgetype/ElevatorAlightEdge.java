@@ -21,6 +21,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -36,14 +38,28 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
     /**
      * This is the level of this elevator exit, used in narrative generation.
      */
-    private Float level;
+    private String level;
+
+    /**
+     * The polyline geometry of this edge.
+     * It's generally a polyline with two coincident points, but some elevators have horizontal
+     * dimension, e.g. the ones on the Eiffel Tower.
+     */
+    private Geometry the_geom;
 
     /**
      * @param level It's a float for future expansion.
      */
-    public ElevatorAlightEdge(Vertex from, Vertex to, Float level) {
+    public ElevatorAlightEdge(Vertex from, Vertex to, String level) {
         super(from, to);
 	this.level = level;
+
+	// set up the geometry
+	Coordinate[] coords = new Coordinate[2];
+	coords[0] = new Coordinate(from.getX(), from.getY());
+	coords[1] = new Coordinate(to.getX(), to.getY());
+	// TODO: SRID?
+	the_geom = new GeometryFactory().createLineString(coords);
     }
     
     @Override
@@ -61,7 +77,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
 
     @Override
     public Geometry getGeometry() {
-	return null;
+	return the_geom;
     }
 
     @Override
@@ -74,7 +90,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
      */
     @Override
     public String getName() {
-        return level.toString();
+        return level;
     }
 
     /**
