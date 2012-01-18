@@ -125,6 +125,29 @@ public class HashGrid<T extends Pointlike> {
         return closestT;
     }
 
+    public Iterable<T> query (double lon, double lat, double radiusMeters) {
+        Pointlike p = new Point (lon, lat);
+        List<T> ret = new ArrayList<T>();
+        int radiusBins = (int) Math.ceil(radiusMeters / binSizeMeters);
+        int xBin = xBin(p);
+        int yBin = yBin(p);
+        int minBinX = xBin - radiusBins;
+        int maxBinX = xBin + radiusBins;
+        int minBinY = yBin - radiusBins;
+        int maxBinY = yBin + radiusBins;
+        for (int x = minBinX; x <= maxBinX; x += 1) {
+            int wrappedX = xWrap(x);
+            for (int y = minBinY; y <=maxBinY; y += 1) {
+                int wrappedY = yWrap(y);
+                List<T> bin = bins[wrappedX][wrappedY];
+                if (bin != null) {
+                    ret.addAll(bin);
+                }
+            }
+        }
+        return ret;
+    }
+
     static final double M_PER_DEGREE_LAT = 111111.111111;
     
     static double mPerDegreeLon(double lat) {
