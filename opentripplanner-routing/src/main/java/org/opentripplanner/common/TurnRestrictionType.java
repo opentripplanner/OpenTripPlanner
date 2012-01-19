@@ -11,16 +11,8 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.services;
+package org.opentripplanner.common;
 
-import java.util.Set;
-
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
-
-public class TurnRestriction {
-	public TurnRestrictionType type;
-	public Edge from;
-	public Edge to;
-	public Set<TraverseMode> modes;
+public enum TurnRestrictionType {
+	NO_TURN, ONLY_TURN
 }

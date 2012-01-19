@@ -23,4 +23,12 @@ public class TimePeriod {
 
     @XmlAttribute
     public long endTime;
+
+    public boolean equals(Object o) {
+        if (!(o instanceof TimePeriod)) {
+            return false;
+        }
+        TimePeriod other = (TimePeriod) o;
+        return other.startTime == startTime && other.endTime == endTime;
+    }
 }

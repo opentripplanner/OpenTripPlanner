@@ -141,10 +141,12 @@ public abstract class AbstractEdge implements DirectEdge {
 
     @Override
     public void addPatch(Patch patch) {
-    	if (patches == null) {
-    		patches = new ArrayList<Patch>();
-    	}
-    	patches.add(patch);
+        if (patches == null) {
+            patches = new ArrayList<Patch>();
+        }
+        if (!patches.contains(patch)) {
+            patches.add(patch);
+        }
     }
 
     public List<Patch> getPatches() {

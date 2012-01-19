@@ -18,8 +18,11 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -76,7 +79,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     public static final double MAX_DISTANCE_FROM_STREET = 0.05;
 
-    private static final double DISTANCE_ERROR = 0.00005;
+    public static final double DISTANCE_ERROR = 0.00005;
+
+    //if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
+    private static final double MAX_CORNER_DISTANCE = 0.00010;
 
     private static final double DIRECTION_ERROR = 0.05;
 
@@ -179,6 +185,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         // first, check for intersections very close by
         List<StreetVertex> vertices = getIntersectionAt(coordinate);
         if (vertices != null && !vertices.isEmpty()) {
+            // coordinate is at a street corner or endpoint
+            if (name == null) {
+                // generate names for corners when no name was given
+                // TODO: internationalize
+                Set<String> uniqueNameSet = new HashSet<String>();
+                // filter to avoid using OSM node ids for dead ends 
+                for (StreetVertex v : IterableLibrary.filter(vertices, StreetVertex.class))
+                    uniqueNameSet.add(v.getName());
+                List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
+                if (uniqueNames.size() > 1)
+                    name = String.format("corner of %s and %s", uniqueNames.get(0), uniqueNames.get(1));
+                else if (uniqueNames.size() == 1)
+                    name = uniqueNames.get(0);
+                else 
+                    name = "unnamed street";
+            }
             StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, name);
             for (Vertex v : vertices) {
                 FreeEdge e = new FreeEdge(closest, v);

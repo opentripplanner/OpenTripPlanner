@@ -48,7 +48,7 @@ public interface RequestInf {
         public static String TRANSFER_PENALTY = "transferPenalty";
         public static String LANGUAGE = "lang";
         public static String MAX_TRANSFERS = "maxTransfers";
-        public static String INTERMEDAITE_PLACES_ORDERED = "intermediatePlacesOrdered";
+        public static String INTERMEDIATE_PLACES_ORDERED = "intermediatePlacesOrdered";
 
 	/**
 	 * @return the from

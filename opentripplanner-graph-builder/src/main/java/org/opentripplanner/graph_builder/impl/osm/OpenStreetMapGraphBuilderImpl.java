@@ -22,12 +22,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Iterator;
 
+import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.*;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.StreetUtils;
-import org.opentripplanner.graph_builder.services.TurnRestriction;
-import org.opentripplanner.graph_builder.services.TurnRestrictionType;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
 import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;

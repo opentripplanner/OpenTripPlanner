@@ -20,19 +20,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
-import org.geotools.data.DefaultQuery;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
 import org.geotools.factory.Hints;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.ReferencingFactoryFinder;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.StreetUtils;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -84,7 +85,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             CoordinateReferenceSystem worldCRS = factory
                     .createCoordinateReferenceSystem("EPSG:4326");
 
-            DefaultQuery query = new DefaultQuery();
+            Query query = new Query();
             query.setCoordinateSystem(sourceCRS);
             query.setCoordinateSystemReproject(worldCRS);
 
@@ -114,7 +115,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             HashSet<Object> seen = new HashSet<Object>();
 
             List<SimpleFeature> featureList = new ArrayList<SimpleFeature>();
-            Iterator<SimpleFeature> it2 = features.iterator();
+            FeatureIterator<SimpleFeature> it2 = features.features();
             while (it2.hasNext()) {
                 SimpleFeature feature = it2.next();
                 if (featureSelector != null && ! featureSelector.convert(feature)) {
@@ -122,7 +123,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
                 featureList.add(feature);
             }
-            features.close(it2);
+            it2.close();
 
             HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(featureList);
             
@@ -212,7 +213,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             StreetUtils.pruneFloatingIslands(graph);
             StreetUtils.makeEdgeBased(graph, intersectionsByLocation.values(), null);
 
-            features.close(it2);
+            it2.close();
 
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);

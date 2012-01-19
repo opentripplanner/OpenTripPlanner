@@ -33,7 +33,8 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 
 /**
  * Data about the edges and vertices of a graph. This data is tied to a particular internal graph
- * representation. OTP internals
+ * representation. OTP internals are subject to change at any time, so please do not use this for
+ * anything other than debugging.
  * 
  * @author novalis
  * 

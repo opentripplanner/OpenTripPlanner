@@ -4,4 +4,8 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <mime-mapping>
+    <extension>js</extension>
+    <mime-type>application/x-javascript</mime-type>
+  </mime-mapping>
 </web-app>

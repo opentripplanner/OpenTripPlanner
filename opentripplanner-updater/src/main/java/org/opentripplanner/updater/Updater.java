@@ -37,8 +37,9 @@ public class Updater implements Runnable {
 
     private String defaultAgencyId;
 
-
     private PatchService patchService;
+
+    private long earlyStart;
 
     public void setUrl(String url) {
         this.url = url;
@@ -72,6 +73,7 @@ public class Updater implements Runnable {
             }
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
             UpdateHandler updateHandler = new UpdateHandler(feed);
+            updateHandler.setEarlyStart(earlyStart);
             updateHandler.setDefaultAgencyId(defaultAgencyId);
             updateHandler.setPatchService(getPatchService());
             updateHandler.update();
@@ -87,6 +89,14 @@ public class Updater implements Runnable {
 
     public PatchService getPatchService() {
         return patchService;
+    }
+
+    public long getEarlyStart() {
+        return earlyStart;
+    }
+
+    public void setEarlyStart(long earlyStart) {
+        this.earlyStart = earlyStart;
     }
 
 

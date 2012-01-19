@@ -34,6 +34,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.util.monitoring.MonitoringStore;
+import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -67,6 +69,8 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 
+    private static final MonitoringStore store = MonitoringStoreFactory.getStore();
+    
     private double[] _timeouts = new double[] {4, 2, 0.6, 0.4}; // seconds
     
     private double _maxPaths = 4;
@@ -184,8 +188,10 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                     LOG.debug("timeout at {} msec", System.currentTimeMillis() - startTime);
                     if (returnStates.isEmpty())
                         continue WALK;
-                    else
+                    else {
+                        storeMemory();
                         break WALK;
+                    }
                 }
     
                 State su = pq.extract_min();
@@ -259,7 +265,8 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                 }
             }
         }
-    
+        storeMemory();
+
         // Make the states into paths and return them
         List<GraphPath> paths = new LinkedList<GraphPath>();
         for (State s : returnStates) {
@@ -267,6 +274,15 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             paths.add(new GraphPath(s, true));
         }
         return paths;
+    }
+
+    private void storeMemory() {
+        if (store.isMonitoring("memoryUsed")) {
+            System.gc();
+            long memoryUsed = Runtime.getRuntime().totalMemory() -
+                    Runtime.getRuntime().freeMemory();
+            store.setLongMax("memoryUsed", memoryUsed);
+        }
     }
 
 //    private boolean eDominates(State s0, State s1) {

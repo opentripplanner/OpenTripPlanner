@@ -252,7 +252,9 @@ public class TurnEdge extends StreetEdge {
         if (patches == null) {
             patches = new ArrayList<Patch>();
         }
-        patches.add(patch);
+        if (!patches.contains(patch)) {
+            patches.add(patch);
+        }
     }
 
     @Override
