@@ -257,7 +257,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             Coordinate c = v.getCoordinate();
             env = new Envelope(c);
             vertexIndex.insert(env, v);
-            for (Edge e : IterableLibrary.filter(v.getOutgoing(),Edge.class)) {
+            for (Edge e : v.getOutgoing()) {
                 if (e.getGeometry() == null) continue;
                 if (e instanceof PatternEdge ||
                 	e instanceof StreetTransitLink ||

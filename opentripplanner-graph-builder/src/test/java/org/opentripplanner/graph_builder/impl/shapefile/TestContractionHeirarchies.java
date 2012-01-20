@@ -163,10 +163,10 @@ public class TestContractionHeirarchies extends TestCase {
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N; ++x) {
                 Vertex vertexIn = verticesIn[y][x];
-                for (Edge e1: filter(vertexIn.getIncoming(),Edge.class)) {
+                for (Edge e1: vertexIn.getIncoming()) {
                     Vertex vertexOut = verticesOut[y][x];
                     TurnVertex fromv = (TurnVertex) e1.getFromVertex();
-                    for (Edge e2: filter(vertexOut.getOutgoing(),Edge.class)) {
+                    for (Edge e2: vertexOut.getOutgoing()) {
                         TurnVertex tov = (TurnVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
@@ -330,7 +330,7 @@ public class TestContractionHeirarchies extends TestCase {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         Vertex last = null;
         for (Vertex v : vertices) {
-            for (Edge e: filter(v.getOutgoing(),Edge.class)) {
+            for (Edge e: v.getOutgoing()) {
                 components.union(v, e.getToVertex());
             }
             last = v;
@@ -565,7 +565,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         for (Vertex v : vertices) {
-            for (Edge e: filter(v.getOutgoing(), Edge.class)) {
+            for (Edge e: v.getOutgoing()) {
                 components.union(v, e.getToVertex());
             }
         }

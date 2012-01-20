@@ -661,7 +661,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                 String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
                         JOptionPane.PLAIN_MESSAGE);
                 for (Vertex gv : getGraph().getVertices()) {
-                	for (Edge edge : filter(gv.getOutgoing(),Edge.class)) {
+                	for (Edge edge : gv.getOutgoing()) {
                         if (edge.getName() != null && edge.getName().contains(edgeName)) {
                             showGraph.highlightVertex(gv);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -736,7 +736,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         HashSet<Vertex> newOpen = new HashSet<Vertex>();
         for (Vertex v2 : open) {
             closed.add(v2);
-            for (Edge e: filter(v2.getOutgoing(),Edge.class)) {
+            for (Edge e: v2.getOutgoing()) {
                 Vertex target = e.getToVertex();
                 if (closed.contains(target)) {
                     continue;
@@ -763,7 +763,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (Edge e : filter(src.getOutgoing(),Edge.class)) {
+            for (Edge e : src.getOutgoing()) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);
@@ -785,7 +785,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (Edge e : filter(src.getOutgoing(),Edge.class)) {
+            for (Edge e : src.getOutgoing()) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);

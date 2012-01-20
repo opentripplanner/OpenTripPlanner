@@ -97,7 +97,7 @@ public class TestPatternHopFactory extends TestCase {
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (Edge e : filter(journey_a_1.getOutgoing(), Edge.class)) {
+        for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(Alight.class, e.getClass());
             } else {

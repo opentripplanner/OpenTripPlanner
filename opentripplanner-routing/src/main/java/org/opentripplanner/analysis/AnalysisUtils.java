@@ -119,7 +119,7 @@ public class AnalysisUtils {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
 
         for (Vertex v : graph.getVertices()) {
-            for (Edge e : filter(v.getOutgoing(), Edge.class)) {
+            for (Edge e : v.getOutgoing()) {
                 components.union(e.getFromVertex(), e.getToVertex());
             }
         }

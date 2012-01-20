@@ -235,7 +235,7 @@ public class LocalStopFinder {
 
             if (fromv instanceof TransitStop) {
                 Vertex departureVertex = null;
-                for (Edge e : filter(fromv.getOutgoing(),Edge.class)) {
+                for (Edge e : fromv.getOutgoing()) {
                     /* to departure vertex */
                     departureVertex = e.getToVertex();
                     break;
@@ -314,12 +314,12 @@ public class LocalStopFinder {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
                     // enter to get to actual stop
-                    for (Edge e : filter(v.getOutgoing(),Edge.class)) {
+                    for (Edge e : v.getOutgoing()) {
                         v = e.getToVertex();
                         break;
                     }
                 }
-                for (Edge e : filter(v.getOutgoing(),Edge.class)) {
+                for (Edge e : v.getOutgoing()) {
                     for (Edge e2 : e.getToVertex().getOutgoing()) {
                         if (e2 instanceof PatternBoard) {
                             neighborhood.add(((PatternBoard) e2).getPattern());

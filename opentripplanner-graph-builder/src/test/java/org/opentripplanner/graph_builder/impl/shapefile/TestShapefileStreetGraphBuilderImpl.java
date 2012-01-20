@@ -122,7 +122,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                  */
                 int numParks = 0;
                 int numCarltons = 0;
-                for (Edge e: filter(v.getOutgoing(),Edge.class)) {
+                for (Edge e: v.getOutgoing()) {
                     if (e.getToVertex().getName().contains("PARK")) {
                         numParks ++;
                     }
@@ -143,7 +143,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numFlatbushes = 0;
                 int numParks = 0;
 
-                for (Edge e: filter(v.getOutgoing(),Edge.class)) {
+                for (Edge e: v.getOutgoing()) {
                     if (e.getToVertex().getName().contains("FLATBUSH")) {
                         numFlatbushes ++;
                     }

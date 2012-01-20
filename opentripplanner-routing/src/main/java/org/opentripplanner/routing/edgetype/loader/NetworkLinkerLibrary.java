@@ -372,7 +372,7 @@ public class NetworkLinkerLibrary {
         StreetVertex newEnd = new IntersectionVertex(graph, "replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
         
-        for (Edge e: filter(startVertex.getOutgoing(), Edge.class)) {
+        for (Edge e: startVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
                 continue;
@@ -391,7 +391,7 @@ public class NetworkLinkerLibrary {
         StreetVertex newStart = new IntersectionVertex(graph, "replace " + startVertex.getLabel(),
                 startVertex.getX(), startVertex.getY());
 
-        for (Edge e: filter(endVertex.getOutgoing(), Edge.class)) {
+        for (Edge e: endVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(startVertex.getCoordinate())) {
                 continue;

@@ -120,7 +120,7 @@ public class ContractionHierarchy implements Serializable {
         double maxWWeight = 0;
 
         ArrayList<State> ws = new ArrayList<State>();
-        for (Edge e : filter(core.getOutgoing(u), Edge.class)) {
+        for (Edge e : core.getOutgoing(u)) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -164,7 +164,7 @@ public class ContractionHierarchy implements Serializable {
                     ArrayList<Edge> toRemove = new ArrayList<Edge>();
                     // starting from each v
                     State sv0 = new State(wsresult.vertex, fwdOptions);
-                    for (Edge e : filter(core.getOutgoing(wsresult.vertex), Edge.class)) {
+                    for (Edge e : core.getOutgoing(wsresult.vertex)) {
                         State sSpt = spt.getState(e.getToVertex());
                         if (sSpt == null) {
                             continue;
@@ -455,7 +455,7 @@ public class ContractionHierarchy implements Serializable {
             HashSet<Vertex> neighbors = new HashSet<Vertex>();
 
             // outgoing, therefore upward
-            for (Edge de : filter(core.getOutgoing(vertex), Edge.class)) {
+            for (Edge de : core.getOutgoing(vertex)) {
                 // do not use removeEdge 
                 // to avoid erasing the edge list out from under iteration
                 Vertex toVertex = de.getToVertex();
@@ -466,7 +466,7 @@ public class ContractionHierarchy implements Serializable {
             }
 
             // incoming, therefore downward
-            for (Edge de : filter(core.getIncoming(vertex), Edge.class)) {
+            for (Edge de : core.getIncoming(vertex)) {
                 Vertex fromVertex = de.getFromVertex();
                 core.removeOutgoing(fromVertex, de);
                 updown.addIncoming(vertex, de);
@@ -572,7 +572,7 @@ public class ContractionHierarchy implements Serializable {
             BasicShortestPathTree spt = dijkstra.getShortestPathTree(Double.POSITIVE_INFINITY,
                     Integer.MAX_VALUE);
             ArrayList<Edge> toRemove = new ArrayList<Edge>();
-            for (Edge e : filter(core.getOutgoing(u),Edge.class)) {
+            for (Edge e : core.getOutgoing(u)) {
                 if (!isContractable(e)) {
                     continue;
                 }
