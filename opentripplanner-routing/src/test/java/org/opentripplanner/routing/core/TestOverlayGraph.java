@@ -55,29 +55,19 @@ public class TestOverlayGraph extends TestCase {
         assertTrue(og.getIncoming(a).size() == 0);
         assertTrue(og.getOutgoing(d).size() == 0);
         
-        // add an edge to the overlay that is not in the original
+        // add an edge that is not in the overlay
         Edge ad = new FreeEdge(a, d);
-        og.addEdge(ad);
-        assertTrue(d.getIncoming().size() == 3);
-        assertTrue(og.getIncoming(d).size() == 4);
-        assertTrue(a.getOutgoing().size() == 1);
-        assertTrue(og.getOutgoing(a).size() == 2);
-        
-        // remove all original edges from overlaygraph
-        for (Vertex v : g.getVertices()) {
-            for (Edge e : v.getOutgoing()) {
-                og.removeEdge(e);
-            }
-        }
-        assertEquals(og.countEdges(), 1);
-        assertTrue(d.getOutgoing().size() == 0);
-        assertTrue(d.getIncoming().size() == 3);
-        assertTrue(og.getOutgoing(d).size() == 0);
-        assertTrue(og.getIncoming(d).size() == 1);
-        assertTrue(a.getIncoming().size() == 0);
-        assertTrue(a.getOutgoing().size() == 1);
+        assertTrue(d.getIncoming().size() == 4);
+        assertTrue(og.getIncoming(d).size() == 3);
+        assertTrue(a.getOutgoing().size() == 2);
         assertTrue(og.getOutgoing(a).size() == 1);
-        assertTrue(og.getOutgoing(b).size() == 0);
-        assertTrue(og.getOutgoing(c).size() == 0);
+        
+        // remove edges from overlaygraph
+        og.removeEdge(bc1);
+        og.removeEdge(bc2);
+
+        assertEquals(og.countEdges(), g.countEdges() - 3);
+        assertTrue(og.getOutgoing(b).size() == 1);
+        assertTrue(og.getIncoming(c).size() == 1);
     }
 }
