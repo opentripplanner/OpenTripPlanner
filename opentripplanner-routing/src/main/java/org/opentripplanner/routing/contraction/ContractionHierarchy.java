@@ -36,7 +36,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -120,7 +120,7 @@ public class ContractionHierarchy implements Serializable {
         double maxWWeight = 0;
 
         ArrayList<State> ws = new ArrayList<State>();
-        for (DirectEdge e : filter(core.getOutgoing(u), DirectEdge.class)) {
+        for (Edge e : filter(core.getOutgoing(u), Edge.class)) {
             if (!isContractable(e)) {
                 continue;
             }
@@ -161,10 +161,10 @@ public class ContractionHierarchy implements Serializable {
                 BasicShortestPathTree spt = wsresult.spt;
                 if (!simulate && spt != null) {
                     /* while we're here, remove some non-optimal edges */
-                    ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
+                    ArrayList<Edge> toRemove = new ArrayList<Edge>();
                     // starting from each v
                     State sv0 = new State(wsresult.vertex, fwdOptions);
-                    for (DirectEdge e : filter(core.getOutgoing(wsresult.vertex), DirectEdge.class)) {
+                    for (Edge e : filter(core.getOutgoing(wsresult.vertex), Edge.class)) {
                         State sSpt = spt.getState(e.getToVertex());
                         if (sSpt == null) {
                             continue;
@@ -182,7 +182,7 @@ public class ContractionHierarchy implements Serializable {
                     }
 
                     Vertex uv = wsresult.vertex;
-                    for (DirectEdge e : toRemove) {
+                    for (Edge e : toRemove) {
                         uv.removeOutgoing(e);
                         e.getToVertex().removeIncoming(e);
                     }
@@ -246,7 +246,7 @@ public class ContractionHierarchy implements Serializable {
             if (pathAroundU == null || pathAroundU.exceedsWeightLimit(weightThroughU + .01)) {
                 int timeThroughU = (int) (w.getAbsTimeDeltaSec() + v.getAbsTimeDeltaSec());
                 double walkDistance = v.getWalkDistance() + w.getWalkDistance();
-                Shortcut vuw = new Shortcut((DirectEdge)v.getBackEdge(), (DirectEdge)w.getBackEdge(), 
+                Shortcut vuw = new Shortcut((Edge)v.getBackEdge(), (Edge)w.getBackEdge(), 
                         timeThroughU, weightThroughU, walkDistance, mode);
                 shortcuts.add(vuw);
             }
@@ -319,9 +319,9 @@ public class ContractionHierarchy implements Serializable {
     private boolean isContractable(Vertex v) {
         if (v instanceof TurnVertex || v instanceof IntersectionVertex) {
             for (Edge e : core.getOutgoing(v)) {
-                if( ! (e instanceof DirectEdge))
+                if( ! (e instanceof Edge))
                     return false;
-                DirectEdge de = (DirectEdge) e;
+                Edge de = (Edge) e;
                 Vertex tov = de.getToVertex();
                 if (!(tov instanceof TurnVertex || tov instanceof IntersectionVertex)) {
                     return false;
@@ -458,8 +458,8 @@ public class ContractionHierarchy implements Serializable {
             HashSet<Vertex> neighbors = new HashSet<Vertex>();
 
             // outgoing, therefore upward
-            for (DirectEdge de : filter(core.getOutgoing(vertex), DirectEdge.class)) {
-                // do not use removedirectedge 
+            for (Edge de : filter(core.getOutgoing(vertex), Edge.class)) {
+                // do not use removeEdge 
                 // to avoid erasing the edge list out from under iteration
                 Vertex toVertex = de.getToVertex();
                 core.removeIncoming(toVertex, de);
@@ -469,7 +469,7 @@ public class ContractionHierarchy implements Serializable {
             }
 
             // incoming, therefore downward
-            for (DirectEdge de : filter(core.getIncoming(vertex), DirectEdge.class)) {
+            for (Edge de : filter(core.getIncoming(vertex), Edge.class)) {
                 Vertex fromVertex = de.getFromVertex();
                 core.removeOutgoing(fromVertex, de);
                 updown.addIncoming(vertex, de);
@@ -498,7 +498,7 @@ public class ContractionHierarchy implements Serializable {
             List<Shortcut> shortcuts = shortcutsAndSearchSpace.shortcuts;
             // Add shortcuts to graph
             for (Shortcut shortcut : shortcuts) {
-                core.addDirectEdge(shortcut);
+                core.addEdge(shortcut);
             }
 
             nContractableVertices--;
@@ -574,8 +574,8 @@ public class ContractionHierarchy implements Serializable {
             Dijkstra dijkstra = new Dijkstra(core, u, fwdOptions, null, hopLimit);
             BasicShortestPathTree spt = dijkstra.getShortestPathTree(Double.POSITIVE_INFINITY,
                     Integer.MAX_VALUE);
-            ArrayList<DirectEdge> toRemove = new ArrayList<DirectEdge>();
-            for (DirectEdge e : filter(core.getOutgoing(u),DirectEdge.class)) {
+            ArrayList<Edge> toRemove = new ArrayList<Edge>();
+            for (Edge e : filter(core.getOutgoing(u),Edge.class)) {
                 if (!isContractable(e)) {
                     continue;
                 }
@@ -591,8 +591,8 @@ public class ContractionHierarchy implements Serializable {
                     toRemove.add(e);
                 }
             }
-            for (DirectEdge e : toRemove) {
-                core.removeDirectEdge(e);
+            for (Edge e : toRemove) {
+                core.removeEdge(e);
             }
             removed += toRemove.size();
         }
@@ -932,8 +932,8 @@ public class ContractionHierarchy implements Serializable {
         Map<Vertex, ArrayList<Edge>> extraEdges;
         if (origin instanceof StreetLocation) {
             extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
-            Iterable<DirectEdge> extra = ((StreetLocation)origin).getExtra();
-            for (DirectEdge edge : extra) {
+            Iterable<Edge> extra = ((StreetLocation)origin).getExtra();
+            for (Edge edge : extra) {
                 Vertex fromv = edge.getFromVertex();
                 ArrayList<Edge> edges = extraEdges.get(fromv);
                 if (edges == null) {
@@ -950,8 +950,8 @@ public class ContractionHierarchy implements Serializable {
             if (extraEdges instanceof NullExtraEdges) {
                 extraEdges = new HashMap<Vertex, ArrayList<Edge>>();
             }
-            Iterable<DirectEdge> extra = ((StreetLocation) target).getExtra();
-            for (DirectEdge edge : extra) {
+            Iterable<Edge> extra = ((StreetLocation) target).getExtra();
+            for (Edge edge : extra) {
                 Vertex tov = edge.getToVertex();
                 ArrayList<Edge> edges = extraEdges.get(tov);
                 if (edges == null) {

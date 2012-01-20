@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex.ValidEdgeTypes;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -64,7 +64,7 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
 
     public abstract int getGroupIndex();
 
-    public abstract List<DirectEdge> getOutgoingStreetEdges();
+    public abstract List<Edge> getOutgoingStreetEdges();
 
     /**
      * Merge another vertex into this one.  Useful during graph construction for handling 

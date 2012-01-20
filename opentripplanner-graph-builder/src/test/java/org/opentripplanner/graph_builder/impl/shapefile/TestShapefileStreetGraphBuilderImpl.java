@@ -26,7 +26,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -122,7 +122,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                  */
                 int numParks = 0;
                 int numCarltons = 0;
-                for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
+                for (Edge e: filter(v.getOutgoing(),Edge.class)) {
                     if (e.getToVertex().getName().contains("PARK")) {
                         numParks ++;
                     }
@@ -143,7 +143,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
                 int numFlatbushes = 0;
                 int numParks = 0;
 
-                for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
+                for (Edge e: filter(v.getOutgoing(),Edge.class)) {
                     if (e.getToVertex().getName().contains("FLATBUSH")) {
                         numFlatbushes ++;
                     }

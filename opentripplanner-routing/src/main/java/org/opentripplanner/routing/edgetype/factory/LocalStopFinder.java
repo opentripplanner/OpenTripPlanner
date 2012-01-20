@@ -31,7 +31,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -235,7 +235,7 @@ public class LocalStopFinder {
 
             if (fromv instanceof TransitStop) {
                 Vertex departureVertex = null;
-                for (DirectEdge e : filter(fromv.getOutgoing(),DirectEdge.class)) {
+                for (Edge e : filter(fromv.getOutgoing(),Edge.class)) {
                     /* to departure vertex */
                     departureVertex = e.getToVertex();
                     break;
@@ -314,12 +314,12 @@ public class LocalStopFinder {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
                     // enter to get to actual stop
-                    for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
+                    for (Edge e : filter(v.getOutgoing(),Edge.class)) {
                         v = e.getToVertex();
                         break;
                     }
                 }
-                for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
+                for (Edge e : filter(v.getOutgoing(),Edge.class)) {
                     for (Edge e2 : e.getToVertex().getOutgoing()) {
                         if (e2 instanceof PatternBoard) {
                             neighborhood.add(((PatternBoard) e2).getPattern());

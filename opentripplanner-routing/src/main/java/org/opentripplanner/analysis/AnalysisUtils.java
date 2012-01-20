@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.common.DisjointSet;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -119,7 +119,7 @@ public class AnalysisUtils {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
 
         for (Vertex v : graph.getVertices()) {
-            for (DirectEdge e : filter(v.getOutgoing(), DirectEdge.class)) {
+            for (Edge e : filter(v.getOutgoing(), Edge.class)) {
                 components.union(e.getFromVertex(), e.getToVertex());
             }
         }

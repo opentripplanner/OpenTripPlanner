@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -43,7 +43,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  */
 public class StreetLocation extends AbstractVertex {
 
-    private ArrayList<DirectEdge> extra = new ArrayList<DirectEdge>();
+    private ArrayList<Edge> extra = new ArrayList<Edge>();
 
     private boolean wheelchairAccessible;
 
@@ -193,12 +193,12 @@ public class StreetLocation extends AbstractVertex {
 //            return;
 //        }
 //
-//        for (DirectEdge e : extra) {
+//        for (Edge e : extra) {
 //            graph.addVerticesFromEdge(e);
 //        }
 //    }
 
-    public List<DirectEdge> getExtra() {
+    public List<Edge> getExtra() {
         return extra;
     }
 

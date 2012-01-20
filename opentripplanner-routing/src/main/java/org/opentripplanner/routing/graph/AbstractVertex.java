@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -291,8 +291,8 @@ public abstract class AbstractVertex implements Vertex {
     
     @Override
     @XmlTransient
-    public List<DirectEdge> getOutgoingStreetEdges() {
-        List<DirectEdge> result = new ArrayList<DirectEdge>();
+    public List<Edge> getOutgoingStreetEdges() {
+        List<Edge> result = new ArrayList<Edge>();
         for (Edge out : this.getOutgoing()) {
             if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
                 continue;
@@ -313,7 +313,7 @@ public abstract class AbstractVertex implements Vertex {
 
         for (Edge e : edges) {
             // We only support Vertices that are direct edges when merging
-            DirectEdge de = (DirectEdge) e;
+            Edge de = (Edge) e;
             Vertex from = de.getFromVertex();
             Vertex to = de.getToVertex();
             if ((from==this && to==other) || (from==other && to==this)) {
@@ -330,8 +330,8 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void removeAllEdges() {
         for (Edge e : outgoing) {
-            if (e instanceof DirectEdge) {
-                DirectEdge edge = (DirectEdge) e;
+            if (e instanceof Edge) {
+                Edge edge = (Edge) e;
                 Vertex target = edge.getToVertex();
                 if (target != null) {
                     target.removeIncoming(e);

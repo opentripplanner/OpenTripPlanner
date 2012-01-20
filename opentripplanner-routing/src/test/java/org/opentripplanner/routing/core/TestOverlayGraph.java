@@ -15,7 +15,7 @@ package org.opentripplanner.routing.core;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -32,19 +32,19 @@ public class TestOverlayGraph extends TestCase {
         Vertex c = new IntersectionVertex(g, "c", 7, 5);
         Vertex d = new IntersectionVertex(g, "d", 8, 5);
         // vary weights so edges are not considered equal
-        DirectEdge ab = new SimpleEdge(a, b, 1, 1);
-        DirectEdge bc1 = new SimpleEdge(b, c, 1, 1);
-        DirectEdge bc2 = new SimpleEdge(b, c, 2, 2);
-        DirectEdge bc3 = new SimpleEdge(b, c, 3, 3);
-        DirectEdge cd1 = new SimpleEdge(c, d, 1, 1);
-        DirectEdge cd2 = new SimpleEdge(c, d, 2, 2);
-        DirectEdge cd3 = new SimpleEdge(c, d, 3, 3);
+        Edge ab = new SimpleEdge(a, b, 1, 1);
+        Edge bc1 = new SimpleEdge(b, c, 1, 1);
+        Edge bc2 = new SimpleEdge(b, c, 2, 2);
+        Edge bc3 = new SimpleEdge(b, c, 3, 3);
+        Edge cd1 = new SimpleEdge(c, d, 1, 1);
+        Edge cd2 = new SimpleEdge(c, d, 2, 2);
+        Edge cd3 = new SimpleEdge(c, d, 3, 3);
         OverlayGraph og = new OverlayGraph(g);
         assertEquals(g.countVertices(), og.countVertices());
         assertEquals(g.countEdges(), og.countEdges());
         for (Vertex v : g.getVertices()) {
             for (Edge e : v.getOutgoing()) {
-                DirectEdge de = (DirectEdge) e;
+                Edge de = (Edge) e;
                 assertTrue(og.getOutgoing(v).contains(e));
                 assertTrue(og.getIncoming(de.getToVertex()).contains(e));
             }
@@ -57,8 +57,8 @@ public class TestOverlayGraph extends TestCase {
         assertTrue(og.getOutgoing(d).size() == 0);
         
         // add an edge to the overlay that is not in the original
-        DirectEdge ad = new FreeEdge(a, d);
-        og.addDirectEdge(ad);
+        Edge ad = new FreeEdge(a, d);
+        og.addEdge(ad);
         assertTrue(d.getIncoming().size() == 3);
         assertTrue(og.getIncoming(d).size() == 4);
         assertTrue(a.getOutgoing().size() == 1);
@@ -67,8 +67,8 @@ public class TestOverlayGraph extends TestCase {
         // remove all original edges from overlaygraph
         for (Vertex v : g.getVertices()) {
             for (Edge e : v.getOutgoing()) {
-                DirectEdge de = (DirectEdge) e;
-                og.removeDirectEdge(de);
+                Edge de = (Edge) e;
+                og.removeEdge(de);
             }
         }
         assertEquals(og.countEdges(), 1);

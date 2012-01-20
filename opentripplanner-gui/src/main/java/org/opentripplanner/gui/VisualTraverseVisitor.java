@@ -17,7 +17,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Edge;
 
 public class VisualTraverseVisitor implements TraverseVisitor {
@@ -34,8 +34,8 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitEdge(Edge edge, State state) {
-        if (edge instanceof DirectEdge) {
-            gui.enqueueHighlightedEdge((DirectEdge) edge);
+        if (edge instanceof Edge) {
+            gui.enqueueHighlightedEdge((Edge) edge);
         }
         //gui.highlightVertex(state.getVertex());
     }
@@ -58,8 +58,8 @@ public class VisualTraverseVisitor implements TraverseVisitor {
     @Override
     public void visitEnqueue(State state) {
 //        Edge e = state.getBackEdge();
-//        if (e instanceof DirectEdge) {
-//            gui.enqueueHighlightedEdge((DirectEdge) e);
+//        if (e instanceof Edge) {
+//            gui.enqueueHighlightedEdge((Edge) e);
 //        }
     }
     

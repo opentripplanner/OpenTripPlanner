@@ -29,7 +29,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -167,7 +167,7 @@ public class TestHalfEdges extends TestCase {
         assertTrue(start.getX() < end.getX());
         assertTrue(start.getY() < end.getY());
         
-        List<DirectEdge> extra = end.getExtra();
+        List<Edge> extra = end.getExtra();
         
         assertEquals(12, extra.size());
         
@@ -263,7 +263,7 @@ public class TestHalfEdges extends TestCase {
         assertNotNull(start);
         assertTrue("wheelchair accessibility is correctly set (splitting)", start.isWheelchairAccessible());
 
-        List<DirectEdge> extras = start.getExtra();
+        List<Edge> extras = start.getExtra();
         assertEquals(10, extras.size());
         
         TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
@@ -307,14 +307,14 @@ public class TestHalfEdges extends TestCase {
         assertEquals (6, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
         assertTrue(outgoing.size() == 2);
-        DirectEdge edge = (DirectEdge) outgoing.iterator().next();
+        Edge edge = (Edge) outgoing.iterator().next();
         
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
         
         outgoing = station2.getOutgoing();
         assertTrue(outgoing.size() == 2);
-        edge = (DirectEdge) outgoing.iterator().next();
+        edge = (Edge) outgoing.iterator().next();
         
         Vertex station2point = edge.getToVertex();
         assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);

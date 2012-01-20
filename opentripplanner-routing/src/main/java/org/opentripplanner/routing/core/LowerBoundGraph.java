@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -183,7 +183,7 @@ public class LowerBoundGraph {
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
-		for (DirectEdge de : origin.getExtra()) {
+		for (Edge de : origin.getExtra()) {
 			Vertex toVertex = de.getToVertex();  
 			int toIndex = toVertex.getIndex();
 			if (toVertex == origin) continue;

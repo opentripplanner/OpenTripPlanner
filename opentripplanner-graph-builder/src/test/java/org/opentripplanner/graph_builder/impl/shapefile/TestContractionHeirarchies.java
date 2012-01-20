@@ -47,7 +47,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -163,10 +163,10 @@ public class TestContractionHeirarchies extends TestCase {
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N; ++x) {
                 Vertex vertexIn = verticesIn[y][x];
-                for (DirectEdge e1: filter(vertexIn.getIncoming(),DirectEdge.class)) {
+                for (Edge e1: filter(vertexIn.getIncoming(),Edge.class)) {
                     Vertex vertexOut = verticesOut[y][x];
                     TurnVertex fromv = (TurnVertex) e1.getFromVertex();
-                    for (DirectEdge e2: filter(vertexOut.getOutgoing(),DirectEdge.class)) {
+                    for (Edge e2: filter(vertexOut.getOutgoing(),Edge.class)) {
                         TurnVertex tov = (TurnVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
@@ -330,7 +330,7 @@ public class TestContractionHeirarchies extends TestCase {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         Vertex last = null;
         for (Vertex v : vertices) {
-            for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
+            for (Edge e: filter(v.getOutgoing(),Edge.class)) {
                 components.union(v, e.getToVertex());
             }
             last = v;
@@ -565,7 +565,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         for (Vertex v : vertices) {
-            for (DirectEdge e: filter(v.getOutgoing(), DirectEdge.class)) {
+            for (Edge e: filter(v.getOutgoing(), Edge.class)) {
                 components.union(v, e.getToVertex());
             }
         }

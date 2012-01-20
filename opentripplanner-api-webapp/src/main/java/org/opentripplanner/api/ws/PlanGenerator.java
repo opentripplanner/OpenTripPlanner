@@ -37,7 +37,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.Hop;
@@ -697,7 +697,7 @@ public class PlanGenerator {
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (DirectEdge alternative : backState.getVertex().getOutgoingStreetEdges()) {
+                        for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
                             if (alternative instanceof TinyTurnEdge) {
                                 //a tiny turn edge has no geometry, but the next
                                 //edge will be a TurnEdge or PSE and will have direction
@@ -725,8 +725,8 @@ public class PlanGenerator {
                         //we are stuck
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
-                        for (DirectEdge alternative : backVertex.getOutgoingStreetEdges()) {
-                            List<DirectEdge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
+                        for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
+                            List<Edge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
                             if (alternatives.size() == 0) {
                                 continue; //this is not an alternative
                             }

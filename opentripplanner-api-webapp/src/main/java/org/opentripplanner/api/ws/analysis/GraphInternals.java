@@ -16,7 +16,7 @@ import org.opentripplanner.api.model.analysis.SimpleVertex;
 import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.analysis.WrappedEdge;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -67,9 +67,9 @@ public class GraphInternals {
             Envelope vertexEnvelope = new Envelope(v.getCoordinate());
             vertexIndex.insert(vertexEnvelope, v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof DirectEdge) {
+                if (e instanceof Edge) {
                     Envelope envelope;
-                    Geometry geometry = ((DirectEdge) e).getGeometry();
+                    Geometry geometry = ((Edge) e).getGeometry();
                     if (geometry == null) {
                         envelope = vertexEnvelope;
                     } else {

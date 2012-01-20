@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.graph.Edge;
@@ -103,7 +103,7 @@ public class SimplifiedLowerBoundGraph {
             List<Vertex> group = vertex_by_gindex.get(from_gindex);
             for (Vertex u : group) {
                 for (Edge e : u.getOutgoing()) {
-                    DirectEdge de = (DirectEdge) e;
+                    Edge de = (Edge) e;
                     Vertex v = de.getToVertex();
                     int to_gindex = v.getGroupIndex();
                     if (to_gindex == from_gindex)
@@ -155,7 +155,7 @@ public class SimplifiedLowerBoundGraph {
         double[] result = new double[max_gindex];
         Arrays.fill(result, Double.POSITIVE_INFINITY);
         IntBinHeap q = new IntBinHeap(max_gindex / 2);
-        for (DirectEdge de : origin.getExtra()) {
+        for (Edge de : origin.getExtra()) {
             Vertex toVertex = de.getToVertex();
             int toGroup = toVertex.getGroupIndex();
             if (toVertex == origin)

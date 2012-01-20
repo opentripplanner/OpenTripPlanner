@@ -32,7 +32,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -97,7 +97,7 @@ public class TestPatternHopFactory extends TestCase {
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (DirectEdge e : filter(journey_a_1.getOutgoing(), DirectEdge.class)) {
+        for (Edge e : filter(journey_a_1.getOutgoing(), Edge.class)) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(Alight.class, e.getClass());
             } else {

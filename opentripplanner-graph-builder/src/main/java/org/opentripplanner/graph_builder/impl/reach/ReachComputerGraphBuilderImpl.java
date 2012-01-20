@@ -28,7 +28,7 @@ import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
@@ -109,10 +109,10 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     private void addReachToGraph(Graph graph) {
 
-        HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>> classMapping = new HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>>();
+        HashMap<Class<? extends Edge>, Class<? extends Edge>> classMapping = new HashMap<Class<? extends Edge>, Class<? extends Edge>>();
 
-        HashSet<DirectEdge> edgesToRemove = new HashSet<DirectEdge>();
-        HashSet<DirectEdge> edgesToAdd = new HashSet<DirectEdge>();
+        HashSet<Edge> edgesToRemove = new HashSet<Edge>();
+        HashSet<Edge> edgesToAdd = new HashSet<Edge>();
         for (Vertex vertex : graph.getVertices()) {
             for (Edge e : vertex.getOutgoing()) {
                 if (e instanceof StreetEdge) {
@@ -132,20 +132,20 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 }
             }
         }
-        for (DirectEdge e: edgesToRemove) {
+        for (Edge e: edgesToRemove) {
             e.detach();
         }
 
 // should no longer be necessary        
-//        for (DirectEdge e: edgesToAdd) {
+//        for (Edge e: edgesToAdd) {
 //            graph.addVerticesFromEdge(e);
 //        }
     }
 
     @SuppressWarnings("unchecked")
-    private DirectEdge reachifyEdge(Graph graph, HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>> classMapping, DirectEdge e) {
-        Class<? extends DirectEdge> oldClass = e.getClass();
-        Class<? extends DirectEdge> newClass = classMapping.get(oldClass);
+    private Edge reachifyEdge(Graph graph, HashMap<Class<? extends Edge>, Class<? extends Edge>> classMapping, Edge e) {
+        Class<? extends Edge> oldClass = e.getClass();
+        Class<? extends Edge> newClass = classMapping.get(oldClass);
 
         if (newClass == null) {
             String newClassName = oldClass.getName() + "WithReach";
@@ -155,7 +155,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             customizer.addDoubleField("reach");
             // create the new class
             
-            newClass = (Class<? extends DirectEdge>) customizer.saveClass();
+            newClass = (Class<? extends Edge>) customizer.saveClass();
             classMapping.put(oldClass, newClass);
         }
         EdgeWithReach newEdge = (EdgeWithReach) ClassCustomizer.reclass(e, newClass);
@@ -253,7 +253,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 edgesToRemove.add(e);
             }
             for (EdgeWithReach e : edgesToRemove) {
-                ograph.removeDirectEdge(e);
+                ograph.removeEdge(e);
                 removed++;
             }
         }
@@ -271,7 +271,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addDirectEdge((DirectEdge) e);
+                        workingGraph.addEdge((Edge) e);
                     }
                 }
             }
@@ -279,7 +279,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addDirectEdge((DirectEdge) e);
+                        workingGraph.addEdge((Edge) e);
                     }
                 }
             }
@@ -436,12 +436,12 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             HashMap<Edge, Double> reachEstimateForEdge, boolean transitStops) {
         Double reach = reachEstimateForEdge.get(edge);
         if (reach == null) {
-            newGraph.addDirectEdge(edge);
+            newGraph.addEdge(edge);
             return 0;
         }
 
         if (reach >= epsilon) {
-            newGraph.addDirectEdge(edge);
+            newGraph.addEdge(edge);
             return 0;
         }
 

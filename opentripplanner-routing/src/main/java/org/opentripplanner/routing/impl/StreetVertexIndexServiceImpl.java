@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -179,7 +179,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return getClosestVertex(coordinate, name, options, null);
     }
 
-    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<DirectEdge> extraEdges) {
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
@@ -284,10 +284,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<DirectEdge> extraEdges) {
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
         if (extraEdges != null) {
-            for (DirectEdge e : extraEdges) {
+            for (Edge e : extraEdges) {
                 if (e instanceof StreetEdge) {
                     extraStreets.add((StreetEdge) e);
                 }

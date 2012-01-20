@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -150,7 +150,7 @@ public class NetworkLinkerLibrary {
 //            /* remove original (replaced) edges from the graph */
 //            for (Edge edge : entry.getKey()) {
 //                // uncomment to remove replaced edges
-//                // graph.removeEdge((DirectEdge)edge);
+//                // graph.removeEdge((Edge)edge);
 //            }
 //        }
 //    }
@@ -372,7 +372,7 @@ public class NetworkLinkerLibrary {
         StreetVertex newEnd = new IntersectionVertex(graph, "replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
         
-        for (DirectEdge e: filter(startVertex.getOutgoing(), DirectEdge.class)) {
+        for (Edge e: filter(startVertex.getOutgoing(), Edge.class)) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
                 continue;
@@ -391,7 +391,7 @@ public class NetworkLinkerLibrary {
         StreetVertex newStart = new IntersectionVertex(graph, "replace " + startVertex.getLabel(),
                 startVertex.getX(), startVertex.getY());
 
-        for (DirectEdge e: filter(endVertex.getOutgoing(), DirectEdge.class)) {
+        for (Edge e: filter(endVertex.getOutgoing(), Edge.class)) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(startVertex.getCoordinate())) {
                 continue;

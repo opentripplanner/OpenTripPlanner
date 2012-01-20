@@ -163,7 +163,7 @@ public class Graph implements Serializable {
 //        b.addIncoming(ee);
 //    }
 //
-//    public void addVerticesFromEdge(DirectEdge ee) {
+//    public void addVerticesFromEdge(Edge ee) {
 //        addVertex(ee.getFromVertex());
 //        addVertex(ee.getToVertex());
 //    }
@@ -182,7 +182,7 @@ public class Graph implements Serializable {
      * this should really be in Edge constructor/destructor, not Graph
      * @param ee
      */
-//    public void removeEdge(DirectEdge ee) {
+//    public void removeEdge(Edge ee) {
 //        Vertex fromv = ee.getFromVertex();
 //        Vertex tov = ee.getToVertex();
 //        fromv.removeOutgoing(ee);

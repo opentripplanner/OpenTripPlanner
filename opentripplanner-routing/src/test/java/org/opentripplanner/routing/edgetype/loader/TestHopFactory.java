@@ -23,7 +23,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -69,7 +69,7 @@ public class TestHopFactory extends TestCase {
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (DirectEdge e : filter(journey_a_1.getOutgoing(),DirectEdge.class)) {
+        for (Edge e : filter(journey_a_1.getOutgoing(),Edge.class)) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(PatternAlight.class, e.getClass());
             } else {

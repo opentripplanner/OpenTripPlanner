@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.State;
@@ -66,7 +66,7 @@ public class StreetUtils {
                 	if (e_in == e_out)
                 		continue;
                     // only make turn edges for U turns when they are dead ends
-                    if (e_in.getFromVertex() == ((DirectEdge)e_out).getToVertex() &&
+                    if (e_in.getFromVertex() == ((Edge)e_out).getToVertex() &&
                     	v.getOutgoing().size() > 1)
                     		continue;
                     TurnVertex tv_out = getTurnVertexForEdge(graph, (PlainStreetEdge) e_out);

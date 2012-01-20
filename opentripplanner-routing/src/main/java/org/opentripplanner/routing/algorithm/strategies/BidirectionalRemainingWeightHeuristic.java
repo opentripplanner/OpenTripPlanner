@@ -16,7 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.util.Arrays;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -95,7 +95,7 @@ public class BidirectionalRemainingWeightHeuristic implements
             long t0 = System.currentTimeMillis();
 
             if (target instanceof StreetLocation) {
-                for (DirectEdge de : ((StreetLocation) target).getExtra()) {
+                for (Edge de : ((StreetLocation) target).getExtra()) {
                     Vertex gv;
                     if (options.isArriveBy()) {
                         gv = de.getToVertex();
@@ -127,9 +127,9 @@ public class BidirectionalRemainingWeightHeuristic implements
                 else
                     edges = u.getIncoming();
                 for (Edge e : edges) {
-                    if (e instanceof DirectEdge) {
+                    if (e instanceof Edge) {
                         Vertex v = options.isArriveBy() ? 
-                            ((DirectEdge) e).getToVertex() : e.getFromVertex();
+                            ((Edge) e).getToVertex() : e.getFromVertex();
                         double vw = uw + (timeNotWeight ? 
                                 e.timeLowerBound(options) : e.weightLowerBound(options));
                         int vi = v.getIndex();

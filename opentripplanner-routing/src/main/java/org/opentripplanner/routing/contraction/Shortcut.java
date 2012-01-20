@@ -22,7 +22,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.edgetype.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
@@ -35,14 +35,14 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class Shortcut extends AbstractEdge {
     private static final long serialVersionUID = -5813252201367498850L;
     
-    DirectEdge edge1;
-    DirectEdge edge2;
+    Edge edge1;
+    Edge edge2;
     int time;
     double weight = -1;
     private TraverseMode mode;
     private double walkDistance;
 
-    public Shortcut(DirectEdge edge1, DirectEdge edge2, int time, double weight, double walkDistance, TraverseMode mode) {
+    public Shortcut(Edge edge1, Edge edge2, int time, double weight, double walkDistance, TraverseMode mode) {
         super(edge1.getFromVertex(), edge2.getToVertex());
         this.edge1 = edge1;
         this.edge2 = edge2;
