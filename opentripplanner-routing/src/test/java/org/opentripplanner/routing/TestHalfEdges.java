@@ -307,14 +307,14 @@ public class TestHalfEdges extends TestCase {
         assertEquals (6, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
         assertTrue(outgoing.size() == 2);
-        Edge edge = (Edge) outgoing.iterator().next();
+        Edge edge = outgoing.iterator().next();
         
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
         
         outgoing = station2.getOutgoing();
         assertTrue(outgoing.size() == 2);
-        edge = (Edge) outgoing.iterator().next();
+        edge = outgoing.iterator().next();
         
         Vertex station2point = edge.getToVertex();
         assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);

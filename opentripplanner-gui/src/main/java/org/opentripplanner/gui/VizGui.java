@@ -425,7 +425,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
             public void valueChanged(ListSelectionEvent e) {
 
                 JList edgeList = (JList) e.getSource();
-                Edge selected = (Edge) edgeList.getSelectedValue();
+                Edge selected = edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
@@ -439,15 +439,15 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                     Vertex tov = selected.getToVertex();
                     for (Edge og : tov.getOutgoing()) {
                     	if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
-                    		edges.add((Edge)og);
-                            vertices.add (((StreetEdge)og).getToVertex());
+                    		edges.add(og);
+                            vertices.add (og.getToVertex());
                             break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : fromv.getIncoming()) {
                         if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
-                    		edges.add((Edge)ic);
+                    		edges.add(ic);
                             vertices.add (ic.getFromVertex());
                             break;
                         }

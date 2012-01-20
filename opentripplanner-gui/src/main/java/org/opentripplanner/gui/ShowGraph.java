@@ -315,7 +315,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
         	TraverseMode mode = en.getMode();
             if(en instanceof DelegatingEdgeNarrative) {
-                en = (Edge) ((DelegatingEdgeNarrative)en).getBase();
+                en = ((DelegatingEdgeNarrative)en).getBase();
             }
 
         	if (!(en instanceof Edge)) continue;

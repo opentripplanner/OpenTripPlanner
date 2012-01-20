@@ -271,7 +271,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addEdge((Edge) e);
+                        workingGraph.addEdge(e);
                     }
                 }
             }
@@ -279,7 +279,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addEdge((Edge) e);
+                        workingGraph.addEdge(e);
                     }
                 }
             }

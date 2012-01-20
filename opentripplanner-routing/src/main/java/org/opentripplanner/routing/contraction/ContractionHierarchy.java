@@ -246,7 +246,7 @@ public class ContractionHierarchy implements Serializable {
             if (pathAroundU == null || pathAroundU.exceedsWeightLimit(weightThroughU + .01)) {
                 int timeThroughU = (int) (w.getAbsTimeDeltaSec() + v.getAbsTimeDeltaSec());
                 double walkDistance = v.getWalkDistance() + w.getWalkDistance();
-                Shortcut vuw = new Shortcut((Edge)v.getBackEdge(), (Edge)w.getBackEdge(), 
+                Shortcut vuw = new Shortcut(v.getBackEdge(), w.getBackEdge(), 
                         timeThroughU, weightThroughU, walkDistance, mode);
                 shortcuts.add(vuw);
             }
@@ -319,10 +319,7 @@ public class ContractionHierarchy implements Serializable {
     private boolean isContractable(Vertex v) {
         if (v instanceof TurnVertex || v instanceof IntersectionVertex) {
             for (Edge e : core.getOutgoing(v)) {
-                if( ! (e instanceof Edge))
-                    return false;
-                Edge de = (Edge) e;
-                Vertex tov = de.getToVertex();
+                Vertex tov = e.getToVertex();
                 if (!(tov instanceof TurnVertex || tov instanceof IntersectionVertex)) {
                     return false;
                 }

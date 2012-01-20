@@ -127,18 +127,16 @@ public class BidirectionalRemainingWeightHeuristic implements
                 else
                     edges = u.getIncoming();
                 for (Edge e : edges) {
-                    if (e instanceof Edge) {
-                        Vertex v = options.isArriveBy() ? 
-                            ((Edge) e).getToVertex() : e.getFromVertex();
-                        double vw = uw + (timeNotWeight ? 
-                                e.timeLowerBound(options) : e.weightLowerBound(options));
-                        int vi = v.getIndex();
-                        if (weights[vi] > vw) {
-                            weights[vi] = vw;
-                            // selectively rekeying did not seem to offer any speed advantage
-                            q.insert(v, vw);
-                            // System.out.println("Insert " + v + " weight " + vw);
-                        }
+                    Vertex v = options.isArriveBy() ? 
+                        e.getToVertex() : e.getFromVertex();
+                    double vw = uw + (timeNotWeight ? 
+                            e.timeLowerBound(options) : e.weightLowerBound(options));
+                    int vi = v.getIndex();
+                    if (weights[vi] > vw) {
+                        weights[vi] = vw;
+                        // selectively rekeying did not seem to offer any speed advantage
+                        q.insert(v, vw);
+                        // System.out.println("Insert " + v + " weight " + vw);
                     }
                 }
             }

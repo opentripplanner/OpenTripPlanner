@@ -66,7 +66,7 @@ public class StreetUtils {
                 	if (e_in == e_out)
                 		continue;
                     // only make turn edges for U turns when they are dead ends
-                    if (e_in.getFromVertex() == ((Edge)e_out).getToVertex() &&
+                    if (e_in.getFromVertex() == e_out.getToVertex() &&
                     	v.getOutgoing().size() > 1)
                     		continue;
                     TurnVertex tv_out = getTurnVertexForEdge(graph, (PlainStreetEdge) e_out);

@@ -44,9 +44,8 @@ public class TestOverlayGraph extends TestCase {
         assertEquals(g.countEdges(), og.countEdges());
         for (Vertex v : g.getVertices()) {
             for (Edge e : v.getOutgoing()) {
-                Edge de = (Edge) e;
                 assertTrue(og.getOutgoing(v).contains(e));
-                assertTrue(og.getIncoming(de.getToVertex()).contains(e));
+                assertTrue(og.getIncoming(e.getToVertex()).contains(e));
             }
             for (Edge e : v.getIncoming()) {
                 assertTrue(og.getIncoming(v).contains(e));
@@ -67,8 +66,7 @@ public class TestOverlayGraph extends TestCase {
         // remove all original edges from overlaygraph
         for (Vertex v : g.getVertices()) {
             for (Edge e : v.getOutgoing()) {
-                Edge de = (Edge) e;
-                og.removeEdge(de);
+                og.removeEdge(e);
             }
         }
         assertEquals(og.countEdges(), 1);

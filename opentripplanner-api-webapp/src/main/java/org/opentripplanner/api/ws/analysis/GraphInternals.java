@@ -67,16 +67,14 @@ public class GraphInternals {
             Envelope vertexEnvelope = new Envelope(v.getCoordinate());
             vertexIndex.insert(vertexEnvelope, v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof Edge) {
-                    Envelope envelope;
-                    Geometry geometry = ((Edge) e).getGeometry();
-                    if (geometry == null) {
-                        envelope = vertexEnvelope;
-                    } else {
-                        envelope = geometry.getEnvelopeInternal();
-                    }
-                    edgeIndex.insert(envelope, e);
+                Envelope envelope;
+                Geometry geometry = e.getGeometry();
+                if (geometry == null) {
+                    envelope = vertexEnvelope;
+                } else {
+                    envelope = geometry.getEnvelopeInternal();
                 }
+                edgeIndex.insert(envelope, e);
             }
         }
         vertexIndex.build();

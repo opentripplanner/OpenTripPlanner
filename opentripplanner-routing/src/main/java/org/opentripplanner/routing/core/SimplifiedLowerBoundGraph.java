@@ -103,8 +103,7 @@ public class SimplifiedLowerBoundGraph {
             List<Vertex> group = vertex_by_gindex.get(from_gindex);
             for (Vertex u : group) {
                 for (Edge e : u.getOutgoing()) {
-                    Edge de = (Edge) e;
-                    Vertex v = de.getToVertex();
+                    Vertex v = e.getToVertex();
                     int to_gindex = v.getGroupIndex();
                     if (to_gindex == from_gindex)
                         continue;

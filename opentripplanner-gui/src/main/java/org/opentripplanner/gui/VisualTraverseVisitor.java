@@ -34,9 +34,7 @@ public class VisualTraverseVisitor implements TraverseVisitor {
 
     @Override
     public void visitEdge(Edge edge, State state) {
-        if (edge instanceof Edge) {
-            gui.enqueueHighlightedEdge((Edge) edge);
-        }
+        gui.enqueueHighlightedEdge(edge);
         //gui.highlightVertex(state.getVertex());
     }
 

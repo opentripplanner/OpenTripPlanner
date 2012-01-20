@@ -313,9 +313,8 @@ public abstract class AbstractVertex implements Vertex {
 
         for (Edge e : edges) {
             // We only support Vertices that are direct edges when merging
-            Edge de = (Edge) e;
-            Vertex from = de.getFromVertex();
-            Vertex to = de.getToVertex();
+            Vertex from = e.getFromVertex();
+            Vertex to = e.getToVertex();
             if ((from==this && to==other) || (from==other && to==this)) {
                 e.detach();
             } else if (from == other) {
@@ -330,12 +329,9 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void removeAllEdges() {
         for (Edge e : outgoing) {
-            if (e instanceof Edge) {
-                Edge edge = (Edge) e;
-                Vertex target = edge.getToVertex();
-                if (target != null) {
-                    target.removeIncoming(e);
-                }
+            Vertex target = e.getToVertex();
+            if (target != null) {
+                target.removeIncoming(e);
             }
         }
         for (Edge e : incoming) {
