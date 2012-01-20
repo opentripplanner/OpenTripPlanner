@@ -251,7 +251,8 @@ public class TestHalfEdges extends TestCase {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
         //test that the local stop finder finds stops
-        assertTrue(finder.getLocalTransitStops(new Coordinate(-74.005000001, 40.01), 100).size() > 0);
+        Coordinate c = new Coordinate(-74.005000001, 40.01);
+        assertTrue(finder.getLocalTransitStops(c, 100).size() > 0);
 
         //test that the closest vertex finder returns the closest vertex
         StreetLocation some = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.00, 40.00), null, null);

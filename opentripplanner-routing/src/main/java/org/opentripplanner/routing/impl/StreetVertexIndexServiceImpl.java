@@ -138,7 +138,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 // only index transit stops that (a) are entrances, or (b) have no associated
                 // entrances
                 TransitStop ts = (TransitStop) v;
-                if (ts.isEntrance() || !ts.hasEntrances()) {
+                if (!ts.isEntrance() && ts.hasEntrances()) {
                     continue;
                 }
                 Envelope env = new Envelope(v.getCoordinate());
