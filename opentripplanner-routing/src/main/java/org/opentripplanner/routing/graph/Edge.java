@@ -16,6 +16,7 @@ package org.opentripplanner.routing.graph;
 import java.io.Serializable;
 import java.util.List;
 
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge.ValidVertexTypes;
@@ -43,7 +44,7 @@ import org.opentripplanner.routing.spt.GraphPath;
  * If you think of a compelling reason where you need multiple traverse results in BOTH directions,
  * let us know.
  */
-public interface Edge extends Serializable {
+public interface Edge extends Serializable, EdgeNarrative {
 
     /** @return the vertex this edge comes from */
     public Vertex getFromVertex();

@@ -29,7 +29,7 @@ import org.opentripplanner.routing.edgetype.DirectEdge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
-public abstract class AbstractEdge implements DirectEdge {
+public abstract class AbstractEdge implements Edge {
 
     private static final long serialVersionUID = 1L;
 
