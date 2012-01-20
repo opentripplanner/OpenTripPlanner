@@ -107,10 +107,10 @@ public class SimplifiedLowerBoundGraph {
                     int to_gindex = v.getGroupIndex();
                     if (to_gindex == from_gindex)
                         continue;
-                    if (de instanceof PatternHop || de instanceof Hop)
-                        putIfBetter(distEdges, from_gindex, to_gindex, de.timeLowerBound(dummyOptions));
+                    if (e instanceof PatternHop || e instanceof Hop)
+                        putIfBetter(distEdges, from_gindex, to_gindex, e.timeLowerBound(dummyOptions));
                     else 
-                        putIfBetter(distEdges, from_gindex, to_gindex, de.getDistance());
+                        putIfBetter(distEdges, from_gindex, to_gindex, e.getDistance());
                 }
             }
         }

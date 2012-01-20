@@ -425,7 +425,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
             public void valueChanged(ListSelectionEvent e) {
 
                 JList edgeList = (JList) e.getSource();
-                Edge selected = edgeList.getSelectedValue();
+                Edge selected = (Edge) edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
