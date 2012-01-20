@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,10 +58,18 @@ public class UpdateHandler {
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
         alertText.alertUrl = deBuffer(alert.getUrl());
         ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
+        long bestStartTime = Long.MAX_VALUE;
         for (TimeRange activePeriod : alert.getActivePeriodList()) {
             final long start = activePeriod.hasStart() ? activePeriod.getStart() - earlyStart : 0;
+            final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
+            if (realStart > 0 && realStart < bestStartTime) {
+                bestStartTime = realStart;
+            }
             final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
             periods.add(new TimePeriod(start, end));
+        }
+        if (bestStartTime != Long.MAX_VALUE) {
+            alertText.effectiveStartDate = new Date(bestStartTime);
         }
         for (EntitySelector informed : alert.getInformedEntityList()) {
             String routeId = null;
