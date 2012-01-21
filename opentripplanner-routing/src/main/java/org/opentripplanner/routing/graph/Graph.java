@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Graph implements Serializable {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20111209L;
+    private static final long serialVersionUID = 20120121L;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
