@@ -11,7 +11,7 @@
     </parent>
 
     <properties>
-        <tomcat.version>5.5.28</tomcat.version>
+        <tomcat.version>6.0.35</tomcat.version>
     </properties>
 
     <dependencies>
@@ -101,7 +101,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Create a custom opentriplanner-api-webapp war with the path to our graph>
+            <!-- Create a custom opentriplanner-api-webapp war with the path to our graph -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -120,7 +120,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!- Start up tomcat with our custom wars and graph >
+            <!-- Start up tomcat with our custom wars and graph -->
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
@@ -134,16 +134,16 @@
                         <configuration>
 
                             <container>
-                                <containerId>tomcat5x</containerId>
-                                <log>${project.build.directory}/tomcat5x/cargo.log</log>
+                                <containerId>tomcat6x</containerId>
+                                <log>${project.build.directory}/tomcat6x/cargo.log</log>
                                 <zipUrlInstaller>
-                                    <url>http://www.apache.org/dist/tomcat/tomcat-5/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip</url>
+                                    <url>http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip</url>
                                     <installDir>${installDir}</installDir>
                                 </zipUrlInstaller>
                             </container>
 
                             <configuration>
-                                <home>${project.build.directory}/tomcat5x/container</home>
+                                <home>${project.build.directory}/tomcat6x/container</home>
                                 <properties>
                                     <cargo.servlet.port>8080</cargo.servlet.port>
                                     <cargo.logging>high</cargo.logging>
@@ -169,7 +169,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin-->
+            </plugin>
         </plugins>
     </build>
 
@@ -182,9 +182,18 @@
                     <plugin>
                         <groupId>org.codehaus.cargo</groupId>
                         <artifactId>cargo-maven2-plugin</artifactId>
-                        <configuration>
-                            <wait>true</wait>
-                        </configuration>
+                        <executions>
+                          <execution>
+                            <id>tomcat-execution</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                              <goal>start</goal>
+                            </goals>
+                            <configuration>
+                              <wait>true</wait>
+                            </configuration>
+                            </execution>
+                          </executions>
                     </plugin>
                 </plugins>
             </build>
