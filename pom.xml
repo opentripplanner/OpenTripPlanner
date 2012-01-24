@@ -289,7 +289,7 @@
   </dependencyManagement>
 
   <properties>
-    <geotools.version>2.7.1</geotools.version>
+    <geotools.version>8.0-M4</geotools.version>
     <jersey.version>1.11</jersey.version>
     <spring.version>3.0.5.RELEASE</spring.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
