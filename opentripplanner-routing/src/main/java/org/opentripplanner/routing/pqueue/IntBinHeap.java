@@ -34,7 +34,7 @@ public class IntBinHeap implements OTPPriorityQueue<Integer> {
     	this.capacity = capacity;
     	size = 0;
         elem = new int[capacity + 1];
-        elem[0] = Integer.MIN_VALUE;
+        elem[0] = NOT_AN_ELEMENT;
         prio = new double[capacity + 1];    // 1-based indexing
         prio[0] = Double.NEGATIVE_INFINITY; // set sentinel
     }
@@ -58,7 +58,7 @@ public class IntBinHeap implements OTPPriorityQueue<Integer> {
     	if (size > 0)
     		return elem[1];
     	else 
-    		return Integer.MIN_VALUE;
+    		return NOT_AN_ELEMENT;
     }
     
     public Integer peek_min() {
@@ -145,7 +145,7 @@ public class IntBinHeap implements OTPPriorityQueue<Integer> {
         int    lastElem = elem[size];
         double lastPrio = prio[size];
         if (size <= 0) 
-            return Integer.MIN_VALUE;
+            return NOT_AN_ELEMENT;
     	size -= 1;
         for (i=1; i*2 <= size; i=child) {
             child = i*2;
