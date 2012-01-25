@@ -16,7 +16,8 @@ package org.opentripplanner.routing.pqueue;
 import java.util.Arrays;
 
 public class IntBinHeap implements OTPPriorityQueue<Integer> {
-    
+
+    public static int NOT_AN_ELEMENT = Integer.MIN_VALUE;
     private static final double GROW_FACTOR = 2.0;
     
     private double[] prio;
