@@ -33,10 +33,11 @@ public class IntBinHeap implements OTPPriorityQueue<Integer> {
     	this.capacity = capacity;
     	size = 0;
         elem = new int[capacity + 1];
+        elem[0] = Integer.MIN_VALUE;
         prio = new double[capacity + 1];    // 1-based indexing
         prio[0] = Double.NEGATIVE_INFINITY; // set sentinel
     }
-    
+
     public int size() {
     	return size;
     }
