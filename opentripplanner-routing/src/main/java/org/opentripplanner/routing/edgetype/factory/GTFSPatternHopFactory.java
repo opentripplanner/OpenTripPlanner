@@ -494,7 +494,7 @@ public class GTFSPatternHopFactory {
                         arrivalVertexId(id(stop.getId())), 
                         stop.getLon(), stop.getLat(), stop.getId());
 
-                //add a vertex representing departing from at the stop
+                //add a vertex representing departing from the stop
                 TransitStopDepart depart = new TransitStopDepart(graph,
                         departureVertexId(id(stop.getId())), 
                         stop.getLon(), stop.getLat(), stop.getId());
