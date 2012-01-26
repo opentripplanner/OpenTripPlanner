@@ -124,6 +124,7 @@
             <plugin>
                 <groupId>org.codehaus.cargo</groupId>
                 <artifactId>cargo-maven2-plugin</artifactId>
+                <version>1.2.0</version>
                 <executions>
                     <execution>
                         <id>tomcat-execution</id>
@@ -132,13 +133,11 @@
                             <goal>start</goal>
                         </goals>
                         <configuration>
-
                             <container>
                                 <containerId>tomcat6x</containerId>
                                 <log>${project.build.directory}/tomcat6x/cargo.log</log>
                                 <zipUrlInstaller>
                                     <url>http://www.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip</url>
-                                    <installDir>${installDir}</installDir>
                                 </zipUrlInstaller>
                             </container>
 
@@ -152,6 +151,8 @@
                                 </properties>
                                 <deployables>
                                     <deployable>
+                                        <groupId>org.opentripplanner</groupId>
+                                        <artifactId>opentripplanner-api-webapp</artifactId>
                                         <location>${project.build.directory}/opentripplanner-api-webapp-integration.war</location>
                                         <type>war</type>
                                         <properties>
@@ -165,7 +166,6 @@
                                     </deployable>
                                 </deployables>
                             </configuration>
-                            <wait>false</wait>
                         </configuration>
                     </execution>
                 </executions>
@@ -187,11 +187,8 @@
                             <id>tomcat-execution</id>
                             <phase>pre-integration-test</phase>
                             <goals>
-                              <goal>start</goal>
+                              <goal>run</goal>
                             </goals>
-                            <configuration>
-                              <wait>true</wait>
-                            </configuration>
                             </execution>
                           </executions>
                     </plugin>
