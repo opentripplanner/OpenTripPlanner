@@ -26,13 +26,15 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
@@ -52,7 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for
  * each vertex, but those are in the vertex now.
  */
-public class Graph implements Serializable {
+public class Graph implements Serializable, Iterable<Vertex> {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
     private static final long serialVersionUID = 20120121L;
@@ -71,7 +73,7 @@ public class Graph implements Serializable {
     private GraphBundle bundle;
     
     /* vertex index by name is reconstructed from edges */
-    private transient HashMap<String, Vertex> vertices = new HashMap<String, Vertex>();
+    private transient Set<Vertex> vertices;
 
     private transient ContractionHierarchySet hierarchies;
     
@@ -89,7 +91,7 @@ public class Graph implements Serializable {
     }
 
     public Graph() {
-        this.vertices = new HashMap<String, Vertex>();
+        this.vertices = new HashSet<Vertex>();
     }
 
     /**
@@ -100,100 +102,24 @@ public class Graph implements Serializable {
      * @param vv the vertex to add
      */
     protected void addVertex(Vertex v) {
-        // vertex labels must be unique
-        Vertex gv = vertices.get(v.getLabel());
-        if (gv != null) {
-            throw new IllegalStateException("vertices must have a unique label");
-        }
-        vertices.put(v.getLabel(), v);
+        if (! vertices.add(v))
+            LOG.warn("repeatedly added the same vertex: {}", v);
     }
 
-/* eventually, 
- * avoid using labels to look up vertices... and finding the equivalent 
- * vertex by label should also be avoided 
- */
-    
-//    /**
-//     * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-//     * Vertex with the given label and coordinates, add it to the graph, and return it.
-//     */
-//    public Vertex addVertex(String label, double x, double y) {
-//        Vertex gv = vertices.get(label);
-//        if (gv == null) {
-//            Vertex vv = new Vertex(label, x, y);
-//            vertices.put(label, vv);
-//            return vv;
-//        }
-//        return gv;
-//    }
-//
-//    /**
-//     * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-//     * Vertex with the given parameters, add it to the graph, and return it.
-//     */
-//    public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
-//        Vertex gv = vertices.get(label);
-//        if (gv == null) {
-//            Vertex vv = new Vertex(label, x, y, name, stopId);
-//            vertices.put(label, vv);
-//            return vv;
-//        }
-//        return gv;
-//    }
-//
-    /**
-     * If the graph contains a vertex with the given label, return it. Otherwise, return null.
-     */
-    public Vertex getVertex(String label) {
-        return vertices.get(label);
+    protected void removeVertex(Vertex v) {
+        if (! vertices.remove(v))
+            LOG.warn("attempting to remove vertex that is not in graph: {}", v);
     }
 
-    public Collection<Vertex> getVertices() {
-        return vertices.values();
+    public boolean contains(Vertex v) {
+        return vertices.contains(v);
     }
-//
-//    public void addEdge(Vertex a, Vertex b, Edge ee) {
-//        a = addVertex(a);
-//        b = addVertex(b);
-//        // there is the potential here for the edge lists to no longer match
-//        // the vertices pointed to by the edge
-//        if (ee.getFromVertex() != a)
-//            throw new IllegalStateException("Saving an edge with the wrong vertex.");
-//        a.addOutgoing(ee);
-//        b.addIncoming(ee);
-//    }
-//
-//    public void addVerticesFromEdge(Edge ee) {
-//        addVertex(ee.getFromVertex());
-//        addVertex(ee.getToVertex());
-//    }
-//
-//    public void addEdge(String from_label, String to_label, Edge ee) {
-//        Vertex a = this.getVertex(from_label);
-//        Vertex b = this.getVertex(to_label);
-//        // there is the potential here for the edge lists to no longer match
-//        // the vertices pointed to by the edge
-//        if (ee.getFromVertex() != a)
-//            throw new IllegalStateException("Saving an edge with the wrong vertex.");
-//        addEdge(a, b, ee);
-//    }
-    
-    /**
-     * this should really be in Edge constructor/destructor, not Graph
-     * @param ee
-     */
-//    public void removeEdge(Edge ee) {
-//        Vertex fromv = ee.getFromVertex();
-//        Vertex tov = ee.getToVertex();
-//        fromv.removeOutgoing(ee);
-//        tov.removeIncoming(ee);
-//    }
-//
+
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
         Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : vertices.values()) {
+        for (Vertex vv : this) {
             double dist = vv.distance(c);
             if (dist < minDist) {
                 ret = vv;
@@ -217,45 +143,22 @@ public class Graph implements Serializable {
         return (T) _services.get(serviceType);
     }
 
-    public void removeVertex(Vertex vertex) {
-        vertices.remove(vertex.getLabel());
+    public void remove(Vertex vertex) {
+        vertices.remove(vertex);
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
-        Vertex gv = this.getVertex(vertex.getLabel());
-        if (gv == null) {
-            return;
-        }
-        if (gv != vertex) {
+        if (! vertices.contains(vertex)) {
             throw new IllegalStateException(
-                    "Vertex has the same label as one in the graph, but is not the same object.");
+                    "attempting to remove vertex that is not in graph.");
         }
         vertex.removeAllEdges();
-        vertices.remove(vertex.getLabel());
+        vertices.remove(vertex);
     }
-
-//    public void removeEdge(AbstractEdge e) {
-//        Vertex fv = e.getFromVertex();
-//        Vertex fgv = vertices.get(fv.getLabel());
-//        if (fgv != null) {
-//            if (fv != fgv)
-//                throw new IllegalStateException("Vertex / edge mismatch.");
-//            else
-//                fgv.removeOutgoing(e);
-//        }
-//        Vertex tv = e.getToVertex();
-//        Vertex tgv = vertices.get(tv.getLabel());
-//        if (tgv != null) {
-//            if (tv != tgv)
-//                throw new IllegalStateException("Vertex / edge mismatch.");
-//            else
-//                tgv.removeIncoming(e);
-//        }
-//    }
 
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (Vertex v : this.getVertices()) {
+        for (Vertex v : this) {
             env.expandToInclude(v.getCoordinate());
         }
         return env;
@@ -306,7 +209,7 @@ public class Graph implements Serializable {
      */
     public int countEdges() {
         int ne = 0;
-        for (Vertex v : vertices.values()) {
+        for (Vertex v : this) {
             ne += v.getDegreeOut();
         }
         return ne;
@@ -314,7 +217,7 @@ public class Graph implements Serializable {
     
     /* this will require a rehash of any existing hashtables keyed on vertices */
     private void renumberVerticesAndEdges() {
-        this.vertexById = new ArrayList<Vertex>(this.getVertices());
+        this.vertexById = new ArrayList<Vertex>(vertices);
         Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
@@ -383,13 +286,13 @@ public class Graph implements Serializable {
             // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();
+            graph.vertices = new HashSet<Vertex>();;
             for (Edge e : edges) {
-               graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-               graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
+               graph.vertices.add(e.getFromVertex());
+               graph.vertices.add(e.getToVertex());
             }
             // trim edge lists to length
-            for (Vertex v : graph.vertices.values())
+            for (Vertex v : graph)
                 v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             if (level == LoadLevel.NO_HIERARCHIES)
@@ -421,7 +324,7 @@ public class Graph implements Serializable {
         LOG.debug("Consolidating edges...");
         // this is not space efficient
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : vertices.values()) {
+        for (Vertex v : this) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
         }
@@ -463,4 +366,10 @@ public class Graph implements Serializable {
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }
+
+    @Override
+    public Iterator<Vertex> iterator() {
+        return vertices.iterator();
+    }
+
 }
