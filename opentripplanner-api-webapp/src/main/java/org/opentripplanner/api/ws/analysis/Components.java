@@ -87,13 +87,15 @@ public class Components {
 
         TraverseOptions options = new TraverseOptions(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();
-        for (String element : bannedRoutes.split(",")) {
-            String[] routeSpec = element.split("_", 2);
-            if (routeSpec.length != 2) {
-                throw new IllegalArgumentException(
-                        "AgencyId or routeId not set in bannedRoutes list");
+        if (bannedRoutes.length() > 0) {
+            for (String element : bannedRoutes.split(",")) {
+                String[] routeSpec = element.split("_", 2);
+                if (routeSpec.length != 2) {
+                    throw new IllegalArgumentException(
+                            "AgencyId or routeId not set in bannedRoutes list");
+                }
+                options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
             }
-            options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
         }
 
         long dateTime = DateUtils.toDate(date, time).getTime();

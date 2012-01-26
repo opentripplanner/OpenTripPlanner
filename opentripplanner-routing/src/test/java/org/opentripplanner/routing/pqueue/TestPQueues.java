@@ -87,6 +87,17 @@ public class TestPQueues extends TestCase {
         System.out.println(q.getClass() + " time " + (t1 - t0) / 1000.0 + " sec");
     }
 
+    public void testIntBinHeap() {
+        IntBinHeap binHeap = new IntBinHeap(100);
+        binHeap.insert(0, 123);
+        assertEquals(123, binHeap.peek_min_key(), 1e-4);
+        assertEquals(1, binHeap.size());
+
+        binHeap.rekey(0, 12);
+        assertEquals(12, binHeap.peek_min_key(), 1e-4);
+        assertEquals(1, binHeap.size());
+    }
+
     private List<OTPPriorityQueue<Integer>> makeQueues() {
         List<OTPPriorityQueue<Integer>> queues = new ArrayList<OTPPriorityQueue<Integer>>();
         queues.add(new PriorityQueueImpl<Integer>());
