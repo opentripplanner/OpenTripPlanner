@@ -66,9 +66,8 @@ public class NetworkLinker {
         // no longer necessary
         //networkLinkerLibrary.addAllReplacementEdgesToGraph();
         
-        // Commented out when removing label-based vertex lookup.
-        // Do we really need this? (AMB)
-        // networkLinkerLibrary.markLocalStops();
+        // Do we really need this? Commenting out does seem to cause some slowdown. (AMB)
+        networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
     }
 }

@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -66,6 +67,8 @@ public class LocalStopFinder {
 
     private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
 
+    private HashMap<AgencyAndId, TransitStop> transitStops;
+    
     public LocalStopFinder(StreetVertexIndexServiceImpl indexService, Graph graph) {
         this.graph = graph;
         this.indexService = indexService;
@@ -74,11 +77,13 @@ public class LocalStopFinder {
     public void markLocalStops() {
         _log.debug("Finding local stops");
         patterns = new HashSet<TripPattern>();
-
+        transitStops = new HashMap<AgencyAndId, TransitStop>();
         int total = 0;
         for (Vertex gv : graph.getVertices()) {
             if (gv instanceof TransitStop) {
-                ((TransitStop) gv).setLocal(true);
+                TransitStop ts = (TransitStop) gv;
+                ts.setLocal(true);
+                transitStops.put(ts.getStopId(), ts);
                 total ++;
             }
             for (Edge e : gv.getOutgoing()) {
@@ -300,8 +305,7 @@ public class LocalStopFinder {
     }
 
     private TransitStop getVertexForStop(Stop stop) {
-        String label = GtfsLibrary.convertIdToString(stop.getId());
-        return (TransitStop) graph.getVertex(label);
+        return transitStops.get(stop.getId());
     }
 
     private HashSet<TripPattern> getNearbyPatterns(Stop stop) {
