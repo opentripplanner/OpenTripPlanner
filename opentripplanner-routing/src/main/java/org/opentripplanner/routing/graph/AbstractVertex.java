@@ -43,10 +43,11 @@ public abstract class AbstractVertex implements Vertex {
     
     private transient int groupIndex = -1;
 
-    /* short name */
+    /* short debugging name */
     private final String label;
     
-    private String streetName = "(no name)";
+    /* Longer human-readable name for the client */
+    private String name;
 
     private final double x;
 
@@ -69,11 +70,12 @@ public abstract class AbstractVertex implements Vertex {
         // null graph means temporary vertex
         if (g != null)
             g.addVertex(this);
+        this.name = "(no name)";
     }
 
     protected AbstractVertex(Graph g, String label, double x, double y, String name) {
         this(g, label, x, y);
-        this.streetName = name;
+        this.name = name;
     }
 
     
@@ -229,12 +231,12 @@ public abstract class AbstractVertex implements Vertex {
     
     @Override
     public String getName() {
-        return this.streetName;
+        return this.name;
     }
 
     @Override
-    public void setStreetName(String streetName) {
-        this.streetName = streetName;
+    public void setStreetName(String name) {
+        this.name = name;
     }
 
 

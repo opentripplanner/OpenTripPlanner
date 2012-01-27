@@ -50,7 +50,8 @@ public class NetworkLinker {
 
         _log.debug("creating linkages...");
         // iterate over a copy of vertex list because it will be modified
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        vertices.addAll(graph.getVertices());
 
         for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
             // only connect transit stops that (a) are entrances, or (b) have no associated
@@ -64,7 +65,10 @@ public class NetworkLinker {
         }
         // no longer necessary
         //networkLinkerLibrary.addAllReplacementEdgesToGraph();
-        networkLinkerLibrary.markLocalStops();
+        
+        // Commented out when removing label-based vertex lookup.
+        // Do we really need this? (AMB)
+        // networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
     }
 }

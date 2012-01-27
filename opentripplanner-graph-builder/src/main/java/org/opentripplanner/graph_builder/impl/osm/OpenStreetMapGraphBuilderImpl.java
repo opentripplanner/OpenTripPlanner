@@ -152,12 +152,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             // figure out which nodes that are actually intersections
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
-            Set<Long> intersectionNodes = new HashSet<Long>();
+            Map<Long, IntersectionVertex> intersectionNodes = new HashMap<Long, IntersectionVertex>();
             for (OSMWay way : _ways.values()) {
                 List<Long> nodes = way.getNodeRefs();
                 for (long node : nodes) {
                     if (possibleIntersectionNodes.contains(node)) {
-                        intersectionNodes.add(node);
+                        intersectionNodes.put(node, null);
                     } else {
                         possibleIntersectionNodes.add(node);
                     }
@@ -224,7 +224,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         segmentCoordinates.add(getCoordinate(osmStartNode));
                     }
 
-                    if (intersectionNodes.contains(endNode) || i == nodes.size() - 2) {
+                    if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         geometry = geometryFactory.createLineString(segmentCoordinates
                                 .toArray(new Coordinate[0]));
@@ -237,24 +237,28 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     /* generate endpoints */
                     if (startEndpoint == null) {
                         // first iteration on this way
-                        String label = "osm node " + osmStartNode.getId();
-
-                        startEndpoint = (IntersectionVertex) graph.getVertex(label);
+                        long sid = osmStartNode.getId();
+                        startEndpoint = intersectionNodes.get(sid);
                         if (startEndpoint == null) {
                             Coordinate coordinate = getCoordinate(osmStartNode);
-                            startEndpoint = new IntersectionVertex(graph, label, coordinate.x, coordinate.y,
-                                    label);
+                            String label = "osm node " + sid;
+                            startEndpoint = new IntersectionVertex(graph, label, 
+                                    coordinate.x, coordinate.y, label);
+                            intersectionNodes.put(sid, startEndpoint);
                             endpoints.add(startEndpoint);
                         }
                     } else {
                         startEndpoint = endEndpoint;
                     }
 
-                    String label = "osm node " + osmEndNode.getId();
-                    endEndpoint = (IntersectionVertex) graph.getVertex(label);
+                    long eid = osmEndNode.getId();
+                    endEndpoint = intersectionNodes.get(eid);
                     if (endEndpoint == null) {
+                        String label = "osm node " + eid;
                         Coordinate coordinate = getCoordinate(osmEndNode);
-                        endEndpoint = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                        endEndpoint = new IntersectionVertex(graph, label, 
+                                coordinate.x, coordinate.y, label);
+                        intersectionNodes.put(eid, endEndpoint);
                         endpoints.add(endEndpoint);
                     }
 

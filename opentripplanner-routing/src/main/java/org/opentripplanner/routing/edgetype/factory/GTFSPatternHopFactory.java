@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
@@ -222,6 +223,13 @@ public class GTFSPatternHopFactory {
     private HashMap<BlockIdAndServiceId, List<InterliningTrip>> tripsForBlock = new HashMap<BlockIdAndServiceId, List<InterliningTrip>>();
 
     private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
+
+    /* maps replacing label lookup */
+    private Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
+    Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
+    Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>();
+    Map<T2<Stop, Trip>, Vertex> patternArriveNodes = new HashMap<T2<Stop, Trip>, Vertex>(); 
+    Map<T2<Stop, Trip>, Vertex> patternDepartNodes = new HashMap<T2<Stop, Trip>, Vertex>(); // exemplar trip
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -440,12 +448,9 @@ public class GTFSPatternHopFactory {
                 InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(s0, s1, fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
                 dwell = getInterlineDwell(dwellKey);
                 if (dwell == null) {
-                    
                     // create the dwell
-                    String startId = id(s0.getId()) + "_" + id(fromExemplar.getId()) + "_"  + exemplarStopSequence0 + "_A";
-                    Vertex startJourney = graph.getVertex(startId);
-                    String endId = id(s1.getId()) + "_" + id(toExemplar.getId()) + "_"  + exemplarStopSequence1 + "_D";
-                    Vertex endJourney = graph.getVertex(endId);
+                    Vertex startJourney = patternArriveNodes.get(new T2<Stop, Trip>(s0,fromExemplar));
+                    Vertex endJourney = patternDepartNodes.get(new T2<Stop, Trip>(s1,toExemplar));
                     dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
                     putInterlineDwell(dwellKey, dwell);
                 }
@@ -472,8 +477,8 @@ public class GTFSPatternHopFactory {
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : _dao.getAllPathways()) {
-            Vertex fromVertex = graph.getVertex(id(pathway.getFromStop().getId()));
-            Vertex toVertex = graph.getVertex(id(pathway.getToStop().getId()));
+            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
+            Vertex toVertex = stopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
             } else {
@@ -487,17 +492,20 @@ public class GTFSPatternHopFactory {
             //add a vertex representing the stop
             TransitStop stopVertex = new TransitStop(graph, id(stop.getId()), stop.getLon(),
                     stop.getLat(), stop.getName(), stop.getId(), stop);
+            stopNodes.put(stop, stopVertex);
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
                 TransitStopArrive arrive = new TransitStopArrive(graph,
                         arrivalVertexId(id(stop.getId())), 
                         stop.getLon(), stop.getLat(), stop.getId());
+                stopArriveNodes.put(stop, arrive);
 
                 //add a vertex representing departing from the stop
                 TransitStopDepart depart = new TransitStopDepart(graph,
                         departureVertexId(id(stop.getId())), 
                         stop.getLon(), stop.getLat(), stop.getId());
+                stopDepartNodes.put(stop, depart);
 
                 //add edges from arrive to stop and stop to depart
                 new PreAlightEdge(arrive, stopVertex);
@@ -647,7 +655,8 @@ public class GTFSPatternHopFactory {
 
             psv0depart = new PatternDepartVertex(graph, departId, 
                     s0.getLon(), s0.getLat(), s0.getId(), tripPattern); 
-
+            patternDepartNodes.put(new T2<Stop, Trip>(s0, trip), psv0depart);
+            
             if (i != 0) {
                 psv0arrive = psv1arrive;
                 PatternDwell dwell = new PatternDwell(psv0arrive, psv0depart, i, tripPattern);
@@ -658,6 +667,7 @@ public class GTFSPatternHopFactory {
 
             psv1arrive = new PatternArriveVertex(graph, arriveId, 
                     s1.getLon(), s1.getLat(), s1.getId(), tripPattern);
+            patternArriveNodes.put(new T2<Stop, Trip>(s1, trip), psv1arrive);
 
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, i,
                     tripPattern);
@@ -673,10 +683,8 @@ public class GTFSPatternHopFactory {
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
                     st0.getStopHeadsign(), trip);
 
-            TransitStopDepart stopDepart = 
-                    (TransitStopDepart) graph.getVertex(departureVertexId(id(s0.getId())));
-            TransitStopArrive stopArrive = 
-                    (TransitStopArrive) graph.getVertex(arrivalVertexId(id(s1.getId())));
+            TransitStopDepart stopDepart = stopDepartNodes.get(s0);
+            TransitStopArrive stopArrive = stopArriveNodes.get(s1);
 
             new PatternBoard(stopDepart, psv0depart, tripPattern, i, mode);
             new PatternAlight(psv1arrive, stopArrive, tripPattern, i, mode);
@@ -713,8 +721,8 @@ public class GTFSPatternHopFactory {
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
-            Vertex fromVertex = graph.getVertex(arrivalVertexId(id(fromStop.getId())));
-            Vertex toVertex = graph.getVertex(departureVertexId(id(toStop.getId())));
+            Vertex fromVertex = stopArriveNodes.get(fromStop);
+            Vertex toVertex = stopDepartNodes.get(toStop);
             switch (t.getTransferType()) {
             case 1:
                 // timed (synchronized) transfer 
@@ -754,8 +762,8 @@ public class GTFSPatternHopFactory {
             Stop s0 = st0.getStop();
             StopTime st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
-            Vertex startStation = graph.getVertex(departureVertexId(id(s0.getId())));
-            Vertex endStation = graph.getVertex(arrivalVertexId(id(s1.getId())));
+            Vertex startStation = stopDepartNodes.get(s0);
+            Vertex endStation = stopArriveNodes.get(s1);
 
             // create and connect journey vertices
             if (psv1arrive == null) { 

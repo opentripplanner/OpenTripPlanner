@@ -50,13 +50,14 @@ public class StreetUtils {
     public static void makeEdgeBased(Graph graph, Collection<IntersectionVertex> endpoints, 
             Map<Edge, TurnRestriction> restrictions) {
         
+        Map<PlainStreetEdge, TurnVertex> turnVertices = new HashMap<PlainStreetEdge, TurnVertex>(); 
         /* generate turns */
 
         _log.debug("converting to edge-based graph");
         for (IntersectionVertex v : endpoints) {
             for (Edge e_in : v.getIncoming()) {
                 PlainStreetEdge pse_in = (PlainStreetEdge) e_in;
-                TurnVertex tv_in = getTurnVertexForEdge(graph, pse_in);
+                TurnVertex tv_in = getTurnVertexForEdge(graph, turnVertices, pse_in);
                 TurnRestriction restriction = null;
                 if (restrictions != null) {
                     restriction = restrictions.get(pse_in);
@@ -69,7 +70,7 @@ public class StreetUtils {
                     if (e_in.getFromVertex() == e_out.getToVertex() &&
                     	v.getOutgoing().size() > 1)
                     		continue;
-                    TurnVertex tv_out = getTurnVertexForEdge(graph, (PlainStreetEdge) e_out);
+                    TurnVertex tv_out = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_out);
                     TurnEdge turn = new TurnEdge(tv_in, tv_out);
                     if (restriction != null) {
                     	if (restriction.type == TurnRestrictionType.NO_TURN && restriction.to == e_out) {
@@ -87,27 +88,28 @@ public class StreetUtils {
         }
     }
 
-    private static TurnVertex getTurnVertexForEdge(Graph graph, PlainStreetEdge e) {
-        boolean back = e.back;
-        
-        String id = e.getId();
-        Vertex v = graph.getVertex(id + (back ? " back" : ""));
-        if (v != null) {
-            return (TurnVertex) v;
+    private static TurnVertex getTurnVertexForEdge(Graph graph, Map<PlainStreetEdge, TurnVertex> turnVertices, PlainStreetEdge pse) {
+
+        TurnVertex tv = turnVertices.get(pse);
+        if (tv != null) {
+            return tv;
         }
 
-        TurnVertex newv = new TurnVertex(graph, id, e.getGeometry(), e.getName(), e.getLength(), back, e.getNotes());
-        newv.setWheelchairAccessible(e.isWheelchairAccessible());
-        newv.setBicycleSafetyEffectiveLength(e.getBicycleSafetyEffectiveLength());
-        newv.setCrossable(e.isCrossable());
-        newv.setPermission(e.getPermission());
-        newv.setSlopeOverride(e.getSlopeOverride());
-        newv.setElevationProfile(e.getElevationProfile());
-        newv.setRoundabout(e.isRoundabout());
-        newv.setBogusName(e.hasBogusName());
-        newv.setNoThruTraffic(e.isNoThruTraffic());
-        newv.setStairs(e.isStairs());
-        return newv;
+        boolean back = pse.back;
+        String id = pse.getId();
+        tv = new TurnVertex(graph, id, pse.getGeometry(), pse.getName(), pse.getLength(), back, pse.getNotes());
+        tv.setWheelchairAccessible(pse.isWheelchairAccessible());
+        tv.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength());
+        tv.setCrossable(pse.isCrossable());
+        tv.setPermission(pse.getPermission());
+        tv.setSlopeOverride(pse.getSlopeOverride());
+        tv.setElevationProfile(pse.getElevationProfile());
+        tv.setRoundabout(pse.isRoundabout());
+        tv.setBogusName(pse.hasBogusName());
+        tv.setNoThruTraffic(pse.isNoThruTraffic());
+        tv.setStairs(pse.isStairs());
+        turnVertices.put(pse, tv);
+        return tv;
     }
 
 

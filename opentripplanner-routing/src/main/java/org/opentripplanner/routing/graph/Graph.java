@@ -106,9 +106,15 @@ public class Graph implements Serializable, Iterable<Vertex> {
             LOG.warn("repeatedly added the same vertex: {}", v);
     }
 
-    protected void removeVertex(Vertex v) {
+    // called from streetutils, must be public for now
+    // could makeEdgeBased be moved into Graph?
+    public void removeVertex(Vertex v) {
         if (! vertices.remove(v))
             LOG.warn("attempting to remove vertex that is not in graph: {}", v);
+    }
+
+    public Set<Vertex> getVertices() {
+        return this.vertices;
     }
 
     public boolean contains(Vertex v) {
