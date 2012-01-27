@@ -28,111 +28,110 @@ import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
 import org.opentripplanner.routing.patch.StopAdapter;
 
 /**
- * This represents a particular stop pattern on a particular route. For example,
- * the N train has at least four different variants: express (over the Manhattan
- * bridge), and local (via lower Manhattan and the tunnel) x to Astoria and to
- * Coney Island. During construction, it sometimes has a fifth variant: along
- * the D line to Coney Island after 59th St (or from Coney Island to 59th).
+ * This represents a particular stop pattern on a particular route. For example, the N train has at
+ * least four different variants: express (over the Manhattan bridge), and local (via lower
+ * Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has
+ * a fifth variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
  * 
- * This is needed because route names are intended for customer information, but
- * scheduling personnel need to know about where a particular trip actually
- * goes.
+ * This is needed because route names are intended for customer information, but scheduling
+ * personnel need to know about where a particular trip actually goes.
  * 
  * @author novalis
  * 
  */
 public class RouteVariant implements Serializable {
-	private static final long serialVersionUID = -3110443015998033630L;
+    private static final long serialVersionUID = -3110443015998033630L;
 
-	/*
-	 * This indicates that trips with multipledirection_ids are part of this
-	 * variant. It should probably never be used, because generally trips making
-	 * the same stops in the same order will have the same direction
-	 */
-	private static final String MULTIDIRECTION = "[multidirection]";
+    /*
+     * This indicates that trips with multipledirection_ids are part of this variant. It should
+     * probably never be used, because generally trips making the same stops in the same order will
+     * have the same direction
+     */
+    private static final String MULTIDIRECTION = "[multidirection]";
 
-	private String name; // "N via Whitehall"
-	
-	//@XmlElementWrapper
-	@XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-	private ArrayList<AgencyAndId> trips;
-	
-	@XmlJavaTypeAdapter(StopAdapter.class)
-	private ArrayList<Stop> stops;
+    private String name; // "N via Whitehall"
 
-	private ArrayList<RouteSegment> segments;
-	private Route route;
+    // @XmlElementWrapper
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    private ArrayList<AgencyAndId> trips;
 
-	private String direction;
+    @XmlJavaTypeAdapter(StopAdapter.class)
+    private ArrayList<Stop> stops;
 
-	public RouteVariant() {
-		//needed for JAXB but unused
-	}
-	
-	public RouteVariant(Route route, ArrayList<Stop> stops) {
-		this.route = route;
-		this.stops = stops;
-		trips = new ArrayList<AgencyAndId>();
-		segments = new ArrayList<RouteSegment>();
-	}
+    private ArrayList<RouteSegment> segments;
 
-	public void addTrip(Trip trip) {
-	    if (!trips.contains(trip.getId())) {
-		trips.add(trip.getId());
-		if (direction == null) {
-			direction = trip.getDirectionId();
-		} else {
-			if (!direction.equals(trip.getDirectionId())) {
-				direction = MULTIDIRECTION;
-			}
-		}
-	    }
-	}
+    private Route route;
 
-	public void addSegment(RouteSegment segment) {
-		segments.add(segment);
-	}
+    private String direction;
 
-	public List<RouteSegment> getSegments() {
-		return segments;
-	}
+    public RouteVariant() {
+        // needed for JAXB but unused
+    }
 
-	public void cleanup() {
-		trips.trimToSize();
-		stops.trimToSize();
-		segments.trimToSize();
-	}
+    public RouteVariant(Route route, ArrayList<Stop> stops) {
+        this.route = route;
+        this.stops = stops;
+        trips = new ArrayList<AgencyAndId>();
+        segments = new ArrayList<RouteSegment>();
+    }
 
-	public ArrayList<Stop> getStops() {
-		return stops;
-	}
+    public void addTrip(Trip trip) {
+        if (!trips.contains(trip.getId())) {
+            trips.add(trip.getId());
+            if (direction == null) {
+                direction = trip.getDirectionId();
+            } else {
+                if (!direction.equals(trip.getDirectionId())) {
+                    direction = MULTIDIRECTION;
+                }
+            }
+        }
+    }
 
-	public Route getRoute() {
-		return route;
-	}
+    public void addSegment(RouteSegment segment) {
+        segments.add(segment);
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public List<RouteSegment> getSegments() {
+        return segments;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public void cleanup() {
+        trips.trimToSize();
+        stops.trimToSize();
+        segments.trimToSize();
+    }
 
-	public List<AgencyAndId> getTrips() {
-		return trips;
-	}
+    public ArrayList<Stop> getStops() {
+        return stops;
+    }
 
-	public String toString() {
-		return "RouteVariant(" + name + ")";
-	}
+    public Route getRoute() {
+        return route;
+    }
 
-	public void setDirection(String direction) {
-		this.direction = direction;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@XmlElement
-	public String getDirection() {
-		return direction;
-	}
+    public String getName() {
+        return name;
+    }
+
+    public List<AgencyAndId> getTrips() {
+        return trips;
+    }
+
+    public String toString() {
+        return "RouteVariant(" + name + ")";
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    @XmlElement
+    public String getDirection() {
+        return direction;
+    }
 }
