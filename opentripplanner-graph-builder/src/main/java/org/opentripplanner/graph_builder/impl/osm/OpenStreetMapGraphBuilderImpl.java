@@ -150,7 +150,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private double bestBikeSafety = 1;
 
         public void buildGraph(Graph graph) {
-        	this.graph = graph;
+	    this.graph = graph;
         	
             // handle turn restrictions and road names in relations
             processRelations();
@@ -168,6 +168,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 	    // later they will be iterated over to build ElevatorEdges between them
 	    // this stores the levels that each node is used at
 	    HashMap<Long, HashMap> multiLevelNodesLevels = new HashMap<Long, HashMap>();
+
+	    // store levels that cannot be parsed, and assign them a number
+	    int nextUnparsedLevel = 10000;
+	    HashMap<String, Integer> unparsedLevels = new HashMap<String, Integer>();
 
             for (OSMWay way : _ways.values()) {
                 List<Long> nodes = way.getNodeRefs();
@@ -218,6 +222,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		   and then entered.
 		   levels that come from a layer tag have 2000 added and then entered.
 		   the fallback ground level is 3000.
+		   Levels that have an unparseable name, like Z, Subway or Middle Earth, are added
+		   to the unparsedLevels hash if not already there, and a new level defined for 
+		   them. These levels start at 10000.
 
 		   The reason for this is that it prevents a layer 1 from being equal to a level_map
 		   1, because they may not be. Worst case scenario, OTP will say "take elevator to
@@ -231,13 +238,54 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		else if (way.hasTag("level")) {
 		    // TODO: floating-point levels &c.
 		    String level = way.getTag("level");
+		    int numLevel;
+		    try {
+			numLevel = Integer.parseInt(level) + 1000;
+		    }
+		    catch (NumberFormatException e) {
+			// get a unique level number for this
+			if (unparsedLevels.containsKey(level)) {
+			    numLevel = unparsedLevels.get(level);
+			}
+			else {
+			    // make a new unique ID
+			    numLevel = nextUnparsedLevel;
+			    nextUnparsedLevel++;
+			    unparsedLevels.put(level, numLevel);
+			}
+			_log.warn("Could not determine ordinality of level " + level +
+				  ". Elevators will work, but costing may be incorrect. " +
+				  "a level map should be used in this situation.");
+		    }
+
 		    way.addTag("otp:numeric_level", 
-			       Integer.toString(Integer.parseInt(level) + 1000));
+			       Integer.toString(numLevel));
 		    way.addTag("otp:human_level", level);
 		} else if (way.hasTag("layer")) {
 		    String layer = way.getTag("layer");
+
+		    int numLayer;
+		    try {
+			numLayer = Integer.parseInt(layer) + 2000;
+		    }
+		    catch (NumberFormatException e) {
+			// get a unique level number for this
+			if (unparsedLevels.containsKey(layer)) {
+			    numLayer = unparsedLevels.get(layer);
+			}
+			else {
+			    // make a new unique ID
+			    numLayer = nextUnparsedLevel;
+			    nextUnparsedLevel++;
+			    unparsedLevels.put(layer, numLayer);
+			}
+			_log.warn("Could not determine ordinality of layer " + layer +
+				  ". Elevators will work, but costing may be incorrect. " +
+				  "A level map should be used in this situation.");
+		    }
+
 		    way.addTag("otp:numeric_level", 
-			       Integer.toString(Integer.parseInt(layer) + 2000));
+			       Integer.toString(numLayer));
 		    way.addTag("otp:human_level", layer);
 		} else {
 		    // assume it's ground level
