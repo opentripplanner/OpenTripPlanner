@@ -62,7 +62,7 @@ public abstract class AbstractVertex implements Vertex {
     
     /* PUBLIC CONSTRUCTORS */
     
-    protected AbstractVertex(Graph g, String label, double x, double y) {
+    public AbstractVertex(Graph g, String label, double x, double y) {
         this.label = label;
         this.x = x;
         this.y = y;
@@ -70,7 +70,7 @@ public abstract class AbstractVertex implements Vertex {
         // null graph means temporary vertex
         if (g != null)
             g.addVertex(this);
-        this.name = "(no name)";
+        this.name = "(no name provided)";
     }
 
     protected AbstractVertex(Graph g, String label, double x, double y, String name) {
@@ -121,7 +121,8 @@ public abstract class AbstractVertex implements Vertex {
      *  Could be used instead of extraEdges OverlayGraph.
      *  As of Java 6 intrinsic locks are apparently just as fast as an explicit reentrantlock.
      */
-    protected synchronized void addOutgoingConcurrent(Edge ee) { // create TemporaryEdge type?
+    // should really be protected but methods in interfaces cannot be protected...
+    public synchronized void addOutgoingConcurrent(Edge ee) { // create TemporaryEdge type?
         @SuppressWarnings("unchecked")
         ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
         newOutgoing.add(ee);
@@ -151,7 +152,7 @@ public abstract class AbstractVertex implements Vertex {
         incoming.add(ee);
     }
     
-    protected synchronized void addIncomingConcurrent(Edge ee) {
+    public synchronized void addIncomingConcurrent(Edge ee) {
         @SuppressWarnings("unchecked")
         ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
         newIncoming.add(ee);

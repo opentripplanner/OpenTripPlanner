@@ -248,10 +248,6 @@ public class GTFSPatternHopFactory {
         return pattern;
     }
 
-    private String id(AgencyAndId id) {
-        return GtfsLibrary.convertIdToString(id);
-    }
-
     /**
      * Generate the edges. Assumes that there are already vertices in the graph for the stops.
      */
@@ -490,21 +486,16 @@ public class GTFSPatternHopFactory {
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
             //add a vertex representing the stop
-            TransitStop stopVertex = new TransitStop(graph, id(stop.getId()), stop.getLon(),
-                    stop.getLat(), stop.getName(), stop.getId(), stop);
+            TransitStop stopVertex = new TransitStop(graph, stop);
             stopNodes.put(stop, stopVertex);
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
-                TransitStopArrive arrive = new TransitStopArrive(graph,
-                        arrivalVertexId(id(stop.getId())), 
-                        stop.getLon(), stop.getLat(), stop.getId());
+                TransitStopArrive arrive = new TransitStopArrive(graph, stop);
                 stopArriveNodes.put(stop, arrive);
 
                 //add a vertex representing departing from the stop
-                TransitStopDepart depart = new TransitStopDepart(graph,
-                        departureVertexId(id(stop.getId())), 
-                        stop.getLon(), stop.getLat(), stop.getId());
+                TransitStopDepart depart = new TransitStopDepart(graph, stop);
                 stopDepartNodes.put(stop, depart);
 
                 //add edges from arrive to stop and stop to depart
@@ -647,14 +638,9 @@ public class GTFSPatternHopFactory {
             Stop s1 = st1.getStop();
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
 
-            String departId = id(s0.getId()) + "_" + id(trip.getId()) + "_"  + st0.getStopSequence() + "_D";
-
-            String arriveId = id(s1.getId()) + "_" + id(trip.getId()) + "_" + st1.getStopSequence() + "_A";
-
             // create journey vertices
 
-            psv0depart = new PatternDepartVertex(graph, departId, 
-                    s0.getLon(), s0.getLat(), s0.getId(), tripPattern); 
+            psv0depart = new PatternDepartVertex(graph, tripPattern, st0); 
             patternDepartNodes.put(new T2<Stop, Trip>(s0, trip), psv0depart);
             
             if (i != 0) {
@@ -665,8 +651,7 @@ public class GTFSPatternHopFactory {
                 }
             }
 
-            psv1arrive = new PatternArriveVertex(graph, arriveId, 
-                    s1.getLon(), s1.getLat(), s1.getId(), tripPattern);
+            psv1arrive = new PatternArriveVertex(graph, tripPattern, st1);
             patternArriveNodes.put(new T2<Stop, Trip>(s1, trip), psv1arrive);
 
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, i,
@@ -696,14 +681,6 @@ public class GTFSPatternHopFactory {
                                     || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
 
         return tripPattern;
-    }
-
-    private String arrivalVertexId(String id) {
-        return id + "_arrive";
-    }
-
-    private String departureVertexId(String id) {
-        return id + "_depart";
     }
 
     private void clearCachedData() {
@@ -749,13 +726,9 @@ public class GTFSPatternHopFactory {
 
     private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes) {
 
-        String tripId = id(trip.getId());
         ArrayList<Hop> hops = new ArrayList<Hop>();
         boolean tripWheelchairAccessible = trip.getWheelchairAccessible() == 1;
 
-        /* TODO: this depends on fetching existing vertices from graph.
-         * It should really just keep a map from stop->stopvertex and lists of 
-         */
         PatternStopVertex psv0arrive, psv0depart, psv1arrive = null;
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
@@ -768,18 +741,13 @@ public class GTFSPatternHopFactory {
             // create and connect journey vertices
             if (psv1arrive == null) { 
                 // first iteration
-                psv0arrive = new PatternStopVertex(graph, id(s0.getId()) + "_" + tripId + "_" + 
-                        st0.getStopSequence() + "_A", s0.getLon(), s0.getLat(), s0.getId(), null); // should not really be null
+                psv0arrive = new PatternArriveVertex(graph, trip, st0); 
             } else { 
                 // subsequent iterations
                 psv0arrive = psv1arrive; 
             }
-            psv0depart = new PatternStopVertex(graph, id(s0.getId()) + "_" + 
-                    tripId + "_" + st0.getStopSequence() + "_D", 
-                    s0.getLon(), s0.getLat(), s0.getId(), null); // should not really be null
-            psv1arrive = new PatternStopVertex(graph, id(s1.getId()) + "_" + 
-                    tripId + "_" + st1.getStopSequence() + "_A",  
-                    s1.getLon(), s1.getLat(), s1.getId(), null); // should not really be null
+            psv0depart = new PatternDepartVertex(graph, trip, st0);
+            psv1arrive = new PatternArriveVertex(graph, trip, st1);
 
             new Dwell(psv0arrive, psv0depart, st0);
             Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip);

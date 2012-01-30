@@ -48,6 +48,7 @@ public abstract class AbstractEdge implements Edge {
 //        if (! vertexTypesValid()) {
 //            throw new IllegalStateException(this.getClass() + " constructed with bad vertex types");
 //        }
+
         fromv.addOutgoing(this);
         tov.addIncoming(this);
     }

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -11,9 +12,9 @@ public abstract class TransitVertex extends AbstractVertex {
 
     private final AgencyAndId stopId;
     
-    public TransitVertex(Graph g, String label, double x, double y, AgencyAndId stopId) {
-        super(g, label, x, y);
-        this.stopId = stopId;
+    public TransitVertex(Graph graph, String label, Stop stop) {
+        super(graph, label, stop.getLon(), stop.getLat(), stop.getName());
+        this.stopId = stop.getId();
     }
 
     /** Get the stop at which this TransitVertex is located */
@@ -21,8 +22,4 @@ public abstract class TransitVertex extends AbstractVertex {
         return stopId;
     }
     
-    public String getName() {
-        return stopId.toString();
-    }
-
 }

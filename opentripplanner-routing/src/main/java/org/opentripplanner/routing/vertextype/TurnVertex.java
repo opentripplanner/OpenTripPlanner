@@ -97,7 +97,6 @@ public class TurnVertex extends StreetVertex {
         this.bicycleSafetyEffectiveLength = length;
         this.slopeWorkCost = length;
         this.slopeSpeedEffectiveLength = length;
-        this.streetName = name;
         this.permission = StreetTraversalPermission.ALL;
         this.notes = notes;
         
@@ -249,7 +248,7 @@ public class TurnVertex extends StreetVertex {
     }
 
     public String toString() {
-        return "<" + getLabel() + " (" + streetName + ")>";
+        return "<" + getLabel() + " (" + getName() + ")>";
     }
 
     public String getEdgeId() {

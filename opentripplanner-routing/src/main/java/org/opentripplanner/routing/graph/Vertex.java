@@ -19,11 +19,13 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
     
     public abstract Collection<Edge> getOutgoing();
     public abstract void addOutgoing(Edge ee);
+    public abstract void addOutgoingConcurrent(Edge e);
     public abstract void removeOutgoing(Edge ee);
     public abstract int getDegreeOut();
 
     public abstract Collection<Edge> getIncoming();
     public abstract void addIncoming(Edge ee);
+    public abstract void addIncomingConcurrent(Edge e);
     public abstract void removeIncoming(Edge ee);
     public abstract int getDegreeIn();
 
@@ -90,5 +92,6 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
 
     /** Check that all of this Vertex's incoming and outgoing edges are of the proper types */
     public abstract boolean edgeTypesValid();
+
 
 }
