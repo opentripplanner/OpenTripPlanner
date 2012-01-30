@@ -26,16 +26,13 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -54,7 +51,7 @@ import com.vividsolutions.jts.geom.Envelope;
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for
  * each vertex, but those are in the vertex now.
  */
-public class Graph implements Serializable, Iterable<Vertex> {
+public class Graph implements Serializable {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
     private static final long serialVersionUID = 20120121L;
@@ -73,7 +70,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
     private GraphBundle bundle;
     
     /* vertex index by name is reconstructed from edges */
-    private transient Set<Vertex> vertices;
+    private transient Map<String, Vertex> vertices;
 
     private transient ContractionHierarchySet hierarchies;
     
@@ -91,7 +88,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
     }
 
     public Graph() {
-        this.vertices = new HashSet<Vertex>();
+        this.vertices = new HashMap<String, Vertex>();
     }
 
     /**
@@ -102,30 +99,37 @@ public class Graph implements Serializable, Iterable<Vertex> {
      * @param vv the vertex to add
      */
     protected void addVertex(Vertex v) {
-        if (! vertices.add(v))
-            LOG.warn("repeatedly added the same vertex: {}", v);
+        if (vertices.put(v.getLabel(), v) != null)
+            LOG.error("repeatedly added the same vertex: {}", v);
     }
 
     // called from streetutils, must be public for now
-    // could makeEdgeBased be moved into Graph?
+    // could makeEdgeBased be moved into Graph or graph package?
     public void removeVertex(Vertex v) {
-        if (! vertices.remove(v))
-            LOG.warn("attempting to remove vertex that is not in graph: {}", v);
+        if (vertices.remove(v.getLabel()) != v)
+            LOG.error("attempting to remove vertex that is not in graph (or mapping value was null): {}", v);
     }
 
-    public Set<Vertex> getVertices() {
-        return this.vertices;
+    /* convenient in tests and such, but avoid using in general */
+    @Deprecated
+    public Vertex getVertex(String label) {
+        return vertices.get(label);
     }
 
-    public boolean contains(Vertex v) {
-        return vertices.contains(v);
+    public Collection<Vertex> getVertices() {
+        return this.vertices.values();
+    }
+
+    public boolean containsVertex(Vertex v) {
+        return (v != null) &&
+                vertices.get(v.getLabel()) == v;
     }
 
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
         Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : this) {
+        for (Vertex vv : getVertices()) {
             double dist = vv.distance(c);
             if (dist < minDist) {
                 ret = vv;
@@ -154,9 +158,8 @@ public class Graph implements Serializable, Iterable<Vertex> {
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
-        if (! vertices.contains(vertex)) {
-            throw new IllegalStateException(
-                    "attempting to remove vertex that is not in graph.");
+        if (! containsVertex(vertex)) {
+            throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
         vertex.removeAllEdges();
         vertices.remove(vertex);
@@ -164,7 +167,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
 
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (Vertex v : this) {
+        for (Vertex v : getVertices()) {
             env.expandToInclude(v.getCoordinate());
         }
         return env;
@@ -215,7 +218,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
      */
     public int countEdges() {
         int ne = 0;
-        for (Vertex v : this) {
+        for (Vertex v : getVertices()) {
             ne += v.getDegreeOut();
         }
         return ne;
@@ -223,7 +226,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
     
     /* this will require a rehash of any existing hashtables keyed on vertices */
     private void renumberVerticesAndEdges() {
-        this.vertexById = new ArrayList<Vertex>(vertices);
+        this.vertexById = new ArrayList<Vertex>(getVertices());
         Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
@@ -292,13 +295,13 @@ public class Graph implements Serializable, Iterable<Vertex> {
             // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashSet<Vertex>();;
+            graph.vertices = new HashMap<String, Vertex>();;
             for (Edge e : edges) {
-               graph.vertices.add(e.getFromVertex());
-               graph.vertices.add(e.getToVertex());
+               graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+               graph.vertices.put(e.getToVertex().getLabel(),   e.getToVertex());
             }
             // trim edge lists to length
-            for (Vertex v : graph)
+            for (Vertex v : graph.getVertices())
                 v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             if (level == LoadLevel.NO_HIERARCHIES)
@@ -330,7 +333,7 @@ public class Graph implements Serializable, Iterable<Vertex> {
         LOG.debug("Consolidating edges...");
         // this is not space efficient
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : this) {
+        for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
         }
@@ -371,11 +374,6 @@ public class Graph implements Serializable, Iterable<Vertex> {
 
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
-    }
-
-    @Override
-    public Iterator<Vertex> iterator() {
-        return vertices.iterator();
     }
 
 }
