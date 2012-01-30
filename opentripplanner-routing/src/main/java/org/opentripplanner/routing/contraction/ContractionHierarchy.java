@@ -533,16 +533,14 @@ public class ContractionHierarchy implements Serializable {
 
     	_log.debug("removing non-optimal edges, hopLimit is {}", hopLimit);
         int removed = 0;
-        for (Vertex u : core.getVertices()) {
+        for (Vertex u : corev) {
             State su = new State(u, fwdOptions);
-            Dijkstra dijkstra = new Dijkstra(core, u, fwdOptions, null, hopLimit);
+            Dijkstra dijkstra = new Dijkstra(u, fwdOptions, null, hopLimit);
+            dijkstra.setRouteOn(corev);
             BasicShortestPathTree spt = dijkstra.getShortestPathTree(Double.POSITIVE_INFINITY,
                     Integer.MAX_VALUE);
             ArrayList<Edge> toRemove = new ArrayList<Edge>();
-            for (Edge e : core.getOutgoing(u)) {
-                if (!isContractable(e)) {
-                    continue;
-                }
+            for (Edge e : u.getOutgoing()) {
                 State svSpt = spt.getState(e.getToVertex());
                 State sv = e.traverse(su);
                 if (sv == null) {
@@ -556,7 +554,7 @@ public class ContractionHierarchy implements Serializable {
                 }
             }
             for (Edge e : toRemove) {
-                core.removeEdge(e);
+                e.detach(); // TODO: is this really the right action to take?
             }
             removed += toRemove.size();
         }
