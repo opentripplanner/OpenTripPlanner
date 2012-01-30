@@ -95,7 +95,7 @@ public abstract class AbstractEdge implements Edge {
 
     private void detachTo() {
         if (tov != null) {
-            tov.removeOutgoing(this);
+            tov.removeIncoming(this);
             tov = null;
         }
     }
