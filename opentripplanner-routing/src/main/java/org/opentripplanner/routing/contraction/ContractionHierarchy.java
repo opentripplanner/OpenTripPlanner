@@ -443,6 +443,10 @@ public class ContractionHierarchy implements Serializable {
 
             /* update neighbors' priority and deleted neighbors */
             for (Vertex n : neighbors) {
+                if (n == null) {
+                    _log.warn("a neighbor vertex of {} was null", vertex);
+                    continue;
+                }
                 int deleted = 0;
                 if (deletedNeighbors.containsKey(n)) {
                     deleted = deletedNeighbors.get(n);
