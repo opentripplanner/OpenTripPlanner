@@ -59,8 +59,8 @@ public abstract class GenericPathService implements PathService {
                 return _indexService.getClosestVertex(location, place.name, options);
             }
         }
-        throw new UnsupportedOperationException("latlon not matched, vertex label lookup deprecated");
-        //return _graphService.getGraph().getVertex(place.place);
+        // this should probably only be used in tests
+        return _graphService.getGraph().getVertex(place.place);
     }
 
     @Override
