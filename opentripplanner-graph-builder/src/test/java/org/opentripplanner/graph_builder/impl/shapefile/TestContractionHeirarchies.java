@@ -39,6 +39,7 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
+import org.opentripplanner.routing.contraction.ContractionHierarchy.PotentialShortcut;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.Shortcut;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -187,26 +188,25 @@ public class TestContractionHeirarchies extends TestCase {
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
-        OverlayGraph og = new OverlayGraph(graph);
 
         // test hop limit
-        Dijkstra dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
+        Dijkstra dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(verticesIn[0][2], 4);
         State v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
+        dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 500);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
 
         // test distance limit
-        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 20);
         v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 130);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
@@ -215,7 +215,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         ContractionHierarchy testch = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
-        List<Shortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
+        List<PotentialShortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
         assertEquals(16, shortcuts.size());
         
@@ -226,9 +226,7 @@ public class TestContractionHeirarchies extends TestCase {
         // test hierarchy construction
         ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
-        int n = hierarchy.updown.getVertices().size();
-        //assertTrue(hierarchy.updown.getVertices().size() == graphSize);
-        assertTrue(hierarchy.core.getVertices().size() == 0);
+        assertTrue("remaining vertices = " + hierarchy.corev.size(), hierarchy.corev.size() == 0);
 
         System.out.println("Contracted");
 
@@ -559,7 +557,7 @@ public class TestContractionHeirarchies extends TestCase {
         long now = System.currentTimeMillis();
         int i = 0;
         int notNull = 0;
-        Collection<Vertex> updownVertices = hierarchy.updown.getVertices();
+        Collection<Vertex> chv = hierarchy.chv;
         Collection<Vertex> vertices = graph.getVertices();
                
         
@@ -574,7 +572,7 @@ public class TestContractionHeirarchies extends TestCase {
         ArrayList<Vertex> verticesOut = new ArrayList<Vertex>();
         for (Vertex v : vertices) {
             int componentSize = components.size(components.find(v));
-            if (componentSize > updownVertices.size() / 2) {
+            if (componentSize > chv.size() / 2) {
                 if (v.getDegreeOut() != 0) {
                     verticesOut.add(v);
                 }
@@ -596,7 +594,7 @@ public class TestContractionHeirarchies extends TestCase {
                 break; 
             }
             // make sure origin is on the up graph
-            if (hierarchy.updown.getOutgoing(orig).size() == 0) {
+            if (! chv.contains(orig) || orig.getDegreeOut() < 1) {
                 --i;
                 continue;
             }
@@ -608,7 +606,7 @@ public class TestContractionHeirarchies extends TestCase {
                     continue;
                 }
                 // make sure destination is on the down graph
-                if (hierarchy.updown.getIncoming(dest).size() == 0) {
+                if (! chv.contains(dest) || dest.getDegreeIn() < 1) {
                     dest = null;
                     continue;
                 }

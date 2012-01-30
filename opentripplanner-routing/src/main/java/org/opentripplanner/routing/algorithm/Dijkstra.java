@@ -15,13 +15,12 @@ package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
-import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -34,20 +33,18 @@ public class Dijkstra {
     Vertex taboo;
     private BasicShortestPathTree spt;
     private BinHeap<State> queue;
-    private HashSet<Vertex> targets = null; // why was this a set of String not Vertex?
-    
+    private HashSet<Vertex> targets = null; 
     private int hopLimit;
-    private OverlayGraph graph;
+    Set<Vertex> routeOn;
     
-    public Dijkstra(OverlayGraph graph, Vertex origin, TraverseOptions options, Vertex taboo) {
-        this(graph, origin, options, taboo, Integer.MAX_VALUE);
+    public Dijkstra(Vertex origin, TraverseOptions options, Vertex taboo) {
+        this(origin, options, taboo, Integer.MAX_VALUE);
     }
     /**
      * 
      * @param taboo Do not consider any paths passing through this vertex
      */
-    public Dijkstra(OverlayGraph graph, Vertex origin, TraverseOptions options, Vertex taboo, int hopLimit) {
-        this.graph = graph;
+    public Dijkstra(Vertex origin, TraverseOptions options, Vertex taboo, int hopLimit) {
         this.taboo = taboo;
         this.hopLimit = hopLimit;
 
@@ -63,7 +60,6 @@ public class Dijkstra {
         spt = new BasicShortestPathTree(50);
         queue = new BinHeap<State>(50);
         // Never init time to 0 since traverseBack will give times less than 0
-        // which in certain cases can trigger
         State init = new State(origin, options);
         spt.add(init);
         queue.insert(init, init.getWeight());
@@ -93,7 +89,7 @@ public class Dijkstra {
             if (u == target)
                 break;
 
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
+            Iterable<Edge> outgoing = u.getOutgoing();
             for (Edge edge : outgoing) {
             	State sv = edge.traverse(su);
                 if (sv != null
@@ -111,10 +107,7 @@ public class Dijkstra {
     @SuppressWarnings("unchecked")
 	public BasicShortestPathTree getShortestPathTree(double weightLimit, int nodeLimit) {
         
-//        if (targets != null) {
-//            targets.remove(origin);
-//        }
-    	// clone targets since they will be checked off destructively
+        // clone targets since they will be checked off destructively
     	HashSet<String> remainingTargets = null;
     	if (targets != null)
     		remainingTargets = (HashSet<String>) targets.clone();
@@ -137,16 +130,12 @@ public class Dijkstra {
                 	break;
             }
             
-            Iterable<Edge> outgoing = graph.getOutgoing(u);
+            Iterable<Edge> outgoing = u.getOutgoing();
             for (Edge edge : outgoing) {
-//                if (!(edge instanceof TurnEdge || edge instanceof FreeEdge || edge instanceof Shortcut || edge instanceof PlainStreetEdge)) {
-//                    //only consider street edges when contracting
-//                    // use isContractable() ?
-//                    continue;
-//                }
-            	if ( ! (ContractionHierarchy.isContractable(edge)))
-            		continue;
-            	
+
+                if (routeOn != null && ! routeOn.contains(edge.getToVertex()))
+                    continue;
+
                 State sv = edge.traverse(su);
                 
                 if (sv != null
@@ -164,6 +153,10 @@ public class Dijkstra {
         this.targets = targets;
     }
     
+    public void setRouteOn(Set<Vertex> routeOn) {
+        this.routeOn = routeOn;
+    }
+
     public void setTargets(Collection<State> targets) {
         this.targets = new HashSet<Vertex>(targets.size());
         for (State s : targets) {

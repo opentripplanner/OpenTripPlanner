@@ -23,6 +23,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.State;
@@ -144,8 +145,20 @@ public class TestHalfEdges extends TestCase {
         new TurnEdge(bottom, right);
         new TurnEdge(right, topBack);
         
-        station1 = new TransitStop(graph, "transitVertex 1", -74.005, 40.0099999, "transitVertex 1", new AgencyAndId("A", "fleem station"), null);
-        station2 = new TransitStop(graph, "transitVertex 2", -74.002, 40.0099999, "transitVertex 2", new AgencyAndId("A", "morx station"), null);
+        Stop s1 = new Stop();
+        s1.setName("transitVertex 1");
+        s1.setLon(-74.005);
+        s1.setLat(40.0099999);
+        s1.setId(new AgencyAndId("A", "fleem station"));
+        
+        Stop s2 = new Stop();
+        s2.setName("transitVertex 2");
+        s2.setLon(-74.002);
+        s2.setLat(40.0099999);
+        s2.setId(new AgencyAndId("A", "morx station"));
+
+        station1 = new TransitStop(graph, s1);
+        station2 = new TransitStop(graph, s2);
     }
 
     public void testHalfEdges() {
