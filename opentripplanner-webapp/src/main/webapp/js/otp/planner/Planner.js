@@ -79,6 +79,7 @@ otp.planner.Planner = {
             enableTabScroll:   true,
             minTabWidth:       75,
             autoScroll:        false,
+            defaults:          {autoScroll: true}, 
             plugins:           new Ext.ux.TabCloseMenu()
         });
         this.m_tabPanel.on('tabchange', this.tabChange, this);
