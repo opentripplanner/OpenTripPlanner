@@ -62,6 +62,7 @@ otp.core.MapStatic = {
     permaLinkEnabled  : false,
     historyEnabled    : true,
     rightClickZoom    : true,
+    layerSwitchEnabled: false,
 
     /*
      * Projections - neither should need changing. displayProjection is only
@@ -90,7 +91,10 @@ otp.core.MapStatic = {
         if (this.baseLayer == null) {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
         } else {
-            this.map.addLayer(this.baseLayer);
+            this.map.addLayers(this.baseLayer);
+            if (this.baseLayer.length > 1) {
+                this.layerSwitchEnabled=true;
+            }
         }
         this.map.setBaseLayer(this.baseLayer, true);
         this.map.events.register('click', this, this.closeAllPopupsCB);
@@ -102,7 +106,7 @@ otp.core.MapStatic = {
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
-            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
+            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.layerSwitchEnabled);
         }
         var pageParameters = Ext.urlDecode(window.location.search.substring(1));
         if (pageParameters["fromPlace"] !== undefined) {

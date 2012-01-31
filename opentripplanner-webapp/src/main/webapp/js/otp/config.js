@@ -90,37 +90,50 @@ otp.config_defaults = {
 
         // Instead of specifying just the base layer options, you can instead
         // specify the full base layer object.
-        // The example below creates a new base layer that uses the default OSM
-        // tiles.
-        baseLayer: new OpenLayers.Layer.OSM({
-            url: [
-                  "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                  "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                  "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
-            ],
-            numZoomLevels: 20
-        }),
-
-        // here's the MapQuest baseMap option for basemap tiles
-        // note, the attribution is wrong (leaves out MapQuest info), so it's commented
-        MQ_baseLayer: new OpenLayers.Layer.OSM(
-            "MapQuest", 
-            [ 
-                  "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                  "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                  "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                  "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
-            ],
-            {
-                  sphericalMecator : true,
-                  isBaseLayer      : true,
-                  numZoomLevels    : 19
-            }
-        ),
-
+        // If only one layer is defined in the baseLayer array, the layer switcher is disabled.
+        // If there are several layers in the baseLayer array, the layer switcher is enabled and the first layer in the array becomes the default layer
+        baseLayer: [
+            //Regular Open Street Map server
+            new OpenLayers.Layer.OSM(
+               "Open Street Map"
+            ),
+            //Tiles@home server (it is good to use it to reduce the load on the main OSM server)
+            new OpenLayers.Layer.OSM(
+                "Open Street Map Tiles@home",[
+                    "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+                    "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
+                    "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
+                    ]
+             ),
+            new OpenLayers.Layer.OSM(
+                "Open Cycle Map", [
+                    "http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                    "http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                    "http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"
+                    ],{
+                    numZoomLevels: 17,
+                    attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA</a> by <a href='www.opencyclemap.org'>OpenCycleMap </a> and <a href='http://openstreetmap.org/'> Open Street Map</a>"
+                    }
+            ),
+             // here's the MapQuest baseMap option for basemap tiles
+             new OpenLayers.Layer.OSM(
+                "OSM MapQuest",[
+                    "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                    "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                    "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                    "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+                    ],{
+                    sphericalMecator : true,
+                    isBaseLayer      : true,
+                    numZoomLevels    : 19,
+                    attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
+                    +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
+                    }
+             )
+        ],
 
         // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
-        // config object used in the creation of a new base layer for the map. 
+        // config object used in the creation of a new base layer for the map.
         baseLayerOptions: {
             projection : new OpenLayers.Projection("EPSG:4326"),
             url        : 'http://maps.opengeo.org/geowebcache/service/wms',
