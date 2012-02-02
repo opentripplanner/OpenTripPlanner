@@ -71,13 +71,8 @@ public class WalkStep {
     /**  
      * When exiting a highway or traffic circle, the exit name/number.
      */
+
     public String exit;
-
-    /**
-     * A special direction that should be indicated for this step, e.g. "Take elevator to"
-     */
-    public SpecialDirection specialDirection;
-
     /**
      * Indicates whether or not a street changes direction at an intersection.
      */

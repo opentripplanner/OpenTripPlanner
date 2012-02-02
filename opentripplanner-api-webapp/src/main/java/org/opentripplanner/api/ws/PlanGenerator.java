@@ -26,7 +26,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.SpecialDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -52,7 +51,6 @@ import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.patch.Alert;
@@ -627,25 +625,6 @@ public class PlanGenerator {
             if (geom == null) {
                 continue;
             }
-
-	    // check if we're getting off an elevator (getting onto elevators is narrative-less)
-	    if (edge instanceof ElevatorAlightEdge) {
-		// Don't care about what came before
-		step = createWalkStep(currState);
-
-		// make it clear to the user an elevator is involved
-		step.exit = ((ElevatorAlightEdge) edge).getName();
-
-		// leave it at "continue"
-		step.relativeDirection = RelativeDirection.CONTINUE;
-
-		// but set a specialDirection
-		step.specialDirection = SpecialDirection.ELEVATOR;
-		
-		steps.add(step);
-		continue;
-	    }
-
             String streetName = edgeNarrative.getName();
             if (step == null) {
                 // first step
