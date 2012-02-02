@@ -315,10 +315,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         var iconURL  = null;
 
         var relativeDirection = step.relativeDirection;
-        if (step.specialDirection != undefined & step.specialDirection != null) {
-	    stepText += this.locale.specialDirections[step.specialDirection.toLowerCase()];
-	}
-        else if (relativeDirection == null || stepNum == 1)
+        if (relativeDirection == null || stepNum == 1)
         {
             var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
             stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on;
