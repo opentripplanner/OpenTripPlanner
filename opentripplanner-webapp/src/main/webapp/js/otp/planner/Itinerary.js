@@ -601,13 +601,22 @@ otp.planner.Itinerary = {
             var step = itin.steps[i];
 
             // step 3b: make this leg (tree) node
+            var node;
             if(!step.leaf && itin.steps.length > 2)
             {
                 // show/hide instructions if our trip has more than 2 legs 
                 step.expanded = false;
                 step.singleClickExpand = true;
+                var id = 'showDetails-' + step.id;
+                step.text += '<div id="' + id + '" class="togglesteps"> ' + this.templates.getShowDetails() + '</div>';
+                node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+                node.showDetailsId = id;
+                node.showing = false;
             }
-            var node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+            else
+            {
+                node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+            }
 
             // step 3c: if we have instruction sub-nodes, add them to the tree...
             if(!step.leaf)

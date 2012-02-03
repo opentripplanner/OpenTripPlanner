@@ -235,6 +235,17 @@ otp.planner.Templates = {
         return retVal;
     },
 
+    getShowDetails : function()
+    {
+        return '<a href="#">' + this.locale.buttons.showDetails + '</a>';
+    },
+
+    getHideDetails : function()
+    {
+        return '<a href="#">' + this.locale.buttons.hideDetails + '</a>';
+    },
+
+
     CLASS_NAME: "otp.planner.Templates"
 };
 

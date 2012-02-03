@@ -25,6 +25,7 @@ otp.planner.Renderer = {
 
     map                      : null,
     locale                   : null,
+    templates                : null,
 
     m_markerLayer            : null,
     m_vectorLayer            : null,
@@ -190,6 +191,23 @@ otp.planner.Renderer = {
             }
             coord = coord.get('geometry');
             this.map.zoom(coord.x, coord.y);
+
+            // change the 'Show Details...' / 'Hide Details...' link string when sub-tree is open / close
+            if(node.showDetailsId)
+            {
+                var content;
+                if(node.showing)
+                {
+                    content = this.templates.getShowDetails();
+                    node.showing = false;
+                }
+                else
+                {
+                    content = this.templates.getHideDetails();
+                    node.showing = true;
+                }
+                Ext.fly(node.showDetailsId).update(content);
+            }
         }
     },
 

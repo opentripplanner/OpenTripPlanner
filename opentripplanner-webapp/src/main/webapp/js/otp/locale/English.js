@@ -102,7 +102,9 @@ otp.locale.English = {
         ok           : "OK",
         cancel       : "Cancel",
         yes          : "Yes",
-        no           : "No"
+        no           : "No",
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -243,9 +245,9 @@ otp.locale.English = {
             when          : "When",
             from          : "From",
             fromHere      : "From here",
-            intermediate  : "Intermediate Place",
             to            : "To",
             toHere        : "To here",
+            intermediate  : "Intermediate Place",
             minimize      : "Show me the",
             maxWalkDistance: "Maximum walk",
             maxBikeDistance: "Maximum bike",

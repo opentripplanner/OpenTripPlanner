@@ -102,7 +102,9 @@ otp.locale.Portuguese = {
         ok           : "OK",
         cancel       : "Cancel",
         yes          : "Yes",
-        no           : "No"
+        no           : "No",
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)

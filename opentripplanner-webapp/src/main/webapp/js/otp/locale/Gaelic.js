@@ -102,7 +102,10 @@ otp.locale.Gaelic = {
         ok           : "OK",
         cancel       : "Dúiltaigh",
         yes          : "Ar aghaidh",
-        no           : "Ní"
+        no           : "Ní",
+// TODO
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -251,8 +254,10 @@ otp.locale.Gaelic = {
             fromHere      : "Ón áit seo",
             to            : "Go",
             toHere        : "Go dtí seo",
+            intermediate  : "Intermediate Place",          // TODO
             minimize      : "Teaspáin dom an",
             maxWalkDistance: "Súil is faide",
+            maxBikeDistance: "Súil is bike",              // TODO
             arriveDepart  : "Sroic roimh/Imigh ag",
             mode          : "Iompair ar",
             wheelchair    : "Turas oiriúnach do chathaoireacha rothaí", 
