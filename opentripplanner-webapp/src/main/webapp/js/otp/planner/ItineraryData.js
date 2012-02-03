@@ -315,8 +315,9 @@ otp.planner.ItineraryDataFactoryStatic = {
         var iconURL  = null;
 
         var relativeDirection = step.relativeDirection;
-        if (relativeDirection == null || stepNum == 1)
+        if ((relativeDirection == null || stepNum == 1) && step.absoluteDirection != null)
         {
+            console.log(step);
             var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
             stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on;
             iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon();
