@@ -34,19 +34,40 @@ public class ElevatorHopEdge extends AbstractEdge {
 
     private StreetTraversalPermission permission;
 
+    public boolean wheelchairAccessible = true;
+
     public ElevatorHopEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
         super(from, to);
-	this.permission = permission;
+        this.permission = permission;
     }
     
     @Override
     public State traverse(State s0) {
     	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
-	TraverseOptions options = s0.getOptions();
+        TraverseOptions options = s0.getOptions();
+
+        if (options.wheelchairAccessible && !wheelchairAccessible) {
+            return null;
+        }
+
+        if (options.getModes().getWalk() && 
+            !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return null;
+        }
+
+        if (options.getModes().getBicycle() && 
+            !permission.allows(StreetTraversalPermission.BICYCLE)) {
+            return null;
+        }
+        // there are elevators which allow cars
+        if (options.getModes().getCar() && !permission.allows(StreetTraversalPermission.CAR)) {
+            return null;
+        }
+
 
     	StateEditor s1 = s0.edit(this, en);
     	s1.incrementWeight(options.elevatorHopCost);
-	s1.incrementTimeInSeconds(options.elevatorHopTime);
+        s1.incrementTimeInSeconds(options.elevatorHopTime);
         return s1.makeState();
     }
 
