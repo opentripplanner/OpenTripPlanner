@@ -327,9 +327,16 @@ otp.planner.ItineraryDataFactoryStatic = {
             iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon(relativeDirection);
 
             var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
+
             if (relativeDirection == "continue")
             {
                 stepText += directionText;
+            }
+            else if (relativeDirection == "elevator") {
+              // elevators are handled differently because, in English
+              // anyhow, you want to say 'exit at' or 'go to' not
+              // 'elevator on'
+              stepText += directionText;
             }
             else if (step.stayOn == true)
             {

@@ -131,7 +131,10 @@ otp.locale.English = {
         to:             "to",
         via:            "via",
         circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise"
+        circle_clockwise:        "take roundabout clockwise",
+        // rather than just being a direction, this should be
+        // full-fledged to take just the exit name at the end
+        elevator: "take elevator to"
     },
 
     // see otp.planner.Templates for use
@@ -190,8 +193,7 @@ otp.locale.English = {
         FERRY:          "Ferry",
         CABLE_CAR:      "Cable Car",
         GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular",
-	ELEVATOR:       "Elevator"
+        FUNICULAR:      "Funicular"
     },
 
     ordinal_exit:
