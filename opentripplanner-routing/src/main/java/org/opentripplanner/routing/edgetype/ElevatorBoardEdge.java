@@ -56,11 +56,11 @@ public class ElevatorBoardEdge extends AbstractEdge {
     @Override
     public State traverse(State s0) {
     	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
-	TraverseOptions options = s0.getOptions();
+        TraverseOptions options = s0.getOptions();
 
     	StateEditor s1 = s0.edit(this, en);
     	s1.incrementWeight(options.elevatorBoardCost);
-	s1.incrementTimeInSeconds(options.elevatorBoardTime);
+        s1.incrementTimeInSeconds(options.elevatorBoardTime);
         return s1.makeState();
     }
 
@@ -85,8 +85,9 @@ public class ElevatorBoardEdge extends AbstractEdge {
     }
 
     /** 
-     * Since board edges always are called Elevator (figure out how to fix this),
-     * the name is utterly and completely bogus.
+     * Since board edges always are called Elevator,
+     * the name is utterly and completely bogus but is never included
+     * in plans..
      */
     @Override
     public boolean hasBogusName() {
