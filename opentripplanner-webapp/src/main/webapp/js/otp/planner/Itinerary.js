@@ -125,22 +125,27 @@ otp.planner.Itinerary = {
             }
         }
 
-        if (this.map.dataProjection != mLayer.map.getProjection()) {
-            for (var i = 0; i < this.m_markers.length; ++i) {
-                if (!this.m_markers[i].geometry._otp_reprojected) {
-                    this.m_markers[i].geometry._otp_reprojected = true;
-                    this.m_markers[i].geometry.transform(
-                            this.map.dataProjection, 
-                            mLayer.map.getProjectionObject()
-                    );
+        // In order to use this function also for alternative routes
+        if (mLayer != null) { 
+            if (this.map.dataProjection != mLayer.map.getProjection()) {
+                for (var i = 0; i < this.m_markers.length; ++i) {
+                    if (!this.m_markers[i].geometry._otp_reprojected) {
+                        this.m_markers[i].geometry._otp_reprojected = true;
+                        this.m_markers[i].geometry.transform(
+                                this.map.dataProjection, 
+                                mLayer.map.getProjectionObject()
+                        );
+                    }
                 }
             }
+            mLayer.addFeatures(this.m_markers);
         }
 
         vLayer.addFeatures(this.m_vectors);
-        mLayer.addFeatures(this.m_markers);
-        this.m_extent = mLayer.getDataExtent();
-        this.m_extent.extend(vLayer.getDataExtent());
+
+        this.m_extent = vLayer.getDataExtent();
+        if (mLayer != null) // we don't want to change the extent for alternative routes 
+        	this.m_extent.extend(mLayer.getDataExtent());
     },
 
     /** */

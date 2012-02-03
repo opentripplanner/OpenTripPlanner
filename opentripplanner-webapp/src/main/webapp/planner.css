@@ -155,6 +155,13 @@ height:16px;
 background-image: url(images/ui/buttons/systemmap.png)!important;
 }
 
+/* Show alternative routes */
+.dir-alt-route-inner {
+    padding: 2px 4px 2px 20px;
+    font-family: arial, sans serif;
+    font-size: 13px;    
+}
+
 #trip-details {
   border: 1px solid #4c4c4c;
   background-color: #f9f9f9;

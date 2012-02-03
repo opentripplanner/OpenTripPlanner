@@ -23,11 +23,14 @@ otp.namespace("otp.planner");
   */
 otp.planner.Renderer = {
 
-    map                     : null,
-    locale                  : null,
+    map                      : null,
+    locale                   : null,
 
-    m_markerLayer : null,
-    m_vectorLayer : null,
+    m_markerLayer            : null,
+    m_vectorLayer            : null,
+
+    m_markerLayerAlternative : null,
+    m_vectorLayerAlternative : null,
 
     // these members are set & re-set by the TripTab routines 
     m_tree        : null,
@@ -55,6 +58,15 @@ otp.planner.Renderer = {
     {
         this.map.cleanMap();
     },
+
+    /** clear the ghost geom from mouse hover */
+    clearAlternatives : function(itin) {
+        if (itin == this.m_itinerary)
+            return;
+
+        this.m_vectorLayerAlternative.destroyFeatures(this.m_vectorLayerAlternative.features);
+    },
+
 
     /** */
     drawItineraryOntoMap : function()
@@ -111,6 +123,46 @@ otp.planner.Renderer = {
     drawItineraryIntoEmail : function()
     {
     },
+
+    /** draw the ghost hover of alternative routes */
+    drawItineraryAlternative : function(itin)
+    {
+        if(this.m_vectorLayerAlternative == null)
+        {
+            var vectorLayerOptions = {
+                    isBaseLayer: false,
+                    isFixed: false,
+                    visibility: true,
+                    projection: this.map.dataProjection
+            };
+            this.m_vectorLayerAlternative = new OpenLayers.Layer.Vector('trip-vector-layer-alternative', vectorLayerOptions);
+            this.m_vectorLayerAlternative.setOpacity(0.5);
+            this.m_vectorLayerAlternative.OTP_LAYER = true;
+            this.map.getMap().addLayer(this.m_vectorLayerAlternative);
+                                    
+            var style = otp.util.OpenLayersUtils.getMarkerStyle();
+            var styleMap = new OpenLayers.StyleMap(style);
+            var uniqueValueRules = otp.util.OpenLayersUtils.getMarkerUniqueValueRules();
+            styleMap.addUniqueValueRules("default", "type", uniqueValueRules);
+            
+            var markerLayerOptions = {
+                    isBaseLayer: false,
+                    rendererOptions: {yOrdering: true},
+                    projection: this.map.dataProjection,
+                    styleMap: styleMap
+            };
+            this.m_markerLayerAlternative = new OpenLayers.Layer.Vector('trip-marker-layer-alternative', markerLayerOptions);
+            this.m_markerLayerAlternative.setOpacity(0.4);
+        }
+
+        // draw graphic plan on the map
+        this.m_vectorLayerAlternative.destroyFeatures(this.m_vectorLayerAlternative.features);
+        if (itin == this.m_itinerary)
+            return;
+
+        itin.draw(this.m_vectorLayerAlternative, null);
+    },
+
 
     /**
      * callback to the itinerary legs for mouse-click / zoom purposes

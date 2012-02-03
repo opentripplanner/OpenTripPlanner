@@ -25,7 +25,7 @@ otp.core.MapStatic = {
 
 //http://maps.opengeo.org/geowebcache/service/wms?LAYERS=openstreetmap&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&SRS=EPSG:4326&BBOX=-8240523.1442212,4972687.3114282,-8238077.1593164,4975133.296333&WIDTH=256&HEIGHT=256
 
-	routerId          : null,
+    routerId          : null,
     locale            : null,
     map               : null,
     baseLayer         : null,
@@ -499,10 +499,7 @@ otp.core.MapStatic = {
             var layer = this.map.layers[i];
             if (!layer.isBaseLayer && layer.OTP_LAYER)
             {
-                if (typeof layer.removeFeatures === 'function'
-                 && layer.features
-                 && layer.features.length > 0
-                ) 
+                if (layer.isVector)
                 {
                     layer.removeFeatures(layer.features);
                 }
