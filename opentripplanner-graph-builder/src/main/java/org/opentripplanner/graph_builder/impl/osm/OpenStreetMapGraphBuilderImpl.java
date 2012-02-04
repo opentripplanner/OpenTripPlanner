@@ -251,8 +251,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             int numLevel;
             try {
                 numLevel = Integer.parseInt(level) + 1000;
-                if (noZeroLevels && numLevel >= 1000) { //positive level, US
-                    level = new Integer(Integer.parseInt(level) + 1).toString();
+                if (noZeroLevels && numLevel >= 1000) { // positive level, US
+                    // add 1, subract 1000
+                    level = "" + (numLevel - 999);
                     _log.debug("adding 1 to level " + numLevel + " for US audiences.");
                 }
             }
@@ -281,8 +282,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             int numLayer;
             try {
                 numLayer = Integer.parseInt(layer) + 2000;
-                if (noZeroLevels && numLayer >= 2000) { //positive level, US
-                    layer = new Integer(Integer.parseInt(layer) + 1).toString();
+                if (noZeroLevels && numLayer >= 2000) { // positive level, US
+                    // add 1 to the layer number but subract 2000
+                    // added above
+                    layer = "" + (numLayer - 1999);
                     _log.debug("adding 1 to layer " + numLayer + " for US audiences.");
                 }
             }
