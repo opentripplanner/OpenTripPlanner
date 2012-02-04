@@ -543,17 +543,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		    Vertex to   = onboardVertices.get(i + 1);
             
             StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+            // default true
+            boolean wheelchairAccessible = true;
 
             // check for bicycle=no, otherwise assume it's OK to take a bike
             if (node.isTagFalse("bicycle")) {
                 permission = StreetTraversalPermission.PEDESTRIAN;
             }   
 
+            // check for wheelchair=no
+            if (node.isTagFalse("wheelchair")) {
+                wheelchairAccessible = false;
+            }
+
             // The narrative won't be strictly correct, as it will show the elevator as part of
             // the cycling leg, but I think most cyclists will figure out that they should really
             // dismount.
 		    ElevatorHopEdge theEdge = new ElevatorHopEdge(from, to, permission);
 		    ElevatorHopEdge backEdge = new ElevatorHopEdge(to, from, permission);
+
+            theEdge.wheelchairAccessible = wheelchairAccessible;
+            backEdge.wheelchairAccessible = wheelchairAccessible;
 
 		    graph.addEdge(theEdge);
 		    graph.addEdge(backEdge);
