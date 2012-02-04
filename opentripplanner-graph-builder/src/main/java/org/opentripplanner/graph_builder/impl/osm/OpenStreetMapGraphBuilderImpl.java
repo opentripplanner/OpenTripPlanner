@@ -76,6 +76,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private CustomNamer customNamer;
 
+    private boolean noZeroLevels = true;
+
     /**
      * The source for OSM map data
      */
@@ -97,6 +99,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      */
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
         wayPropertySet = source.getWayPropertySet();
+    }
+
+    /**
+     * If true, disallow non-zero floors and add 1 to positive numeric floors, as is generally done
+     * in the United States. This does not affect floor names from level maps. Default: true.
+     */
+    public void setNoZeroLevels(boolean nz) {
+        noZeroLevels = nz;
     }
 
     @Override
@@ -240,48 +250,56 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		    String level = way.getTag("level");
 		    int numLevel;
 		    try {
-			numLevel = Integer.parseInt(level) + 1000;
+                numLevel = Integer.parseInt(level) + 1000;
+                if (noZeroLevels && numLevel >= 1000) { //positive level, US
+                    level = new Integer(Integer.parseInt(level) + 1).toString();
+                    _log.debug("adding 1 to level " + numLevel + " for US audiences.");
+                }
 		    }
 		    catch (NumberFormatException e) {
-			// get a unique level number for this
-			if (unparsedLevels.containsKey(level)) {
-			    numLevel = unparsedLevels.get(level);
-			}
-			else {
-			    // make a new unique ID
-			    numLevel = nextUnparsedLevel;
-			    nextUnparsedLevel++;
-			    unparsedLevels.put(level, numLevel);
-			}
-			_log.warn("Could not determine ordinality of level " + level +
-				  ". Elevators will work, but costing may be incorrect. " +
-				  "a level map should be used in this situation.");
+                // get a unique level number for this
+                if (unparsedLevels.containsKey(level)) {
+                    numLevel = unparsedLevels.get(level);
+                }
+                else {
+                    // make a new unique ID
+                    numLevel = nextUnparsedLevel;
+                    nextUnparsedLevel++;
+                    unparsedLevels.put(level, numLevel);
+                }
+                _log.warn("Could not determine ordinality of level " + level +
+                          ". Elevators will work, but costing may be incorrect. " +
+                          "a level map should be used in this situation.");
 		    }
-
+            
 		    way.addTag("otp:numeric_level", 
-			       Integer.toString(numLevel));
+                       Integer.toString(numLevel));
 		    way.addTag("otp:human_level", level);
 		} else if (way.hasTag("layer")) {
 		    String layer = way.getTag("layer");
 
 		    int numLayer;
 		    try {
-			numLayer = Integer.parseInt(layer) + 2000;
+                numLayer = Integer.parseInt(layer) + 2000;
+                if (noZeroLevels && numLayer >= 2000) { //positive level, US
+                    layer = new Integer(Integer.parseInt(layer) + 1).toString();
+                    _log.debug("adding 1 to layer " + numLayer + " for US audiences.");
+                }
 		    }
 		    catch (NumberFormatException e) {
-			// get a unique level number for this
-			if (unparsedLevels.containsKey(layer)) {
-			    numLayer = unparsedLevels.get(layer);
-			}
-			else {
-			    // make a new unique ID
-			    numLayer = nextUnparsedLevel;
-			    nextUnparsedLevel++;
-			    unparsedLevels.put(layer, numLayer);
-			}
-			_log.warn("Could not determine ordinality of layer " + layer +
-				  ". Elevators will work, but costing may be incorrect. " +
-				  "A level map should be used in this situation.");
+                // get a unique level number for this
+                if (unparsedLevels.containsKey(layer)) {
+                    numLayer = unparsedLevels.get(layer);
+                }
+                else {
+                    // make a new unique ID
+                    numLayer = nextUnparsedLevel;
+                    nextUnparsedLevel++;
+                    unparsedLevels.put(layer, numLayer);
+                }
+                _log.warn("Could not determine ordinality of layer " + layer +
+                          ". Elevators will work, but costing may be incorrect. " +
+                          "A level map should be used in this situation.");
 		    }
 
 		    way.addTag("otp:numeric_level", 
@@ -290,9 +308,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		} else {
 		    // assume it's ground level
 		    way.addTag("otp:numeric_level", "3000");
-		    // this should be universally understood, at least in English-speaking nations
-		    // TODO: i18n
-		    way.addTag("otp:human_level", "ground level");
+            // 0 in a reasonable, 0-based nation, 1 in a (-inf, -1] U [1, inf) country like the
+            // US
+            if (noZeroLevels) {
+                way.addTag("otp:human_level", "1");
+            } else {
+                way.addTag("otp:human_level", "0");
+            }
 		}
 
                 /*
