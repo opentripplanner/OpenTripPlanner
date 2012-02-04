@@ -7,7 +7,7 @@
     <bean id="graphBundle" class="org.opentripplanner.model.GraphBundle">
         <property name="path" value="/home/otp/graph-bundle" />
     </bean>
-<!--
+
     <bean id="gtfsBuilder" class="org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl">
         <property name="gtfsBundles">
             <bean id="gtfsBundles" class="org.opentripplanner.graph_builder.model.GtfsBundles">
@@ -22,15 +22,16 @@
             </bean>
         </property>
     </bean>
--->
- <bean id="osmBuilder" class="org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl">
-        <!-- Use an OSM provider that reads street data from an .osm file -->
+
+    <bean id="osmBuilder" class="org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl">
         <property name="provider">
-            <bean class="org.opentripplanner.graph_builder.impl.osm.StreamedFileBasedOpenStreetMapProviderImpl">
-                <property name="path" value="/home/matthewc/sw/OpenTripPlanner/osm/guggenheimelevator.osm" />
+            <bean class="org.opentripplanner.graph_builder.impl.osm.RegionBasedOpenStreetMapProviderImpl">
+                <property name="regionsSource">
+                    <bean class="org.opentripplanner.graph_builder.impl.TransitStopsRegionsSourceImpl" />
+                </property>
+                <property name="cacheDirectory" value="/home/otp/osm" />
             </bean>
         </property>
-
 	<property name="defaultWayPropertySetSource">
           <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
 	</property>
@@ -45,10 +46,10 @@
         <property name="graphBuilders">
             <list>
                 <!-- GTFS comes before OSM, because we use the loaded set of stops to determine our OSM coverage -->
-<!--                <ref bean="gtfsBuilder" /> -->
+                <ref bean="gtfsBuilder" />
                 <ref bean="osmBuilder" />
-<!--                <ref bean="transitStreetLink" /> -->
-<!--                <ref bean="optimizeTransit" /> -->
+                <ref bean="transitStreetLink" />
+                <ref bean="optimizeTransit" />
             </list>
         </property>
     </bean>
