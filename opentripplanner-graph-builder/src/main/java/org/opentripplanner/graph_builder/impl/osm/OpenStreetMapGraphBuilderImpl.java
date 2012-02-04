@@ -541,16 +541,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 		for (Integer i = 0; i < vSize; i++) {
 		    Vertex from = onboardVertices.get(i);
 		    Vertex to   = onboardVertices.get(i + 1);
+            
+            StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
 
-		    // for now, assume only walking is permitted.
-		    // TODO: if we assign bicycle, that generally means you can ride.
-		    // how do we prevent the engine from walking bicycles in elevators?
-		    ElevatorHopEdge theEdge = 
-			new ElevatorHopEdge(from, to, 
-					    StreetTraversalPermission.PEDESTRIAN);
-		    ElevatorHopEdge backEdge = 
-			new ElevatorHopEdge(to, from, 
-					    StreetTraversalPermission.PEDESTRIAN);
+            // check for bicycle=no, otherwise assume it's OK to take a bike
+            if (node.isTagFalse("bicycle")) {
+                permission = StreetTraversalPermission.PEDESTRIAN;
+            }   
+
+            // The narrative won't be strictly correct, as it will show the elevator as part of
+            // the cycling leg, but I think most cyclists will figure out that they should really
+            // dismount.
+		    ElevatorHopEdge theEdge = new ElevatorHopEdge(from, to, permission);
+		    ElevatorHopEdge backEdge = new ElevatorHopEdge(to, from, permission);
 
 		    graph.addEdge(theEdge);
 		    graph.addEdge(backEdge);
