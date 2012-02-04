@@ -102,7 +102,10 @@ otp.locale.Italian = {
         ok           : "OK",
         cancel       : "Annulla",
         yes          : "Si",
-        no           : "No"
+        no           : "No",
+// TODO
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -244,8 +247,10 @@ otp.locale.Italian = {
             fromHere      : "Da qui",
             to            : "A",
             toHere        : "A qui",
+            intermediate  : "Intermediate Place",          // TODO
             minimize      : "Mostrami",
             maxWalkDistance: "Massimo cammino a piedi",
+            maxBikeDistance: "Massimo cammino a  bike",              // TODO
             arriveDepart  : "Arriva entro/Parti a",
             mode          : "Passa per",
             wheelchair    : "Percorso accessibile ai portatori di sedia a rotelle", 

@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.patch;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -18,6 +19,10 @@ public class Alert implements Serializable {
 
     @XmlElement
     public TranslatedString alertUrl;
+
+    //null means unknown
+    @XmlElement
+    public Date effectiveStartDate;
 
     public static HashSet<Alert> newSimpleAlertSet(String text) {
         Alert note = createSimpleAlerts(text);

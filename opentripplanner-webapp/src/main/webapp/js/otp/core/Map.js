@@ -25,7 +25,7 @@ otp.core.MapStatic = {
 
 //http://maps.opengeo.org/geowebcache/service/wms?LAYERS=openstreetmap&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&SRS=EPSG:4326&BBOX=-8240523.1442212,4972687.3114282,-8238077.1593164,4975133.296333&WIDTH=256&HEIGHT=256
 
-	routerId          : null,
+    routerId          : null,
     locale            : null,
     map               : null,
     baseLayer         : null,
@@ -62,6 +62,7 @@ otp.core.MapStatic = {
     permaLinkEnabled  : false,
     historyEnabled    : true,
     rightClickZoom    : true,
+    layerSwitchEnabled: false,
 
     /*
      * Projections - neither should need changing. displayProjection is only
@@ -90,7 +91,10 @@ otp.core.MapStatic = {
         if (this.baseLayer == null) {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
         } else {
-            this.map.addLayer(this.baseLayer);
+            this.map.addLayers(this.baseLayer);
+            if (this.baseLayer.length > 1) {
+                this.layerSwitchEnabled=true;
+            }
         }
         this.map.setBaseLayer(this.baseLayer, true);
         this.map.events.register('click', this, this.closeAllPopupsCB);
@@ -102,7 +106,7 @@ otp.core.MapStatic = {
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
-            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled);
+            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.layerSwitchEnabled);
         }
         var pageParameters = Ext.urlDecode(window.location.search.substring(1));
         if (pageParameters["fromPlace"] !== undefined) {
@@ -495,10 +499,7 @@ otp.core.MapStatic = {
             var layer = this.map.layers[i];
             if (!layer.isBaseLayer && layer.OTP_LAYER)
             {
-                if (typeof layer.removeFeatures === 'function'
-                 && layer.features
-                 && layer.features.length > 0
-                ) 
+                if (layer.isVector)
                 {
                     layer.removeFeatures(layer.features);
                 }

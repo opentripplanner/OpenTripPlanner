@@ -54,6 +54,7 @@ color: #393939;
 padding: 3px;
 }
 
+
 div.olControlAttribution a:hover,
 div.olControlAttribution a:active {
 color: #ff8b38;
@@ -73,6 +74,20 @@ position: absolute;
 font-size: x-small;
 }
 
+div.togglesteps a:hover {
+    background: #4c4c4c;
+    text-decoration: none;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+}
+
+div.togglesteps a {
+    color: #ff8b38;
+    font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
+    font-size: x-small;
+    font-weight: 700;
+}
 
 .splash-screen {
 font-size: 135%;
@@ -153,6 +168,13 @@ width:28px;
 width:28px;
 height:16px;
 background-image: url(images/ui/buttons/systemmap.png)!important;
+}
+
+/* Show alternative routes */
+.dir-alt-route-inner {
+    padding: 2px 4px 2px 20px;
+    font-family: arial, sans serif;
+    font-size: 13px;    
 }
 
 #trip-details {

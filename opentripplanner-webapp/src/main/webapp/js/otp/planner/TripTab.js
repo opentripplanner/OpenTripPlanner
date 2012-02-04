@@ -187,6 +187,18 @@ otp.planner.TripTab = {
         return this.isValid();
     },
 
+    /** Show alternative routes - hover */
+    mouseOverItineraryFn : function(eventObject,elRef) {
+        var newItin = eventObject.getItinerary(elRef.id);
+        eventObject.renderer.drawItineraryAlternative(newItin);
+    },
+
+    /** Show alternative routes - clear  */
+    mouseOutItineraryFn : function(eventObject,elRef) {
+        var theItin = eventObject.getItinerary(elRef.id);
+        eventObject.renderer.clearAlternatives(theItin);
+    },
+
     /** 
      * will display a link (or set of links) to the trip planner for a given itinerary in a dialog
      * 
@@ -307,6 +319,18 @@ otp.planner.TripTab = {
 
         this.renderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
         this.planner.controller.activate(this.CLASS_NAME);
+        
+        /* Show alternative routes */
+        /* ------------------------------------------------- */
+        var els = Ext.query('.dir-alt-route-inner');        
+        for (var i=0; i < els.length; i++) {
+        	var el = Ext.get(els[i]);
+        	el.removeAllListeners();
+        	el.on('mouseover', this.mouseOverItineraryFn.createCallback(this, el));
+        	el.on('mouseout', this.mouseOutItineraryFn.createCallback(this, el));
+        }
+        /* ------------------------------------------------- */
+
     },
 
     /**

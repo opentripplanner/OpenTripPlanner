@@ -101,7 +101,10 @@ otp.locale.Polish = {
         ok           : "OK",
         cancel       : "Anuluj",
         yes          : "Tak",
-        no           : "Nie"
+        no           : "Nie",
+// TODO
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -249,8 +252,10 @@ otp.locale.Polish = {
             fromHere      : "Sk¹d",
             to            : "Do",
             toHere        : "Dok¹d",
+            intermediate  : "Intermediate Place",            // TODO
             minimize      : "Pokaż",
             maxWalkDistance: "Maksymalny spacer",
+            maxBikeDistance: "Maksymalny bike",              // TODO
             arriveDepart  : "Dojazd/odjazd o",
             mode          : "Podróżuj",
             wheelchair    : "Podróż dostêpna dla niepe³nosprawnych", 

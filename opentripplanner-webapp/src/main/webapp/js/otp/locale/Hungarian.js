@@ -102,7 +102,10 @@ otp.locale.Hungarian = {
         ok           : "OK",
         cancel       : "Mégse",
         yes          : "Igen",
-        no           : "Nem"
+        no           : "Nem",
+// TODO
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -250,8 +253,10 @@ otp.locale.Hungarian = {
             fromHere      : "Innen",
             to            : "Hová",
             toHere        : "Ide",
+            intermediate  : "Intermediate Place",          // TODO
             minimize      : "A következő megjelenítése",
             maxWalkDistance: "Maximális gyaloglás",
+            maxBikeDistance: "Maximális bike",              // TODO
             arriveDepart  : "Érkezés/indulás",
             mode          : "Utazás ezzel",
             wheelchair    : "Kerekesszékkel megtehető útvonal", 

@@ -35,6 +35,8 @@ import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.util.monitoring.MonitoringStore;
+import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 public class GenericAStar {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
+    private static final MonitoringStore store = MonitoringStoreFactory.getStore();
 
     private boolean _verbose = false;
 
@@ -149,6 +152,7 @@ public class GenericAStar {
                 // Returning null indicates something went wrong and search should be aborted.
                 // This is distinct from the empty list of paths which implies that a result may still
                 // be found by retrying with altered options (e.g. max walk distance)
+                storeMemory();
                 return null;
             }
 
@@ -182,6 +186,7 @@ public class GenericAStar {
                     break;
             } else if (u_vertex == target) {
                 LOG.debug("total vertices visited {}", nVisited);
+                storeMemory();
                 return spt;
             }
 
@@ -243,7 +248,17 @@ public class GenericAStar {
                 }
             }
         }
+        storeMemory();
         return spt;
+    }
+
+    private void storeMemory() {
+        if (store.isMonitoring("memoryUsed")) {
+            System.gc();
+            long memoryUsed = Runtime.getRuntime().totalMemory() -
+                    Runtime.getRuntime().freeMemory();
+            store.setLongMax("memoryUsed", memoryUsed);
+        }
     }
 
     private Collection<Edge> getEdgesForVertex(Graph graph, Map<Vertex, List<Edge>> extraEdges,

@@ -125,22 +125,27 @@ otp.planner.Itinerary = {
             }
         }
 
-        if (this.map.dataProjection != mLayer.map.getProjection()) {
-            for (var i = 0; i < this.m_markers.length; ++i) {
-                if (!this.m_markers[i].geometry._otp_reprojected) {
-                    this.m_markers[i].geometry._otp_reprojected = true;
-                    this.m_markers[i].geometry.transform(
-                            this.map.dataProjection, 
-                            mLayer.map.getProjectionObject()
-                    );
+        // In order to use this function also for alternative routes
+        if (mLayer != null) { 
+            if (this.map.dataProjection != mLayer.map.getProjection()) {
+                for (var i = 0; i < this.m_markers.length; ++i) {
+                    if (!this.m_markers[i].geometry._otp_reprojected) {
+                        this.m_markers[i].geometry._otp_reprojected = true;
+                        this.m_markers[i].geometry.transform(
+                                this.map.dataProjection, 
+                                mLayer.map.getProjectionObject()
+                        );
+                    }
                 }
             }
+            mLayer.addFeatures(this.m_markers);
         }
 
         vLayer.addFeatures(this.m_vectors);
-        mLayer.addFeatures(this.m_markers);
-        this.m_extent = mLayer.getDataExtent();
-        this.m_extent.extend(vLayer.getDataExtent());
+
+        this.m_extent = vLayer.getDataExtent();
+        if (mLayer != null) // we don't want to change the extent for alternative routes 
+        	this.m_extent.extend(mLayer.getDataExtent());
     },
 
     /** */
@@ -596,13 +601,22 @@ otp.planner.Itinerary = {
             var step = itin.steps[i];
 
             // step 3b: make this leg (tree) node
+            var node;
             if(!step.leaf && itin.steps.length > 2)
             {
                 // show/hide instructions if our trip has more than 2 legs 
                 step.expanded = false;
                 step.singleClickExpand = true;
+                var id = 'showDetails-' + step.id;
+                step.text += '<div id="' + id + '" class="togglesteps"> ' + this.templates.getShowDetails() + '</div>';
+                node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+                node.showDetailsId = id;
+                node.showing = false;
             }
-            var node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+            else
+            {
+                node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
+            }
 
             // step 3c: if we have instruction sub-nodes, add them to the tree...
             if(!step.leaf)

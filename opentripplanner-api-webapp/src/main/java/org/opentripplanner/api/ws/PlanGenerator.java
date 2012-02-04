@@ -261,6 +261,12 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
+                } else if (mode == TraverseMode.BOARDING) {
+                    //this only happens in case of a timed transfer.
+                    pgstate = PlanGenState.PRETRANSIT;
+                    finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
+                    leg = makeLeg(itinerary, state);
+                    itinerary.transfers++;
                 } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
                     nextName = state.getBackState().getBackState().getBackState().getVertex().getName();
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);

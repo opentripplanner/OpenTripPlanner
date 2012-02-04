@@ -176,7 +176,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 		for (int i = 0; i < rides.size(); i++) {
 			// each diagonal
 			for (int j = 0; j < rides.size() - i; j++) {
-				resultTable[j][j + i] = calculateCost(rides, j, j + i);
+				int cost = calculateCost(rides, j, j + i);
+				if (cost < 0) {
+				    continue;
+				}
+                                resultTable[j][j + i] = cost;
 				for (int k = 0; k < i; k++) {
 					if (resultTable[j][j + i] > resultTable[j][j + k]
 							+ resultTable[j + k + 1][j + i])
@@ -254,7 +258,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 			if (currentFare == -1) {
 				// Problem: there's no fare for this ride.
 				_log.warn("No fare for a ride: " + ride);
-				return Integer.MAX_VALUE;
+				return -1;
 			}
 		}
 

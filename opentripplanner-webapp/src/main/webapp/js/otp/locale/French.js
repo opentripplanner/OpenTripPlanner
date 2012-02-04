@@ -96,7 +96,10 @@ otp.locale.French = {
         ok : "OK",
         cancel : "Annuler",
         yes : "Oui",
-        no : "Non"
+        no : "Non",
+// TODO
+        showDetails  : "Show details...",
+        hideDetails  : "Hide details..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -230,10 +233,11 @@ otp.locale.French = {
             fromHere : "Partir d'ici",
             to : "Arrivée",
             toHere : "Arriver ici",
+            intermediate  : "Intermediate Place",          // TODO
             minimize : "Optimiser pour",
             maxWalkDistance : "Marche maximum",
-            maxBikeDistance: "Parcours à vélo maximum",
-            arriveDepart : "Arriver à/Partir de",
+            maxBikeDistance : "Parcours à vélo maximum",
+            arriveDepart    : "Arriver à/Partir de",
             mode : "Voyager par",
             wheelchair : "Accessible aux fauteuils roulants",
             go : "Go",

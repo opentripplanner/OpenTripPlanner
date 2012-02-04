@@ -102,7 +102,9 @@ otp.locale.Spanish = {
         ok           : "OK",
         cancel       : "Cancelar",
         yes          : "S\xED",
-        no           : "No"
+        no           : "No",
+        showDetails  : "Mostrar detalles...",
+        hideDetails  : "Ocultar detalles..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -162,6 +164,7 @@ otp.locale.Spanish = {
         end_at       : "Destino:"
     },
 
+    // see otp.planner.Templates for use
     labels : 
     {
         about        : "Alrededor de ",
@@ -176,6 +179,7 @@ otp.locale.Spanish = {
         alert_for_rt : "Alert for route"
     },
 
+    // see otp.planner.Templates for use -- one output are the itinerary leg headers
     modes : 
     {
         WALK:           "A PIE",
@@ -243,8 +247,10 @@ otp.locale.Spanish = {
             fromHere      : "Desde aqu\xED",
             to            : "Hasta",
             toHere        : "Hasta aqu\xED",
+            intermediate  : "Intermediate Place",          // TODO
             minimize      : "Mostrar el",
             maxWalkDistance: "M\xE1xima distancia hasta la parada",
+            maxBikeDistance: "M\xE1xima distancia hasta la bicicletas",               // TODO
             arriveDepart  : "Llegada/Salida a",
             mode          : "Modo de viaje",
             wheelchair    : "Viaje con accesibilidad",

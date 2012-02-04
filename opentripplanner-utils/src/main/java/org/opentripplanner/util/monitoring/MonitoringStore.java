@@ -61,14 +61,17 @@ public class MonitoringStore {
     public synchronized void setLongMax(String k, long v) {
         if (!monitoring.contains(k))
             return;
-        longs.put(k, v);
+        Long old = longs.get(k);
+        if (old == null || old < v) {
+            longs.put(k, v);
+        }
     }
 
     public void stopMonitoring(String k) {
         monitoring.remove(k);
     }
 
-    public void setMonitoring(String key, Boolean on) {
+    public void setMonitoring(String key, boolean on) {
         if (on) {
             monitoring.add(key);
         } else {

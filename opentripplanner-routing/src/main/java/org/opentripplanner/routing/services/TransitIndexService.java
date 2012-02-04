@@ -22,15 +22,15 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
 public interface TransitIndexService {
-	public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
-	
-	public RouteVariant getVariantForTrip(AgencyAndId trip);
+    public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
 
-	public Edge getPreboardEdge(AgencyAndId stop);
+    public RouteVariant getVariantForTrip(AgencyAndId trip);
 
-	public Edge getPrealightEdge(AgencyAndId stop);
+    public Edge getPreboardEdge(AgencyAndId stop);
 
-	public Collection<String> getDirectionsForRoute(AgencyAndId route);
+    public Edge getPrealightEdge(AgencyAndId stop);
 
-	public List<TraverseMode> getAllModes();
+    public Collection<String> getDirectionsForRoute(AgencyAndId route);
+
+    public List<TraverseMode> getAllModes();
 }

@@ -63,348 +63,342 @@ import org.slf4j.LoggerFactory;
 public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private static final Logger _log = LoggerFactory.getLogger(TransitIndexBuilder.class);
 
-	private GtfsRelationalDao dao;
-	
-	private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
-	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
-	private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
-	private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
-	private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
-	List<TraverseMode> modes = new ArrayList<TraverseMode>();
-	
-	@Override
-	public void setDao(GtfsRelationalDao dao) {
-		this.dao = dao;
-	}
+    private GtfsRelationalDao dao;
 
-	@Override
-	public void buildGraph(Graph graph) {
-		_log.debug("Building transit index");
-		
-		// this is keyed by the arrival vertex
-		HashMap<Vertex, RouteSegment> segmentsByVertex = new HashMap<Vertex, RouteSegment>();
+    private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
 
-		for (Vertex gv : graph.getVertices()) {
-			RouteSegment segment = null;
-			if (gv instanceof StreetVertex || gv instanceof EndpointVertex) {
-				continue;
-			}
-			for (Edge e : gv.getOutgoing()) {
-		                 RouteVariant variant = null;
-				/*
-				 * gv.vertex could be a journey vertex, or it could be any of a
-				 * number of other types of vertex. If it is a journey vertex,
-				 * it could have a dwell, or not have a dwell. we could
-				 * encounter its Alight, Dwell, or Hop vertices in any order
-				 * (boards are in getIncoming). And we could encounter either
-				 * the alight side or the hop side vertex first.
-				 */
-				if (!(e instanceof AbstractEdge)) {
-					continue;
-				}
+    private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
 
-				if (e instanceof PreBoardEdge) {
-					TransitStop stop = (TransitStop) e.getFromVertex();
-					preBoardEdges.put(stop.getStopId(), e);
-				}
-				if (e instanceof PreAlightEdge) {
-					TransitStop stop = (TransitStop) ((PreAlightEdge) e).getToVertex();
-					preAlightEdges.put(stop.getStopId(), e);
-				}				
-				if (e instanceof Alight || e instanceof Hop
-						|| e instanceof Dwell) {
-					Trip trip = ((AbstractEdge) e).getTrip();
-					addModeFromTrip(trip);
-					variant = addTripToVariant(trip);
-				} else if (e instanceof PatternAlight
-						|| e instanceof PatternHop || e instanceof PatternDwell) {
-					TripPattern pattern = ((PatternEdge) e).getPattern();
-					for (Trip trip : pattern.getTrips()) {
-						variantsByTrip.put(trip.getId(), variant);
-						variant = addTripToVariant(trip);
-						addModeFromTrip(trip);
-					}
-				} else {
-					continue;
-				}
+    private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
 
-				if (segment == null) {
-					segment = getOrMakeSegment(variant, segmentsByVertex, gv);
-				}
+    private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
 
-				if (e instanceof Alight || e instanceof PatternAlight) {
-					segment.alight = e;
-				} else if (e instanceof Hop || e instanceof PatternHop) {
-					segment.hopOut = e;
-				} else if (e instanceof Dwell || e instanceof PatternDwell) {
-					segment.dwell = e;
-				}
-			}
-			for (Edge e : gv.getIncoming()) {
-			        RouteVariant variant = null;
-				if (!(e instanceof AbstractEdge)) {
-					continue;
-				}
+    private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
 
-				if (e instanceof Board || e instanceof Hop) {
-					Trip trip = ((AbstractEdge) e).getTrip();
-					variant = addTripToVariant(trip);
-				} else if (e instanceof PatternBoard || e instanceof PatternHop) {
-					TripPattern pattern = ((PatternEdge) e).getPattern();
-					Trip exemplar = pattern.getExemplar();
-					variant = addTripToVariant(exemplar);
-					for (Trip trip : pattern.getTrips()) {
-						variantsByTrip.put(trip.getId(), variant);
-					}
-				} else {
-					continue;
-				}
+    List<TraverseMode> modes = new ArrayList<TraverseMode>();
 
-				if (segment == null) {
-					segment = getOrMakeSegment(variant, segmentsByVertex, gv);
-				}
+    @Override
+    public void setDao(GtfsRelationalDao dao) {
+        this.dao = dao;
+    }
 
-				if (e instanceof Board || e instanceof PatternBoard) {
-					segment.board = e;
-				} else if (e instanceof Hop || e instanceof PatternHop) {
-					segment.hopIn = e;
-				}
-			}
-		}
-		
-		nameVariants(variantsByRoute);
-		int totalVariants = 0;
-		int totalTrips = 0;
-		for (List<RouteVariant> variants : variantsByRoute.values()) {
-			totalVariants += variants.size();
-			for (RouteVariant variant : variants) {
-				totalTrips += variant.getTrips().size();
-			}
-		}
-		_log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
-		
-		TransitIndexService service = new TransitIndexServiceImpl(
-				variantsByRoute, variantsByTrip, preBoardEdges, 
-				preAlightEdges, directionsByRoute, modes);
-		graph.putService(TransitIndexService.class, service);
-	}
+    @Override
+    public void buildGraph(Graph graph) {
+        _log.debug("Building transit index");
 
-	private void addModeFromTrip(Trip trip) {
-		TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
-		if (!modes.contains(mode)) {
-			modes.add(mode);
-		}
-	}
+        // this is keyed by the arrival vertex
+        HashMap<Vertex, RouteSegment> segmentsByVertex = new HashMap<Vertex, RouteSegment>();
 
-	private void nameVariants(
-			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute) {
-		for (List<RouteVariant> variants : variantsByRoute.values()) {
-			Route route = variants.get(0).getRoute();
-			String routeName = GtfsLibrary.getRouteName(route);
+        for (Vertex gv : graph.getVertices()) {
+            RouteSegment segment = null;
+            if (gv instanceof StreetVertex || gv instanceof EndpointVertex) {
+                continue;
+            }
+            for (Edge e : gv.getOutgoing()) {
+                RouteVariant variant = null;
+                /*
+                 * gv.vertex could be a journey vertex, or it could be any of a number of other
+                 * types of vertex. If it is a journey vertex, it could have a dwell, or not have a
+                 * dwell. we could encounter its Alight, Dwell, or Hop vertices in any order (boards
+                 * are in getIncoming). And we could encounter either the alight side or the hop
+                 * side vertex first.
+                 */
+                if (!(e instanceof AbstractEdge)) {
+                    continue;
+                }
 
-			/*
-			 * simplest case: there's only one route variant, so we'll just give
-			 * it the route's name
-			 */
-			if (variants.size() == 1) {
-				variants.get(0).setName(routeName);
-				continue;
-			}
+                if (e instanceof PreBoardEdge) {
+                    TransitStop stop = (TransitStop) e.getFromVertex();
+                    preBoardEdges.put(stop.getStopId(), e);
+                }
+                if (e instanceof PreAlightEdge) {
+                    TransitStop stop = (TransitStop) ((PreAlightEdge) e).getToVertex();
+                    preAlightEdges.put(stop.getStopId(), e);
+                }
+                if (e instanceof Alight || e instanceof Hop || e instanceof Dwell) {
+                    Trip trip = ((AbstractEdge) e).getTrip();
+                    addModeFromTrip(trip);
+                    variant = addTripToVariant(trip);
+                } else if (e instanceof PatternAlight || e instanceof PatternHop
+                        || e instanceof PatternDwell) {
+                    TripPattern pattern = ((PatternEdge) e).getPattern();
+                    for (Trip trip : pattern.getTrips()) {
+                        variantsByTrip.put(trip.getId(), variant);
+                        variant = addTripToVariant(trip);
+                        addModeFromTrip(trip);
+                    }
+                } else {
+                    continue;
+                }
 
-			/* next, do routes have a unique start, end, or via? */
-			HashMap<Stop, List<RouteVariant>> starts = new HashMap<Stop, List<RouteVariant>>();
-			HashMap<Stop, List<RouteVariant>> ends = new HashMap<Stop, List<RouteVariant>>();
-			HashMap<Stop, List<RouteVariant>> vias = new HashMap<Stop, List<RouteVariant>>();
-			for (RouteVariant variant : variants) {
-				variant.cleanup();
-				List<Stop> stops = variant.getStops();
-				MapUtils.addToMapList(starts, stops.get(0), variant);
-				MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
-				for (Stop stop : stops) {
-					MapUtils.addToMapList(vias, stop, variant);
-				}
-			}
+                if (segment == null) {
+                    segment = getOrMakeSegment(variant, segmentsByVertex, gv);
+                }
 
-			// do simple naming for unique start/end/via
-			for (RouteVariant variant : variants) {
-				List<Stop> stops = variant.getStops();
-				if (starts.get(stops.get(0)).size() == 1) {
-					// this is the only route with this start
-					String name = routeName + " from " + stops.get(0).getName();
-					variant.setName(name);
-				} else if (ends.get(stops.get(stops.size() - 1)).size() == 1) {
-					String name = routeName + " to "
-							+ stops.get(stops.size() - 1).getName();
-					variant.setName(name);
-				} else {
-					for (Stop stop : stops) {
-						if (vias.get(stop).size() == 1) {
-							variant.setName(routeName + " via " + stop.getName());
-							break;
-						}
-					}
-				}
-			}
+                if (e instanceof Alight || e instanceof PatternAlight) {
+                    segment.alight = e;
+                } else if (e instanceof Hop || e instanceof PatternHop) {
+                    segment.hopOut = e;
+                } else if (e instanceof Dwell || e instanceof PatternDwell) {
+                    segment.dwell = e;
+                }
+            }
+            for (Edge e : gv.getIncoming()) {
+                RouteVariant variant = null;
+                if (!(e instanceof AbstractEdge)) {
+                    continue;
+                }
 
-			/**
-			 * now we have the case where no route has a unique start, stop, or
-			 * via. This can happen if you have a single route which serves
-			 * trips on an H-shaped alignment, where trips can start at A or B
-			 * and end at either C or D, visiting the same sets of stops along
-			 * the shared segments.
-			 * 
-			 * <pre>
-			 *            A      B
-			 * 			  |      |
-			 * 			  |------|
-			 * 			  |      |
-			 * 			  |      |
-			 * 			  C      D
-			 * </pre>
-			 * 
-			 * First, we try unique start + end, then start + via + end, and if
-			 * that doesn't work, we check for expresses, and finally we use a
-			 * random trip's id.
-			 * 
-			 * It canhappen if there is an express and a local version of a
-			 * given line where the local starts and ends at the same place as
-			 * the express but makes a strict superset of stops; the local
-			 * version will get a "via", but the express will be doomed.
-			 * 
-			 * We can first check for the local/express situation by saying that
-			 * if there are a subset of routes with the same start/end, and
-			 * there is exactly one that can't be named with start/end/via, call
-			 * it "express".
-			 * 
-			 * Consider the following three trips (A, B, C) along a route with
-			 * four stops. A is the local, and gets "via stop 3"; B is a
-			 * limited, and C is (logically) an express:
-			 * 
-			 * A,B,C -- A,B -- A -- A, B, C
-			 * 
-			 * Here, neither B nor C is nameable. If either were removed, the
-			 * other would be called "express".
-			 * 
-			 * 
-			 * 
-			 */
-			for (RouteVariant variant : variants) {
-				List<Stop> stops = variant.getStops();
-				Stop firstStop = stops.get(0);
-				HashSet<RouteVariant> remainingVariants = new HashSet<RouteVariant>(
-						starts.get(firstStop));
+                if (e instanceof Board || e instanceof Hop) {
+                    Trip trip = ((AbstractEdge) e).getTrip();
+                    variant = addTripToVariant(trip);
+                } else if (e instanceof PatternBoard || e instanceof PatternHop) {
+                    TripPattern pattern = ((PatternEdge) e).getPattern();
+                    Trip exemplar = pattern.getExemplar();
+                    variant = addTripToVariant(exemplar);
+                    for (Trip trip : pattern.getTrips()) {
+                        variantsByTrip.put(trip.getId(), variant);
+                    }
+                } else {
+                    continue;
+                }
 
-				Stop lastStop = stops.get(stops.size() - 1);
-				// take the intersection
-				remainingVariants.retainAll(ends.get(lastStop));
-				if (remainingVariants.size() == 1) {
-					String name = routeName + " from " + firstStop.getName()
-							+ " to " + lastStop.getName();
-					variant.setName(name);
-				}
-				// this did not yield a unique name; try start / via / end for
-				// each via
-				for (Stop stop : stops) {
-					if (stop == firstStop || stop == lastStop) {
-						continue;
-					}
-					List<RouteVariant> via = vias.get(stop);
-					boolean found = false;
-					boolean bad = false;
-					for (RouteVariant viaVariant : via) {
-						if (remainingVariants.contains(viaVariant)) {
-							if (found) {
-								bad = true;
-								break;
-							} else {
-								found = true;
-							}
-						}
-					}
-					if (found && !bad) {
-						String name = routeName + " from "
-								+ firstStop.getName() + " to "
-								+ lastStop.getName() + " via " + stop.getName();
-						variant.setName(name);
-						break;
-					}
-				}
-				if (variant.getName() == null) {
-					// check for express
-					if (remainingVariants.size() == 2) {
-						//there are exactly two remaining variants sharing this start/end
-						//we know that this oen must be a subset of the other, because it
-						//has no unique via.  So, it is the express
-						variant.setName(routeName + " from " + firstStop.getName() + " to " + lastStop.getName() + " express");
-					} else { 
-					// the final fallback
-					variant.setName(routeName + " like "
-							+ variant.getTrips().get(0).getId());
-					
-					}
-				}
-			}
+                if (segment == null) {
+                    segment = getOrMakeSegment(variant, segmentsByVertex, gv);
+                }
 
-		}
+                if (e instanceof Board || e instanceof PatternBoard) {
+                    segment.board = e;
+                } else if (e instanceof Hop || e instanceof PatternHop) {
+                    segment.hopIn = e;
+                }
+            }
+        }
 
-	}
+        nameVariants(variantsByRoute);
+        int totalVariants = 0;
+        int totalTrips = 0;
+        for (List<RouteVariant> variants : variantsByRoute.values()) {
+            totalVariants += variants.size();
+            for (RouteVariant variant : variants) {
+                totalTrips += variant.getTrips().size();
+            }
+        }
+        _log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips
+                + " trips, " + totalVariants + " variants ");
 
-	private RouteSegment getOrMakeSegment(RouteVariant variant,
-			HashMap<Vertex, RouteSegment> segmentsByVertex, Vertex vertex) {
-		RouteSegment segment = segmentsByVertex.get(vertex);
-		if (segment != null) {
-			return segment;
-		}
-		segment = new RouteSegment(vertex.getStopId());
-		segmentsByVertex.put(vertex, segment);
-		variant.addSegment(segment);
-		return segment;
-	}
+        TransitIndexService service = new TransitIndexServiceImpl(variantsByRoute, variantsByTrip,
+                preBoardEdges, preAlightEdges, directionsByRoute, modes);
+        graph.putService(TransitIndexService.class, service);
+    }
 
-	private RouteVariant addTripToVariant(Trip trip) {
-		// have we seen this trip before?
-		RouteVariant variant = variantsByTrip.get(trip.getId());
-		if (variant != null) {
-			variant.addTrip(trip);
-			return variant;
-		}
-		
-		AgencyAndId routeId = trip.getRoute().getId();
-		String directionId = trip.getDirectionId();
-		HashSet<String> directions = directionsByRoute.get(routeId);
-		if (directions == null) {
-		    directions = new HashSet<String>();
-		    directionsByRoute.put(routeId, directions);
-		}
-		directions.add(directionId);
-		
-		// build the list of stops for this trip
-		List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
-		ArrayList<Stop> stops = new ArrayList<Stop>();
-		for (StopTime stopTime : stopTimes) {
-			stops.add(stopTime.getStop());
-		}
+    private void addModeFromTrip(Trip trip) {
+        TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
+        if (!modes.contains(mode)) {
+            modes.add(mode);
+        }
+    }
 
-		Route route = trip.getRoute();
-		// see if we have a variant for this route like this already
-		List<RouteVariant> variants = variantsByRoute.get(route.getId());
-		if (variants == null) {
-			variants = new ArrayList<RouteVariant>();
-			variantsByRoute.put(route.getId(), variants);
-		}
-		for (RouteVariant existingVariant : variants) {
-			if (existingVariant.getStops().equals(stops)) {
-				variant = existingVariant;
-				break;
-			}
-		}
-		if (variant == null) {
-			// create a variant for these stops on this route
-			variant = new RouteVariant(route, stops);
-			variants.add(variant);
-		}
-		variantsByTrip.put(trip.getId(), variant);
-		variant.addTrip(trip);
-		return variant;
-	}
+    private void nameVariants(HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute) {
+        for (List<RouteVariant> variants : variantsByRoute.values()) {
+            Route route = variants.get(0).getRoute();
+            String routeName = GtfsLibrary.getRouteName(route);
+
+            /*
+             * simplest case: there's only one route variant, so we'll just give it the route's name
+             */
+            if (variants.size() == 1) {
+                variants.get(0).setName(routeName);
+                continue;
+            }
+
+            /* next, do routes have a unique start, end, or via? */
+            HashMap<Stop, List<RouteVariant>> starts = new HashMap<Stop, List<RouteVariant>>();
+            HashMap<Stop, List<RouteVariant>> ends = new HashMap<Stop, List<RouteVariant>>();
+            HashMap<Stop, List<RouteVariant>> vias = new HashMap<Stop, List<RouteVariant>>();
+            for (RouteVariant variant : variants) {
+                variant.cleanup();
+                List<Stop> stops = variant.getStops();
+                MapUtils.addToMapList(starts, stops.get(0), variant);
+                MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
+                for (Stop stop : stops) {
+                    MapUtils.addToMapList(vias, stop, variant);
+                }
+            }
+
+            // do simple naming for unique start/end/via
+            for (RouteVariant variant : variants) {
+                List<Stop> stops = variant.getStops();
+                if (starts.get(stops.get(0)).size() == 1) {
+                    // this is the only route with this start
+                    String name = routeName + " from " + stops.get(0).getName();
+                    variant.setName(name);
+                } else if (ends.get(stops.get(stops.size() - 1)).size() == 1) {
+                    String name = routeName + " to " + stops.get(stops.size() - 1).getName();
+                    variant.setName(name);
+                } else {
+                    for (Stop stop : stops) {
+                        if (vias.get(stop).size() == 1) {
+                            variant.setName(routeName + " via " + stop.getName());
+                            break;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * now we have the case where no route has a unique start, stop, or via. This can happen
+             * if you have a single route which serves trips on an H-shaped alignment, where trips
+             * can start at A or B and end at either C or D, visiting the same sets of stops along
+             * the shared segments.
+             * 
+             * <pre>
+             *                    A      B
+             * 	                  |      |
+             *                    |------|
+             *                    |      |
+             *                    |      |
+             *                    C      D
+             * </pre>
+             * 
+             * First, we try unique start + end, then start + via + end, and if that doesn't work,
+             * we check for expresses, and finally we use a random trip's id.
+             * 
+             * It can happen if there is an express and a local version of a given line where the
+             * local starts and ends at the same place as the express but makes a strict superset of
+             * stops; the local version will get a "via", but the express will be doomed.
+             * 
+             * We can first check for the local/express situation by saying that if there are a
+             * subset of routes with the same start/end, and there is exactly one that can't be
+             * named with start/end/via, call it "express".
+             * 
+             * Consider the following three trips (A, B, C) along a route with four stops. A is the
+             * local, and gets "via stop 3"; B is a limited, and C is (logically) an express:
+             * 
+             * A,B,C -- A,B -- A -- A, B, C
+             * 
+             * Here, neither B nor C is nameable. If either were removed, the other would be called
+             * "express".
+             * 
+             * 
+             * 
+             */
+            for (RouteVariant variant : variants) {
+                List<Stop> stops = variant.getStops();
+                Stop firstStop = stops.get(0);
+                HashSet<RouteVariant> remainingVariants = new HashSet<RouteVariant>(
+                        starts.get(firstStop));
+
+                Stop lastStop = stops.get(stops.size() - 1);
+                // take the intersection
+                remainingVariants.retainAll(ends.get(lastStop));
+                if (remainingVariants.size() == 1) {
+                    String name = routeName + " from " + firstStop.getName() + " to "
+                            + lastStop.getName();
+                    variant.setName(name);
+                }
+                // this did not yield a unique name; try start / via / end for
+                // each via
+                for (Stop stop : stops) {
+                    if (stop == firstStop || stop == lastStop) {
+                        continue;
+                    }
+                    List<RouteVariant> via = vias.get(stop);
+                    boolean found = false;
+                    boolean bad = false;
+                    for (RouteVariant viaVariant : via) {
+                        if (remainingVariants.contains(viaVariant)) {
+                            if (found) {
+                                bad = true;
+                                break;
+                            } else {
+                                found = true;
+                            }
+                        }
+                    }
+                    if (found && !bad) {
+                        String name = routeName + " from " + firstStop.getName() + " to "
+                                + lastStop.getName() + " via " + stop.getName();
+                        variant.setName(name);
+                        break;
+                    }
+                }
+                if (variant.getName() == null) {
+                    // check for express
+                    if (remainingVariants.size() == 2) {
+                        // there are exactly two remaining variants sharing this start/end
+                        // we know that this oen must be a subset of the other, because it
+                        // has no unique via. So, it is the express
+                        variant.setName(routeName + " from " + firstStop.getName() + " to "
+                                + lastStop.getName() + " express");
+                    } else {
+                        // the final fallback
+                        variant.setName(routeName + " like " + variant.getTrips().get(0).getId());
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    private RouteSegment getOrMakeSegment(RouteVariant variant,
+            HashMap<Vertex, RouteSegment> segmentsByVertex, Vertex vertex) {
+        RouteSegment segment = segmentsByVertex.get(vertex);
+        if (segment != null) {
+            return segment;
+        }
+        segment = new RouteSegment(vertex.getStopId());
+        segmentsByVertex.put(vertex, segment);
+        variant.addSegment(segment);
+        return segment;
+    }
+
+    private RouteVariant addTripToVariant(Trip trip) {
+        // have we seen this trip before?
+        RouteVariant variant = variantsByTrip.get(trip.getId());
+        if (variant != null) {
+            variant.addTrip(trip);
+            return variant;
+        }
+
+        AgencyAndId routeId = trip.getRoute().getId();
+        String directionId = trip.getDirectionId();
+        HashSet<String> directions = directionsByRoute.get(routeId);
+        if (directions == null) {
+            directions = new HashSet<String>();
+            directionsByRoute.put(routeId, directions);
+        }
+        directions.add(directionId);
+
+        // build the list of stops for this trip
+        List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
+        ArrayList<Stop> stops = new ArrayList<Stop>();
+        for (StopTime stopTime : stopTimes) {
+            stops.add(stopTime.getStop());
+        }
+
+        Route route = trip.getRoute();
+        // see if we have a variant for this route like this already
+        List<RouteVariant> variants = variantsByRoute.get(route.getId());
+        if (variants == null) {
+            variants = new ArrayList<RouteVariant>();
+            variantsByRoute.put(route.getId(), variants);
+        }
+        for (RouteVariant existingVariant : variants) {
+            if (existingVariant.getStops().equals(stops)) {
+                variant = existingVariant;
+                break;
+            }
+        }
+        if (variant == null) {
+            // create a variant for these stops on this route
+            variant = new RouteVariant(route, stops);
+            variants.add(variant);
+        }
+        variantsByTrip.put(trip.getId(), variant);
+        variant.addTrip(trip);
+        return variant;
+    }
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.api.ws.analysis;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -16,7 +17,7 @@ import com.sun.jersey.api.spring.Autowire;
 import com.sun.jersey.spi.resource.Singleton;
 
 /**
- * Monitor the state of the system, and control monitoring (to turn expensive things on/off) 
+ * Monitor the state of the system, and control monitoring (to turn expensive things on/off)
  * 
  * @author novalis
  * 
@@ -27,9 +28,10 @@ import com.sun.jersey.spi.resource.Singleton;
 @Singleton
 public class Monitoring {
     static MonitoringStore store = MonitoringStoreFactory.getStore();
-    
-    /** 
+
+    /**
      * Get a Long from the monitoring store
+     * 
      * @param key
      * @return
      */
@@ -37,25 +39,38 @@ public class Monitoring {
     @GET
     @Path("/long")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Object getLong(
-            @QueryParam("key") String key) {
+    public Object getLong(@QueryParam("key") String key) {
         return store.getLong(key);
     }
-    
-    /** 
+
+    /**
      * Turn on/off monitoring for a given key
+     * 
      * @param key
      * @return
      */
     @Secured({ "ROLE_USER" })
     @POST
-    @Path("/control")
+    @Path("/monitoring")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Object control(
-            @QueryParam("key") String key,
-            @QueryParam("on") Boolean on) {
+    public Object control(@FormParam("key") String key, @FormParam("on") boolean on) {
+        System.out.println("setting " + key + " to " + on);
         store.setMonitoring(key, on);
         return "OK";
     }
-    
+
+    /**
+     * Turn on/off monitoring for a given key
+     * 
+     * @param key
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/monitoring")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Object control(@QueryParam("key") String key) {
+        return store.isMonitoring(key);
+    }
+
 }
