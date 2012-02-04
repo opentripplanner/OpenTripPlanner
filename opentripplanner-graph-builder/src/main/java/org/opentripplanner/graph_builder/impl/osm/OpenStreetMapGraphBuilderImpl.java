@@ -858,55 +858,55 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         // try to get a best-guess delta between level order and level numbers, and fix up
         // levels
         for (int i = 0; i < levels.size(); i++) {
-        String level = levels.get(i);
-        Integer numLevel = null;
+            String level = levels.get(i);
+            Integer numLevel = null;
         
-        // try to parse out the level number
-        try {
-            numLevel = Integer.parseInt(level);
-        }
-        catch (NumberFormatException e) {
+            // try to parse out the level number
             try {
-            numLevel = Integer.parseInt(level.split("=")[0]);
+                numLevel = Integer.parseInt(level);
             }
-            catch (NumberFormatException e2) {
-            try {
-                numLevel = Integer.parseInt(level.split("@")[1]);
+            catch (NumberFormatException e) {
+                try {
+                    numLevel = Integer.parseInt(level.split("=")[0]);
+                }
+                catch (NumberFormatException e2) {
+                    try {
+                        numLevel = Integer.parseInt(level.split("@")[1]);
+                    }
+                    catch (NumberFormatException e3) {
+                        // do nothing
+                    }
+                    catch (ArrayIndexOutOfBoundsException e4) {
+                        // do nothing
+                    }
+                }
             }
-            catch (NumberFormatException e3) {
-                continue;
-            }
-            catch (ArrayIndexOutOfBoundsException e4) {
-                continue;
-            }
-            }
-        }
         
-        if (numLevel == 0) {
-            levelDelta = -1 * levels.indexOf(level);
-        }
+            if (numLevel == 0) {
+                levelDelta = -1 * levels.indexOf(level);
+            }
 
-        String levelIndex;
-        String levelName;
-        // get just the human-readable level name from a name like T=Tunnel@-15
-        // first, discard elevation info
-        level = level.split("@")[0];
-        // if it's there, discard the long name, but put it into a hashmap for retrieval
-        // below
-        // Why not just use the hashmap? Because we need the ordered ArrayList.
-        levelIndex = level.split("=")[0];
-        try {
-            levelName = level.split("=")[1];
-        }
-        catch (ArrayIndexOutOfBoundsException e) {
-            // no separate index
-            levelName = levelIndex;
-        }
-        // overwrite for later indexing
-        levels.set(i, levelIndex);
+            String levelIndex;
+            String levelName;
+            // get just the human-readable level name from a name like T=Tunnel@-15
+            // first, discard elevation info
+            level = level.split("@")[0];
+            // if it's there, discard the long name, but put it into a hashmap for retrieval
+            // below
+            // Why not just use the hashmap? Because we need the ordered ArrayList.
+            levelIndex = level.split("=")[0];
+            try {
+                levelName = level.split("=")[1];
+            }
+            catch (ArrayIndexOutOfBoundsException e) {
+                // no separate index
+                levelName = levelIndex;
+            }
+            // overwrite for later indexing
+            levels.set(i, levelIndex);
 
-        // add to the HashMap
-        levelFullNames.put(levelIndex, levelName);
+            // add to the HashMap
+            levelFullNames.put(levelIndex, levelName);
         }
     
         for (OSMRelationMember member : relation.getMembers()) {
