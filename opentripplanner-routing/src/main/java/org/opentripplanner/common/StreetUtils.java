@@ -192,35 +192,35 @@ public class StreetUtils {
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         
         for (Vertex gv : graph.getVertices()) {
-	    if (!(gv instanceof EndpointVertex)) {
-		continue;
-	    }
-	    State s0 = new State(gv, options);
-	    for (Edge e: gv.getOutgoing()) {
-		Vertex in = gv;
-		if (!(e instanceof StreetEdge)) {
-		    continue;
-		}
-		State s1 = e.traverse(s0);
-		if (s1 == null) {
-		    continue;
-		}
-		Vertex out = s1.getVertex();
+        if (!(gv instanceof EndpointVertex)) {
+        continue;
+        }
+        State s0 = new State(gv, options);
+        for (Edge e: gv.getOutgoing()) {
+        Vertex in = gv;
+        if (!(e instanceof StreetEdge)) {
+            continue;
+        }
+        State s1 = e.traverse(s0);
+        if (s1 == null) {
+            continue;
+        }
+        Vertex out = s1.getVertex();
                         
-		ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
-		if (vertexList == null) {
-		    vertexList = new ArrayList<Vertex>();
-		    neighborsForVertex.put(in, vertexList);
+        ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
+        if (vertexList == null) {
+            vertexList = new ArrayList<Vertex>();
+            neighborsForVertex.put(in, vertexList);
                 }
                 vertexList.add(out);
                 
-		vertexList = neighborsForVertex.get(out);
-		if (vertexList == null) {
-		    vertexList = new ArrayList<Vertex>();
-		    neighborsForVertex.put(out, vertexList);
+        vertexList = neighborsForVertex.get(out);
+        if (vertexList == null) {
+            vertexList = new ArrayList<Vertex>();
+            neighborsForVertex.put(out, vertexList);
                 }
                 vertexList.add(in);
-	    }
+        }
         }
         
         ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
@@ -258,21 +258,21 @@ public class StreetUtils {
     
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
         Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
-	for (Edge e : outgoing) {
-	    if (e instanceof PlainStreetEdge) {
-		PlainStreetEdge pse = (PlainStreetEdge) e;
-		StreetTraversalPermission permission = pse.getPermission();
-		permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-		if (permission == StreetTraversalPermission.NONE) {
-		    graph.removeEdge(pse);
-		} else {
-		    pse.setPermission(permission);
-		}
-	    }
-	}
-	if (v.getOutgoing().size() == 0) {
-	    graph.removeVertexAndEdges(v);
-	}
+    for (Edge e : outgoing) {
+        if (e instanceof PlainStreetEdge) {
+        PlainStreetEdge pse = (PlainStreetEdge) e;
+        StreetTraversalPermission permission = pse.getPermission();
+        permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+        if (permission == StreetTraversalPermission.NONE) {
+            graph.removeEdge(pse);
+        } else {
+            pse.setPermission(permission);
+        }
+        }
+    }
+    if (v.getOutgoing().size() == 0) {
+        graph.removeVertexAndEdges(v);
+    }
     }
 
     private static HashSet<Vertex> computeConnectedSubgraph(
