@@ -1,4 +1,4 @@
-/* This program is free software: you can redistribute it and/or
+b/* This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
  the License, or (at your option) any later version.
@@ -162,6 +162,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /** The bike safety factor of the safest street */
         private double bestBikeSafety = 1;
 
+    // store nodes which are decomposed to multiple nodes because they are elevators
+    // later they will be iterated over to build ElevatorEdges between them
+    // this stores the levels that each node is used at
+    private HashMap<Long, HashMap> multiLevelNodesLevels = new HashMap<Long, HashMap>();    
+
         public void buildGraph(Graph graph) {
             this.graph = graph;
             
@@ -177,11 +182,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
             Set<Long> intersectionNodes = new HashSet<Long>();
 
-            // store nodes which are decomposed to multiple nodes because they are elevators
-            // later they will be iterated over to build ElevatorEdges between them
-            // this stores the levels that each node is used at
-            HashMap<Long, HashMap> multiLevelNodesLevels = new HashMap<Long, HashMap>();
-            
             // store levels that cannot be parsed, and assign them a number
             int nextUnparsedLevel = 10000;
             HashMap<String, Integer> unparsedLevels = new HashMap<String, Integer>();
@@ -373,21 +373,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // if it is, we need to write down each level that it is active at, so
                         // we can build edges.
                         if (isMultiLevelNode(osmStartNode)) {
-                            HashMap<Integer, String> levels;
-                            int level = Integer.parseInt(way.getTag("otp:numeric_level"));
-                            if (multiLevelNodesLevels.containsKey(osmStartNode.getId())) {
-                                levels = multiLevelNodesLevels.get(osmStartNode.getId());
-                            } else {
-                                levels = new HashMap<Integer, String>();
-                                multiLevelNodesLevels.put(osmStartNode.getId(), levels);
-                            }
-                            if (!levels.containsKey(level)) {
-                                levels.put(level, way.getTag("otp:human_level"));
-                            }
-                            else if (!levels.get(level).equals(way.getTag("otp:human_level"))) {
-                                throw new IllegalStateException("Multiple levels have the same " + 
-                                                                "level number!");
-                            }
+                recordLevel(way, osmStartNode);
                         }
 
                         startEndpoint = graph.getVertex(label);
@@ -404,23 +390,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     String label = getVertexLabelFromNode(osmEndNode, way);
 
-                    // TODO: avoid duplicating this code
                     if (isMultiLevelNode(osmEndNode)) {
-                        HashMap<Integer, String> levels;
-                        int level = Integer.parseInt(way.getTag("otp:numeric_level"));
-                        if (multiLevelNodesLevels.containsKey(osmEndNode.getId())) {
-                            levels = multiLevelNodesLevels.get(osmEndNode.getId());
-                        } else {
-                            levels = new HashMap<Integer, String>();
-                            multiLevelNodesLevels.put(osmEndNode.getId(), levels);
-                        }
-                        if (!levels.containsKey(level)) {
-                            levels.put(level, way.getTag("otp:human_level"));
-                        }
-                        else if (!levels.get(level).equals(way.getTag("otp:human_level"))) {
-                            throw new IllegalStateException("Multiple levels have the same " + 
-                                                            "level number!");
-                        }
+            recordLevel(way, osmEndNode);
                     }
 
                     endEndpoint = graph.getVertex(label);
@@ -1241,6 +1212,74 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             return permission;
         }
+    
+        /**
+         * Is this a multi-level node that should be decomposed to multiple coincident nodes?
+         * Currently returns true only for elevators.
+         * @param {OSMNode} node
+         * @returns {Boolean} isMultiLevel
+         * @author mattwigway
+         */
+        private boolean isMultiLevelNode(OSMNode node) {
+            if (node.hasTag("highway") && "elevator".equals(node.getTag("highway"))) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        /**
+         * Record the level of the way for this node, e.g. if the way is at level 5, mark that this 
+         * node is active at level 5.
+         * @param {way} the way that has the level
+         * @param {node} the node to record for
+         * @author mattwigway
+         */
+        private void recordLevel(OSMWay way, OSMNode node) {
+            HashMap<Integer, String> levels;
+            int level = Integer.parseInt(way.getTag("otp:numeric_level"));
+            if (multiLevelNodesLevels.containsKey(node.getId())) {
+                levels = multiLevelNodesLevels.get(node.getId());
+            } else {
+                levels = new HashMap<Integer, String>();
+                multiLevelNodesLevels.put(node.getId(), levels);
+            }
+            
+            if (!levels.containsKey(level)) {
+                levels.put(level, way.getTag("otp:human_level"));
+            }
+            else if (!levels.get(level).equals(way.getTag("otp:human_level"))) {
+                throw new IllegalStateException("Multiple levels have the same " + 
+                                                "level number!");
+            }
+        }
+
+        /**
+         * Get a vertex label from a node and a way. The reason this has been abstracted is that
+         * the vertex label is "osm node x" except when there is an elevator or other
+         * Z-dimension discontinuity, when it is "osm node x_y", with y representing the
+         * OSM level or layer (level preferred).
+         * @param {OSMNode} node The node to fetch a label for.
+         * @param {OSMWay} way The way it is connected to (for fetching level information).
+         * @returns {String} label The label for the graph vertex.
+         * @author mattwigway
+         */
+        private String getVertexLabelFromNode (OSMNode node, OSMWay way) {
+            String label;
+            
+            // If the node should be decomposed to multiple levels, append _level to the id
+            // use the numeric level because it is unique, the human level may not be (although
+            // it will likely lead to some head-scratching if it is not).
+            if (isMultiLevelNode(node)) {
+                label = "osm node " + node.getId() + "_" + 
+                    way.getTag("otp:numeric_level");
+            } else {
+                // assume all other ways are connected if they share a node
+                label = "osm node " + node.getId();
+            }
+            
+            return label;
+        }
     }
 
     public CustomNamer getCustomNamer() {
@@ -1249,48 +1288,5 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     public void setCustomNamer(CustomNamer customNamer) {
         this.customNamer = customNamer;
-    }
-
-   /**
-    * Is this a multi-level node that should be decomposed to multiple coincident nodes?
-    * Currently returns true only for elevators.
-    * @param {OSMNode} node
-    * @returns {Boolean} isMultiLevel
-    * @author mattwigway
-    */
-    private boolean isMultiLevelNode(OSMNode node) {
-        if (node.hasTag("highway") && "elevator".equals(node.getTag("highway"))) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-
-    /**
-     * Get a vertex label from a node and a way. The reason this has been abstracted is that
-     * the vertex label is "osm node x" except when there is an elevator or other
-     * Z-dimension discontinuity, when it is "osm node x_y", with y representing the
-     * OSM level or layer (level preferred).
-     * @param {OSMNode} node The node to fetch a label for.
-     * @param {OSMWay} way The way it is connected to (for fetching level information).
-     * @returns {String} label The label for the graph vertex.
-     * @author mattwigway
-     */
-    private String getVertexLabelFromNode (OSMNode node, OSMWay way) {
-    String label;
-
-    // If the node should be decomposed to multiple levels, append _level to the id
-    // use the numeric level because it is unique, the human level may not be (although
-    // it will likely lead to some head-scratching if it is not).
-    if (isMultiLevelNode(node)) {
-        label = "osm node " + node.getId() + "_" + 
-        way.getTag("otp:numeric_level");
-    } else {
-        // assume all other ways are connected if they share a node
-        label = "osm node " + node.getId();
-    }
-
-    return label;
     }
 }
