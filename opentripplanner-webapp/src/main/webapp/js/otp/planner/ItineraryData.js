@@ -354,10 +354,10 @@ otp.planner.ItineraryDataFactoryStatic = {
         }
         stepText += ' <strong>' + step.streetName + '</strong>';
 
-	// don't show distance for routes which have no distance (e.g. elevators)
-	if (step.distance > 0) {
+        // don't show distance for routes which have no distance (e.g. elevators)
+        if (step.distance > 0) {
             stepText += ' - ' + otp.planner.Utils.prettyDistance(step.distance) + '';
-	}
+        }
 
         // edit the step object (by default, unless otherwise told)
         if(!dontEditStep)

@@ -52,21 +52,21 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
      */
     public ElevatorAlightEdge(Vertex from, Vertex to, String level) {
         super(from, to);
-	this.level = level;
+        this.level = level;
 
-	// set up the geometry
-	Coordinate[] coords = new Coordinate[2];
-	coords[0] = new Coordinate(from.getX(), from.getY());
-	coords[1] = new Coordinate(to.getX(), to.getY());
-	// TODO: SRID?
-	the_geom = new GeometryFactory().createLineString(coords);
+        // set up the geometry
+        Coordinate[] coords = new Coordinate[2];
+        coords[0] = new Coordinate(from.getX(), from.getY());
+        coords[1] = new Coordinate(to.getX(), to.getY());
+        // TODO: SRID?
+        the_geom = new GeometryFactory().createLineString(coords);
     }
     
     @Override
     public State traverse(State s0) {
-	// we are our own edge narrative
-    	StateEditor s1 = s0.edit(this, this);
-    	s1.incrementWeight(1);
+        // we are our own edge narrative
+        StateEditor s1 = s0.edit(this, this);
+        s1.incrementWeight(1);
         return s1.makeState();
     }
 
@@ -77,7 +77,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
 
     @Override
     public Geometry getGeometry() {
-	return the_geom;
+        return the_geom;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
      */
     @Override 
     public boolean hasBogusName() {
-	return false;
+        return false;
     }
     
     public boolean equals(Object o) {

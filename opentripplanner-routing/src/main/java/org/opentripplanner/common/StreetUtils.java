@@ -81,15 +81,15 @@ public class StreetUtils {
                         // therefore are StreetVertices
                         StreetVertex v1 = getStreetVertexForEdge(graph, (PlainStreetEdge) e);
                         StreetVertex v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
-
+                        
                         TurnEdge turn = new TurnEdge(v1, v2);
-
+                        
                         if (restriction != null) {
                             if (restriction.type == TurnRestrictionType.NO_TURN && 
-                                restriction.to == e2) {
+                                    restriction.to == e2) {
                                 turn.setRestrictedModes(restriction.modes);
                             } else if (restriction.type == TurnRestrictionType.ONLY_TURN && 
-                                       restriction.to != e2) {
+                                           restriction.to != e2) {
                                 turn.setRestrictedModes(restriction.modes);
                             }
                         }
@@ -130,15 +130,15 @@ public class StreetUtils {
                         if (e2 instanceof PlainStreetEdge) {
                             v2 = getStreetVertexForEdge(graph, (PlainStreetEdge) e2);
                         } else {
-			    // e is an outgoing edge, so get the To vertex
-			    // getToVertex is not in Edge, only in AbstractEdge
-			    // TODO: is this a bug, or can there be single-vertex edges?
+                            // e is an outgoing edge, so get the To vertex
+                            // getToVertex is not in Edge, only in AbstractEdge
+                            // TODO: is this a bug, or can there be single-vertex edges?
                             v2 = ((AbstractEdge) e2).getToVertex(); 
                         }
 
-			if (v1 == null || v2 == null) {
-			    throw new IllegalStateException("Null vertex when building FreeEdge!");
-			}
+                        if (v1 == null || v2 == null) {
+                            throw new IllegalStateException("Null vertex when building FreeEdge!");
+                        }
                         else if (v1 != v2) {
                             // Use a FreeEdge to model the turn since TurnEdges are
                             // StreetVertex only
@@ -184,7 +184,6 @@ public class StreetUtils {
         return newv;
     }
 
-
     public static void pruneFloatingIslands(Graph graph) {
         _log.debug("pruning");
         Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
@@ -193,35 +192,35 @@ public class StreetUtils {
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         
         for (Vertex gv : graph.getVertices()) {
-                if (!(gv instanceof EndpointVertex)) {
-                        continue;
-                }
-                State s0 = new State(gv, options);
-                for (Edge e: gv.getOutgoing()) {
-                        Vertex in = gv;
-                        if (!(e instanceof StreetEdge)) {
-                                continue;
-                        }
-                        State s1 = e.traverse(s0);
-                        if (s1 == null) {
-                                continue;
-                        }
-                        Vertex out = s1.getVertex();
+	    if (!(gv instanceof EndpointVertex)) {
+		continue;
+	    }
+	    State s0 = new State(gv, options);
+	    for (Edge e: gv.getOutgoing()) {
+		Vertex in = gv;
+		if (!(e instanceof StreetEdge)) {
+		    continue;
+		}
+		State s1 = e.traverse(s0);
+		if (s1 == null) {
+		    continue;
+		}
+		Vertex out = s1.getVertex();
                         
-                        ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
-                        if (vertexList == null) {
-                                vertexList = new ArrayList<Vertex>();
-                                neighborsForVertex.put(in, vertexList);
+		ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
+		if (vertexList == null) {
+		    vertexList = new ArrayList<Vertex>();
+		    neighborsForVertex.put(in, vertexList);
                 }
                 vertexList.add(out);
                 
-                        vertexList = neighborsForVertex.get(out);
-                        if (vertexList == null) {
-                                vertexList = new ArrayList<Vertex>();
-                                neighborsForVertex.put(out, vertexList);
+		vertexList = neighborsForVertex.get(out);
+		if (vertexList == null) {
+		    vertexList = new ArrayList<Vertex>();
+		    neighborsForVertex.put(out, vertexList);
                 }
                 vertexList.add(in);
-                }
+	    }
         }
         
         ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
@@ -259,38 +258,37 @@ public class StreetUtils {
     
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
         Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
-                for (Edge e : outgoing) {
-                if (e instanceof PlainStreetEdge) {
-                        PlainStreetEdge pse = (PlainStreetEdge) e;
-                        StreetTraversalPermission permission = pse.getPermission();
-                        permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-                        if (permission == StreetTraversalPermission.NONE) {
-                                graph.removeEdge(pse);
-                        } else {
-                                pse.setPermission(permission);
-                        }
-                }
-        }
-                if (v.getOutgoing().size() == 0) {
-                        graph.removeVertexAndEdges(v);
-                }
-        }
+	for (Edge e : outgoing) {
+	    if (e instanceof PlainStreetEdge) {
+		PlainStreetEdge pse = (PlainStreetEdge) e;
+		StreetTraversalPermission permission = pse.getPermission();
+		permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+		if (permission == StreetTraversalPermission.NONE) {
+		    graph.removeEdge(pse);
+		} else {
+		    pse.setPermission(permission);
+		}
+	    }
+	}
+	if (v.getOutgoing().size() == 0) {
+	    graph.removeVertexAndEdges(v);
+	}
+    }
 
-        private static HashSet<Vertex> computeConnectedSubgraph(
-                Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex) {
+    private static HashSet<Vertex> computeConnectedSubgraph(
+            Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex) {
         HashSet<Vertex> subgraph = new HashSet<Vertex>();
         Queue<Vertex> q = new LinkedList<Vertex>();
         q.add(startVertex);
         while (!q.isEmpty()) {
-	    Vertex vertex = q.poll();
-	    for (Vertex neighbor : neighborsForVertex.get(vertex)) {
-		if (!subgraph.contains(neighbor)) {
-		    subgraph.add(neighbor);
-		    q.add(neighbor);
-		}
-	    }
+            Vertex vertex = q.poll();
+            for (Vertex neighbor : neighborsForVertex.get(vertex)) {
+                if (!subgraph.contains(neighbor)) {
+                    subgraph.add(neighbor);
+                    q.add(neighbor);
+                }
+            }
         }
         return subgraph;
-	}
-        
+    }
 }

@@ -43,7 +43,7 @@ public class ElevatorHopEdge extends AbstractEdge {
     
     @Override
     public State traverse(State s0) {
-    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+        EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
         TraverseOptions options = s0.getOptions();
 
         if (options.wheelchairAccessible && !wheelchairAccessible) {
@@ -65,8 +65,8 @@ public class ElevatorHopEdge extends AbstractEdge {
         }
 
 
-    	StateEditor s1 = s0.edit(this, en);
-    	s1.incrementWeight(options.elevatorHopCost);
+        StateEditor s1 = s0.edit(this, en);
+        s1.incrementWeight(options.elevatorHopCost);
         s1.incrementTimeInSeconds(options.elevatorHopTime);
         return s1.makeState();
     }

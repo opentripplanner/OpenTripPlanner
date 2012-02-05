@@ -45,21 +45,21 @@ public class ElevatorBoardEdge extends AbstractEdge {
     public ElevatorBoardEdge(Vertex from, Vertex to) {
         super(from, to);
 
-	// set up the geometry
-	Coordinate[] coords = new Coordinate[2];
-	coords[0] = new Coordinate(from.getX(), from.getY());
-	coords[1] = new Coordinate(to.getX(), to.getY());
-	// TODO: SRID?
-	the_geom = new GeometryFactory().createLineString(coords);
+        // set up the geometry
+        Coordinate[] coords = new Coordinate[2];
+        coords[0] = new Coordinate(from.getX(), from.getY());
+        coords[1] = new Coordinate(to.getX(), to.getY());
+        // TODO: SRID?
+        the_geom = new GeometryFactory().createLineString(coords);
     }
     
     @Override
     public State traverse(State s0) {
-    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+        EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
         TraverseOptions options = s0.getOptions();
 
-    	StateEditor s1 = s0.edit(this, en);
-    	s1.incrementWeight(options.elevatorBoardCost);
+        StateEditor s1 = s0.edit(this, en);
+        s1.incrementWeight(options.elevatorBoardCost);
         s1.incrementTimeInSeconds(options.elevatorBoardTime);
         return s1.makeState();
     }
@@ -71,7 +71,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
 
     @Override
     public Geometry getGeometry() {
-	return null;
+        return null;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
      */
     @Override
     public boolean hasBogusName() {
-	return true;
+        return true;
     }
     
     public boolean equals(Object o) {
