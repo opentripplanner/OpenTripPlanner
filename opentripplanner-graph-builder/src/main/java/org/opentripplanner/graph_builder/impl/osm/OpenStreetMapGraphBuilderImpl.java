@@ -839,7 +839,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // levels
             for (int i = 0; i < levels.size(); i++) {
                 String level = levels.get(i);
-                Integer numLevel = null;
+                // leaving it null gives NullPointerException when there is no matched 0 level
+                // making it 1 doesn't matter, since its only purpose is to be compared to 0
+                Integer numLevel = 1;
                 
                 // try to parse out the level number
                 try {
@@ -851,12 +853,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     catch (NumberFormatException e2) {
                         try {
-                            numLevel = Integer.parseInt(level.split("@")[1]);
+                            // http://stackoverflow.com/questions/1181969/java-get-last-element-after-split
+                            int lastInd = level.lastIndexOf('@');
+                            if (lastInd != -1) {
+                                numLevel = Integer.parseInt(level.substring(lastInd + 1));
+                            }
                         }
                         catch (NumberFormatException e3) {
-                            // do nothing
-                        }
-                        catch (ArrayIndexOutOfBoundsException e4) {
                             // do nothing
                         }
                     }
@@ -870,18 +873,28 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 String levelName;
                 // get just the human-readable level name from a name like T=Tunnel@-15
                 // first, discard elevation info
-                level = level.split("@")[0];
+                // don't use split, in case there is an @ in the level name; split on only the last
+                // one
+                int lastIndAt = level.lastIndexOf('@');
+                if (lastIndAt >= 1) {
+                    level = level.substring(0, lastIndAt);
+                }
+
                 // if it's there, discard the long name, but put it into a hashmap for retrieval
                 // below
                 // Why not just use the hashmap? Because we need the ordered ArrayList.
-                levelIndex = level.split("=")[0];
-                try {
-                    levelName = level.split("=")[1];
+                Integer levelSplit = level.indexOf('=');
+                if (levelSplit >= 1) {
+                    levelIndex = level.substring(0, levelSplit);
+                    levelName = level.substring(levelSplit + 1);
+                } else {
+                    // set them both the same, the @whatever has already been discarded
+                    levelIndex = levelName = level;
                 }
-                catch (ArrayIndexOutOfBoundsException e) {
-                    // no separate index
-                    levelName = levelIndex;
-                }
+                
+                _log.debug("levelSplit: " + levelSplit + ", levelIndex: " + levelIndex + 
+                           ", levelName: " + levelName);
+
                 // overwrite for later indexing
                 levels.set(i, levelIndex);
 
