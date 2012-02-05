@@ -1216,8 +1216,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * Is this a multi-level node that should be decomposed to multiple coincident nodes?
          * Currently returns true only for elevators.
-         * @param {OSMNode} node
-         * @returns {Boolean} isMultiLevel
+         * @param node
+         * @return whether the node is multi-level
          * @author mattwigway
          */
         private boolean isMultiLevelNode(OSMNode node) {
@@ -1231,8 +1231,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * Record the level of the way for this node, e.g. if the way is at level 5, mark that this 
          * node is active at level 5.
-         * @param {way} the way that has the level
-         * @param {node} the node to record for
+         * @param the way that has the level
+         * @param the node to record for
          * @author mattwigway
          */
         private void recordLevel(OSMWay way, OSMNode node) {
@@ -1259,9 +1259,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * the vertex label is "osm node x" except when there is an elevator or other
          * Z-dimension discontinuity, when it is "osm node x_y", with y representing the
          * OSM level or layer (level preferred).
-         * @param {OSMNode} node The node to fetch a label for.
-         * @param {OSMWay} way The way it is connected to (for fetching level information).
-         * @returns {String} label The label for the graph vertex.
+         * @param node  The node to fetch a label for.
+         * @param way  The way it is connected to (for fetching level information).
+         * @return label  The label for the graph vertex.
          * @author mattwigway
          */
         private String getVertexLabelFromNode (OSMNode node, OSMWay way) {
