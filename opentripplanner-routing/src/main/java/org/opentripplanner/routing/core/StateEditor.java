@@ -129,7 +129,9 @@ public class StateEditor {
                 return null;
             }
 
-            applyPatches();
+            if(!applyPatches()) {
+                return null;
+            }
         }
         spawned = true;
         return child;
@@ -395,22 +397,31 @@ public class StateEditor {
      * state's back edge) and allow these patches to manipulate the StateEditor before the child
      * state is put to use.
      * 
-     * @return whether any patches were applied
+     * @return false if a patch blocked traversal
      */
     private boolean applyPatches() {
-        boolean filtered = false;
         List<Patch> patches = child.backEdge.getPatches();
+        boolean display = false, active = false;
+
         if (patches != null) {
             for (Patch patch : patches) {
-                if (!patch.activeDuring(child.stateData.options, child.getStartTime(),
-                        child.getTime())) {
-                    continue;
+                active  = false;
+                display = patch.displayDuring(child.stateData.options, child.getStartTime(),
+                                              child.getTime());
+
+                if(!display) {
+                    active = patch.activeDuring(child.stateData.options, child.getStartTime(),
+                                                child.getTime());
                 }
-                patch.filterTraverseResult(this);
-                filtered = true;
+
+                if(display || active) {
+                    if(!patch.filterTraverseResult(this, display))
+                        return false;
+                }
             }
         }
-        return filtered;
+
+        return true;
     }
 
     /**

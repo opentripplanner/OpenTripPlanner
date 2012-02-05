@@ -81,6 +81,11 @@ public class TestPatch extends TestCase {
             }
 
             @Override
+            public List<RouteVariant> getVariantsForAgency(String agency) {
+                return null;
+            }
+
+            @Override
             public List<RouteVariant> getVariantsForRoute(AgencyAndId routeId) {
                 Route route = new Route();
                 route.setId(routeId);

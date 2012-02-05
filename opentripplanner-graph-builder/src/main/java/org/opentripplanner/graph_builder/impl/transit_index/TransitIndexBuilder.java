@@ -69,6 +69,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
 
+    private HashMap<String, List<RouteVariant>> variantsByAgency = new HashMap<String, List<RouteVariant>>();
+
     private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
 
     private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
@@ -184,11 +186,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 totalTrips += variant.getTrips().size();
             }
         }
-        _log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips
-                + " trips, " + totalVariants + " variants ");
+        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
+                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
 
-        TransitIndexService service = new TransitIndexServiceImpl(variantsByRoute, variantsByTrip,
-                preBoardEdges, preAlightEdges, directionsByRoute, modes);
+        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
+                variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, modes);
         graph.putService(TransitIndexService.class, service);
     }
 
@@ -381,6 +383,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
         Route route = trip.getRoute();
         // see if we have a variant for this route like this already
+        List<RouteVariant> agencyVariants = variantsByAgency.get(route.getId().getAgencyId());
+        if (agencyVariants == null) {
+            agencyVariants = new ArrayList<RouteVariant>();
+            variantsByAgency.put(route.getId().getAgencyId(), agencyVariants);
+        }
         List<RouteVariant> variants = variantsByRoute.get(route.getId());
         if (variants == null) {
             variants = new ArrayList<RouteVariant>();
@@ -396,6 +403,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             // create a variant for these stops on this route
             variant = new RouteVariant(route, stops);
             variants.add(variant);
+            agencyVariants.add(variant);
         }
         variantsByTrip.put(trip.getId(), variant);
         variant.addTrip(trip);

@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.patch;
 
 import java.util.List;
+import java.util.LinkedList;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,47 +38,40 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 public class AlertPatch extends AbstractPatch {
     private static final long serialVersionUID = -7947169269916558755L;
 
+    private String agency;
+
     private AgencyAndId route;
+
+    private AgencyAndId trip;
 
     private AgencyAndId stop;
 
     private String direction;
 
+    private boolean cancelled = false;
+
     public AlertPatch() {
     }
 
     @Override
-    public void remove(Graph graph) {
-        if (route != null) {
-            TransitIndexService index = graph.getService(TransitIndexService.class);
-            List<RouteVariant> variants = index.getVariantsForRoute(route);
-            for (RouteVariant variant : variants) {
-                if (direction != null && !direction.equals(variant.getDirection())) {
-                    continue;
-                }
-                for (RouteSegment segment : variant.getSegments()) {
-                    if (stop == null || segment.stop.equals(stop)) {
-                        if (segment.board != null) {
-                            segment.board.removePatch(this);
-                        }
-                    }
-                }
-            }
-        } else if (stop != null) {
-            TransitIndexService index = graph.getService(TransitIndexService.class);
-            Edge edge = index.getPreboardEdge(stop);
-            edge.removePatch(this);
-            edge = index.getPrealightEdge(stop);
-            edge.removePatch(this);
-        }
-    }
-
-    @Override
     public void apply(Graph graph) {
+        TransitIndexService index = graph.getService(TransitIndexService.class);
 
-        if (route != null) {
-            TransitIndexService index = graph.getService(TransitIndexService.class);
-            List<RouteVariant> variants = index.getVariantsForRoute(route);
+        if (route != null || trip != null || agency != null) {
+            List<RouteVariant> variants;
+
+            if(trip != null) {
+                variants = new LinkedList<RouteVariant>();
+                RouteVariant tripVariant = index.getVariantForTrip(trip);
+                if(tripVariant != null) {
+                    variants.add(index.getVariantForTrip(trip));
+                }
+            } else if (route != null) {
+               variants = index.getVariantsForRoute(route);
+            } else {
+               variants = index.getVariantsForAgency(agency);
+            }
+
             for (RouteVariant variant : variants) {
                 if (direction != null && !direction.equals(variant.getDirection())) {
                     continue;
@@ -87,21 +81,76 @@ public class AlertPatch extends AbstractPatch {
                         if (segment.board != null) {
                             segment.board.addPatch(this);
                         }
+                        if(segment.alight != null) {
+                            segment.alight.addPatch(this);
+                        }
                     }
                 }
             }
         } else if (stop != null) {
-            TransitIndexService index = graph.getService(TransitIndexService.class);
             Edge edge = index.getPreboardEdge(stop);
-            edge.addPatch(this);
+            if(edge != null)
+                edge.addPatch(this);
+
             edge = index.getPrealightEdge(stop);
-            edge.addPatch(this);
+            if(edge != null)
+                edge.addPatch(this);
         }
     }
 
     @Override
-    public void filterTraverseResult(StateEditor result) {
+    public void remove(Graph graph) {
+        TransitIndexService index = graph.getService(TransitIndexService.class);
+
+        if (route != null || trip != null || agency != null) {
+            List<RouteVariant> variants;
+
+            if(trip != null) {
+                variants = new LinkedList<RouteVariant>();
+                RouteVariant tripVariant = index.getVariantForTrip(trip);
+                if(tripVariant != null) {
+                    variants.add(index.getVariantForTrip(trip));
+                }
+            } else if (route != null) {
+               variants = index.getVariantsForRoute(route);
+            } else {
+               variants = index.getVariantsForAgency(agency);
+            }
+
+            for (RouteVariant variant : variants) {
+                if (direction != null && !direction.equals(variant.getDirection())) {
+                    continue;
+                }
+                for (RouteSegment segment : variant.getSegments()) {
+                    if (stop == null || segment.stop.equals(stop)) {
+                        if (segment.board != null) {
+                            segment.board.removePatch(this);
+                        }
+                        if(segment.alight != null) {
+                            segment.alight.removePatch(this);
+                        }
+                    }
+                }
+            }
+        } else if (stop != null) {
+            Edge edge = index.getPreboardEdge(stop);
+            if(edge != null)
+                edge.removePatch(this);
+
+            edge = index.getPrealightEdge(stop);
+            if(edge != null)
+                edge.removePatch(this);
+        }
+    }
+
+    @Override
+    public boolean filterTraverseResult(StateEditor result, boolean displayOnly) {
         result.addAlert(alert);
+        return displayOnly || !isCancelled();
+    }
+
+    public String getAgency() {
+        return agency;
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
@@ -110,12 +159,33 @@ public class AlertPatch extends AbstractPatch {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    public AgencyAndId getTrip() {
+        return trip;
+    }
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public AgencyAndId getStop() {
         return stop;
     }
 
+    public void setAgencyId(String agency) {
+        this.agency = agency;
+    }
+
     public void setRoute(AgencyAndId route) {
         this.route = route;
+    }
+
+    public void setTrip(AgencyAndId trip) {
+        this.trip = trip;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     public void setDirection(String direction) {
@@ -148,6 +218,24 @@ public class AlertPatch extends AbstractPatch {
                 return false;
             }
         }
+        if (agency == null) {
+            if (other.agency != null) {
+                return false;
+            }
+        } else {
+            if (!agency.equals(other.agency)) {
+                return false;
+            }
+        }
+        if (trip == null) {
+            if (other.trip != null) {
+                return false;
+            }
+        } else {
+            if (!trip.equals(other.trip)) {
+                return false;
+            }
+        }
         if (stop == null) {
             if (other.stop != null) {
                 return false;
@@ -165,6 +253,9 @@ public class AlertPatch extends AbstractPatch {
             if (!route.equals(other.route)) {
                 return false;
             }
+        }
+        if(cancelled != other.cancelled) {
+            return false;
         }
         return other.alert.equals(alert) && super.equals(other);
     }

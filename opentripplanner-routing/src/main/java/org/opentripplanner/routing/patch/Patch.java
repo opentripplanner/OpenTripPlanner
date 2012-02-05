@@ -24,6 +24,8 @@ public interface Patch extends Serializable {
 
     public boolean activeDuring(TraverseOptions options, long start, long end);
 
+    public boolean displayDuring(TraverseOptions options, long start, long end);
+
     public String getId();
 
     void setId(String id);
@@ -32,5 +34,5 @@ public interface Patch extends Serializable {
 
     public void remove(Graph graph);
 
-    public void filterTraverseResult(StateEditor result);
+    public boolean filterTraverseResult(StateEditor result, boolean displayOnly);
 }
