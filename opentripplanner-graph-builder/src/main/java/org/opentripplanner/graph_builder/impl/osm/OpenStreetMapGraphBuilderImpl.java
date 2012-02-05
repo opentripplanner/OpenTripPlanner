@@ -257,7 +257,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if (noZeroLevels && numLevel >= 1000) { // positive level, US
                             // add 1, subract 1000
                             level = "" + (numLevel - 999);
-                            _log.debug("adding 1 to level " + numLevel + " for US audiences.");
                         }
                     }
                     catch (NumberFormatException e) {
@@ -289,7 +288,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             // add 1 to the layer number but subract 2000
                             // added above
                             layer = "" + (numLayer - 1999);
-                            _log.debug("adding 1 to layer " + numLayer + " for US audiences.");
                         }
                     }
                     catch (NumberFormatException e) {
@@ -312,7 +310,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                Integer.toString(numLayer));
                     way.addTag("otp:human_level", layer);
                 } else {
-                    // assume it's ground level
+                    // assume it's ground level, but don't assume it's connected to any other
+                    // ground level
                     way.addTag("otp:numeric_level", "3000");
                     // 0 in a reasonable, 0-based nation, 1 in a (-inf, -1] U [1, inf) 
                     // country like the US
@@ -891,9 +890,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // set them both the same, the @whatever has already been discarded
                     levelIndex = levelName = level;
                 }
-                
-                _log.debug("levelSplit: " + levelSplit + ", levelIndex: " + levelIndex + 
-                           ", levelName: " + levelName);
 
                 // overwrite for later indexing
                 levels.set(i, levelIndex);
