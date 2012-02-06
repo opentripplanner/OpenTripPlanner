@@ -24,28 +24,28 @@ otp.namespace("otp.planner");
   */
 
 otp.planner.TopoRendererStatic = {
-    
+
     map :       null,
     panel :     null,
-    
+
     mainContainerDiv :      null,
     axisDiv :               null,
     terrainContainerDiv :   null,
     terrainDiv :            null,
     previewDiv :            null,
-    
+
     terrainPct :        0.8,
     axisWidth :         40,
     nonBikeLegWidth:    150,
-    
+
     terrainCursor :     null,
-    
+
     currentLeft      :  0,
     currentMouseRect :  null,
     markerLayer    :    null,
     locationPoint  :    null,
     locationMarker :    null,
-    
+
     legInfoArr :        null,
     nonBikeWalkLegCount :   null,
     minElev :           null,
@@ -191,39 +191,38 @@ otp.planner.TopoRendererStatic = {
                 'font-size' : '12px',
                 'font-weight' : 'bold',
                 'text-anchor' : 'end'
-            });            
+            });
         }
-        
+
         // MAIN LOOP
-        
+
         var bgLabels = new Array();
         var fgLabels = new Array();
         var mouseRects = new Array();
         var previewXCoords = new Array();
         var previewYCoords = new Array();
         var currentX = 0, lastTerrainHeight = terrainHeight/2;
-        
+
         // iterate through legs
         for (var li = 0; li < this.legInfoArr.length; li++) {
-                    
             var legInfo = this.legInfoArr[li];
             var leg = legInfo.leg; //itin.m_legStore.getAt(li);
             leg.topoGraphSpan = 0;
             var legStartX = currentX;
-            
+
             // for non-bike/walk legs, insert fixed-width arrow graphic into
             // topo graph indicating a "jump"
             if(leg.get('mode') != "BICYCLE" && leg.get('mode') != "WALK")
             {
                 var prevElevY = (li == 0) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li-1].lastElev-this.minElev)/(this.maxElev-this.minElev);
                 var nextElevY = (li >= this.legInfoArr.length-1) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li+1].firstElev-this.minElev)/(this.maxElev-this.minElev);
-                
+
                 if(isNaN(prevElevY) || prevElevY < 0 || prevElevY >= terrainHeight) prevElevY = terrainHeight/2;
                 if(isNaN(nextElevY) || nextElevY < 0 || nextElevY >= terrainHeight) nextElevY = terrainHeight/2;
-                                
+
                 var midX = currentX + this.nonBikeLegWidth/2;
                 var midY = (prevElevY + nextElevY)/2;
-                                
+
                 var curve = [["M",currentX+4, prevElevY],["C", midX, prevElevY, midX, prevElevY, midX, midY],["C", midX, nextElevY, midX, nextElevY, currentX+this.nonBikeLegWidth-16, nextElevY]];
                 terrainCanvas.path(curve).attr({
                     stroke : 'black', 
@@ -231,8 +230,9 @@ otp.planner.TopoRendererStatic = {
                     fill : 'none'
                 });
 
+                // mode strings (localized to otp.locale by default) 
                 var mode    = leg.get('mode').toLowerCase();
-                var modeStr = otp.util.Modes.translate(mode);
+                var modeStr = otp.util.Modes.translate(mode, this.locale);
                 var imgPath = "images/ui/trip/mode/" + mode + ".png";
 
                 terrainCanvas.image(imgPath, midX-10, midY-10, 20, 20);
