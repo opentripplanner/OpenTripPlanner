@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -57,6 +58,11 @@ public class PatchServiceImpl implements PatchService {
     @Override
     public synchronized void apply(Patch patch) {
         Graph graph = graphService.getGraph();
+
+        if(patches.containsKey(patch.getId())) {
+            expire(patches.get(patch.getId()));
+        }
+
         patch.apply(graph);
         patches.put(patch.getId(), patch);
         if (patch instanceof AlertPatch) {
@@ -84,31 +90,53 @@ public class PatchServiceImpl implements PatchService {
     }
 
     @Override
-    public void expireAllExcept(Set<String> retain) {
+    public void expire(Set<String> purge) {
+        for (String patchId : purge) {
+            if (patches.containsKey(patchId)) {
+                expire(patches.get(patchId));
+            }
+        }
 
+        patches.keySet().removeAll(purge);
+    }
+
+    @Override
+    public void expireAll() {
+        for (Patch patch : patches.values()) {
+            expire(patch);
+        }
+        patches.clear();
+    }
+
+    @Override
+    public void expireAllExcept(Set<String> retain) {
         ArrayList<String> toRemove = new ArrayList<String>();
-        Graph graph = graphService.getGraph();
 
         for (Entry<String, Patch> entry : patches.entrySet()) {
             final String key = entry.getKey();
             if (!retain.contains(key)) {
                 toRemove.add(key);
-                Patch patch = entry.getValue();
-                if (patch instanceof AlertPatch) {
-                    AlertPatch alertPatch = (AlertPatch) patch;
-                    AgencyAndId stop = alertPatch.getStop();
-                    if (stop != null) {
-                        MapUtils.removeFromMapList(patchesByStop, stop, patch);
-                    }
-                    AgencyAndId route = alertPatch.getRoute();
-                    if (route != null) {
-                        MapUtils.removeFromMapList(patchesByRoute, stop, patch);
-                    }
-                }
-                patch.remove(graph);
+                expire(entry.getValue());
             }
         }
         patches.keySet().removeAll(toRemove);
     }
 
+    private void expire(Patch patch) {
+        Graph graph = graphService.getGraph();
+
+        if (patch instanceof AlertPatch) {
+            AlertPatch alertPatch = (AlertPatch) patch;
+            AgencyAndId stop = alertPatch.getStop();
+            if (stop != null) {
+                MapUtils.removeFromMapList(patchesByStop, stop, patch);
+            }
+            AgencyAndId route = alertPatch.getRoute();
+            if (route != null) {
+                MapUtils.removeFromMapList(patchesByRoute, stop, patch);
+            }
+        }
+
+        patch.remove(graph);
+    }
 }

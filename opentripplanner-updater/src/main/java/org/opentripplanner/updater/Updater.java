@@ -41,6 +41,8 @@ public class Updater implements Runnable {
 
     private long earlyStart;
 
+    private UpdateHandler updateHandler = null;
+
     public void setUrl(String url) {
         this.url = url;
     }
@@ -71,12 +73,15 @@ public class Updater implements Runnable {
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
-            FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
-            UpdateHandler updateHandler = new UpdateHandler(feed);
+            if(updateHandler == null) {
+                updateHandler = new UpdateHandler();
+            }
             updateHandler.setEarlyStart(earlyStart);
             updateHandler.setDefaultAgencyId(defaultAgencyId);
             updateHandler.setPatchService(getPatchService());
-            updateHandler.update();
+
+            FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
+            updateHandler.update(feed);
         } catch (IOException e) {
             log.error("Eror reading gtfs-realtime feed from " + url, e);
         }
