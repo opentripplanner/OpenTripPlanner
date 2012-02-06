@@ -213,8 +213,8 @@ otp.planner.TopoRendererStatic = {
             
             // for non-bike/walk legs, insert fixed-width arrow graphic into
             // topo graph indicating a "jump"
-            if(leg.get('mode') != "BICYCLE" && leg.get('mode') != "WALK") {
-
+            if(leg.get('mode') != "BICYCLE" && leg.get('mode') != "WALK")
+            {
                 var prevElevY = (li == 0) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li-1].lastElev-this.minElev)/(this.maxElev-this.minElev);
                 var nextElevY = (li >= this.legInfoArr.length-1) ? terrainHeight/2 : terrainHeight-terrainHeight*(this.legInfoArr[li+1].firstElev-this.minElev)/(this.maxElev-this.minElev);
                 
@@ -229,17 +229,20 @@ otp.planner.TopoRendererStatic = {
                     stroke : 'black', 
                     'stroke-width' : '6',
                     fill : 'none'
-                });  
-                
-                var imgPath = "images/ui/trip/mode/"+leg.get('mode').toLowerCase()+".png";
+                });
+
+                var mode    = leg.get('mode').toLowerCase();
+                var modeStr = otp.util.Modes.translate(mode);
+                var imgPath = "images/ui/trip/mode/" + mode + ".png";
+
                 terrainCanvas.image(imgPath, midX-10, midY-10, 20, 20);
-                
+
                 // draw the arrowhead
                 terrainCanvas.path(["M",currentX+this.nonBikeLegWidth-16, nextElevY-12, "L", currentX+this.nonBikeLegWidth-4, nextElevY, "L", currentX+this.nonBikeLegWidth-16, nextElevY+12,"z"]).attr({
                     fill: 'black',
                     stroke: 'none'
                 });
-                terrainCanvas.text(currentX + this.nonBikeLegWidth/2, terrainHeight - 10, leg.get('mode')+" "+leg.get('routeShortName')).attr({
+                terrainCanvas.text(currentX + this.nonBikeLegWidth/2, terrainHeight - 10, modeStr + " " + leg.get('routeShortName')).attr({
                     fill: 'black',
                     'font-size' : '14px',
                     'font-weight' : 'bold'
@@ -358,19 +361,19 @@ otp.planner.TopoRendererStatic = {
                         thisTR.markerLayer.redraw();
                     }
                 });
-                
+
                 mouseRect.mousemove(function (event) {
                     // shift terrain cursor to follow mouse movement
                     var nx = Math.round(event.clientX - thisTR.panel.getEl().getLeft() - thisTR.axisWidth - thisTR.currentLeft);
                     thisTR.terrainCursor.attr({x : nx});
-                    
+
                     // also, show / move the locator marker on the main map
                     var distAlongLS = this.leg.get('legGeometry').getLength() * (nx-this.legStartX)/this.leg.topoGraphSpan;
-                    thisTR.locationPoint = thisTR.pointAlongLineString(this.leg.get('legGeometry'), distAlongLS);                    
-                    if(thisTR.markerLayer == null) {                        
+                    thisTR.locationPoint = thisTR.pointAlongLineString(this.leg.get('legGeometry'), distAlongLS);
+                    if(thisTR.markerLayer == null) {
                         thisTR.markerLayer = thisTR.map.getMap().getLayersByName('trip-marker-layer')[0];
                     }
-                    
+
                     if(thisTR.locationMarker == null || thisTR.locationMarker.attributes.mode != this.leg.get('mode')) {
                         var topoMarkerID = this.leg.get('mode').toLowerCase()+'-topo-marker';
                         thisTR.locationMarker = thisTR.markerLayer.getFeatureById(topoMarkerID);
@@ -404,7 +407,6 @@ otp.planner.TopoRendererStatic = {
                 opacity : .5,
                 stroke : 'none'
             });
-            
         } // end of leg loop
         
         // bring terrain cursor and street labels (currently hidden) to foreground
