@@ -49,6 +49,8 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -184,6 +186,7 @@ public class PlanGenerator {
      */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         Itinerary itinerary = makeEmptyItinerary(path);
+        EdgeNarrative postponedAlerts = null;
 
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -200,6 +203,13 @@ public class PlanGenerator {
                 continue;
             }
             if (backEdge instanceof FreeEdge) {
+                if(backEdge instanceof PreBoardEdge) {
+                    // Add boarding alerts to the next leg
+                    postponedAlerts = backEdgeNarrative;
+                } else if(backEdge instanceof PreAlightEdge) {
+                    // Add alighting alerts to the previous leg
+                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdgeNarrative);
+                }
                 continue;
             }
 
@@ -380,6 +390,12 @@ public class PlanGenerator {
                         coordinates.extend(edgeCoordinates);
                     }
                 }
+
+                if(postponedAlerts != null) {
+                    addNotesToLeg(leg, postponedAlerts);
+                    postponedAlerts = null;
+                }
+
                 addNotesToLeg(leg, backEdgeNarrative);
                 if (pgstate == PlanGenState.TRANSIT) {
                     itinerary.transitTime += state.getElapsedTime();
