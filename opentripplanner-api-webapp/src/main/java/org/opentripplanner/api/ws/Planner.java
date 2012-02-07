@@ -143,6 +143,12 @@ public class Planner {
      *             value to discourage transfers.  Of course, transfers that save significant
      *             time or walking will still be taken.
      * 
+     * @param maxTransfers
+     *          The maximum number of transfers (that is, one plus the maximum number of boardings)
+     *          that a trip will be allowed.  Larger values will slow performance, but could give
+     *          better routes.  This is limited on the server side by the MAX_TRANSFERS value in 
+     *          org.opentripplanner.api.ws.Planner.
+     * 
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
      * 
