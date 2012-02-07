@@ -428,7 +428,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         
         /* the RLIS/CCGIS:bicycle=designated mixins are coded out as they are no longer neccessary because of
            of the bicycle=designated block of code above.  This switch makes our weighting system less reliant
-           on tags that aren't generally used by the OSM community */
+           on tags that aren't generally used by the OSM community, and prevents the double counting that was 
+           occuring on streets with both bicycle infrastructure and an RLIS:bicycle=designated tag */
            
         /* setProperties(props, "RLIS:bicycle=designated", 
             StreetTraversalPermission.ALL, 0.97, 0.97, true); */
