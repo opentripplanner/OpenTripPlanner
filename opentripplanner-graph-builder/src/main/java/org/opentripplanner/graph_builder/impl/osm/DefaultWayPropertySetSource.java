@@ -292,20 +292,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
         /* footway */
         setProperties(props, "highway=footway;bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
-            
-        /* track */
-        setProperties(props, "highway=track;bicycle=yes",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.18, 1.18);
-        setProperties(props, "highway=track;bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.99, 0.99);
-        setProperties(props, "highway=track;bicycle=yes;surface=*",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.18, 1.18);
-        setProperties(props, "highway=track;bicycle=designated;surface=*",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.99, 0.99);
-        setProperties(props, "highway=track;surface=*",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.3, 1.3);
-
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);     
         /* Portland area specific tags */
         setProperties(props, "highway=footway;RLIS:bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
@@ -323,26 +310,58 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.1, 1.1);
         setProperties(props, "highway=footway;footway=crossing;bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.0, 1.0);
-                
         /* Portland area specific tags */
         setProperties(props, "footway=sidewalk;highway=footway;RLIS:bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1, 1);
         setProperties(props, "footway=sidewalk;highway=footway;CCGIS:bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1, 1);
 
+        /* bicycles on tracks (tracks are defined in OSM as: Roads for agricultural use, gravel roads in the 
+           forest etc.; usually unpaved/unsealed but may occasionally apply to paved tracks as well.)  */
+        setProperties(props, "highway=track;bicycle=yes",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.18, 1.18);
+        setProperties(props, "highway=track;bicycle=designated",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.99, 0.99);
+        setProperties(props, "highway=track;bicycle=yes;surface=*",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.18, 1.18);
+        setProperties(props, "highway=track;bicycle=designated;surface=*",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.99, 0.99);
+        /* this is to avoid double counting since tracks are almost of surface type that is penalized*/ 
+        setProperties(props, "highway=track;surface=*",
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 1.3, 1.3);
+            
+        /* bicycle=designated, but no bike infrastructure is present */
+        setProperties(props, "highway=*;bicycle=designated", 
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.97, 0.97);
+        setProperties(props, "highway=service;bicycle=designated",
+            StreetTraversalPermission.ALL, 0.84, 0.84);
+        setProperties(props, "highway=residential;bicycle=designated",
+            StreetTraversalPermission.ALL, 0.95, 0.95);
+        setProperties(props, "highway=residential_link;bicycle=designated",
+            StreetTraversalPermission.ALL, 0.95, 0.95);
+        setProperties(props, "highway=tertiary;bicycle=designated",
+            StreetTraversalPermission.ALL, 0.97, 0.97);
+        setProperties(props, "highway=tertiary_link;bicycle=designated",
+            StreetTraversalPermission.ALL, 0.97, 0.97);
+        setProperties(props, "highway=secondary;bicycle=designated",
+            StreetTraversalPermission.ALL, 1.46, 1.46);
+        setProperties(props, "highway=secondary_link;bicycle=designated",
+            StreetTraversalPermission.ALL, 1.46, 1.46);
+        setProperties(props, "highway=primary;bicycle=designated",
+            StreetTraversalPermission.ALL, 2, 2);
+        setProperties(props, "highway=primary_link;bicycle=designated",
+            StreetTraversalPermission.ALL, 2, 2);
+        setProperties(props, "highway=trunk;bicycle=designated",
+            StreetTraversalPermission.BICYCLE_AND_CAR, 7.25, 7.25);
+        setProperties(props, "highway=trunk_link;bicycle=designated",
+            StreetTraversalPermission.BICYCLE_AND_CAR, 2, 2);
+        setProperties(props, "highway=motorway;bicycle=designated",
+            StreetTraversalPermission.BICYCLE_AND_CAR, 7.76, 7.76);
+        setProperties(props, "highway=motorway_link;bicycle=designated",
+            StreetTraversalPermission.BICYCLE_AND_CAR, 2, 2);
 
         /*** special situations ****/
 
-        /* if service roads are meant to be a bike route, we want to encourage their use above residential **/
-        setProperties(props, "highway=service;bicycle=designated",
-            StreetTraversalPermission.ALL, 0.84, 0.84);
-
-        /* Portland area specific tags */
-        setProperties(props, "highway=service;RLIS:bicycle=designated",
-            StreetTraversalPermission.ALL, 0.87, 0.87);
-        setProperties(props, "highway=service;CCGIS:bicycle=designated",
-            StreetTraversalPermission.ALL, 0.87, 0.87);
-        
         /* cycleway:left/right=lane/track/shared_lane permutations -
          * no longer needed because left/right matching algorithm 
          * does this 
@@ -406,17 +425,22 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.ALL, 3.0, 3.0, true);
         
         /* Portland-local mixins */
-        setProperties(props, "RLIS:bicycle=designated", 
-            StreetTraversalPermission.ALL, 0.97, 0.97, true);
+        
+        /* the RLIS/CCGIS:bicycle=designated mixins are coded out as they are no longer neccessary because of
+           of the bicycle=designated block of code above.  This switch makes our weighting system less reliant
+           on tags that aren't generally used by the OSM community */
+           
+        /* setProperties(props, "RLIS:bicycle=designated", 
+            StreetTraversalPermission.ALL, 0.97, 0.97, true); */
         setProperties(props, "RLIS:bicycle=caution_area", 
             StreetTraversalPermission.ALL, 1.45, 1.45, true);
         setProperties(props, "RLIS:bicycle:right=caution_area", 
             StreetTraversalPermission.ALL, 1.45, 1.0, true);
         setProperties(props, "RLIS:bicycle:left=caution_area", 
             StreetTraversalPermission.ALL, 1.0, 1.45, true);
-        setProperties(props, "CCGIS:bicycle=designated", 
-            StreetTraversalPermission.ALL, 0.97, 0.97, true);
-        setProperties(props, "CCGIS:bicycle=caution_area", 
+        /* setProperties(props, "CCGIS:bicycle=designated", 
+            StreetTraversalPermission.ALL, 0.97, 0.97, true); */
+        setProperties(props, "CCGIS:bicycle=caution_area",
             StreetTraversalPermission.ALL, 1.45, 1.45, true);
         setProperties(props, "CCGIS:bicycle:right=caution_area", 
             StreetTraversalPermission.ALL, 1.45, 1.0, true);
