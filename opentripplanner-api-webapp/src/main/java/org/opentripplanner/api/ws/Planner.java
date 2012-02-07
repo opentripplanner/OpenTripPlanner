@@ -118,10 +118,30 @@ public class Planner {
      *            The maximum number of possible itineraries to return.
      *            
      * @param preferredRoutes
-     *            The list of preferred routes.
+     *            The list of preferred routes.  The format is agency_route, so TriMet_100.
      * 
      * @param unpreferredRoutes
-     *            The list of unpreferred routes.
+     *            The list of unpreferred routes.  The format is agency_route, so TriMet_100.
+     * 
+     * @param bannedRoutes
+     *            The list of banned routes.  The format is agency_route, so TriMet_100.
+     * 
+     * @param minTransferTime
+     *            The minimum time, in seconds, between successive trips on different vehicles.
+     *            This is designed to allow for imperfect schedule adherence.  This is a minimum;
+     *            transfers over longer distances might use a longer time.
+     * 
+     * @param showIntermediateStops
+     *             Whether intermediate stops -- those that the itinerary passes in a vehicle, but 
+     *             does not board or alight at -- should be returned in the response.  For example,
+     *             on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and 
+     *             Atlantic Avenue should be included.
+     * 
+     * @param transferPenalty
+     *             An additional penalty added to boardings after the first.  The value is in OTP's
+     *             internal weight units, which are roughly equivalent to seconds.  Set this to a high
+     *             value to discourage transfers.  Of course, transfers that save significant
+     *             time or walking will still be taken.
      * 
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
