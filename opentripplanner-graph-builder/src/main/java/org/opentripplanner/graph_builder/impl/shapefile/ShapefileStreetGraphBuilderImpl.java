@@ -139,6 +139,12 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 String name = streetNameConverter.convert(feature);
                 Coordinate[] coordinates = geom.getCoordinates();
 
+                if (coordinates.length < 2) {
+                    //not a real linestring
+                    log.warn("Bad geometry for street with id " + id + " name " + name);
+                    continue;
+                }
+                
                 // this rounding is a total hack, to work around
                 // http://jira.codehaus.org/browse/GEOT-2811
                 Coordinate startCoordinate = new Coordinate(
