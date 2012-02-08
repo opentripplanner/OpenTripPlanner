@@ -24,24 +24,24 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.customize.ClassCustomizer;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,10 +109,10 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     private void addReachToGraph(Graph graph) {
 
-        HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>> classMapping = new HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>>();
+        HashMap<Class<? extends Edge>, Class<? extends Edge>> classMapping = new HashMap<Class<? extends Edge>, Class<? extends Edge>>();
 
-        HashSet<DirectEdge> edgesToRemove = new HashSet<DirectEdge>();
-        HashSet<DirectEdge> edgesToAdd = new HashSet<DirectEdge>();
+        HashSet<Edge> edgesToRemove = new HashSet<Edge>();
+        HashSet<Edge> edgesToAdd = new HashSet<Edge>();
         for (Vertex vertex : graph.getVertices()) {
             for (Edge e : vertex.getOutgoing()) {
                 if (e instanceof StreetEdge) {
@@ -132,19 +132,20 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 }
             }
         }
-        for (DirectEdge e: edgesToRemove) {
-            graph.removeEdge(e);
+        for (Edge e: edgesToRemove) {
+            e.detach();
         }
 
-        for (DirectEdge e: edgesToAdd) {
-            graph.addEdge(e);
-        }
+// should no longer be necessary        
+//        for (Edge e: edgesToAdd) {
+//            graph.addVerticesFromEdge(e);
+//        }
     }
 
     @SuppressWarnings("unchecked")
-    private DirectEdge reachifyEdge(Graph graph, HashMap<Class<? extends DirectEdge>, Class<? extends DirectEdge>> classMapping, DirectEdge e) {
-        Class<? extends DirectEdge> oldClass = e.getClass();
-        Class<? extends DirectEdge> newClass = classMapping.get(oldClass);
+    private Edge reachifyEdge(Graph graph, HashMap<Class<? extends Edge>, Class<? extends Edge>> classMapping, Edge e) {
+        Class<? extends Edge> oldClass = e.getClass();
+        Class<? extends Edge> newClass = classMapping.get(oldClass);
 
         if (newClass == null) {
             String newClassName = oldClass.getName() + "WithReach";
@@ -154,7 +155,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             customizer.addDoubleField("reach");
             // create the new class
             
-            newClass = (Class<? extends DirectEdge>) customizer.saveClass();
+            newClass = (Class<? extends Edge>) customizer.saveClass();
             classMapping.put(oldClass, newClass);
         }
         EdgeWithReach newEdge = (EdgeWithReach) ClassCustomizer.reclass(e, newClass);
@@ -252,7 +253,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 edgesToRemove.add(e);
             }
             for (EdgeWithReach e : edgesToRemove) {
-                ograph.removeDirectEdge(e);
+                ograph.removeEdge(e);
                 removed++;
             }
         }
@@ -270,7 +271,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addDirectEdge((DirectEdge) e);
+                        workingGraph.addEdge(e);
                     }
                 }
             }
@@ -278,7 +279,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 if (e instanceof EdgeWithReach) {
                     if (!added.contains(e)) {
                         added.add(e);
-                        workingGraph.addDirectEdge((DirectEdge) e);
+                        workingGraph.addEdge(e);
                     }
                 }
             }
@@ -297,12 +298,12 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     private Set<Vertex> getWalkingVertices(OverlayGraph ograph, TraverseOptions options) {
         Set<Vertex> streetVertices = new HashSet<Vertex>();
         for (Vertex vertex : ograph.getVertices()) {
-            if (vertex instanceof StreetVertex) {
+            if (vertex instanceof TurnVertex) {
                 GenericDijkstra dijkstra = new GenericDijkstra(options, ograph);
                 ShortestPathTree spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
-                    if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
+                    if (v2 instanceof TurnVertex || v2 instanceof IntersectionVertex) {
                         streetVertices.add(s.getVertex());
                     }
                 }
@@ -310,7 +311,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
                 spt = dijkstra.getShortestPathTree(new State(vertex, options));
                 for (State s : spt.getAllStates()) {
                     Vertex v2 = s.getVertex();
-                    if (v2 instanceof StreetVertex || v2 instanceof EndpointVertex) {
+                    if (v2 instanceof TurnVertex || v2 instanceof IntersectionVertex) {
                         streetVertices.add(s.getVertex());
                     }
                 }
@@ -435,12 +436,12 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
             HashMap<Edge, Double> reachEstimateForEdge, boolean transitStops) {
         Double reach = reachEstimateForEdge.get(edge);
         if (reach == null) {
-            newGraph.addDirectEdge(edge);
+            newGraph.addEdge(edge);
             return 0;
         }
 
         if (reach >= epsilon) {
-            newGraph.addDirectEdge(edge);
+            newGraph.addEdge(edge);
             return 0;
         }
 

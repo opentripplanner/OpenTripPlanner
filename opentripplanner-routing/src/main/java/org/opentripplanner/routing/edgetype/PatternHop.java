@@ -20,8 +20,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -42,9 +42,9 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     private Geometry geometry = null;
 
-    public PatternHop(Vertex startJourney, Vertex endJourney, Stop start, Stop end, int stopIndex,
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
-        super(startJourney, endJourney, tripPattern);
+        super(from, to, tripPattern);
         this.start = start;
         this.end = end;
         this.stopIndex = stopIndex;

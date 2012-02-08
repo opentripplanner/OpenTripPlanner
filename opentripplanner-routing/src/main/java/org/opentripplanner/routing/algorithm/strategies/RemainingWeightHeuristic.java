@@ -16,7 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.io.Serializable;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * Interface for classes that provides an admissible estimate of (lower bound on) 

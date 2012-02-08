@@ -11,12 +11,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 
-public class TransitStop extends Vertex {
+public class TransitStop extends OffboardVertex {
     private static final long serialVersionUID = 1L;
     private boolean wheelchairEntrance;
     private boolean isEntrance;
@@ -28,8 +32,8 @@ public class TransitStop extends Vertex {
      */
     private boolean local = false;
 
-    public TransitStop(String id, double lon, double lat, String name, AgencyAndId stopId, Stop stop) {
-        super(id, lon, lat, name, stopId);
+    public TransitStop(Graph graph, Stop stop) {
+        super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop);
         if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
         }
@@ -49,5 +53,14 @@ public class TransitStop extends Vertex {
     }
     public boolean isLocal() {
         return local;
+    }
+
+    public boolean hasEntrances() {
+        for (Edge e : this.getOutgoing()) {
+            if (e instanceof PathwayEdge) {
+                return true;
+            }
+        }
+        return false;
     }
 }

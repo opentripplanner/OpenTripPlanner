@@ -16,10 +16,10 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.List;
 
-import org.opentripplanner.routing.core.DirectEdge;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -29,12 +29,12 @@ public interface StreetVertexIndexService {
     public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options);
 
     public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options,
-            List<DirectEdge> extraEdges);
+            List<Edge> extraEdges);
 
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
     public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options,
-            List<DirectEdge> extraEdges);
+            List<Edge> extraEdges);
 
     public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options);
 }

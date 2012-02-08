@@ -17,8 +17,8 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

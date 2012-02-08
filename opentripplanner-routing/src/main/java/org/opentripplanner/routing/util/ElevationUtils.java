@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 
 public class ElevationUtils {
-    private static Logger log = LoggerFactory.getLogger(StreetVertex.class);
+    private static Logger log = LoggerFactory.getLogger(TurnVertex.class);
 
     /*
      * These numbers disagree with everything else I (David Turner) have read about the energy cost

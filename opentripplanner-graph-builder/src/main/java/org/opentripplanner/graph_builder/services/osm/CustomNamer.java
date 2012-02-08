@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.services.osm;
 
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * For when CreativeNamePicker/WayPropertySet is just not powerful enough.

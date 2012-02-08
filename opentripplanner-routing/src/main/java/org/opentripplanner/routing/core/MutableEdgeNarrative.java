@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
 /**

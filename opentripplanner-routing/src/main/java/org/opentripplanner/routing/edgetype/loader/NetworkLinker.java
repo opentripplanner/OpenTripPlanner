@@ -15,14 +15,15 @@ package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
 
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.core.TransitStop;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,37 +49,24 @@ public class NetworkLinker {
     public void createLinkage() {
 
         _log.debug("creating linkages...");
-        ArrayList<Vertex> vertices = new ArrayList<Vertex>(graph.getVertices());
+        // iterate over a copy of vertex list because it will be modified
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        vertices.addAll(graph.getVertices());
 
-        for (Vertex v : vertices) {
-
-            if (v instanceof TransitStop) {
-                // only connect transit stops that (a) are entrances, or (b) have no associated
-                // entrances
-                TransitStop ts = (TransitStop) v;
-                if (!ts.isEntrance()) {
-                    boolean hasEntrance = false;
-
-                    for (Edge e : v.getOutgoing()) {
-                        if (e instanceof PathwayEdge) {
-                            hasEntrance = true;
-                            break;
-                        }
-                    }
-                    if (hasEntrance) {
-                        // transit stop has entrances
-                        continue;
-                    }
-                }
-
+        for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+            // only connect transit stops that (a) are entrances, or (b) have no associated
+            // entrances
+            if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!networkLinkerLibrary.connectVertexToStreets(v, wheelchairAccessible)) {
-                	_log.warn(GraphBuilderAnnotation.register(graph, Variety.STOP_UNLINKED, ts));
+                if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible)) {
+                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.STOP_UNLINKED, ts));
                 }
             }
         }
-
-        networkLinkerLibrary.addAllReplacementEdgesToGraph();
+        // no longer necessary
+        //networkLinkerLibrary.addAllReplacementEdgesToGraph();
+        
+        // Do we really need this? Commenting out does seem to cause some slowdown. (AMB)
         networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
     }

@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.vertextype;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -19,10 +19,11 @@ import java.util.Set;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
@@ -33,9 +34,8 @@ import com.vividsolutions.jts.geom.LineString;
 /**
  * This vertex represents one direction of a street. Its location is the start of that street in
  * that direction.  It contains most of the data used for edges from the street.
- * 
  */
-public class StreetVertex extends Vertex {
+public class TurnVertex extends StreetVertex {
 
     private static final long serialVersionUID = -385126804908021091L;
 
@@ -88,15 +88,15 @@ public class StreetVertex extends Vertex {
 
     private boolean noThruTraffic = false;
 
-    public StreetVertex(String id, LineString geometry, String name, double length, boolean back, Set<Alert> notes) {
-        super(id + (back ? " back" : ""), getCoord(geometry), name);
+    public TurnVertex(Graph g, String id, LineString geometry, String name, double length, 
+    	              boolean back, Set<Alert> notes) {
+        super(g, id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
         this.length = length;
         this.bicycleSafetyEffectiveLength = length;
         this.slopeWorkCost = length;
         this.slopeSpeedEffectiveLength = length;
-        this.name = name;
         this.permission = StreetTraversalPermission.ALL;
         this.notes = notes;
         
@@ -248,7 +248,7 @@ public class StreetVertex extends Vertex {
     }
 
     public String toString() {
-        return "<" + label + " (" + name + ")>";
+        return "<" + getLabel() + " (" + getName() + ")>";
     }
 
     public String getEdgeId() {

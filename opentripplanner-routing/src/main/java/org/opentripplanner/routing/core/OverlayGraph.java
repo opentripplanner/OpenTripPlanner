@@ -23,6 +23,11 @@ import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.List;
 
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+
 
 /**
  * Allows adding supplemental edges to existing vertices in another graph. Useful for CH, and
@@ -95,14 +100,14 @@ public class OverlayGraph implements Serializable {
         }
     }
 
-    public void addDirectEdge(DirectEdge e) {
+    public void addEdge(Edge e) {
         Vertex fromv = e.getFromVertex();
         Vertex tov = e.getToVertex();
         addOutgoing(fromv, e);
         addIncoming(tov, e);
     }
 
-    public void removeDirectEdge(DirectEdge e) {
+    public void removeEdge(Edge e) {
         Vertex fromv = e.getFromVertex();
         Vertex tov = e.getToVertex();
         removeOutgoing(fromv, e);
@@ -165,8 +170,8 @@ public class OverlayGraph implements Serializable {
     // List<Edge> toRemove = outgoing.remove(vertex);
     // toRemove.addAll(incoming.remove(vertex));
     // for (Edge e : toRemove)
-    // if (e instanceof DirectEdge)
-    // removeDirectEdge((DirectEdge)e);
+    // if (e instanceof Edge)
+    // removeEdge((Edge)e);
     // }
 
     public void removeVertex(Vertex vertex) {

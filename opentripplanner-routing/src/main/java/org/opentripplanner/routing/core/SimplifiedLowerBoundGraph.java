@@ -20,8 +20,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
@@ -99,15 +103,14 @@ public class SimplifiedLowerBoundGraph {
             List<Vertex> group = vertex_by_gindex.get(from_gindex);
             for (Vertex u : group) {
                 for (Edge e : u.getOutgoing()) {
-                    DirectEdge de = (DirectEdge) e;
-                    Vertex v = de.getToVertex();
+                    Vertex v = e.getToVertex();
                     int to_gindex = v.getGroupIndex();
                     if (to_gindex == from_gindex)
                         continue;
-                    if (de instanceof PatternHop || de instanceof Hop)
-                        putIfBetter(distEdges, from_gindex, to_gindex, de.timeLowerBound(dummyOptions));
+                    if (e instanceof PatternHop || e instanceof Hop)
+                        putIfBetter(distEdges, from_gindex, to_gindex, e.timeLowerBound(dummyOptions));
                     else 
-                        putIfBetter(distEdges, from_gindex, to_gindex, de.getDistance());
+                        putIfBetter(distEdges, from_gindex, to_gindex, e.getDistance());
                 }
             }
         }
@@ -151,7 +154,7 @@ public class SimplifiedLowerBoundGraph {
         double[] result = new double[max_gindex];
         Arrays.fill(result, Double.POSITIVE_INFINITY);
         IntBinHeap q = new IntBinHeap(max_gindex / 2);
-        for (DirectEdge de : origin.getExtra()) {
+        for (Edge de : origin.getExtra()) {
             Vertex toVertex = de.getToVertex();
             int toGroup = toVertex.getGroupIndex();
             if (toVertex == origin)

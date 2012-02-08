@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 
 public interface DummyableEdge {
 

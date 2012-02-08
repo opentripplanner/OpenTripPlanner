@@ -17,20 +17,20 @@ import java.util.Collection;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
 public interface TransitIndexService {
-    public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
+	public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
+	
+	public RouteVariant getVariantForTrip(AgencyAndId trip);
 
-    public RouteVariant getVariantForTrip(AgencyAndId trip);
+	public Edge getPreboardEdge(AgencyAndId stop);
 
-    public Edge getPreboardEdge(AgencyAndId stop);
+	public Edge getPrealightEdge(AgencyAndId stop);
 
-    public Edge getPrealightEdge(AgencyAndId stop);
+	public Collection<String> getDirectionsForRoute(AgencyAndId route);
 
-    public Collection<String> getDirectionsForRoute(AgencyAndId route);
-
-    public List<TraverseMode> getAllModes();
+	public List<TraverseMode> getAllModes();
 }

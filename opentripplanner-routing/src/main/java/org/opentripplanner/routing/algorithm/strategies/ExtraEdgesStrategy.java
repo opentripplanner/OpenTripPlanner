@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.io.Serializable;
 
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * When a temporary {@link Vertex} is generated at the origin or destination of a search, it is

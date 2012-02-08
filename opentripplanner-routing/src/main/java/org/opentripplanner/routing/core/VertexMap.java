@@ -15,6 +15,9 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 
+import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Vertex;
+
 @SuppressWarnings("unchecked")
 public class VertexMap<T> {
 	
@@ -25,7 +28,7 @@ public class VertexMap<T> {
 	}
 
 	public VertexMap() {
-		this(Vertex.getMaxIndex());
+		this(AbstractVertex.getMaxIndex());
 	}
 	
 	public void set(Vertex v, T elem) {

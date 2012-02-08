@@ -22,18 +22,18 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.core.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 public class TestHopFactory extends TestCase {
@@ -69,7 +69,7 @@ public class TestHopFactory extends TestCase {
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
-        for (DirectEdge e : filter(journey_a_1.getOutgoing(),DirectEdge.class)) {
+        for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
                 assertEquals(PatternAlight.class, e.getClass());
             } else {

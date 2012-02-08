@@ -21,7 +21,7 @@ import org.codehaus.jackson.map.JsonSerializer;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializerProvider;
 import org.codehaus.jackson.map.module.SimpleModule;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 
 /**

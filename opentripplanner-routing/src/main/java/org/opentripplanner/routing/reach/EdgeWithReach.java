@@ -13,9 +13,9 @@
 
 package org.opentripplanner.routing.reach;
 
-import org.opentripplanner.routing.core.DirectEdge;
+import org.opentripplanner.routing.graph.Edge;
 
-public interface EdgeWithReach extends DirectEdge {
+public interface EdgeWithReach extends Edge {
     public void setReach(double reach);
     //public void setTransitReach(double reach);
 

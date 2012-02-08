@@ -21,26 +21,27 @@ import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +67,8 @@ public class LocalStopFinder {
 
     private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
 
+    private HashMap<AgencyAndId, TransitStop> transitStops;
+    
     public LocalStopFinder(StreetVertexIndexServiceImpl indexService, Graph graph) {
         this.graph = graph;
         this.indexService = indexService;
@@ -74,11 +77,13 @@ public class LocalStopFinder {
     public void markLocalStops() {
         _log.debug("Finding local stops");
         patterns = new HashSet<TripPattern>();
-
+        transitStops = new HashMap<AgencyAndId, TransitStop>();
         int total = 0;
         for (Vertex gv : graph.getVertices()) {
             if (gv instanceof TransitStop) {
-                ((TransitStop) gv).setLocal(true);
+                TransitStop ts = (TransitStop) gv;
+                ts.setLocal(true);
+                transitStops.put(ts.getStopId(), ts);
                 total ++;
             }
             for (Edge e : gv.getOutgoing()) {
@@ -235,7 +240,7 @@ public class LocalStopFinder {
 
             if (fromv instanceof TransitStop) {
                 Vertex departureVertex = null;
-                for (DirectEdge e : filter(fromv.getOutgoing(),DirectEdge.class)) {
+                for (Edge e : fromv.getOutgoing()) {
                     /* to departure vertex */
                     departureVertex = e.getToVertex();
                     break;
@@ -300,8 +305,7 @@ public class LocalStopFinder {
     }
 
     private TransitStop getVertexForStop(Stop stop) {
-        String label = GtfsLibrary.convertIdToString(stop.getId());
-        return (TransitStop) graph.getVertex(label);
+        return transitStops.get(stop.getId());
     }
 
     private HashSet<TripPattern> getNearbyPatterns(Stop stop) {
@@ -314,12 +318,12 @@ public class LocalStopFinder {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
                     // enter to get to actual stop
-                    for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
+                    for (Edge e : v.getOutgoing()) {
                         v = e.getToVertex();
                         break;
                     }
                 }
-                for (DirectEdge e : filter(v.getOutgoing(),DirectEdge.class)) {
+                for (Edge e : v.getOutgoing()) {
                     for (Edge e2 : e.getToVertex().getOutgoing()) {
                         if (e2 instanceof PatternBoard) {
                             neighborhood.add(((PatternBoard) e2).getPattern());

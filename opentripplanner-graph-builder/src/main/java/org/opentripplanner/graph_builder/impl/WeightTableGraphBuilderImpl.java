@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Add a weight table to a graph, which provides information to the

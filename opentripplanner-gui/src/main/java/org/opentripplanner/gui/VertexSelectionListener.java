@@ -15,7 +15,7 @@ package org.opentripplanner.gui;
 
 import java.util.List;
 
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * An interface allowing a map UI element to report

@@ -20,11 +20,11 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 

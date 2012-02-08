@@ -18,17 +18,19 @@ import java.io.ObjectOutputStream;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -40,7 +42,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author novalis
  * 
  */
-public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
+public class PlainStreetEdge extends StreetEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -93,7 +95,10 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
         super(null, null);
     }
 
-    public PlainStreetEdge(Vertex v1, Vertex v2, LineString geometry, String name, double length,
+    // Presently, we have plainstreetedges that connect both IntersectionVertexes and
+    // TurnVertexes
+    public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
+            String name, double length,
             StreetTraversalPermission permission, boolean back) {
         super(v1, v2);
         this.geometry = geometry;
@@ -206,7 +211,7 @@ public class PlainStreetEdge extends AbstractEdge implements StreetEdge {
             	break;
             case GREENWAYS:            	
                 weight = bicycleSafetyEffectiveLength / options.speed;
-                if (bicycleSafetyEffectiveLength / length <= StreetVertex.GREENWAY_SAFETY_FACTOR) {
+                if (bicycleSafetyEffectiveLength / length <= TurnVertex.GREENWAY_SAFETY_FACTOR) {
                 	//greenways are treated as even safer than they really are
                 	weight *= 0.66;
                 }

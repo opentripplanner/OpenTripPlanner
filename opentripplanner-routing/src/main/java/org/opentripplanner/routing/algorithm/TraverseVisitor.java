@@ -13,8 +13,8 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
 
 public interface TraverseVisitor {
 

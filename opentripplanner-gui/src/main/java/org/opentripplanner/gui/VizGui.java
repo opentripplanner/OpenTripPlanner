@@ -67,20 +67,20 @@ import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWe
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
@@ -425,7 +425,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
             public void valueChanged(ListSelectionEvent e) {
 
                 JList edgeList = (JList) e.getSource();
-                DirectEdge selected = (DirectEdge) edgeList.getSelectedValue();
+                Edge selected = (Edge) edgeList.getSelectedValue();
                 if (selected == null) {
                     departurePattern.removeAll();
                     return;
@@ -435,19 +435,19 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                 /* for turns, highlight the outgoing street's ends */
                 if (selected instanceof TurnEdge || selected instanceof PlainStreetEdge) {
                     List<Vertex> vertices = new ArrayList<Vertex>();
-                    List<DirectEdge> edges = new ArrayList<DirectEdge>();
+                    List<Edge> edges = new ArrayList<Edge>();
                     Vertex tov = selected.getToVertex();
                     for (Edge og : tov.getOutgoing()) {
                     	if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
-                    		edges.add((DirectEdge)og);
-                            vertices.add (((StreetEdge)og).getToVertex());
+                    		edges.add(og);
+                            vertices.add (og.getToVertex());
                             break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : fromv.getIncoming()) {
                         if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
-                    		edges.add((DirectEdge)ic);
+                    		edges.add(ic);
                             vertices.add (ic.getFromVertex());
                             break;
                         }
@@ -661,7 +661,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                 String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
                         JOptionPane.PLAIN_MESSAGE);
                 for (Vertex gv : getGraph().getVertices()) {
-                	for (DirectEdge edge : filter(gv.getOutgoing(),DirectEdge.class)) {
+                	for (Edge edge : gv.getOutgoing()) {
                         if (edge.getName() != null && edge.getName().contains(edgeName)) {
                             showGraph.highlightVertex(gv);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -736,7 +736,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         HashSet<Vertex> newOpen = new HashSet<Vertex>();
         for (Vertex v2 : open) {
             closed.add(v2);
-            for (DirectEdge e: filter(v2.getOutgoing(),DirectEdge.class)) {
+            for (Edge e: v2.getOutgoing()) {
                 Vertex target = e.getToVertex();
                 if (closed.contains(target)) {
                     continue;
@@ -763,7 +763,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (DirectEdge e : filter(src.getOutgoing(),DirectEdge.class)) {
+            for (Edge e : src.getOutgoing()) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);
@@ -785,7 +785,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         seenVertices.add(v);
         while (!toExplore.isEmpty()) {
             Vertex src = toExplore.poll();
-            for (DirectEdge e : filter(src.getOutgoing(),DirectEdge.class)) {
+            for (Edge e : src.getOutgoing()) {
                 Vertex tov = e.getToVertex();
                 if (!seenVertices.contains(tov)) {
                     seenVertices.add(tov);

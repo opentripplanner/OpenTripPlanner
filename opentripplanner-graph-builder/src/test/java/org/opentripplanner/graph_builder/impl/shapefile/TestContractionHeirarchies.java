@@ -39,28 +39,29 @@ import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
+import org.opentripplanner.routing.contraction.ContractionHierarchy.PotentialShortcut;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.contraction.Shortcut;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -107,12 +108,10 @@ public class TestContractionHeirarchies extends TestCase {
             for (int x = 0; x < N; ++x) {
                 double xc = x * STEP + LON0;
                 double yc = y * STEP + LAT0;
-                Vertex in = new EndpointVertex("(" + x + ", " + y + ") in", xc, yc);
-                graph.addVertex(in);
+                Vertex in = new IntersectionVertex(graph, "(" + x + ", " + y + ") in", xc, yc);
                 verticesIn[y][x] = in;
 
-                Vertex out = new EndpointVertex("(" + x + ", " + y + ") out", xc, yc);
-                graph.addVertex(out);
+                Vertex out = new IntersectionVertex(graph, "(" + x + ", " + y + ") out", xc, yc);
                 verticesOut[y][x] = out;
             }
         }
@@ -133,53 +132,47 @@ public class TestContractionHeirarchies extends TestCase {
                 double lat = i * STEP + LAT0;
                 double d = 111.111;
                 LineString geometry = GeometryUtils.makeLineString(lon, lat, lon + STEP, lat);
-                StreetVertex we = new StreetVertex("a(" + j + ", " + i + ")", geometry, "", d, false, null);
-                StreetVertex ew = new StreetVertex("a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex we = new TurnVertex(graph, "a(" + j + ", " + i + ")", geometry, "", d, false, null);
+                TurnVertex ew = new TurnVertex(graph, "a(" + j + ", " + i + ")", (LineString) geometry.reverse(), "", d, true, null);
                 
-                graph.addVertex(we);
-                graph.addVertex(ew);
-
                 lon = i * STEP + LON0;
                 lat = j * STEP + LAT0;
                 d = 111.111;
                 geometry = GeometryUtils.makeLineString(lon, lat, lon, lat + STEP);
-                StreetVertex sn = new StreetVertex("d(" + i + ", " + j + ")", geometry, "", d, false, null);
-                StreetVertex ns = new StreetVertex("d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
+                TurnVertex sn = new TurnVertex(graph, "d(" + i + ", " + j + ")", geometry, "", d, false, null);
+                TurnVertex ns = new TurnVertex(graph, "d(" + i + ", " + j + ")", (LineString) geometry.reverse(), "", d, true, null);
 
-                graph.addVertex(sn);
-                graph.addVertex(ns);
+                new FreeEdge(verticesOut[i][j], we);
+                new FreeEdge(verticesOut[j][i], sn);
                 
-                graph.addEdge(new FreeEdge(verticesOut[i][j], we));
-                graph.addEdge(new FreeEdge(verticesOut[j][i], sn));
+                new FreeEdge(verticesOut[i][j + 1], ew);
+                new FreeEdge(verticesOut[j + 1][i], ns);
                 
-                graph.addEdge(new FreeEdge(verticesOut[i][j + 1], ew));
-                graph.addEdge(new FreeEdge(verticesOut[j + 1][i], ns));
-                
-                graph.addEdge(new FreeEdge(ew, verticesIn[i][j]));
-                graph.addEdge(new FreeEdge(ns, verticesIn[j][i]));
+                new FreeEdge(ew, verticesIn[i][j]);
+                new FreeEdge(ns, verticesIn[j][i]);
             
-                graph.addEdge(new FreeEdge(we, verticesIn[i][j + 1]));
-                graph.addEdge(new FreeEdge(sn, verticesIn[j + 1][i]));
+                new FreeEdge(we, verticesIn[i][j + 1]);
+                new FreeEdge(sn, verticesIn[j + 1][i]);
                 
-                assertEquals(we, graph.addVertex(we));
-                assertEquals(ew, graph.addVertex(ew));
-                assertEquals(sn, graph.addVertex(sn));
-                assertEquals(ns, graph.addVertex(ns));
+                assertEquals(we, graph.getVertex(we.getLabel()));
+                assertEquals(ew, graph.getVertex(ew.getLabel()));
+                assertEquals(sn, graph.getVertex(sn.getLabel()));
+                assertEquals(ns, graph.getVertex(ns.getLabel()));
             }
         }
 
         for (int y = 0; y < N; ++y) {
             for (int x = 0; x < N; ++x) {
                 Vertex vertexIn = verticesIn[y][x];
-                for (DirectEdge e1: filter(vertexIn.getIncoming(),DirectEdge.class)) {
+                for (Edge e1: vertexIn.getIncoming()) {
                     Vertex vertexOut = verticesOut[y][x];
-                    StreetVertex fromv = (StreetVertex) e1.getFromVertex();
-                    for (DirectEdge e2: filter(vertexOut.getOutgoing(),DirectEdge.class)) {
-                        StreetVertex tov = (StreetVertex) e2.getToVertex();
+                    TurnVertex fromv = (TurnVertex) e1.getFromVertex();
+                    for (Edge e2: vertexOut.getOutgoing()) {
+                        TurnVertex tov = (TurnVertex) e2.getToVertex();
                         if (tov.getEdgeId().equals(fromv.getEdgeId())) {
                             continue;
                         }
-                        graph.addEdge(new TurnEdge(fromv, tov));
+                        new TurnEdge(fromv, tov);
                     }
                     assertTrue(fromv.getDegreeOut() <= 4);
                 }
@@ -195,26 +188,25 @@ public class TestContractionHeirarchies extends TestCase {
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
-        OverlayGraph og = new OverlayGraph(graph);
 
         // test hop limit
-        Dijkstra dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
+        Dijkstra dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
         BasicShortestPathTree spt = dijkstra.getShortestPathTree(verticesIn[0][2], 4);
         State v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(og, verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
+        dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 6);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 500);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
 
         // test distance limit
-        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 20);
         v03 = spt.getState(verticesIn[0][3]);
         assertNull(v03);
 
-        dijkstra = new Dijkstra(og, verticesOut[0][1], options, verticesIn[0][2]);
+        dijkstra = new Dijkstra(verticesOut[0][1], options, verticesIn[0][2]);
         spt = dijkstra.getShortestPathTree(verticesIn[0][3], 130);
         v03 = spt.getState(verticesIn[0][3]);
         assertNotNull(v03);
@@ -223,7 +215,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         ContractionHierarchy testch = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
-        List<Shortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
+        List<PotentialShortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
         assertEquals(16, shortcuts.size());
         
@@ -234,9 +226,7 @@ public class TestContractionHeirarchies extends TestCase {
         // test hierarchy construction
         ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
-        int n = hierarchy.updown.getVertices().size();
-        //assertTrue(hierarchy.updown.getVertices().size() == graphSize);
-        assertTrue(hierarchy.core.getVertices().size() == 0);
+        assertTrue("remaining vertices = " + hierarchy.corev.size(), hierarchy.corev.size() == 0);
 
         System.out.println("Contracted");
 
@@ -304,8 +294,7 @@ public class TestContractionHeirarchies extends TestCase {
         for (int i = 0; i < N; ++i) {
             double x = random.nextDouble() * 1000;
             double y = random.nextDouble() * 1000;
-            Vertex v = new EndpointVertex("(" + x + ", " + y + ")", x, y);
-            graph.addVertex(v);
+            Vertex v = new IntersectionVertex(graph, "(" + x + ", " + y + ")", x, y);
             Envelope env = new Envelope(v.getCoordinate());
             tree.insert(env, v);
             vertices.add(v);
@@ -328,18 +317,18 @@ public class TestContractionHeirarchies extends TestCase {
                 }
             });
             for (Vertex n : nearby.subList(1, 6)) {
-                graph.addEdge(new FreeEdge(v, n));
-                graph.addEdge(new FreeEdge(n, v));
+                new FreeEdge(v, n);
+                new FreeEdge(n, v);
             }
             Vertex badTarget = nearby.get(6);
-            graph.addEdge(new ForbiddenEdge(badTarget, v));
+            new ForbiddenEdge(badTarget, v);
         }
 
         // ensure that graph is connected
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         Vertex last = null;
         for (Vertex v : vertices) {
-            for (DirectEdge e: filter(v.getOutgoing(),DirectEdge.class)) {
+            for (Edge e: v.getOutgoing()) {
                 components.union(v, e.getToVertex());
             }
             last = v;
@@ -351,8 +340,8 @@ public class TestContractionHeirarchies extends TestCase {
                 lastKey = components.union(v, last);
                 last = v;
                 Coordinate c = v.getCoordinate();
-                graph.addEdge(new SimpleEdge(v, last, last.distance(c), 0));
-                graph.addEdge(new SimpleEdge(last, v, last.distance(c), 0));
+                new SimpleEdge(v, last, last.distance(c), 0);
+                new SimpleEdge(last, v, last.distance(c), 0);
             }
         }
 
@@ -568,13 +557,13 @@ public class TestContractionHeirarchies extends TestCase {
         long now = System.currentTimeMillis();
         int i = 0;
         int notNull = 0;
-        Collection<Vertex> updownVertices = hierarchy.updown.getVertices();
+        Collection<Vertex> chv = hierarchy.chv;
         Collection<Vertex> vertices = graph.getVertices();
                
         
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
         for (Vertex v : vertices) {
-            for (DirectEdge e: filter(v.getOutgoing(), DirectEdge.class)) {
+            for (Edge e: v.getOutgoing()) {
                 components.union(v, e.getToVertex());
             }
         }
@@ -583,7 +572,7 @@ public class TestContractionHeirarchies extends TestCase {
         ArrayList<Vertex> verticesOut = new ArrayList<Vertex>();
         for (Vertex v : vertices) {
             int componentSize = components.size(components.find(v));
-            if (componentSize > updownVertices.size() / 2) {
+            if (componentSize > chv.size() / 2) {
                 if (v.getDegreeOut() != 0) {
                     verticesOut.add(v);
                 }
@@ -605,7 +594,7 @@ public class TestContractionHeirarchies extends TestCase {
                 break; 
             }
             // make sure origin is on the up graph
-            if (hierarchy.updown.getOutgoing(orig).size() == 0) {
+            if (! chv.contains(orig) || orig.getDegreeOut() < 1) {
                 --i;
                 continue;
             }
@@ -617,7 +606,7 @@ public class TestContractionHeirarchies extends TestCase {
                     continue;
                 }
                 // make sure destination is on the down graph
-                if (hierarchy.updown.getIncoming(dest).size() == 0) {
+                if (! chv.contains(dest) || dest.getDegreeIn() < 1) {
                     dest = null;
                     continue;
                 }

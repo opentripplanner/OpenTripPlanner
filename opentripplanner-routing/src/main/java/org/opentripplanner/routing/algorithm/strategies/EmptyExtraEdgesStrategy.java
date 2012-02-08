@@ -18,9 +18,9 @@ import java.util.Map;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A base implementation of {@link ExtraEdgesStrategy} that does actually add any extra edges, but

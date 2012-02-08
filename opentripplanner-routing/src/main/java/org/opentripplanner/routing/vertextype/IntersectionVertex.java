@@ -11,21 +11,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Graph;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /** Represents an ordinary location in space, typically an intersection */
 
-public class EndpointVertex extends Vertex {
-
-    public EndpointVertex(String label, double x, double y, String name) {
-        super(label, x, y, name);
-    }
-    
-    public EndpointVertex(String label, double x, double y) {
-        super(label, x, y, label);
-    }
+public class IntersectionVertex extends StreetVertex {
 
     private static final long serialVersionUID = 1L;
+
+    public IntersectionVertex(Graph g, String label, double x, double y, String name) {
+        super(g, label, x, y, name);
+    }
+    
+    public IntersectionVertex(Graph g, String label, double x, double y) {
+        super(g, label, x, y, label);
+    }
+
+    public IntersectionVertex(Graph g, String label, Coordinate c, String name) {
+        super(g, label, c.x, c.y, name);
+    }
+
 }

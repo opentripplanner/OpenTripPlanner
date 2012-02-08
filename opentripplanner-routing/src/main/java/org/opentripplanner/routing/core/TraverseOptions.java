@@ -450,6 +450,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         this.transferTable = transferTable;
     }
 
+    /* must be called after traverseoptions already has a calendarservice set */
     public void setServiceDays(long time) {
         if( ! useServiceDays )
             return;

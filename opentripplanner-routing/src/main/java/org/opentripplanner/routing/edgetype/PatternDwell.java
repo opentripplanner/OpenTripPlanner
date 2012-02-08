@@ -18,7 +18,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -33,8 +34,8 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
 
     private int stopIndex;
     
-    public PatternDwell(Vertex startJourney, Vertex endJourney, int stopIndex, TripPattern tripPattern) {
-        super(startJourney, endJourney, tripPattern);
+    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TripPattern tripPattern) {
+        super(from, to, tripPattern);
         this.stopIndex = stopIndex;
         this.pattern = tripPattern;
     }

@@ -17,10 +17,10 @@ import java.io.File;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.graph.Graph;
 
 public class ConstantsForTests {
 
