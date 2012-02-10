@@ -13,7 +13,6 @@
 */
 package org.opentripplanner.routing.vertextype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.PathwayEdge;

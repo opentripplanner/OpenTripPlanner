@@ -57,6 +57,11 @@ public class PatchServiceImpl implements PatchService {
     @Override
     public synchronized void apply(Patch patch) {
         Graph graph = graphService.getGraph();
+
+        if(patches.containsKey(patch.getId())) {
+            expire(patches.get(patch.getId()));
+        }
+
         patch.apply(graph);
         patches.put(patch.getId(), patch);
         if (patch instanceof AlertPatch) {
@@ -84,16 +89,41 @@ public class PatchServiceImpl implements PatchService {
     }
 
     @Override
-    public void expireAllExcept(Set<String> retain) {
+    public void expire(Set<String> purge) {
+        for (String patchId : purge) {
+            if (patches.containsKey(patchId)) {
+                expire(patches.get(patchId));
+            }
+        }
 
+        patches.keySet().removeAll(purge);
+    }
+
+    @Override
+    public void expireAll() {
+        for (Patch patch : patches.values()) {
+            expire(patch);
+        }
+        patches.clear();
+    }
+
+    @Override
+    public void expireAllExcept(Set<String> retain) {
         ArrayList<String> toRemove = new ArrayList<String>();
-        Graph graph = graphService.getGraph();
 
         for (Entry<String, Patch> entry : patches.entrySet()) {
             final String key = entry.getKey();
             if (!retain.contains(key)) {
                 toRemove.add(key);
-                Patch patch = entry.getValue();
+                expire(entry.getValue());
+            }
+        }
+        patches.keySet().removeAll(toRemove);
+    }
+
+    private void expire(Patch patch) {
+        Graph graph = graphService.getGraph();
+
                 if (patch instanceof AlertPatch) {
                     AlertPatch alertPatch = (AlertPatch) patch;
                     AgencyAndId stop = alertPatch.getStop();
@@ -105,10 +135,7 @@ public class PatchServiceImpl implements PatchService {
                         MapUtils.removeFromMapList(patchesByRoute, stop, patch);
                     }
                 }
+
                 patch.remove(graph);
             }
-        }
-        patches.keySet().removeAll(toRemove);
-    }
-
 }

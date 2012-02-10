@@ -47,6 +47,8 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -186,6 +188,7 @@ public class PlanGenerator {
      */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         Itinerary itinerary = makeEmptyItinerary(path);
+        EdgeNarrative postponedAlerts = null;
 
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -202,6 +205,13 @@ public class PlanGenerator {
                 continue;
             }
             if (backEdge instanceof FreeEdge) {
+                if(backEdge instanceof PreBoardEdge) {
+                    // Add boarding alerts to the next leg
+                    postponedAlerts = backEdgeNarrative;
+                } else if(backEdge instanceof PreAlightEdge) {
+                    // Add alighting alerts to the previous leg
+                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdgeNarrative);
+                }
                 continue;
             }
 
@@ -352,7 +362,7 @@ public class PlanGenerator {
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
                             Place stop = makePlace(state.getBackState());
                             leg.stop.add(stop);
-                        } else {
+                        } else if(leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
                                     state.getTimeInMillis());
                         }
@@ -382,6 +392,12 @@ public class PlanGenerator {
                         coordinates.extend(edgeCoordinates);
                     }
                 }
+
+                if(postponedAlerts != null) {
+                    addNotesToLeg(leg, postponedAlerts);
+                    postponedAlerts = null;
+                }
+
                 addNotesToLeg(leg, backEdgeNarrative);
                 if (pgstate == PlanGenState.TRANSIT) {
                     itinerary.transitTime += state.getElapsedTime();
@@ -409,6 +425,8 @@ public class PlanGenerator {
             leg.tripShortName = trip.getTripShortName();
             leg.routeShortName = trip.getRoute().getShortName();
             leg.routeLongName = trip.getRoute().getLongName();
+            leg.routeColor = trip.getRoute().getColor();
+            leg.routeTextColor = trip.getRoute().getTextColor();
         }
         leg.mode = en.getMode().toString();
         leg.startTime = new Date(state.getBackState().getTimeInMillis());
@@ -507,10 +525,13 @@ public class PlanGenerator {
         Coordinate endCoord = v.getCoordinate();
         String name = v.getName();
         AgencyAndId stopId = null;
-        if (v instanceof TransitVertex)
+        String stopCode = null;
+        if (v instanceof TransitVertex) {
             stopId = ((TransitVertex)v).getStopId();
+            stopCode = ((TransitVertex)v).getStopCode();
+        }
         Date timeAtState = new Date(state.getTimeInMillis());
-        Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
+        Place place = new Place(endCoord.x, endCoord.y, name, stopId, stopCode, timeAtState);
         return place;
     }
 
@@ -522,8 +543,10 @@ public class PlanGenerator {
     private Place makePlace(Vertex vertex) {
         Coordinate endCoord = vertex.getCoordinate();
         Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
-        if (vertex instanceof TransitVertex)
+        if (vertex instanceof TransitVertex) {
             place.stopId = ((TransitVertex)vertex).getStopId();
+            place.stopCode = ((TransitVertex)vertex).getStopCode();
+        }
         return place;
     }
 

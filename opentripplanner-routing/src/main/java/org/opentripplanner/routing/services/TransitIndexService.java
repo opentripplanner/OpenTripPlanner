@@ -22,6 +22,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
 public interface TransitIndexService {
+    public List<RouteVariant> getVariantsForAgency(String agency);
+
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
 	
 	public RouteVariant getVariantForTrip(AgencyAndId trip);

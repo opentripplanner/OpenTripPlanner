@@ -105,7 +105,7 @@ otp.planner.ItineraryDataFactoryStatic = {
     store        : null,
     templates    : null,
     locale       : null,
-    showStopIds  : false,
+    showStopCodes : false,
 
     from         : null,
     to           : null,
@@ -165,7 +165,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         for(var i = 0; i < numLegs; i++)
         {
             var leg              = this.store.getAt(i);
-            leg.data.showStopIds = this.showStopIds;
+            leg.data.showStopCodes = this.showStopCodes;
 
             var text         = null;
             var verb         = null;

@@ -12,9 +12,12 @@ public abstract class TransitVertex extends AbstractVertex {
 
     private final AgencyAndId stopId;
     
+    private final String stopCode;
+
     public TransitVertex(Graph graph, String label, Stop stop) {
         super(graph, label, stop.getLon(), stop.getLat(), stop.getName());
         this.stopId = stop.getId();
+        this.stopCode = stop.getCode();
     }
 
     /** Get the stop at which this TransitVertex is located */
@@ -22,4 +25,9 @@ public abstract class TransitVertex extends AbstractVertex {
         return stopId;
     }
     
+    /** The passenger-facing stop ID/Code (for systems like TriMet that have this feature).  */
+    public String getStopCode() {
+        return stopCode;
+    }
+
 }

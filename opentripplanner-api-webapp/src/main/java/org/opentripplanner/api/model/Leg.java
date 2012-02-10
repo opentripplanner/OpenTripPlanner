@@ -62,6 +62,18 @@ public class Leg {
     public String route = "";
 
     /**
+     * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
+     */
+    @XmlAttribute
+    public String routeColor = null;
+
+    /**
+     * For transit leg, the route's text color (if one exists). For non-transit legs, null.
+     */
+    @XmlAttribute
+    public String routeTextColor = null;
+
+    /**
      * For transit legs, if the rider should stay on the vehicle as it changes route names.
      */
     @XmlAttribute

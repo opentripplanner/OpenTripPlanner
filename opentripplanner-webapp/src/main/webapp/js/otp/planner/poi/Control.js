@@ -116,9 +116,9 @@ otp.planner.poi.Control = {
 
             f.attributes.m_text = ll.lon + "," + ll.lat;
             if(f.attributes.m_to)
-                otp.planner.StaticForms.setTo(f.attributes.m_text, ll.lon, ll.lat, true, true);
+                otp.planner.StaticForms.setTo(null, ll.lon, ll.lat, true, true);
             if(f.attributes.m_from)
-                otp.planner.StaticForms.setFrom(f.attributes.m_text, ll.lon, ll.lat, true, true);
+                otp.planner.StaticForms.setFrom(null, ll.lon, ll.lat, true, true);
         }
         catch(e)
         {

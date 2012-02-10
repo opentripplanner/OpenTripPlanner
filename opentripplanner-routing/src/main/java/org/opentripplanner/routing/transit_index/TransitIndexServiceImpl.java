@@ -29,7 +29,10 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 		Serializable {
 	private static final long serialVersionUID = -8147894489513820239L;
 
+	private HashMap<String     , List<RouteVariant>> variantsByAgency;
+
 	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute;
+
 	private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
 
 	private HashMap<AgencyAndId, Edge> preAlightEdges;
@@ -41,12 +44,14 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 	private List<TraverseMode> modes;
 
 	public TransitIndexServiceImpl(
+			HashMap<String     , List<RouteVariant>> variantsByAgency,
 			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
 			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
 			HashMap<AgencyAndId, Edge> preBoardEdges,
 			HashMap<AgencyAndId, Edge> preAlightEdges,
 			HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
 			List<TraverseMode> modes) {
+		this.variantsByAgency   = variantsByAgency;
 		this.variantsByRoute = variantsByRoute;
 		this.variantsByTrip = variantsByTrip;
 		this.preBoardEdges = preBoardEdges;
@@ -55,6 +60,16 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 		this.modes = modes;
 	}
 
+	@Override
+	public List<RouteVariant> getVariantsForAgency(String agency) {
+		List<RouteVariant> variants = variantsByAgency.get(agency);
+		if (variants == null) {
+		    return Collections.emptyList();
+		}
+		return variants;
+	}
+
+	@Override
 	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
 		List<RouteVariant> variants = variantsByRoute.get(route);
 		if (variants == null) {
@@ -63,6 +78,7 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 		return variants;
 	}
 
+	@Override
 	public RouteVariant getVariantForTrip(AgencyAndId trip) {
 		return variantsByTrip.get(trip);
 	}
