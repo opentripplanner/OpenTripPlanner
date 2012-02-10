@@ -46,6 +46,7 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -636,6 +637,28 @@ public class PlanGenerator {
             if (geom == null) {
                 continue;
             }
+
+            // generate a step for getting off an elevator (all
+            // elevator narrative generation occurs when alighting). We don't need to know what came
+            // before or will come after
+            if (edge instanceof ElevatorAlightEdge) {
+                // don't care what came before or comes after
+                step = createWalkStep(currState);
+                
+                // tell the user where to get off the elevator using the exit notation, so the
+                // i18n interface will say 'Elevator to <exit>'
+                // what happens is that the webapp sees name == null and ignores that, and it sees
+                // exit != null and uses to <exit>
+                // the floor name is the AlightEdge name
+                // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
+                step.streetName =((ElevatorAlightEdge) edge).getName();
+
+                step.relativeDirection = RelativeDirection.ELEVATOR;
+
+                steps.add(step);
+                continue;
+            }
+
             String streetName = edgeNarrative.getName();
             if (step == null) {
                 // first step
