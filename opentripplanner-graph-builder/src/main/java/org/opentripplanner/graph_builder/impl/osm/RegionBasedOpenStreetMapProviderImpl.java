@@ -34,6 +34,8 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
 
     private File _cacheDirectory;
 
+    private String _apiBaseUrl;
+
     private OSMDownloader downloader = new OSMDownloader();
     
     public void setRegionsSource(RegionsSource regionsSource) {
@@ -50,6 +52,9 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
         if( _cacheDirectory != null)
             downloader.setCacheDirectory(_cacheDirectory);
         
+        if( _apiBaseUrl != null)
+            downloader.setApiBaseUrl(_apiBaseUrl);
+
         DownloadHandler downloadHandler = new DownloadHandler(handler);
 
         try {
@@ -101,4 +106,12 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
         }
     };
 
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this._apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getApiBaseUrl() {
+        return _apiBaseUrl;
+    }
+    
 }
