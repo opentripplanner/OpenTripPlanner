@@ -170,32 +170,32 @@ otp.locale.Turkish = {
     // see otp.planner.Templates for use
     labels : 
     {
-        about        : "About",
+        about        : "Hakkında",
         stop_id      : "Stop ID",
-        trip_details : "Trip details",
-        fare         : "Fare",
+        trip_details : "Yolculuk detayları",
+        fare         : "Ücret",
         fare_symbol  : "$",
-        travel       : "Travel",
-        valid        : "Valid",
-        trip_length  : "Time",
-        with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        travel       : "Seyehat",
+        valid        : "Geçerli",
+        trip_length  : "Zaman",
+        with_a_walk  : "yürüyüş ile",
+        alert_for_rt : "Güzergah için uyar"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
     modes :
     {
-        WALK:           "Walk",
-        BICYCLE:        "Bicycle",
-        CAR:            "Car",
-        TRAM:           "Tram",
-        SUBWAY:         "Subway",
-        RAIL:           "Rail",
-        BUS:            "Bus",
-        FERRY:          "Ferry",
-        CABLE_CAR:      "Cable Car",
-        GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular"
+        WALK:           "Yürüyüş",
+        BICYCLE:        "Bisiklet",
+        CAR:            "Araba",
+        TRAM:           "Tramway",
+        SUBWAY:         "Metro",
+        RAIL:           "Tren",
+        BUS:            "Otobüs",
+        FERRY:          "Feribot",
+        CABLE_CAR:      "Teleferik",
+        GONDOLA:        "Gondol",
+        FUNICULAR:      "Funiküler"
     },
 
     ordinal_exit:
@@ -214,21 +214,21 @@ otp.locale.Turkish = {
 
     time:
     {
-        minute         : "minute",
-        minutes        : "minutes",
-        minute_abbrev  : "min",
-        minutes_abbrev : "mins",
-        second_abbrev  : "sec",
-        seconds_abbrev : "secs",
+        minute         : "dakika",
+        minutes        : "dakika",
+        minute_abbrev  : "dak",
+        minutes_abbrev : "dak",
+        second_abbrev  : "san",
+        seconds_abbrev : "san",
         format         : "F jS, Y @ g:ia",
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        months         : ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
     },
 
     systemmap :
     {
         labels :
         {
-            panelTitle : "System Map"
+            panelTitle : "Sistem Haritası"
         }
     },
 
