@@ -39,7 +39,7 @@ public class OSMDownloader {
 
     private int _updateIfOlderThanDuration = 0;
 
-    private String _apiBaseUrl;
+    private String _apiBaseUrl = "http://open.mapquestapi.com/xapi/api/0.6/";
 
     public void setLatStep(double latStep) {
         _latYStep = latStep;
