@@ -434,7 +434,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // create a Vertex to connect the FreeNode to.
                     ElevatorOffboardVertex offboardVert = new ElevatorOffboardVertex(
                                      graph, sourceVertLabel + "_middle", 
-                                     sourceVert.getX(), sourceVert.getY());
+                                     sourceVert.getX(), sourceVert.getY(),
+                                     humanLevel);
 
                     new FreeEdge(sourceVert, offboardVert);
                     new FreeEdge(offboardVert, sourceVert);
@@ -443,7 +444,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // ElevatorHop edges to.
                     ElevatorOnboardVertex onboardVert = new ElevatorOnboardVertex(
                                     graph, sourceVertLabel + "_onboard",
-                                    sourceVert.getX(), sourceVert.getY());
+                                    sourceVert.getX(), sourceVert.getY(),
+                                    humanLevel);
 
                     new ElevatorBoardEdge(offboardVert, onboardVert);
                     new ElevatorAlightEdge(onboardVert, offboardVert, humanLevel);
