@@ -185,15 +185,20 @@ otp.util.ParseUrlParams = {
      */
     getUrl : function()
     {
-        try
-        {
-            return location.search.substring(1).replace(/\+/g, ' ');
+        var fromHash = '';
+        var fromSubstring = '';
+        try {
+            var fromSubstring = location.search.substring(1).replace(/\+/g, ' ');
         }
-        catch(exp)
-        {
-        }
+        catch(exp) {}
         
-        return null;
+        try {
+            fromHash = location.hash.substring(2).replace(/\+/g, ' ');
+        }
+        catch (e) {}
+            
+        // return the longer one; this will implicitly throw out the one that will generally be ''
+        return fromSubstring.length > fromHash.length ? fromSubstring : fromHash;
     },
 
     /**

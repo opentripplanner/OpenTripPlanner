@@ -55,6 +55,10 @@ otp.planner.Planner = {
     m_renderer    : null,
     m_topoRenderer : null,
 
+    // the template for the dynamic bookmarking #/ stuff
+    // will be populated when first used
+    hashTemplate : null,
+
     /** */
     initialize : function(config)
     {
@@ -353,6 +357,20 @@ otp.planner.Planner = {
         if (this.ui.innerSouth.isVisible()  && this.ui.innerSouth.getEl().dom.childNodes.length == 0) {
             this.ui.innerSouth.hide();
             this.ui.viewport.doLayout();
+        }
+
+        // update the dynamic link to the current trip plan
+        // TODO: is the 'plan a trip' tab always tab 0?
+        if (this.m_activeTabID === 0) {
+            location.hash = '#/';
+        }
+        else {
+            // we're on a TP tab
+            // template for the dynamic url
+            if (this.hashTemplate == null) {
+                this.hashTemplate = new Ext.XTemplate('#/' + otp.planner.ParamTemplate).compile();
+            }
+            location.hash = this.hashTemplate.apply(newTab.request);
         }
     },
 
