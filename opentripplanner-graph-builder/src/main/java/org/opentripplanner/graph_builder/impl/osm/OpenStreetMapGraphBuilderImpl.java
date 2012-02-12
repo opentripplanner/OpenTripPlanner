@@ -168,7 +168,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         // track osm nodes that will become graph vertices
         private Map<Long, IntersectionVertex> intersectionNodes = 
                 new HashMap<Long, IntersectionVertex>();
-        // track vertices to be removed in the turn-conversion (redundant w. intersectionNodes.values?)
+        // track vertices to be removed in the turn-conversion.
+        // this is slightly different than intersectionNodes.values, which contains
+        // a null vertex reference for multilevel nodes. the individual vertices
+        // for each level of a multilevel node are added to endpoints.
         ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
         
         public void buildGraph(Graph graph) {
@@ -281,8 +284,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         strLevel = Integer.toString(intLevel + 1);
                     }
                     way.addTag("otp:numeric_level", Integer.toString(intLevel + offset));
-                    way.addTag("otp:human_level", strLevel); // redunant
-                    levelHumanNames.put(intLevel+offset, strLevel);
+                    way.addTag("otp:human_level", strLevel); // redundant
+                    levelHumanNames.put(intLevel + offset, strLevel);
                 }
 
                 /*
@@ -1217,6 +1220,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 IntersectionVertex iv = new IntersectionVertex(
                         graph, label, coordinate.x, coordinate.y, label);
                 levels.put(level, iv);
+                // multilevel nodes should also undergo turn-conversion
+                endpoints.add(iv);
                 return iv;
             }
             return levels.get(level);
@@ -1250,7 +1255,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
                 intersectionNodes.put(nid, iv);
                 endpoints.add(iv);
-                // endpoints and intersectionNodes.values are the same thing now right?
             }
             return iv;
         }
