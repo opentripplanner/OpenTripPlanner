@@ -607,8 +607,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-<<<<<<< HEAD
-=======
          * Copies useful metadata from multipolygon relations to the relevant ways.
          *
          * This is done at a different time than processRelations(), so that way purging doesn't
@@ -645,7 +643,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
 
         /**
->>>>>>> origin/master
          * Copies useful metadata from relations to the relevant ways/nodes.
          */
         private void processRelations() {
