@@ -189,8 +189,8 @@ public class NetworkLinkerLibrary {
         /* is there a bundle of edges nearby to use or split? */
         Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options);
         if (edges == null || edges.size() < 2) {
-            // no edges were found nearby, or a bidirectional bundle of edges was not identified
-        	_log.debug("found too few edges: {}", edges);
+            // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
+            _log.debug("found too few edges: {}", edges);
             return null;
         }
         return getSplitterVertices(vertexLabel, edges, coordinate);

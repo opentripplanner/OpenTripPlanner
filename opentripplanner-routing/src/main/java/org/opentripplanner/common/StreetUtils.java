@@ -58,9 +58,6 @@ public class StreetUtils {
         for (IntersectionVertex v : endpoints) {
             for (Edge e_in : v.getIncoming()) {
                 for (Edge e_out : v.getOutgoing()) {
-                    if (e_in == e_out)
-                        // do not make turns for going around loops (several hundred in Portland)
-                        continue;
                     if (e_in.getFromVertex() == e_out.getToVertex() &&
                         v.getOutgoing().size() > 1)
                         // only make turn edges for U turns when they are dead ends
