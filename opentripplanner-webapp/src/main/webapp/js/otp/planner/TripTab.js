@@ -401,6 +401,11 @@ otp.planner.TripTab = {
         return this.id;
     },
 
+    /** Return the title of this tab */
+    getTitle : function () {
+        return this.m_title;
+    },
+
     /** */
     getActiveItinerary : function() 
     {

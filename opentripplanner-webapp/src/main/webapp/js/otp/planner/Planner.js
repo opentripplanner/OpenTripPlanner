@@ -57,7 +57,7 @@ otp.planner.Planner = {
 
     // the template for the dynamic bookmarking #/ stuff
     // will be populated when first used
-    hashTemplate : null,
+    m_hashTemplate : null,
 
     /** */
     initialize : function(config)
@@ -363,14 +363,17 @@ otp.planner.Planner = {
         // TODO: is the 'plan a trip' tab always tab 0?
         if (this.m_activeTabID === 0) {
             location.hash = '#/';
+            Ext.select('title').first().update('OpenTripPlanner Map');
         }
         else {
             // we're on a TP tab
             // template for the dynamic url
-            if (this.hashTemplate == null) {
-                this.hashTemplate = new Ext.XTemplate('#/' + otp.planner.ParamTemplate).compile();
+            if (this.m_hashTemplate == null) {
+                this.m_hashTemplate = new Ext.XTemplate('#/' + otp.planner.ParamTemplate).compile();
             }
-            location.hash = this.hashTemplate.apply(newTab.request);
+            location.hash = this.m_hashTemplate.apply(newTab.request);
+            // update the title so folks bookmark something meaningful
+            Ext.select('title').first().update(newTab.getTitle() + ' - OpenTripPlanner Map');
         }
     },
 
