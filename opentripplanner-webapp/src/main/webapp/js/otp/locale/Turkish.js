@@ -288,7 +288,7 @@ otp.locale.Turkish = {
 
         error:
         {
-            title        : 'Trip Planner Error',
+            title        : 'Trip Planner Hata',
             deadMsg      : "Map Trip Planner is currently not responding. Please wait a few minutes to try again, or try the text trip planner (see link below).",
             geoFromMsg   : "Please select the 'From' location for your trip: ",
             geoToMsg     : "Please select the 'To' location for your trip: "
@@ -316,10 +316,10 @@ otp.locale.Turkish = {
 
         options: 
         [
-          ['TRANSFERS', 'Fewest transfers'],
-          ['QUICK',     'Quickest trip'],
-          ['SAFE',      'Safest trip'],
-          ['TRIANGLE',  'Custom trip...']
+          ['TRANSFERS', 'En az transfer'],
+          ['QUICK',     'En hızlı yolculuk'],
+          ['SAFE',      'En Güvenli yolculuk'],
+          ['TRIANGLE',  'Özelleştirilmiş yolculuk...']
         ],
     
         arriveDepart: 
@@ -330,22 +330,22 @@ otp.locale.Turkish = {
     
         maxWalkDistance : 
         [
-            ['160',   '1/10 mile'],
-            ['420',   '1/4 mile'],
-            ['840',   '1/2 mile'],
-            ['1260',  '3/4 mile'],
-            ['1609',  '1 mile'],
-            ['3219',  '2 miles'],
-            ['4828',  '3 miles'],
-            ['6437',  '4 miles'],
-            ['8047',  '5 miles'],
-            ['16093',  '10 miles'],
-            ['24140',  '15 miles'],
-            ['32187',  '20 miles'],
-            ['48280',  '30 miles'],
-            ['64374',  '40 miles'],
-            ['80467',  '50 miles'],
-            ['160934',  '100 miles']
+            ['160',   '1/10 mil'],
+            ['420',   '1/4 mil'],
+            ['840',   '1/2 mil'],
+            ['1260',  '3/4 mil'],
+            ['1609',  '1 mil'],
+            ['3219',  '2 mil'],
+            ['4828',  '3 mil'],
+            ['6437',  '4 mil'],
+            ['8047',  '5 mil'],
+            ['16093',  '10 mil'],
+            ['24140',  '15 mil'],
+            ['32187',  '20 mil'],
+            ['48280',  '30 mil'],
+            ['64374',  '40 mil'],
+            ['80467',  '50 mil'],
+            ['160934',  '100 mil']
         ],
     
         mode : 
@@ -362,10 +362,10 @@ otp.locale.Turkish = {
 
         wheelchair :
         [
-            ['false', 'Not required'],
-            ['true', 'Required']
+            ['false', 'Zorunlu Değil'],
+            ['true', 'Zorunlu']
         ]
     },
 
-    CLASS_NAME : "otp.locale.English"
+    CLASS_NAME : "otp.locale.Turkish"
 };
