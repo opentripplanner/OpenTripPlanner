@@ -363,7 +363,7 @@ otp.planner.Planner = {
         // TODO: is the 'plan a trip' tab always tab 0?
         if (this.m_activeTabID === 0) {
             location.hash = '#/';
-            Ext.select('title').first().update('OpenTripPlanner Map');
+            document.title = 'OpenTripPlanner Map';
         }
         else {
             // we're on a TP tab
@@ -373,7 +373,7 @@ otp.planner.Planner = {
             }
             location.hash = this.m_hashTemplate.apply(newTab.request);
             // update the title so folks bookmark something meaningful
-            Ext.select('title').first().update(newTab.getTitle() + ' - OpenTripPlanner Map');
+            document.title = newTab.getTitle() + ' - OpenTripPlanner Map';
         }
     },
 
