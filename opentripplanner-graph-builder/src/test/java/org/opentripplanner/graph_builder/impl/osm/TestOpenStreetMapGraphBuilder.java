@@ -20,11 +20,11 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -122,6 +122,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertTrue("There is no edge from v4back to v3back", v4BackEdgeExists);
     }
 
+    @Test
     public void testWayDataSet() {
         OSMWay way = new OSMWay();
         way.addTag("highway", "footway");
@@ -207,6 +208,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         assertEquals ("sidewalk", propset.getCreativeNameForWay(way));
     }
 
+    @Test
     public void testCreativeNaming() {
         OSMWay way = new OSMWay();
         way.addTag("highway", "footway");
@@ -217,5 +219,19 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         namer.setCreativeNamePattern("Highway with cycleway {cycleway} and access {access} and morx {morx}");
         assertEquals("Highway with cycleway lane and access no and morx ",
                 namer.generateCreativeName(way));
+    }
+
+    @Test
+    public void testMultipolygon() throws Exception {
+        Graph gg = new Graph();
+        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+
+        FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
+        pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
+        loader.setProvider(pr);
+
+        loader.buildGraph(gg);
+
+        assertNotNull(gg.getVertex("way -3535 from 4"));
     }
 }

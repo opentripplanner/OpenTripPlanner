@@ -20,14 +20,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -226,8 +226,7 @@ public class AStarTest {
      ****/
 
     private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(label, lat, lon);
-        _graph.addVertex(v);
+        SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
         return v;
     }
 
@@ -236,17 +235,17 @@ public class AStarTest {
             Vertex vA = _graph.getVertex(vLabels[i]);
             Vertex vB = _graph.getVertex(vLabels[i + 1]);
 
-            _graph.addEdge(vA, vB, new SimpleEdge(vA, vB));
-            _graph.addEdge(vB, vA, new SimpleEdge(vB, vA));
+            new SimpleEdge(vA, vB);
+            new SimpleEdge(vB, vA);
         }
     }
 
-    private static class SimpleVertex extends Vertex {
+    private static class SimpleVertex extends AbstractVertex {
 
         private static final long serialVersionUID = 1L;
 
-        public SimpleVertex(String label, double lat, double lon) {
-            super(label, lon, lat);
+        public SimpleVertex(Graph g, String label, double lat, double lon) {
+            super(g, label, lon, lat);
         }
     }
 

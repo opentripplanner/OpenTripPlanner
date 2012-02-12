@@ -39,12 +39,10 @@ public class OSMDownloader {
 
     private int _updateIfOlderThanDuration = 0;
 
-    //if this fails, try http://osmxapi.hypercube.telascience.org/api/0.6/
-    private String apiBaseUrl = "http://api.openstreetmap.org/api/0.6/";
+    private String _apiBaseUrl = "http://open.mapquestapi.com/xapi/api/0.6/";
 
     public void setLatStep(double latStep) {
         _latYStep = latStep;
-
     }
 
     public void setLonStep(double lonStep) {
@@ -183,10 +181,12 @@ public class OSMDownloader {
      * Set the base OSM API URL from which OSM tiles will be downloaded.    
      */
     public void setApiBaseUrl(String apiBaseUrl) {
-        this.apiBaseUrl = apiBaseUrl;
+        this._apiBaseUrl = apiBaseUrl;
     }
 
     public String getApiBaseUrl() {
-        return apiBaseUrl;
+    	if (_apiBaseUrl == null)
+    		throw new IllegalStateException("Map API base URL must be set before building a URL.");
+        return _apiBaseUrl;
     }
 }

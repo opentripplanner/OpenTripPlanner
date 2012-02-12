@@ -14,8 +14,8 @@
 package org.opentripplanner.graph_builder.impl;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * {@link GraphBuilder} plugin that links up the stops of a transit network to a street network.

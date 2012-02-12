@@ -100,14 +100,17 @@ otp.util.Modes =  {
     /** return mode name from locale */
     translate : function(mode, locale)
     {
-        if(mode == null) return mode;
+        if(mode == null)   return null;
         if(locale == null)
             locale = otp.config.locale;
 
-        var retVal = mode;
-        try {
-            retVal = locale.modes[mode];
-        } catch(e) {
+        var retVal = null;
+        try
+        {
+            retVal = locale.modes[mode.toUpperCase()];
+        }
+        catch(e)
+        {
         }
 
         if(retVal == null)

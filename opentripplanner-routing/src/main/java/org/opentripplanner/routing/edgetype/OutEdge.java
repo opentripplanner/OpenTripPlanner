@@ -15,13 +15,15 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.AbstractEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -29,7 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * An edge from the main edge-based street network out to an intersection vertex
  *
  */
-public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEdge {
+public class OutEdge extends StreetEdge {
 
     private static final long serialVersionUID = -4922790993642455605L;
 
@@ -39,18 +41,18 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
         super(null, null);
     }
 
-    public OutEdge(StreetVertex fromv, Vertex tov) {
+    public OutEdge(TurnVertex fromv, IntersectionVertex tov) {
         super(fromv, tov);
     }
 
     @Override
     public double getDistance() {
-        return ((StreetVertex)getFromVertex()).getLength();
+        return ((TurnVertex)getFromVertex()).getLength();
     }
 
     @Override
     public Geometry getGeometry() {
-        return ((StreetVertex)fromv).getGeometry();
+        return ((TurnVertex)fromv).getGeometry();
     }
 
     @Override
@@ -60,7 +62,7 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
 
     @Override
     public String getName() {
-        return fromv.getName();
+        return ((TurnVertex)fromv).getName();
     }
 
     @Override
@@ -73,7 +75,7 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     }
 
     private State doTraverse(State s0, TraverseOptions options) {
-        StreetVertex fromv = ((StreetVertex)this.fromv);
+        TurnVertex fromv = ((TurnVertex)this.fromv);
         
         if (!fromv.canTraverse(options)) {
         	// try walking bike since you can't ride it here
@@ -104,28 +106,28 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return ((StreetVertex) fromv).getElevationProfile();
+        return ((TurnVertex) fromv).getElevationProfile();
     }
 
     public boolean canTraverse(TraverseOptions options) {
-        return ((StreetVertex) fromv).canTraverse(options);
+        return ((TurnVertex) fromv).canTraverse(options);
     }
     @Override
     public double getLength() {
-        return ((StreetVertex) fromv).getLength();
+        return ((TurnVertex) fromv).getLength();
     }
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return ((StreetVertex) fromv).getElevationProfile(start, end);
+        return ((TurnVertex) fromv).getElevationProfile(start, end);
     }
     @Override
     public StreetTraversalPermission getPermission() {
-        return ((StreetVertex) fromv).getPermission();
+        return ((TurnVertex) fromv).getPermission();
     }
 
     @Override
     public void setElevationProfile(PackedCoordinateSequence elev) {
-        ((StreetVertex)fromv).setElevationProfile(elev);
+        ((TurnVertex)fromv).setElevationProfile(elev);
     }
     
     public boolean equals(Object o) {
@@ -138,6 +140,6 @@ public class OutEdge extends AbstractEdge implements EdgeWithElevation, StreetEd
 
 	@Override
 	public boolean isNoThruTraffic() {
-		return ((StreetVertex) fromv).isNoThruTraffic();
+		return ((TurnVertex) fromv).isNoThruTraffic();
 	}
 }

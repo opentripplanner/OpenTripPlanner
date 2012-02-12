@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder.impl.reach;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class PartialTreesPhaseTerminationCondition implements SearchTerminationStrategy {

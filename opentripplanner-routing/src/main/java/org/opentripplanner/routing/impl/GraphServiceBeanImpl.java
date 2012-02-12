@@ -15,8 +15,8 @@ package org.opentripplanner.routing.impl;
 
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Graph.LoadLevel;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 
 /**

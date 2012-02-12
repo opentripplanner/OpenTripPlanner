@@ -3,6 +3,8 @@ package org.opentripplanner.routing.core;
 import java.util.Comparator;
 import java.util.List;
 
+import org.opentripplanner.routing.graph.Vertex;
+
 /**
  * A Comparator implementation that will sort a 1D list of Vertex objects such that
  * 2D spatial locality is mostly preserved. It implicitly compares the Morton code for 

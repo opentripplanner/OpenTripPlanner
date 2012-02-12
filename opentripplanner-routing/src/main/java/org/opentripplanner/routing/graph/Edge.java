@@ -11,10 +11,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.graph;
 
+import java.io.Serializable;
 import java.util.List;
 
+import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.graph.AbstractEdge.ValidVertexTypes;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -39,10 +44,19 @@ import org.opentripplanner.routing.spt.GraphPath;
  * If you think of a compelling reason where you need multiple traverse results in BOTH directions,
  * let us know.
  */
-public interface Edge {
+public interface Edge extends Serializable, EdgeNarrative {
 
+    /** @return the vertex this edge comes from */
     public Vertex getFromVertex();
 
+    /** @return the vertex this edge leads to, or null if this edge leads to more than one vertex */
+    public Vertex getToVertex();
+
+    void detach();
+
+    void attach(Vertex fromv, Vertex tov);
+
+    /** From a State at the beginning of this edge, calculate the new State at the end of the edge. */   
     public State traverse(State s0);
 
     /**
@@ -76,4 +90,11 @@ public interface Edge {
 
     public void removePatch(Patch patch);
     
+    
+    /* GRAPH COHERENCY AND TYPE CHECKING */
+
+    public abstract ValidVertexTypes getValidVertexTypes();
+    
+    public abstract boolean vertexTypesValid();
+
 }

@@ -16,7 +16,7 @@ package org.opentripplanner.routing.transit_index;
 import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.graph.Edge;
 
 /**
  * RouteSegment holds the edges around one stop on particular trip or pattern.

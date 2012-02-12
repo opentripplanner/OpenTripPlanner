@@ -14,12 +14,12 @@
 package org.opentripplanner.graph_builder.impl;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * Replace BasicTripPatterns with ArrayTripPatterns.
@@ -28,8 +28,8 @@ public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph) {
-        for (Vertex gv : graph.getVertices()) {
-            for (Edge e: gv.getOutgoing()) {
+        for (Vertex v : graph.getVertices()) {
+            for (Edge e: v.getOutgoing()) {
                 if (e instanceof PatternEdge) {
                     PatternEdge pe = (PatternEdge) e;
                     TripPattern pattern = pe.getPattern();

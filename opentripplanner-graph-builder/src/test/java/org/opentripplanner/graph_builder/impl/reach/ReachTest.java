@@ -22,16 +22,19 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.reach.EdgeWithReach;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -118,23 +121,21 @@ public class ReachTest extends TestCase {
     }
     
 
-    private Vertex vertex(String label, double lat, double lon) {
-        Vertex v = new Vertex(label, lat, lon);
-        graph.addVertex(v);
+    private IntersectionVertex vertex(String label, double lat, double lon) {
+        IntersectionVertex v = new IntersectionVertex(graph, label, lat, lon);
         return v;
     }
 
     private void edges(String... vLabels) {
         for (int i = 0; i < vLabels.length - 1; i++) {
-            Vertex vA = graph.getVertex(vLabels[i]);
-            Vertex vB = graph.getVertex(vLabels[i + 1]);
-
-            graph.addEdge(vA, vB, edge(vA, vB));
-            graph.addEdge(vB, vA, edge(vB, vA));
+            IntersectionVertex vA = (IntersectionVertex) graph.getVertex(vLabels[i]);
+            IntersectionVertex vB = (IntersectionVertex) graph.getVertex(vLabels[i + 1]);
+            edge(vA, vB);
+            edge(vB, vA);
         }
     }
 
-    private Edge edge(Vertex vA, Vertex vB) {
+    private PlainStreetEdge edge(IntersectionVertex vA, IntersectionVertex vB) {
         Coordinate c1 = vA.getCoordinate();
         Coordinate c2 = vB.getCoordinate();
         

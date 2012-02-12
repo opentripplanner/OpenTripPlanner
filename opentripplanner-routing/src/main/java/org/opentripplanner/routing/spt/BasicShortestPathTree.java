@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A ShortestPathTree implementation that corresponds to a basic Dijkstra search, where there is a

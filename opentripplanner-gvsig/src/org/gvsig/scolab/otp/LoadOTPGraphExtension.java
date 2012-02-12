@@ -40,7 +40,7 @@ import org.gvsig.gui.beans.swing.JFileChooser;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.core.graph.Graph;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;

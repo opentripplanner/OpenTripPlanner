@@ -24,18 +24,13 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -44,12 +39,19 @@ import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.StreetVertex;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.TransitIndexServiceImpl;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +70,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
 
     private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
+
+    private HashMap<String, List<RouteVariant>> variantsByAgency = new HashMap<String, List<RouteVariant>>();
 
     private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
 
@@ -89,12 +93,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         // this is keyed by the arrival vertex
         HashMap<Vertex, RouteSegment> segmentsByVertex = new HashMap<Vertex, RouteSegment>();
 
-        for (Vertex gv : graph.getVertices()) {
+		for (TransitVertex tv : 
+		     IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             RouteSegment segment = null;
-            if (gv instanceof StreetVertex || gv instanceof EndpointVertex) {
-                continue;
-            }
-            for (Edge e : gv.getOutgoing()) {
+			for (Edge e : tv.getOutgoing()) {
                 RouteVariant variant = null;
                 /*
                  * gv.vertex could be a journey vertex, or it could be any of a number of other
@@ -132,7 +134,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
 
                 if (segment == null) {
-                    segment = getOrMakeSegment(variant, segmentsByVertex, gv);
+					segment = getOrMakeSegment(variant, segmentsByVertex, tv);
                 }
 
                 if (e instanceof Alight || e instanceof PatternAlight) {
@@ -143,7 +145,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     segment.dwell = e;
                 }
             }
-            for (Edge e : gv.getIncoming()) {
+			for (Edge e : tv.getIncoming()) {
                 RouteVariant variant = null;
                 if (!(e instanceof AbstractEdge)) {
                     continue;
@@ -164,7 +166,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
 
                 if (segment == null) {
-                    segment = getOrMakeSegment(variant, segmentsByVertex, gv);
+					segment = getOrMakeSegment(variant, segmentsByVertex, tv);
                 }
 
                 if (e instanceof Board || e instanceof PatternBoard) {
@@ -184,11 +186,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 totalTrips += variant.getTrips().size();
             }
         }
-        _log.debug("Built transit index: " + variantsByRoute.size() + " routes, " + totalTrips
-                + " trips, " + totalVariants + " variants ");
+        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
+                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
 
-        TransitIndexService service = new TransitIndexServiceImpl(variantsByRoute, variantsByTrip,
-                preBoardEdges, preAlightEdges, directionsByRoute, modes);
+        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
+                variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, modes);
         graph.putService(TransitIndexService.class, service);
     }
 
@@ -344,7 +346,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     }
 
     private RouteSegment getOrMakeSegment(RouteVariant variant,
-            HashMap<Vertex, RouteSegment> segmentsByVertex, Vertex vertex) {
+			HashMap<Vertex, RouteSegment> segmentsByVertex, TransitVertex vertex) {
         RouteSegment segment = segmentsByVertex.get(vertex);
         if (segment != null) {
             return segment;
@@ -381,6 +383,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
         Route route = trip.getRoute();
         // see if we have a variant for this route like this already
+        List<RouteVariant> agencyVariants = variantsByAgency.get(route.getId().getAgencyId());
+        if (agencyVariants == null) {
+            agencyVariants = new ArrayList<RouteVariant>();
+            variantsByAgency.put(route.getId().getAgencyId(), agencyVariants);
+        }
         List<RouteVariant> variants = variantsByRoute.get(route.getId());
         if (variants == null) {
             variants = new ArrayList<RouteVariant>();
@@ -396,6 +403,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             // create a variant for these stops on this route
             variant = new RouteVariant(route, stops);
             variants.add(variant);
+            agencyVariants.add(variant);
         }
         variantsByTrip.put(trip.getId(), variant);
         variant.addTrip(trip);

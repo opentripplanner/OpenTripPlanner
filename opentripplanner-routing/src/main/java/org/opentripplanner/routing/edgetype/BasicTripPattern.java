@@ -350,7 +350,10 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     }
     
     private void writeObject(ObjectOutputStream out) throws IOException {
-        perTripFlags.trimToSize();
+        System.out.println("serialize basicTripPattern " + this + " arraypattern = " + this.arrayPattern);
+        // DEBUG unused basic patterns hanging around in the graph
+        if (perTripFlags != null)
+            perTripFlags.trimToSize();
         out.defaultWriteObject();
     }
 

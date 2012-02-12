@@ -13,9 +13,9 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
+import org.opentripplanner.routing.graph.Graph;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -54,7 +54,6 @@ public class TransferGraphLinker {
                         transfer.from.getCoordinate(),
                         transfer.to.getCoordinate() });
                 edge.setGeometry(geometry);
-                graph.addEdge(edge);
             }
         }
     }

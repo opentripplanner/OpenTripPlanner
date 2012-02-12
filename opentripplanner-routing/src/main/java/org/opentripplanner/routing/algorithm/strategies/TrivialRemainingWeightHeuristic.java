@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. 

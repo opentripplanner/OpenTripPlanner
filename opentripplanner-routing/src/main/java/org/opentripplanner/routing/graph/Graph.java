@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.graph;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -26,9 +26,9 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,9 +38,12 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
-import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.MortonVertexComparator;
+import org.opentripplanner.routing.core.TransferTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -51,7 +54,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class Graph implements Serializable {
     // update serialVersionId to the current date in format YYYYMMDDL
     // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20111209L;
+    private static final long serialVersionUID = 20120121L;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
@@ -67,7 +70,7 @@ public class Graph implements Serializable {
     private GraphBundle bundle;
     
     /* vertex index by name is reconstructed from edges */
-    private transient HashMap<String, Vertex> vertices = new HashMap<String, Vertex>();
+    private transient Map<String, Vertex> vertices;
 
     private transient ContractionHierarchySet hierarchies;
     
@@ -89,111 +92,44 @@ public class Graph implements Serializable {
     }
 
     /**
-     * Add the given vertex to the graph, or if one already exists with the same label, return that
-     * instead.
+     * Add the given vertex to the graph.
+     * Ideally, only vertices should add themselves to the graph, 
+     * when they are constructed or deserialized.
      * 
      * @param vv the vertex to add
-     * @return the existing or new vertex
      */
-    public Vertex addVertex(Vertex vv) {
-        String label = vv.getLabel();
-        Vertex gv = vertices.get(label);
-        if (gv == null) {
-            vertices.put(label, vv);
-            return vv;
-        }
-        return vv;
+    protected void addVertex(Vertex v) {
+        if (vertices.put(v.getLabel(), v) != null)
+            LOG.error("repeatedly added the same vertex: {}", v);
     }
 
-    /**
-     * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-     * Vertex with the given label and coordinates, add it to the graph, and return it.
-     */
-    public Vertex addVertex(String label, double x, double y) {
-        Vertex gv = vertices.get(label);
-        if (gv == null) {
-            Vertex vv = new Vertex(label, x, y);
-            vertices.put(label, vv);
-            return vv;
-        }
-        return gv;
+    // called from streetutils, must be public for now
+    // could makeEdgeBased be moved into Graph or graph package?
+    public void removeVertex(Vertex v) {
+        if (vertices.remove(v.getLabel()) != v)
+            LOG.error("attempting to remove vertex that is not in graph (or mapping value was null): {}", v);
     }
 
-    /**
-     * If the graph contains a vertex with the given label, return it. Otherwise, create a new
-     * Vertex with the given parameters, add it to the graph, and return it.
-     */
-    public Vertex addVertex(String label, String name, AgencyAndId stopId, double x, double y) {
-        Vertex gv = vertices.get(label);
-        if (gv == null) {
-            Vertex vv = new Vertex(label, x, y, name, stopId);
-            vertices.put(label, vv);
-            return vv;
-        }
-        return gv;
-    }
-
-    /**
-     * If the graph contains a vertex with the given label, return it. Otherwise, return null.
-     */
+    /* convenient in tests and such, but avoid using in general */
+    @Deprecated
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
 
     public Collection<Vertex> getVertices() {
-        return vertices.values();
+        return this.vertices.values();
     }
 
-    public void addEdge(Vertex a, Vertex b, Edge ee) {
-        a = addVertex(a);
-        b = addVertex(b);
-        // there is the potential here for the edge lists to no longer match
-        // the vertices pointed to by the edge
-        if (ee.getFromVertex() != a)
-            throw new IllegalStateException("Saving an edge with the wrong vertex.");
-        a.addOutgoing(ee);
-        b.addIncoming(ee);
-    }
-
-    public void addEdge(DirectEdge ee) {
-        Vertex fromv = ee.getFromVertex();
-        Vertex tov = ee.getToVertex();
-        fromv = addVertex(fromv);
-        tov = addVertex(tov);
-        // there is the potential here for the edge lists to no longer match
-        // the vertices pointed to by the edge
-        if (ee.getFromVertex() != fromv || ee.getToVertex() != tov)
-            throw new IllegalStateException("Saving an edge with the wrong vertex.");
-        fromv.addOutgoing(ee);
-        tov.addIncoming(ee);
-    }
-
-    public void addEdge(String from_label, String to_label, Edge ee) {
-        Vertex a = this.getVertex(from_label);
-        Vertex b = this.getVertex(to_label);
-        // there is the potential here for the edge lists to no longer match
-        // the vertices pointed to by the edge
-        if (ee.getFromVertex() != a)
-            throw new IllegalStateException("Saving an edge with the wrong vertex.");
-        addEdge(a, b, ee);
-    }
-    
-    /**
-     * this should really be in Edge, not Graph
-     * @param ee
-     */
-    public void removeEdge(DirectEdge ee) {
-        Vertex fromv = ee.getFromVertex();
-        Vertex tov = ee.getToVertex();
-        fromv.removeOutgoing(ee);
-        tov.removeIncoming(ee);
+    public boolean containsVertex(Vertex v) {
+        return (v != null) &&
+                vertices.get(v.getLabel()) == v;
     }
 
     public Vertex nearestVertex(float lat, float lon) {
         double minDist = Float.MAX_VALUE;
         Vertex ret = null;
         Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : vertices.values()) {
+        for (Vertex vv : getVertices()) {
             double dist = vv.distance(c);
             if (dist < minDist) {
                 ret = vv;
@@ -217,45 +153,21 @@ public class Graph implements Serializable {
         return (T) _services.get(serviceType);
     }
 
-    public void removeVertex(Vertex vertex) {
-        vertices.remove(vertex.getLabel());
+    public void remove(Vertex vertex) {
+        vertices.remove(vertex);
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
-        Vertex gv = this.getVertex(vertex.getLabel());
-        if (gv == null) {
-            return;
-        }
-        if (gv != vertex) {
-            throw new IllegalStateException(
-                    "Vertex has the same label as one in the graph, but is not the same object.");
+        if (! containsVertex(vertex)) {
+            throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
         vertex.removeAllEdges();
-        vertices.remove(vertex.getLabel());
-    }
-
-    public void removeEdge(AbstractEdge e) {
-        Vertex fv = e.getFromVertex();
-        Vertex fgv = vertices.get(fv.getLabel());
-        if (fgv != null) {
-            if (fv != fgv)
-                throw new IllegalStateException("Vertex / edge mismatch.");
-            else
-                fgv.removeOutgoing(e);
-        }
-        Vertex tv = e.getToVertex();
-        Vertex tgv = vertices.get(tv.getLabel());
-        if (tgv != null) {
-            if (tv != tgv)
-                throw new IllegalStateException("Vertex / edge mismatch.");
-            else
-                tgv.removeIncoming(e);
-        }
+        vertices.remove(vertex);
     }
 
     public Envelope getExtent() {
         Envelope env = new Envelope();
-        for (Vertex v : this.getVertices()) {
+        for (Vertex v : getVertices()) {
             env.expandToInclude(v.getCoordinate());
         }
         return env;
@@ -306,7 +218,7 @@ public class Graph implements Serializable {
      */
     public int countEdges() {
         int ne = 0;
-        for (Vertex v : vertices.values()) {
+        for (Vertex v : getVertices()) {
             ne += v.getDegreeOut();
         }
         return ne;
@@ -314,13 +226,13 @@ public class Graph implements Serializable {
     
     /* this will require a rehash of any existing hashtables keyed on vertices */
     private void renumberVerticesAndEdges() {
-        this.vertexById = new ArrayList<Vertex>(this.getVertices());
+        this.vertexById = new ArrayList<Vertex>(getVertices());
         Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
         int i = 0;
         for (Vertex v : this.vertexById) {
-            v.index = i;
+            v.setIndex(i);
             int j = 0;
             for (Edge e : v.getOutgoing()) {
                 int eid = (i*100) + j;
@@ -357,44 +269,40 @@ public class Graph implements Serializable {
     
     public static Graph load(File file, LoadLevel level) 
         throws IOException, ClassNotFoundException {
+        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
-        return load(ClassLoader.getSystemClassLoader(), file, level);
+        ObjectInputStream in = new ObjectInputStream (new FileInputStream(file));
+        return load(in, level);
     }
     
-    @SuppressWarnings("unchecked")
     public static Graph load(ClassLoader classLoader, File file, LoadLevel level) 
         throws IOException, ClassNotFoundException {
+        LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
         ObjectInputStream in = new GraphObjectInputStream(
                 new BufferedInputStream (new FileInputStream(file)), classLoader);
-        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
+        return load(in, level);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Graph load(ObjectInputStream in, LoadLevel level) 
+        throws IOException, ClassNotFoundException {
         try {
-            Graph graph= (Graph) in.readObject();
+            Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info and annotations read.");
             if (level == LoadLevel.BASIC)
                 return graph;
-            // vertex edge lists are transient to avoid excessive recursion depth 
+            // vertex edge lists are transient to avoid excessive recursion depth
+            // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();
-            LOG.debug("Reconnecting graph...");
+            graph.vertices = new HashMap<String, Vertex>();;
             for (Edge e : edges) {
-                Vertex fromv = e.getFromVertex();
-                Vertex tov = null;
-                if (e instanceof AbstractEdge)
-                    tov = ((AbstractEdge)e).getToVertex();
-                else if (e instanceof TurnEdge)
-                    tov = ((TurnEdge)e).getToVertex();
-                else
-                    LOG.warn("Edge with no to-vertex: " + e);
-                graph.vertices.put(fromv.getLabel(), fromv);
-                fromv.addOutgoing(e);
-                if (tov != null) {
-                    graph.vertices.put(tov.getLabel(), tov);
-                    tov.addIncoming(e);
-                }
+               graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+               graph.vertices.put(e.getToVertex().getLabel(),   e.getToVertex());
             }
-            for (Vertex v : graph.vertices.values())
-                v.trimEdgeLists();
+            // trim edge lists to length
+            for (Vertex v : graph.getVertices())
+                v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             if (level == LoadLevel.NO_HIERARCHIES)
                 return graph;
@@ -425,7 +333,7 @@ public class Graph implements Serializable {
         LOG.debug("Consolidating edges...");
         // this is not space efficient
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : vertices.values()) {
+        for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
         }
@@ -467,4 +375,5 @@ public class Graph implements Serializable {
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }
+
 }

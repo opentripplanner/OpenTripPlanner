@@ -23,22 +23,21 @@ import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.EndpointVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,23 +138,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 // only index transit stops that (a) are entrances, or (b) have no associated
                 // entrances
                 TransitStop ts = (TransitStop) v;
-                if (!ts.isEntrance()) {
-                    boolean hasEntrance = false;
-
-                    for (Edge e : gv.getOutgoing()) {
-                        if (e instanceof PathwayEdge) {
-                            hasEntrance = true;
-                            break;
-                        }
-                    }
-                    if (hasEntrance) {
-                        continue;
-                    }
+                if (!ts.isEntrance() && ts.hasEntrances()) {
+                    continue;
                 }
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
-            if (v instanceof StreetVertex || v instanceof EndpointVertex) {
+            if (v instanceof TurnVertex || v instanceof IntersectionVertex) {
                 Envelope env = new Envelope(v.getCoordinate());
                 intersectionTree.insert(env, v);
             }
@@ -190,11 +179,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return getClosestVertex(coordinate, name, options, null);
     }
 
-    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<DirectEdge> extraEdges) {
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
-        List<Vertex> vertices = getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
+        List<StreetVertex> vertices = getIntersectionAt(coordinate);
         if (vertices != null && !vertices.isEmpty()) {
             // coordinate is at a street corner or endpoint
             if (name == null) {
@@ -202,7 +191,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
                 // filter to avoid using OSM node ids for dead ends 
-                for (Vertex v : IterableLibrary.filter(vertices, StreetVertex.class))
+                for (StreetVertex v : IterableLibrary.filter(vertices, StreetVertex.class))
                     uniqueNameSet.add(v.getName());
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                 if (uniqueNames.size() > 1)
@@ -218,7 +207,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 closest.getExtra().add(e);
                 e = new FreeEdge(v, closest);
                 closest.getExtra().add(e);
-                if (v instanceof StreetVertex && ((StreetVertex) v).isWheelchairAccessible()) {
+                if (v instanceof TurnVertex && ((TurnVertex) v).isWheelchairAccessible()) {
                     closest.setWheelchairAccessible(true);
                 }
             }
@@ -295,10 +284,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<DirectEdge> extraEdges) {
+    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
         if (extraEdges != null) {
-            for (DirectEdge e : extraEdges) {
+            for (Edge e : extraEdges) {
                 if (e instanceof StreetEdge) {
                     extraStreets.add((StreetEdge) e);
                 }
@@ -430,13 +419,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     @SuppressWarnings("unchecked")
-    public List<Vertex> getIntersectionAt(Coordinate coordinate, double distanceError) {
+    public List<StreetVertex> getIntersectionAt(Coordinate coordinate) {
         Envelope envelope = new Envelope(coordinate);
-        envelope.expandBy(distanceError * 2);
-        List<Vertex> nearby = intersectionTree.query(envelope);
-        List<Vertex> atIntersection = new ArrayList<Vertex>(nearby.size());
-        for (Vertex v : nearby) {
-            if (coordinate.distance(v.getCoordinate()) < distanceError) {
+        envelope.expandBy(DISTANCE_ERROR * 2);
+        List<StreetVertex> nearby = intersectionTree.query(envelope);
+        List<StreetVertex> atIntersection = new ArrayList<StreetVertex>(nearby.size());
+        for (StreetVertex v : nearby) {
+            if (coordinate.distance(v.getCoordinate()) < DISTANCE_ERROR) {
                 atIntersection.add(v);
             }
         }

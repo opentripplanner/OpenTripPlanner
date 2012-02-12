@@ -27,6 +27,10 @@ public interface PatchService {
 	
 	void apply(Patch patch);
 	
+	void expire(Set<String> ids);
+
+	void expireAll();
+
 	void expireAllExcept(Set<String> ids);
 
 }

@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * Common base class for common {@link ShortestPathTree} functionality.

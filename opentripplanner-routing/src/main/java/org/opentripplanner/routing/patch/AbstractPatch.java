@@ -17,10 +17,21 @@ public abstract class AbstractPatch implements Patch {
     protected Alert alert;
 
     protected List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
+    protected List<TimePeriod> displayTimePeriods = new ArrayList<TimePeriod>();
 
     @Override
     public boolean activeDuring(TraverseOptions options, long start, long end) {
         for (TimePeriod period : timePeriods) {
+            if (!(end <= period.startTime || start >= period.endTime)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    @Override
+    public boolean displayDuring(TraverseOptions options, long start, long end) {
+        for (TimePeriod period : displayTimePeriods) {
             if (!(end <= period.startTime || start >= period.endTime)) {
                 return true;
             }
@@ -64,11 +75,19 @@ public abstract class AbstractPatch implements Patch {
         timePeriods = periods;
     }
 
+    public void addDisplayTimePeriod(long start, long end) {
+        displayTimePeriods.add(new TimePeriod(start, end));
+    }
+    
+    public void setDisplayTimePeriods(List<TimePeriod> periods) {
+        displayTimePeriods = periods;
+    }
+
     public boolean equals(Object o) {
         if (!(o instanceof AbstractPatch)) {
             return false;
         }
         AbstractPatch other = (AbstractPatch) o;
-        return id.equals(other.id) && timePeriods.equals(other.timePeriods);
+        return id.equals(other.id) && timePeriods.equals(other.timePeriods) && displayTimePeriods.equals(other.displayTimePeriods);
     }
 }

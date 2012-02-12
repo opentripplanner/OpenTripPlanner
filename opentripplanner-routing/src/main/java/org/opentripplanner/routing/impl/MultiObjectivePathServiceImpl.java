@@ -25,13 +25,13 @@ import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.monitoring.MonitoringStore;
@@ -304,6 +304,35 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             return false;
         }
     }
+
+//private boolean eDominates(State s0, State s1) {
+//  final double EPSILON1 = 0.1;
+//  if (s0.similarTripSeq(s1)) {
+//      return  s0.getWeight()       <= s1.getWeight()       * (1 + EPSILON1) &&
+//              s0.getElapsedTime()  <= s1.getElapsedTime()  * (1 + EPSILON1) &&
+//              s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON1) && 
+//              s0.getNumBoardings() <= s1.getNumBoardings();
+//  } else if (s0.getTripId() != null && s0.getTripId() == s1.getTripId()) {
+//      return  s0.getNumBoardings() <= s1.getNumBoardings() &&
+//    		  s0.getWeight()       <= s1.getWeight()       * (1 + EPSILON2) &&
+//              s0.getElapsedTime()  <= s1.getElapsedTime()  * (1 + EPSILON2) &&
+//              s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON2);
+//  } else {
+//	  return false;
+//  }
+//}
+
+    //    private boolean eDominates(State s0, State s1) {
+//        if (s0.similarTripSeq(s1)) {
+//            return s0.getWeight() <= s1.getWeight();
+//        } else if (s0.getTrip() == s1.getTrip()) {
+//            if (s0.getNumBoardings() < s1.getNumBoardings())
+//                return true;
+//            return s0.getWeight() <= s1.getWeight();
+//        } else {
+//            return false;
+//        }
+//    }
 
 //    private boolean eDominates(State s0, State s1) {
 //        final double EPSILON = 0.1;

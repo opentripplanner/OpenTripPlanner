@@ -16,17 +16,17 @@ package org.opentripplanner.routing.edgetype.factory;
 import java.util.HashSet;
 
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransitStop;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.edgetype.StreetVertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
+import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,8 +103,8 @@ public class FindMaxWalkDistances {
 
                 double new_w = v.getWeight();
 
-                if (toVertex instanceof StreetVertex) {
-                    StreetVertex sv = (StreetVertex) toVertex;
+                if (toVertex instanceof TurnVertex) {
+                    TurnVertex sv = (TurnVertex) toVertex;
                     if (sv.getDistanceToNearestTransitStop() <= new_w) {
                         continue;
                     }

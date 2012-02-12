@@ -379,7 +379,7 @@ otp.planner.TripTab = {
                 map              : this.planner.map,
                 locale           : this.locale,
                 templates        : this.templates,
-                showStopIds      : this.planner.showStopIds,
+                showStopCodes    : this.planner.showStopCodes,
                 useRouteLongName : this.planner.useRouteLongName,
                 itineraryMessages: this.planner.itineraryMessages,
                 xml              : itin,

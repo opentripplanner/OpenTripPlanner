@@ -375,7 +375,7 @@ otp.planner.StaticForms = {
 
         if (lat && lat > -181.1 && lon && lon > -181.1)
         {
-            retVal = lat + ',' + lon;
+            retVal = (1*lat).toFixed(6) + ',' + (1*lon).toFixed(6);
 
             // append geocoder string, which OTP will pass back to us in the response
             if(this.appendGeocodeName && name && name.length > 0 && !otp.util.ObjUtils.isCoordinate(name))
@@ -753,9 +753,7 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getYOffsetMapCoordinate();
-                var latlon = ll.lat + "," + ll.lon;
-                this.setFrom(latlon, ll.lat, ll.lon);
-                this.m_fromForm.setRawValue(latlon);
+                this.setFrom(null, ll.lat, ll.lon);
                 this.m_fromForm.getComboBox().clearInvalid();
             }
         }
@@ -766,9 +764,7 @@ otp.planner.StaticForms = {
             scope   : this,
             handler : function () {
                 var ll = this.contextMenu.getYOffsetMapCoordinate();
-                var latlon = ll.lat + "," + ll.lon;
-                this.setTo(latlon, ll.lat, ll.lon);
-                this.m_toForm.setRawValue(latlon);
+                this.setTo(null, ll.lat, ll.lon);
                 this.m_toForm.getComboBox().clearInvalid();
             }
         }

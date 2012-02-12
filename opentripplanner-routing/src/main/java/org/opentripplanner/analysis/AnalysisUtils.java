@@ -22,12 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.common.DisjointSet;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
 import org.opentripplanner.util.MapUtils;
 
 import com.vividsolutions.jts.algorithm.ConvexHull;
@@ -119,7 +119,7 @@ public class AnalysisUtils {
         DisjointSet<Vertex> components = new DisjointSet<Vertex>();
 
         for (Vertex v : graph.getVertices()) {
-            for (DirectEdge e : filter(v.getOutgoing(), DirectEdge.class)) {
+            for (Edge e : v.getOutgoing()) {
                 components.union(e.getFromVertex(), e.getToVertex());
             }
         }

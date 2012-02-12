@@ -105,7 +105,7 @@ otp.planner.ItineraryDataFactoryStatic = {
     store        : null,
     templates    : null,
     locale       : null,
-    showStopIds  : false,
+    showStopCodes : false,
 
     from         : null,
     to           : null,
@@ -165,7 +165,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         for(var i = 0; i < numLegs; i++)
         {
             var leg              = this.store.getAt(i);
-            leg.data.showStopIds = this.showStopIds;
+            leg.data.showStopCodes = this.showStopCodes;
 
             var text         = null;
             var verb         = null;
@@ -315,8 +315,9 @@ otp.planner.ItineraryDataFactoryStatic = {
         var iconURL  = null;
 
         var relativeDirection = step.relativeDirection;
-        if (relativeDirection == null || stepNum == 1)
+        if ((relativeDirection == null || stepNum == 1) && step.absoluteDirection != null)
         {
+            console.log(step);
             var absoluteDirectionText = this.locale.directions[step.absoluteDirection.toLowerCase()];
             stepText += verb + ' <strong>' + absoluteDirectionText + '</strong> ' + this.locale.directions.on;
             iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon();
@@ -327,9 +328,16 @@ otp.planner.ItineraryDataFactoryStatic = {
             iconURL = otp.util.ImagePathManagerUtils.getStepDirectionIcon(relativeDirection);
 
             var directionText = otp.util.StringFormattingUtils.capitolize(this.locale.directions[relativeDirection]);
+
             if (relativeDirection == "continue")
             {
                 stepText += directionText;
+            }
+            else if (relativeDirection == "elevator") {
+              // elevators are handled differently because, in English
+              // anyhow, you want to say 'exit at' or 'go to' not
+              // 'elevator on'
+              stepText += directionText;
             }
             else if (step.stayOn == true)
             {
@@ -345,7 +353,11 @@ otp.planner.ItineraryDataFactoryStatic = {
             }
         }
         stepText += ' <strong>' + step.streetName + '</strong>';
-        stepText += ' - ' + otp.planner.Utils.prettyDistance(step.distance) + '';
+
+        // don't show distance for routes which have no distance (e.g. elevators)
+        if (step.distance > 0) {
+            stepText += ' - ' + otp.planner.Utils.prettyDistance(step.distance) + '';
+        }
 
         // edit the step object (by default, unless otherwise told)
         if(!dontEditStep)

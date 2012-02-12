@@ -5,7 +5,7 @@ import java.util.List;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.opentripplanner.api.model.json_serializers.EdgeSetJSONSerializer;
 import org.opentripplanner.api.model.json_serializers.WithGraph;
-import org.opentripplanner.routing.core.Graph;
+import org.opentripplanner.routing.graph.Graph;
 
 public class EdgeSet {
     public List<WrappedEdge> edges;

@@ -14,16 +14,15 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.Arrays;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,14 +88,14 @@ public class BidirectionalRemainingWeightHeuristic implements
     private void recalculate(Vertex target, TraverseOptions options, boolean timeNotWeight) {
         if (target != this.target) {
             this.target = target;
-            this.nVertices = Vertex.getMaxIndex();
+            this.nVertices = AbstractVertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             BinHeap<Vertex> q = new BinHeap<Vertex>();
             long t0 = System.currentTimeMillis();
 
             if (target instanceof StreetLocation) {
-                for (DirectEdge de : ((StreetLocation) target).getExtra()) {
+                for (Edge de : ((StreetLocation) target).getExtra()) {
                     Vertex gv;
                     if (options.isArriveBy()) {
                         gv = de.getToVertex();
@@ -128,18 +127,16 @@ public class BidirectionalRemainingWeightHeuristic implements
                 else
                     edges = u.getIncoming();
                 for (Edge e : edges) {
-                    if (e instanceof DirectEdge) {
-                        Vertex v = options.isArriveBy() ? 
-                            ((DirectEdge) e).getToVertex() : e.getFromVertex();
-                        double vw = uw + (timeNotWeight ? 
-                                e.timeLowerBound(options) : e.weightLowerBound(options));
-                        int vi = v.getIndex();
-                        if (weights[vi] > vw) {
-                            weights[vi] = vw;
-                            // selectively rekeying did not seem to offer any speed advantage
-                            q.insert(v, vw);
-                            // System.out.println("Insert " + v + " weight " + vw);
-                        }
+                    Vertex v = options.isArriveBy() ? 
+                        e.getToVertex() : e.getFromVertex();
+                    double vw = uw + (timeNotWeight ? 
+                            e.timeLowerBound(options) : e.weightLowerBound(options));
+                    int vi = v.getIndex();
+                    if (weights[vi] > vw) {
+                        weights[vi] = vw;
+                        // selectively rekeying did not seem to offer any speed advantage
+                        q.insert(v, vw);
+                        // System.out.println("Insert " + v + " weight " + vw);
                     }
                 }
             }

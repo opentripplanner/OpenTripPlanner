@@ -361,6 +361,8 @@ otp.core.MapStatic = {
         otp.util.OpenLayersUtils.pan(this.map, x, y);
     },
 
+// TODO : shouldn't this be in a spot like POI.js (there's a planner/poi, but nothing generic to the map right now, so guess that's why I put it here, but...) 
+
     /** */
     tooltip : function(x, y, html, contentSize)
     {
@@ -391,26 +393,37 @@ otp.core.MapStatic = {
             else
                 zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
 
-            // if content is longer than 25 characters, we lack tooltip space, so don't break the links to next line nor use the (@Google)
-            var svConf = {name:'sv', x:x, y:y};
-            if(contentSize && contentSize <= 25)
+            // IE can't do streetview in these map tooltips (freeze's the browser)
+            if(Ext.isIE)
+                this.noStreetview = true;
+
+            var streetview = null;
+            if(!this.noStreetview)
             {
-                html += '<br/>';
-                svConf.name = 'Streetview (&copy; Google)'
+                // if content is longer than 25 characters, we lack tooltip space, so don't break the links to next line nor use the (@Google)
+                var svConf = {name:'sv', x:x, y:y};
+                if(contentSize && contentSize <= 25)
+                {
+                    html += '<br/>';
+                    svConf.name = 'Streetview (&copy; Google)'
+                }
+                else
+                { 
+                    html += ' ';
+                    svConf.name = 'Streetview';
+                }
+                streetview = otp.planner.Templates.THIS.streetviewTemplate.applyTemplate(svConf);
             }
-            else
-            { 
-                html += ' ';
-                svConf.name = 'Streetview';
-            }
-            var streetview = otp.planner.Templates.THIS.streetviewTemplate.applyTemplate(svConf);
+
 
             // append links to tooltip content
-            html += '<span class="popLinks">' 
-                 +  zoom
-                 +  ' | '
-                 +  streetview
-                 +  '</span>';
+            html += '<span class="popLinks">' +  zoom; 
+
+            if(streetview)
+            {
+                 html += ' | ' + streetview
+            }
+            html += '</span>';
         }
 
         self.tooltipPopup.setContentHTML(html);

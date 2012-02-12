@@ -12,8 +12,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.AbstractEdge;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 
 /**
  * A superclass for general trip pattern related edges
@@ -26,7 +27,7 @@ public abstract class PatternEdge extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public PatternEdge(Vertex fromv, Vertex tov, TripPattern pattern) {
+    public PatternEdge(TransitVertex fromv, TransitVertex tov, TripPattern pattern) {
         super(fromv, tov);
         this.pattern = pattern;
     }

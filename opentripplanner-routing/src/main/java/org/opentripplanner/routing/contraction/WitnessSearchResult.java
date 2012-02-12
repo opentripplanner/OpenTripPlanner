@@ -15,11 +15,12 @@ package org.opentripplanner.routing.contraction;
 
 import java.util.List;
 
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.contraction.ContractionHierarchy.PotentialShortcut;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 
 public class WitnessSearchResult {
-    public List<Shortcut> shortcuts;
+    public List<PotentialShortcut> shortcuts;
     public int searchSpace;
     public BasicShortestPathTree spt;
     public Vertex vertex;
@@ -32,7 +33,7 @@ public class WitnessSearchResult {
      * @param vertex - the start point of this search V (not U, the taboo vertex)
      * @param searchSpace - number of nodes visited
      */
-    public WitnessSearchResult(List<Shortcut> shortcuts, BasicShortestPathTree spt, Vertex vertex, int searchSpace) {
+    public WitnessSearchResult(List<PotentialShortcut> shortcuts, BasicShortestPathTree spt, Vertex vertex, int searchSpace) {
         this.shortcuts = shortcuts;
         this.spt = spt;
         this.vertex = vertex; 

@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model.analysis;
 
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.routing.graph.Edge;
 
 public class WrappedEdge {
 

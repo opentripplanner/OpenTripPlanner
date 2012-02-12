@@ -16,11 +16,11 @@ import org.opentripplanner.api.model.analysis.SimpleVertex;
 import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.analysis.WrappedEdge;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Graph;
-import org.opentripplanner.routing.core.Graph.LoadLevel;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.access.annotation.Secured;
@@ -67,16 +67,14 @@ public class GraphInternals {
             Envelope vertexEnvelope = new Envelope(v.getCoordinate());
             vertexIndex.insert(vertexEnvelope, v);
             for (Edge e : v.getOutgoing()) {
-                if (e instanceof DirectEdge) {
-                    Envelope envelope;
-                    Geometry geometry = ((DirectEdge) e).getGeometry();
-                    if (geometry == null) {
-                        envelope = vertexEnvelope;
-                    } else {
-                        envelope = geometry.getEnvelopeInternal();
-                    }
-                    edgeIndex.insert(envelope, e);
+                Envelope envelope;
+                Geometry geometry = e.getGeometry();
+                if (geometry == null) {
+                    envelope = vertexEnvelope;
+                } else {
+                    envelope = geometry.getEnvelopeInternal();
                 }
+                edgeIndex.insert(envelope, e);
             }
         }
         vertexIndex.build();

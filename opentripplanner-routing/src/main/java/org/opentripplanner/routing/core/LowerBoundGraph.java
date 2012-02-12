@@ -17,6 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -44,7 +49,7 @@ public class LowerBoundGraph {
 
 	public LowerBoundGraph(Graph original, int kind) {
 		originalGraph = original;
-		nVertices = Vertex.getMaxIndex();
+		nVertices = AbstractVertex.getMaxIndex();
 		LOG.info("Table size is: {}", nVertices);
 		vertex = new int   [nVertices][];
 		weight = new double[nVertices][];
@@ -178,7 +183,7 @@ public class LowerBoundGraph {
 		double[] result = new double[nVertices];
 		Arrays.fill(result, Double.POSITIVE_INFINITY);
 		BinHeap<Integer> q = new BinHeap<Integer>();
-		for (DirectEdge de : origin.getExtra()) {
+		for (Edge de : origin.getExtra()) {
 			Vertex toVertex = de.getToVertex();  
 			int toIndex = toVertex.getIndex();
 			if (toVertex == origin) continue;

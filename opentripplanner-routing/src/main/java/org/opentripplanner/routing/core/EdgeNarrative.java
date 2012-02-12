@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 
 import com.vividsolutions.jts.geom.Geometry;

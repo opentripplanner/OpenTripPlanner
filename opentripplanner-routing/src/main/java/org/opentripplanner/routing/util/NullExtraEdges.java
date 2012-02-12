@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.routing.core.Edge;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 
 /** 

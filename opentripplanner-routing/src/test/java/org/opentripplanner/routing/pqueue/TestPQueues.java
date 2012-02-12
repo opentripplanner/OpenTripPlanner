@@ -96,6 +96,11 @@ public class TestPQueues extends TestCase {
         binHeap.rekey(0, 12);
         assertEquals(12, binHeap.peek_min_key(), 1e-4);
         assertEquals(1, binHeap.size());
+
+        // element 8 is not present
+        binHeap.rekey(8, 8);
+        assertEquals(12, binHeap.peek_min_key(), 1e-4);
+        assertEquals(1, binHeap.size());
     }
 
     private List<OTPPriorityQueue<Integer>> makeQueues() {

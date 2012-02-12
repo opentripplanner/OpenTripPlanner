@@ -1,6 +1,6 @@
 package org.opentripplanner.api.model.analysis;
 
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 
 public class SimpleVertex {
     public String label;
@@ -15,6 +15,6 @@ public class SimpleVertex {
     public SimpleVertex(Vertex v) {
         x = v.getX();
         y = v.getY();
-        label = v.label;
+        label = v.getLabel();
     }
 }

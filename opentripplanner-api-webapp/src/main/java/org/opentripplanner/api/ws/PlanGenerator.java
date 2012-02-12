@@ -31,16 +31,13 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.DirectEdge;
-import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.Hop;
@@ -49,15 +46,22 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -184,6 +188,7 @@ public class PlanGenerator {
      */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         Itinerary itinerary = makeEmptyItinerary(path);
+        EdgeNarrative postponedAlerts = null;
 
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -200,6 +205,13 @@ public class PlanGenerator {
                 continue;
             }
             if (backEdge instanceof FreeEdge) {
+                if(backEdge instanceof PreBoardEdge) {
+                    // Add boarding alerts to the next leg
+                    postponedAlerts = backEdgeNarrative;
+                } else if(backEdge instanceof PreAlightEdge) {
+                    // Add alighting alerts to the previous leg
+                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdgeNarrative);
+                }
                 continue;
             }
 
@@ -350,7 +362,7 @@ public class PlanGenerator {
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
                             Place stop = makePlace(state.getBackState());
                             leg.stop.add(stop);
-                        } else {
+                        } else if(leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
                                     state.getTimeInMillis());
                         }
@@ -380,6 +392,12 @@ public class PlanGenerator {
                         coordinates.extend(edgeCoordinates);
                     }
                 }
+
+                if(postponedAlerts != null) {
+                    addNotesToLeg(leg, postponedAlerts);
+                    postponedAlerts = null;
+                }
+
                 addNotesToLeg(leg, backEdgeNarrative);
                 if (pgstate == PlanGenState.TRANSIT) {
                     itinerary.transitTime += state.getElapsedTime();
@@ -407,6 +425,8 @@ public class PlanGenerator {
             leg.tripShortName = trip.getTripShortName();
             leg.routeShortName = trip.getRoute().getShortName();
             leg.routeLongName = trip.getRoute().getLongName();
+            leg.routeColor = trip.getRoute().getColor();
+            leg.routeTextColor = trip.getRoute().getTextColor();
         }
         leg.mode = en.getMode().toString();
         leg.startTime = new Date(state.getBackState().getTimeInMillis());
@@ -501,11 +521,17 @@ public class PlanGenerator {
      * @return
      */
     private Place makePlace(State state) {
-        Coordinate endCoord = state.getVertex().getCoordinate();
-        String name = state.getVertex().getName();
-        AgencyAndId stopId = state.getVertex().getStopId();
+        Vertex v = state.getVertex();
+        Coordinate endCoord = v.getCoordinate();
+        String name = v.getName();
+        AgencyAndId stopId = null;
+        String stopCode = null;
+        if (v instanceof TransitVertex) {
+            stopId = ((TransitVertex)v).getStopId();
+            stopCode = ((TransitVertex)v).getStopCode();
+        }
         Date timeAtState = new Date(state.getTimeInMillis());
-        Place place = new Place(endCoord.x, endCoord.y, name, stopId, timeAtState);
+        Place place = new Place(endCoord.x, endCoord.y, name, stopId, stopCode, timeAtState);
         return place;
     }
 
@@ -517,7 +543,10 @@ public class PlanGenerator {
     private Place makePlace(Vertex vertex) {
         Coordinate endCoord = vertex.getCoordinate();
         Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
-        place.stopId = vertex.getStopId();
+        if (vertex instanceof TransitVertex) {
+            place.stopId = ((TransitVertex)vertex).getStopId();
+            place.stopCode = ((TransitVertex)vertex).getStopCode();
+        }
         return place;
     }
 
@@ -631,6 +660,28 @@ public class PlanGenerator {
             if (geom == null) {
                 continue;
             }
+
+            // generate a step for getting off an elevator (all
+            // elevator narrative generation occurs when alighting). We don't need to know what came
+            // before or will come after
+            if (edge instanceof ElevatorAlightEdge) {
+                // don't care what came before or comes after
+                step = createWalkStep(currState);
+                
+                // tell the user where to get off the elevator using the exit notation, so the
+                // i18n interface will say 'Elevator to <exit>'
+                // what happens is that the webapp sees name == null and ignores that, and it sees
+                // exit != null and uses to <exit>
+                // the floor name is the AlightEdge name
+                // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
+                step.streetName =((ElevatorAlightEdge) edge).getName();
+
+                step.relativeDirection = RelativeDirection.ELEVATOR;
+
+                steps.add(step);
+                continue;
+            }
+
             String streetName = edgeNarrative.getName();
             if (step == null) {
                 // first step
@@ -698,7 +749,7 @@ public class PlanGenerator {
                     if (edge instanceof PlainStreetEdge) {
                         // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
-                        for (DirectEdge alternative : backState.getVertex().getOutgoingStreetEdges()) {
+                        for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
                             if (alternative instanceof TinyTurnEdge) {
                                 //a tiny turn edge has no geometry, but the next
                                 //edge will be a TurnEdge or PSE and will have direction
@@ -726,8 +777,8 @@ public class PlanGenerator {
                         //we are stuck
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
-                        for (DirectEdge alternative : backVertex.getOutgoingStreetEdges()) {
-                            List<DirectEdge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
+                        for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
+                            List<Edge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
                             if (alternatives.size() == 0) {
                                 continue; //this is not an alternative
                             }
