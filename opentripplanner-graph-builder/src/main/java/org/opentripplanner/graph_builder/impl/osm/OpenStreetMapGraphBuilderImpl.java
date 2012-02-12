@@ -1213,7 +1213,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             if (!levels.containsKey(level)) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nid;
+                String label = "osm multilevel node " + nid + ", level " + level;
                 IntersectionVertex iv = new IntersectionVertex(
                         graph, label, coordinate.x, coordinate.y, label);
                 levels.put(level, iv);
