@@ -22,8 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
@@ -188,10 +186,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
             long wayIndex = 0;
-
-            // store levels that cannot be parsed, and assign them a number
-            int nextUnparsedLevel = 0;
-            HashMap<String, Integer> unparsedLevels = new HashMap<String, Integer>();
 
             // figure out which nodes that are actually intersections
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();

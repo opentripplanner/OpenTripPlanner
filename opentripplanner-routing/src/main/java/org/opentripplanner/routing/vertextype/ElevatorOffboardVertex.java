@@ -1,9 +1,8 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
 
-public class ElevatorOffboardVertex extends AbstractVertex {
+public class ElevatorOffboardVertex extends StreetVertex {
 
     private static final long serialVersionUID = 20120209L;
 
