@@ -32,6 +32,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -51,7 +52,7 @@ public class TurnEdge extends StreetEdge {
 
     TurnVertex fromv;
 
-    TurnVertex tov;
+    StreetVertex tov;
 
     private List<Patch> patches;
 
@@ -73,6 +74,14 @@ public class TurnEdge extends StreetEdge {
         if (turnCost > 180) {
             turnCost = 360 - turnCost;
         }
+    }
+
+    // TODO: better handling of multiple constructor arg vertex types, specific multilevel vertex type
+    public TurnEdge(TurnVertex fromv, StreetVertex tov) {
+        super(fromv, tov);
+        this.fromv = fromv;
+        this.tov = tov;
+        turnCost = 0;
     }
 
     /*

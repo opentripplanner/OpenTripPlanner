@@ -18,7 +18,7 @@ otp.namespace("otp.core");
  * Simple Ext Text form with Cookie backed memory
  * @class
  */
-otp.core.ComboBox = {
+otp.core.ComboBoxStatic = {
 
     maxNumValues : 10,
     id           : 'cb.id',
@@ -230,4 +230,4 @@ otp.core.ComboBox = {
     
     CLASS_NAME : "otp.core.ComboBox"
 };
-otp.core.ComboBox = new otp.Class(otp.core.ComboBox);
+otp.core.ComboBox = new otp.Class(otp.core.ComboBoxStatic);
