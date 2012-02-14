@@ -28,6 +28,7 @@ import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -165,7 +166,7 @@ public class StreetLocation extends AbstractVertex {
                 ((TurnEdge)e).setRestrictedModes(((TurnEdge) edge).getRestrictedModes());
             }
         } else {
-            e = new OutEdge(location, (IntersectionVertex) tov);
+            e = new OutEdge(location, (StreetVertex) tov);
         }
         base.extra.add(e);
         

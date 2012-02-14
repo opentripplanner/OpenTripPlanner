@@ -388,11 +388,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                    + GenericVertex, X EndpointVertex, ~~ FreeEdge, == ElevatorBoardEdge/ElevatorAlightEdge
                    Another loop will fill in the ElevatorHopEdges. */
 
-                ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
 
                 OSMLevel[] levels = vertices.keySet().toArray(new OSMLevel[0]);
                 Arrays.sort(levels);
-
+                ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
                 for (OSMLevel level : levels) {
                     // get the node to build the elevator out from
                     IntersectionVertex sourceVertex = vertices.get(level);
@@ -419,7 +418,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     onboardVertices.add(onboardVertex);
                 }
 
-                // -1 because we loop over it two at a time
+                // -1 because we loop over onboardVertices two at a time
                 for (Integer i = 0, vSize = onboardVertices.size()-1; i < vSize; i++) {
                     Vertex from = onboardVertices.get(i);
                     Vertex to   = onboardVertices.get(i + 1);

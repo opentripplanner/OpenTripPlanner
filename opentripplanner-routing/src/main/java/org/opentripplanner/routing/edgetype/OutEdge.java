@@ -41,7 +41,7 @@ public class OutEdge extends StreetEdge {
         super(null, null);
     }
 
-    public OutEdge(TurnVertex fromv, IntersectionVertex tov) {
+    public OutEdge(TurnVertex fromv, StreetVertex tov) {
         super(fromv, tov);
     }
 
