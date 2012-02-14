@@ -326,6 +326,36 @@ otp.util.ObjUtils = {
         return retVal;
     },
 
+    /** return a <name>::<coord> from an object with .name, .x, .y, .lat and .lon elements */
+    getNamedCoordRecord : function(data, isMercator)
+    {
+        var retVal = {};
+
+        var X='x'; var Y='y';
+        retVal.zoom = 6;
+        retVal.isMercator = isMercator;
+        if(isMercator)
+        {
+            X='lon';
+            Y='lat';
+            retVal.zoom = 15;
+        }
+
+        // handle the <name>:: part of the coord
+        retVal.coord = '';
+        if(data['name'] && data['name'].length > 0)
+            retVal.coord =  data['name'] + '::';
+        retVal.name = data['name'] || '';
+
+        // do the X,Y part of the named coord
+        retVal.x = data[X]
+        retVal.y = data[Y], 
+        retVal.coord += retVal.x + "," + retVal.y;
+
+        return retVal;
+    },
+
+
     /** gets the number of properties */
     numProperties : function(feature, defVal) 
     {
