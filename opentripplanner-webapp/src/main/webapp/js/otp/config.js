@@ -46,7 +46,7 @@ otp.config_defaults = {
         },
 
         linkTemplates  : [
-            {name:otp.config.locale.tripPlanner.link.text,  url:'index.html?' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
+            {name:otp.config.locale.tripPlanner.link.text,  url:'index.html#/' + otp.planner.ParamTemplate}, // TODO - this will cause an error if otp.planner is not defined
             {name:otp.config.locale.tripPlanner.link.trip_separator, separator:true},
             {name:otp.config.locale.tripPlanner.link.google_transit, url: otp.config.locale.tripPlanner.link.google_domain + '/maps?<tpl if="arriveBy == \'Arrive\'">ttype=arr&</tpl>date={date}&time={time}&daddr={toLat},{toLon}&saddr={fromLat},{fromLon}&ie=UTF8&dirflg=r'},
             {name:otp.config.locale.tripPlanner.link.bike_separator, separator:true},
