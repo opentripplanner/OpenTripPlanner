@@ -99,7 +99,7 @@ public class TestStreetMatcher {
         LineString geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470);
 
         StreetMatcher matcher = new StreetMatcher(_graph);
-/*
+
         List<Edge> match = matcher.match(geometry);
         assertNotNull(match);
         assertEquals(1, match.size());
@@ -117,10 +117,10 @@ public class TestStreetMatcher {
         match = matcher.match(geometry);
         assertNotNull(match);
         assertEquals(3, match.size());
-*/
+
         geometry = geometry(-122.384756, 47.669260, -122.384777, 47.667454, -122.383554, 47.666789,
                 -122.3825, 47.666);
-        List<Edge> match = matcher.match(geometry);
+         match = matcher.match(geometry);
         assertNotNull(match);
         System.out.println(match);
         assertEquals(4, match.size());
