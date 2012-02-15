@@ -39,6 +39,10 @@ otp.core.ComboBoxStatic = {
     m_lastValue  : null,
     m_forceDirty : false,
 
+    geocodeName  : null,
+    geocodeCoord : null,
+    geocodeRec   : null,
+
     /**
      * constructor of sorts
      */
@@ -121,6 +125,32 @@ otp.core.ComboBoxStatic = {
         this.m_forceDirty = true;
     },
 
+
+    /** */
+    setGeocodeName : function(name, doUpdate)
+    {
+        this.geocodeName = name;
+        if(doUpdate)
+            this.setRawValue(name);
+    },
+
+    /** */
+    setGeocodeCoord : function(coord, record)
+    {
+        this.geocodeCoord = coord;
+        this.geocodeRec   = record;
+
+        // cleanup ... no 0.0,0.0
+        if(coord && coord.indexOf('0.0') == 0 && coord.indexOf('0.0') != coord.lastIndexOf('0.0'))
+            this.geocodeCoord = null;
+    },
+
+    /** */
+    getGeocodeCoord : function()
+    {
+        return trimet.utils.ObjUtils.getCoordinate(this.geocodeCoord);
+    },
+
     /**
      * persist Ext ComboBox's text field content into a Cookie
      */
@@ -201,7 +231,17 @@ otp.core.ComboBoxStatic = {
     {
         this.m_form.collapse();
         this.m_form.reset();
+        this.clearGeocode();
     },
+
+    /** */
+    clearGeocode : function()
+    {
+        geocodeName  = null;
+        geocodeCoord = null;
+        geocodeRec   = null;
+    },
+
 
     /** */
     blur : function()
@@ -223,6 +263,10 @@ otp.core.ComboBoxStatic = {
             var tmp = this.getRawValue();
             this.setRawValue(combo.getRawValue());
             combo.setRawValue(tmp);
+
+            this.swapElements(combo, 'geocodeName');
+            this.swapElements(combo, 'geocodeCoord');
+            this.swapElements(combo, 'geocodeRec');
         }
         catch(e)
         {}
