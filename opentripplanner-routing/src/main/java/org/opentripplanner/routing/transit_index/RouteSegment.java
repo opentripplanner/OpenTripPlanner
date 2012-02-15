@@ -17,6 +17,7 @@ import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.graph.Edge;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * RouteSegment holds the edges around one stop on particular trip or pattern.
@@ -33,5 +34,8 @@ public class RouteSegment implements Serializable  {
 	public AgencyAndId stop;
 	public RouteSegment(AgencyAndId stop) {
 		this.stop = stop;
+	}
+	public Geometry getGeometry() {
+	    return hopOut.getGeometry();
 	}
 }

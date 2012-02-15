@@ -15,6 +15,8 @@ package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -24,8 +26,16 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
 import org.opentripplanner.routing.patch.StopAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * This represents a particular stop pattern on a particular route. For example, the N train has at
@@ -40,7 +50,11 @@ import org.opentripplanner.routing.patch.StopAdapter;
  * 
  */
 public class RouteVariant implements Serializable {
+    private static final Logger _log = LoggerFactory.getLogger(RouteVariant.class);
+
     private static final long serialVersionUID = -3110443015998033630L;
+
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     /*
      * This indicates that trips with multipledirection_ids are part of this variant. It should
@@ -58,6 +72,7 @@ public class RouteVariant implements Serializable {
     @XmlJavaTypeAdapter(StopAdapter.class)
     private ArrayList<Stop> stops;
 
+    /** Ordered list of segments for this route */
     private ArrayList<RouteSegment> segments;
 
     private Route route;
@@ -100,6 +115,29 @@ public class RouteVariant implements Serializable {
         trips.trimToSize();
         stops.trimToSize();
         segments.trimToSize();
+
+        // topological sort on segments to make sure that they are in order
+
+        // since segments only know about their next edges, we must build a mapping from prior-edge
+        // to segment; while we're at it, we find the first segment.
+        HashMap<Edge, RouteSegment> successors = new HashMap<Edge, RouteSegment>();
+        RouteSegment segment = null;
+        for (RouteSegment s : segments) {
+            if (s.hopIn == null) {
+                segment = s;
+            } else {
+                successors.put(s.hopIn, s);
+            }
+        }
+
+        int i = 0;
+        while (segment != null) {
+            segments.set(i++, segment);
+            segment = successors.get(segment.hopOut);
+        }
+        if (i != segments.size()) {
+            _log.error("Failed to organize hops in route variant " + name);
+        }
     }
 
     public ArrayList<Stop> getStops() {
@@ -133,5 +171,17 @@ public class RouteVariant implements Serializable {
     @XmlElement
     public String getDirection() {
         return direction;
+    }
+
+    public LineString getGeometry() {
+        List<Coordinate> coords = new ArrayList<Coordinate>();
+        for (RouteSegment segment : segments) {
+            if (segment.hopOut != null) {
+                Geometry segGeometry = segment.getGeometry();
+                coords.addAll(Arrays.asList(segGeometry.getCoordinates()));
+            }
+        }
+        Coordinate[] coordArray = new Coordinate[coords.size()];
+        return geometryFactory.createLineString(coords.toArray(coordArray));
     }
 }
