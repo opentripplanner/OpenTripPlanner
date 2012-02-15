@@ -92,7 +92,7 @@ public abstract class MatchState {
     }
 
     /* computes the distance, in meters, along a geometry */
-    protected double distanceAlongGeometry(Geometry geometry, LinearLocation startIndex,
+    protected static double distanceAlongGeometry(Geometry geometry, LinearLocation startIndex,
             LinearLocation endIndex) {
 
         if (endIndex == null) {
