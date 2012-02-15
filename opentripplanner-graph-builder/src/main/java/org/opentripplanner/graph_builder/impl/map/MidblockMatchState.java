@@ -64,7 +64,7 @@ public class MidblockMatchState extends MatchState {
             // so we return an end state
             Coordinate pt = routeIndex.getCoordinate(routeGeometry);
             double error = distance(pt, edgeIndex.getCoordinate(edgeGeometry));
-            nextStates.add(new EndMatchState(this, error, getDistanceAlongRoute()));
+            nextStates.add(new EndMatchState(this, error, 0));
             return nextStates;
         }
 
@@ -179,26 +179,26 @@ public class MidblockMatchState extends MatchState {
                 // case, we jump to the corner, and our error is the distance from the route point
                 // and the corner
 
-                // FIXME: we should actually compute the error by computing the distance from the
-                // corner
-                // plus the distance from the new edge, *and* we should build a midblock state as
-                // this could leave you far down the block
-
                 Vertex toVertex = edge.getToVertex();
-
-                positionError = edge.getToVertex().distance(newRouteCoord);
-                travelAlongEdge = distanceAlongGeometry(edgeGeometry, edgeIndex, null);
-                travelError = Math.abs(travelAlongRoute - travelAlongEdge);
-
-                error = travelError + positionError;
-
-                if (error > MAX_ERROR) {
-                    // we're not going to bother with states which are
-                    // totally wrong
-                    return nextStates;
-                }
+                double travelAlongOldEdge = distanceAlongGeometry(edgeGeometry, edgeIndex, null);
 
                 for (Edge e : getOutgoingMatchableEdges(toVertex)) {
+                    Geometry newEdgeGeometry = e.getGeometry();
+                    LocationIndexedLine newIndexedEdge = new LocationIndexedLine(newEdgeGeometry);
+                    newEdgeIndex = newIndexedEdge.project(newRouteCoord);
+                    Coordinate newEdgeCoord = newEdgeIndex.getCoordinate(newEdgeGeometry);
+                    positionError = newEdgeCoord.distance(newRouteCoord);
+                    travelAlongEdge = travelAlongOldEdge + distanceAlongGeometry(newEdgeGeometry, new LinearLocation(), newEdgeIndex);
+                    travelError = Math.abs(travelAlongRoute - travelAlongEdge);
+
+                    error = travelError + positionError;
+
+                    if (error > MAX_ERROR) {
+                        // we're not going to bother with states which are
+                        // totally wrong
+                        return nextStates;
+                    }
+
                     double cost = error + NEW_SEGMENT_PENALTY;
                     if (!carsCanTraverse(e)) {
                         cost += NO_TRAVERSE_PENALTY;
@@ -217,7 +217,7 @@ public class MidblockMatchState extends MatchState {
             LinearLocation projected = indexedEdge.project(routeCoord);
             double locationError = distance(projected.getCoordinate(edgeGeometry), routeCoord);
 
-            MatchState end = new EndMatchState(this, locationError, getDistanceAlongRoute());
+            MatchState end = new EndMatchState(this, locationError, 0);
             return Arrays.asList(end);
         }
 
