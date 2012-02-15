@@ -52,9 +52,6 @@ public abstract class MatchState {
         if (parent != null) {
             this.accumulatedError = parent.accumulatedError + parent.currentError;
             this.distanceAlongRoute += parent.distanceAlongRoute;
-            if (parent.currentError < 0) {
-                throw new IllegalStateException("Cannot have an error of less than zero");
-            }
         }
     }
 
