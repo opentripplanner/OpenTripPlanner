@@ -86,14 +86,15 @@ public class StreetMatcher {
             LinearLocation initialLocation = indexedEdge.project(routeStartCoordinate);
             
             double error = MatchState.distance(initialLocation.getCoordinate(edgeGeometry), routeStartCoordinate);
-            MatchState state = new MidblockMatchState(null, routeGeometry, initialEdge, startIndex, initialLocation, error, 0);
-            states.insert(state, error);
+            MatchState state = new MidblockMatchState(null, routeGeometry, initialEdge, startIndex, initialLocation, error, 0.01);
+            states.insert(state, 0); //make sure all initial states are visited by inserting them at 0
         }
 
         // search for best-matching path
         int seen_count = 0, total = 0;
         HashSet<MatchState> seen = new HashSet<MatchState>(); 
         while (!states.empty()) {
+            double k = states.peek_min_key();
             MatchState state = states.extract_min();
             if (++total % 10000 == 0) {
                 log.debug("seen / total: " + seen_count + " / " + total);
@@ -102,7 +103,10 @@ public class StreetMatcher {
                 ++seen_count;
                 continue;
             } else {
-                seen.add(state);
+                if (k != 0) {
+                    //but do not mark states as closed if we start at them
+                    seen.add(state);
+                }
             }
             if (state instanceof EndMatchState) {
                 return toEdgeList(state);
