@@ -15,6 +15,7 @@ package org.opentripplanner.graph_builder.impl.map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -36,6 +37,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
 
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
@@ -112,7 +114,7 @@ public class TestStreetMatcher {
         assertEquals(2, match.size());
 
         geometry = geometry(-122.385689, 47.669484, -122.387384, 47.669470, -122.387588, 47.669325,
-                47.668675, -122.387255);
+                -122.387255, 47.668675);
 
         match = matcher.match(geometry);
         assertNotNull(match);
@@ -235,6 +237,10 @@ public class TestStreetMatcher {
         @Override
         public boolean isNoThruTraffic() {
             return false;
+        }
+
+        public String toString() {
+            return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
     }
 }
