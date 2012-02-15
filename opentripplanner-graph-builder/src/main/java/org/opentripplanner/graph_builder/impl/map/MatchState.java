@@ -33,7 +33,8 @@ public abstract class MatchState {
 
     protected static final double NEW_SEGMENT_PENALTY = 0.1;
 
-    protected static final double NO_TRAVERSE_PENALTY = 20;
+    //this turns out to cause weird problems if it is set.
+    protected static final double NO_TRAVERSE_PENALTY = 0;
 
     public double currentError;
 
