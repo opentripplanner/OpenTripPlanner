@@ -26,7 +26,9 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.Edge;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
 import org.opentripplanner.routing.patch.StopAdapter;
 import org.slf4j.Logger;
@@ -65,6 +67,8 @@ public class RouteVariant implements Serializable {
 
     private String name; // "N via Whitehall"
 
+    private TraverseMode mode;
+    
     // @XmlElementWrapper
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     private ArrayList<AgencyAndId> trips;
@@ -79,6 +83,8 @@ public class RouteVariant implements Serializable {
 
     private String direction;
 
+    private LineString geometry;
+
     public RouteVariant() {
         // needed for JAXB but unused
     }
@@ -88,6 +94,7 @@ public class RouteVariant implements Serializable {
         this.stops = stops;
         trips = new ArrayList<AgencyAndId>();
         segments = new ArrayList<RouteSegment>();
+        this.mode = GtfsLibrary.getTraverseMode(route);
     }
 
     public void addTrip(Trip trip) {
@@ -99,7 +106,7 @@ public class RouteVariant implements Serializable {
                 if (!direction.equals(trip.getDirectionId())) {
                     direction = MULTIDIRECTION;
                 }
-            }
+            }            
         }
     }
 
@@ -174,14 +181,25 @@ public class RouteVariant implements Serializable {
     }
 
     public LineString getGeometry() {
-        List<Coordinate> coords = new ArrayList<Coordinate>();
-        for (RouteSegment segment : segments) {
-            if (segment.hopOut != null) {
-                Geometry segGeometry = segment.getGeometry();
-                coords.addAll(Arrays.asList(segGeometry.getCoordinates()));
+        if (geometry == null) {
+            List<Coordinate> coords = new ArrayList<Coordinate>();
+            for (RouteSegment segment : segments) {
+                if (segment.hopOut != null) {
+                    Geometry segGeometry = segment.getGeometry();
+                    coords.addAll(Arrays.asList(segGeometry.getCoordinates()));
+                }
             }
+            Coordinate[] coordArray = new Coordinate[coords.size()];
+            geometry = geometryFactory.createLineString(coords.toArray(coordArray));
         }
-        Coordinate[] coordArray = new Coordinate[coords.size()];
-        return geometryFactory.createLineString(coords.toArray(coordArray));
+        return geometry;
+    }
+
+    public TraverseMode getTraverseMode() {
+        return mode;
+    }
+
+    public void setGeometry(LineString geometry) {
+        this.geometry = geometry;
     }
 }

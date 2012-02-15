@@ -69,4 +69,30 @@ public class MapUtils {
         return false;
     }
 
+    public static <T, U> void addToMapListUnique(Map<T, List<U>> mapList,
+            T key, List<U> values) {
+        List<U> list = mapList.get(key);
+        if (list == null) {
+            list = new ArrayList<U>(values.size());
+            mapList.put(key, list);
+        }
+        for (U value : values) {
+            if (!list.contains(value)) {
+                list.add(value);
+            }
+        }
+    }
+
+    public static <T, U> void addToMapListUnique(Map<T, List<U>> mapList,
+            T key, U value) {
+        List<U> list = mapList.get(key);
+        if (list == null) {
+            list = new ArrayList<U>();
+            mapList.put(key, list);
+        }
+        if (!list.contains(value)) {
+            list.add(value);
+        }
+    }
+
 }
