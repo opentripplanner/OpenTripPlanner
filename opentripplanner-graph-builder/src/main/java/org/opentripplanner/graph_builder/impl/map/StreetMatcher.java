@@ -115,7 +115,7 @@ public class StreetMatcher {
                 if (seen.contains(next)) {
                     continue;
                 }
-                states.insert(next, next.getTotalError() / next.getDistanceAlongRoute());
+                states.insert(next, next.getTotalError() - next.getDistanceAlongRoute());
             }
         }
         return null;
