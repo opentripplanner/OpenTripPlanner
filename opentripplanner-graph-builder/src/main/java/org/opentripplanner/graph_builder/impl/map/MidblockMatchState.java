@@ -102,7 +102,7 @@ public class MidblockMatchState extends MatchState {
 
             if (newEdgeIndex.getSegmentIndex() == edgeGeometry.getNumPoints() - 1) {
 
-                // but we might also choose to continue from the end of the edge and a point mid-way
+                // we might choose to continue from the end of the edge and a point mid-way
                 // along this route segment
 
                 // find nearest point that makes progress along the route
@@ -154,7 +154,6 @@ public class MidblockMatchState extends MatchState {
                     }
                     MatchState nextState = new MidblockMatchState(this, routeGeometry, e,
                             routeProjectedEndIndex, new LinearLocation(), cost, travelAlongRoute);
-                    distanceAlongGeometry(routeGeometry, routeIndex, routeProjectedEndIndex);
                     nextStates.add(nextState);
                 }
 
@@ -187,7 +186,7 @@ public class MidblockMatchState extends MatchState {
                     LocationIndexedLine newIndexedEdge = new LocationIndexedLine(newEdgeGeometry);
                     newEdgeIndex = newIndexedEdge.project(newRouteCoord);
                     Coordinate newEdgeCoord = newEdgeIndex.getCoordinate(newEdgeGeometry);
-                    positionError = newEdgeCoord.distance(newRouteCoord);
+                    positionError = distance(newEdgeCoord, newRouteCoord);
                     travelAlongEdge = travelAlongOldEdge + distanceAlongGeometry(newEdgeGeometry, new LinearLocation(), newEdgeIndex);
                     travelError = Math.abs(travelAlongRoute - travelAlongEdge);
 
