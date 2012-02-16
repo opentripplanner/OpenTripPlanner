@@ -96,7 +96,7 @@ public class StreetMatcher {
         while (!states.empty()) {
             double k = states.peek_min_key();
             MatchState state = states.extract_min();
-            if (++total % 10000 == 0) {
+            if (++total % 50000 == 0) {
                 log.debug("seen / total: " + seen_count + " / " + total);
             }
             if (seen.contains(state)) {
