@@ -22,13 +22,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.model.osm.OSMLevel;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMRelationMember;
@@ -159,32 +158,34 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /** The bike safety factor of the safest street */
         private double bestBikeSafety = 1;
 
-        // store nodes which are decomposed to multiple nodes because they are elevators
-        // later they will be iterated over to build ElevatorEdges between them
-        // this stores the levels that each node is used at
-        private HashMap<Long, HashMap<Integer, IntersectionVertex>> multiLevelNodes = 
-                new HashMap<Long, HashMap<Integer, IntersectionVertex>>();    
-        private Map<Integer, String> levelHumanNames = new HashMap<Integer, String>(); 
-        // track osm nodes that will become graph vertices
+        // track OSM nodes which are decomposed into multiple graph vertices because they are 
+        // elevators. later they will be iterated over to build ElevatorEdges between them.
+        private HashMap<Long, HashMap<OSMLevel, IntersectionVertex>> multiLevelNodes = 
+                new HashMap<Long, HashMap<OSMLevel, IntersectionVertex>>();
+        
+        // track OSM nodes that will become graph vertices because they appear in multiple OSM ways
         private Map<Long, IntersectionVertex> intersectionNodes = 
                 new HashMap<Long, IntersectionVertex>();
-        // track vertices to be removed in the turn-conversion (redundant w. intersectionNodes.values?)
-        ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
+        
+        // track vertices to be removed in the turn-graph conversion.
+        // this is a superset of intersectionNodes.values, which contains
+        // a null vertex reference for multilevel nodes. the individual vertices
+        // for each level of a multilevel node are includeed in endpoints.
+        private ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
+        
+        // track which vertical level each OSM way belongs to, for building elevators etc.
+        private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel> ();
         
         public void buildGraph(Graph graph) {
             this.graph = graph;
         	
-            // handle turn restrictions and road names in relations
+            // handle turn restrictions, road names, and level maps in relations
             processRelations();
 
             // Remove all simple islands
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
             long wayIndex = 0;
-
-            // store levels that cannot be parsed, and assign them a number
-            int nextUnparsedLevel = 0;
-            HashMap<String, Integer> unparsedLevels = new HashMap<String, Integer>();
 
             // figure out which nodes that are actually intersections
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
@@ -229,60 +230,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
 
-                /* The otp:numeric_level tag adds a constant to level numbers depending on
-                   where they come from (level map, tags).
-                   This prevents a layer 1 from being equal to a level_map 1, because they may 
-                   not represent the same thing. Worst case scenario, OTP will say 
-                   "take elevator to level 1" when you're already on level 1. 
-                 */
-                final int LEVEL_MAP_LEVEL = 0;
-                final int LEVEL_TAG_LEVEL = 100000;
-                final int LAYER_TAG_LEVEL = 200000;
-                final int OTHER_LEVEL     = 300000;
-                final int UNPARSED_LEVEL  = 400000;
-
-                if (! way.hasTag("otp:numeric_level")) {
-                    // Parse levels, if a level map was not already applied in processRelations
-                    String strLevel = null;
-                    int offset = LEVEL_MAP_LEVEL, intLevel;
+                /* Determine OSM level for each way, if it was not already set */
+                if (! wayLevels.containsKey(way)) {
+                    // if this way is not a key in the wayLevels map, a level map was not 
+                    // already applied in processRelations
+                    
+                    /* try to find a level name in tags */
+                    String levelName = null;
+                    OSMLevel.Source source = OSMLevel.Source.NONE;
+                    OSMLevel level = OSMLevel.DEFAULT;
                     if (way.hasTag("level")) { // TODO: floating-point levels &c.
-                        strLevel = way.getTag("level");
-                        offset = LEVEL_TAG_LEVEL;
+                        levelName = way.getTag("level");
+                        source = OSMLevel.Source.LEVEL_TAG;
                     } else if (way.hasTag("layer")) {
-                        strLevel = way.getTag("layer");
-                        offset = LAYER_TAG_LEVEL;
+                        levelName = way.getTag("layer");
+                        source = OSMLevel.Source.LAYER_TAG;
                     } 
-                    if (strLevel != null) {
-                        try {
-                            intLevel = Integer.parseInt(strLevel);
-                        } catch (NumberFormatException e) {
-                            // could not parse the level string as an integer
-                            // get a unique level number for this
-                            if (unparsedLevels.containsKey(strLevel)) {
-                                intLevel = unparsedLevels.get(strLevel);
-                            } else { // make a new unique ID
-                                intLevel = nextUnparsedLevel++;
-                                unparsedLevels.put(strLevel, intLevel);
-                            }
-                            offset = UNPARSED_LEVEL;
-                            _log.warn("Could not determine ordinality of layer " + strLevel +
-                                      ". Elevators will work, but costing may be incorrect. " +
-                                      "A level map should be used in this situation.");
-                        }
-                    } else { 
-                        // no string level description was available. assume ground level, but 
-                        // don't assume it's connected to any other ground level.
-                        intLevel = 0;
-                        offset = OTHER_LEVEL;
-                    }
-                    if (noZeroLevels && intLevel >= 0) { 
-                        // add 1 to human-readable representation of non-negative levels 
-                        // in (-inf, -1] U [1, inf) locations like the US
-                        strLevel = Integer.toString(intLevel + 1);
-                    }
-                    way.addTag("otp:numeric_level", Integer.toString(intLevel + offset));
-                    way.addTag("otp:human_level", strLevel); // redunant
-                    levelHumanNames.put(intLevel+offset, strLevel);
+//                    if (noZeroLevels && intLevel >= 0) ...
+                    if (levelName != null) {
+                        level = OSMLevel.fromString(levelName, source);
+                    } 
+                    wayLevels.put(way, level);
                 }
 
                 /*
@@ -404,7 +372,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // subscript it so we can loop over it in twos. Assumedly, it will stay
                 // sorted when we convert it to an Array.
                 // The objects are Integers, but toArray returns Object[]
-                HashMap<Integer, IntersectionVertex> levels = multiLevelNodes.get(nodeId);
+                HashMap<OSMLevel, IntersectionVertex> vertices = multiLevelNodes.get(nodeId);
 
                 /* first, build FreeEdges to disconnect from the graph,
                    GenericVertices to serve as attachment points,
@@ -422,48 +390,44 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 ArrayList<Vertex> onboardVertices = new ArrayList<Vertex>();
 
-                Integer[] levelKeys = levels.keySet().toArray(new Integer[0]);
-                Arrays.sort(levelKeys);
+                OSMLevel[] levels = vertices.keySet().toArray(new OSMLevel[0]);
+                Arrays.sort(levels);
 
-                for (Integer level : levelKeys) {
-                    // get the source node to hang all this stuff off of.
-                    String humanLevel = levelHumanNames.get(level);
-                    IntersectionVertex sourceVert = levels.get(level);
-                    String sourceVertLabel = sourceVert.getLabel();
+                for (OSMLevel level : levels) {
+                    // get the node to build the elevator out from
+                    IntersectionVertex sourceVertex = vertices.get(level);
+                    String sourceVertexLabel = sourceVertex.getLabel();
+                    String levelName = level.longName;
                     
-                    // create a Vertex to connect the FreeNode to.
-                    ElevatorOffboardVertex offboardVert = new ElevatorOffboardVertex(
-                                     graph, sourceVertLabel + "_middle", 
-                                     sourceVert.getX(), sourceVert.getY());
+                    ElevatorOffboardVertex offboardVertex = new ElevatorOffboardVertex(
+                                     graph, sourceVertexLabel + "_offboard", 
+                                     sourceVertex.getX(), sourceVertex.getY(),
+                                     levelName);
 
-                    new FreeEdge(sourceVert, offboardVert);
-                    new FreeEdge(offboardVert, sourceVert);
+                    new FreeEdge(sourceVertex, offboardVertex);
+                    new FreeEdge(offboardVertex, sourceVertex);
 
-                    // Create a vertex to connect the ElevatorAlight, ElevatorBoard, and 
-                    // ElevatorHop edges to.
-                    ElevatorOnboardVertex onboardVert = new ElevatorOnboardVertex(
-                                    graph, sourceVertLabel + "_onboard",
-                                    sourceVert.getX(), sourceVert.getY());
+                    ElevatorOnboardVertex onboardVertex = new ElevatorOnboardVertex(
+                                    graph, sourceVertexLabel + "_onboard",
+                                    sourceVertex.getX(), sourceVertex.getY(),
+                                    levelName);
 
-                    new ElevatorBoardEdge(offboardVert, onboardVert);
-                    new ElevatorAlightEdge(onboardVert, offboardVert, humanLevel);
+                    new ElevatorBoardEdge(offboardVertex, onboardVertex);
+                    new ElevatorAlightEdge(onboardVertex, offboardVertex, level.longName);
 
-                    // add it to the array so it can be connected later
-                    onboardVertices.add(onboardVert);
+                    // accumulate onboard vertices to so they can be connected by hop edges later
+                    onboardVertices.add(onboardVertex);
                 }
 
                 // -1 because we loop over it two at a time
-                Integer vSize = onboardVertices.size() - 1;
-        
-                for (Integer i = 0; i < vSize; i++) {
+                for (Integer i = 0, vSize = onboardVertices.size()-1; i < vSize; i++) {
                     Vertex from = onboardVertices.get(i);
                     Vertex to   = onboardVertices.get(i + 1);
             
+                    // default permissions: pedestrian, wheelchair, and bicycle
+                    boolean wheelchairAccessible = true;
                     StreetTraversalPermission permission = 
                           StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
-
-                    // default to true
-                    boolean wheelchairAccessible = true;
                     // check for bicycle=no, otherwise assume it's OK to take a bike
                     if (node.isTagFalse("bicycle")) {
                         permission = StreetTraversalPermission.PEDESTRIAN;
@@ -472,12 +436,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (node.isTagFalse("wheelchair")) {
                         wheelchairAccessible = false;
                     }
+                    
                     // The narrative won't be strictly correct, as it will show the elevator as part
                     // of the cycling leg, but I think most cyclists will figure out that they 
                     // should really dismount.
-                    ElevatorHopEdge theEdge = new ElevatorHopEdge(from, to, permission);
+                    ElevatorHopEdge foreEdge = new ElevatorHopEdge(from, to, permission);
                     ElevatorHopEdge backEdge = new ElevatorHopEdge(to, from, permission);
-                    theEdge.wheelchairAccessible = wheelchairAccessible;
+                    foreEdge.wheelchairAccessible = wheelchairAccessible;
                     backEdge.wheelchairAccessible = wheelchairAccessible;
                 }
             } // END elevator edge loop 
@@ -605,8 +570,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-<<<<<<< HEAD
-=======
          * Copies useful metadata from multipolygon relations to the relevant ways.
          *
          * This is done at a different time than processRelations(), so that way purging doesn't
@@ -643,7 +606,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
 
         /**
->>>>>>> origin/master
          * Copies useful metadata from relations to the relevant ways/nodes.
          */
         private void processRelations() {
@@ -749,128 +711,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param relation
          */
         private void processLevelMap(OSMRelation relation) {
-            ArrayList<String> levels = new ArrayList<String>();
-
-            // This stores the mapping from level keys to the full level values
-            HashMap<String, String> levelFullNames = new HashMap<String, String>();
-
-            int levelDelta = 0;
-
-            /* 
-             * parse all of the levels
-             * this array is ordered
-             * this is a little different than the OpenStreetMap levels notation,
-             * because the lowest level of a building (basement or whatever) is
-             * always otp:numeric_level 0. This is OK, as otp:numeric_level tags
-             * are *always* accompanied by otp:human_level tags that give the actual
-             * name of the level; otp:numeric_level is used only for relative
-             * position, and should *never* be shown to the user. To make things more understandable
-             * we try to find a delta to compensate and put the basement where it should be, but
-             * this data should never be displayed to the user or mixed with OSM levels
-             * from elsewhere. It's possible we wouldn't find a delta (imagine 
-             * levels=Garage;Basement;Lobby;Sky Bridge;Roof), but this is OK. 
-             */
-        
-            Pattern isRange = Pattern.compile("^[0-9]+\\-[0-9]+$");
-            Matcher m;
-
-            for (String level : relation.getTag("levels").split(";")) {
-                // split out ranges
-                m = isRange.matcher(level);
-                if (m.matches()) {
-                    String[] range = level.split("-");
-                    int endOfRange = Integer.parseInt(range[1]);
-                    for (int i = Integer.parseInt(range[0]); i <= endOfRange; 
-                             i++) {
-                        levels.add(Integer.toString(i));
-                    }
-                }
-                // not a range, just normal
-                else {
-                    levels.add(level);
-                }
-            }
-        
-            // try to get a best-guess delta between level order and level numbers, and fix up
-            // levels
-            for (int i = 0; i < levels.size(); i++) {
-                String level = levels.get(i);
-                // leaving it null gives NullPointerException when there is no matched 0 level
-                // making it 1 doesn't matter, since its only purpose is to be compared to 0
-                Integer numLevel = 1;
-                
-                // try to parse out the level number
-                try {
-                    numLevel = Integer.parseInt(level);
-                }
-                catch (NumberFormatException e) {
-                    try {
-                        numLevel = Integer.parseInt(level.split("=")[0]);
-                    }
-                    catch (NumberFormatException e2) {
-                        try {
-                            // http://stackoverflow.com/questions/1181969/java-get-last-element-after-split
-                            int lastInd = level.lastIndexOf('@');
-                            if (lastInd != -1) {
-                                numLevel = Integer.parseInt(level.substring(lastInd + 1));
-                            }
-                        }
-                        catch (NumberFormatException e3) {
-                            // do nothing
-                        }
-                    }
-                }
-        
-                if (numLevel == 0) {
-                    levelDelta = -1 * levels.indexOf(level);
-                }
-
-                String levelIndex;
-                String levelName;
-                // get just the human-readable level name from a name like T=Tunnel@-15
-                // first, discard elevation info
-                // don't use split, in case there is an @ in the level name; split on only the last
-                // one
-                int lastIndAt = level.lastIndexOf('@');
-                if (lastIndAt >= 1) {
-                    level = level.substring(0, lastIndAt);
-                }
-
-                // if it's there, discard the long name, but put it into a hashmap for retrieval
-                // below
-                // Why not just use the hashmap? Because we need the ordered ArrayList.
-                Integer levelSplit = level.indexOf('=');
-                if (levelSplit >= 1) {
-                    levelIndex = level.substring(0, levelSplit);
-                    levelName = level.substring(levelSplit + 1);
-                } else {
-                    // set them both the same, the @whatever has already been discarded
-                    levelIndex = levelName = level;
-                }
-
-                // overwrite for later indexing
-                levels.set(i, levelIndex);
-
-                // add to the HashMap
-                levelFullNames.put(levelIndex, levelName);
-            }
-    
+            Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"));
             for (OSMRelationMember member : relation.getMembers()) {
                 if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
                     OSMWay way = _ways.get(member.getRef());
                     if (way != null) {
                         String role = member.getRole();
-       
-                        // this would indicate something more complicated than a single
-                        // level. Skip it.
+                        // if the level map relation has a role:xyz tag, this way is something 
+                        // more complicated than a single level (e.g. ramp/stairway).
                         if (!relation.hasTag("role:" + role)) {
-
-                            if (levels.indexOf(role) != -1) {
-                                way.addTag("otp:numeric_level", 
-                                           Integer.toString(levels.indexOf(role) + levelDelta));
-                                way.addTag("otp:human_level", levelFullNames.get(role));
-                            }
-                            else {
+                            if (levels.containsKey(role)) {
+                                wayLevels.put(way, levels.get(role));
+                            } else {
                                 _log.warn(member.getRef() + " has undefined level " + role);
                             }
                         }
@@ -1203,24 +1055,26 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @author mattwigway
          */
         private IntersectionVertex recordLevel(OSMNode node, OSMWay way) {
-            HashMap<Integer, IntersectionVertex> levels;
-            long nid = node.getId();
-            int level = Integer.parseInt(way.getTag("otp:numeric_level"));
-            if (multiLevelNodes.containsKey(nid)) {
-                levels = multiLevelNodes.get(nid);
+            OSMLevel level = wayLevels.get(way);
+            HashMap<OSMLevel, IntersectionVertex> vertices;
+            long nodeId = node.getId();
+            if (multiLevelNodes.containsKey(nodeId)) {
+                vertices = multiLevelNodes.get(nodeId);
             } else {
-                levels = new HashMap<Integer, IntersectionVertex>();
-                multiLevelNodes.put(nid, levels);
+                vertices = new HashMap<OSMLevel, IntersectionVertex>();
+                multiLevelNodes.put(nodeId, vertices);
             }
-            if (!levels.containsKey(level)) {
+            if (!vertices.containsKey(level)) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nid;
-                IntersectionVertex iv = new IntersectionVertex(
+                String label = "osm node " + nodeId + " at level " + level.shortName;
+                IntersectionVertex vertex = new IntersectionVertex(
                         graph, label, coordinate.x, coordinate.y, label);
-                levels.put(level, iv);
-                return iv;
+                vertices.put(level, vertex);
+                // multilevel nodes should also undergo turn-conversion
+                endpoints.add(vertex);
+                return vertex;
             }
-            return levels.get(level);
+            return vertices.get(level);
         }
 
         /**
@@ -1251,7 +1105,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
                 intersectionNodes.put(nid, iv);
                 endpoints.add(iv);
-                // endpoints and intersectionNodes.values are the same thing now right?
             }
             return iv;
         }

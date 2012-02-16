@@ -38,6 +38,11 @@ try
     OpenLayers.IMAGE_RELOAD_ATTEMPTS = 5;
     OpenLayers.Util.onImageLoadErrorColor = "";
     OpenLayers.ImgPath = "images/map/controls/";
+
+    otp.utils.WGS_SRS = "EPSG:4326";
+    otp.utils.GEOGRAPHIC   = new OpenLayers.Projection(otp.utils.WGS_SRS);
+    otp.utils.WEB_MERC_SRS = "EPSG:900913";
+    otp.utils.WEB_MERCATOR = new OpenLayers.Projection(otp.utils.WEB_MERC_SRS);
 } 
 catch (e) 
 {
@@ -309,6 +314,18 @@ otp.util.OpenLayersUtils = {
         catch(Exe)
         {
         }
+    },
+
+    /**
+     * static routine that adds controls to a map 
+     */
+    makePoint : function(x, y, reproject)
+    {
+        var ll = new OpenLayers.Geometry.Point(x, y)
+        if(reproject)
+            ll = ll.transform(otp.utils.GEOGRAPHIC, otp.utils.WEB_MERCATOR);
+
+        return ll;
     },
 
     ///////////// MARKER UTILS ///////////// MARKER UTILS ///////////// MARKER UTILS ///////////// MARKER UTILS /////////////

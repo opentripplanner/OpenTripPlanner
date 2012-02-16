@@ -170,32 +170,32 @@ otp.locale.Turkish = {
     // see otp.planner.Templates for use
     labels : 
     {
-        about        : "About",
+        about        : "Hakkında",
         stop_id      : "Stop ID",
-        trip_details : "Trip details",
-        fare         : "Fare",
+        trip_details : "Yolculuk detayları",
+        fare         : "Ücret",
         fare_symbol  : "$",
-        travel       : "Travel",
-        valid        : "Valid",
-        trip_length  : "Time",
-        with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        travel       : "Seyehat",
+        valid        : "Geçerli",
+        trip_length  : "Zaman",
+        with_a_walk  : "yürüyüş ile",
+        alert_for_rt : "Güzergah için uyar"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
     modes :
     {
-        WALK:           "Walk",
-        BICYCLE:        "Bicycle",
-        CAR:            "Car",
-        TRAM:           "Tram",
-        SUBWAY:         "Subway",
-        RAIL:           "Rail",
-        BUS:            "Bus",
-        FERRY:          "Ferry",
-        CABLE_CAR:      "Cable Car",
-        GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular"
+        WALK:           "Yürüyüş",
+        BICYCLE:        "Bisiklet",
+        CAR:            "Araba",
+        TRAM:           "Tramway",
+        SUBWAY:         "Metro",
+        RAIL:           "Tren",
+        BUS:            "Otobüs",
+        FERRY:          "Feribot",
+        CABLE_CAR:      "Teleferik",
+        GONDOLA:        "Gondol",
+        FUNICULAR:      "Funiküler"
     },
 
     ordinal_exit:
@@ -214,21 +214,21 @@ otp.locale.Turkish = {
 
     time:
     {
-        minute         : "minute",
-        minutes        : "minutes",
-        minute_abbrev  : "min",
-        minutes_abbrev : "mins",
-        second_abbrev  : "sec",
-        seconds_abbrev : "secs",
+        minute         : "dakika",
+        minutes        : "dakika",
+        minute_abbrev  : "dak",
+        minutes_abbrev : "dak",
+        second_abbrev  : "san",
+        seconds_abbrev : "san",
         format         : "F jS, Y @ g:ia",
-        months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        months         : ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
     },
 
     systemmap :
     {
         labels :
         {
-            panelTitle : "System Map"
+            panelTitle : "Sistem Haritası"
         }
     },
 
@@ -238,13 +238,13 @@ otp.locale.Turkish = {
         labels : 
         {
             panelTitle    : "Trip Planner",
-            tabTitle      : "Plan a Trip",
-            inputTitle    : "Trip Details",
-            optTitle      : "Trip Preferences (optional)",
-            submitMsg     : "Planning Your Trip...",
+            tabTitle      : "Bir Yolculuk Planla",
+            inputTitle    : "Yolculuk detayları",
+            optTitle      : "Yolculuk ayarları (opsiyonel)",
+            submitMsg     : "Yolculuğunuz planlanıyor...",
             optionalTitle : "",
-            date          : "Date",
-            time          : "Time",
+            date          : "Tarih",
+            time          : "Saat",
             when          : "When",
             from          : "From",
             fromHere      : "From here",
@@ -288,7 +288,7 @@ otp.locale.Turkish = {
 
         error:
         {
-            title        : 'Trip Planner Error',
+            title        : 'Trip Planner Hata',
             deadMsg      : "Map Trip Planner is currently not responding. Please wait a few minutes to try again, or try the text trip planner (see link below).",
             geoFromMsg   : "Please select the 'From' location for your trip: ",
             geoToMsg     : "Please select the 'To' location for your trip: "
@@ -316,10 +316,10 @@ otp.locale.Turkish = {
 
         options: 
         [
-          ['TRANSFERS', 'Fewest transfers'],
-          ['QUICK',     'Quickest trip'],
-          ['SAFE',      'Safest trip'],
-          ['TRIANGLE',  'Custom trip...']
+          ['TRANSFERS', 'En az transfer'],
+          ['QUICK',     'En hızlı yolculuk'],
+          ['SAFE',      'En Güvenli yolculuk'],
+          ['TRIANGLE',  'Özelleştirilmiş yolculuk...']
         ],
     
         arriveDepart: 
@@ -330,22 +330,22 @@ otp.locale.Turkish = {
     
         maxWalkDistance : 
         [
-            ['160',   '1/10 mile'],
-            ['420',   '1/4 mile'],
-            ['840',   '1/2 mile'],
-            ['1260',  '3/4 mile'],
-            ['1609',  '1 mile'],
-            ['3219',  '2 miles'],
-            ['4828',  '3 miles'],
-            ['6437',  '4 miles'],
-            ['8047',  '5 miles'],
-            ['16093',  '10 miles'],
-            ['24140',  '15 miles'],
-            ['32187',  '20 miles'],
-            ['48280',  '30 miles'],
-            ['64374',  '40 miles'],
-            ['80467',  '50 miles'],
-            ['160934',  '100 miles']
+            ['160',   '1/10 mil'],
+            ['420',   '1/4 mil'],
+            ['840',   '1/2 mil'],
+            ['1260',  '3/4 mil'],
+            ['1609',  '1 mil'],
+            ['3219',  '2 mil'],
+            ['4828',  '3 mil'],
+            ['6437',  '4 mil'],
+            ['8047',  '5 mil'],
+            ['16093',  '10 mil'],
+            ['24140',  '15 mil'],
+            ['32187',  '20 mil'],
+            ['48280',  '30 mil'],
+            ['64374',  '40 mil'],
+            ['80467',  '50 mil'],
+            ['160934',  '100 mil']
         ],
     
         mode : 
@@ -362,10 +362,10 @@ otp.locale.Turkish = {
 
         wheelchair :
         [
-            ['false', 'Not required'],
-            ['true', 'Required']
+            ['false', 'Zorunlu Değil'],
+            ['true', 'Zorunlu']
         ]
     },
 
-    CLASS_NAME : "otp.locale.English"
+    CLASS_NAME : "otp.locale.Turkish"
 };

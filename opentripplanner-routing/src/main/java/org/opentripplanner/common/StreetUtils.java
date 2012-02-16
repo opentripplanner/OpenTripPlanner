@@ -21,21 +21,21 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph.AbstractEdge;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,9 +58,6 @@ public class StreetUtils {
         for (IntersectionVertex v : endpoints) {
             for (Edge e_in : v.getIncoming()) {
                 for (Edge e_out : v.getOutgoing()) {
-                    if (e_in == e_out)
-                        // do not make turns for going around loops (several hundred in Portland)
-                        continue;
                     if (e_in.getFromVertex() == e_out.getToVertex() &&
                         v.getOutgoing().size() > 1)
                         // only make turn edges for U turns when they are dead ends
@@ -83,25 +80,22 @@ public class StreetUtils {
                             }
                         }
                     } else { // turn involving a plainstreetedge and a freeedge
-                        Vertex v1 = null;
-                        Vertex v2 = null;
+                        Vertex fromv = null;
+                        Vertex tov   = null;
                         if (e_in instanceof PlainStreetEdge) {
-                            v1 = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_in);
+                            fromv = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_in);
                         } else if (e_in instanceof FreeEdge) {
-                            v1 = e_in.getFromVertex(); // fromv for incoming
+                            fromv = e_in.getFromVertex(); // fromv for incoming
                         }
                         if (e_out instanceof PlainStreetEdge) {
-                            v2 = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_out);
-                        } else {
-                            v2 = e_out.getToVertex(); // tov for outgoing 
+                            tov = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_out);
+                        } else if (e_out instanceof FreeEdge) {
+                            tov = e_out.getToVertex(); // tov for outgoing 
                         }
-                        if (v1 == null || v2 == null) {
-                            throw new IllegalStateException("Null vertex when building FreeEdge!");
-                        } else if (v1 != v2) {
-                            // TODO:FIXME
-                            // Use a FreeEdge to model the turn since TurnEdges are
-                            // StreetVertex only
-                            FreeEdge turn = new FreeEdge(v1, v2);
+                        if (fromv instanceof TurnVertex) {
+                            new TurnEdge((TurnVertex)fromv, (StreetVertex)tov);
+                        } else {
+                            new FreeEdge(fromv, tov);
                         }
                     }                   
                 }

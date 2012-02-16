@@ -132,6 +132,10 @@ otp.Class = function() {
         }
         otp.extend(extended, parent);
     }
+
+   // decorate new object with otp.js methods
+   extended.swapElements = otp.swapElements;
+
     Class.prototype = extended;
     return Class;
 };
@@ -143,6 +147,21 @@ otp.isLocalHost = function() {
     } catch(e) {
     }
     return false;
+};
+
+
+/** swap element values with another object */
+otp.swapElements = function(object, elementName) {
+    if(object == null || elementName == null) return;
+
+    try {
+        var tmp = this[elementName];
+        this[elementName]   = object[elementName];
+        object[elementName] = tmp;
+    }
+    catch(e) {
+        console.log("EXCEPTION otp.swap(): couldn't swap element values named " + elementName + "\n" + e );
+    }
 };
 
 

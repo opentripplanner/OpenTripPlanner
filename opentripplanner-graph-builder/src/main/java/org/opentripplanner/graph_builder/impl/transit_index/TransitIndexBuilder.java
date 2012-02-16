@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.transit_index;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +36,6 @@ import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -43,15 +43,12 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.TransitIndexServiceImpl;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,89 +87,89 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     public void buildGraph(Graph graph) {
         _log.debug("Building transit index");
 
-        // this is keyed by the arrival vertex
-        HashMap<Vertex, RouteSegment> segmentsByVertex = new HashMap<Vertex, RouteSegment>();
-
-		for (TransitVertex tv : 
-		     IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
-            RouteSegment segment = null;
-			for (Edge e : tv.getOutgoing()) {
-                RouteVariant variant = null;
-                /*
-                 * gv.vertex could be a journey vertex, or it could be any of a number of other
-                 * types of vertex. If it is a journey vertex, it could have a dwell, or not have a
-                 * dwell. we could encounter its Alight, Dwell, or Hop vertices in any order (boards
-                 * are in getIncoming). And we could encounter either the alight side or the hop
-                 * side vertex first.
-                 */
+        for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
+            boolean start = false;
+            boolean noStart = false;
+            TripPattern pattern = null;
+            Trip trip = null;
+            for (Edge e : gv.getIncoming()) {
                 if (!(e instanceof AbstractEdge)) {
                     continue;
                 }
-
+                if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell || e instanceof Dwell) {
+                    noStart = true;
+                }
+                if (e instanceof PatternBoard) {
+                    pattern = ((PatternBoard) e).getPattern();
+                    trip = pattern.getExemplar();
+                    start = true;
+                }
+                if (e instanceof Board) {
+                    trip = ((Board) e).getTrip();
+                    start = true;
+                }
                 if (e instanceof PreBoardEdge) {
                     TransitStop stop = (TransitStop) e.getFromVertex();
                     preBoardEdges.put(stop.getStopId(), e);
+                    start = false;
                 }
                 if (e instanceof PreAlightEdge) {
                     TransitStop stop = (TransitStop) ((PreAlightEdge) e).getToVertex();
                     preAlightEdges.put(stop.getStopId(), e);
-                }
-                if (e instanceof Alight || e instanceof Hop || e instanceof Dwell) {
-                    Trip trip = ((AbstractEdge) e).getTrip();
-                    addModeFromTrip(trip);
-                    variant = addTripToVariant(trip);
-                } else if (e instanceof PatternAlight || e instanceof PatternHop
-                        || e instanceof PatternDwell) {
-                    TripPattern pattern = ((PatternEdge) e).getPattern();
-                    for (Trip trip : pattern.getTrips()) {
-                        variantsByTrip.put(trip.getId(), variant);
-                        variant = addTripToVariant(trip);
-                        addModeFromTrip(trip);
-                    }
-                } else {
-                    continue;
-                }
-
-                if (segment == null) {
-					segment = getOrMakeSegment(variant, segmentsByVertex, tv);
-                }
-
-                if (e instanceof Alight || e instanceof PatternAlight) {
-                    segment.alight = e;
-                } else if (e instanceof Hop || e instanceof PatternHop) {
-                    segment.hopOut = e;
-                } else if (e instanceof Dwell || e instanceof PatternDwell) {
-                    segment.dwell = e;
+                    start = false;
                 }
             }
-			for (Edge e : tv.getIncoming()) {
-                RouteVariant variant = null;
-                if (!(e instanceof AbstractEdge)) {
-                    continue;
-                }
-
-                if (e instanceof Board || e instanceof Hop) {
-                    Trip trip = ((AbstractEdge) e).getTrip();
+            if (start && !noStart) {
+                RouteVariant variant = variantsByTrip.get(trip.getId());
+                if (variant == null) {
                     variant = addTripToVariant(trip);
-                } else if (e instanceof PatternBoard || e instanceof PatternHop) {
-                    TripPattern pattern = ((PatternEdge) e).getPattern();
-                    Trip exemplar = pattern.getExemplar();
-                    variant = addTripToVariant(exemplar);
-                    for (Trip trip : pattern.getTrips()) {
-                        variantsByTrip.put(trip.getId(), variant);
+                    if (pattern != null) {
+                        for (Trip trip2 : pattern.getTrips()) {
+                            addModeFromTrip(trip2);
+                            variantsByTrip.put(trip2.getId(), variant);
+                        }
                     }
                 } else {
                     continue;
                 }
 
-                if (segment == null) {
-					segment = getOrMakeSegment(variant, segmentsByVertex, tv);
+                if (variant.getSegments().size() > 0) {
+                    continue;
                 }
-
-                if (e instanceof Board || e instanceof PatternBoard) {
-                    segment.board = e;
-                } else if (e instanceof Hop || e instanceof PatternHop) {
-                    segment.hopIn = e;
+                Edge prevHop = null;
+                while (gv != null) {
+                    RouteSegment segment = new RouteSegment(gv.getStopId());
+                    segment.hopIn = prevHop;
+                    for (Edge e : gv.getIncoming()) {
+                        if (e instanceof Board || e instanceof PatternBoard) {
+                            segment.board = e;
+                        }
+                    }
+                    Collection<Edge> outgoing = gv.getOutgoing();
+                    gv = null;
+                    for (Edge e : outgoing) {
+                        if (e instanceof PatternHop || e instanceof Hop) {
+                            segment.hopOut = e;
+                            gv = (TransitVertex) e.getToVertex();
+                        }
+                        if (e instanceof PatternDwell || e instanceof Dwell) {
+                            segment.dwell = e;
+                            for (Edge e2 : e.getToVertex().getOutgoing()) {
+                                if (e2 instanceof PatternHop || e2 instanceof Hop) {
+                                    segment.hopOut = e2;
+                                    gv = (TransitVertex) e2.getToVertex();
+                                }
+                                if (e2 instanceof PatternAlight || e2 instanceof Alight) {
+                                    segment.alight = e2;
+                                }
+                            }
+                        }
+                        if (e instanceof PatternAlight || e instanceof Alight) {
+                            segment.alight = e;
+                        }
+                    }
+                    prevHop = segment.hopOut;
+                    variant.addSegment(segment);
                 }
             }
         }
@@ -183,6 +180,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         for (List<RouteVariant> variants : variantsByRoute.values()) {
             totalVariants += variants.size();
             for (RouteVariant variant : variants) {
+                variant.cleanup();
                 totalTrips += variant.getTrips().size();
             }
         }
@@ -219,7 +217,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             HashMap<Stop, List<RouteVariant>> ends = new HashMap<Stop, List<RouteVariant>>();
             HashMap<Stop, List<RouteVariant>> vias = new HashMap<Stop, List<RouteVariant>>();
             for (RouteVariant variant : variants) {
-                variant.cleanup();
                 List<Stop> stops = variant.getStops();
                 MapUtils.addToMapList(starts, stops.get(0), variant);
                 MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
@@ -343,18 +340,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
         }
 
-    }
-
-    private RouteSegment getOrMakeSegment(RouteVariant variant,
-			HashMap<Vertex, RouteSegment> segmentsByVertex, TransitVertex vertex) {
-        RouteSegment segment = segmentsByVertex.get(vertex);
-        if (segment != null) {
-            return segment;
-        }
-        segment = new RouteSegment(vertex.getStopId());
-        segmentsByVertex.put(vertex, segment);
-        variant.addSegment(segment);
-        return segment;
     }
 
     private RouteVariant addTripToVariant(Trip trip) {
