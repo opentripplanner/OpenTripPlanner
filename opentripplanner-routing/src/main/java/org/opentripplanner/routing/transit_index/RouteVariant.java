@@ -15,6 +15,8 @@ package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -24,8 +26,18 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
 import org.opentripplanner.routing.patch.StopAdapter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * This represents a particular stop pattern on a particular route. For example, the N train has at
@@ -40,7 +52,11 @@ import org.opentripplanner.routing.patch.StopAdapter;
  * 
  */
 public class RouteVariant implements Serializable {
+    private static final Logger _log = LoggerFactory.getLogger(RouteVariant.class);
+
     private static final long serialVersionUID = -3110443015998033630L;
+
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     /*
      * This indicates that trips with multipledirection_ids are part of this variant. It should
@@ -51,6 +67,8 @@ public class RouteVariant implements Serializable {
 
     private String name; // "N via Whitehall"
 
+    private TraverseMode mode;
+    
     // @XmlElementWrapper
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     private ArrayList<AgencyAndId> trips;
@@ -58,11 +76,14 @@ public class RouteVariant implements Serializable {
     @XmlJavaTypeAdapter(StopAdapter.class)
     private ArrayList<Stop> stops;
 
+    /** Ordered list of segments for this route */
     private ArrayList<RouteSegment> segments;
 
     private Route route;
 
     private String direction;
+
+    private LineString geometry;
 
     public RouteVariant() {
         // needed for JAXB but unused
@@ -73,6 +94,7 @@ public class RouteVariant implements Serializable {
         this.stops = stops;
         trips = new ArrayList<AgencyAndId>();
         segments = new ArrayList<RouteSegment>();
+        this.mode = GtfsLibrary.getTraverseMode(route);
     }
 
     public void addTrip(Trip trip) {
@@ -84,7 +106,7 @@ public class RouteVariant implements Serializable {
                 if (!direction.equals(trip.getDirectionId())) {
                     direction = MULTIDIRECTION;
                 }
-            }
+            }            
         }
     }
 
@@ -100,6 +122,29 @@ public class RouteVariant implements Serializable {
         trips.trimToSize();
         stops.trimToSize();
         segments.trimToSize();
+
+        // topological sort on segments to make sure that they are in order
+
+        // since segments only know about their next edges, we must build a mapping from prior-edge
+        // to segment; while we're at it, we find the first segment.
+        HashMap<Edge, RouteSegment> successors = new HashMap<Edge, RouteSegment>();
+        RouteSegment segment = null;
+        for (RouteSegment s : segments) {
+            if (s.hopIn == null) {
+                segment = s;
+            } else {
+                successors.put(s.hopIn, s);
+            }
+        }
+
+        int i = 0;
+        while (segment != null) {
+            segments.set(i++, segment);
+            segment = successors.get(segment.hopOut);
+        }
+        if (i != segments.size()) {
+            _log.error("Failed to organize hops in route variant " + name);
+        }
     }
 
     public ArrayList<Stop> getStops() {
@@ -133,5 +178,28 @@ public class RouteVariant implements Serializable {
     @XmlElement
     public String getDirection() {
         return direction;
+    }
+
+    public LineString getGeometry() {
+        if (geometry == null) {
+            List<Coordinate> coords = new ArrayList<Coordinate>();
+            for (RouteSegment segment : segments) {
+                if (segment.hopOut != null) {
+                    Geometry segGeometry = segment.getGeometry();
+                    coords.addAll(Arrays.asList(segGeometry.getCoordinates()));
+                }
+            }
+            Coordinate[] coordArray = new Coordinate[coords.size()];
+            geometry = geometryFactory.createLineString(coords.toArray(coordArray));
+        }
+        return geometry;
+    }
+
+    public TraverseMode getTraverseMode() {
+        return mode;
+    }
+
+    public void setGeometry(LineString geometry) {
+        this.geometry = geometry;
     }
 }

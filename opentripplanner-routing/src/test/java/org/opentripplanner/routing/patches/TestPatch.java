@@ -121,6 +121,11 @@ public class TestPatch extends TestCase {
             public List<TraverseMode> getAllModes() {
                 return Collections.emptyList();
             }
+
+            @Override
+            public List<AgencyAndId> getAllRouteIds() {
+                return Collections.emptyList();
+            }
         };
         graph.putService(TransitIndexService.class, index);
     }

@@ -103,4 +103,9 @@ public class TransitIndexServiceImpl implements TransitIndexService,
 		return modes;
 	}
 
+    @Override
+    public Collection<AgencyAndId> getAllRouteIds() {
+        return variantsByRoute.keySet();
+    }
+
 }
