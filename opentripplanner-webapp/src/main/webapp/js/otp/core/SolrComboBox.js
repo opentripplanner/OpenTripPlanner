@@ -74,7 +74,7 @@ otp.core.SolrComboBoxStatic = {
     {
         try
         {
-            var coord = otp.utils.ObjUtils.getNamedCoordRecord(record.data, this.poi.isMercator);
+            var coord = otp.util.ObjUtils.getNamedCoordRecord(record.data, this.poi.isMercator);
             this.poi.setIntermediate(coord['x'], coord['y'], coord['name']);
         }
         catch(e)
@@ -102,7 +102,7 @@ otp.core.SolrComboBoxStatic = {
     /** Make an Ext store for SOLR */
     _makeStore : function() 
     {
-        var retVal = otp.utils.SolrUtils.makeSolrStore(this.url, {baseParams:{wt:'json', qt:'dismax', rows:this.maxNumValues}});
+        var retVal = otp.util.SolrUtils.makeSolrStore(this.url, {baseParams:{wt:'json', qt:'dismax', rows:this.maxNumValues}});
         return retVal;
     },
 
@@ -207,104 +207,3 @@ otp.core.SolrComboBoxStatic = {
     CLASS_NAME : "otp.core.SolrComboBox"
 };
 otp.core.SolrComboBox = new otp.Class(otp.core.SolrComboBoxStatic);
-
-
-
-/**
- * @class 
- */
-otp.utils.SolrUtils = {
-
-    id:    'id',
-    total: 'response.numFound',
-    root:  'response.docs',
-
-    // SOLR elements
-    fields : [
-            {name: 'name'}, 
-            {name: 'address'},
-            {name: 'city'},
-            {name: 'url'},
-
-            {name: 'lat'},  {name: 'lon'},
-            {name: 'x'},    {name: 'y'},
-            {name: 'bbox'}, {name: 'bbox_ospn'}, {name: 'bbox_wgs84'},
-            
-            {name: 'type'}, {name: 'type_name'}, {name: 'vtype'},
-
-            {name: 'number', type: 'string'},  {name: 'pad_number'}, 
-            {name: 'weekday'}, {name: 'saturday'}, {name: 'sunday'},
-            {name: 'inbound_name'}, {name: 'outbound_name'},
-            {name: 'frequent'},
-
-            {name: 'id'},
-            {name: 'zone_id'},
-            {name: 'stop_id'},
-            {name: 'landmark_id'},
-            {name: 'amenities'},
-            {name: 'street_direction'},
-            {name: 'providers'},
-            {name: 'ada_boundary'},
-            {name: 'district_boundary'},
-
-            {name: 'spaces'},
-            {name: 'routes'},
-            {name: 'notes'},
-            {name: 'use'}
-    ],
-
-
-    /** */
-    solrDataToVectors : function(records, isMercator)
-    {
-        var retVal = [];
-        for(var i = 0; i < records.length; i++)
-        {
-            var d = records[i].data;
-            var x = d.x;
-            var y = d.y;
-            if(isMercator)
-            {
-                x = d.lon;
-                y = d.lat;
-            }
-
-            var p = otp.utils.OpenLayersUtils.makePoint(x, y, isMercator);
-            var v = new OpenLayers.Feature.Vector(p, d);
-            d.feature = v;
-            retVal.push(v);
-        }
-        return retVal;
-    },
-
-    /** get the elements from a SOLR record as an object (array) */
-    solrRecordToObject : function(record)
-    {
-        var data = [];
-        var el  = this.fields;
-        for(var i in el)
-        {
-            var n = el[i].name;
-            var r = record.get(n);
-            if(n != null && r != null)
-                data[n] = r;
-        }
-
-        return data;
-    },
-
-    /** @param layer is an OpenLayer Vector layer, to be used with a Grid Select plugin */
-    makeSolrStore : function(url, config)
-    {
-        if(url == null)
-        {
-            if(otp.isLocalHost())
-                url = '/js/otp/planner/test/solr-geo.json';
-            else
-                url = '/solr/select';
-        }
-        return otp.utils.ExtUtils.makeJsonStore(url, this.id, this.total, this.root, this.fields, config);
-    },
-
-    CLASS_NAME: "otp.utils.SolrUtils"
-};

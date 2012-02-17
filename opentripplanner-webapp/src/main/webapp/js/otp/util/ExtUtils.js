@@ -683,7 +683,7 @@ otp.util.ExtUtils = {
         var rec = store.getAt(index);
         return otp.util.ExtUtils.getCoordinate(rec, defVal, isLatLon);
     },
-    
+
     /** */
     getCoordinate: function(record, defVal)
     {
@@ -700,6 +700,35 @@ otp.util.ExtUtils = {
         {
             retVal = defVal;
         }
+
+        return retVal;
+    },
+
+    /** */
+    getName : function(record, defVal)
+    {
+        var name = null;
+        try
+        {
+            name = record.get('name');
+        }
+        catch(err)
+        {
+            name = defVal;
+        }
+
+        return name;
+    },
+
+    /** */
+    getNamedCoordinate : function(record, defVal)
+    {
+        var coord = this.getCoordinate(record, defVal);
+        var name  = this.getName(record);
+
+        var retVal = coord;
+        if(name)
+            retVal = name + "::" + coord;
 
         return retVal;
     },

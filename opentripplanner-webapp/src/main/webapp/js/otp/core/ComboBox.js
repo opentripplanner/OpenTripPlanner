@@ -99,6 +99,14 @@ otp.core.ComboBoxStatic = {
         this.m_form  = new Ext.form.ComboBox(formOptions);
     },
 
+    /** */
+    selectCB : function(combo, record, num)
+    {
+         var coord = otp.util.ExtUtils.getCoordinate(record);
+         var name  = otp.util.ExtUtils.getName(record);
+         
+    },
+
     /** dirty means that the form is not empty, and it's different than it was before */
     isDirty : function()
     {
@@ -148,7 +156,13 @@ otp.core.ComboBoxStatic = {
     /** */
     getGeocodeCoord : function()
     {
-        return trimet.utils.ObjUtils.getCoordinate(this.geocodeCoord);
+        return otp.util.ObjUtils.getCoordinate(this.geocodeCoord);
+    },
+
+    /** */
+    getNamedCoord : function()
+    {
+        return otp.util.ObjUtils.getCoordinate(this.geocodeCoord);
     },
 
     /**

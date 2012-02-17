@@ -39,10 +39,10 @@ try
     OpenLayers.Util.onImageLoadErrorColor = "";
     OpenLayers.ImgPath = "images/map/controls/";
 
-    otp.utils.WGS_SRS = "EPSG:4326";
-    otp.utils.GEOGRAPHIC   = new OpenLayers.Projection(otp.utils.WGS_SRS);
-    otp.utils.WEB_MERC_SRS = "EPSG:900913";
-    otp.utils.WEB_MERCATOR = new OpenLayers.Projection(otp.utils.WEB_MERC_SRS);
+    otp.util.WGS_SRS = "EPSG:4326";
+    otp.util.GEOGRAPHIC   = new OpenLayers.Projection(otp.util.WGS_SRS);
+    otp.util.WEB_MERC_SRS = "EPSG:900913";
+    otp.util.WEB_MERCATOR = new OpenLayers.Projection(otp.util.WEB_MERC_SRS);
 } 
 catch (e) 
 {
@@ -323,7 +323,7 @@ otp.util.OpenLayersUtils = {
     {
         var ll = new OpenLayers.Geometry.Point(x, y)
         if(reproject)
-            ll = ll.transform(otp.utils.GEOGRAPHIC, otp.utils.WEB_MERCATOR);
+            ll = ll.transform(otp.util.GEOGRAPHIC, otp.util.WEB_MERCATOR);
 
         return ll;
     },

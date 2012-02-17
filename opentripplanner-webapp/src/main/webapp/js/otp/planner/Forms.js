@@ -213,9 +213,17 @@ otp.planner.StaticForms = {
         this.hideErrorDialogs();
 
         // step 3: fix up some of the form values before sending onto the trip planner web service
+        var from = this.m_fromForm.getRawValue();
+        var to   = this.m_toForm.getRawValue();
+        var fromPlace = this.m_toForm.getGeocodeCoord();
+        var toPlace   = this.m_toForm.getGeocodeCoord();
+        var fromPlace = this.getFrom();  // TEMP -- delete soon
+        var toPlace   = this.getTo();    // TEMP -- delete soon
         form.setValues({
-            fromPlace: this.getFrom(),
-            toPlace:   this.getTo()
+            from      : from,
+            to        : to,
+            fromPlace : fromPlace, 
+            toPlace   : toPlace
         });
     },
 
