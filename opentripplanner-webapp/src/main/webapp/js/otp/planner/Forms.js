@@ -38,7 +38,7 @@ otp.planner.StaticForms = {
     useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
     geocoder              : null,
-    appendGeocodeName     : true,  // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP 
+    appendGeocodeName     : false,
 
     // forms & stores
     m_panel               : null,
@@ -46,8 +46,6 @@ otp.planner.StaticForms = {
 
     m_fromForm            : null,
     m_toForm              : null,
-    m_toPlace             : null,
-    m_fromPlace           : null,
     m_intermediatePlaces  : null,
     m_interPlacesPanel    : null,
 
@@ -71,9 +69,6 @@ otp.planner.StaticForms = {
     // buttons
     m_submitButton        : null,
 
-    m_fromCoord           : otp.util.Constants.BLANK_LAT_LON,
-    m_toCoord             : otp.util.Constants.BLANK_LAT_LON,
-
     m_xmlRespRecord       : null,
 
     // to enable masking of the from/to fields
@@ -91,8 +86,6 @@ otp.planner.StaticForms = {
         // step 1: bit of init (before configure override happens)
         otp.configure(this, config);
         this.routerId = config.routerId;
-        this.THIS = this;
-        otp.planner.StaticForms.THIS = this;
 
         // step 2: setup
         if(this.m_xmlRespRecord == null)
@@ -108,7 +101,8 @@ otp.planner.StaticForms = {
         this.makeMainPanel();
 
         // step 3: set the singleton & status stuff to this 
-        otp.planner.StaticForms = this;
+        this.THIS = this;
+        otp.planner.StaticForms.THIS = this;
     },
 
     /**
@@ -155,7 +149,8 @@ otp.planner.StaticForms = {
         }
 
         if (this.m_fromForm.getComboBox().activeError ||
-            this.m_toForm.getComboBox().activeError) {
+            this.m_toForm.getComboBox().activeError)
+        {
             Ext.Msg.show({
                 title: this.locale.tripPlanner.geocoder.msg_title,
                 msg:   this.locale.tripPlanner.geocoder.msg_content
@@ -215,10 +210,8 @@ otp.planner.StaticForms = {
         // step 3: fix up some of the form values before sending onto the trip planner web service
         var from = this.m_fromForm.getRawValue();
         var to   = this.m_toForm.getRawValue();
-        var fromPlace = this.m_toForm.getGeocodeCoord();
-        var toPlace   = this.m_toForm.getGeocodeCoord();
-        var fromPlace = this.getFrom();  // TEMP -- delete soon
-        var toPlace   = this.getTo();    // TEMP -- delete soon
+        var fromPlace = this.m_fromForm.getNamedCoord();
+        var toPlace   = this.m_toForm.getNamedCoord();
         form.setValues({
             from      : from,
             to        : to,
@@ -347,52 +340,6 @@ otp.planner.StaticForms = {
         this.THIS.planner.focus();
     },
 
-    /** parse a string param -- lookng to separate any name :: separation from coordinate data */
-    parseGeoParam : function(p)
-    {
-        var retVal = null;
-
-        if(p)
-        {
-            retVal = {};
-
-            var ll = p; 
-
-            // process named coordinates, ala NAME::lat,lon
-            var s  = p.indexOf("::");
-            if(s && s > 0)
-            {
-                retVal.name = p.substr(0, s);
-                ll = p.substr(s+2);
-            }
-
-            // process coordinates part of the string
-            retVal.ll  = ll; 
-            retVal.lat = otp.util.ObjUtils.getLat(ll);
-            retVal.lon = otp.util.ObjUtils.getLon(ll);
-        }
-
-        return retVal;
-    },
-
-
-    /** builds the 'place' parameter that gets sent down to OTP routing */
-    getGeoParam : function(name, lat, lon)
-    {
-        var retVal = null;
-
-        if (lat && lat > -181.1 && lon && lon > -181.1)
-        {
-            retVal = (1*lat).toFixed(6) + ',' + (1*lon).toFixed(6);
-
-            // append geocoder string, which OTP will pass back to us in the response
-            if(this.appendGeocodeName && name && name.length > 0 && !otp.util.ObjUtils.isCoordinate(name))
-                retVal = name + '::' + retVal;
-        }
-
-        return retVal;
-    },
-
 
     /**
      * set from form with either/both a string and X/Y
@@ -402,16 +349,9 @@ otp.planner.StaticForms = {
     setFrom : function(fString, lat, lon, moveMap, noPoi)
     {
         this.THIS.focus();
-        var param = this.getGeoParam(fString, lat, lon);
-        if(param)
-        {
-            this.THIS.m_fromCoord = param;
-            if(this.THIS.poi && !noPoi)
-                this.THIS.poi.setFrom(lon, lat, fString, moveMap);
-
-            otp.util.ExtUtils.formSetRawValue(this.THIS.m_fromForm, fString, this.THIS.m_fromCoord);
-            this.THIS.m_fromForm.setLastValue();
-        }
+        this.THIS.m_fromForm.setNameLatLon(fString, lat, lon, null, true);
+        if(!noPoi)
+            this.THIS.poi.setFrom(lon, lat, null, moveMap);
     },
 
     /**
@@ -421,37 +361,10 @@ otp.planner.StaticForms = {
     setTo : function(tString, lat, lon, moveMap, noPoi)
     {
         this.THIS.focus();
-
-        var param = this.getGeoParam(tString, lat, lon);
-        if(param)
-        {
-            this.THIS.m_toCoord = param;
-            if(this.THIS.poi && !noPoi)
-                this.THIS.poi.setTo(lon, lat, tString, moveMap);
-
-            otp.util.ExtUtils.formSetRawValue(this.m_toForm, tString, this.THIS.m_toCoord);
-            this.THIS.m_toForm.setLastValue();
-        }
+        this.THIS.m_toForm.setNameLatLon(tString, lat, lon, null, true);
+        if(!noPoi)
+            this.THIS.poi.setTo(lon, lat, null, moveMap);
     },
-
-
-    /** will look in text forms first, then hidden form variable, then coordinate for value */
-    getFrom : function()
-    {
-        return this.m_fromCoord ||
-               this.m_fromForm ||
-               this.m_fromPlace;
-    },
-
-
-    /** will look in text forms first, then hidden form variable, then coordinate for value */
-    getTo : function()
-    {
-        return this.m_toCoord ||
-               this.m_toForm ||
-               this.m_toPlace;
-    },
-
 
     /** a simple helper class to set data in a form ... note we also set a dirty flag on said form */
     setDirtyRawInput : function(p, f, d)
@@ -461,17 +374,9 @@ otp.planner.StaticForms = {
         if( p != null 
          && p !== true 
          && p != "true" 
-         && p.match('Address, .*Stop ID') == null
         )
         {
             var dirty = true;
-            var gp = this.parseGeoParam(p);
-            if(gp && gp.name)
-            {
-                p = gp.name;
-                if(gp.ll)
-                    dirty = false;
-            }
             otp.util.ExtUtils.formSetRawValue(f, p, d, dirty);
             retVal = true;
         }
@@ -480,43 +385,58 @@ otp.planner.StaticForms = {
     },
 
     /** */
+    setFormGeocodeName : function(p, f)
+    {
+        var retVal = false;
+
+        // since we're 
+        if(p != null 
+        && p !== true 
+        && p != "true" 
+        && p.match('Address, .*Stop ID') == null
+        )
+        {
+            // replace the @ if used as intersection escape of " & "
+            if(p.indexOf(" @ ") > 3)
+            {
+               p = p.replace(/ @ /," & ")
+            }
+            f.setNamedCoord(p, null, true);
+            retVal = true;
+        }
+
+        return retVal;
+    },
+
+
+    /** */
     populate : function(params)
     {
         var forms = this;
         if(params)
         {
-            this.clearFrom();
-            this.clearTo();
+            this.clearFrom(true);
+            this.clearTo(true);
 
-            this.setDirtyRawInput(params.Orig,      forms.m_fromForm);
-            this.setDirtyRawInput(params.Orig,      forms.m_fromPlace);
-            this.setDirtyRawInput(params.Dest,      forms.m_toForm);
-            this.setDirtyRawInput(params.Dest,      forms.m_toPlace);
-            this.setDirtyRawInput(params.from,      forms.m_fromForm);
-            this.setDirtyRawInput(params.from,      forms.m_fromPlace);
-            this.setDirtyRawInput(params.to,        forms.m_toForm);
-            this.setDirtyRawInput(params.to,        forms.m_toPlace);
-            this.setDirtyRawInput(params.fromPlace, forms.m_fromForm);
-            this.setDirtyRawInput(params.fromPlace, forms.m_fromPlace);
-            this.setDirtyRawInput(params.toPlace,   forms.m_toForm);
-            this.setDirtyRawInput(params.toPlace,   forms.m_toPlace);
+            // check different GET parameters for from & to info 
+            this.setFormGeocodeName(params.Orig,      forms.m_fromForm);
+            this.setFormGeocodeName(params.Dest,      forms.m_toForm);
+            this.setFormGeocodeName(params.Floc,      forms.m_fromForm);
+            this.setFormGeocodeName(params.Tloc,      forms.m_toForm);
+            this.setFormGeocodeName(params.from,      forms.m_fromForm);
+            this.setFormGeocodeName(params.to,        forms.m_toForm);
+            this.setFormGeocodeName(params.fromPlace, forms.m_fromForm);
+            this.setFormGeocodeName(params.toPlace,   forms.m_toForm);
+            if(this.THIS.poi)
+            {
+                this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
+                this.THIS.poi.setToCoord(this.THIS.m_toForm.geocodeCoord);
+            }
+
 
             // triangleSafetyFactor=0.409&triangleSlopeFactor=0.0974&triangleTimeFactor=0.493
             if(this.m_bikeTriangle)
                 this.m_bikeTriangle.setSHT(params.triangleSafetyFactor, params.triangleSlopeFactor, params.triangleTimeFactor);
-
-            // special handling of the fromPlace & toPlace parameters because of the "::" geoParams
-            var gp = this.parseGeoParam(params.fromPlace);
-            if(gp)
-            {
-                this.setFrom(gp.name, gp.lat, gp.lon, false, false);
-            }
-
-            var gp = this.parseGeoParam(params.toPlace);
-            if(gp)
-            {
-                this.setTo(gp.name, gp.lat, gp.lon, false, false);
-            }
 
             if(params.fromCoord && params.fromCoord.indexOf('0.0') != 0)
                 this.m_fromCoord = params.fromCoord;
@@ -668,8 +588,8 @@ otp.planner.StaticForms = {
         var retVal = {};
         retVal.url       = url;
         retVal.itinID    = "1";
-        retVal.fromPlace = this.getFrom();
-        retVal.toPlace   = this.getTo();
+        retVal.fromPlace = this.m_fromForm.getNamedCoord();
+        retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = this.m_time.getRawValue();
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
@@ -718,8 +638,7 @@ otp.planner.StaticForms = {
      */
     clearFrom : function(formToo)
     {
-        this.m_fromCoord = otp.util.Constants.BLANK_LAT_LON; 
-
+        this.m_fromForm.setGeocodeCoord(null, null);
         if(formToo && formToo === true)
         {
             this.m_fromForm.clear();
@@ -730,8 +649,7 @@ otp.planner.StaticForms = {
      */
     clearTo : function(formToo)
     {
-        this.m_toCoord = otp.util.Constants.BLANK_LAT_LON; 
-
+        this.m_toForm.setGeocodeCoord(null, null);
         if(formToo && formToo === true)
         {
             this.m_toForm.clear();
@@ -741,12 +659,14 @@ otp.planner.StaticForms = {
     /** */
     selectFrom : function(combo, record, num)
     {
-         this.m_fromCoord = otp.util.ExtUtils.getCoordinate(record);
+         var coord = otp.util.ExtUtils.getCoordinate(record);
+         this.m_fromForm.setGeocodeCoord(coord, record);
     },
 
     /** */
     selectTo : function(combo, record, num) {
-        this.m_toCoord = otp.util.ExtUtils.getCoordinate(record);
+        var coord = otp.util.ExtUtils.getCoordinate(record);
+        this.m_toForm.setGeocodeCoord(coord, record);
     },
 
     /** */
@@ -918,9 +838,9 @@ otp.planner.StaticForms = {
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        var comboBoxOptions = {layout: 'anchor', label: '', cls: 'nudgeRight', msgTarget: "under"};
+        var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', appendGeocodeName:this.appendGeocodeName};
         var fromFormOptions = Ext.apply({}, {id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
-        var toFormOptions = Ext.apply({}, {id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to}, comboBoxOptions);
+        var toFormOptions   = Ext.apply({}, {id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
         if(this.geocoderEnabled()) {
             fromFormOptions.changeHandler = this.geocoder.fromChanged.createDelegate(this.geocoder);
             toFormOptions.changeHandler   = this.geocoder.toChanged.createDelegate(this.geocoder);
@@ -1007,9 +927,7 @@ otp.planner.StaticForms = {
         if (this.geocoderEnabled()) {
             // but we only do this when the geocoder isn't enabled, because the forms have a separate change listener
             // that manages this state when the geocoder is enabled
-            this.m_fromForm.getComboBox().on({scope: this, focus  : this.clearFrom  });
             this.m_fromForm.getComboBox().on({scope: this, select : this.selectFrom });
-            this.m_toForm.getComboBox().on(  {scope: this, focus  : this.clearTo    });
             this.m_toForm.getComboBox().on(  {scope: this, select : this.selectTo   });
         }
 

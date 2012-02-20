@@ -42,6 +42,7 @@ otp.core.ComboBoxStatic = {
     geocodeName  : null,
     geocodeCoord : null,
     geocodeRec   : null,
+    appendGeocodeName : false,
 
     /**
      * constructor of sorts
@@ -102,9 +103,7 @@ otp.core.ComboBoxStatic = {
     /** */
     selectCB : function(combo, record, num)
     {
-         var coord = otp.util.ExtUtils.getCoordinate(record);
-         var name  = otp.util.ExtUtils.getName(record);
-         
+         console.log("Stub ComboBox.selectCB -- not doing anything...")
     },
 
     /** dirty means that the form is not empty, and it's different than it was before */
@@ -138,8 +137,11 @@ otp.core.ComboBoxStatic = {
     setGeocodeName : function(name, doUpdate)
     {
         this.geocodeName = name;
-        if(doUpdate)
+        if (doUpdate)
+        {
             this.setRawValue(name);
+            this.setLastValue();
+        }
     },
 
     /** */
@@ -162,7 +164,48 @@ otp.core.ComboBoxStatic = {
     /** */
     getNamedCoord : function()
     {
-        return otp.util.ObjUtils.getCoordinate(this.geocodeCoord);
+        return this.makeGeoParam(this.geocodeName, this.geocodeCoord);
+    },
+
+    /** */
+    setNamedCoord : function(nc, rec, doUpdate)
+    {
+        var pg = this.parseGeoParam(nc);
+        this.setGeocodeName(pg.name, doUpdate);
+        this.setGeocodeCoord(pg.ll,  rec);
+    },
+
+    /** */
+    setNameLatLon : function(name, lat, lon, rec, doUpdate)
+    {
+        var ll = null; 
+        ll = (1 * lat).toFixed(6) + ',' + (1 * lon).toFixed(6);
+        ll = otp.util.ObjUtils.getCoordinate(ll);
+        this.setGeocodeCoord(ll, rec);
+
+        // use lat,lon as geo name if no other name given
+        if(name == null)
+            name = ll;
+            // TODO: call reverse geocoder here
+
+        this.setGeocodeName(name, doUpdate);
+    },
+
+    /** */
+    setPoi : function(poiMethod, tString, moveMap)
+    {
+        if(this.geocodeCoord && poiMethod)
+        try
+        {
+            var lat = otp.util.ObjUtils.getLat(this.geocodeCoord);
+            var lon = otp.util.ObjUtils.getLon(this.geocodeCoord);
+            if(lat && lon)
+                poiMethod(lon, lat, tString, moveMap);
+        }
+        catch(e)
+        {
+            console.log("ComboBox: callPoi - " + e);
+        }
     },
 
     /**
@@ -285,7 +328,51 @@ otp.core.ComboBoxStatic = {
         catch(e)
         {}
     },
-    
+
+
+    /** parse a string param -- looking to separate any name :: separation from coordinate data */
+    parseGeoParam : function(p)
+    {
+        var retVal = null;
+
+        if(p)
+        {
+            retVal = {};
+
+            var ll = p; 
+
+            // process named coordinates, ala NAME::lat,lon
+            var s  = p.indexOf("::");
+            if(s && s > 0)
+            {
+                retVal.name = p.substr(0, s);
+                ll = p.substr(s+2);
+            }
+
+            // process coordinates part of the string
+            retVal.ll  = ll; 
+            retVal.lat = otp.util.ObjUtils.getLat(ll);
+            retVal.lon = otp.util.ObjUtils.getLon(ll);
+        }
+
+        return retVal;
+    },
+
+    /** builds the 'place' parameter that gets sent down to OTP routing */
+    makeGeoParam : function(name, coord)
+    {
+        var retVal = null;
+
+        if(coord && coord.indexOf(',') > 0)
+            retVal = coord;
+
+        // append geocoder string, which OTP will pass back to us in the response
+        if(this.appendGeocodeName && name && name.length > 0 && !otp.util.ObjUtils.isCoordinate(name))
+            retVal = name + '::' + retVal;
+
+        return retVal;
+    },
+
     CLASS_NAME : "otp.core.ComboBox"
 };
 otp.core.ComboBox = new otp.Class(otp.core.ComboBoxStatic);

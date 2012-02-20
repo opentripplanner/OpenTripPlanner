@@ -256,7 +256,7 @@ otp.util.ObjUtils = {
             var c = coord.split(",");
             var X = c[0].trim();
             var Y = c[1].trim();
-            if(X >= -180.0 && X < 100000000.0 && Y >= -90.0 && Y < 100000000.0)
+            if(X >= -180.0 && X < 100000000.0 && Y >= -180.0 && Y < 100000000.0)
                 retVal = X + "," + Y;
         }
         catch(e)

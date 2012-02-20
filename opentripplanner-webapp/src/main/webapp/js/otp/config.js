@@ -30,7 +30,9 @@ otp.config_defaults = {
             showPrintButton       : true,   // turn on/off itinerary print button
             showLinksButton       : true,   // turn on/off itinerary links button
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
-            useRouteLongName      : false   // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
+            useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
+            appendGeocodeName     : true,   // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP 
+            NOTE: "THIS IS A STRUCTURE USED TO CUSTOMIZE THE TRIP FORMS AND OTHER BEHAVIORS"
         },
 
         // will add a tree node to the bottom of the itinerary with this message
@@ -64,7 +66,7 @@ otp.config_defaults = {
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
         /* debug geocoder */
-        /* *
+        /*
         geocoder  :
         {
             enabled : true,

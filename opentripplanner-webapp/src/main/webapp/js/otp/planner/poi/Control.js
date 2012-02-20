@@ -153,6 +153,17 @@ otp.planner.poi.Control = {
     },
 
     /** */
+    setFromCoord : function(coord, text, move)
+    {
+        if(coord)
+        {
+            var lat = otp.util.ObjUtils.getLat(coord);
+            var lon = otp.util.ObjUtils.getLon(coord);
+            this.setFrom(lon, lat, text, move);
+        }
+    },
+
+    /** */
     setTo : function(x, y, text, move)
     {
         if(x == null || y == null) return;
@@ -162,8 +173,20 @@ otp.planner.poi.Control = {
         if(move) otp.util.OpenLayersUtils.setCenter(this.map, x, y);
         this.drag.activate();
     },
-    
-    addIntermediate: function(x, y, text, move) {
+
+    /** */
+    setToCoord : function(coord, text, move)
+    {
+        if(coord)
+        {
+            var lat = otp.util.ObjUtils.getLat(coord);
+            var lon = otp.util.ObjUtils.getLon(coord);
+            this.setTo(lon, lat, text, move);
+        }
+    },
+
+    addIntermediate: function(x, y, text, move)
+    {
         if(x == null || y == null) return;
         var inter = this.makeFeature(x, y, {m_text:text}, otp.planner.poi.Style.intermediatePlace);
         this.show();
