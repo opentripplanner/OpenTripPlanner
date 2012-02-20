@@ -171,24 +171,17 @@ otp.core.ComboBoxStatic = {
     setNamedCoord : function(nc, rec, doUpdate)
     {
         var pg = this.parseGeoParam(nc);
-        this.setGeocodeName(pg.name, doUpdate);
         this.setGeocodeCoord(pg.ll,  rec);
+        this.setGeocodeName(pg.name || pg.ll, doUpdate);
     },
 
     /** */
     setNameLatLon : function(name, lat, lon, rec, doUpdate)
     {
-        var ll = null; 
-        ll = (1 * lat).toFixed(6) + ',' + (1 * lon).toFixed(6);
+        var ll = (1 * lat).toFixed(6) + ',' + (1 * lon).toFixed(6);
         ll = otp.util.ObjUtils.getCoordinate(ll);
         this.setGeocodeCoord(ll, rec);
-
-        // use lat,lon as geo name if no other name given
-        if(name == null)
-            name = ll;
-            // TODO: call reverse geocoder here
-
-        this.setGeocodeName(name, doUpdate);
+        this.setGeocodeName(name || ll, doUpdate);
     },
 
     /** */
