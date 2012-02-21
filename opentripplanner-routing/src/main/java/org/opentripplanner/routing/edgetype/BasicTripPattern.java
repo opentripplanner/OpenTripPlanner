@@ -90,12 +90,9 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             if (stopTime.getStop().getWheelchairBoarding() != 0) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
-            if (stopTime.getPickupType() != 1) {
-                perStopFlags[i] |= FLAG_PICKUP;
-            }
-            if (stopTime.getDropOffType() != 1) {
-                perStopFlags[i] |= FLAG_DROPOFF;
-            }
+
+            perStopFlags[i] |= stopTime.getPickupType() << SHIFT_PICKUP;
+            perStopFlags[i] |= stopTime.getDropOffType() << SHIFT_DROPOFF;
             ++i;
         }
     }
@@ -162,8 +159,9 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
             boolean bikesAllowed, boolean pickup) {
-        int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
-        if ((perStopFlags[stopIndex] & flag) == 0) {
+        int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
+        int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex] & mask) >> shift == NO_PICKUP) {
             return -1;
         }
         if (wheelchairAccessible && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
@@ -208,8 +206,9 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
     public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
             boolean bikesAllowed, boolean pickup) {
-        int flag = pickup ? FLAG_PICKUP : FLAG_DROPOFF;
-        if ((perStopFlags[stopIndex + 1] & flag) == 0) {
+        int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
+        int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex + 1] & mask) >> shift == NO_PICKUP) {
             return -1;
         }
         if (wheelchairAccessible && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
@@ -342,11 +341,11 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     }
 
     public boolean canAlight(int stopIndex) {
-        return (perStopFlags[stopIndex] & FLAG_DROPOFF) != 0;
+        return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF != NO_PICKUP;
     }
 
     public boolean canBoard(int stopIndex) {
-        return (perStopFlags[stopIndex] & FLAG_PICKUP) != 0;
+        return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP != NO_PICKUP;
     }
     
     private void writeObject(ObjectOutputStream out) throws IOException {
@@ -437,4 +436,15 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 		}
 		return headsigns[stopIndex].get(trip); 
 	}
+
+    @Override
+    public int getAlightType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF;
+    }
+
+    @Override
+    public int getBoardType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    }
+
 }

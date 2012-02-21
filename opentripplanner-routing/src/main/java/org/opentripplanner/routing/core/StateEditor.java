@@ -323,6 +323,7 @@ public class StateEditor {
         child.stateData.trip = state.stateData.trip;
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.zone = state.stateData.zone;
+        child.stateData.extensions = state.stateData.extensions;
     }
 
     /* PUBLIC GETTER METHODS */

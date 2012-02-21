@@ -25,8 +25,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,10 +84,11 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     	    if (state0.getBackEdgeNarrative() instanceof PatternAlight) {
                 return null;
             }
-            if (!getPattern().canBoard(stopIndex)) {
+            StateEditor s1 = state0.edit(this);
+            int type = pattern.getBoardType(stopIndex);
+            if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            StateEditor s1 = state0.edit(this);
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
@@ -175,6 +174,10 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             }
 
             StateEditor s1 = state0.edit(this);
+            int type = pattern.getBoardType(stopIndex);
+            if (TransitUtils.handleBoardAlightType(s1, type)) {
+                return null;
+            }
             s1.setTrip(bestPatternIndex);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();

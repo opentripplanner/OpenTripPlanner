@@ -41,14 +41,17 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
     private String zone;
 
+    private int dropoffType;
+
     private static final long serialVersionUID = 1L;
 
-    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone, Trip trip) {
+    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone, Trip trip, int dropoffType) {
         super(fromv, tov);
         this.hop = hop;
 	this.wheelchairAccessible = wheelchairAccessible;
 	this.zone = zone;
 	this.trip = trip;
+	this.dropoffType = dropoffType;
     }
 
     public String getDirection() {
@@ -111,6 +114,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             }
             
             StateEditor s1 = s0.edit(this);
+            TransitUtils.handleBoardAlightType(s1, dropoffType);
             s1.incrementTimeInSeconds(wait); 
             s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
             s1.incrementNumBoardings();
@@ -121,6 +125,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
     	} else {
     		// forward traversal
         	StateEditor s1 = s0.edit(this);
+        	TransitUtils.handleBoardAlightType(s1, dropoffType);
         	s1.setTripId(null);
         	s1.setLastAlightedTime(s0.getTime());
         	s1.setPreviousStop(tov);

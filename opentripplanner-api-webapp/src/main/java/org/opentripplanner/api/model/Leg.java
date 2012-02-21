@@ -144,6 +144,12 @@ public class Leg {
     @XmlAttribute
 	public String routeLongName;
 
+    @XmlAttribute
+    public String boardRule;
+
+    @XmlAttribute
+    public String alightRule;
+
     /**
      * bogus walk/bike/car legs are those that have 0.0 distance, 
      * and just one instruction

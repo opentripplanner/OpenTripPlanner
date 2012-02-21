@@ -53,7 +53,6 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
@@ -334,6 +333,7 @@ public class PlanGenerator {
                         System.out.println("leg unexpectedly not null");
                     }
                     leg = makeLeg(itinerary, state);
+                    leg.boardRule = (String) state.getExtension("boardAlightRule");
                     itinerary.transfers++;
                 }
                 if (backEdge instanceof Hop || backEdge instanceof PatternHop) {
@@ -350,6 +350,7 @@ public class PlanGenerator {
                             leg.stop = null;
                         }
                     }
+                    leg.alightRule = (String) state.getExtension("boardAlightRule");
                     finalizeLeg(leg, state, null, -1, -1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;

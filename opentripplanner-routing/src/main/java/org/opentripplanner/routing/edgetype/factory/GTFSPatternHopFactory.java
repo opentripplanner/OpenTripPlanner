@@ -85,12 +85,12 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 class ScheduledStopPattern {
     ArrayList<Stop> stops;
-    ArrayList<Boolean> pickups;
-    ArrayList<Boolean> dropoffs;
+    ArrayList<Integer> pickups;
+    ArrayList<Integer> dropoffs;
 
     AgencyAndId calendarId;
 
-    public ScheduledStopPattern(ArrayList<Stop> stops, ArrayList<Boolean> pickups, ArrayList<Boolean> dropoffs, AgencyAndId calendarId) {
+    public ScheduledStopPattern(ArrayList<Stop> stops, ArrayList<Integer> pickups, ArrayList<Integer> dropoffs, AgencyAndId calendarId) {
         this.stops = stops;
         this.pickups = pickups;
         this.dropoffs = dropoffs;
@@ -237,12 +237,12 @@ public class GTFSPatternHopFactory {
 
     public static ScheduledStopPattern stopPatternfromTrip(Trip trip, GtfsRelationalDao dao) {
         ArrayList<Stop> stops = new ArrayList<Stop>();
-        ArrayList<Boolean> pickups = new ArrayList<Boolean>();
-        ArrayList<Boolean> dropoffs = new ArrayList<Boolean>();
+        ArrayList<Integer> pickups = new ArrayList<Integer>();
+        ArrayList<Integer> dropoffs = new ArrayList<Integer>();
         for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
             stops.add(stoptime.getStop());
-            pickups.add(stoptime.getPickupType() != 1);
-            dropoffs.add(stoptime.getDropOffType() != 1);
+            pickups.add(stoptime.getPickupType());
+            dropoffs.add(stoptime.getDropOffType());
         }
         ScheduledStopPattern pattern = new ScheduledStopPattern(stops, pickups, dropoffs, trip.getServiceId());
         return pattern;
@@ -758,12 +758,12 @@ public class GTFSPatternHopFactory {
             if (st0.getPickupType() != 1) {
                 new Board(startStation, psv0depart, hop,
                     tripWheelchairAccessible && s0.getWheelchairBoarding() == 1,
-                    st0.getStop().getZoneId(), trip);
+                    st0.getStop().getZoneId(), trip, st0.getPickupType());
             }
             if (st0.getDropOffType() != 1) {
                 new Alight(psv1arrive, endStation, hop, 
                     tripWheelchairAccessible && s1.getWheelchairBoarding() != 0,
-                    st0.getStop().getZoneId(), trip);
+                    st0.getStop().getZoneId(), trip, st0.getDropOffType());
             }
         }
     }

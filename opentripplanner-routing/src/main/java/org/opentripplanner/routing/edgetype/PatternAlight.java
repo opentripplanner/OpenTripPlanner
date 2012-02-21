@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -161,6 +160,10 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             }
 
             StateEditor s1 = state0.edit(this);
+            int type = pattern.getAlightType(stopIndex + 1);
+            if (TransitUtils.handleBoardAlightType(s1, type)) {
+                return null;
+            }
             s1.setTrip(bestPatternIndex);
             s1.incrementTimeInSeconds(bestWait); 
             s1.incrementNumBoardings();
@@ -186,10 +189,12 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (state0.getBackEdgeNarrative() instanceof PatternBoard) {
                 return null;
             }
-            if (!pattern.canAlight(stopIndex + 1)) {
+            StateEditor s1 = state0.edit(this);
+            int type = pattern.getAlightType(stopIndex + 1);
+            if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            StateEditor s1 = state0.edit(this);
+
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(tov);
@@ -240,6 +245,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     }
 
     public String toString() {
-    	return "PatternAlight(" + getFromVertex() + ", " + getToVertex() + ")";
+        return "PatternAlight(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 }

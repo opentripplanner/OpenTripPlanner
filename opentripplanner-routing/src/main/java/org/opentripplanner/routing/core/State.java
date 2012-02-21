@@ -128,6 +128,9 @@ public class State implements Cloneable {
      * @return - The extension value for the given key, or null if not present
      */
     public Object getExtension(Object key) {
+        if (stateData.extensions == null) {
+            return null;
+        }
         return stateData.extensions.get(key);
     }
 

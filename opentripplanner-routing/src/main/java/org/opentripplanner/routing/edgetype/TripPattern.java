@@ -30,11 +30,15 @@ public interface TripPattern {
 
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
 
-    public static final int FLAG_PICKUP = 2;
+    public static final int MASK_PICKUP = 2|4;
+    public static final int SHIFT_PICKUP = 1;
 
-    public static final int FLAG_DROPOFF = 4;
+    public static final int MASK_DROPOFF = 8|16;
+    public static final int SHIFT_DROPOFF = 3;
 
-    public static final int FLAG_BIKES_ALLOWED = 8;
+    public static final int NO_PICKUP = 1;
+
+    public static final int FLAG_BIKES_ALLOWED = 32;
 
     /** Get the index of the next trip that has a stop after afterTime at the stop at stopIndex
      * 
@@ -96,4 +100,8 @@ public interface TripPattern {
 
 	/** Gets the current headsign as-of this stop, if it differs from the trip headsign */
 	public String getHeadsign(int stopIndex, int trip);
+
+    public int getAlightType(int stopIndex);
+
+    public int getBoardType(int stopIndex);
 }
