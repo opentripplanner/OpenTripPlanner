@@ -51,7 +51,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     private static final long serialVersionUID = 2L;
 
     public Board(Vertex startStation, Vertex startJourney, Hop hop, boolean wheelchairAccessible,
-                 String zone, Trip trip, int pickupType) {
+            String zone, Trip trip, int pickupType) {
         super(startStation, startJourney);
         this.hop = hop;
         this.wheelchairAccessible = wheelchairAccessible;
@@ -85,7 +85,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
-    	TraverseOptions options = state0.getOptions();
+        TraverseOptions options = state0.getOptions();
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
@@ -147,14 +147,14 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     /**
-     * If the search is proceeding forward, board cost is added at board edges. 
-     * Otherwise it is added at alight edges.
+     * If the search is proceeding forward, board cost is added at board edges. Otherwise it is
+     * added at alight edges.
      */
     @Override
     public double weightLowerBound(TraverseOptions options) {
-    	if (options.isArriveBy())
+        if (options.isArriveBy())
             return 0;
-    	else
+        else
             return options.boardCost;
     }
 

@@ -350,7 +350,7 @@ public class State implements Cloneable {
     }
 
     public double getWalkSinceLastTransit() {
-        return stateData.walkDistance - lastTransitWalk ;
+        return stateData.walkDistance - lastTransitWalk;
     }
 
     public double getWalkAtLastTransit() {
@@ -389,7 +389,7 @@ public class State implements Cloneable {
             for (Edge out2 : tov.getOutgoing()) {
                 State outState2 = out2.traverse(outState);
                 if (outState2 != null && !outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
-                    //walking a bike, so, not really an exit
+                    // walking a bike, so, not really an exit
                     continue;
                 }
                 found = true;

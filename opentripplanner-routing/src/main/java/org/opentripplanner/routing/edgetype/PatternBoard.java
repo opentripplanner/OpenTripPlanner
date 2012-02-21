@@ -74,14 +74,14 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     public String getName() {
         return "leave street network for transit network";
     }
-    
+
     public State traverse(State state0) {
-    	TraverseOptions options = state0.getOptions();
-    	if (options.isArriveBy()) {
-    		/* reverse traversal, not so much to do */
+        TraverseOptions options = state0.getOptions();
+        if (options.isArriveBy()) {
+            /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
             // this affects multi-itinerary searches
-    	    if (state0.getBackEdgeNarrative() instanceof PatternAlight) {
+            if (state0.getBackEdgeNarrative() instanceof PatternAlight) {
                 return null;
             }
             StateEditor s1 = state0.edit(this);
@@ -93,15 +93,15 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             return s1.makeState();
-    	} else {
-    		/* forward traversal: look for a transit trip on this pattern */
+        } else {
+            /* forward traversal: look for a transit trip on this pattern */
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
             /* find next boarding time */
-            /* 
-             * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to initial state)
-             * if this pattern's serviceId is running look for the next boarding time
+            /*
+             * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to
+             * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
             long current_time = state0.getTime();
@@ -112,10 +112,11 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
-                if (secondsSinceMidnight < 0) continue; 
+                if (secondsSinceMidnight < 0)
+                    continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options.wheelchairAccessible,
-                                                                options.getModes().getBicycle(), true);
+                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight,
+                            options.wheelchairAccessible, options.getModes().getBicycle(), true);
                     if (patternIndex >= 0) {
                         Trip trip = pattern.getTrip(patternIndex);
                         while (options.bannedTrips.contains(trip.getId())) {
@@ -129,15 +130,17 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                         }
 
                         // a trip was found, index is valid, wait will be non-negative
-                        int wait = (int) (sd.time(getPattern().getDepartureTime(stopIndex, patternIndex)) - current_time);
-                        if (wait < 0) _log.error("negative wait time on board");
+                        int wait = (int) (sd.time(getPattern().getDepartureTime(stopIndex,
+                                patternIndex)) - current_time);
+                        if (wait < 0)
+                            _log.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
                             bestPatternIndex = patternIndex;
                         }
                     }
-                    
+
                 }
             }
             if (bestWait < 0) {
@@ -148,28 +151,31 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
                 Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+                        GtfsLibrary.getRouteName(route));
                 if (options.bannedRoutes.contains(spec)) {
                     return null;
                 }
             }
-            
+
             /* check if route is preferred for this plan */
             long preferences_penalty = 0;
-            if (options.preferredRoutes != null && options.preferredRoutes.size()>0) {
+            if (options.preferredRoutes != null && options.preferredRoutes.size() > 0) {
                 Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+                        GtfsLibrary.getRouteName(route));
                 if (!options.preferredRoutes.contains(spec)) {
-                	preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
+                    preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
                 }
             }
-            
-            /* check if route is unpreferred for this plan*/
-            if (options.unpreferredRoutes != null && options.unpreferredRoutes.size()>0) {
+
+            /* check if route is unpreferred for this plan */
+            if (options.unpreferredRoutes != null && options.unpreferredRoutes.size() > 0) {
                 Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(), GtfsLibrary.getRouteName(route));
+                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+                        GtfsLibrary.getRouteName(route));
                 if (options.unpreferredRoutes.contains(spec)) {
-                	preferences_penalty += options.useUnpreferredRoutesPenalty;
+                    preferences_penalty += options.useUnpreferredRoutesPenalty;
                 }
             }
 
@@ -184,19 +190,18 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setTripId(trip.getId());
             s1.setZone(getPattern().getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
-            
+
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
-            }
-            else {
+            } else {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
             s1.incrementWeight(wait_cost + options.boardCost);
             return s1.makeState();
-    	}
-	}
+        }
+    }
 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
@@ -206,7 +211,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     /* See weightLowerBound comment. */
     public double timeLowerBound(TraverseOptions options) {
-    	if (options.isArriveBy()) {
+        if (options.isArriveBy()) {
             if (!options.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
@@ -215,18 +220,17 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 if (sd.serviceIdRunning(serviceId))
                     return 0;
             return Double.POSITIVE_INFINITY;
-    	} else {
+        } else {
             return 0;
-    	}
+        }
     }
 
-    /* 
+    /*
      * If the main search is proceeding backward, the lower bound search is proceeding forward.
-     * Check the mode or serviceIds of this pattern at board time to see whether this pattern 
-     * is worth exploring.
-     * If the main search is proceeding forward, board cost is added at board edges.
-     * The lower bound search is proceeding backward, and if it has reached a board edge the pattern
-     * was already deemed useful.
+     * Check the mode or serviceIds of this pattern at board time to see whether this pattern is
+     * worth exploring. If the main search is proceeding forward, board cost is added at board
+     * edges. The lower bound search is proceeding backward, and if it has reached a board edge the
+     * pattern was already deemed useful.
      */
     public double weightLowerBound(TraverseOptions options) {
         if (options.isArriveBy())

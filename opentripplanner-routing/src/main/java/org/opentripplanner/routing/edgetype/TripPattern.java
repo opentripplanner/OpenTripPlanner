@@ -96,10 +96,10 @@ public interface TripPattern {
     /** Returns the shortest possible dwell time at this stop */
     int getBestDwellTime(int stopIndex);
 
-	public List<Trip> getTrips();
+    public List<Trip> getTrips();
 
-	/** Gets the current headsign as-of this stop, if it differs from the trip headsign */
-	public String getHeadsign(int stopIndex, int trip);
+    /** Gets the current headsign as-of this stop, if it differs from the trip headsign */
+    public String getHeadsign(int stopIndex, int trip);
 
     public int getAlightType(int stopIndex);
 

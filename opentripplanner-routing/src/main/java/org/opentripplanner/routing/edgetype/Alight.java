@@ -28,8 +28,8 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
  * station off vehicle. When traversed backwards, the the resultant state has the time of the
- * previous arrival, in addition the pattern that was boarded. When traversed forwards, the
- * result state is unchanged. An boarding penalty can also be applied to discourage transfers.
+ * previous arrival, in addition the pattern that was boarded. When traversed forwards, the result
+ * state is unchanged. An boarding penalty can also be applied to discourage transfers.
  */
 public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
@@ -45,13 +45,14 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone, Trip trip, int dropoffType) {
+    public Alight(Vertex fromv, Vertex tov, Hop hop, boolean wheelchairAccessible, String zone,
+            Trip trip, int dropoffType) {
         super(fromv, tov);
         this.hop = hop;
-	this.wheelchairAccessible = wheelchairAccessible;
-	this.zone = zone;
-	this.trip = trip;
-	this.dropoffType = dropoffType;
+        this.wheelchairAccessible = wheelchairAccessible;
+        this.zone = zone;
+        this.trip = trip;
+        this.dropoffType = dropoffType;
     }
 
     public String getDirection() {
@@ -81,9 +82,9 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
     public State traverse(State s0) {
         TraverseOptions options = s0.getOptions();
-    	if (options.wheelchairAccessible && !wheelchairAccessible) 
-    		return null;
-    	if (options.isArriveBy()) {
+        if (options.wheelchairAccessible && !wheelchairAccessible)
+            return null;
+        if (options.isArriveBy()) {
             if (options.bannedTrips.contains(getTrip().getId())) {
                 return null;
             }
@@ -93,7 +94,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             if (options.getModes().getBicycle() && !hop.getBikesAllowed())
                 return null;
             long current_time = s0.getTime();
-            
+
             /* check if this trip is running or not */
             AgencyAndId serviceId = hop.getServiceId();
             int wait = -1;
@@ -101,7 +102,8 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
-                if (secondsSinceMidnight < 0) continue; 
+                if (secondsSinceMidnight < 0)
+                    continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     int newWait = secondsSinceMidnight - hop.getEndStopTime().getArrivalTime();
                     if (wait < 0 || newWait < wait) {
@@ -112,44 +114,44 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             if (wait < 0) {
                 return null;
             }
-            
+
             StateEditor s1 = s0.edit(this);
             TransitUtils.handleBoardAlightType(s1, dropoffType);
-            s1.incrementTimeInSeconds(wait); 
+            s1.incrementTimeInSeconds(wait);
             s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
             return s1.makeState();
-    	} else {
-    		// forward traversal
-        	StateEditor s1 = s0.edit(this);
-        	TransitUtils.handleBoardAlightType(s1, dropoffType);
-        	s1.setTripId(null);
-        	s1.setLastAlightedTime(s0.getTime());
-        	s1.setPreviousStop(tov);
-        	return s1.makeState();
-    	}
+        } else {
+            // forward traversal
+            StateEditor s1 = s0.edit(this);
+            TransitUtils.handleBoardAlightType(s1, dropoffType);
+            s1.setTripId(null);
+            s1.setLastAlightedTime(s0.getTime());
+            s1.setPreviousStop(tov);
+            return s1.makeState();
+        }
     }
 
-	@Override
-	public State optimisticTraverse(State s0) {
-		StateEditor s1 = s0.edit(this);
-		return s1.makeState();
-	}
-	
+    @Override
+    public State optimisticTraverse(State s0) {
+        StateEditor s1 = s0.edit(this);
+        return s1.makeState();
+    }
+
     /**
-     * If the search is proceeding backward, board cost is added at alight edges. 
-     * Otherwise it is added at board edges.
+     * If the search is proceeding backward, board cost is added at alight edges. Otherwise it is
+     * added at board edges.
      */
     public double weightLowerBound(TraverseOptions options) {
-    	if (options.isArriveBy())
-    		return options.boardCost;
-    	else
-    		return 0;
+        if (options.isArriveBy())
+            return options.boardCost;
+        else
+            return 0;
     }
-    
+
     /* Use default (constant 0) timeLowerBound */
 
 }
