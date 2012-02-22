@@ -18,11 +18,15 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -54,6 +58,8 @@ import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
+import com.vividsolutions.jts.operation.distance.GeometryLocation;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
@@ -77,9 +83,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     private STRtree intersectionTree;
 
-    public static final double MAX_DISTANCE_FROM_STREET = 0.05;
+    public static final double MAX_DISTANCE_FROM_STREET = 0.001;
 
-    public static final double DISTANCE_ERROR = 0.00005;
+    // maximum difference in distance for two geometries to be considered coincident
+    public static final double DISTANCE_ERROR = 0.00001;
 
     //if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
     private static final double MAX_CORNER_DISTANCE = 0.00010;
@@ -233,21 +240,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        Collection<StreetEdge> edges = getClosestEdges(coordinate, options, extraEdges);
+        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges);
+        CandidateEdge candidate = bundle.closest;
         double closest_street_distance = Double.POSITIVE_INFINITY;
-        if (edges != null) {
-            StreetEdge bestStreet = edges.iterator().next();
-            Geometry g = bestStreet.getGeometry();
-            LocationIndexedLine l = new LocationIndexedLine(g);
-            LinearLocation location = l.project(coordinate);
-            Coordinate nearestPoint = location.getCoordinate(g);
+        if (candidate != null) {
+            StreetEdge bestStreet = candidate.edge;
+            Coordinate nearestPoint = candidate.nearestPointOnEdge;
             closest_street_distance = DistanceLibrary.distance(coordinate, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closest_street_distance);
             if (name == null) {
                 name = bestStreet.getName();
             }
             closest_street = StreetLocation.createStreetLocation(bestStreet.getName() + "_"
-                    + coordinate.toString(), name, edges, nearestPoint);
+                    + coordinate.toString(), name, bundle.toEdgeList(), nearestPoint);
         }
 
         // decide whether to return stop, street, or street + stop
@@ -279,143 +284,153 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return intersectionTree.query(envelope);
     }
 
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options) {
+    private static final GeometryFactory geometryFactory = new GeometryFactory();
+    private static final double SEARCH_RADIUS_M = 100; // meters
+    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
+    public static class CandidateEdge {
+        public final DistanceOp op;
+        public final StreetEdge edge;
+        public final Vertex endwiseVertex;
+        public final double distance;
+        public final Coordinate nearestPointOnEdge;
+        public final double directionToEdge;
+        public final double directionOfEdge;
+        public final double directionDifference;
+        public CandidateEdge(StreetEdge e, Point p) {
+            edge = e;
+            Geometry edgeGeom = edge.getGeometry();
+            op = new DistanceOp(p, edgeGeom);
+            distance = op.distance();
+            // location on second geometry (edge)
+            GeometryLocation edgeLocation = op.nearestLocations()[1];
+            nearestPointOnEdge = edgeLocation.getCoordinate(); 
+            Coordinate[] edgeCoords = edgeGeom.getCoordinates();
+            if (nearestPointOnEdge.equals(edgeCoords[0]))
+                endwiseVertex = edge.getFromVertex();
+            else if (nearestPointOnEdge.equals(edgeCoords[edgeCoords.length - 1])) 
+                endwiseVertex = edge.getToVertex();
+            else
+                endwiseVertex = null;
+            double xd = nearestPointOnEdge.x - p.getX();
+            double yd = nearestPointOnEdge.y - p.getY();
+            directionToEdge = Math.atan2(yd, xd);
+            int edgeSegmentIndex = edgeLocation.getSegmentIndex();
+            Coordinate c0 = edgeCoords[edgeSegmentIndex];
+            Coordinate c1 = edgeCoords[edgeSegmentIndex + 1];
+            xd = c1.x - c1.y;
+            yd = c1.y - c0.y;
+            directionOfEdge = Math.atan2(yd, xd);
+            double absDiff = Math.abs(directionToEdge - directionOfEdge);
+            directionDifference = Math.min(2*Math.PI - absDiff, absDiff);
+            if (Double.isNaN(directionToEdge) ||
+                Double.isNaN(directionOfEdge) ||
+                Double.isNaN(directionDifference)) {
+                _log.warn("direction to/of edge is NaN (0 length?): {}", edge);
+            }
+        }
+        public boolean endwise() { return endwiseVertex != null; }
+        public boolean parallel()  { return directionDifference < Math.PI / 2; } 
+        public boolean perpendicular()  { return !parallel(); } 
+    }
+    
+    public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
+        private static final long serialVersionUID = 20120222L;
+        public Vertex endwiseVertex = null;
+        public CandidateEdge closest = null;
+//        public CandidateEdgeBundle(CandidateEdge... ce) {
+//            super(Arrays.asList(ce));
+//        }
+        public boolean add(CandidateEdge ce) {
+            if (ce.endwiseVertex != null)
+                this.endwiseVertex = ce.endwiseVertex;
+            if (closest == null || ce.distance < closest.distance)
+                closest = ce;
+            return super.add(ce);
+        }
+        public List<StreetEdge> toEdgeList() {
+            List<StreetEdge> ret = new ArrayList<StreetEdge>();
+            for (CandidateEdge ce : this)
+                ret.add(ce.edge);
+            return ret;
+        }
+        public Collection<CandidateEdgeBundle> binByAngleAndDirection() {
+            Map<P2<Double>, CandidateEdgeBundle> bins = 
+                new HashMap<P2<Double>, CandidateEdgeBundle>(); // (r, theta)
+            CANDIDATE : for (CandidateEdge ce : this) {
+                for (Entry<P2<Double>, CandidateEdgeBundle> bin : bins.entrySet()) {
+                    double distance  = bin.getKey().getFirst();
+                    double direction = bin.getKey().getSecond();
+                    if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR &&
+                        Math.abs(distance  - ce.distance) < DISTANCE_ERROR ) {
+                        bin.getValue().add(ce);
+                        continue CANDIDATE;
+                    }
+                }
+                P2<Double> rTheta = new P2<Double>(ce.distance, ce.directionToEdge);
+                CandidateEdgeBundle bundle = new CandidateEdgeBundle();
+                bundle.add(ce);
+                bins.put(rTheta, bundle);
+            }
+            return bins.values();
+        }
+        public boolean endwise() { return endwiseVertex != null; }
+    }
+
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options) {
         return getClosestEdges(coordinate, options, null);
     }
 
     @SuppressWarnings("unchecked")
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges) {
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
-        if (extraEdges != null) {
-            for (Edge e : extraEdges) {
-                if (e instanceof StreetEdge) {
-                    extraStreets.add((StreetEdge) e);
-                }
-            }
-        }
+        if (extraEdges != null)
+            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
+                extraStreets.add(se);
+
         Envelope envelope = new Envelope(coordinate);
-        int i = 0;
-        double envelopeGrowthRate = 0.0002;
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
-        double bestDistance = Double.MAX_VALUE;
-
         TraverseOptions walkingOptions = null;
         if (options != null) {
             walkingOptions = options.getWalkingOptions();
         }
-        while (bestDistance > MAX_DISTANCE_FROM_STREET && i < 10) {
-            ++i;
-            envelope.expandBy(envelopeGrowthRate);
-            envelopeGrowthRate *= 2;
-
-            /*
-             * It is presumed, that edges which are roughly the same distance from the examined
-             * coordinate in the same direction are parallel (coincident) edges.
-             * 
-             * Parallel edges are needed to account for (oneway) streets with varying permissions,
-             * as well as the edge-based nature of the graph. i.e. using a C point on a oneway
-             * street a cyclist may go in one direction only, while a pedestrian should be able to
-             * go in any direction.
-             */
-
-            bestDistance = Double.MAX_VALUE;
-            StreetEdge bestEdge = null;
-            List<StreetEdge> nearby = edgeTree.query(envelope);
-            if (extraEdges != null && nearby != null) {
-                nearby = new JoinedList<StreetEdge>(nearby, extraStreets);
-            }
-            if (nearby != null) {
-                for (StreetEdge e : nearby) {
-                    if (e == null || e instanceof OutEdge)
-                        continue;
-                    Geometry g = e.getGeometry();
-                    if (g != null) {
-                        if (options != null) {
-                            if (!(e.canTraverse(options) || e.canTraverse(walkingOptions))) {
-                                continue;
-                            }
-                        }
-                        double distance = g.distance(p);
-                        if (distance > envelope.getWidth() / 2) {
-                            // Even if an edge is outside the query envelope, bounding boxes can
-                            // still intersect. In this case, distance to the edge is greater
-                            // than the query envelope size.
-                            continue;
-                        }
-                        if (distance < bestDistance) {
-                            bestDistance = distance;
-                            bestEdge = e;
-                        }
-                    }
-                }
-
-                // find coincidence edges
-                if (bestDistance <= MAX_DISTANCE_FROM_STREET) {
-                    LocationIndexedLine lil = new LocationIndexedLine(bestEdge.getGeometry());
-                    LinearLocation location = lil.project(coordinate);
-                    Coordinate nearestPointOnEdge = lil.extractPoint(location);
-                    double xd = nearestPointOnEdge.x - coordinate.x;
-                    double yd = nearestPointOnEdge.y - coordinate.y;
-                    double edgeDirection = Math.atan2(yd, xd);
-
-                    /**
-                     * If the edgeDirection is NaN, it means the edge has no length and therefore no
-                     * direction, so we just return it directly instead of looking for parallel
-                     * edges
-                     */
-                    if (Double.isNaN(edgeDirection))
-                        return Arrays.asList(bestEdge);
-
-                    List<StreetEdge> parallel = new ArrayList<StreetEdge>();
-                    for (StreetEdge e : nearby) {
-                        /* only include edges that this user can actually use */
-                        if (e == null || e instanceof OutEdge) {
-                            continue;
-                        }
-                        if (options != null) {
-                            if (!(e.canTraverse(options) || e.canTraverse(walkingOptions))) {
-                                continue;
-                            }
-                        }
-                        Geometry eg = e.getGeometry();
-                        if (eg != null) {
-                            double distance = eg.distance(p);
-
-                            if (distance <= bestDistance + DISTANCE_ERROR) {
-
-                                lil = new LocationIndexedLine(eg);
-                                location = lil.project(coordinate);
-                                nearestPointOnEdge = lil.extractPoint(location);
-
-                                if (distance > bestDistance) {
-                                    /*
-                                     * ignore edges caught end-on unless they're the only choice
-                                     */
-                                    Coordinate[] coordinates = eg.getCoordinates();
-                                    if (nearestPointOnEdge.equals(coordinates[0])
-                                            || nearestPointOnEdge
-                                                    .equals(coordinates[coordinates.length - 1])) {
-                                        continue;
-                                    }
-                                }
-
-                                /* compute direction from coordinate to edge */
-                                xd = nearestPointOnEdge.x - coordinate.x;
-                                yd = nearestPointOnEdge.y - coordinate.y;
-                                double direction = Math.atan2(yd, xd);
-
-                                if (Math.abs(direction - edgeDirection) < DIRECTION_ERROR) {
-                                    parallel.add(e);
-                                }
-                            }
-                        }
-                    }
-                    return parallel;
+        envelope.expandBy(MAX_DISTANCE_FROM_STREET);
+        List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
+        if (extraEdges != null && nearbyEdges != null) {
+            nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
+        }
+        CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
+        for (StreetEdge e : nearbyEdges) {
+            if (e == null || e instanceof OutEdge)
+                continue;
+            if (options != null && 
+               (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
+                continue;
+            CandidateEdge ce = new CandidateEdge(e, p);
+            // Even if an edge is outside the query envelope, bounding boxes can
+            // still intersect. In this case, distance to the edge is greater
+            // than the query envelope size.
+            if (ce.distance < MAX_DISTANCE_FROM_STREET)
+                candidateEdges.add(ce);
+        }
+        Collection<CandidateEdgeBundle> bundles = candidateEdges.binByAngleAndDirection();
+        // initially set best bundle to the closest bundle
+        CandidateEdgeBundle best = null; 
+        for (CandidateEdgeBundle bundle : bundles) {
+            if (best == null || bundle.closest.distance < best.closest.distance)
+                best = bundle;
+        }
+        // prefer bundles that are not caught end-wise as long as they are not much farther away
+        if (best != null && best.endwise()) {
+            for (CandidateEdgeBundle bundle : bundles) {
+                if (bundle.closest.distance < best.closest.distance * 1.5 &&
+                    ! bundle.endwise()) {
+                    best = bundle;
+                    break;
                 }
             }
         }
-        return null;
+        return best;
     }
 
     @SuppressWarnings("unchecked")
