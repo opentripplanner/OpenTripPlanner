@@ -39,6 +39,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdge;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -187,13 +189,18 @@ public class NetworkLinkerLibrary {
             return atIntersection;
         }
         /* is there a bundle of edges nearby to use or split? */
-        Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options);
+        CandidateEdgeBundle edges = index.getClosestEdges(coordinate, options);
         if (edges == null || edges.size() < 2) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             _log.debug("found too few edges: {}", edges);
             return null;
         }
-        return getSplitterVertices(vertexLabel, edges, coordinate);
+        // if the bundle was caught endwise (T intersections and dead ends), 
+        // get the intersection instead.
+        if (edges.endwise())
+            return index.getIntersectionAt(edges.endwiseVertex.getCoordinate());
+        else
+            return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
     }
 
     /** 
@@ -371,7 +378,7 @@ public class NetworkLinkerLibrary {
          */
         StreetVertex newEnd = new IntersectionVertex(graph, "replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY());
-        
+
         for (Edge e: startVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
