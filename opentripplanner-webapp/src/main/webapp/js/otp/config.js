@@ -66,10 +66,11 @@ otp.config_defaults = {
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
         /* debug geocoder */
-        /*
+        /*  *
         geocoder  :
         {
             enabled : true,
+            isSolr  : true,
             url     : "/js/otp/planner/test/geo-multi.xml",
             addressParamName : "address"
         }

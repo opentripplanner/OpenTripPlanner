@@ -181,7 +181,7 @@ otp.planner.StaticForms = {
                 triParams['intermediatePlaces'] = intPlacesArr;
             }
         }
-        
+
         this.m_panel.form.submit( {
             method  : 'GET',
             url     : this.url,
@@ -433,15 +433,9 @@ otp.planner.StaticForms = {
                 this.THIS.poi.setToCoord(this.THIS.m_toForm.geocodeCoord);
             }
 
-
             // triangleSafetyFactor=0.409&triangleSlopeFactor=0.0974&triangleTimeFactor=0.493
             if(this.m_bikeTriangle)
                 this.m_bikeTriangle.setSHT(params.triangleSafetyFactor, params.triangleSlopeFactor, params.triangleTimeFactor);
-
-            if(params.fromCoord && params.fromCoord.indexOf('0.0') != 0)
-                this.m_fromCoord = params.fromCoord;
-            if(params.toCoord && params.toCoord.indexOf('0.0') != 0)
-                this.m_toCoord = params.toCoord;
 
             // TODO - should find a way to make the xxx (String value, vs coded value) work properly in submit
             var time=false;
@@ -596,6 +590,12 @@ otp.planner.StaticForms = {
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.m_routerIdForm.getValue();
 
+        // break up the from coordinate into lat & lon
+        retVal.fromLat = otp.util.ObjUtils.getLat(this.m_fromForm.geocodeCoord);
+        retVal.fromLon = otp.util.ObjUtils.getLon(this.m_fromForm.geocodeCoord);
+        retVal.toLat   = otp.util.ObjUtils.getLat(this.m_toForm.geocodeCoord);
+        retVal.toLon   = otp.util.ObjUtils.getLon(this.m_toForm.geocodeCoord);
+
         if(retVal.opt == "TRIANGLE") {
             var triopts = this.m_bikeTriangle.getFormData();
             otp.extend(retVal, triopts);
@@ -607,20 +607,6 @@ otp.planner.StaticForms = {
             retVal.wheelchair      = this.m_wheelchairForm.getValue();
         if(this.showIntermediateForms)
             retVal.intermediate_places = ''; //TODO: intermediate stops
-
-        // break up the from coordinate into lat & lon
-        var coord = this.m_fromCoord;
-        if(coord == otp.util.Constants.BLANK_LAT_LON)
-            coord = retVal.fromPlace;
-        retVal.fromLat = otp.util.ObjUtils.getLat(coord);
-        retVal.fromLon = otp.util.ObjUtils.getLon(coord);
-
-        // break up the to coordinate into lat & lon
-        coord = this.m_toCoord;
-        if(coord == otp.util.Constants.BLANK_LAT_LON)
-            coord = retVal.toPlace;
-        retVal.toLat   = otp.util.ObjUtils.getLat(coord);
-        retVal.toLon   = otp.util.ObjUtils.getLon(coord);
 
         try
         {
@@ -804,23 +790,12 @@ otp.planner.StaticForms = {
      * (otherwise the renderer would clear the work done here because
      * tabchange gets triggered after activate)
      */
-    panelActivated: function() {
-        if (!this.poi) {
-            return;
-        }
-        if (this.m_fromCoord && this.m_fromCoord.length > 2) {
-            var x = otp.util.ObjUtils.getLat(this.m_fromCoord);
-            var y = otp.util.ObjUtils.getLon(this.m_fromCoord);
-            if (x != 0 && y != 0) {
-                this.poi.setFrom(y, x, this.m_fromCoord);
-            }
-        }
-        if (this.m_toCoord && this.m_toCoord.length > 2) {
-            var x = otp.util.ObjUtils.getLat(this.m_toCoord);
-            var y = otp.util.ObjUtils.getLon(this.m_toCoord);
-            if (x != 0 && y != 0) {
-                this.poi.setTo(y, x, this.m_toCoord);
-            }
+    panelActivated: function()
+    {
+        if(this.THIS.poi)
+        {
+            this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
+            this.THIS.poi.setToCoord(this.THIS.m_toForm.geocodeCoord);
         }
     },
 
@@ -838,15 +813,23 @@ otp.planner.StaticForms = {
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', appendGeocodeName:this.appendGeocodeName};
-        var fromFormOptions = Ext.apply({}, {id: 'from.id', name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
-        var toFormOptions   = Ext.apply({}, {id: 'to.id',   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
-        if(this.geocoderEnabled()) {
-            fromFormOptions.changeHandler = this.geocoder.fromChanged.createDelegate(this.geocoder);
-            toFormOptions.changeHandler   = this.geocoder.toChanged.createDelegate(this.geocoder);
+        var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.appendGeocodeName};
+        var fromFormOptions = Ext.apply({}, {id: otp.util.Constants.fromFormID, name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
+        var toFormOptions   = Ext.apply({}, {id: otp.util.Constants.toFormID,   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
+        if(this.isSolrGeocoderEnabled())
+        {
+            this.m_fromForm = new otp.core.SolrComboBox(fromFormOptions);
+            this.m_toForm   = new otp.core.SolrComboBox(toFormOptions);
         }
-        this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
-        this.m_toForm   = new otp.core.ComboBox(toFormOptions);
+        else
+        {
+            if(this.geocoderEnabled()) {
+                fromFormOptions.changeHandler = this.geocoder.fromChanged.createDelegate(this.geocoder);
+                toFormOptions.changeHandler   = this.geocoder.toChanged.createDelegate(this.geocoder);
+            }
+            this.m_fromForm = new otp.core.ComboBox(fromFormOptions);
+            this.m_toForm   = new otp.core.ComboBox(toFormOptions);
+        }
 
         // intermediate places form
         this.m_interPlacesPanel = new Ext.Panel({  
@@ -911,10 +894,7 @@ otp.planner.StaticForms = {
             {
                 // this reverses the form values
                 this.m_fromForm.reverse(this.m_toForm);
-                // but we should also reverse the coordinates themselves
-                var tmp = this.m_fromCoord;
-                this.m_fromCoord = this.m_toCoord;
-                this.m_toCoord = tmp;
+
                 // and also update the style on the map markers
                 if (this.poi) {
                     this.poi.reverseStyles();
@@ -1021,7 +1001,7 @@ otp.planner.StaticForms = {
             format:     'm/d/Y',
             allowBlank: false,
             msgTarget:  'qtip',
-            anchor:     "95%",
+            anchor:     "87%",
             value:      new Date().format('m/d/Y')
         });
 
@@ -1064,25 +1044,24 @@ otp.planner.StaticForms = {
             autoWidth: true,
             items: [
                 {
-                    columnWidth: 0.37,
+                    columnWidth: 0.38,
                     layout: 'form',
                     border: false,
                     items: [this.m_arriveByForm]
                 }
                 ,
                 {
-                    columnWidth: 0.33,
+                    columnWidth: 0.28,
                     layout: 'anchor',
                     border: false,
-                    items: [this.m_date]
+                    items: [this.m_time]
                 }
                 ,
                 {
-                    columnWidth: 0.30,
+                    columnWidth: 0.34,
                     layout: 'anchor',
                     border: false,
-                    //labelWidth: 5,
-                    items: [this.m_time]
+                    items: [this.m_date]
                 }
             ]
         };
@@ -1235,6 +1214,12 @@ otp.planner.StaticForms = {
     geocoderEnabled : function()
     {
         return this.geocoder && this.geocoder.enabled;
+    },
+
+    /** utility to */
+    isSolrGeocoderEnabled : function()
+    {
+        return this.geocoderEnabled() && this.geocoder.isSolr;
     },
 
     /** utility to see if we're geocoding at the moment...*/

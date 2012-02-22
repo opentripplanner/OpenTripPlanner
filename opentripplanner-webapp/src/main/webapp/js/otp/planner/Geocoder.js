@@ -28,9 +28,10 @@ otp.namespace("otp.planner");
   */
 otp.planner.GeocoderStatic = {
 
-    form     : null,
     enabled  : false,
-    geocoder : {},    // geocoder config
+    isSolr   : false,
+    form     : null,
+    geocoder : {},    // geocoder reference from config.js
 
     // hold state for whether geocoding is currently active
     m_fromGeocoding : false,
@@ -39,7 +40,7 @@ otp.planner.GeocoderStatic = {
     initialize : function(config)
     {
         otp.configure(this, config);
-        this.enabled = this.geocoder.enabled;
+        otp.configure(this, config.geocoder);
     },
 
     /** */

@@ -28,7 +28,8 @@ otp.planner.poi.Control = {
     map          : null,
     styleMap     : null,
     visibility   : false,
-    width        : 250,  // popup width
+    width        : 250,    // popup width
+    isMercator   : true,   // lat, lon - WGS 84 by default
 
     m_control    : null,
     m_popup      : null,
@@ -196,10 +197,14 @@ otp.planner.poi.Control = {
         return inter;
     },
     
-    removeIntermediate: function(inter) {
-        this._destroyFeature(inter);
-        for(var i=0; i < this.m_intermediates.length; i++) { 
-            if(this.m_intermediates[i]==inter) this.m_intermediates.splice(i,1); 
+    removeIntermediate: function(inter)
+    {
+        if(inter)
+        {
+            this._destroyFeature(inter);
+            for(var i=0; i < this.m_intermediates.length; i++) { 
+                if(this.m_intermediates[i]==inter) this.m_intermediates.splice(i,1); 
+            }
         }
     },
     

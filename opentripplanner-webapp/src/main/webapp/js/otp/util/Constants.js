@@ -22,6 +22,9 @@ otp.util.Constants = {
     TP_COOKIE_VALUE  : "otp_cookie_value",
     BLANK_LAT_LON    : '0.0,0.0',
 
+    fromFormID       : 'from.form.id',
+    toFormID         : 'to.form.id',
+    intermediatFormID: 'intermediate.form.id',
 
     CLASS_NAME       : "otp.util.Constants"
 };

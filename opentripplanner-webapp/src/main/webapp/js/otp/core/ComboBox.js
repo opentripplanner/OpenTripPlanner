@@ -26,14 +26,19 @@ otp.core.ComboBoxStatic = {
     label        : 'Form',
     display      : 'display',
     cls          : '',
-    changeHandler : null,
+    changeHandler: null,
 
     anchor       : '95%',
     msgTarget    : 'qtip',
     emptyText    : '...',
     maxHeight    : 150,
 
-    m_form       : null,
+    // pointer to other external objects
+    locale       : null,
+    poi          : null,
+    form         : null,
+
+    // internal objects
     m_store      : null,
     m_template   : null,
     m_lastValue  : null,
@@ -97,7 +102,7 @@ otp.core.ComboBoxStatic = {
             formOptions.listeners = {change: this.changeHandler};
         }
 
-        this.m_form  = new Ext.form.ComboBox(formOptions);
+        this.form = new Ext.form.ComboBox(formOptions);
     },
 
     /** */
@@ -110,7 +115,7 @@ otp.core.ComboBoxStatic = {
     isDirty : function()
     {
         var retVal = false;
-        var v = this.m_form.getRawValue();
+        var v = this.form.getRawValue();
 
         // to be considered dirty, there must first be some content in the form
         if(v != null && v.length > 0)
@@ -184,28 +189,13 @@ otp.core.ComboBoxStatic = {
         this.setGeocodeName(name || ll, doUpdate);
     },
 
-    /** */
-    setPoi : function(poiMethod, tString, moveMap)
-    {
-        if(this.geocodeCoord && poiMethod)
-        try
-        {
-            var lat = otp.util.ObjUtils.getLat(this.geocodeCoord);
-            var lon = otp.util.ObjUtils.getLon(this.geocodeCoord);
-            if(lat && lon)
-                poiMethod(lon, lat, tString, moveMap);
-        }
-        catch(e)
-        {
-            console.log("ComboBox: callPoi - " + e);
-        }
-    },
-
     /**
      * persist Ext ComboBox's text field content into a Cookie
      */
     persist : function(text) 
     {
+        if(this.m_store == null) return;
+
         // either use passed in text
         if(Ext.isEmpty(text))
         {
@@ -247,19 +237,19 @@ otp.core.ComboBoxStatic = {
     /** return ExtComboBox */
     getComboBox : function()
     {
-        return this.m_form;
+        return this.form;
     },
     
     /** return ExtComboBox's current text value */
     getRawValue : function()
     {
-        return this.m_form.getRawValue();
+        return this.form.getRawValue();
     },
     
     /** set the value of this combo box's text */
     setRawValue : function(val)
     {
-        this.m_form.setRawValue(val);
+        this.form.setRawValue(val);
         this.setLastValue(val);
     },
 
@@ -279,8 +269,8 @@ otp.core.ComboBoxStatic = {
     /** */
     clear : function()
     {
-        this.m_form.collapse();
-        this.m_form.reset();
+        this.form.collapse();
+        this.form.reset();
         this.clearGeocode();
     },
 
@@ -297,12 +287,12 @@ otp.core.ComboBoxStatic = {
     blur : function()
     {
         if(this.isDirty())
-            this.m_form.triggerBlur();
+            this.form.triggerBlur();
     },
 
     collapse : function()
     {
-        this.m_form.collapse();
+        this.form.collapse();
     },
 
     /** */

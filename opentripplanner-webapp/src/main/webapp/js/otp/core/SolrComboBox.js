@@ -54,13 +54,14 @@ otp.core.SolrComboBoxStatic = {
         {
             console.log("enter SolrComboBox.selectCB " + record + " " + index);
 
+            // GET data from SOLR, and place it into the form (and call POI to plot on map)
             var name = record.data['name'];
             var lat  = record.data['lat'];
             var lon  = record.data['lon'];
-            this.PARENT.setGeocodeName(name, true);
-            this.PARENT.setGeocodeCoord(lon + ',' + lat, record.data);
-            this.collapse();
+            this.PARENT.setNameLatLon(name, lat, lon, record.data, true);
+            this.PARENT.selectPoiCB(lon, lat, name, true);
 
+            this.collapse();
             console.log("exit SolrComboBox.selectCB " + record + " " + index);
         }
         catch(e)
@@ -69,23 +70,45 @@ otp.core.SolrComboBoxStatic = {
         }
     },
 
-    /** */
-    hoverCB : function(record, index)
+    /** stub functionality to be overridden */
+    selectPoiCB : function(x, y, text, moveMap)
     {
         try
         {
-            var coord = otp.util.ObjUtils.getNamedCoordRecord(record.data, this.poi.isMercator);
-            this.poi.setIntermediate(coord['x'], coord['y'], coord['name']);
+            this.poi.removeIntermediate(this.m_intermediate);
+            this.m_intermediate = null;
+
+            if(otp.util.Constants.fromFormID == this.id)
+                this.poi.setFrom(x, y, text, moveMap);
+            else if(otp.util.Constants.toFormID == this.id)
+                this.poi.setTo(x, y, text, moveMap);
+            else
+                this.m_intermediate = this.poi.addIntermediate(x, y, text, moveMap);
         }
         catch(e)
-        {
-            console.log("EXCEPTION: SolrComboBox.selectCB " + e);
-        }
+        {}
     },
+
 
     /** SolrComboBox.hoverCB stub (when hover on a SOLR result list item -- good for painting a POI arrow on the map) */
     hoverCB : function(record, index)
     {
+        try
+        {
+            var c = otp.util.ObjUtils.getNamedCoordRecord(record.data, this.poi.isMercator);
+            this.hoverPoiCB(c.x, c.y, c.name, false);
+        }
+        catch(e)
+        {
+            console.log("EXCEPTION: SolrComboBox.hoverCB " + e);
+        }
+    },
+
+    /** draw highlighting icon */
+    hoverPoiCB : function(x, y, text, moveMap)
+    {
+        this.poi.removeIntermediate(this.m_intermediate);
+        this.m_intermediate = this.poi.addIntermediate(x, y, text, moveMap);
     },
 
     /** SolrComboBox.focusCB stub (when input focus is given to the form) */
@@ -114,26 +137,28 @@ otp.core.SolrComboBoxStatic = {
 
         var retVal = new Ext.form.ComboBox({
             id:            this.id,
+            cls:           this.cls,
             hiddenName:    this.name,
-            store:         this.store,
-            queryParam:    'q',
-            displayField:  'title',
-            itemSelector:  sel,
-            minChars:      1,
             fieldLabel:    this.label,
-            loadingText:   this.locale.indicators.searching,
-            emptyText:     this.locale.indicators.qEmptyText,
-            onSelect:      this.selectCB,
+            displayField:  this.display,
+            msgTarget:     this.msgTarget,
             tpl:           this.template,
+            emptyText:     this.emptyText,
+            loadingText:   this.locale.indicators.searching,
+            valueNotFoundText: '',
+            anchor:        this.anchor,
             PARENT:        parent,
+            store:         this.store,
+            itemSelector:  sel,
+            onSelect:      this.selectCB,
+            queryParam:    'q',
+            minChars:      1,
+            pageSize:      10,
             editable:      true,
             typeAhead:     false,
             hideTrigger:   false,
+            hideLabel:     true,
             selectOnFocus: true,
-            anchor:        '100%',
-            resizable:     true,
-            shadow:        'frame',
-            pageSize:      10,
             keys:          {key: [10, 13], handler: function(key) { try { this.expand(); } catch(Ex){}}}
         });
 
