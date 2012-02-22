@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
@@ -390,8 +391,18 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     private void drawVertex(Vertex v, double r) {
-    	noStroke();
+        noStroke();
         ellipse(toScreenX(v.getX()), toScreenY(v.getY()), r, r);
+        if (v instanceof TurnVertex) {
+            Coordinate[] coords = ((TurnVertex) v).getGeometry().getCoordinates();
+            Coordinate c0 = coords[0];
+            Coordinate c1 = coords[coords.length - 1];
+            stroke(255, 255, 50, 127);
+            strokeWeight(3);
+            line((float) toScreenX(c0.x), (float) toScreenY(c0.y), 
+                 (float) toScreenX(c1.x), (float) toScreenY(c1.y));
+            noStroke();
+        }
     }
 
     public synchronized void draw() {
