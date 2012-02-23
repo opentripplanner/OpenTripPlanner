@@ -35,8 +35,10 @@ public class OutEdge extends StreetEdge {
 
     private static final long serialVersionUID = -4922790993642455605L;
 
-    /** No-arg constructor used only for customization -- do not call this unless
-     * you know what you are doing */
+    /**
+     * No-arg constructor used only for customization -- do not call this unless you know what you
+     * are doing
+     */
     public OutEdge() {
         super(null, null);
     }
@@ -47,12 +49,12 @@ public class OutEdge extends StreetEdge {
 
     @Override
     public double getDistance() {
-        return ((TurnVertex)getFromVertex()).getLength();
+        return ((TurnVertex) getFromVertex()).getLength();
     }
 
     @Override
     public Geometry getGeometry() {
-        return ((TurnVertex)fromv).getGeometry();
+        return ((TurnVertex) fromv).getGeometry();
     }
 
     @Override
@@ -62,7 +64,7 @@ public class OutEdge extends StreetEdge {
 
     @Override
     public String getName() {
-        return ((TurnVertex)fromv).getName();
+        return ((TurnVertex) fromv).getName();
     }
 
     @Override
@@ -71,19 +73,19 @@ public class OutEdge extends StreetEdge {
     }
 
     public State traverse(State s0) {
-    	return doTraverse(s0, s0.getOptions());
+        return doTraverse(s0, s0.getOptions());
     }
 
     private State doTraverse(State s0, TraverseOptions options) {
-        TurnVertex fromv = ((TurnVertex)this.fromv);
-        
+        TurnVertex fromv = ((TurnVertex) this.fromv);
+
         if (!fromv.canTraverse(options)) {
-        	// try walking bike since you can't ride it here
-        	if (options.getModes().contains(TraverseMode.BICYCLE)) {
-        		return doTraverse(s0, options.getWalkingOptions());
-        	} else {
-        		return null;
-        	}
+            // try walking bike since you can't ride it here
+            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+                return doTraverse(s0, options.getWalkingOptions());
+            } else {
+                return null;
+            }
         }
 
         TraverseMode traverseMode = options.getModes().getNonTransitMode();
@@ -112,14 +114,17 @@ public class OutEdge extends StreetEdge {
     public boolean canTraverse(TraverseOptions options) {
         return ((TurnVertex) fromv).canTraverse(options);
     }
+
     @Override
     public double getLength() {
         return ((TurnVertex) fromv).getLength();
     }
+
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
         return ((TurnVertex) fromv).getElevationProfile(start, end);
     }
+
     @Override
     public StreetTraversalPermission getPermission() {
         return ((TurnVertex) fromv).getPermission();
@@ -127,9 +132,9 @@ public class OutEdge extends StreetEdge {
 
     @Override
     public void setElevationProfile(PackedCoordinateSequence elev) {
-        ((TurnVertex)fromv).setElevationProfile(elev);
+        ((TurnVertex) fromv).setElevationProfile(elev);
     }
-    
+
     public boolean equals(Object o) {
         if (o instanceof OutEdge) {
             OutEdge other = (OutEdge) o;
@@ -138,8 +143,8 @@ public class OutEdge extends StreetEdge {
         return false;
     }
 
-	@Override
-	public boolean isNoThruTraffic() {
-		return ((TurnVertex) fromv).isNoThruTraffic();
-	}
+    @Override
+    public boolean isNoThruTraffic() {
+        return ((TurnVertex) fromv).isNoThruTraffic();
+    }
 }

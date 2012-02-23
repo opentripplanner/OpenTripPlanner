@@ -18,18 +18,17 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 public class FixedModeEdge extends DelegatingEdgeNarrative {
 
-	private TraverseMode mode;
+    private TraverseMode mode;
 
-	public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
-		super(base);
-		this.mode = mode;
-	}
+    public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
+        super(base);
+        this.mode = mode;
+    }
 
-	@Override
-	public TraverseMode getMode() {
-		return mode;
-	}
-	
+    @Override
+    public TraverseMode getMode() {
+        return mode;
+    }
 
     public String toString() {
         return "FixedModeEdge(" + base + ", " + mode + ")";

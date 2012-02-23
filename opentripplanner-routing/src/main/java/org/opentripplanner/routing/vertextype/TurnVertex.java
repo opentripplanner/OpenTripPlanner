@@ -33,17 +33,16 @@ import com.vividsolutions.jts.geom.LineString;
 
 /**
  * This vertex represents one direction of a street. Its location is the start of that street in
- * that direction.  It contains most of the data used for edges from the street.
+ * that direction. It contains most of the data used for edges from the street.
  */
 public class TurnVertex extends StreetVertex {
 
     private static final long serialVersionUID = -385126804908021091L;
 
     /**
-     * This declares that greenways are streets that are more than 10x as safe as
-     * ordinary streets.
+     * This declares that greenways are streets that are more than 10x as safe as ordinary streets.
      */
-	public static final double GREENWAY_SAFETY_FACTOR = 0.1;
+    public static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
     public LineString geometry;
 
@@ -70,8 +69,8 @@ public class TurnVertex extends StreetVertex {
     /** is this street a staircase */
     private boolean stairs = false;
 
-    protected boolean crossable = true; //can this street be safely crossed? (unused)
-    
+    protected boolean crossable = true; // can this street be safely crossed? (unused)
+
     protected double bicycleSafetyEffectiveLength;
 
     protected String edgeId;
@@ -88,8 +87,10 @@ public class TurnVertex extends StreetVertex {
 
     private boolean noThruTraffic = false;
 
-    public TurnVertex(Graph g, String id, LineString geometry, String name, double length, 
-    	              boolean back, Set<Alert> notes) {
+    private Set<Alert> wheelchairNotes;
+
+    public TurnVertex(Graph g, String id, LineString geometry, String name, double length,
+            boolean back, Set<Alert> notes) {
         super(g, id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
@@ -99,7 +100,7 @@ public class TurnVertex extends StreetVertex {
         this.slopeSpeedEffectiveLength = length;
         this.permission = StreetTraversalPermission.ALL;
         this.notes = notes;
-        
+
         if (geometry != null) {
             double angleR = DirectionUtils.getLastAngle(geometry);
             outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
@@ -145,17 +146,17 @@ public class TurnVertex extends StreetVertex {
     }
 
     public void setElevationProfile(PackedCoordinateSequence elev) {
-    	if (elev == null || elev.size() < 2) {
+        if (elev == null || elev.size() < 2) {
             return;
         }
         if (slopeOverride) {
-            elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),elev.getCoordinate((elev.size()-1))},
-                    2);
+            elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),
+                    elev.getCoordinate((elev.size() - 1)) }, 2);
         }
 
         elevationProfile = elev;
 
-        //compute the various costs of the elevation changes
+        // compute the various costs of the elevation changes
         double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
         length *= lengthMultiplier;
         bicycleSafetyEffectiveLength *= lengthMultiplier;
@@ -203,13 +204,13 @@ public class TurnVertex extends StreetVertex {
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
-            	weight = bicycleSafetyEffectiveLength / options.speed;
-            	break;
+                weight = bicycleSafetyEffectiveLength / options.speed;
+                break;
             case GREENWAYS:
                 weight = bicycleSafetyEffectiveLength / options.speed;
                 if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
-                	//greenways are treated as even safer than they really are
-                	weight *= 0.66;
+                    // greenways are treated as even safer than they really are
+                    weight *= 0.66;
                 }
                 break;
             case FLAT:
@@ -222,7 +223,9 @@ public class TurnVertex extends StreetVertex {
                 double quick = slopeSpeedEffectiveLength;
                 double safety = bicycleSafetyEffectiveLength;
                 double slope = slopeWorkCost;
-                weight = quick * options.getTriangleTimeFactor() + slope * options.getTriangleSlopeFactor() + safety * options.getTriangleSafetyFactor();
+                weight = quick * options.getTriangleTimeFactor() + slope
+                        * options.getTriangleSlopeFactor() + safety
+                        * options.getTriangleSafetyFactor();
                 weight /= options.speed;
                 break;
             default:
@@ -232,9 +235,9 @@ public class TurnVertex extends StreetVertex {
             weight = time;
         }
         if (stairs) {
-        	weight *= options.stairsReluctance;
+            weight *= options.stairsReluctance;
         } else {
-        	weight *= options.walkReluctance;
+            weight *= options.walkReluctance;
         }
         return weight;
     }
@@ -282,11 +285,11 @@ public class TurnVertex extends StreetVertex {
     public boolean isWheelchairAccessible() {
         return wheelchairAccessible;
     }
-    
+
     public void setCrossable(boolean crossable) {
-        this.crossable = crossable; 
+        this.crossable = crossable;
     }
-    
+
     public boolean isCrossable() {
         return crossable;
     }
@@ -303,13 +306,13 @@ public class TurnVertex extends StreetVertex {
         return notes;
     }
 
-	public boolean hasBogusName() {
-		return hasBogusName;
-	}
+    public boolean hasBogusName() {
+        return hasBogusName;
+    }
 
-	public void setBogusName(boolean hasBogusName) {
-		this.hasBogusName = hasBogusName;
-	}
+    public void setBogusName(boolean hasBogusName) {
+        this.hasBogusName = hasBogusName;
+    }
 
     public void setNoThruTraffic(boolean noThruTraffic) {
         this.noThruTraffic = noThruTraffic;
@@ -319,19 +322,19 @@ public class TurnVertex extends StreetVertex {
         return noThruTraffic;
     }
 
-	public void setStairs(boolean stairs) {
-		this.stairs = stairs;
-	}
+    public void setStairs(boolean stairs) {
+        this.stairs = stairs;
+    }
 
-	public boolean isStairs() {
-		return stairs;
-	}
+    public boolean isStairs() {
+        return stairs;
+    }
 
-	public double getEffectiveLength(TraverseMode traverseMode) {
-		if (traverseMode == TraverseMode.BICYCLE) {
-			return slopeSpeedEffectiveLength;
-		} else {
-			return length;
-		}
-	}
+    public double getEffectiveLength(TraverseMode traverseMode) {
+        if (traverseMode == TraverseMode.BICYCLE) {
+            return slopeSpeedEffectiveLength;
+        } else {
+            return length;
+        }
+    }
 }
