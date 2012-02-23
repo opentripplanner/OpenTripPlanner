@@ -136,13 +136,13 @@ public class StreetLocation extends AbstractVertex {
             double lengthIn = street.getLength() * lengthRatioIn;
             double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-            newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), name,
+            newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), street.getName(),
                     lengthIn, false, street.getNotes());
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn));
             newFrom.setPermission(street.getPermission());
             newFrom.setNoThruTraffic(street.isNoThruTraffic());
 
-            location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), name, lengthOut,
+            location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), street.getName(), lengthOut,
                     false, street.getNotes());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut));
             location.setPermission(street.getPermission());
