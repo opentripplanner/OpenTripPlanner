@@ -89,6 +89,20 @@ otp.planner.poi.Control = {
         }
     },
 
+    /** */
+    zoomToExtent : function()
+    {
+        try
+        {
+            var e = this.layer.getDataExtent();
+            this.map.zoomToExtent(e);
+        }
+        catch(e)
+        {
+            console.log("EXCEPTION poi.zoomToExtent: " + e);
+        }
+    },
+
     destroyPopup: function()
     {
         try
@@ -126,6 +140,8 @@ otp.planner.poi.Control = {
             console.log("EXCEPTION onComplete: " + e);
         }
     },
+
+
 
     /** */
     highlight : function(x, y, zoom, text, trustedText)
