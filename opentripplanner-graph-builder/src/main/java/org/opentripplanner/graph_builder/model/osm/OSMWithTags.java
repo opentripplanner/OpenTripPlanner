@@ -163,6 +163,20 @@ public class OSMWithTags {
         return null;
     }
 
+    public Map<String, String> getTagsByPrefix(String prefix) {
+        Map<String, String> out = new HashMap<String, String>();
+       for (Map.Entry<String, String> entry : _tags.entrySet()) {
+           String k = entry.getKey();
+           if (k.equals(prefix) || k.startsWith(prefix + ":")) {
+               out.put(k, entry.getValue());
+           }
+       }
+
+       if (out.isEmpty())
+           return null;
+       return out;
+    }
+
     public static boolean isFalse(String tagValue) {
         return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
       }

@@ -118,6 +118,7 @@ public class StreetUtils {
         boolean back = pse.back;
         String id = pse.getId();
         tv = new TurnVertex(graph, id, pse.getGeometry(), pse.getName(), pse.getLength(), back, pse.getNotes());
+        tv.setWheelchairNotes(pse.getWheelchairNotes());
         tv.setWheelchairAccessible(pse.isWheelchairAccessible());
         tv.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength());
         tv.setCrossable(pse.isCrossable());

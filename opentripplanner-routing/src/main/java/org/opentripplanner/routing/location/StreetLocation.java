@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -27,7 +26,6 @@ import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -166,7 +164,8 @@ public class StreetLocation extends AbstractVertex {
                 ((TurnEdge)e).setRestrictedModes(((TurnEdge) edge).getRestrictedModes());
             }
         } else {
-            e = new OutEdge(location, (StreetVertex) tov);
+            OutEdge outEdge = new OutEdge(location, (StreetVertex) tov);
+            e = outEdge;
         }
         base.extra.add(e);
         

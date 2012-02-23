@@ -15,13 +15,10 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -89,7 +86,10 @@ public class OutEdge extends StreetEdge {
         }
 
         TraverseMode traverseMode = options.getModes().getNonTransitMode();
-        EdgeNarrative en = new FixedModeEdge(this, traverseMode);
+        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
+        if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
+            en.addNotes(fromv.getWheelchairNotes());
+        }
         StateEditor s1 = s0.edit(this, en);
 
         double time = fromv.getEffectiveLength(traverseMode) / options.speed;

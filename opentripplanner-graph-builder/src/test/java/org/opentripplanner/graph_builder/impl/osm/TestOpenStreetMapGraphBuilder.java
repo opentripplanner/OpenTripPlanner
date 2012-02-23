@@ -20,6 +20,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -124,7 +125,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     @Test
     public void testWayDataSet() {
-        OSMWay way = new OSMWay();
+        OSMWithTags way = new OSMWay();
         way.addTag("highway", "footway");
         way.addTag("cycleway", "lane");
         way.addTag("access", "no");
@@ -210,7 +211,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     @Test
     public void testCreativeNaming() {
-        OSMWay way = new OSMWay();
+        OSMWithTags way = new OSMWay();
         way.addTag("highway", "footway");
         way.addTag("cycleway", "lane");
         way.addTag("access", "no");

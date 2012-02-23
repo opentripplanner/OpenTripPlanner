@@ -337,4 +337,12 @@ public class TurnVertex extends StreetVertex {
             return length;
         }
     }
+
+    public void setWheelchairNotes(Set<Alert> wheelchairNotes) {
+        this.wheelchairNotes = wheelchairNotes;
+    }
+
+    public Set<Alert> getWheelchairNotes() {
+        return wheelchairNotes;
+    }
 }

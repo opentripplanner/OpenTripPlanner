@@ -35,6 +35,10 @@ public class TranslatedString implements Serializable {
     public TranslatedString() {
     }
 
+    public TranslatedString(String v) {
+        this(Alert.defaultLanguage, v);
+    }
+
     public boolean equals(Object o) {
         if (!(o instanceof TranslatedString)) {
             return false;
