@@ -556,6 +556,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     it.remove();
                 } else if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed")) {
                     it.remove();
+                } else if (way.isTag("area", "yes")) {
+                    // routing on areas is not yet supported. areas can cause problems with stop linking.
+                    // (24th & Mission BART plaza is both highway=pedestrian and area=yes)
+                    it.remove(); 
                 } else {
                     // Since the way is kept, update nodes-with-neighbors
                     List<Long> nodes = way.getNodeRefs();
