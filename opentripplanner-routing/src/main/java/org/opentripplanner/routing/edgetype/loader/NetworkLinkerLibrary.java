@@ -190,7 +190,7 @@ public class NetworkLinkerLibrary {
         Collection<StreetEdge> edges = index.getClosestEdges(coordinate, options);
         if (edges == null || edges.size() < 2) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
-            _log.debug("found too few edges: {}", edges);
+            _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
             return null;
         }
         return getSplitterVertices(vertexLabel, edges, coordinate);
