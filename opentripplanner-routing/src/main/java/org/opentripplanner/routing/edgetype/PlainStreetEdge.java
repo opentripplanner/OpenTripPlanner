@@ -18,17 +18,14 @@ import java.io.ObjectOutputStream;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -86,6 +83,8 @@ public class PlainStreetEdge extends StreetEdge {
      * This street is a staircase
      */
     private boolean stairs;
+
+    private Set<Alert> wheelchairNotes;
 
     /**
      * No-arg constructor used only for customization -- do not call this unless you know
@@ -241,7 +240,10 @@ public class PlainStreetEdge extends StreetEdge {
         } else {
             weight *= options.walkReluctance;
         }
-        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        FixedModeEdge en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
+        if (wheelchairNotes != null && options.wheelchairAccessible) {
+            en.addNotes(wheelchairNotes);
+        }
         StateEditor s1 = s0.edit(this, en);
 
         switch (s0.getNoThruTrafficState()) {
@@ -424,5 +426,13 @@ public class PlainStreetEdge extends StreetEdge {
 
     public void setName(String name) {
        this.name = name;
+    }
+
+    public void setWheelchairNote(Set<Alert> wheelchairNotes) {
+        this.wheelchairNotes = wheelchairNotes;
+    }
+
+    public Set<Alert> getWheelchairNotes() {
+        return wheelchairNotes;
     }
 }

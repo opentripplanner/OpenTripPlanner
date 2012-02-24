@@ -52,6 +52,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.patch.TranslatedString;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -218,6 +219,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 Set<Alert> note = wayPropertySet.getNoteForWay(way);
+                Set<Alert> wheelchairNote = getWheelchairNotes(way);
 
                 StreetTraversalPermission permissions = getPermissionsForEntity(way,
                         wayData.getPermission());
@@ -316,6 +318,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if (note != null) {
                             street.setNote(note);
                         }
+                        if (wheelchairNote != null) {
+                            street.setWheelchairNote(wheelchairNote);
+                        }
                     }
 
                     PlainStreetEdge backStreet = streets.getSecond();
@@ -327,6 +332,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         backStreet.setBicycleSafetyEffectiveLength(backStreet.getLength() * safety);
                         if (note != null) {
                             backStreet.setNote(note);
+                        }
+                        if (wheelchairNote != null) {
+                            backStreet.setWheelchairNote(wheelchairNote);
                         }
                     }
 
@@ -460,6 +468,28 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         } // END buildGraph()
 
+        private Set<Alert> getWheelchairNotes(OSMWithTags way) {
+            Map<String, String> tags = way.getTagsByPrefix("wheelchair:description");
+            if (tags == null) {
+                return null;
+            }
+            Set<Alert> alerts = new HashSet<Alert>();
+            Alert alert = new Alert();
+            alerts.add(alert);
+            for (Map.Entry<String, String> entry : tags.entrySet()) {
+                String k = entry.getKey();
+                String v = entry.getValue();
+                if (k.equals("wheelchair:description")) {
+                    //no language, assume default from TranslatedString
+                    alert.alertHeaderText = new TranslatedString(v);
+                } else {
+                    String lang = k.substring("wheelchair:description:".length());
+                    alert.alertHeaderText = new TranslatedString(lang, v);
+                }
+            }
+            return alerts;
+        }
+
         /**
          * The safest bike lane should have a safety weight no lower than the time weight of a flat
          * street.  This method divides the safety lengths by the length ratio of the safest street,
@@ -589,7 +619,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
 
-                    OSMWay way = _ways.get(member.getRef());
+                    OSMWithTags way = _ways.get(member.getRef());
                     if (way == null) {
                         continue;
                     }
@@ -745,7 +775,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     continue;
                 }
 
-                    OSMWay way = _ways.get(member.getRef());
+                    OSMWithTags way = _ways.get(member.getRef());
                 if (way == null) {
                     continue;
                 }
@@ -792,7 +822,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start, IntersectionVertex end, 
-                OSMWay way, long startNode, StreetTraversalPermission permissions, LineString geometry) {
+                OSMWithTags way, long startNode, StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length in meters, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
@@ -914,7 +944,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end, 
-                OSMWay way, long startNode, double length, StreetTraversalPermission permissions,
+                OSMWithTags way, long startNode, double length, StreetTraversalPermission permissions,
                 LineString geometry, boolean back) {
 
             String id = "way " + way.getId() + " from " + startNode;
@@ -1057,7 +1087,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param the node to record for
          * @author mattwigway
          */
-        private IntersectionVertex recordLevel(OSMNode node, OSMWay way) {
+        private IntersectionVertex recordLevel(OSMNode node, OSMWithTags way) {
             OSMLevel level = wayLevels.get(way);
             HashMap<OSMLevel, IntersectionVertex> vertices;
             long nodeId = node.getId();
@@ -1090,7 +1120,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param way  The way it is connected to (for fetching level information).
          * @return vertex The graph vertex.
          */
-        private IntersectionVertex getVertexForOsmNode (OSMNode node, OSMWay way) {
+        private IntersectionVertex getVertexForOsmNode (OSMNode node, OSMWithTags way) {
             // If the node should be decomposed to multiple levels, 
             // use the numeric level because it is unique, the human level may not be (although
             // it will likely lead to some head-scratching if it is not).

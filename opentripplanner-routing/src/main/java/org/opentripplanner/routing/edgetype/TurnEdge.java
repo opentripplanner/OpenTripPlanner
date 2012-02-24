@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -155,7 +153,11 @@ public class TurnEdge extends StreetEdge {
 
         TraverseMode traverseMode = options.getModes().getNonTransitMode();
 
-        EdgeNarrative en = new FixedModeEdge(this, traverseMode);
+        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
+        Set<Alert> wheelchairNotes = fromv.getWheelchairNotes();
+        if (options.wheelchairAccessible) {
+            en.addNotes(wheelchairNotes);
+        }
         StateEditor s1 = s0.edit(this, en);
 
         switch (s0.getNoThruTrafficState()) {

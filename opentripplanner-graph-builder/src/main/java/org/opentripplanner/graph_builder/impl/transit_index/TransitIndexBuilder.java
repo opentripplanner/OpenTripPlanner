@@ -133,9 +133,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     continue;
                 }
 
-                if (variant.getSegments().size() > 0) {
-                    continue;
-                }
+                boolean setExemplar = !variant.isExemplarSet();
+
                 Edge prevHop = null;
                 while (gv != null) {
                     RouteSegment segment = new RouteSegment(gv.getStopId());
@@ -169,6 +168,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                     }
                     prevHop = segment.hopOut;
+                    if (setExemplar) {
+                        variant.addExemplarSegment(segment);
+                    }
                     variant.addSegment(segment);
                 }
             }

@@ -796,6 +796,7 @@ otp.planner.StaticForms = {
         {
             this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
             this.THIS.poi.setToCoord(this.THIS.m_toForm.geocodeCoord);
+            this.THIS.poi.zoomToExtent();
         }
     },
 

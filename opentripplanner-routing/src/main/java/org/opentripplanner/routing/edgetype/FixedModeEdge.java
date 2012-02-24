@@ -13,25 +13,47 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.patch.Alert;
 
 public class FixedModeEdge extends DelegatingEdgeNarrative {
 
-	private TraverseMode mode;
+    private TraverseMode mode;
+    private Set<Alert> extraNotes;
 
-	public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
-		super(base);
-		this.mode = mode;
-	}
+    public FixedModeEdge(EdgeNarrative base, TraverseMode mode) {
+        super(base);
+        this.mode = mode;
+    }
 
-	@Override
-	public TraverseMode getMode() {
-		return mode;
-	}
-	
+    @Override
+    public TraverseMode getMode() {
+        return mode;
+    }
 
     public String toString() {
         return "FixedModeEdge(" + base + ", " + mode + ")";
+    }
+
+    public void addNotes(Set<Alert> notes) {
+        this.extraNotes = notes;
+    }
+
+    @Override
+    public Set<Alert> getNotes() {
+        Set<Alert> notes = base.getNotes();
+        if (notes == null) {
+            return extraNotes;
+        }
+        if (extraNotes == null) {
+            return notes;
+        }
+        notes = new HashSet<Alert>(notes);
+        notes.addAll(extraNotes);
+        return notes;
     }
 }

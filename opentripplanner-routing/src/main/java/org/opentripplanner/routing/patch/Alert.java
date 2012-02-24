@@ -24,6 +24,8 @@ import javax.xml.bind.annotation.XmlType;
 public class Alert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;
 
+    public static final String defaultLanguage = "en";
+
     @XmlElement
     public TranslatedString alertHeaderText;
 
@@ -47,7 +49,7 @@ public class Alert implements Serializable {
     public static Alert createSimpleAlerts(String text) {
         Alert note = new Alert();
         note.alertHeaderText = new TranslatedString();
-        note.alertHeaderText.addTranslation("en", text);
+        note.alertHeaderText.addTranslation(defaultLanguage, text);
         return note;
     }
 

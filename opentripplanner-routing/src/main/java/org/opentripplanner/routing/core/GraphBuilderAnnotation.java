@@ -79,7 +79,15 @@ public class GraphBuilderAnnotation implements Serializable {
 		TURN_RESTRICTION_UNKNOWN ("Invalid turn restriction at %s"),
 		TURN_RESTRICTION_BAD ("Invalid turn restriction at %s"),
 		TURN_RESTRICTION_EXCEPTION ("Turn restriction with bicycle exception at node %s from %s"),
-		STOP_UNLINKED ("Stop %s not near any streets; it will not be usable");
+		STOP_UNLINKED ("Stop %s not near any streets; it will not be usable"),
+		VERTEX_SHAPE_ERROR ("Transit edge %s has shape geometry which is far from its "
+		        + "start/end vertices.  This could be caused by bad shape geometry, or "
+		        + "by incorrect use of defaultAgencyId"),
+		BOGUS_EDGE_GEOMETRY("Edge %s has bogus geometry (some coordinates are NaN)"),
+		BOGUS_VERTEX_GEOMETRY("Vertex %s has NaN location; this will cause all sorts of problems."
+		        + " This is probably caused by a bug in the graph builder, but could conceivably"
+		        + " happen with extremely bad GTFS or OSM data.");
+
 		private final String formatString;
 		Variety (String formatString) {
 			this.formatString = formatString;

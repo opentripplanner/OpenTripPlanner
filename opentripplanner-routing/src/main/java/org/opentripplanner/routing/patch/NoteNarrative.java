@@ -21,23 +21,23 @@ import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 
 public class NoteNarrative extends DelegatingEdgeNarrative {
 
-	private Alert note;
+    private Alert note;
 
-	public NoteNarrative(EdgeNarrative base, Alert notes) {
-		super(base);
-		this.note = notes;
-	}
-	
-	@Override
-	public Set<Alert> getNotes() {
-		Set<Alert> baseNotes = base.getNotes();
-		HashSet<Alert> notes;
-		if (baseNotes != null) {
-			 notes = new HashSet<Alert>(baseNotes);
-		} else {
-			notes = new HashSet<Alert>(1);
-		}
-		notes.add(note);
-		return notes;
-	}
+    public NoteNarrative(EdgeNarrative base, Alert notes) {
+        super(base);
+        this.note = notes;
+    }
+
+    @Override
+    public Set<Alert> getNotes() {
+        Set<Alert> baseNotes = base.getNotes();
+        HashSet<Alert> notes;
+        if (baseNotes != null) {
+            notes = new HashSet<Alert>(baseNotes);
+        } else {
+            notes = new HashSet<Alert>(1);
+        }
+        notes.add(note);
+        return notes;
+    }
 }

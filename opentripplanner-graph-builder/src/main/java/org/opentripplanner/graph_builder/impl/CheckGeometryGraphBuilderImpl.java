@@ -17,8 +17,12 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +38,14 @@ import com.vividsolutions.jts.geom.Geometry;
 public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
     private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
+    private static final double MAX_VERTEX_SHAPE_ERROR = 100;
 
     @Override
     public void buildGraph(Graph graph) {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_VERTEX_GEOMETRY, gv));
             }
             
             for (EdgeNarrative e : filter(gv.getOutgoing(),EdgeNarrative.class)) {
@@ -49,7 +55,19 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                 }
                 for (Coordinate c : g.getCoordinates()) {
                     if (Double.isNaN(c.x) || Double.isNaN(c.y)) {
-                        _log.warn("Edge " + e + " has bogus geometry");
+                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_EDGE_GEOMETRY, e));
+                    }
+                }
+                if (e instanceof HopEdge) {
+                    Coordinate edgeStartCoord = e.getFromVertex().getCoordinate();
+                    Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
+                    Coordinate[] geometryCoordinates = g.getCoordinates();
+                    Coordinate geometryStartCoord = geometryCoordinates[0];
+                    Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
+                    if (DistanceLibrary.distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
+                    } else if (DistanceLibrary.distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
                     }
                 }
             }

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.graph_builder.services.osm;
 
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -24,9 +24,9 @@ import org.opentripplanner.routing.graph.Graph;
  * 
  */
 public interface CustomNamer {
-    public String name(OSMWay way, String defaultName);
+    public String name(OSMWithTags way, String defaultName);
 
-    public void nameWithEdge(OSMWay way, PlainStreetEdge edge);
+    public void nameWithEdge(OSMWithTags way, PlainStreetEdge edge);
 
     public void postprocess(Graph graph);
 }

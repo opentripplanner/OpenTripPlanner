@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
@@ -51,7 +51,7 @@ public class WayPropertySet {
 		notes = new ArrayList<NotePicker>();
 	}
 
-	public WayProperties getDataForWay(OSMWay way) {
+	public WayProperties getDataForWay(OSMWithTags way) {
 		WayProperties leftResult = defaultProperties;
 		WayProperties rightResult = defaultProperties;
 		int bestLeftScore = 0;
@@ -103,7 +103,7 @@ public class WayPropertySet {
 		return result;
 	}
 
-	private String dumpTags(OSMWay way) {
+	private String dumpTags(OSMWithTags way) {
 		/* generate warning message */
 		String all_tags = null;
 		Map<String, String> tags = way.getTags();
@@ -135,7 +135,7 @@ public class WayPropertySet {
 		result.setSafetyFeatures(new P2<Double>(first, second));
 	}
 
-	public String getCreativeNameForWay(OSMWay way) {
+	public String getCreativeNameForWay(OSMWithTags way) {
 		CreativeNamer bestNamer = null;
 		int bestScore = 0;
 		for (CreativeNamerPicker picker : creativeNamers) {
@@ -153,7 +153,7 @@ public class WayPropertySet {
 		return bestNamer.generateCreativeName(way);
 	}
 
-	public Set<Alert> getNoteForWay(OSMWay way) {
+	public Set<Alert> getNoteForWay(OSMWithTags way) {
 		HashSet<Alert> out = new HashSet<Alert>();
 		for (NotePicker picker : notes) {
 			OSMSpecifier specifier = picker.getSpecifier();
@@ -169,7 +169,7 @@ public class WayPropertySet {
 		return out;
 	}
 
-	public boolean getSlopeOverride(OSMWay way) {
+	public boolean getSlopeOverride(OSMWithTags way) {
 		boolean result = false;
 		int bestScore = 0;
 		for (SlopeOverridePicker picker : slopeOverrides) {
