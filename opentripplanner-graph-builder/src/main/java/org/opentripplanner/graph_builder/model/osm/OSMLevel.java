@@ -84,21 +84,27 @@ public class OSMLevel implements Comparable<OSMLevel> {
         Integer floorNumber = null;
         try {
             floorNumber = Integer.parseInt(longName);
-            if (incrementNonNegative && floorNumber >= 0) {
-                if (source == Source.LEVEL_MAP)
-                    floorNumber -= 1; // level maps are localized, floor numbers are 0-based
-                else
-                    longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+            if (incrementNonNegative) {
+                if (source == Source.LEVEL_MAP) {
+                    if (floorNumber >= 1)
+                        floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+                } else {
+                    if (floorNumber >= 0)
+                        longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+                }
             }
         } catch (NumberFormatException e) {}          
         try { 
             // short name takes precedence over long name for floor numbering
             floorNumber = Integer.parseInt(shortName);
-            if (incrementNonNegative && floorNumber >= 0) {
-                if (source == Source.LEVEL_MAP)
-                    floorNumber -= 1;
-                else
-                    shortName = Integer.toString(floorNumber + 1);
+            if (incrementNonNegative) {
+                if (source == Source.LEVEL_MAP) {
+                    if (floorNumber >= 1)
+                        floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+                } else {
+                    if (floorNumber >= 0)
+                        shortName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
+                }
             }
         } catch (NumberFormatException e) {}
 
