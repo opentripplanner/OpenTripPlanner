@@ -249,7 +249,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         levelName = way.getTag("layer");
                         source = OSMLevel.Source.LAYER_TAG;
                     } 
-//                    if (noZeroLevels && intLevel >= 0) ...
                     if (levelName != null) {
                         level = OSMLevel.fromString(levelName, source, noZeroLevels);
                     } 
