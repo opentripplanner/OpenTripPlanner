@@ -13,8 +13,10 @@
 
 package org.opentripplanner.graph_builder.services;
 
+import java.util.HashMap;
+
 import org.opentripplanner.routing.graph.Graph;
 
 public interface GraphBuilder {
-    public void buildGraph(Graph graph);
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra);
 }

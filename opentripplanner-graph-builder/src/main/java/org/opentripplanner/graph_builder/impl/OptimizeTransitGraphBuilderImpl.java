@@ -13,6 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.util.HashMap;
+
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.PatternEdge;
@@ -27,7 +29,7 @@ import org.opentripplanner.routing.graph.Vertex;
 public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         for (Vertex v : graph.getVertices()) {
             for (Edge e: v.getOutgoing()) {
                 if (e instanceof PatternEdge) {

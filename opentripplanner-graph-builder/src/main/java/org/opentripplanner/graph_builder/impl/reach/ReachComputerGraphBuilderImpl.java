@@ -84,7 +84,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     }
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
         options.walkReluctance = 1;
         options.speed = 1;

@@ -15,6 +15,7 @@ package org.opentripplanner.graph_builder.impl.map;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -35,7 +36,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class MapBuilder implements GraphBuilder {
     private static final Logger log = LoggerFactory.getLogger(MapBuilder.class);
 
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         TransitIndexService transit = graph.getService(TransitIndexService.class);
 
         StreetMatcher matcher = new StreetMatcher(graph);

@@ -15,6 +15,8 @@ package org.opentripplanner.graph_builder.impl;
 
 import static org.opentripplanner.common.IterableLibrary.filter;
 
+import java.util.HashMap;
+
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
@@ -41,7 +43,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
     private static final double MAX_VERTEX_SHAPE_ERROR = 100;
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");

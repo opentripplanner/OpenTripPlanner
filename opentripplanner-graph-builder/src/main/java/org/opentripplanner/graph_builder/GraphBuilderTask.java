@@ -15,6 +15,7 @@ package org.opentripplanner.graph_builder;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -93,8 +94,9 @@ public class GraphBuilderTask implements Runnable {
             return;
         }
         
+        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
-            load.buildGraph(graph);
+            load.buildGraph(graph, extra);
         
         if (_modeList != null) {
             ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);

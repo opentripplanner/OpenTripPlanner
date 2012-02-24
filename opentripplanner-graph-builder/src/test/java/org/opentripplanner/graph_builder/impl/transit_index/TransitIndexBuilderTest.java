@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 import junit.framework.TestCase;
@@ -53,7 +54,7 @@ public class TransitIndexBuilderTest extends TestCase {
 		builders.add(builder);
 		gtfsBuilder.setGtfsGraphBuilders(builders);
 		
-		gtfsBuilder.buildGraph(graph);
+		gtfsBuilder.buildGraph(graph, new HashMap<Class<?>, Object>());
 		
 		TransitIndexService index = graph.getService(TransitIndexService.class); 
 	

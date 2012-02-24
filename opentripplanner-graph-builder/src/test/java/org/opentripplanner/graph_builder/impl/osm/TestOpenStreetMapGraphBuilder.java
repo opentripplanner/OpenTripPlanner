@@ -14,9 +14,11 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
+import java.util.HashMap;
 
 import junit.framework.TestCase;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMWay;
@@ -29,6 +31,13 @@ import org.opentripplanner.routing.graph.Vertex;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
+    private HashMap<Class<?>, Object> extra;
+
+    @Before
+    public void setUp() {
+        extra = new HashMap<Class<?>, Object>();
+    }
+    
     @Test
     public void testGraphBuilder() throws Exception {
 
@@ -43,7 +52,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg);
+        loader.buildGraph(gg, extra);
 
         Vertex v2 = gg.getVertex("way 25660216 from 1"); // Kamiennogorska
         Vertex v2back = gg.getVertex("way 25660216 from 1 back"); // Kamiennogorska
@@ -231,7 +240,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
         loader.setProvider(pr);
 
-        loader.buildGraph(gg);
+        loader.buildGraph(gg, extra);
 
         assertNotNull(gg.getVertex("way -3535 from 4"));
     }

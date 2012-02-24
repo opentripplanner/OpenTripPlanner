@@ -16,6 +16,7 @@ package org.opentripplanner.api.ws;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.api.model.AbsoluteDirection;
@@ -122,7 +123,7 @@ public class TestRequest extends TestCase {
         schema.setNoteConverter(new AttributeFeatureConverter<String> ("PREFIX"));
 
         builder.setSchema(schema );
-        builder.buildGraph(graph);
+        builder.buildGraph(graph, new HashMap<Class<?>, Object>());
         GraphServiceImpl graphService = new GraphServiceImpl();
         graphService.setGraph(graph);
         

@@ -71,7 +71,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
     }
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         try {
 

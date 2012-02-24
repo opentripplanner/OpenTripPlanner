@@ -114,7 +114,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     }
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         Handler handler = new Handler();
         for (OpenStreetMapProvider provider : _providers) {
             _log.debug("gathering osm from provider: " + provider);

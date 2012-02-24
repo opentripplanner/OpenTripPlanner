@@ -421,7 +421,7 @@ public class TestContractionHeirarchies extends TestCase {
         loader.setFeatureSourceFactory(factory);
         loader.setSchema(schema);
 
-        loader.buildGraph(graph);       
+        loader.buildGraph(graph, new HashMap<Class<?>, Object>());       
         
         // load gtfs 
 
@@ -446,7 +446,7 @@ public class TestContractionHeirarchies extends TestCase {
         bundles.setBundles(bundleList);
         gtfsBuilder.setGtfsBundles(bundles);
         
-        gtfsBuilder.buildGraph(graph);
+        gtfsBuilder.buildGraph(graph, new HashMap<Class<?>, Object>());
 
         NetworkLinker nl = new NetworkLinker(graph);
         nl.createLinkage();

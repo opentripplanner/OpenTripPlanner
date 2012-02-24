@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.ned;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     }
 
     @Override
-    public void buildGraph(Graph graph) {
+    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
         

@@ -102,7 +102,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         loader.setFeatureSourceFactory(factory);
         loader.setSchema(schema);
 
-        loader.buildGraph(gg);
+        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
 
         //find start and end vertices
         Vertex start = null;
