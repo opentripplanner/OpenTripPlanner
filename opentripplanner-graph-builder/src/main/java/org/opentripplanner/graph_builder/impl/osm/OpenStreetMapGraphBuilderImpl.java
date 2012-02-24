@@ -189,17 +189,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             long wayIndex = 0;
 
             // figure out which nodes that are actually intersections
-            Set<Long> possibleIntersectionNodes = new HashSet<Long>();
-            for (OSMWay way : _ways.values()) {
-                List<Long> nodes = way.getNodeRefs();
-                for (long node : nodes) {
-                    if (possibleIntersectionNodes.contains(node)) {
-                        intersectionNodes.put(node, null);
-                    } else {
-                        possibleIntersectionNodes.add(node);
-                    }
-                }
-            }
+            initIntersectionNodes();
+            
             GeometryFactory geometryFactory = new GeometryFactory();
 
             /* build an ordinary graph, which we will convert to an edge-based graph */
@@ -232,28 +223,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 ArrayList<Coordinate> segmentCoordinates = new ArrayList<Coordinate>();
 
-                /* Determine OSM level for each way, if it was not already set */
-                if (! wayLevels.containsKey(way)) {
-                    // if this way is not a key in the wayLevels map, a level map was not 
-                    // already applied in processRelations
-                    
-                    /* try to find a level name in tags */
-                    String levelName = null;
-                    OSMLevel.Source source = OSMLevel.Source.NONE;
-                    OSMLevel level = OSMLevel.DEFAULT;
-                    if (way.hasTag("level")) { // TODO: floating-point levels &c.
-                        levelName = way.getTag("level");
-                        source = OSMLevel.Source.LEVEL_TAG;
-                    } else if (way.hasTag("layer")) {
-                        levelName = way.getTag("layer");
-                        source = OSMLevel.Source.LAYER_TAG;
-                    } 
-//                    if (noZeroLevels && intLevel >= 0) ...
-                    if (levelName != null) {
-                        level = OSMLevel.fromString(levelName, source);
-                    } 
-                    wayLevels.put(way, level);
-                }
+                getLevelsForWay(way);
 
                 /*
                  * Traverse through all the nodes of this edge. For nodes which are not shared with
@@ -338,39 +308,30 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
 
-                    /* Check if there are turn restrictions starting on this segment */
-                    List<TurnRestrictionTag> restrictionTags = 
-                        turnRestrictionsByFromWay.get(way.getId());
-
-                    if (restrictionTags != null) {
-                        for (TurnRestrictionTag tag : restrictionTags) {
-                            if (tag.via == startNode) {
-                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                                restriction.from = backStreet;
-                            } else if (tag.via == endNode) {
-                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                                restriction.from = street;
-                            }
-                        }
-                    }
-
-                    restrictionTags = turnRestrictionsByToWay.get(way.getId());
-                    if (restrictionTags != null) {
-                        for (TurnRestrictionTag tag : restrictionTags) {
-                            if (tag.via == startNode) {
-                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                                restriction.to = street;
-                            } else if (tag.via == endNode) {
-                                TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                                restriction.to = backStreet;
-                            }
-                        }
-                    }
+                    applyEdgesToTurnRestrictions(way,
+                            startNode, endNode, street, backStreet);
                     startNode = endNode;
                     osmStartNode = _nodes.get(startNode);
                 }
             } // END loop over OSM ways
 
+            buildElevatorEdges(graph);
+
+            /* unify turn restrictions */
+            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
+            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
+                turnRestrictions.put(restriction.from, restriction);
+            }
+            if (customNamer != null) {
+                customNamer.postprocess(graph);
+            }
+            applyBikeSafetyFactor(graph);
+            StreetUtils.pruneFloatingIslands(graph);
+            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+
+        } // END buildGraph()
+
+        private void buildElevatorEdges(Graph graph) {
             /* build elevator edges */
             for (Long nodeId : multiLevelNodes.keySet()) {
                 OSMNode node = _nodes.get(nodeId);
@@ -453,20 +414,78 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     backEdge.wheelchairAccessible = wheelchairAccessible;
                 }
             } // END elevator edge loop 
+        }
 
-            /* unify turn restrictions */
-            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
-            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
-                turnRestrictions.put(restriction.from, restriction);
-            }
-            if (customNamer != null) {
-                customNamer.postprocess(graph);
-            }
-            applyBikeSafetyFactor(graph);
-            StreetUtils.pruneFloatingIslands(graph);
-            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+        private void applyEdgesToTurnRestrictions(OSMWay way, long startNode,
+                long endNode, PlainStreetEdge street, PlainStreetEdge backStreet) {
+            /* Check if there are turn restrictions starting on this segment */
+            List<TurnRestrictionTag> restrictionTags = 
+                turnRestrictionsByFromWay.get(way.getId());
 
-        } // END buildGraph()
+            if (restrictionTags != null) {
+                for (TurnRestrictionTag tag : restrictionTags) {
+                    if (tag.via == startNode) {
+                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                        restriction.from = backStreet;
+                    } else if (tag.via == endNode) {
+                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                        restriction.from = street;
+                    }
+                }
+            }
+
+            restrictionTags = turnRestrictionsByToWay.get(way.getId());
+            if (restrictionTags != null) {
+                for (TurnRestrictionTag tag : restrictionTags) {
+                    if (tag.via == startNode) {
+                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                        restriction.to = street;
+                    } else if (tag.via == endNode) {
+                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
+                        restriction.to = backStreet;
+                    }
+                }
+            }
+        }
+
+        private void getLevelsForWay(OSMWay way) {
+            /* Determine OSM level for each way, if it was not already set */
+            if (! wayLevels.containsKey(way)) {
+                // if this way is not a key in the wayLevels map, a level map was not 
+                // already applied in processRelations
+                
+                /* try to find a level name in tags */
+                String levelName = null;
+                OSMLevel.Source source = OSMLevel.Source.NONE;
+                OSMLevel level = OSMLevel.DEFAULT;
+                if (way.hasTag("level")) { // TODO: floating-point levels &c.
+                    levelName = way.getTag("level");
+                    source = OSMLevel.Source.LEVEL_TAG;
+                } else if (way.hasTag("layer")) {
+                    levelName = way.getTag("layer");
+                    source = OSMLevel.Source.LAYER_TAG;
+                } 
+//                    if (noZeroLevels && intLevel >= 0) ...
+                if (levelName != null) {
+                    level = OSMLevel.fromString(levelName, source);
+                } 
+                wayLevels.put(way, level);
+            }
+        }
+
+        private void initIntersectionNodes() {
+            Set<Long> possibleIntersectionNodes = new HashSet<Long>();
+            for (OSMWay way : _ways.values()) {
+                List<Long> nodes = way.getNodeRefs();
+                for (long node : nodes) {
+                    if (possibleIntersectionNodes.contains(node)) {
+                        intersectionNodes.put(node, null);
+                    } else {
+                        possibleIntersectionNodes.add(node);
+                    }
+                }
+            }
+        }
 
         private Set<Alert> getWheelchairNotes(OSMWithTags way) {
             Map<String, String> tags = way.getTagsByPrefix("wheelchair:description");
