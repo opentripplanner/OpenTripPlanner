@@ -76,8 +76,14 @@ public class RouteVariant implements Serializable {
     @XmlJavaTypeAdapter(StopAdapter.class)
     private ArrayList<Stop> stops;
 
-    /** Ordered list of segments for this route */
+    /** An unordered list of all segments for this route */
     private ArrayList<RouteSegment> segments;
+
+    /**
+     * An ordered list of segments that represents one characteristic trip (or trip pattern) on this
+     * variant
+     */
+    private ArrayList<RouteSegment> exemplarSegments;
 
     private Route route;
 
@@ -94,6 +100,7 @@ public class RouteVariant implements Serializable {
         this.stops = stops;
         trips = new ArrayList<AgencyAndId>();
         segments = new ArrayList<RouteSegment>();
+        exemplarSegments = new ArrayList<RouteSegment>();
         this.mode = GtfsLibrary.getTraverseMode(route);
     }
 
@@ -110,6 +117,10 @@ public class RouteVariant implements Serializable {
         }
     }
 
+    public void addExemplarSegment(RouteSegment segment) {
+        exemplarSegments.add(segment);
+    }
+
     public void addSegment(RouteSegment segment) {
         segments.add(segment);
     }
@@ -118,10 +129,14 @@ public class RouteVariant implements Serializable {
         return segments;
     }
 
+    public boolean isExemplarSet() {
+        return !exemplarSegments.isEmpty();
+    }
+
     public void cleanup() {
         trips.trimToSize();
         stops.trimToSize();
-        segments.trimToSize();
+        exemplarSegments.trimToSize();
 
         // topological sort on segments to make sure that they are in order
 
@@ -129,7 +144,7 @@ public class RouteVariant implements Serializable {
         // to segment; while we're at it, we find the first segment.
         HashMap<Edge, RouteSegment> successors = new HashMap<Edge, RouteSegment>();
         RouteSegment segment = null;
-        for (RouteSegment s : segments) {
+        for (RouteSegment s : exemplarSegments) {
             if (s.hopIn == null) {
                 segment = s;
             } else {
@@ -139,10 +154,10 @@ public class RouteVariant implements Serializable {
 
         int i = 0;
         while (segment != null) {
-            segments.set(i++, segment);
+            exemplarSegments.set(i++, segment);
             segment = successors.get(segment.hopOut);
         }
-        if (i != segments.size()) {
+        if (i != exemplarSegments.size()) {
             _log.error("Failed to organize hops in route variant " + name);
         }
     }
@@ -183,7 +198,7 @@ public class RouteVariant implements Serializable {
     public LineString getGeometry() {
         if (geometry == null) {
             List<Coordinate> coords = new ArrayList<Coordinate>();
-            for (RouteSegment segment : segments) {
+            for (RouteSegment segment : exemplarSegments) {
                 if (segment.hopOut != null) {
                     Geometry segGeometry = segment.getGeometry();
                     coords.addAll(Arrays.asList(segGeometry.getCoordinates()));
