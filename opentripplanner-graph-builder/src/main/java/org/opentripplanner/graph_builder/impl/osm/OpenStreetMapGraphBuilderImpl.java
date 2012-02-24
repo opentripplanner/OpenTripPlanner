@@ -28,6 +28,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.model.osm.OSMLevel;
+import org.opentripplanner.graph_builder.model.osm.OSMLevel.Source;
 import org.opentripplanner.graph_builder.model.osm.OSMNode;
 import org.opentripplanner.graph_builder.model.osm.OSMRelation;
 import org.opentripplanner.graph_builder.model.osm.OSMRelationMember;
@@ -250,7 +251,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     } 
 //                    if (noZeroLevels && intLevel >= 0) ...
                     if (levelName != null) {
-                        level = OSMLevel.fromString(levelName, source);
+                        level = OSMLevel.fromString(levelName, source, noZeroLevels);
                     } 
                     wayLevels.put(way, level);
                 }
@@ -740,7 +741,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param relation
          */
         private void processLevelMap(OSMRelation relation) {
-            Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"));
+            Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"), Source.LEVEL_MAP, true);
             for (OSMRelationMember member : relation.getMembers()) {
                 if ("way".equals(member.getType()) && _ways.containsKey(member.getRef())) {
                     OSMWay way = _ways.get(member.getRef());

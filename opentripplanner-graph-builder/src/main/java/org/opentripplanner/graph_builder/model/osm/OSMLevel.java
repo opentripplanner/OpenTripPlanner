@@ -28,12 +28,12 @@ public class OSMLevel implements Comparable<OSMLevel> {
     private static Logger _log = LoggerFactory.getLogger(OSMLevel.class);
 
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
-    public static final float METERS_PER_FLOOR = 3;
-    public static final OSMLevel DEFAULT = fromString("", Source.NONE);
-    public final int floorNumber;
-    public final float altitudeMeters;
-    public final String shortName;
-    public final String longName;
+    public static final double METERS_PER_FLOOR = 3;
+    public static final OSMLevel DEFAULT = fromString("", Source.NONE, false);
+    public final int floorNumber; // 0-based
+    public final double altitudeMeters;
+    public final String shortName; // localized (potentially 1-based)
+    public final String longName; // localized (potentially 1-based)
     public final Source source;
     
     public enum Source {
@@ -44,7 +44,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         NONE
     }
     
-    public OSMLevel(int floorNumber, float altitudeMeters, String shortName, String longName, Source source) {
+    public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName, Source source) {
         this.floorNumber = floorNumber;
         this.altitudeMeters = altitudeMeters;
         this.shortName = shortName;
@@ -56,17 +56,15 @@ public class OSMLevel implements Comparable<OSMLevel> {
      * makes an OSMLevel from one of the semicolon-separated fields in an OSM
      * level map relation's levels= tag.
      */
-    public static OSMLevel fromString (String spec, Source source) {
+    public static OSMLevel fromString (String spec, Source source, boolean incrementNonNegative) {
 
         /*  extract any altitude information after the @ character */
-        float altitude = 0;
+        Double altitude = null;
         int lastIndexAt = spec.lastIndexOf('@');
         if (lastIndexAt != -1) {
             try {
-                altitude = Integer.parseInt(spec.substring(lastIndexAt + 1));
-            } catch (NumberFormatException e3) {
-                altitude = 0;
-            }
+                altitude = Double.parseDouble(spec.substring(lastIndexAt + 1));
+            } catch (NumberFormatException e) {}
             spec = spec.substring(0, lastIndexAt);
         }
 
@@ -82,25 +80,46 @@ public class OSMLevel implements Comparable<OSMLevel> {
             shortName = longName = spec;
         }
                 
-        /* try to parse a floor number out of names and altitude */
-        int floorNumber = 0;
+        /* try to parse a floor number out of names */
+        Integer floorNumber = null;
         try {
-            floorNumber = Integer.parseInt(shortName);
-        } catch (NumberFormatException e) {
-            try {
-                floorNumber = Integer.parseInt(longName);
-            } catch (NumberFormatException e2) {
-                _log.warn("Could not determine ordinality of layer {}. " +
-                        "Elevators will work, but costing may be incorrect. " +
-                        "A level map should be used in this situation.", spec);
-                floorNumber = (int)(altitude); // / METERS_PER_FLOOR);
+            floorNumber = Integer.parseInt(longName);
+            if (incrementNonNegative && floorNumber >= 0) {
+                if (source == Source.LEVEL_MAP)
+                    floorNumber -= 1; // level maps are localized, floor numbers are 0-based
+                else
+                    longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
             }
-        }
+        } catch (NumberFormatException e) {}          
+        try { 
+            // short name takes precedence over long name for floor numbering
+            floorNumber = Integer.parseInt(shortName);
+            if (incrementNonNegative && floorNumber >= 0) {
+                if (source == Source.LEVEL_MAP)
+                    floorNumber -= 1;
+                else
+                    shortName = Integer.toString(floorNumber + 1);
+            }
+        } catch (NumberFormatException e) {}
 
+        /* fall back on altitude when necessary */ 
+        if (floorNumber == null && altitude != null) {
+            floorNumber = (int)(altitude / METERS_PER_FLOOR);
+            _log.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
+        } 
+        
+        /* set default values when parsing failed */
+        if (altitude == null) {
+            altitude = 0.0;
+        }
+        if (floorNumber == null) {
+            floorNumber = 0;
+            _log.warn("Could not infer floor number for layer '{}'. Vertical movement will still be possible, but elevator cost might be incorrect. Consider an OSM level map.", spec);
+        }
         return new OSMLevel(floorNumber, altitude, shortName, longName, source);
     }
     
-    public static List<OSMLevel> fromSpecList (String specList) {
+    public static List<OSMLevel> fromSpecList (String specList, Source source, boolean incrementNonNegative) {
         
         List<String> levelSpecs = new ArrayList<String>();
         
@@ -121,14 +140,14 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* build an OSMLevel for each level spec in the list */
         List<OSMLevel> levels = new ArrayList<OSMLevel>();
         for (String spec : levelSpecs) {
-            levels.add(fromString(spec, Source.LEVEL_MAP));
+            levels.add(fromString(spec, source, incrementNonNegative));
         }
         return levels;
     }
 
-    public static Map<String, OSMLevel> mapFromSpecList (String specList) {
+    public static Map<String, OSMLevel> mapFromSpecList (String specList, Source source, boolean incrementNonNegative) {
         Map<String, OSMLevel> map = new HashMap<String, OSMLevel>();
-        for (OSMLevel level : fromSpecList(specList)) {
+        for (OSMLevel level : fromSpecList(specList, source, incrementNonNegative)) {
             map.put(level.shortName, level);
         }
         return map;
