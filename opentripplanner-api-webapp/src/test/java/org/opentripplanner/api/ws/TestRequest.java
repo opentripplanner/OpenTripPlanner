@@ -31,7 +31,6 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFa
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;

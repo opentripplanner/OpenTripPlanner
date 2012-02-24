@@ -13,8 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
