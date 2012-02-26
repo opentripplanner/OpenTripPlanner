@@ -42,15 +42,15 @@ public class Itinerary {
     public Date endTime = null;
 
     /**
-     * How much time is spent walking, in milliseconds.
+     * How much time is spent walking, in seconds.
      */
     public long walkTime = 0;
     /**
-     * How much time is spent on transit, in milliseconds.
+     * How much time is spent on transit, in seconds.
      */
     public long transitTime = 0;
     /**
-     * How much time is spent waiting for transit to arrive, in milliseconds.
+     * How much time is spent waiting for transit to arrive, in seconds.
      */
     public long waitingTime = 0;
 

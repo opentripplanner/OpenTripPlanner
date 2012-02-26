@@ -13,6 +13,8 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.util.HashMap;
+
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.strategies.WeightTable;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,7 +30,7 @@ public class WeightTableGraphBuilderImpl implements GraphBuilder {
         private Double maxWalkDistance = null;
 
 	@Override
-	public void buildGraph(Graph graph) {
+	public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
 		WeightTable wt = new WeightTable(graph);
 		if (maxWalkSpeed != null) {
 			wt.setMaxWalkSpeed(maxWalkSpeed);

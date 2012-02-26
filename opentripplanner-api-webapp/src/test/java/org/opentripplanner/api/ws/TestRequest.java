@@ -16,6 +16,7 @@ package org.opentripplanner.api.ws;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.api.model.AbsoluteDirection;
@@ -31,7 +32,6 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFa
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -123,7 +123,7 @@ public class TestRequest extends TestCase {
         schema.setNoteConverter(new AttributeFeatureConverter<String> ("PREFIX"));
 
         builder.setSchema(schema );
-        builder.buildGraph(graph);
+        builder.buildGraph(graph, new HashMap<Class<?>, Object>());
         GraphServiceImpl graphService = new GraphServiceImpl();
         graphService.setGraph(graph);
         

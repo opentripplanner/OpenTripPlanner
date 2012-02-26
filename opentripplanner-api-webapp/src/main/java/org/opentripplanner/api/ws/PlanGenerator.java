@@ -203,6 +203,22 @@ public class PlanGenerator {
             if (backEdge == null) {
                 continue;
             }
+            
+            TraverseMode mode = backEdgeNarrative.getMode();
+            if (mode != null) {
+                long dt = state.getAbsTimeDeltaSec();
+                if (mode == TraverseMode.BOARDING || 
+                        mode == TraverseMode.ALIGHTING ||
+                        mode == TraverseMode.STL) {
+                    itinerary.waitingTime += dt;
+                } else if (mode.isOnStreetNonTransit()) {
+                    itinerary.walkDistance += backEdgeNarrative.getDistance();
+                    itinerary.walkTime += dt;
+                } else if (mode.isTransit()) {
+                    itinerary.transitTime += dt;
+                } 
+            }
+            
             if (backEdge instanceof FreeEdge) {
                 if(backEdge instanceof PreBoardEdge) {
                     // Add boarding alerts to the next leg
@@ -214,19 +230,12 @@ public class PlanGenerator {
                 continue;
             }
 
-            TraverseMode mode = backEdgeNarrative.getMode();
-            if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING) {
-                itinerary.waitingTime += state.getElapsedTime();
-            }
             if (backEdge instanceof EdgeWithElevation) {
                 PackedCoordinateSequence profile = ((EdgeWithElevation) backEdge)
                         .getElevationProfile();
                 previousElevation = applyElevation(profile, itinerary, previousElevation);
             }
-            if (mode != null && mode.isOnStreetNonTransit()) {
-                itinerary.walkDistance += backEdgeNarrative.getDistance();
-            }
-
+            
             switch (pgstate) {
             case START:
                 if (mode == TraverseMode.WALK) {
@@ -400,9 +409,6 @@ public class PlanGenerator {
                 }
 
                 addNotesToLeg(leg, backEdgeNarrative);
-                if (pgstate == PlanGenState.TRANSIT) {
-                    itinerary.transitTime += state.getElapsedTime();
-                }
 
             }
 

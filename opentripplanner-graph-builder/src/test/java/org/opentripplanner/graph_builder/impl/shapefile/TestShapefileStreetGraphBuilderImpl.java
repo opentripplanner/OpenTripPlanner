@@ -13,8 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl.shapefile;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
@@ -104,7 +102,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         loader.setFeatureSourceFactory(factory);
         loader.setSchema(schema);
 
-        loader.buildGraph(gg);
+        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
 
         //find start and end vertices
         Vertex start = null;
