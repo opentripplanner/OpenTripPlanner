@@ -19,6 +19,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.onebusaway.gtfs.model.Trip;
 
 /**
@@ -68,20 +71,25 @@ public class ArrayTripPattern implements TripPattern, Serializable {
      */
     private Trip exemplar;
 
+    @XmlElement
     private int[][] departureTimes;
 
     private int[][] runningTimes;
 
+    @XmlElement
     private int[][] arrivalTimes;
 
     private int[][] dwellTimes;
-    
+
     private String[][] headsigns;
 
+    @XmlElement
     private String[] zones;
 
+    @XmlElement
     private int[] perTripFlags;
 
+    @XmlElement
     private int[] perStopFlags;
 
     private Trip[] trips;
@@ -287,6 +295,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         return trips[tripIndex];
     }
     
+    @XmlTransient
     public List<Trip> getTrips() {
     	return Arrays.asList(trips);
     }
