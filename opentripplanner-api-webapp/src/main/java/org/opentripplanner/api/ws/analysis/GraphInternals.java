@@ -24,12 +24,12 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.analysis.EdgeSet;
+import org.opentripplanner.api.model.analysis.EdgesForVertex;
 import org.opentripplanner.api.model.analysis.FeatureCount;
 import org.opentripplanner.api.model.analysis.SimpleVertex;
 import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.analysis.WrappedEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -152,6 +152,56 @@ public class GraphInternals {
         }
     }
 
+    /**
+     * Get vertices connected to an edge
+     * 
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/verticesForEdge")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Object getVerticesForEdge(@QueryParam("edge") int edgeId) {
+
+        Graph graph = graphService.getGraph();
+        Edge edge = graph.getEdgeById(edgeId);
+
+        VertexSet out = new VertexSet();
+        out.vertices = new ArrayList<Vertex>(2);
+        out.vertices.add(edge.getFromVertex());
+        out.vertices.add(edge.getToVertex());
+
+        return out.withGraph(graph);
+    }
+
+    /**
+     * Get edges connected to an vertex
+     * 
+     * @return
+     */
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/edgesForVertex")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public EdgesForVertex getEdgesForVertex(@QueryParam("vertex") String label) {
+
+        Graph graph = graphService.getGraph();
+        Vertex vertex = graph.getVertex(label);
+        if (vertex == null) {
+            return null;
+        }
+        EdgeSet incoming = new EdgeSet();
+        incoming.addEdges(vertex.getIncoming(), graph);
+
+        EdgeSet outgoing = new EdgeSet();
+        outgoing.addEdges(vertex.getOutgoing(), graph);
+
+        EdgesForVertex e4v = new EdgesForVertex();
+        e4v.incoming = incoming.withGraph(graph);
+        e4v.outgoing = outgoing.withGraph(graph);
+
+        return e4v;
+    }
 
     /**
      * Get edges inside a bbox.
