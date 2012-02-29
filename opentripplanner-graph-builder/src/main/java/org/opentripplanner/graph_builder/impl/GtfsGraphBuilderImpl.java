@@ -117,14 +117,6 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             GtfsContext context = GtfsLibrary.createContext(_dao, service);
 
-            // Stops were being loaded twice, here and in hopfactory (AB)
-//            for (Stop stop : _dao.getAllStops()) {
-//
-//                String id = GtfsLibrary.convertIdToString(stop.getId());
-//                graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(),
-//                        stop.getId(), stop.getCode(), stop));
-//            }
-
             GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
             hf.setFareServiceFactory(_fareServiceFactory);
             hf.run(graph);
