@@ -13,8 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.common.IterableLibrary.*;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,7 +33,6 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -321,10 +318,10 @@ public class NetworkLinkerLibrary {
         backward1.setBicycleSafetyEffectiveLength(backwardBseLengthIn);
         backward2.setBicycleSafetyEffectiveLength(backwardBseLengthOut);
 
-        forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn));
-        backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut));
-        forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength));
-        backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength));
+        forward1.setElevationProfile(e1.getElevationProfile(0, lengthIn), false);
+        backward1.setElevationProfile(e2.getElevationProfile(0, lengthOut), false);
+        forward2.setElevationProfile(e1.getElevationProfile(lengthOut, totalGeomLength), false);
+        backward2.setElevationProfile(e2.getElevationProfile(lengthIn, totalGeomLength), false);
 
         // swap the new split edge into the replacements list, and remove the old ones
         ListIterator<P2<PlainStreetEdge>> it = replacement.listIterator();
@@ -423,8 +420,8 @@ public class NetworkLinkerLibrary {
         forward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
         backward.setWheelchairAccessible(endVertex.isWheelchairAccessible());
 
-        forward.setElevationProfile(startVertex.getElevationProfile());
-        backward.setElevationProfile(endVertex.getElevationProfile());
+        forward.setElevationProfile(startVertex.getElevationProfile(), false);
+        backward.setElevationProfile(endVertex.getElevationProfile(), false);
 
         forward.setBicycleSafetyEffectiveLength(startVertex.getBicycleSafetyEffectiveLength());
         backward.setBicycleSafetyEffectiveLength(endVertex.getBicycleSafetyEffectiveLength());

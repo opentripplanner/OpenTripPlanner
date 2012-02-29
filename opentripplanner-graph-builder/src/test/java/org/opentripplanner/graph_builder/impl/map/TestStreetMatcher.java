@@ -36,7 +36,6 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
 
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
@@ -215,7 +214,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public void setElevationProfile(PackedCoordinateSequence elevPCS) {
+        public void setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
         }
 
         @Override

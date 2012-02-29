@@ -124,7 +124,9 @@ public class StreetUtils {
         tv.setCrossable(pse.isCrossable());
         tv.setPermission(pse.getPermission());
         tv.setSlopeOverride(pse.getSlopeOverride());
-        tv.setElevationProfile(pse.getElevationProfile());
+        //the only cases where there will already be an elevation profile are those where it came from 
+        //the street network (osm ele tags, for instance), so it's OK to force it here.
+        tv.setElevationProfile(pse.getElevationProfile(), true);
         tv.setRoundabout(pse.isRoundabout());
         tv.setBogusName(pse.hasBogusName());
         tv.setNoThruTraffic(pse.isNoThruTraffic());

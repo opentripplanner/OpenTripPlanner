@@ -237,8 +237,8 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public void setElevationProfile(PackedCoordinateSequence elev) {
-        ((TurnVertex) fromv).setElevationProfile(elev);
+    public void setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
+        ((TurnVertex) fromv).setElevationProfile(elev, computed);
     }
     
     public boolean equals(Object o) {
