@@ -44,13 +44,9 @@ public class TurnEdge extends StreetEdge {
     public static final String[] DIRECTIONS = { "north", "northeast", "east", "southeast", "south",
             "southwest", "west", "northwest" };
 
-    private static final long serialVersionUID = -4510937090471837118L;
+    private static final long serialVersionUID = 20120229L;
 
     public int turnCost;
-
-    TurnVertex fromv;
-
-    StreetVertex tov;
 
     private List<Patch> patches;
 
@@ -95,12 +91,12 @@ public class TurnEdge extends StreetEdge {
 
     @Override
     public double getDistance() {
-        return fromv.getLength();
+        return ((TurnVertex) fromv).getLength();
     }
 
     @Override
     public Geometry getGeometry() {
-        return fromv.getGeometry();
+        return ((TurnVertex) fromv).getGeometry();
     }
 
     @Override
@@ -115,7 +111,7 @@ public class TurnEdge extends StreetEdge {
 
     @Override
     public boolean isRoundabout() {
-        return fromv.isRoundabout();
+        return ((TurnVertex) fromv).isRoundabout();
     }
 
     @Override
@@ -143,7 +139,7 @@ public class TurnEdge extends StreetEdge {
         if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
-        if (!fromv.canTraverse(options)) {
+        if (!((TurnVertex) fromv).canTraverse(options)) {
             if (options.getModes().contains(TraverseMode.BICYCLE)) {
                 // try walking bicycle, since you can't ride it here
                 return doTraverse(s0, options.getWalkingOptions());
@@ -154,7 +150,7 @@ public class TurnEdge extends StreetEdge {
         TraverseMode traverseMode = options.getModes().getNonTransitMode();
 
         FixedModeEdge en = new FixedModeEdge(this, traverseMode);
-        Set<Alert> wheelchairNotes = fromv.getWheelchairNotes();
+        Set<Alert> wheelchairNotes = ((TurnVertex) fromv).getWheelchairNotes();
         if (options.wheelchairAccessible) {
             en.addNotes(wheelchairNotes);
         }
@@ -162,24 +158,24 @@ public class TurnEdge extends StreetEdge {
 
         switch (s0.getNoThruTrafficState()) {
         case INIT:
-            if (fromv.isNoThruTraffic()) {
+            if (((TurnVertex) fromv).isNoThruTraffic()) {
                 s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
             } else {
                 s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
             }
             break;
         case IN_INITIAL_ISLAND:
-            if (!fromv.isNoThruTraffic()) {
+            if (!((TurnVertex) fromv).isNoThruTraffic()) {
                 s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
             }
             break;
         case BETWEEN_ISLANDS:
-            if (fromv.isNoThruTraffic()) {
+            if (((TurnVertex) fromv).isNoThruTraffic()) {
                 s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
             }
             break;
         case IN_FINAL_ISLAND:
-            if (!fromv.isNoThruTraffic()) {
+            if (!((TurnVertex) fromv).isNoThruTraffic()) {
                 // we have now passed entirely through a no thru traffic region,
                 // which is
                 // forbidden
@@ -188,9 +184,9 @@ public class TurnEdge extends StreetEdge {
             break;
         }
 
-        double time = (fromv.getEffectiveLength(traverseMode) + turnCost / 20.0) / options.speed;
-        double weight = fromv.computeWeight(s0, options, time);
-        s1.incrementWalkDistance(fromv.getLength());
+        double time = (((TurnVertex) fromv).getEffectiveLength(traverseMode) + turnCost / 20.0) / options.speed;
+        double weight = ((TurnVertex) fromv).computeWeight(s0, options, time);
+        s1.incrementWalkDistance(((TurnVertex) fromv).getLength());
         s1.incrementTimeInSeconds((int) Math.ceil(time));
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
@@ -204,7 +200,7 @@ public class TurnEdge extends StreetEdge {
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return fromv.getElevationProfile();
+        return ((TurnVertex) fromv).getElevationProfile();
     }
 
     @Override
@@ -222,27 +218,27 @@ public class TurnEdge extends StreetEdge {
     	if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
     		return false;
     	}
-        return fromv.canTraverse(options);
+        return ((TurnVertex) fromv).canTraverse(options);
     }
 
     @Override
     public double getLength() {
-        return fromv.getLength();
+        return ((TurnVertex) fromv).getLength();
     }
 
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return fromv.getElevationProfile(start, end);
+        return ((TurnVertex) fromv).getElevationProfile(start, end);
     }
 
     @Override
     public StreetTraversalPermission getPermission() {
-        return fromv.getPermission();
+        return ((TurnVertex) fromv).getPermission();
     }
 
     @Override
     public void setElevationProfile(PackedCoordinateSequence elev) {
-        fromv.setElevationProfile(elev);
+        ((TurnVertex) fromv).setElevationProfile(elev);
     }
     
     public boolean equals(Object o) {
@@ -255,7 +251,7 @@ public class TurnEdge extends StreetEdge {
 
     @Override
     public int hashCode() {
-        return fromv.hashCode() * 31 + tov.hashCode();
+        return ((TurnVertex) fromv).hashCode() * 31 + tov.hashCode();
     }
 
     @Override
@@ -287,7 +283,7 @@ public class TurnEdge extends StreetEdge {
 
     @Override
     public Set<Alert> getNotes() {
-        return fromv.getNotes();
+        return ((TurnVertex) fromv).getNotes();
     }
 
     public void setRestrictedModes(Set<TraverseMode> modes) {
@@ -300,12 +296,12 @@ public class TurnEdge extends StreetEdge {
 
     @Override
     public boolean hasBogusName() {
-        return fromv.hasBogusName();
+        return ((TurnVertex) fromv).hasBogusName();
     }
 
     @Override
     public boolean isNoThruTraffic() {
-        return fromv.isNoThruTraffic();
+        return ((TurnVertex) fromv).isNoThruTraffic();
     }
 
     @Override
@@ -315,7 +311,7 @@ public class TurnEdge extends StreetEdge {
     
     @Override
     public double timeLowerBound(TraverseOptions options) {
-        return (fromv.getLength() + turnCost/20) / options.speed;
+        return (((TurnVertex) fromv).getLength() + turnCost/20) / options.speed;
     }
     
 	    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
