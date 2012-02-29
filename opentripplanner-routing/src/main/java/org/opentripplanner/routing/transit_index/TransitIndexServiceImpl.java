@@ -25,83 +25,79 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 
-public class TransitIndexServiceImpl implements TransitIndexService,
-		Serializable {
-	private static final long serialVersionUID = -8147894489513820239L;
+public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
+    private static final long serialVersionUID = -8147894489513820239L;
 
-	private HashMap<String     , List<RouteVariant>> variantsByAgency;
+    private HashMap<String, List<RouteVariant>> variantsByAgency;
 
-	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute;
+    private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute;
 
-	private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
+    private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
 
-	private HashMap<AgencyAndId, Edge> preAlightEdges;
+    private HashMap<AgencyAndId, Edge> preAlightEdges;
 
-	private HashMap<AgencyAndId, Edge> preBoardEdges;
+    private HashMap<AgencyAndId, Edge> preBoardEdges;
 
-	private HashMap<AgencyAndId,HashSet<String>> directionsForRoute;
+    private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
-	private List<TraverseMode> modes;
+    private List<TraverseMode> modes;
 
-	public TransitIndexServiceImpl(
-			HashMap<String     , List<RouteVariant>> variantsByAgency,
-			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
-			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
-			HashMap<AgencyAndId, Edge> preBoardEdges,
-			HashMap<AgencyAndId, Edge> preAlightEdges,
-			HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
-			List<TraverseMode> modes) {
-		this.variantsByAgency   = variantsByAgency;
-		this.variantsByRoute = variantsByRoute;
-		this.variantsByTrip = variantsByTrip;
-		this.preBoardEdges = preBoardEdges;
-		this.preAlightEdges = preAlightEdges;
-		this.directionsForRoute = directionsByRoute;
-		this.modes = modes;
-	}
+    public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
+            HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
+            HashMap<AgencyAndId, RouteVariant> variantsByTrip,
+            HashMap<AgencyAndId, Edge> preBoardEdges, HashMap<AgencyAndId, Edge> preAlightEdges,
+            HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
+        this.variantsByAgency = variantsByAgency;
+        this.variantsByRoute = variantsByRoute;
+        this.variantsByTrip = variantsByTrip;
+        this.preBoardEdges = preBoardEdges;
+        this.preAlightEdges = preAlightEdges;
+        this.directionsForRoute = directionsByRoute;
+        this.modes = modes;
+    }
 
-	@Override
-	public List<RouteVariant> getVariantsForAgency(String agency) {
-		List<RouteVariant> variants = variantsByAgency.get(agency);
-		if (variants == null) {
-		    return Collections.emptyList();
-		}
-		return variants;
-	}
+    @Override
+    public List<RouteVariant> getVariantsForAgency(String agency) {
+        List<RouteVariant> variants = variantsByAgency.get(agency);
+        if (variants == null) {
+            return Collections.emptyList();
+        }
+        return variants;
+    }
 
-	@Override
-	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
-		List<RouteVariant> variants = variantsByRoute.get(route);
-		if (variants == null) {
-		    return Collections.emptyList();
-		}
-		return variants;
-	}
+    @Override
+    public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
+        List<RouteVariant> variants = variantsByRoute.get(route);
+        if (variants == null) {
+            return Collections.emptyList();
+        }
+        return variants;
+    }
 
-	@Override
-	public RouteVariant getVariantForTrip(AgencyAndId trip) {
-		return variantsByTrip.get(trip);
-	}
+    @Override
+    public RouteVariant getVariantForTrip(AgencyAndId trip) {
+        return variantsByTrip.get(trip);
+    }
 
-	@Override
-	public Edge getPrealightEdge(AgencyAndId stop) {
-		return preAlightEdges.get(stop);
-	}
+    @Override
+    public Edge getPrealightEdge(AgencyAndId stop) {
+        return preAlightEdges.get(stop);
+    }
 
-	@Override
-	public Edge getPreboardEdge(AgencyAndId stop) {
-		return preBoardEdges.get(stop);
-	}
+    @Override
+    public Edge getPreboardEdge(AgencyAndId stop) {
+        return preBoardEdges.get(stop);
+    }
 
-	@Override
-	public Collection<String> getDirectionsForRoute(AgencyAndId route) {
-		return directionsForRoute.get(route);
-	}
+    @Override
+    public Collection<String> getDirectionsForRoute(AgencyAndId route) {
+        return directionsForRoute.get(route);
+    }
 
-	@Override
-	public List<TraverseMode> getAllModes() {
-		return modes;
-	}
+    @Override
+    public List<TraverseMode> getAllModes() {
+        return modes;
+    }
 
     @Override
     public Collection<AgencyAndId> getAllRouteIds() {

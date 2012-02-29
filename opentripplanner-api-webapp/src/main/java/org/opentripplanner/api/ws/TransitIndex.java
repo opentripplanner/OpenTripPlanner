@@ -42,60 +42,63 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class TransitIndex {
 
-	private GraphService graphService;
+    private GraphService graphService;
 
-	@Autowired
-	public void setGraphService(GraphService graphService) {
-		this.graphService = graphService;
-	}
+    @Autowired
+    public void setGraphService(GraphService graphService) {
+        this.graphService = graphService;
+    }
 
-	/**
-	 * Return data about a route, such as its variants and directions,
-	 * that OneBusAway's API doesn't handle
-	 */
-	@GET
-	@Path("/routeData")
-	@Produces ({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-		MediaType.TEXT_XML })
-	public Object getRouteData(
-			@QueryParam("agency") String agency,
-			@QueryParam("id") String id) throws JSONException {
-		
-		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
-		if (transitIndexService == null) {
-		    return new TransitError("No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
-		}
-		RouteData response = new RouteData();
-		AgencyAndId routeId = new AgencyAndId(agency, id);
-		response.id = routeId;
-		List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
-		
-		response.variants = variants;	
-		response.directions = new ArrayList<String>(transitIndexService.getDirectionsForRoute(routeId));
-		
-		return response;
-	}
+    /**
+     * Return data about a route, such as its variants and directions, that OneBusAway's API doesn't
+     * handle
+     */
+    @GET
+    @Path("/routeData")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getRouteData(@QueryParam("agency") String agency, @QueryParam("id") String id)
+            throws JSONException {
 
-	/**
-	 * Return a list of all available transit modes supported, if any.
-	 * @throws JSONException
-	 */
-	@GET
-	@Path("/modes")
-	@Produces ({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-		MediaType.TEXT_XML })
-	public Object getModes() throws JSONException {
-		TransitIndexService transitIndexService = graphService.getGraph().getService(TransitIndexService.class);
-	        if (transitIndexService == null) {
-	            return new TransitError("No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
-	        }
-		
-		ModeList modes = new ModeList();
-		modes.modes = new ArrayList<TraverseMode>();
-		for (TraverseMode mode : transitIndexService.getAllModes()) {
-			modes.modes.add(mode);
-		}
-		return modes;
-	}
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+        RouteData response = new RouteData();
+        AgencyAndId routeId = new AgencyAndId(agency, id);
+        response.id = routeId;
+        List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
+
+        response.variants = variants;
+        response.directions = new ArrayList<String>(
+                transitIndexService.getDirectionsForRoute(routeId));
+
+        return response;
+    }
+
+    /**
+     * Return a list of all available transit modes supported, if any.
+     * 
+     * @throws JSONException
+     */
+    @GET
+    @Path("/modes")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getModes() throws JSONException {
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        ModeList modes = new ModeList();
+        modes.modes = new ArrayList<TraverseMode>();
+        for (TraverseMode mode : transitIndexService.getAllModes()) {
+            modes.modes.add(mode);
+        }
+        return modes;
+    }
 
 }
