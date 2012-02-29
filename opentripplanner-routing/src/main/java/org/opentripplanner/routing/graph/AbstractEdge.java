@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -199,6 +201,7 @@ public abstract class AbstractEdge implements Edge {
     private static final ValidVertexTypes VALID_VERTEX_TYPES =
             new ValidVertexTypes(Vertex.class, Vertex.class);
     
+    @XmlTransient
     @Override
     public ValidVertexTypes getValidVertexTypes() {
         return VALID_VERTEX_TYPES;

@@ -374,11 +374,13 @@ public abstract class AbstractVertex implements Vertex {
     @SuppressWarnings("unchecked")
     private static final ValidEdgeTypes VALID_EDGE_TYPES = new ValidEdgeTypes(Edge.class);
     
+    @XmlTransient
     @Override
     public ValidEdgeTypes getValidOutgoingEdgeTypes() {
         return VALID_EDGE_TYPES;
     }
 
+    @XmlTransient
     @Override
     public ValidEdgeTypes getValidIncomingEdgeTypes() {
         return VALID_EDGE_TYPES ;
