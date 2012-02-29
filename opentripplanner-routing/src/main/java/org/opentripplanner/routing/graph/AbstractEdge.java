@@ -159,7 +159,7 @@ public abstract class AbstractEdge implements Edge {
 
     @Override
     public void removePatch(Patch patch) {
-        if (patches.size() == 1) {
+        if (patches == null || patches.size() == 1) {
             patches = null;
         } else {
             patches.remove(patch);
