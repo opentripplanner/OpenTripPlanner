@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
@@ -187,11 +189,22 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
         }
         _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
-                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
+                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
+                + " variants ");
 
-        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, modes);
+        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency,
+                variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+                modes);
+
+        insertCalendarData(service);
         graph.putService(TransitIndexService.class, service);
+    }
+
+    private void insertCalendarData(TransitIndexService service) {
+        Collection<ServiceCalendar> allCalendars = dao.getAllCalendars();
+        service.addCalendars(allCalendars);
+        Collection<ServiceCalendarDate> allDates = dao.getAllCalendarDates();
+        service.addCalendarDates(allDates);
     }
 
     private void addModeFromTrip(Trip trip) {

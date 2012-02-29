@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,9 +22,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.util.MapUtils;
 
 public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
     private static final long serialVersionUID = -8147894489513820239L;
@@ -41,6 +45,9 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
     private List<TraverseMode> modes;
+
+    private HashMap<String, List<ServiceCalendar>> calendarsByAgency = new HashMap<String, List<ServiceCalendar>>();
+    private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
 
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
@@ -100,8 +107,36 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     }
 
     @Override
+    public List<String> getAllAgencies() {
+        return new ArrayList<String>(variantsByAgency.keySet());
+    }
+
+    @Override
     public Collection<AgencyAndId> getAllRouteIds() {
         return variantsByRoute.keySet();
     }
 
+    @Override
+    public void addCalendars(Collection<ServiceCalendar> allCalendars) {
+        for (ServiceCalendar calendar : allCalendars) {
+            MapUtils.addToMapList(calendarsByAgency, calendar.getServiceId().getAgencyId(), calendar);
+        }
+    }
+
+    @Override
+    public void addCalendarDates(Collection<ServiceCalendarDate> allDates) {
+        for (ServiceCalendarDate date : allDates) {
+            MapUtils.addToMapList(calendarDatesByAgency, date.getServiceId().getAgencyId(), date);
+        }
+    }
+
+    @Override
+    public List<ServiceCalendarDate> getCalendarDatesByAgency(String agency) {
+        return calendarDatesByAgency.get(agency);
+    }
+
+    @Override
+    public List<ServiceCalendar> getCalendarsByAgency(String agency) {
+        return calendarsByAgency.get(agency);
+    }
 }

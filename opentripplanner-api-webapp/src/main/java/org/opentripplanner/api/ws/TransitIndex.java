@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.error.TransitError;
+import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -99,6 +100,22 @@ public class TransitIndex {
             modes.modes.add(mode);
         }
         return modes;
+    }
+
+    public Object getCalendarServiceDataForAgency(@QueryParam("agency") String agency) {
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        ServiceCalendarData data = new ServiceCalendarData();
+
+        data.calendars = transitIndexService.getCalendarsByAgency(agency);
+        data.calendarDates = transitIndexService.getCalendarDatesByAgency(agency);
+
+        return data;
     }
 
 }
