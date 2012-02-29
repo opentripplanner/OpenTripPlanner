@@ -36,6 +36,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.security.access.annotation.Secured;
 
@@ -126,7 +128,10 @@ public class GraphInternals {
     public Object getVertices(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @QueryParam("pointsOnly") boolean pointsOnly) {
+            @QueryParam("pointsOnly") boolean pointsOnly,
+            @QueryParam("exactClass") String className,
+            @QueryParam("skipTransit") boolean skipTransit,
+            @QueryParam("skipStreets") boolean skipStreets) {
 
         initIndexes();
 
@@ -134,22 +139,26 @@ public class GraphInternals {
 
         @SuppressWarnings("unchecked")
         List<Vertex> query = vertexIndex.query(envelope);
-        
+        List<Vertex> filtered = new ArrayList<Vertex>();
+        for (Vertex v : query) {
+            if (skipTransit && v instanceof TransitVertex) continue;
+            if (skipStreets && v instanceof StreetVertex) continue;
+            if (className != null && !v.getClass().getName().endsWith("." + className)) continue;
+            filtered.add(v);
+        }
         if (pointsOnly) {
             SimpleVertexSet out = new SimpleVertexSet();
-            out.vertices = new ArrayList<SimpleVertex>(query.size());
-            for (Vertex v : query) {
+            out.vertices = new ArrayList<SimpleVertex>(filtered.size());
+            for (Vertex v : filtered) {
                 out.vertices.add(new SimpleVertex(v));
             }
             return out;
         } else {
-            
-        VertexSet out = new VertexSet();
-        out.vertices = query;
+            VertexSet out = new VertexSet();
+            out.vertices = filtered;
 
-        Graph graph = graphService.getGraph();
-        return out.withGraph(graph);
-
+            Graph graph = graphService.getGraph();
+            return out.withGraph(graph);
         }
     }
 
