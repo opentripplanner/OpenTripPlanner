@@ -86,7 +86,8 @@ public class GraphBuilderAnnotation implements Serializable {
 		BOGUS_EDGE_GEOMETRY("Edge %s has bogus geometry (some coordinates are NaN)"),
 		BOGUS_VERTEX_GEOMETRY("Vertex %s has NaN location; this will cause all sorts of problems."
 		        + " This is probably caused by a bug in the graph builder, but could conceivably"
-		        + " happen with extremely bad GTFS or OSM data.");
+		        + " happen with extremely bad GTFS or OSM data."),
+		NO_FUTURE_DATES("Agency %s has no calendar dates which are after today; no trips will be plannable on this agency");
 
 		private final String formatString;
 		Variety (String formatString) {

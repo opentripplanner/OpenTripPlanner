@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparator;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -184,16 +186,28 @@ public class Graph implements Serializable {
 
     // Infer the time period covered by the transit feed
     public void updateTransitFeedValidity(CalendarServiceData data) {
+        long now = new Date().getTime();
         final long SEC_IN_DAY = 24 * 60 * 60;
+        HashSet<String> agenciesWithFutureDates = new HashSet<String>();
+        HashSet<String> agencies = new HashSet<String>();
         for (AgencyAndId sid : data.getServiceIds()) {
+            agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 long t = sd.getAsDate().getTime();
+                if (t > now) {
+                    agenciesWithFutureDates.add(sid.getAgencyId());
+                }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
                 if (t < this.transitServiceStarts)
                     this.transitServiceStarts = t;
                 if (u > this.transitServiceEnds)
                     this.transitServiceEnds = u;
+            }
+        }
+        for (String agency : agencies) {
+            if (!agenciesWithFutureDates.contains(agency)) {
+                LOG.warn(GraphBuilderAnnotation.register(this, Variety.NO_FUTURE_DATES, agency));
             }
         }
     }
