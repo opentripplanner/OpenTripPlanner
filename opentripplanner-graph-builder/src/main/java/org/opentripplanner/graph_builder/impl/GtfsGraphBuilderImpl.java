@@ -43,6 +43,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +73,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
 	private List<GraphBuilderWithGtfsDao> gtfsGraphBuilders;
 
+    private FareServiceFactory _fareServiceFactory;
+
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
         /* check for dups */
@@ -91,6 +94,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     public void setEntityReplacementStrategy(EntityReplacementStrategy strategy) {
         _entityReplacementStrategy = strategy;
+    }
+
+    public void setFareServiceFactory(FareServiceFactory factory) {
+        _fareServiceFactory = factory;
     }
 
     @Override
@@ -119,6 +126,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 //            }
 
             GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
+            hf.setFareServiceFactory(_fareServiceFactory);
             hf.run(graph);
 
             // We need to save the calendar service data so we can use it later
