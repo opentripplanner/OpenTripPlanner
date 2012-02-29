@@ -30,6 +30,7 @@ import org.opentripplanner.api.model.analysis.SimpleVertex;
 import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.analysis.WrappedEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -214,7 +215,11 @@ public class GraphInternals {
     @Produces({ MediaType.APPLICATION_JSON })
     public Object getEdges(
             @QueryParam("lowerLeft") String lowerLeft,
-            @QueryParam("upperRight") String upperRight) {
+            @QueryParam("upperRight") String upperRight,
+            @QueryParam("exactClass") String className,
+            @QueryParam("skipTransit") boolean skipTransit,
+            @QueryParam("skipStreets") boolean skipStreets,
+            @QueryParam("skipNoGeometry") boolean skipNoGeometry) {
 
         initIndexes();
 
@@ -227,6 +232,10 @@ public class GraphInternals {
         List<Edge> query = edgeIndex.query(envelope);
         out.edges = new ArrayList<WrappedEdge>();
         for (Edge e : query) {
+            if (skipStreets && (e instanceof StreetEdge)) continue;
+            if (skipTransit && !(e instanceof StreetEdge)) continue;
+            if (skipNoGeometry && e.getGeometry() == null) continue;
+            if (className != null && !e.getClass().getName().endsWith("." + className)) continue;
             out.edges.add(new WrappedEdge(e, graph.getIdForEdge(e)));
         }
         return out.withGraph(graph);
