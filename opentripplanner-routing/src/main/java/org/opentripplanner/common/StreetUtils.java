@@ -45,21 +45,21 @@ public class StreetUtils {
 
     /**
      * Make an ordinary graph into an edge-based graph.
-     * @param endpoints 
-     * @param coordinateToStreetNames 
+     * 
+     * @param endpoints
+     * @param coordinateToStreetNames
      */
-    public static void makeEdgeBased(Graph graph, Collection<IntersectionVertex> endpoints, 
+    public static void makeEdgeBased(Graph graph, Collection<IntersectionVertex> endpoints,
             Map<Edge, TurnRestriction> restrictions) {
-        
-        Map<PlainStreetEdge, TurnVertex> turnVertices = new HashMap<PlainStreetEdge, TurnVertex>(); 
+
+        Map<PlainStreetEdge, TurnVertex> turnVertices = new HashMap<PlainStreetEdge, TurnVertex>();
         /* generate turns */
 
         _log.debug("converting to edge-based graph");
         for (IntersectionVertex v : endpoints) {
             for (Edge e_in : v.getIncoming()) {
                 for (Edge e_out : v.getOutgoing()) {
-                    if (e_in.getFromVertex() == e_out.getToVertex() &&
-                        v.getOutgoing().size() > 1)
+                    if (e_in.getFromVertex() == e_out.getToVertex() && v.getOutgoing().size() > 1)
                         // only make turn edges for U turns when they are dead ends
                         continue;
                     if (e_in instanceof PlainStreetEdge && e_out instanceof PlainStreetEdge) {
@@ -73,42 +73,46 @@ public class StreetUtils {
                             restriction = restrictions.get(pse_in);
                         }
                         if (restriction != null) {
-                            if (restriction.type == TurnRestrictionType.NO_TURN && restriction.to == e_out) {
+                            if (restriction.type == TurnRestrictionType.NO_TURN
+                                    && restriction.to == e_out) {
                                 turn.setRestrictedModes(restriction.modes);
-                            } else if (restriction.type == TurnRestrictionType.ONLY_TURN && restriction.to != e_in) {
+                            } else if (restriction.type == TurnRestrictionType.ONLY_TURN
+                                    && restriction.to != e_in) {
                                 turn.setRestrictedModes(restriction.modes);
                             }
                         }
                     } else { // turn involving a plainstreetedge and a freeedge
                         Vertex fromv = null;
-                        Vertex tov   = null;
+                        Vertex tov = null;
                         if (e_in instanceof PlainStreetEdge) {
-                            fromv = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_in);
+                            fromv = getTurnVertexForEdge(graph, turnVertices,
+                                    (PlainStreetEdge) e_in);
                         } else if (e_in instanceof FreeEdge) {
                             fromv = e_in.getFromVertex(); // fromv for incoming
                         }
                         if (e_out instanceof PlainStreetEdge) {
                             tov = getTurnVertexForEdge(graph, turnVertices, (PlainStreetEdge) e_out);
                         } else if (e_out instanceof FreeEdge) {
-                            tov = e_out.getToVertex(); // tov for outgoing 
+                            tov = e_out.getToVertex(); // tov for outgoing
                         }
                         if (fromv instanceof TurnVertex) {
-                            new TurnEdge((TurnVertex)fromv, (StreetVertex)tov);
+                            new TurnEdge((TurnVertex) fromv, (StreetVertex) tov);
                         } else {
                             new FreeEdge(fromv, tov);
                         }
-                    }                   
+                    }
                 }
             }
         }
-    
+
         /* remove standard graph */
         for (IntersectionVertex iv : endpoints) {
             graph.removeVertex(iv);
         }
     }
 
-    private static TurnVertex getTurnVertexForEdge(Graph graph, Map<PlainStreetEdge, TurnVertex> turnVertices, PlainStreetEdge pse) {
+    private static TurnVertex getTurnVertexForEdge(Graph graph,
+            Map<PlainStreetEdge, TurnVertex> turnVertices, PlainStreetEdge pse) {
 
         TurnVertex tv = turnVertices.get(pse);
         if (tv != null) {
@@ -117,15 +121,17 @@ public class StreetUtils {
 
         boolean back = pse.back;
         String id = pse.getId();
-        tv = new TurnVertex(graph, id, pse.getGeometry(), pse.getName(), pse.getLength(), back, pse.getNotes());
+        tv = new TurnVertex(graph, id, pse.getGeometry(), pse.getName(), pse.getLength(), back,
+                pse.getNotes());
         tv.setWheelchairNotes(pse.getWheelchairNotes());
         tv.setWheelchairAccessible(pse.isWheelchairAccessible());
         tv.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength());
         tv.setCrossable(pse.isCrossable());
         tv.setPermission(pse.getPermission());
         tv.setSlopeOverride(pse.getSlopeOverride());
-        //the only cases where there will already be an elevation profile are those where it came from 
-        //the street network (osm ele tags, for instance), so it's OK to force it here.
+        // the only cases where there will already be an elevation profile are those where it came
+        // from
+        // the street network (osm ele tags, for instance), so it's OK to force it here.
         tv.setElevationProfile(pse.getElevationProfile(), true);
         tv.setRoundabout(pse.isRoundabout());
         tv.setBogusName(pse.hasBogusName());
@@ -136,63 +142,63 @@ public class StreetUtils {
     }
 
     public static void pruneFloatingIslands(Graph graph) {
-    	_log.debug("pruning");
-    	Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
-    	Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
-    	
-    	TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-    	
-    	for (Vertex gv : graph.getVertices()) {
-    		if (!(gv instanceof IntersectionVertex)) {
-    			continue;
-    		}
-        	State s0 = new State(gv, options);
-    		for (Edge e: gv.getOutgoing()) {
-    			Vertex in = gv;
-    			if (!(e instanceof StreetEdge)) {
-        			continue;
-        		}
-    			State s1 = e.traverse(s0);
-    			if (s1 == null) {
-    				continue;
-    			}
-    			Vertex out = s1.getVertex();
-    			
-    			ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
-    			if (vertexList == null) {
-    				vertexList = new ArrayList<Vertex>();
-    				neighborsForVertex.put(in, vertexList);
+        _log.debug("pruning");
+        Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
+        Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
+
+        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
+
+        for (Vertex gv : graph.getVertices()) {
+            if (!(gv instanceof IntersectionVertex)) {
+                continue;
+            }
+            State s0 = new State(gv, options);
+            for (Edge e : gv.getOutgoing()) {
+                Vertex in = gv;
+                if (!(e instanceof StreetEdge)) {
+                    continue;
+                }
+                State s1 = e.traverse(s0);
+                if (s1 == null) {
+                    continue;
+                }
+                Vertex out = s1.getVertex();
+
+                ArrayList<Vertex> vertexList = neighborsForVertex.get(in);
+                if (vertexList == null) {
+                    vertexList = new ArrayList<Vertex>();
+                    neighborsForVertex.put(in, vertexList);
                 }
                 vertexList.add(out);
-                
-    			vertexList = neighborsForVertex.get(out);
-    			if (vertexList == null) {
-    				vertexList = new ArrayList<Vertex>();
-    				neighborsForVertex.put(out, vertexList);
+
+                vertexList = neighborsForVertex.get(out);
+                if (vertexList == null) {
+                    vertexList = new ArrayList<Vertex>();
+                    neighborsForVertex.put(out, vertexList);
                 }
                 vertexList.add(in);
-    		}
-    	}
-   	
-    	ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
-    	/* associate each node with a subgraph */
-    	for (Vertex gv : graph.getVertices()) {
-    		if (!(gv instanceof IntersectionVertex)) {
-    			continue;
-    		}
-    		Vertex vertex = gv;
-    		if (subgraphs.containsKey(vertex)) {
-    			continue;
-    		}
-    		if (!neighborsForVertex.containsKey(vertex)) {
-    			continue;
-    		}
-    		HashSet<Vertex> subgraph = computeConnectedSubgraph(neighborsForVertex, vertex);
+            }
+        }
+
+        ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
+        /* associate each node with a subgraph */
+        for (Vertex gv : graph.getVertices()) {
+            if (!(gv instanceof IntersectionVertex)) {
+                continue;
+            }
+            Vertex vertex = gv;
+            if (subgraphs.containsKey(vertex)) {
+                continue;
+            }
+            if (!neighborsForVertex.containsKey(vertex)) {
+                continue;
+            }
+            HashSet<Vertex> subgraph = computeConnectedSubgraph(neighborsForVertex, vertex);
             for (Vertex subnode : subgraph) {
                 subgraphs.put(subnode, subgraph);
             }
             islands.add(subgraph);
-    	}
+        }
     	
     	/* remove all tiny subgraphs */
         /* removed 10/27/11, since it looks like PDX is fixed.
@@ -206,40 +212,40 @@ public class StreetUtils {
     	}
         */
     }
-    
-    private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
-    	Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
-		for (Edge e : outgoing) {
-    		if (e instanceof PlainStreetEdge) {
-    			PlainStreetEdge pse = (PlainStreetEdge) e;
-    			StreetTraversalPermission permission = pse.getPermission();
-    			permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-    			if (permission == StreetTraversalPermission.NONE) {
-    				pse.detach();
-    			} else {
-    				pse.setPermission(permission);
-    			}
-    		}
-    	}
-		if (v.getOutgoing().size() == 0) {
-			graph.removeVertexAndEdges(v);
-		}
-	}
 
-	private static HashSet<Vertex> computeConnectedSubgraph(
-    		Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex) {
-    	HashSet<Vertex> subgraph = new HashSet<Vertex>();
-    	Queue<Vertex> q = new LinkedList<Vertex>();
-    	q.add(startVertex);
-    	while (!q.isEmpty()) {
-    		Vertex vertex = q.poll();
-    		for (Vertex neighbor : neighborsForVertex.get(vertex)) {
-    			if (!subgraph.contains(neighbor)) {
-    				subgraph.add(neighbor);
-    				q.add(neighbor);
-    			}
-    		}
-    	}
-    	return subgraph;
+    private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
+        Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
+        for (Edge e : outgoing) {
+            if (e instanceof PlainStreetEdge) {
+                PlainStreetEdge pse = (PlainStreetEdge) e;
+                StreetTraversalPermission permission = pse.getPermission();
+                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                if (permission == StreetTraversalPermission.NONE) {
+                    pse.detach();
+                } else {
+                    pse.setPermission(permission);
+                }
+            }
+        }
+        if (v.getOutgoing().size() == 0) {
+            graph.removeVertexAndEdges(v);
+        }
+    }
+
+    private static HashSet<Vertex> computeConnectedSubgraph(
+            Map<Vertex, ArrayList<Vertex>> neighborsForVertex, Vertex startVertex) {
+        HashSet<Vertex> subgraph = new HashSet<Vertex>();
+        Queue<Vertex> q = new LinkedList<Vertex>();
+        q.add(startVertex);
+        while (!q.isEmpty()) {
+            Vertex vertex = q.poll();
+            for (Vertex neighbor : neighborsForVertex.get(vertex)) {
+                if (!subgraph.contains(neighbor)) {
+                    subgraph.add(neighbor);
+                    q.add(neighbor);
+                }
+            }
+        }
+        return subgraph;
     }
 }
