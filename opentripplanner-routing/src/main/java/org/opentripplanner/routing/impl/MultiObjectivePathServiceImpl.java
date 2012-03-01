@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -273,6 +274,8 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             LOG.debug(s.toStringVerbose());
             paths.add(new GraphPath(s, true));
         }
+        // sort by arrival time, though paths are already in order of increasing difficulty
+        // Collections.sort(paths, new PathComparator(origin.getOptions().isArriveBy()));
         return paths;
     }
 
