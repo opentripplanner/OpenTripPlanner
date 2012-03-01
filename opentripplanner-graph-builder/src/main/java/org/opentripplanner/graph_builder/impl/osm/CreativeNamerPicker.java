@@ -15,35 +15,37 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 /**
  * Describes how unnamed OSM ways are to be named.
+ * 
  * @author novalis
- *
+ * 
  */
 public class CreativeNamerPicker {
-	private OSMSpecifier specifier;
-	private CreativeNamer namer;
+    private OSMSpecifier specifier;
 
-	public CreativeNamerPicker() {
-	}
+    private CreativeNamer namer;
 
-	public CreativeNamerPicker(OSMSpecifier specifier, CreativeNamer namer) {
-		this.specifier = specifier;
-		this.namer = namer;
-	}
+    public CreativeNamerPicker() {
+    }
 
-	public void setSpecifier(OSMSpecifier specifier) {
-		this.specifier = specifier;
-	}
+    public CreativeNamerPicker(OSMSpecifier specifier, CreativeNamer namer) {
+        this.specifier = specifier;
+        this.namer = namer;
+    }
 
-	public OSMSpecifier getSpecifier() {
-		return specifier;
-	}
+    public void setSpecifier(OSMSpecifier specifier) {
+        this.specifier = specifier;
+    }
 
-	public void setNamer(CreativeNamer namer) {
-		this.namer = namer;
-	}
+    public OSMSpecifier getSpecifier() {
+        return specifier;
+    }
 
-	public CreativeNamer getNamer() {
-		return namer;
-	}
+    public void setNamer(CreativeNamer namer) {
+        this.namer = namer;
+    }
+
+    public CreativeNamer getNamer() {
+        return namer;
+    }
 
 }

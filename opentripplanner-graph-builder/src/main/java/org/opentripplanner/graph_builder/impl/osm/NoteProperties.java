@@ -17,25 +17,25 @@ import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
 
 public class NoteProperties {
 
-	private String notePattern;
+    private String notePattern;
 
-	public NoteProperties(String pattern) {
-		this.setNotePattern(pattern);
-	}
+    public NoteProperties(String pattern) {
+        this.setNotePattern(pattern);
+    }
 
-	public NoteProperties() {
-	}
+    public NoteProperties() {
+    }
 
-	public String generateNote(OSMWithTags way) {
-		return TemplateLibrary.generate(getNotePattern(), way);
-	}
+    public String generateNote(OSMWithTags way) {
+        return TemplateLibrary.generate(getNotePattern(), way);
+    }
 
-	public void setNotePattern(String notePattern) {
-		this.notePattern = notePattern;
-	}
+    public void setNotePattern(String notePattern) {
+        this.notePattern = notePattern;
+    }
 
-	public String getNotePattern() {
-		return notePattern;
-	}
+    public String getNotePattern() {
+        return notePattern;
+    }
 
 }

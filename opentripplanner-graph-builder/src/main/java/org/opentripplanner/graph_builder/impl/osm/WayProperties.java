@@ -64,12 +64,11 @@ public class WayProperties implements Cloneable {
         }
     }
 
-	public boolean equals(Object o) {
-		if (o instanceof WayProperties) {
-			WayProperties other = (WayProperties) o;
-			return safetyFeatures.equals(other.safetyFeatures)
-					&& permission == other.permission;
-		}
-		return false;
-	}
+    public boolean equals(Object o) {
+        if (o instanceof WayProperties) {
+            WayProperties other = (WayProperties) o;
+            return safetyFeatures.equals(other.safetyFeatures) && permission == other.permission;
+        }
+        return false;
+    }
 }
