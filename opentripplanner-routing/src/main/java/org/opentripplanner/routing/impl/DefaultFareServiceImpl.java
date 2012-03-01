@@ -186,7 +186,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                int cost = calculateCost(rides.subList(j, j + i));
+                int cost = calculateCost(rides.subList(j, j + i + 1));
                 if (cost < 0) {
                     _log.error("negative cost for a ride sequence");
                     cost = Integer.MAX_VALUE;
