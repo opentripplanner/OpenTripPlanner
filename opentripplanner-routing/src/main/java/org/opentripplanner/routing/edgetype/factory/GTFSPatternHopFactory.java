@@ -917,30 +917,29 @@ public class GTFSPatternHopFactory {
 
         return anew;
     }
-    
-    private List<StopTime> getNonduplicateStopTimesForTrip(Trip trip) {
-		List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
-		ArrayList<StopTime> filtered = new ArrayList<StopTime>(
-				unfiltered.size());
-		for (StopTime st : unfiltered) {
-			if (filtered.size() > 0) {
-    			StopTime lastStopTime = filtered.get(filtered.size() - 1);
-    			if (lastStopTime.getStop().equals(st.getStop())) {
-    				lastStopTime.setDepartureTime(st.getDepartureTime());
-    			} else {
-    				filtered.add(st);
-    			}
-    		} else {
-    			filtered.add(st);
-    		}
-    	}
-    	if (filtered.size() == unfiltered.size()) {
-    		return unfiltered;
-    	}
-		return filtered;
-	}
 
-	public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
-		this.fareServiceFactory = fareServiceFactory;
-	}
+    private List<StopTime> getNonduplicateStopTimesForTrip(Trip trip) {
+        List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
+        ArrayList<StopTime> filtered = new ArrayList<StopTime>(unfiltered.size());
+        for (StopTime st : unfiltered) {
+            if (filtered.size() > 0) {
+                StopTime lastStopTime = filtered.get(filtered.size() - 1);
+                if (lastStopTime.getStop().equals(st.getStop())) {
+                    lastStopTime.setDepartureTime(st.getDepartureTime());
+                } else {
+                    filtered.add(st);
+                }
+            } else {
+                filtered.add(st);
+            }
+        }
+        if (filtered.size() == unfiltered.size()) {
+            return unfiltered;
+        }
+        return filtered;
+    }
+
+    public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
+        this.fareServiceFactory = fareServiceFactory;
+    }
 }

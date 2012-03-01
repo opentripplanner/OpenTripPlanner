@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,91 +22,121 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.util.MapUtils;
 
-public class TransitIndexServiceImpl implements TransitIndexService,
-		Serializable {
-	private static final long serialVersionUID = -8147894489513820239L;
+public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
+    private static final long serialVersionUID = -8147894489513820239L;
 
-	private HashMap<String     , List<RouteVariant>> variantsByAgency;
+    private HashMap<String, List<RouteVariant>> variantsByAgency;
 
-	private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute;
+    private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute;
 
-	private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
+    private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
 
-	private HashMap<AgencyAndId, Edge> preAlightEdges;
+    private HashMap<AgencyAndId, Edge> preAlightEdges;
 
-	private HashMap<AgencyAndId, Edge> preBoardEdges;
+    private HashMap<AgencyAndId, Edge> preBoardEdges;
 
-	private HashMap<AgencyAndId,HashSet<String>> directionsForRoute;
+    private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
-	private List<TraverseMode> modes;
+    private List<TraverseMode> modes;
 
-	public TransitIndexServiceImpl(
-			HashMap<String     , List<RouteVariant>> variantsByAgency,
-			HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
-			HashMap<AgencyAndId, RouteVariant> variantsByTrip,
-			HashMap<AgencyAndId, Edge> preBoardEdges,
-			HashMap<AgencyAndId, Edge> preAlightEdges,
-			HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
-			List<TraverseMode> modes) {
-		this.variantsByAgency   = variantsByAgency;
-		this.variantsByRoute = variantsByRoute;
-		this.variantsByTrip = variantsByTrip;
-		this.preBoardEdges = preBoardEdges;
-		this.preAlightEdges = preAlightEdges;
-		this.directionsForRoute = directionsByRoute;
-		this.modes = modes;
-	}
+    private HashMap<String, List<ServiceCalendar>> calendarsByAgency = new HashMap<String, List<ServiceCalendar>>();
+    private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
 
-	@Override
-	public List<RouteVariant> getVariantsForAgency(String agency) {
-		List<RouteVariant> variants = variantsByAgency.get(agency);
-		if (variants == null) {
-		    return Collections.emptyList();
-		}
-		return variants;
-	}
+    public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
+            HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
+            HashMap<AgencyAndId, RouteVariant> variantsByTrip,
+            HashMap<AgencyAndId, Edge> preBoardEdges, HashMap<AgencyAndId, Edge> preAlightEdges,
+            HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
+        this.variantsByAgency = variantsByAgency;
+        this.variantsByRoute = variantsByRoute;
+        this.variantsByTrip = variantsByTrip;
+        this.preBoardEdges = preBoardEdges;
+        this.preAlightEdges = preAlightEdges;
+        this.directionsForRoute = directionsByRoute;
+        this.modes = modes;
+    }
 
-	@Override
-	public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
-		List<RouteVariant> variants = variantsByRoute.get(route);
-		if (variants == null) {
-		    return Collections.emptyList();
-		}
-		return variants;
-	}
+    @Override
+    public List<RouteVariant> getVariantsForAgency(String agency) {
+        List<RouteVariant> variants = variantsByAgency.get(agency);
+        if (variants == null) {
+            return Collections.emptyList();
+        }
+        return variants;
+    }
 
-	@Override
-	public RouteVariant getVariantForTrip(AgencyAndId trip) {
-		return variantsByTrip.get(trip);
-	}
+    @Override
+    public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
+        List<RouteVariant> variants = variantsByRoute.get(route);
+        if (variants == null) {
+            return Collections.emptyList();
+        }
+        return variants;
+    }
 
-	@Override
-	public Edge getPrealightEdge(AgencyAndId stop) {
-		return preAlightEdges.get(stop);
-	}
+    @Override
+    public RouteVariant getVariantForTrip(AgencyAndId trip) {
+        return variantsByTrip.get(trip);
+    }
 
-	@Override
-	public Edge getPreboardEdge(AgencyAndId stop) {
-		return preBoardEdges.get(stop);
-	}
+    @Override
+    public Edge getPrealightEdge(AgencyAndId stop) {
+        return preAlightEdges.get(stop);
+    }
 
-	@Override
-	public Collection<String> getDirectionsForRoute(AgencyAndId route) {
-		return directionsForRoute.get(route);
-	}
+    @Override
+    public Edge getPreboardEdge(AgencyAndId stop) {
+        return preBoardEdges.get(stop);
+    }
 
-	@Override
-	public List<TraverseMode> getAllModes() {
-		return modes;
-	}
+    @Override
+    public Collection<String> getDirectionsForRoute(AgencyAndId route) {
+        return directionsForRoute.get(route);
+    }
+
+    @Override
+    public List<TraverseMode> getAllModes() {
+        return modes;
+    }
+
+    @Override
+    public List<String> getAllAgencies() {
+        return new ArrayList<String>(variantsByAgency.keySet());
+    }
 
     @Override
     public Collection<AgencyAndId> getAllRouteIds() {
         return variantsByRoute.keySet();
     }
 
+    @Override
+    public void addCalendars(Collection<ServiceCalendar> allCalendars) {
+        for (ServiceCalendar calendar : allCalendars) {
+            MapUtils.addToMapList(calendarsByAgency, calendar.getServiceId().getAgencyId(), calendar);
+        }
+    }
+
+    @Override
+    public void addCalendarDates(Collection<ServiceCalendarDate> allDates) {
+        for (ServiceCalendarDate date : allDates) {
+            MapUtils.addToMapList(calendarDatesByAgency, date.getServiceId().getAgencyId(), date);
+        }
+    }
+
+    @Override
+    public List<ServiceCalendarDate> getCalendarDatesByAgency(String agency) {
+        return calendarDatesByAgency.get(agency);
+    }
+
+    @Override
+    public List<ServiceCalendar> getCalendarsByAgency(String agency) {
+        return calendarsByAgency.get(agency);
+    }
 }
