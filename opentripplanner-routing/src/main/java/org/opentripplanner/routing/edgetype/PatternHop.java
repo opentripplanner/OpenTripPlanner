@@ -80,13 +80,16 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return timeLowerBound(options);
     }
     
-    public State traverse(State state0) {
-        int trip = state0.getTrip();
+    public State traverse(State s0) {
+        int trip = s0.getTrip();
         int runningTime = pattern.getRunningTime(stopIndex, trip);
         EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
-        StateEditor s1 = state0.edit(this, en);
+        StateEditor s1 = s0.edit(this, en);
         s1.incrementTimeInSeconds(runningTime);
-        s1.setZone(getEndStop().getZoneId());
+        if (s0.getOptions().isArriveBy())
+            s1.setZone(getStartStop().getZoneId());
+        else
+            s1.setZone(getEndStop().getZoneId());
         s1.setRoute(pattern.getExemplar().getRoute().getId());
         s1.incrementWeight(runningTime);
         return s1.makeState();

@@ -72,7 +72,10 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
     	StateEditor s1 = s0.edit(this, en);
     	s1.incrementTimeInSeconds(elapsed);
     	s1.incrementWeight(elapsed);
-        s1.setZone(getEndStop().getZoneId());
+        if (s0.getOptions().isArriveBy())
+            s1.setZone(getStartStop().getZoneId());
+        else
+            s1.setZone(getEndStop().getZoneId());
         s1.setRoute(start.getTrip().getRoute().getId());
         return s1.makeState();
     }
