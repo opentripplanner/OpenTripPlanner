@@ -49,6 +49,11 @@ public class MapBuilder implements GraphBuilder {
                     log.debug("Matching: " + variant + " ncoords = " + geometry.getNumPoints());
 
                     List<Edge> edges = matcher.match(geometry);
+                    if (edges == null) {
+                        log.warn("Could not match " + variant.getName() + " to street network");
+                        continue;
+                    }
+
                     GeometryFactory gf = geometry.getFactory();
                     List<Coordinate> coordinates = new ArrayList<Coordinate>();
                     for (Edge e : edges) {
