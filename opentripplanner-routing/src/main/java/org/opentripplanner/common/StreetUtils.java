@@ -146,7 +146,7 @@ public class StreetUtils {
         Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
 
-        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
+        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
 
         for (Vertex gv : graph.getVertices()) {
             if (!(gv instanceof IntersectionVertex)) {
@@ -201,16 +201,15 @@ public class StreetUtils {
         }
     	
     	/* remove all tiny subgraphs */
-        /* removed 10/27/11, since it looks like PDX is fixed.
-    	for (HashSet<Vertex> island : islands) {
-    		if (island.size() < 20) {
-    			_log.warn("Depedestrianizing or deleting floating island at " + island.iterator().next());
-    			for (Vertex vertex : island) {
-    				depedestrianizeOrRemove(graph, vertex);
-    			}
-    		} 
-    	}
-        */
+        for (HashSet<Vertex> island : islands) {
+            if (island.size() < 20) {
+                _log.warn("Depedestrianizing or deleting floating island at "
+                        + island.iterator().next());
+                for (Vertex vertex : island) {
+                    depedestrianizeOrRemove(graph, vertex);
+                }
+            }
+        }
     }
 
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {

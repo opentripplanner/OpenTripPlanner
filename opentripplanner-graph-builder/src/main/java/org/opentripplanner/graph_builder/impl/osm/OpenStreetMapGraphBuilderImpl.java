@@ -389,7 +389,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             applyBikeSafetyFactor(graph);
-            StreetUtils.pruneFloatingIslands(graph);
             StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
 
         } // END buildGraph()
