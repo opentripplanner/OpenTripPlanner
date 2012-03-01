@@ -118,6 +118,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         GtfsContext context = GtfsLibrary.createContext(_dao, service);
 
         GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
+        hf.setFareServiceFactory(_fareServiceFactory);
         hf.run(graph);
 
         // We need to save the calendar service data so we can use it later
