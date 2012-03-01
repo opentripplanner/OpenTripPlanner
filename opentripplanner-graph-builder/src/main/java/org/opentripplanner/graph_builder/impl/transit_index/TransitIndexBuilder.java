@@ -228,33 +228,39 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
 
             /* next, do routes have a unique start, end, or via? */
-            HashMap<Stop, List<RouteVariant>> starts = new HashMap<Stop, List<RouteVariant>>();
-            HashMap<Stop, List<RouteVariant>> ends = new HashMap<Stop, List<RouteVariant>>();
-            HashMap<Stop, List<RouteVariant>> vias = new HashMap<Stop, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> starts = new HashMap<String, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> ends = new HashMap<String, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> vias = new HashMap<String, List<RouteVariant>>();
             for (RouteVariant variant : variants) {
                 List<Stop> stops = variant.getStops();
-                MapUtils.addToMapList(starts, stops.get(0), variant);
-                MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
+                MapUtils.addToMapList(starts, stops.get(0).getName(), variant);
+                MapUtils.addToMapList(ends, stops.get(stops.size() - 1).getName(), variant);
                 for (Stop stop : stops) {
-                    MapUtils.addToMapList(vias, stop, variant);
+                    MapUtils.addToMapList(vias, stop.getName(), variant);
                 }
             }
 
             // do simple naming for unique start/end/via
             for (RouteVariant variant : variants) {
                 List<Stop> stops = variant.getStops();
-                if (starts.get(stops.get(0)).size() == 1) {
+                String firstStop = stops.get(0).getName();
+                if (starts.get(firstStop).size() == 1) {
                     // this is the only route with this start
-                    String name = routeName + " from " + stops.get(0).getName();
-                    variant.setName(name);
-                } else if (ends.get(stops.get(stops.size() - 1)).size() == 1) {
-                    String name = routeName + " to " + stops.get(stops.size() - 1).getName();
+                    String name = routeName + " from " + firstStop;
                     variant.setName(name);
                 } else {
-                    for (Stop stop : stops) {
-                        if (vias.get(stop).size() == 1) {
-                            variant.setName(routeName + " via " + stop.getName());
-                            break;
+                    String lastStop = stops.get(stops.size() - 1).getName();
+                    if (ends.get(lastStop).size() == 1) {
+                        String name = routeName + " to " + lastStop;
+                        variant.setName(name);
+                    } else {
+                        for (Stop stop : stops) {
+                            String viaStop = stop.getName();
+                            if (vias.get(viaStop).size() == 1) {
+                                String name = routeName + " via " + viaStop;
+                                variant.setName(name);
+                                break;
+                            }
                         }
                     }
                 }
@@ -298,26 +304,29 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
              * 
              */
             for (RouteVariant variant : variants) {
+                if (variant.getName() != null)
+                    continue;
                 List<Stop> stops = variant.getStops();
-                Stop firstStop = stops.get(0);
+                String firstStop = stops.get(0).getName();
                 HashSet<RouteVariant> remainingVariants = new HashSet<RouteVariant>(
                         starts.get(firstStop));
 
-                Stop lastStop = stops.get(stops.size() - 1);
+                String lastStop = stops.get(stops.size() - 1).getName();
                 // take the intersection
                 remainingVariants.retainAll(ends.get(lastStop));
                 if (remainingVariants.size() == 1) {
-                    String name = routeName + " from " + firstStop.getName() + " to "
-                            + lastStop.getName();
+                    String name = routeName + " from " + firstStop + " to "
+                            + lastStop;
                     variant.setName(name);
+                    continue;
                 }
                 // this did not yield a unique name; try start / via / end for
                 // each via
                 for (Stop stop : stops) {
-                    if (stop == firstStop || stop == lastStop) {
+                    if (stop.getName().equals(firstStop) || stop.getName().equals(lastStop)) {
                         continue;
                     }
-                    List<RouteVariant> via = vias.get(stop);
+                    List<RouteVariant> via = vias.get(stop.getName());
                     boolean found = false;
                     boolean bad = false;
                     for (RouteVariant viaVariant : via) {
@@ -331,8 +340,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                     }
                     if (found && !bad) {
-                        String name = routeName + " from " + firstStop.getName() + " to "
-                                + lastStop.getName() + " via " + stop.getName();
+                        String name = routeName + " from " + firstStop + " to "
+                                + lastStop + " via " + stop.getName();
                         variant.setName(name);
                         break;
                     }
@@ -341,10 +350,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     // check for express
                     if (remainingVariants.size() == 2) {
                         // there are exactly two remaining variants sharing this start/end
-                        // we know that this oen must be a subset of the other, because it
+                        // we know that this one must be a subset of the other, because it
                         // has no unique via. So, it is the express
-                        variant.setName(routeName + " from " + firstStop.getName() + " to "
-                                + lastStop.getName() + " express");
+                        variant.setName(routeName + " from " + firstStop + " to "
+                                + lastStop + " express");
                     } else {
                         // the final fallback
                         variant.setName(routeName + " like " + variant.getTrips().get(0).getId());
