@@ -65,6 +65,11 @@
           <version>2.5</version>
         </plugin>
         <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>2.8.1</version>
+        </plugin>
+        <plugin>
           <!-- m2eclipse lifecycle mapping configuration -->
           <!-- should not affect builds outside IDE -->
           <groupId>org.eclipse.m2e</groupId>
@@ -92,7 +97,6 @@
         </plugin>
       </plugins>
     </pluginManagement>
-    
   </build>
 
   <distributionManagement>
@@ -109,8 +113,44 @@
     </snapshotRepository>
   </distributionManagement>
 
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- empty: disable project-info reports -->
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <links>
+            <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.4/</link>
+          </links>
+        </configuration>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <!-- enable only aggregate-level javadoc generation -->
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <!-- 
+    CI Server profile
+    Hudson by default defines a property BUILD_NUMBER which is used to enable this profile. 
+  -->
   <profiles>
-    <!-- Hudson by default defines a property BUILD_NUMBER which is used to enable the profile. -->
     <profile>
       <id>hudson</id>
       <activation>
@@ -118,7 +158,6 @@
           <name>BUILD_NUMBER</name>
         </property>
       </activation>
-
       <distributionManagement>
         <site>
           <id>opentripplanner-docs</id>
@@ -126,28 +165,6 @@
           <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
         </site>
       </distributionManagement>
-
-      <reporting>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-project-info-reports-plugin</artifactId>
-            <reportSets>
-              <reportSet />
-            </reportSets>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.6.1</version>
-            <configuration>
-              <links>
-                <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.4/</link>
-              </links>
-            </configuration>
-          </plugin>
-        </plugins>
-      </reporting>
     </profile>
   </profiles>
 
