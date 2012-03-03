@@ -29,7 +29,7 @@ import com.vividsolutions.jts.util.AssertionFailedException;
 
 public class MidblockMatchState extends MatchState {
 
-    private static final double MAX_ERROR = 300;
+    private static final double MAX_ERROR = 600;
 
     private LinearLocation edgeIndex;
 
