@@ -74,11 +74,18 @@ public class StreetMatcher {
 
         Coordinate routeStartCoordinate = startIndex.getCoordinate(routeGeometry);
         Envelope envelope = new Envelope(routeStartCoordinate);
-        envelope.expandBy(DISTANCE_THRESHOLD);
+        double distanceThreshold = DISTANCE_THRESHOLD;
+        envelope.expandBy(distanceThreshold);
 
         BinHeap<MatchState> states = new BinHeap<MatchState>();
+        List nearbyEdges = index.query(envelope);
+        while (nearbyEdges.isEmpty()) {
+            envelope.expandBy(distanceThreshold);
+            distanceThreshold *= 2;
+            nearbyEdges = index.query(envelope);
+        }
         // compute initial states
-        for (Object obj : index.query(envelope)) {
+        for (Object obj : nearbyEdges) {
             Edge initialEdge = (Edge) obj;
             Geometry edgeGeometry = initialEdge.getGeometry();
             
