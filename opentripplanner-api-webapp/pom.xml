@@ -231,7 +231,7 @@
                 </executions>
                 <configuration>
                     <!-- change this to wherever you want the docs -->
-                    <docsDir>${project.build.directory}/api-docs</docsDir>
+                    <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
             </plugin>
         </plugins>

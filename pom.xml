@@ -116,6 +116,11 @@
       <url>${snapshot_distribution_url}</url>
       <uniqueVersion>false</uniqueVersion>
     </snapshotRepository>
+    <site>
+      <id>opentripplanner-docs</id>
+      <name>OpenTripPlanner Docs</name>
+      <url>scp://www.opentripplanner.org:7777/var/www/opentripplanner.org/mvn-site</url>
+    </site>
   </distributionManagement>
 
   <reporting>
@@ -163,12 +168,8 @@
           <name>BUILD_NUMBER</name>
         </property>
       </activation>
+      <!-- CI Server profile currently unused -->
       <distributionManagement>
-        <site>
-          <id>opentripplanner-docs</id>
-          <name>OpenTripPlanner Docs</name>
-          <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site</url>
-        </site>
       </distributionManagement>
     </profile>
   </profiles>
