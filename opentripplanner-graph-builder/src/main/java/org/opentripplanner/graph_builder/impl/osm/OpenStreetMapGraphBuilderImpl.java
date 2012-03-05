@@ -365,7 +365,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
             for (Map.Entry<EdgeWithElevation, List<ElevationPoint>> entry : data.entrySet()) {
                 EdgeWithElevation edge = entry.getKey();
-                System.out.println("setting extra elevation for " + edge);
                 List<ElevationPoint> points = entry.getValue();
                 Collections.sort(points);
 
