@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
@@ -89,6 +90,40 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     public void buildGraph(Graph graph) {
         _log.debug("Building transit index");
 
+        createRouteVariants(graph);
+
+        nameVariants(variantsByRoute);
+        int totalVariants = 0;
+        int totalTrips = 0;
+        for (List<RouteVariant> variants : variantsByRoute.values()) {
+            totalVariants += variants.size();
+            for (RouteVariant variant : variants) {
+                variant.cleanup();
+                totalTrips += variant.getTrips().size();
+            }
+        }
+        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
+                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
+                + " variants ");
+
+        TransitIndexServiceImpl service = new TransitIndexServiceImpl(variantsByAgency,
+                variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+                modes);
+
+        insertCalendarData(service);
+
+        addAgencies(service);
+
+        graph.putService(TransitIndexService.class, service);
+    }
+
+    private void addAgencies(TransitIndexServiceImpl service) {
+        for (Agency agency : dao.getAllAgencies()) {
+            service.addAgency(agency);
+        }
+    }
+
+    private void createRouteVariants(Graph graph) {
         for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             boolean start = false;
             boolean noStart = false;
@@ -177,27 +212,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
             }
         }
-
-        nameVariants(variantsByRoute);
-        int totalVariants = 0;
-        int totalTrips = 0;
-        for (List<RouteVariant> variants : variantsByRoute.values()) {
-            totalVariants += variants.size();
-            for (RouteVariant variant : variants) {
-                variant.cleanup();
-                totalTrips += variant.getTrips().size();
-            }
-        }
-        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
-                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
-                + " variants ");
-
-        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency,
-                variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
-                modes);
-
-        insertCalendarData(service);
-        graph.putService(TransitIndexService.class, service);
     }
 
     private void insertCalendarData(TransitIndexService service) {

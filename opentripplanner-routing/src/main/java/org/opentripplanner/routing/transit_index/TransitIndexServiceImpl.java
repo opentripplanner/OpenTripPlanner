@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
@@ -48,6 +49,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private HashMap<String, List<ServiceCalendar>> calendarsByAgency = new HashMap<String, List<ServiceCalendar>>();
     private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
+
+    private HashMap<String, Agency> agencies = new HashMap<String, Agency>();
 
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
@@ -138,5 +141,14 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public List<ServiceCalendar> getCalendarsByAgency(String agency) {
         return calendarsByAgency.get(agency);
+    }
+
+    @Override
+    public Agency getAgency(String id) {
+        return agencies.get(id);
+    }
+
+    public void addAgency(Agency agency) {
+        agencies.put(agency.getId(), agency);
     }
 }

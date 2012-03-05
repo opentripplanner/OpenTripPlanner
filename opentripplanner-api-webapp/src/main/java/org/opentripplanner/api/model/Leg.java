@@ -61,6 +61,12 @@ public class Leg {
     @XmlAttribute
     public String route = "";
 
+    @XmlAttribute
+    public String agencyName;
+
+    @XmlAttribute
+    public String agencyUrl;
+
     /**
      * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
      */

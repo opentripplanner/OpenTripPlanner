@@ -20,6 +20,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.model.Itinerary;
@@ -59,6 +60,7 @@ import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
+import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
@@ -78,10 +80,13 @@ public class PlanGenerator {
 
     private GeometryFactory geometryFactory = new GeometryFactory();
 
+    private TransitIndexService transitIndex;
+
     public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
         this.request = request;
         pathService = pathServiceFactory.getPathService(request.getRouterId());
         Graph graph = pathService.getGraphService().getGraph();
+        transitIndex = graph.getService(TransitIndexService.class);
         fareService = graph.getService(FareService.class);
     }
 
@@ -434,6 +439,11 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
             leg.routeColor = trip.getRoute().getColor();
             leg.routeTextColor = trip.getRoute().getTextColor();
+            if (transitIndex != null) {
+                Agency agency = transitIndex.getAgency(leg.agencyId);
+                leg.agencyName = agency.getName();
+                leg.agencyUrl = agency.getUrl();
+            }
         }
         leg.mode = en.getMode().toString();
         leg.startTime = new Date(state.getBackState().getTimeInMillis());

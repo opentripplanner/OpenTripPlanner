@@ -23,6 +23,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
@@ -151,6 +152,11 @@ public class TestPatch extends TestCase {
 
             @Override
             public List<ServiceCalendar> getCalendarsByAgency(String agency) {
+                return null;
+            }
+
+            @Override
+            public Agency getAgency(String id) {
                 return null;
             }
         };
