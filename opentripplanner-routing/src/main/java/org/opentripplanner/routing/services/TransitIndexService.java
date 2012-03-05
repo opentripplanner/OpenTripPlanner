@@ -44,9 +44,9 @@ public interface TransitIndexService {
 
     public void addCalendarDates(Collection<ServiceCalendarDate> allDates);
 
-    List<String> getAllAgencies();
+    public List<String> getAllAgencies();
 
-    List<ServiceCalendarDate> getCalendarDatesByAgency(String agency);
+    public List<ServiceCalendarDate> getCalendarDatesByAgency(String agency);
 
-    List<ServiceCalendar> getCalendarsByAgency(String agency);
+    public List<ServiceCalendar> getCalendarsByAgency(String agency);
 }
