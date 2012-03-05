@@ -68,17 +68,16 @@ public class StreetUtils {
                         PlainStreetEdge pse_out = (PlainStreetEdge) e_out;
                         TurnVertex tv_out = getTurnVertexForEdge(graph, turnVertices, pse_out);
                         TurnEdge turn = new TurnEdge(tv_in, tv_out);
-                        TurnRestriction restriction = null;
                         if (restrictions != null) {
-                            restriction = restrictions.get(pse_in);
-                        }
-                        if (restriction != null) {
-                            if (restriction.type == TurnRestrictionType.NO_TURN
-                                    && restriction.to == e_out) {
-                                turn.setRestrictedModes(restriction.modes);
-                            } else if (restriction.type == TurnRestrictionType.ONLY_TURN
-                                    && restriction.to != e_in) {
-                                turn.setRestrictedModes(restriction.modes);
+                            TurnRestriction restriction = restrictions.get(pse_in);
+                            if (restriction != null) {
+                                if (restriction.type == TurnRestrictionType.NO_TURN
+                                        && restriction.to == e_out) {
+                                    turn.setRestrictedModes(restriction.modes);
+                                } else if (restriction.type == TurnRestrictionType.ONLY_TURN
+                                        && restriction.to != e_out) {
+                                    turn.setRestrictedModes(restriction.modes);
+                                }
                             }
                         }
                     } else { // turn involving a plainstreetedge and a freeedge
