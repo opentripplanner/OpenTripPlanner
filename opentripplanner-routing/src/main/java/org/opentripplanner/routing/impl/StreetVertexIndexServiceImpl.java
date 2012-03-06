@@ -89,7 +89,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     /* all distance constants here are plate-carée Euclidean, 0.001 ~= 100m at equator */
     
     // edges will only be found if they are closer than this distance 
-    public static final double MAX_DISTANCE_FROM_STREET = 0.005;
+    public static final double MAX_DISTANCE_FROM_STREET = 0.01000;
 
     // maximum difference in distance for two geometries to be considered coincident
     public static final double DISTANCE_ERROR = 0.00001;
@@ -397,11 +397,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         double envelopeGrowthAmount = 0.002; // ~= 200 meters
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
         while (candidateEdges.size() == 0) {
+            if (envelope.getWidth() > MAX_DISTANCE_FROM_STREET * 2)
+                return candidateEdges; // empty list
             // expand envelope -- assumes many close searches and occasional far ones
             envelope.expandBy(envelopeGrowthAmount);
             envelopeGrowthAmount *= 2;
-            if (envelope.getWidth() > MAX_DISTANCE_FROM_STREET * 2)
-                return candidateEdges; // empty list
             List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
             if (extraEdges != null && nearbyEdges != null) {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
