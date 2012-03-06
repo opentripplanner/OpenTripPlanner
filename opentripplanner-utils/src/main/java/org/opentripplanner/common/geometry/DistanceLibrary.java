@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.impl;
+package org.opentripplanner.common.geometry;
 
 import static java.lang.Math.atan2;
 import static java.lang.Math.cos;

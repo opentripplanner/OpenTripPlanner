@@ -20,16 +20,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.pqueue.IntBinHeap;
+import org.opentripplanner.common.pqueue.IntBinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

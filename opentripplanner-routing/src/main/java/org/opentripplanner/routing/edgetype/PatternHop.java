@@ -14,13 +14,13 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;

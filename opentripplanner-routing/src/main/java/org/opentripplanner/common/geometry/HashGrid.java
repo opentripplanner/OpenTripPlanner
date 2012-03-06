@@ -16,7 +16,6 @@ package org.opentripplanner.common.geometry;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

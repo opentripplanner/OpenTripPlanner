@@ -22,6 +22,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.graph.Edge;
@@ -31,7 +32,6 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 
 public abstract class AbstractVertex implements Vertex {
 

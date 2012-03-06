@@ -17,6 +17,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.util.HashMap;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
@@ -24,7 +25,6 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

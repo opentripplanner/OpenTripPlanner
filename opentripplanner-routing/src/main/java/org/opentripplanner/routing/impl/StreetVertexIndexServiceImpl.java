@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;

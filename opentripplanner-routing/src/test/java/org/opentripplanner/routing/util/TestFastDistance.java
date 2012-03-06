@@ -17,7 +17,7 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 
 public class TestFastDistance extends TestCase {
 
