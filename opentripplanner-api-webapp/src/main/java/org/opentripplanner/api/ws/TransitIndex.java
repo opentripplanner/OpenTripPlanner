@@ -28,13 +28,18 @@ import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
+import org.opentripplanner.api.model.transit.Stop;
+import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
+import com.vividsolutions.jts.geom.Coordinate;
 
 // NOTE - /ws/transit is the full path -- see web.xml
 
@@ -43,11 +48,18 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class TransitIndex {
 
+    private static final double STOP_SEARCH_RADIUS = 200;
     private GraphService graphService;
+    private StreetVertexIndexService streetVertexIndexService;
 
     @Autowired
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
+    }
+
+    @Autowired
+    public void setIndexService(StreetVertexIndexService indexService) {
+        this.streetVertexIndexService = indexService;
     }
 
     /**
@@ -75,6 +87,35 @@ public class TransitIndex {
         response.directions = new ArrayList<String>(
                 transitIndexService.getDirectionsForRoute(routeId));
 
+        return response;
+    }
+
+    /**
+     * Return stops near a point
+     */
+    @GET
+    @Path("/stopsNearPoint")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopsNearPoint(@QueryParam("agency") String agency, 
+            @QueryParam("lat") Double lat,
+            @QueryParam("lon") Double lon) 
+            throws JSONException {
+        
+        List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(new Coordinate(lon, lat), STOP_SEARCH_RADIUS);
+        
+        StopList response = new StopList();
+        for (TransitStop transitStop : stops) {
+            AgencyAndId stopId = transitStop.getStopId();
+            if (agency != null && !agency.equals(stopId.getAgencyId())) continue;
+            Stop stop = new Stop();
+            stop.id = stopId;
+            stop.lat = transitStop.getLat();
+            stop.lon = transitStop.getLon();
+            stop.stopCode = transitStop.getStopCode();
+            stop.stopName = transitStop.getName();
+            response.stops.add(stop);
+        }
+        
         return response;
     }
 

@@ -461,4 +461,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return atIntersection;
     }
 
+    @Override
+    /** radius is meters */
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
+        Envelope envelope = new Envelope(coordinate);
+        envelope.expandBy(DistanceLibrary.metersToDegrees(radius));
+        List<?> stops = transitStopTree.query(envelope);
+        ArrayList<TransitStop> out = new ArrayList<TransitStop>();
+        for (Object o : stops) {
+            TransitStop stop = (TransitStop) o;
+            if (stop.distance(coordinate) < radius) {
+                out.add(stop);
+            }
+        }
+        return out;
+    }
+
 }
