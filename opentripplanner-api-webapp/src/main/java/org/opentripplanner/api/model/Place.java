@@ -67,6 +67,9 @@ public class Place {
     @XmlAttribute
     public String orig;
 
+    @XmlAttribute
+    public String zoneId;
+
     /**
      * Returns the geometry in GeoJSON format
      * @return
@@ -86,15 +89,8 @@ public class Place {
         this.name = name;
     }
 
-    public Place(Double lon, Double lat, String name, AgencyAndId stopId, String stopCode) {
+    public Place(Double lon, Double lat, String name, Date time) {
         this(lon, lat, name);
-        this.stopId = stopId;
-        this.stopCode = stopCode;
-	}
-
-	public Place(Double lon, Double lat, String name, AgencyAndId stopId, String stopCode,
-			Date time) {
-		this(lon, lat, name, stopId, stopCode);
-		this.arrival = departure = time;
-	}
+        this.arrival = departure = time;
+    }
 }
