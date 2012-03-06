@@ -16,6 +16,7 @@
   </scm>
 
   <modules>
+    <module>openstreetmap</module>
     <module>opentripplanner-admin-webapp</module>
     <module>opentripplanner-api-extended</module>
     <module>opentripplanner-api-webapp</module>
