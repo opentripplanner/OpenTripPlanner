@@ -173,7 +173,6 @@ otp.core.MapStatic = {
             if(this.defaultExtent && this.defaultExtent !== 'automatic')
             {
                 this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
-                this.map.zoomTo(this.CLOSE_ZOOM - 7)
             }
         }
         catch(e)
