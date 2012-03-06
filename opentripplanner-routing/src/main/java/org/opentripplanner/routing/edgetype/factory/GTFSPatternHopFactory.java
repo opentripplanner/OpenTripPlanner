@@ -762,7 +762,7 @@ public class GTFSPatternHopFactory {
             }
             if (st0.getDropOffType() != 1) {
                 new Alight(psv1arrive, endStation, hop, 
-                    tripWheelchairAccessible && s1.getWheelchairBoarding() != 0,
+                    tripWheelchairAccessible && s1.getWheelchairBoarding() == 1,
                     st0.getStop().getZoneId(), trip, st0.getDropOffType());
             }
         }
