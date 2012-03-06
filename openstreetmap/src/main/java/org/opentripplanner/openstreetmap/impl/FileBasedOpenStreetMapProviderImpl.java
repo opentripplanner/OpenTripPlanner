@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.openstreetmap.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,10 +19,10 @@ import java.io.InputStream;
 import java.util.zip.GZIPInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
-public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
+public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
     private File _path;
 
@@ -33,21 +33,22 @@ public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvi
     @Override
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
-            if (_path.getName().endsWith(".pbf")) {
-                BinaryFileBasedOpenStreetMapProviderImpl p = new BinaryFileBasedOpenStreetMapProviderImpl();
-                p.setPath(_path);
-                p.readOSM(handler);
+            OpenStreetMapParser parser = new OpenStreetMapParser();
+            if (_path.getName().endsWith(".gz")) {
+                InputStream in = new GZIPInputStream(new FileInputStream(_path));
+                parser.parseMap(in, handler);
+            } else if (_path.getName().endsWith(".bz2")) {
+                BZip2CompressorInputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
+                parser.parseMap(in, handler);
             } else {
-                StreamedFileBasedOpenStreetMapProviderImpl p = new StreamedFileBasedOpenStreetMapProviderImpl();
-                p.setPath(_path);
-                p.readOSM(handler);
+                parser.parseMap(_path, handler);
             }
         } catch (Exception ex) {
             throw new IllegalStateException("error loading OSM from path " + _path, ex);
         }
     }
-    
+
     public String toString() {
-        return "AnyFileBasedOpenStreetMapProviderImpl(" + _path + ")";
+        return "FileBasedOpenStreetMapProviderImpl(" + _path + ")";
     }
 }

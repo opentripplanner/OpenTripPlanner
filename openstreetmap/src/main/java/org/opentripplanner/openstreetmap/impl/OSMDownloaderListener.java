@@ -11,37 +11,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.model.osm;
+package org.opentripplanner.openstreetmap.impl;
 
-public class OSMRelationMember {
+import java.io.File;
 
-  private String type;
-
-  private long ref;
-
-  private String role;
-
-  public String getType() {
-    return type;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public long getRef() {
-    return ref;
-  }
-
-  public void setRef(long ref) {
-    this.ref = ref;
-  }
-
-  public String getRole() {
-    return role;
-  }
-
-  public void setRole(String role) {
-    this.role = role;
-  }
+public interface OSMDownloaderListener {
+  public void handleMapTile(String key, double lat, double lon,
+      File pathToMapTile);
 }

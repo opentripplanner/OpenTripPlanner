@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;

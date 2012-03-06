@@ -1,4 +1,7 @@
-/* This program is free software: you can redistribute it and/or
+/* 
+ Copyright 2008 Brian Ferris
+ 
+ This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
  the License, or (at your option) any later version.
@@ -11,9 +14,17 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.services.osm;
+package org.opentripplanner.openstreetmap.model;
 
+public class OSMNodeRef {
 
-public interface OpenStreetMapProvider {
-    public void readOSM(OpenStreetMapContentHandler handler);
+  private long ref;
+
+  public long getRef() {
+    return ref;
+  }
+
+  public void setRef(long ref) {
+    this.ref = ref;
+  }
 }

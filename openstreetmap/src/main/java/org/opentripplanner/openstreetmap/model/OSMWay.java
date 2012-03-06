@@ -1,4 +1,7 @@
-/* This program is free software: you can redistribute it and/or
+/* 
+ Copyright 2008 Brian Ferris
+ 
+ This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
  the License, or (at your option) any later version.
@@ -11,11 +14,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.openstreetmap.model;
 
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface OSMDownloaderListener {
-  public void handleMapTile(String key, double lat, double lon,
-      File pathToMapTile);
+public class OSMWay extends OSMWithTags {
+
+  private List<Long> _nodes = new ArrayList<Long>();
+
+  public void addNodeRef(OSMNodeRef nodeRef) {
+    _nodes.add(nodeRef.getRef());
+  }
+
+  public void addNodeRef(long nodeRef) {
+    _nodes.add(nodeRef);
+  }
+
+  public List<Long> getNodeRefs() {
+    return _nodes;
+  }
+
+  public String toString() {
+    return "osm way " + id;
+  }
 }

@@ -11,16 +11,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.openstreetmap.impl;
 
-import org.opentripplanner.graph_builder.model.osm.OSMNode;
-import org.opentripplanner.graph_builder.model.osm.OSMNodeRef;
-import org.opentripplanner.graph_builder.model.osm.OSMTag;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
-import org.opentripplanner.graph_builder.model.osm.OSMRelation;
-import org.opentripplanner.graph_builder.model.osm.OSMRelationMember;
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMNodeRef;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -69,18 +69,18 @@ public class OpenStreetMapParser {
             Element element = (Element) node;
             if (nodesOnly && element.getTagName().equals("node")) {
                 OSMNode osmNode = new OSMNode();
-                
+
                 osmNode.setId(Long.parseLong(element.getAttribute("id")));
                 osmNode.setLat(Double.parseDouble(element.getAttribute("lat")));
                 osmNode.setLon(Double.parseDouble(element.getAttribute("lon")));
-                
+
                 processTags(osmNode, element);
                 map.addNode(osmNode);
             } else if (!nodesOnly && element.getTagName().equals("way")) {
                 OSMWay osmWay = new OSMWay();
                 osmWay.setId(Long.parseLong(element.getAttribute("id")));
                 processTags(osmWay, element);
-                
+
                 Node node2 = element.getFirstChild();
                 while (node2 != null) {
                     if (!(node2 instanceof Element)) {
@@ -95,13 +95,13 @@ public class OpenStreetMapParser {
                     }
                     node2 = node2.getNextSibling();
                 }
-                
+
                 map.addWay(osmWay);
             } else if (!nodesOnly && element.getTagName().equals("relation")) {
                 OSMRelation osmRelation = new OSMRelation();
                 osmRelation.setId(Long.parseLong(element.getAttribute("id")));
                 processTags(osmRelation, element);
-                
+
                 Node node2 = element.getFirstChild();
                 while (node2 != null) {
                     if (!(node2 instanceof Element)) {
@@ -118,7 +118,6 @@ public class OpenStreetMapParser {
                     }
                     node2 = node2.getNextSibling();
                 }
-                
                 map.addRelation(osmRelation);
             }
             node = node.getNextSibling();

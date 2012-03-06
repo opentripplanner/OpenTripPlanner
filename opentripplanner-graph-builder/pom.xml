@@ -28,6 +28,12 @@
 
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>openstreetmap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-utils</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -103,11 +109,6 @@
 	        <version>1.0</version>
 	    </dependency>
 
-        <dependency>
-            <groupId>crosby.binary</groupId>
-            <artifactId>osmpbf</artifactId>
-            <version>1.2.1</version>
-        </dependency>
         <dependency>
       		<groupId>net.java.dev.jets3t</groupId>
       		<artifactId>jets3t</artifactId>

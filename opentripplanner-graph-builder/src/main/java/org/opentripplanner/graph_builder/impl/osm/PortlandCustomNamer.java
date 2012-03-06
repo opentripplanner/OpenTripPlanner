@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.util.HashSet;
 
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;

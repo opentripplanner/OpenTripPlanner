@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.model.osm;
+package org.opentripplanner.openstreetmap.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OSMLevel implements Comparable<OSMLevel> {
-    
+
     private static Logger _log = LoggerFactory.getLogger(OSMLevel.class);
 
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
@@ -35,7 +35,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     public final String shortName; // localized (potentially 1-based)
     public final String longName; // localized (potentially 1-based)
     public final Source source;
-    
+
     public enum Source {
         LEVEL_MAP,
         LEVEL_TAG,
@@ -43,7 +43,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         UNPARSABLE,
         NONE
     }
-    
+
     public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName, Source source) {
         this.floorNumber = floorNumber;
         this.altitudeMeters = altitudeMeters;
@@ -51,7 +51,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         this.longName = longName;
         this.source = source;
     }
-    
+
     /** 
      * makes an OSMLevel from one of the semicolon-separated fields in an OSM
      * level map relation's levels= tag.
@@ -69,8 +69,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
         }
 
         /* get short and long level names by splitting on = character */
-        String shortName = ""; 
-        String longName  = ""; 
+        String shortName = "";
+        String longName  = "";
         Integer indexEquals = spec.indexOf('=');
         if (indexEquals >= 1) {
             shortName = spec.substring(0, indexEquals);
@@ -79,7 +79,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             // set them both the same, the trailing @altitude has already been discarded
             shortName = longName = spec;
         }
-                
+
         /* try to parse a floor number out of names */
         Integer floorNumber = null;
         try {
@@ -93,8 +93,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
                         longName = Integer.toString(floorNumber + 1); // level and layer tags are 0-based
                 }
             }
-        } catch (NumberFormatException e) {}          
-        try { 
+        } catch (NumberFormatException e) {}
+        try {
             // short name takes precedence over long name for floor numbering
             floorNumber = Integer.parseInt(shortName);
             if (incrementNonNegative) {
@@ -108,12 +108,12 @@ public class OSMLevel implements Comparable<OSMLevel> {
             }
         } catch (NumberFormatException e) {}
 
-        /* fall back on altitude when necessary */ 
+        /* fall back on altitude when necessary */
         if (floorNumber == null && altitude != null) {
             floorNumber = (int)(altitude / METERS_PER_FLOOR);
             _log.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
-        } 
-        
+        }
+
         /* set default values when parsing failed */
         if (altitude == null) {
             altitude = 0.0;
@@ -124,11 +124,11 @@ public class OSMLevel implements Comparable<OSMLevel> {
         }
         return new OSMLevel(floorNumber, altitude, shortName, longName, source);
     }
-    
+
     public static List<OSMLevel> fromSpecList (String specList, Source source, boolean incrementNonNegative) {
-        
+
         List<String> levelSpecs = new ArrayList<String>();
-        
+
         Matcher m;
         for (String level : specList.split(";")) {
             m = RANGE_PATTERN.matcher(level);
@@ -142,7 +142,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
                 levelSpecs.add(level);
             }
         }
-    
+
         /* build an OSMLevel for each level spec in the list */
         List<OSMLevel> levels = new ArrayList<OSMLevel>();
         for (String spec : levelSpecs) {

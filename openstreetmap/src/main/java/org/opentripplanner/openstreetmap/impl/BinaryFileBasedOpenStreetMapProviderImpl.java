@@ -10,16 +10,14 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
- 
-package org.opentripplanner.graph_builder.impl.osm;
 
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
+package org.opentripplanner.openstreetmap.impl;
+
+import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import crosby.binary.file.BlockInputStream;
 
@@ -28,13 +26,13 @@ import crosby.binary.file.BlockInputStream;
  * First all the ways and relations are read, then the needed nodes are also loaded.
  *
  * @see http://wiki.openstreetmap.org/wiki/PBF_Format
- * @see org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler#biPhase
+ * @see org.opentripplanner.openstreetmap.services.graph_builder.services.osm.OpenStreetMapContentHandler#biPhase
  * @since 0.4
  */
 public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
     private File _path;
-    
+
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
             BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(handler);
@@ -49,14 +47,13 @@ public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapPr
             input = new FileInputStream(_path);
             (new BlockInputStream(input, parser)).process();
         } catch (Exception ex) {
-            throw new IllegalStateException("error loading OSM from path " + _path, ex);
-        }
+            throw new IllegalStateException("error loading OSM from path " + _path, ex);        }
     }
 
     public void setPath(File path) {
         _path = path;
     }
-    
+
     public String toString() {
         return "BinaryFileBasedOpenStreetMapProviderImpl(" + _path + ")";
     }

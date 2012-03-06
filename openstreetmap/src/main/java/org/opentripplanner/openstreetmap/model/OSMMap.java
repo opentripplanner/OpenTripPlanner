@@ -1,4 +1,4 @@
-/* 
+/*
  Copyright 2008 Brian Ferris
  This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
@@ -13,14 +13,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.model.osm;
+package org.opentripplanner.openstreetmap.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 
 public class OSMMap implements OpenStreetMapContentHandler {
 
@@ -41,7 +41,7 @@ public class OSMMap implements OpenStreetMapContentHandler {
   public Map<Long, OSMWay> getWays() {
     return _ways;
   }
-  
+
   public OSMWay getWayForId(long wayId) {
       return _ways.get(wayId);
   }

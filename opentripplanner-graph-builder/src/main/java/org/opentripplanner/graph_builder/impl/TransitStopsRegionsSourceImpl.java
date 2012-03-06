@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.services.RegionsSource;
+import org.opentripplanner.openstreetmap.services.RegionsSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;

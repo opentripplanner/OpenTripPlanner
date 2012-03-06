@@ -10,26 +10,16 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
- 
-package org.opentripplanner.graph_builder.impl.osm;
 
-import org.opentripplanner.graph_builder.model.osm.*;
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapContentHandler;
+package org.opentripplanner.openstreetmap.impl;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.openstreetmap.model.*;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.HashSet;
 
 import crosby.binary.BinaryParser;
 import crosby.binary.Osmformat;
-import crosby.binary.Osmformat.DenseInfo;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
@@ -99,7 +89,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
             _handler.addNode(tmp);
         }
     }
-    
+
     @Override
     protected void parseDense(Osmformat.DenseNodes nodes) {
         long lastId = 0, lastLat = 0, lastLon = 0;
@@ -162,7 +152,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 tag.setV(value);
                 tmp.addTag(tag);
             }
-                
+
             long lastId = 0;
             for (long j : i.getRefsList()) {
                 OSMNodeRef nodeRef = new OSMNodeRef();

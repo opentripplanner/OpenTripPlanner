@@ -11,11 +11,11 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl;
+package org.opentripplanner.openstreetmap.impl;
 
 import java.util.Arrays;
 
-import org.opentripplanner.graph_builder.services.RegionsSource;
+import org.opentripplanner.openstreetmap.services.RegionsSource;
 
 import com.vividsolutions.jts.geom.Envelope;
 

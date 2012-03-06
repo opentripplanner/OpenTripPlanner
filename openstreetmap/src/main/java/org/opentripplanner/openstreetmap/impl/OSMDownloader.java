@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.openstreetmap.impl;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -102,7 +102,7 @@ public class OSMDownloader {
     }
 
     private File getPathToUpToDateMapTile(double lat, double lon, String key) throws IOException {
-        
+
         File path = getPathToMapTile(key);
 
         if (needsUpdate(path)) {
@@ -143,7 +143,7 @@ public class OSMDownloader {
             File tmpDir = new File(System.getProperty("java.io.tmpdir"));
             _cacheDirectory = new File(tmpDir,"osm-tiles");
         }
-        
+
         if (!_cacheDirectory.exists()) {
             if (!_cacheDirectory.mkdirs()) {
                 throw new RuntimeException("Failed to create directory " + _cacheDirectory);
@@ -178,15 +178,15 @@ public class OSMDownloader {
     }
 
     /** 
-     * Set the base OSM API URL from which OSM tiles will be downloaded.    
+     * Set the base OSM API URL from which OSM tiles will be downloaded.
      */
     public void setApiBaseUrl(String apiBaseUrl) {
         this._apiBaseUrl = apiBaseUrl;
     }
 
     public String getApiBaseUrl() {
-    	if (_apiBaseUrl == null)
-    		throw new IllegalStateException("Map API base URL must be set before building a URL.");
+        if (_apiBaseUrl == null)
+            throw new IllegalStateException("Map API base URL must be set before building a URL.");
         return _apiBaseUrl;
     }
 }

@@ -50,8 +50,8 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 
-import org.opentripplanner.graph_builder.impl.osm.OSMDownloader;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
+import org.opentripplanner.openstreetmap.impl.OSMDownloader;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

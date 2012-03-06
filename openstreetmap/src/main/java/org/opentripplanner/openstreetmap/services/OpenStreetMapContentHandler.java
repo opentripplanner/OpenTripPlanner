@@ -13,16 +13,16 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.services.osm;
+package org.opentripplanner.openstreetmap.services;
 
-import org.opentripplanner.graph_builder.model.osm.OSMNode;
-import org.opentripplanner.graph_builder.model.osm.OSMRelation;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 
 /**
  * An interface to process/store parsed OpenStreetMap data.
  *
- * @see org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider
+ * @see org.opentripplanner.openstreetmap.services.OpenStreetMapProvider
  */
 
 public interface OpenStreetMapContentHandler {

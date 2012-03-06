@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>openstreetmap</artifactId>
+    <packaging>jar</packaging>
+    <name>openstreetmap</name>
+
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
+        <version>0.5-SNAPSHOT</version>
+    </parent>
+
+    <repositories>
+        <repository>
+            <id>opengeo</id>
+            <name>OpenGeo Maven Repository</name>
+            <url>http://repo.opengeo.org/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.4</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.axis</groupId>
+          <artifactId>axis-jaxrpc</artifactId>
+          <version>1.4</version>
+        </dependency>
+        <dependency>
+          <groupId>commons-discovery</groupId>
+          <artifactId>commons-discovery</artifactId>
+          <version>0.4</version>
+        </dependency>
+
+        <dependency>
+	        <groupId>org.apache.commons</groupId>
+	        <artifactId>commons-compress</artifactId>
+	        <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>crosby.binary</groupId>
+            <artifactId>osmpbf</artifactId>
+            <version>1.2.1</version>
+        </dependency>
+    </dependencies>
+</project>

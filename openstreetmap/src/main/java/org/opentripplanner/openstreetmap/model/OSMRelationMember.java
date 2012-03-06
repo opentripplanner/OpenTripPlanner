@@ -1,7 +1,4 @@
-/* 
- Copyright 2008 Brian Ferris
- 
- This program is free software: you can redistribute it and/or
+/* This program is free software: you can redistribute it and/or
  modify it under the terms of the GNU Lesser General Public License
  as published by the Free Software Foundation, either version 3 of
  the License, or (at your option) any later version.
@@ -14,11 +11,23 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.model.osm;
+package org.opentripplanner.openstreetmap.model;
 
-public class OSMNodeRef {
+public class OSMRelationMember {
+
+  private String type;
 
   private long ref;
+
+  private String role;
+
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
 
   public long getRef() {
     return ref;
@@ -26,5 +35,13 @@ public class OSMNodeRef {
 
   public void setRef(long ref) {
     this.ref = ref;
+  }
+
+  public String getRole() {
+    return role;
+  }
+
+  public void setRole(String role) {
+    this.role = role;
   }
 }

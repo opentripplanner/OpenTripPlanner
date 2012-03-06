@@ -13,7 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 public class NoteProperties {
 
