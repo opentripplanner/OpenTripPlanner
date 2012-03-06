@@ -87,7 +87,7 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         for (StopTime stopTime : stopTimes) {
             stops.add(stopTime.getStop());
             zones[i] = stopTimes.get(i).getStop().getZoneId();
-            if (stopTime.getStop().getWheelchairBoarding() != 0) {
+            if (stopTime.getStop().getWheelchairBoarding() == 1) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
 
