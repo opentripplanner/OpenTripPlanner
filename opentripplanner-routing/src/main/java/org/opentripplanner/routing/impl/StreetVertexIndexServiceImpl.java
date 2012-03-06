@@ -83,7 +83,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     private STRtree intersectionTree;
 
-    public static final double MAX_DISTANCE_FROM_STREET = 0.001;
+//    private static final double SEARCH_RADIUS_M = 100; // meters
+//    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
+
+    /* all distance constants here are plate-carée Euclidean, 0.001 ~= 100m at equator */
+    
+    // edges will only be found if they are closer than this distance 
+    public static final double MAX_DISTANCE_FROM_STREET = 0.005;
 
     // maximum difference in distance for two geometries to be considered coincident
     public static final double DISTANCE_ERROR = 0.00001;
@@ -284,9 +290,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         return intersectionTree.query(envelope);
     }
 
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
-    private static final double SEARCH_RADIUS_M = 100; // meters
-    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
     public static class CandidateEdge {
         public final DistanceOp op;
         public final StreetEdge edge;
@@ -337,9 +340,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         private static final long serialVersionUID = 20120222L;
         public Vertex endwiseVertex = null;
         public CandidateEdge closest = null;
-//        public CandidateEdgeBundle(CandidateEdge... ce) {
-//            super(Arrays.asList(ce));
-//        }
         public boolean add(CandidateEdge ce) {
             if (ce.endwiseVertex != null)
                 this.endwiseVertex = ce.endwiseVertex;
@@ -394,24 +394,31 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         if (options != null) {
             walkingOptions = options.getWalkingOptions();
         }
-        envelope.expandBy(MAX_DISTANCE_FROM_STREET);
-        List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
-        if (extraEdges != null && nearbyEdges != null) {
-            nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
-        }
+        double envelopeGrowthAmount = 0.002; // ~= 200 meters
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
-        for (StreetEdge e : nearbyEdges) {
-            if (e == null || e instanceof OutEdge)
-                continue;
-            if (options != null && 
-               (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
-                continue;
-            CandidateEdge ce = new CandidateEdge(e, p);
-            // Even if an edge is outside the query envelope, bounding boxes can
-            // still intersect. In this case, distance to the edge is greater
-            // than the query envelope size.
-            if (ce.distance < MAX_DISTANCE_FROM_STREET)
-                candidateEdges.add(ce);
+        while (candidateEdges.size() == 0) {
+            // expand envelope -- assumes many close searches and occasional far ones
+            envelope.expandBy(envelopeGrowthAmount);
+            envelopeGrowthAmount *= 2;
+            if (envelope.getWidth() > MAX_DISTANCE_FROM_STREET * 2)
+                return candidateEdges; // empty list
+            List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
+            if (extraEdges != null && nearbyEdges != null) {
+                nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
+            }
+            for (StreetEdge e : nearbyEdges) {
+                if (e == null || e instanceof OutEdge)
+                    continue;
+                if (options != null && 
+                   (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
+                    continue;
+                CandidateEdge ce = new CandidateEdge(e, p);
+                // Even if an edge is outside the query envelope, bounding boxes can
+                // still intersect. In this case, distance to the edge is greater
+                // than the query envelope size.
+                if (ce.distance < MAX_DISTANCE_FROM_STREET)
+                    candidateEdges.add(ce);
+            }
         }
         Collection<CandidateEdgeBundle> bundles = candidateEdges.binByAngleAndDirection();
         // initially set best bundle to the closest bundle
