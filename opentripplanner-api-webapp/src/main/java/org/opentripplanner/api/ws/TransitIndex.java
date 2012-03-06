@@ -24,12 +24,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.api.model.error.TransitError;
+import org.opentripplanner.api.model.transit.RouteList;
 import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
 import org.opentripplanner.api.model.transit.Stop;
 import org.opentripplanner.api.model.transit.StopList;
+import org.opentripplanner.api.model.transit.TransitRoute;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -87,6 +90,37 @@ public class TransitIndex {
         response.directions = new ArrayList<String>(
                 transitIndexService.getDirectionsForRoute(routeId));
 
+        return response;
+    }
+    /**
+     * Return a list of route ids
+     */
+    @GET
+    @Path("/routes")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getRoutes(@QueryParam("agency") String agency)
+            throws JSONException {
+
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+        RouteList response = new RouteList();
+        for (AgencyAndId routeId : transitIndexService.getAllRouteIds()) {
+            for (RouteVariant variant : transitIndexService.getVariantsForRoute(routeId)) {
+                Route route = variant.getRoute();
+                if (agency != null && !agency.equals(route.getAgency().getId())) continue;
+                TransitRoute transitRoute = new TransitRoute();
+                transitRoute.id = route.getId();
+                transitRoute.routeLongName = route.getLongName();
+                transitRoute.routeShortName = route.getLongName();
+                transitRoute.url = route.getUrl();
+                response.routes.add(transitRoute);
+                break;
+            }
+        }
         return response;
     }
 
