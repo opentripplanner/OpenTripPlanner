@@ -16,13 +16,13 @@ package org.opentripplanner.graph_builder.impl.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
