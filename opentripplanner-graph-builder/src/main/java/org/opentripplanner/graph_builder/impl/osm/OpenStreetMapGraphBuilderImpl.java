@@ -276,7 +276,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     String ele = segmentStartOSMNode.getTag("ele");
                     if (ele != null) {
-                        elevationPoints.add(new ElevationPoint(distance, Double.parseDouble(ele)));
+                        ele = ele.toLowerCase();
+                        double unit = 1;
+                        if (ele.endsWith("m")) {
+                            ele = ele.replaceFirst("\\s*m", "");
+                        } else if (ele.endsWith("ft")) {
+                            ele = ele.replaceFirst("\\s*ft", "");
+                            unit = 0.3048;
+                        }
+                        elevationPoints.add(new ElevationPoint(distance, Double.parseDouble(ele) * unit));
                     }
 
                     distance += DistanceLibrary.distance(segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
