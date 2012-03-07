@@ -211,16 +211,17 @@
                 <artifactId>maven-enunciate-plugin</artifactId>
                 <version>1.23</version>
                 <executions>
-                    <execution>
-                        <goals>
-                            <goal>docs</goal>
-                            <!-- default binding for docs goal is process-sources phase -->
-                        </goals>
-                    </execution>
+                  <execution>
+                    <!-- default binding for docs goal is process-sources phase -->
+                    <phase>site</phase>
+                    <goals>
+                      <goal>docs</goal>
+                    </goals>
+                  </execution>
                 </executions>
                 <configuration>
-                    <!-- change this to wherever you want the docs -->
-                    <docsDir>${project.build.directory}/site/enunciate</docsDir>
+                  <!-- change this to wherever you want the docs -->
+                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
             </plugin>
         </plugins>
