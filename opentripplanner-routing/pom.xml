@@ -46,8 +46,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -79,43 +77,4 @@
             <url>http://download.osgeo.org/</url>
         </repository>
     </repositories>
-    
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <argLine>-Xmx1500m</argLine>
-                    <disableXmlReport>true</disableXmlReport>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
-    <!-- If we are running in hudson -->
-    <profiles>
-        <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>BUILD_NUMBER</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration>
-                            <disableXmlReport>false</disableXmlReport>
-                            <argLine>-Xmx2000m</argLine>
-                        </configuration>
-                	</plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
