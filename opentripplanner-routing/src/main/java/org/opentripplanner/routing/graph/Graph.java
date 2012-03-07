@@ -43,6 +43,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparator;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
-    // update serialVersionId to the current date in format YYYYMMDDL
-    // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20120121L;
+
+    private static final long serialVersionUID = MavenVersion.UID;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
