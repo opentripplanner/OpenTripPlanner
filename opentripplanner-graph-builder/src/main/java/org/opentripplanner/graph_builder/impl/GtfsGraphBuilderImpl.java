@@ -16,7 +16,9 @@ package org.opentripplanner.graph_builder.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -75,6 +77,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private FareServiceFactory _fareServiceFactory;
 
+    public List<String> provides() {
+        return Arrays.asList("transit");
+    }
+
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
+    
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
         /* check for dups */

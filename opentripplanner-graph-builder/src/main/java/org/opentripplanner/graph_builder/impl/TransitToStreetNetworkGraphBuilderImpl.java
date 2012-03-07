@@ -13,7 +13,9 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
@@ -24,6 +26,14 @@ import org.opentripplanner.routing.graph.Graph;
  * Should be called after both the transit network and street network are loaded.
  */
 public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
+
+    public List<String> provides() {
+        return Arrays.asList("linking");
+    }
+
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets", "transit");
+    }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {

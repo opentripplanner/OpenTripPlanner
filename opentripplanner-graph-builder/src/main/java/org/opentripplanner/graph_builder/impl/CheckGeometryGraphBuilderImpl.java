@@ -15,7 +15,10 @@ package org.opentripplanner.graph_builder.impl;
 
 import static org.opentripplanner.common.IterableLibrary.filter;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -39,6 +42,17 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
+
+    /** An set of ids which identifies what stages this graph builder provides (i.e. streets, elevation, transit) */
+    public List<String> provides() {
+        return Collections.emptyList();
+    }
+
+    /** A list of ids of stages which must be provided before this stage */
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets", "transit");
+    }
+    
     private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
     private static final double MAX_VERTEX_SHAPE_ERROR = 100;
 

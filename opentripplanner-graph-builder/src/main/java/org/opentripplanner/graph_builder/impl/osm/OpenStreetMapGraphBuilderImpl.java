@@ -90,6 +90,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private boolean noZeroLevels = true;
 
+    public List<String> provides() {
+        return Arrays.asList("streets", "turns");
+    }
+
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
+    
     /**
      * The source for OSM map data
      */

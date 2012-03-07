@@ -94,6 +94,22 @@ public class GraphBuilderTask implements Runnable {
             return;
         }
         
+        //check prerequisites
+        ArrayList<String> provided = new ArrayList<String>();
+        boolean bad = false;
+        for (GraphBuilder builder : _graphBuilders) {
+            List<String> prerequisites = builder.getPrerequisites();
+            for (String prereq : prerequisites) {
+                if (!provided.contains(prereq)) {
+                    _log.error("Graph builder " + builder + " requires " + prereq + " but no previous stages provide it");
+                    bad = true;
+                }
+            }
+            provided.addAll(builder.provides());
+        }
+        if (bad)
+            throw new RuntimeException("Prerequisites unsatisfied");
+        
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);

@@ -14,6 +14,8 @@
 package org.opentripplanner.graph_builder.impl.ned;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -63,6 +65,14 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      */
     private double distanceBetweenSamplesM = 10;
 
+    public List<String> provides() {
+        return Arrays.asList("elevation");
+    }
+
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets");
+    }
+    
     public void setGridCoverageFactory(NEDGridCoverageFactory factory) {
         gridCoverageFactory = factory;
     }

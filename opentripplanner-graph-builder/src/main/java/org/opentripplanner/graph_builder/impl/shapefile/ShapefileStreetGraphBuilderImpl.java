@@ -14,6 +14,8 @@
 package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -62,6 +64,14 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
     private ShapefileStreetSchema _schema;
 
+    public List<String> provides() {
+        return Arrays.asList("streets");
+    }
+
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
+    
     public void setFeatureSourceFactory(FeatureSourceFactory factory) {
         _featureSourceFactory = factory;
     }

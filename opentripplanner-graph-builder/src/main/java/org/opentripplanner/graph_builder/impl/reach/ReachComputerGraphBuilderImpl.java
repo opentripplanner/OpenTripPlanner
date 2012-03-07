@@ -14,9 +14,12 @@
 package org.opentripplanner.graph_builder.impl.reach;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -67,6 +70,14 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     Map<Vertex, Double> outPenalty = new HashMap<Vertex, Double>();
 
+    public List<String> provides() {
+        return Arrays.asList("reach");
+    }
+    
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets");
+    }
+    
     /** For the first run of the partial trees phase, the reach cut-off */
     public void setInitialStreetEpsilon(double epsilon) {
         this.initialStreetEpsilon = epsilon;
