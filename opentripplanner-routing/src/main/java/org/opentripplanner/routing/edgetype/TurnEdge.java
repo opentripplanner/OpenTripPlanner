@@ -244,7 +244,20 @@ public class TurnEdge extends StreetEdge {
     public boolean equals(Object o) {
         if (o instanceof TurnEdge) {
             TurnEdge other = (TurnEdge) o;
-            return other.fromv.equals(fromv) && other.getToVertex().equals(tov);
+            if (other.fromv == null) {
+                if (fromv != null) {
+                    return false;
+                }
+            } else {
+                if (!other.fromv.equals(fromv)) {
+                    return false;
+                }
+            }
+            if (other.tov == null) {
+                return tov == null;
+            } else {
+                return other.tov.equals(tov);
+            }
         }
         return false;
     }

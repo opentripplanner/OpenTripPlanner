@@ -148,7 +148,7 @@ public class StreetUtils {
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
 
         for (Vertex gv : graph.getVertices()) {
-            if (!(gv instanceof IntersectionVertex)) {
+            if (!(gv instanceof StreetVertex)) {
                 continue;
             }
             State s0 = new State(gv, options);
@@ -182,7 +182,7 @@ public class StreetUtils {
         ArrayList<HashSet<Vertex>> islands = new ArrayList<HashSet<Vertex>>();
         /* associate each node with a subgraph */
         for (Vertex gv : graph.getVertices()) {
-            if (!(gv instanceof IntersectionVertex)) {
+            if (!(gv instanceof StreetVertex)) {
                 continue;
             }
             Vertex vertex = gv;
@@ -222,6 +222,17 @@ public class StreetUtils {
                     pse.detach();
                 } else {
                     pse.setPermission(permission);
+                }
+            }
+            
+            if (e instanceof TurnEdge) {
+                TurnEdge turn = (TurnEdge) e;
+                StreetTraversalPermission permission = turn.getPermission();
+                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                if (permission == StreetTraversalPermission.NONE) {
+                    turn.detach();
+                } else {
+                    ((TurnVertex) turn.getFromVertex()).setPermission(permission);
                 }
             }
         }
