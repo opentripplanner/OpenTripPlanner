@@ -540,17 +540,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 /* try to find a level name in tags */
                 String levelName = null;
-                OSMLevel.Source source = OSMLevel.Source.NONE;
                 OSMLevel level = OSMLevel.DEFAULT;
                 if (way.hasTag("level")) { // TODO: floating-point levels &c.
                     levelName = way.getTag("level");
-                    source = OSMLevel.Source.LEVEL_TAG;
-                } else if (way.hasTag("layer")) {
-                    levelName = way.getTag("layer");
-                    source = OSMLevel.Source.LAYER_TAG;
+                    level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels);
                 } 
-                if (levelName != null) {
-                    level = OSMLevel.fromString(levelName, source, noZeroLevels);
+                if ((level == null || level == OSMLevel.DEFAULT) && way.hasTag("layer")) {
+                    levelName = way.getTag("layer");
+                    level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
+                } 
+                if (level == null) {
+                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.LEVEL_AMBIGUOUS, 
+                        levelName, "OSM way " + way.getId()));
+                    level = OSMLevel.DEFAULT;
                 }
                 wayLevels.put(way, level);
             }
