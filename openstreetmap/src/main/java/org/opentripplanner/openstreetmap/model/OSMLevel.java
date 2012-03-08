@@ -29,7 +29,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
 
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
     public static final double METERS_PER_FLOOR = 3;
-    public static final OSMLevel DEFAULT = fromString("", Source.NONE, false);
+    public static final OSMLevel DEFAULT = 
+        new OSMLevel(0, 0.0, "default level", "default level", Source.NONE);
     public final int floorNumber; // 0-based
     public final double altitudeMeters;
     public final String shortName; // localized (potentially 1-based)
@@ -40,7 +41,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         LEVEL_MAP,
         LEVEL_TAG,
         LAYER_TAG,
-        UNPARSABLE,
+        ALTITUDE,
         NONE
     }
 
@@ -114,13 +115,13 @@ public class OSMLevel implements Comparable<OSMLevel> {
             _log.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
         }
 
-        /* set default values when parsing failed */
+        /* set default value if parsing failed */
         if (altitude == null) {
             altitude = 0.0;
         }
+        /* signal failure to extract any useful level information */
         if (floorNumber == null) {
-            floorNumber = 0;
-            _log.warn("Could not infer floor number for layer '{}'. Vertical movement will still be possible, but elevator cost might be incorrect. Consider an OSM level map.", spec);
+            return null;
         }
         return new OSMLevel(floorNumber, altitude, shortName, longName, source);
     }
