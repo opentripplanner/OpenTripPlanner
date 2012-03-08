@@ -13,11 +13,14 @@
 
 package org.opentripplanner.api.model.analysis;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.opentripplanner.api.model.json_serializers.EdgeSetJSONSerializer;
 import org.opentripplanner.api.model.json_serializers.WithGraph;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 public class EdgeSet {
@@ -32,5 +35,14 @@ public class EdgeSet {
 
     public EdgeSetWithGraph withGraph(Graph graph) {
         return new EdgeSetWithGraph(graph, this);
+    }
+
+    public void addEdges(Collection<Edge> newEdges, Graph graph) {
+        if (edges == null) {
+            edges = new ArrayList<WrappedEdge>();
+        }
+        for (Edge edge : newEdges) {
+            edges.add(new WrappedEdge(edge, graph.getIdForEdge(edge)));
+        }
     }
 }

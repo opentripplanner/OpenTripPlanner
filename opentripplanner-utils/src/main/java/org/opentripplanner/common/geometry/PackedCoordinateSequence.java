@@ -459,4 +459,13 @@ public abstract class PackedCoordinateSequence implements CoordinateSequence, Se
 
     }
 
+    public String toString() {
+        String out = "";
+        int n = Math.min(10, size());
+        for (int i = 0; i < n; ++i) {
+            Coordinate c = getCoordinate(i);
+            out += "(" + c.x + "," + c.y + ")";
+        }
+        return out;
+    }
 }

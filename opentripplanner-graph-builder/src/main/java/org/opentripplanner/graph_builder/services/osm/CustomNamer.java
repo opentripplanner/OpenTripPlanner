@@ -13,7 +13,7 @@
 
 package org.opentripplanner.graph_builder.services.osm;
 
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 

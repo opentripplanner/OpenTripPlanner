@@ -29,7 +29,6 @@ import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -142,13 +141,12 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     @Override
-    public void setElevationProfile(PackedCoordinateSequence elev) {
+    public void setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
             return;
         }
-        if (slopeOverride) {
-            elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),elev.getCoordinate((elev.size()-1))},
-                    2);
+        if (slopeOverride && !computed) {
+            return;
         }
 
         elevationProfile = elev;

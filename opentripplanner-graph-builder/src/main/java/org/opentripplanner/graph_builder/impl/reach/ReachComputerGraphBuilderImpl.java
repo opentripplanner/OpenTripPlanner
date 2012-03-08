@@ -14,9 +14,12 @@
 package org.opentripplanner.graph_builder.impl.reach;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,12 +34,11 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pqueue.BinHeap;
-import org.opentripplanner.routing.pqueue.OTPPriorityQueue;
-import org.opentripplanner.routing.pqueue.OTPPriorityQueueFactory;
+import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.common.pqueue.OTPPriorityQueue;
+import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
@@ -68,6 +70,14 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     Map<Vertex, Double> outPenalty = new HashMap<Vertex, Double>();
 
+    public List<String> provides() {
+        return Arrays.asList("reach");
+    }
+    
+    public List<String> getPrerequisites() {
+        return Arrays.asList("streets");
+    }
+    
     /** For the first run of the partial trees phase, the reach cut-off */
     public void setInitialStreetEpsilon(double epsilon) {
         this.initialStreetEpsilon = epsilon;

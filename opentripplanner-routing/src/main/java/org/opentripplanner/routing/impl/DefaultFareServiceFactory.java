@@ -33,8 +33,7 @@ import org.opentripplanner.routing.services.FareServiceFactory;
  * 
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
-    private HashMap<AgencyAndId, FareRuleSet> fareRules;
-
+    protected HashMap<AgencyAndId, FareRuleSet> fareRules;
     HashMap<AgencyAndId, FareAttribute> fareAttributes;
 
     public FareService makeFareService() {

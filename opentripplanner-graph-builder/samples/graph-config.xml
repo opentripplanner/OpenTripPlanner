@@ -25,7 +25,7 @@
 
     <bean id="osmBuilder" class="org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl">
         <property name="provider">
-            <bean class="org.opentripplanner.graph_builder.impl.osm.RegionBasedOpenStreetMapProviderImpl">
+            <bean class="org.opentripplanner.openstreetmap.impl.RegionBasedOpenStreetMapProviderImpl">
                 <property name="regionsSource">
                     <bean class="org.opentripplanner.graph_builder.impl.TransitStopsRegionsSourceImpl" />
                 </property>

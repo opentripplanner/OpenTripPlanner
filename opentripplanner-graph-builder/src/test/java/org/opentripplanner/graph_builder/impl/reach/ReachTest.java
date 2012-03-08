@@ -22,6 +22,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -31,7 +32,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;

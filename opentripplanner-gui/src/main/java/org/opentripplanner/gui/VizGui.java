@@ -13,8 +13,6 @@
 
 package org.opentripplanner.gui;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -64,18 +62,14 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -86,7 +80,6 @@ import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.reach.ReachRemainingWeightHeuristic;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -489,6 +482,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                         }
                         field.setAccessible(true);
                         String name = field.getName();
+
                         String value = "(unknown -- see console for stack trace)";
                         try {
                             value = "" + field.get(selected);
@@ -515,6 +509,9 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
                     }
                     field.setAccessible(true);
                     String name = field.getName();
+                    if (name.equals("incoming") || name.equals("outgoing")) {
+                        continue;
+                    }
                     String value = "(unknown -- see console for stack trace)";
                     try {
                         value = "" + field.get(fromv);
@@ -694,9 +691,10 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
         pane.add(rightPanel, BorderLayout.LINE_END);
-        
+
         JTabbedPane rightPanelTabs = new JTabbedPane();
-        rightPanel.add(rightPanelTabs, BorderLayout.CENTER);
+
+        rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
         serviceIdLabel = new JLabel("[service id]");
         rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
         
@@ -711,8 +709,11 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
-        metadataList.setMaximumSize(new Dimension(200, 1600));
-        rightPanelTabs.setMaximumSize(new Dimension(200, 1600));
+        Dimension size = new Dimension(200, 1600);
+        mdScrollPane.setMaximumSize(size);
+        mdScrollPane.setPreferredSize(size);
+        rightPanelTabs.setMaximumSize(size);
+        rightPanel.setMaximumSize(size);
 
         showGraph.init();
         addWindowListener(new ExitListener());

@@ -83,7 +83,7 @@ public class UpdateHandler {
                 displayPeriods.add(new TimePeriod(start, realStart));
         }
         if (bestStartTime != Long.MAX_VALUE) {
-            alertText.effectiveStartDate = new Date(bestStartTime);
+            alertText.effectiveStartDate = new Date(bestStartTime * 1000);
         }
         for (EntitySelector informed : alert.getInformedEntityList()) {
             String patchId = createId(id, informed);

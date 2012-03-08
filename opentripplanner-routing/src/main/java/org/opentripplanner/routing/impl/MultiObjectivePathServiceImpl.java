@@ -32,7 +32,7 @@ import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pqueue.BinHeap;
+import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -273,6 +273,8 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             LOG.debug(s.toStringVerbose());
             paths.add(new GraphPath(s, true));
         }
+        // sort by arrival time, though paths are already in order of increasing difficulty
+        // Collections.sort(paths, new PathComparator(origin.getOptions().isArriveBy()));
         return paths;
     }
 

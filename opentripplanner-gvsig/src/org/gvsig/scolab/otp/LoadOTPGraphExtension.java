@@ -41,8 +41,8 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.Edge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.graph.Graph;
-import org.opentripplanner.routing.core.Vertex;
-import org.opentripplanner.routing.core.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.ContractionHierarchySerializationLibrary;
 
 import com.hardcode.gdbms.engine.values.Value;

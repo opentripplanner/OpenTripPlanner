@@ -123,8 +123,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.7</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
@@ -183,15 +181,6 @@
         <finalName>opentripplanner-api-webapp</finalName>
 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
-                <configuration>
-                    <argLine>-Xmx700m</argLine>
-                    <disableXmlReport>true</disableXmlReport>
-                </configuration>
-            </plugin>
             <!-- Copy in a couple of default resources if they are not already present -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -222,16 +211,17 @@
                 <artifactId>maven-enunciate-plugin</artifactId>
                 <version>1.23</version>
                 <executions>
-                    <execution>
-                        <goals>
-                            <goal>docs</goal>
-                            <!-- default binding for docs goal is process-sources phase -->
-                        </goals>
-                    </execution>
+                  <execution>
+                    <!-- default binding for docs goal is process-sources phase -->
+                    <phase>site</phase>
+                    <goals>
+                      <goal>docs</goal>
+                    </goals>
+                  </execution>
                 </executions>
                 <configuration>
-                    <!-- change this to wherever you want the docs -->
-                    <docsDir>${project.build.directory}/api-docs</docsDir>
+                  <!-- change this to wherever you want the docs -->
+                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
                 </configuration>
             </plugin>
         </plugins>

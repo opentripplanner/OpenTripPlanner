@@ -14,13 +14,13 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -80,13 +80,16 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return timeLowerBound(options);
     }
     
-    public State traverse(State state0) {
-        int trip = state0.getTrip();
+    public State traverse(State s0) {
+        int trip = s0.getTrip();
         int runningTime = pattern.getRunningTime(stopIndex, trip);
         EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
-        StateEditor s1 = state0.edit(this, en);
+        StateEditor s1 = s0.edit(this, en);
         s1.incrementTimeInSeconds(runningTime);
-        s1.setZone(getEndStop().getZoneId());
+        if (s0.getOptions().isArriveBy())
+            s1.setZone(getStartStop().getZoneId());
+        else
+            s1.setZone(getEndStop().getZoneId());
         s1.setRoute(pattern.getExemplar().getRoute().getId());
         s1.incrementWeight(runningTime);
         return s1.makeState();

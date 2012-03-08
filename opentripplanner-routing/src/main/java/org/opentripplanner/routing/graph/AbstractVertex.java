@@ -22,6 +22,8 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.graph.Edge;
@@ -31,11 +33,10 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.impl.DistanceLibrary;
 
 public abstract class AbstractVertex implements Vertex {
 
-    private static final long serialVersionUID = 20111212;
+    private static final long serialVersionUID = MavenVersion.UID;
     
     private static int maxIndex = 0;
 
@@ -374,11 +375,13 @@ public abstract class AbstractVertex implements Vertex {
     @SuppressWarnings("unchecked")
     private static final ValidEdgeTypes VALID_EDGE_TYPES = new ValidEdgeTypes(Edge.class);
     
+    @XmlTransient
     @Override
     public ValidEdgeTypes getValidOutgoingEdgeTypes() {
         return VALID_EDGE_TYPES;
     }
 
+    @XmlTransient
     @Override
     public ValidEdgeTypes getValidIncomingEdgeTypes() {
         return VALID_EDGE_TYPES ;

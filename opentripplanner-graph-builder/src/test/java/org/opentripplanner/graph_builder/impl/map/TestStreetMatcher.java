@@ -29,14 +29,13 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DistanceLibrary;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
 
 public class TestStreetMatcher {
     static GeometryFactory gf = new GeometryFactory();
@@ -215,7 +214,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public void setElevationProfile(PackedCoordinateSequence elevPCS) {
+        public void setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
         }
 
         @Override

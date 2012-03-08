@@ -16,7 +16,9 @@ package org.opentripplanner.graph_builder.impl;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -43,6 +45,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,8 +73,18 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private EntityReplacementStrategy _entityReplacementStrategy = new EntityReplacementStrategyImpl();
 
-	private List<GraphBuilderWithGtfsDao> gtfsGraphBuilders;
+    private List<GraphBuilderWithGtfsDao> gtfsGraphBuilders;
 
+    private FareServiceFactory _fareServiceFactory;
+
+    public List<String> provides() {
+        return Arrays.asList("transit");
+    }
+
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
+    
     public void setGtfsBundles(GtfsBundles gtfsBundles) {
         _gtfsBundles = gtfsBundles;
         /* check for dups */
@@ -79,7 +92,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         for (GtfsBundle bundle : gtfsBundles.getBundles()) {
             String key = bundle.getDataKey();
             if (bundles.contains(key)) {
-                throw new RuntimeException("duplicate GTFS bundle " +  key);
+                throw new RuntimeException("duplicate GTFS bundle " + key);
             }
             bundles.add(key);
         }
@@ -93,50 +106,47 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         _entityReplacementStrategy = strategy;
     }
 
+    public void setFareServiceFactory(FareServiceFactory factory) {
+        _fareServiceFactory = factory;
+    }
+
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-            try {
-                readGtfs();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        try {
+            readGtfs();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
+        factory.setGtfsDao(_dao);
+        CalendarServiceData data = factory.createData();
+
+        CalendarServiceImpl service = new CalendarServiceImpl();
+        service.setData(data);
+
+        GtfsContext context = GtfsLibrary.createContext(_dao, service);
+
+        GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
+        hf.setFareServiceFactory(_fareServiceFactory);
+        hf.run(graph);
+
+        // We need to save the calendar service data so we can use it later
+        graph.putService(CalendarServiceData.class, data);
+        graph.updateTransitFeedValidity(data);
+
+        // run any additional graph builders that require the DAO
+        if (gtfsGraphBuilders != null) {
+            for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
+                builder.setDao(_dao);
+                builder.buildGraph(graph);
+                builder.setDao(null); // clean up
             }
-
-            CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
-            factory.setGtfsDao(_dao);
-            CalendarServiceData data = factory.createData();
-
-            CalendarServiceImpl service = new CalendarServiceImpl();
-            service.setData(data);
-
-            GtfsContext context = GtfsLibrary.createContext(_dao, service);
-
-            // Stops were being loaded twice, here and in hopfactory (AB)
-//            for (Stop stop : _dao.getAllStops()) {
-//
-//                String id = GtfsLibrary.convertIdToString(stop.getId());
-//                graph.addVertex(new TransitStop(id, stop.getLon(), stop.getLat(), stop.getName(),
-//                        stop.getId(), stop.getCode(), stop));
-//            }
-
-            GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
-            hf.run(graph);
-
-            // We need to save the calendar service data so we can use it later
-            graph.putService(CalendarServiceData.class, data);
-            graph.updateTransitFeedValidity(data);
-            
-            //run any additional graph builders that require the DAO
-            if (gtfsGraphBuilders != null) {
-            	for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
-            		builder.setDao(_dao);
-            		builder.buildGraph(graph);
-            		builder.setDao(null); //clean up
-            	}
-            }
-            // if in-memory DAO is being used, replace it with an empty one
-            // to free up some space for other graphbuilders
-            if (_dao instanceof GtfsRelationalDaoImpl) 
-                _dao = new GtfsRelationalDaoImpl();
+        }
+        // if in-memory DAO is being used, replace it with an empty one
+        // to free up some space for other graphbuilders
+        if (_dao instanceof GtfsRelationalDaoImpl)
+            _dao = new GtfsRelationalDaoImpl();
     }
 
     /****
@@ -156,7 +166,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             reader.setInputSource(gtfsBundle.getCsvInputSource());
             reader.setEntityStore(store);
             reader.setInternStrings(true);
-            
+
             if (gtfsBundle.getDefaultAgencyId() != null)
                 reader.setDefaultAgencyId(gtfsBundle.getDefaultAgencyId());
 
@@ -166,7 +176,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             if (_log.isDebugEnabled())
                 reader.addEntityHandler(counter);
 
-            if(gtfsBundle.getDefaultBikesAllowed())
+            if (gtfsBundle.getDefaultBikesAllowed())
                 reader.addEntityHandler(new EntityBikeability(true));
 
             readers.add(reader);
@@ -189,9 +199,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             for (GtfsReader reader : readers) {
 
                 // Agencies are the first entity class to be read.
-                // Accumulate the agencies from all GTFS feeds to allow cross-feed 
+                // Accumulate the agencies from all GTFS feeds to allow cross-feed
                 // references in later entity classes.
-                
+
                 // Set each reader's agency list to a copy of the list
                 // containing all agencies seen up to this point
                 if (entityClass.equals(Agency.class))
@@ -199,7 +209,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
                 reader.readEntities(entityClass);
 
-                // Update the list of all agencies seen to include those just read 
+                // Update the list of all agencies seen to include those just read
                 if (entityClass.equals(Agency.class))
                     agencies = reader.getAgencies();
 
@@ -211,14 +221,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     }
 
     public void setGtfsGraphBuilders(List<GraphBuilderWithGtfsDao> gtfsGraphBuilders) {
-		this.gtfsGraphBuilders = gtfsGraphBuilders;
-	}
+        this.gtfsGraphBuilders = gtfsGraphBuilders;
+    }
 
-	public List<GraphBuilderWithGtfsDao> getGtfsGraphBuilders() {
-		return gtfsGraphBuilders;
-	}
+    public List<GraphBuilderWithGtfsDao> getGtfsGraphBuilders() {
+        return gtfsGraphBuilders;
+    }
 
-	private class StoreImpl implements GenericMutableDao {
+    private class StoreImpl implements GenericMutableDao {
 
         @Override
         public void open() {
@@ -322,12 +332,13 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         @Override
         public void handleEntity(Object bean) {
-            if(!(bean instanceof Trip)) {
+            if (!(bean instanceof Trip)) {
                 return;
             }
 
             Trip trip = (Trip) bean;
-            if(_defaultBikesAllowed && trip.getTripBikesAllowed() == 0 && trip.getRoute().getBikesAllowed() == 0) {
+            if (_defaultBikesAllowed && trip.getTripBikesAllowed() == 0
+                    && trip.getRoute().getBikesAllowed() == 0) {
                 trip.setTripBikesAllowed(2);
             }
         }

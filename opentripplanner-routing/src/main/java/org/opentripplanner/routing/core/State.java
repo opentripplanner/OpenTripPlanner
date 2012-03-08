@@ -150,6 +150,7 @@ public class State implements Cloneable {
         return this.time;
     }
 
+    /** returns the length of the trip in seconds up to this state */
     public long getElapsedTime() {
         return Math.abs(this.time - stateData.startTime);
     }

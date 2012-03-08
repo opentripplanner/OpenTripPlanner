@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,8 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparator;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,9 +55,8 @@ import com.vividsolutions.jts.geom.Envelope;
  * each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
-    // update serialVersionId to the current date in format YYYYMMDDL
-    // whenever changes are made that could make existing graphs incompatible
-    private static final long serialVersionUID = 20120121L;
+
+    private static final long serialVersionUID = MavenVersion.UID;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
@@ -99,8 +101,13 @@ public class Graph implements Serializable {
      * @param vv the vertex to add
      */
     protected void addVertex(Vertex v) {
-        if (vertices.put(v.getLabel(), v) != null)
-            LOG.error("repeatedly added the same vertex: {}", v);
+        Vertex old = vertices.put(v.getLabel(), v);
+        if (old != null) {
+            if (old == v)
+                LOG.error("repeatedly added the same vertex: {}", v);
+            else 
+                LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v);
+        }
     }
 
     // called from streetutils, must be public for now
@@ -154,7 +161,7 @@ public class Graph implements Serializable {
     }
 
     public void remove(Vertex vertex) {
-        vertices.remove(vertex);
+        vertices.remove(vertex.getLabel());
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
@@ -162,7 +169,7 @@ public class Graph implements Serializable {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
         vertex.removeAllEdges();
-        vertices.remove(vertex);
+        this.remove(vertex);
     }
 
     public Envelope getExtent() {
@@ -179,16 +186,28 @@ public class Graph implements Serializable {
 
     // Infer the time period covered by the transit feed
     public void updateTransitFeedValidity(CalendarServiceData data) {
+        long now = new Date().getTime();
         final long SEC_IN_DAY = 24 * 60 * 60;
+        HashSet<String> agenciesWithFutureDates = new HashSet<String>();
+        HashSet<String> agencies = new HashSet<String>();
         for (AgencyAndId sid : data.getServiceIds()) {
+            agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 long t = sd.getAsDate().getTime();
+                if (t > now) {
+                    agenciesWithFutureDates.add(sid.getAgencyId());
+                }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
                 if (t < this.transitServiceStarts)
                     this.transitServiceStarts = t;
                 if (u > this.transitServiceEnds)
                     this.transitServiceEnds = u;
+            }
+        }
+        for (String agency : agencies) {
+            if (!agenciesWithFutureDates.contains(agency)) {
+                LOG.warn(GraphBuilderAnnotation.register(this, Variety.NO_FUTURE_DATES, agency));
             }
         }
     }
@@ -336,6 +355,8 @@ public class Graph implements Serializable {
         for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
+            if (v.getOutgoing().size() + v.getIncoming().size() == 0)
+                LOG.warn("vertex {} has no edges, it will not survive serialization.", v);
         }
         LOG.debug("Assigning vertex/edge ID numbers...");
         this.renumberVerticesAndEdges();

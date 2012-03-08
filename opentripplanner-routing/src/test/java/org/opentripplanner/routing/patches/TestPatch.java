@@ -15,14 +15,19 @@ package org.opentripplanner.routing.patches;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -125,6 +130,34 @@ public class TestPatch extends TestCase {
             @Override
             public List<AgencyAndId> getAllRouteIds() {
                 return Collections.emptyList();
+            }
+
+            @Override
+            public void addCalendars(Collection<ServiceCalendar> allCalendars) {
+            }
+
+            @Override
+            public void addCalendarDates(Collection<ServiceCalendarDate> allDates) {
+            }
+
+            @Override
+            public List<String> getAllAgencies() {
+                return Arrays.asList("agency");
+            }
+
+            @Override
+            public List<ServiceCalendarDate> getCalendarDatesByAgency(String agency) {
+                return null;
+            }
+
+            @Override
+            public List<ServiceCalendar> getCalendarsByAgency(String agency) {
+                return null;
+            }
+
+            @Override
+            public Agency getAgency(String id) {
+                return null;
             }
         };
         graph.putService(TransitIndexService.class, index);

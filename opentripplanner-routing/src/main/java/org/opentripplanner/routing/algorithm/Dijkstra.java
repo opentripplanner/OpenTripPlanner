@@ -17,12 +17,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.pqueue.BinHeap;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 
 /**

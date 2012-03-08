@@ -19,8 +19,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.ServiceCalendar;
+import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
@@ -87,6 +90,40 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     public void buildGraph(Graph graph) {
         _log.debug("Building transit index");
 
+        createRouteVariants(graph);
+
+        nameVariants(variantsByRoute);
+        int totalVariants = 0;
+        int totalTrips = 0;
+        for (List<RouteVariant> variants : variantsByRoute.values()) {
+            totalVariants += variants.size();
+            for (RouteVariant variant : variants) {
+                variant.cleanup();
+                totalTrips += variant.getTrips().size();
+            }
+        }
+        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
+                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
+                + " variants ");
+
+        TransitIndexServiceImpl service = new TransitIndexServiceImpl(variantsByAgency,
+                variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+                modes);
+
+        insertCalendarData(service);
+
+        addAgencies(service);
+
+        graph.putService(TransitIndexService.class, service);
+    }
+
+    private void addAgencies(TransitIndexServiceImpl service) {
+        for (Agency agency : dao.getAllAgencies()) {
+            service.addAgency(agency);
+        }
+    }
+
+    private void createRouteVariants(Graph graph) {
         for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             boolean start = false;
             boolean noStart = false;
@@ -175,23 +212,13 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
             }
         }
+    }
 
-        nameVariants(variantsByRoute);
-        int totalVariants = 0;
-        int totalTrips = 0;
-        for (List<RouteVariant> variants : variantsByRoute.values()) {
-            totalVariants += variants.size();
-            for (RouteVariant variant : variants) {
-                variant.cleanup();
-                totalTrips += variant.getTrips().size();
-            }
-        }
-        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
-                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants + " variants ");
-
-        TransitIndexService service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, modes);
-        graph.putService(TransitIndexService.class, service);
+    private void insertCalendarData(TransitIndexService service) {
+        Collection<ServiceCalendar> allCalendars = dao.getAllCalendars();
+        service.addCalendars(allCalendars);
+        Collection<ServiceCalendarDate> allDates = dao.getAllCalendarDates();
+        service.addCalendarDates(allDates);
     }
 
     private void addModeFromTrip(Trip trip) {
@@ -215,33 +242,39 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
 
             /* next, do routes have a unique start, end, or via? */
-            HashMap<Stop, List<RouteVariant>> starts = new HashMap<Stop, List<RouteVariant>>();
-            HashMap<Stop, List<RouteVariant>> ends = new HashMap<Stop, List<RouteVariant>>();
-            HashMap<Stop, List<RouteVariant>> vias = new HashMap<Stop, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> starts = new HashMap<String, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> ends = new HashMap<String, List<RouteVariant>>();
+            HashMap<String, List<RouteVariant>> vias = new HashMap<String, List<RouteVariant>>();
             for (RouteVariant variant : variants) {
                 List<Stop> stops = variant.getStops();
-                MapUtils.addToMapList(starts, stops.get(0), variant);
-                MapUtils.addToMapList(ends, stops.get(stops.size() - 1), variant);
+                MapUtils.addToMapList(starts, getName(stops.get(0)), variant);
+                MapUtils.addToMapList(ends, getName(stops.get(stops.size() - 1)), variant);
                 for (Stop stop : stops) {
-                    MapUtils.addToMapList(vias, stop, variant);
+                    MapUtils.addToMapList(vias, getName(stop), variant);
                 }
             }
 
             // do simple naming for unique start/end/via
             for (RouteVariant variant : variants) {
                 List<Stop> stops = variant.getStops();
-                if (starts.get(stops.get(0)).size() == 1) {
+                String firstStop = getName(stops.get(0));
+                if (starts.get(firstStop).size() == 1) {
                     // this is the only route with this start
-                    String name = routeName + " from " + stops.get(0).getName();
-                    variant.setName(name);
-                } else if (ends.get(stops.get(stops.size() - 1)).size() == 1) {
-                    String name = routeName + " to " + stops.get(stops.size() - 1).getName();
+                    String name = routeName + " from " + firstStop;
                     variant.setName(name);
                 } else {
-                    for (Stop stop : stops) {
-                        if (vias.get(stop).size() == 1) {
-                            variant.setName(routeName + " via " + stop.getName());
-                            break;
+                    String lastStop = getName(stops.get(stops.size() - 1));
+                    if (ends.get(lastStop).size() == 1) {
+                        String name = routeName + " to " + lastStop;
+                        variant.setName(name);
+                    } else {
+                        for (Stop stop : stops) {
+                            String viaStop = getName(stop);
+                            if (vias.get(viaStop).size() == 1) {
+                                String name = routeName + " via " + viaStop;
+                                variant.setName(name);
+                                break;
+                            }
                         }
                     }
                 }
@@ -285,26 +318,29 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
              * 
              */
             for (RouteVariant variant : variants) {
+                if (variant.getName() != null)
+                    continue;
                 List<Stop> stops = variant.getStops();
-                Stop firstStop = stops.get(0);
+                String firstStop = getName(stops.get(0));
                 HashSet<RouteVariant> remainingVariants = new HashSet<RouteVariant>(
                         starts.get(firstStop));
 
-                Stop lastStop = stops.get(stops.size() - 1);
+                String lastStop = getName(stops.get(stops.size() - 1));
                 // take the intersection
                 remainingVariants.retainAll(ends.get(lastStop));
                 if (remainingVariants.size() == 1) {
-                    String name = routeName + " from " + firstStop.getName() + " to "
-                            + lastStop.getName();
+                    String name = routeName + " from " + firstStop + " to "
+                            + lastStop;
                     variant.setName(name);
+                    continue;
                 }
                 // this did not yield a unique name; try start / via / end for
                 // each via
                 for (Stop stop : stops) {
-                    if (stop == firstStop || stop == lastStop) {
+                    if (getName(stop).equals(firstStop) || getName(stop).equals(lastStop)) {
                         continue;
                     }
-                    List<RouteVariant> via = vias.get(stop);
+                    List<RouteVariant> via = vias.get(getName(stop));
                     boolean found = false;
                     boolean bad = false;
                     for (RouteVariant viaVariant : via) {
@@ -318,8 +354,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                     }
                     if (found && !bad) {
-                        String name = routeName + " from " + firstStop.getName() + " to "
-                                + lastStop.getName() + " via " + stop.getName();
+                        String name = routeName + " from " + firstStop + " to "
+                                + lastStop + " via " + getName(stop);
                         variant.setName(name);
                         break;
                     }
@@ -328,20 +364,25 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     // check for express
                     if (remainingVariants.size() == 2) {
                         // there are exactly two remaining variants sharing this start/end
-                        // we know that this oen must be a subset of the other, because it
+                        // we know that this one must be a subset of the other, because it
                         // has no unique via. So, it is the express
-                        variant.setName(routeName + " from " + firstStop.getName() + " to "
-                                + lastStop.getName() + " express");
+
+                        String name = routeName + " from " + firstStop + " to "
+                                + lastStop + " express";
+                        variant.setName(name);
                     } else {
                         // the final fallback
                         variant.setName(routeName + " like " + variant.getTrips().get(0).getId());
-
                     }
                 }
             }
 
         }
 
+    }
+
+    private String getName(Stop stop) {
+        return stop.getName() + " (" + stop.getId() + ")";
     }
 
     private RouteVariant addTripToVariant(Trip trip) {

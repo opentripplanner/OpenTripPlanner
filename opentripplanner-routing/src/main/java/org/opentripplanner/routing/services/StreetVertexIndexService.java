@@ -18,8 +18,9 @@ import java.util.List;
 
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
+import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -33,8 +34,10 @@ public interface StreetVertexIndexService {
 
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options,
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options,
             List<Edge> extraEdges);
 
-    public Collection<StreetEdge> getClosestEdges(Coordinate coordinate, TraverseOptions options);
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options);
+
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
 }

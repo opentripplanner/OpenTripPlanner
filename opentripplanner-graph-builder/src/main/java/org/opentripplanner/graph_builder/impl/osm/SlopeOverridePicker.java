@@ -14,31 +14,32 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 public class SlopeOverridePicker {
-	private OSMSpecifier specifier;
-	private boolean override;
+    private OSMSpecifier specifier;
 
-	public SlopeOverridePicker() {
-	}
+    private boolean override;
 
-	public SlopeOverridePicker(OSMSpecifier specifier, boolean override) {
-		this.specifier = specifier;
-		this.override = override;
-	}
+    public SlopeOverridePicker() {
+    }
 
-	public void setSpecifier(OSMSpecifier specifier) {
-		this.specifier = specifier;
-	}
+    public SlopeOverridePicker(OSMSpecifier specifier, boolean override) {
+        this.specifier = specifier;
+        this.override = override;
+    }
 
-	public OSMSpecifier getSpecifier() {
-		return specifier;
-	}
+    public void setSpecifier(OSMSpecifier specifier) {
+        this.specifier = specifier;
+    }
 
-	public void setOverride(boolean override) {
-		this.override = override;
-	}
+    public OSMSpecifier getSpecifier() {
+        return specifier;
+    }
 
-	public boolean getOverride () {
-		return override;
-	}
+    public void setOverride(boolean override) {
+        this.override = override;
+    }
+
+    public boolean getOverride() {
+        return override;
+    }
 
 }

@@ -16,21 +16,21 @@ package org.opentripplanner.graph_builder.impl.osm;
 import java.beans.PropertyEditorSupport;
 
 public class NotePropertiesEditor extends PropertyEditorSupport {
-	private NoteProperties value;
+    private NoteProperties value;
 
-	public void setAsText(String pattern) {
-		value = new NoteProperties(pattern);
-	}
+    public void setAsText(String pattern) {
+        value = new NoteProperties(pattern);
+    }
 
-	public String getAsText() {
-		return value.getNotePattern();
-	}
+    public String getAsText() {
+        return value.getNotePattern();
+    }
 
-	public Object getValue() {
-		return value;
-	}
+    public Object getValue() {
+        return value;
+    }
 
-	public void setValue(Object object) {
-		value = (NoteProperties) object;
-	}
+    public void setValue(Object object) {
+        value = (NoteProperties) object;
+    }
 }

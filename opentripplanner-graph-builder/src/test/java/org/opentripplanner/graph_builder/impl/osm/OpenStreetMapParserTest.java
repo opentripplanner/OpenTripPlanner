@@ -26,16 +26,16 @@ import java.util.zip.GZIPInputStream;
 
 import org.junit.Test;
 
-import org.opentripplanner.graph_builder.impl.osm.FileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.graph_builder.impl.osm.StreamedFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.graph_builder.impl.osm.BinaryFileBasedOpenStreetMapProviderImpl;
 
-import org.opentripplanner.graph_builder.services.osm.OpenStreetMapProvider;
 
-import org.opentripplanner.graph_builder.model.osm.OSMMap;
-import org.opentripplanner.graph_builder.model.osm.OSMMap;
-import org.opentripplanner.graph_builder.model.osm.OSMNode;
-import org.opentripplanner.graph_builder.model.osm.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMMap;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.impl.BinaryFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.impl.OpenStreetMapParser;
+import org.opentripplanner.openstreetmap.impl.StreamedFileBasedOpenStreetMapProviderImpl;
 
 public class OpenStreetMapParserTest {
     @Test

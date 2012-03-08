@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.model.osm.OSMWithTags;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 /** Specifies a class of OSM tagged objects (e.g. ways) by a list tags and their values */
 public class OSMSpecifier {

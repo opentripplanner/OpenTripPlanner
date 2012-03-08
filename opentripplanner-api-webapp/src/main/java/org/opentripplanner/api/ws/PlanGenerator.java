@@ -20,7 +20,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -59,6 +59,7 @@ import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
+import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
@@ -78,10 +79,13 @@ public class PlanGenerator {
 
     private GeometryFactory geometryFactory = new GeometryFactory();
 
+    private TransitIndexService transitIndex;
+
     public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
         this.request = request;
         pathService = pathServiceFactory.getPathService(request.getRouterId());
         Graph graph = pathService.getGraphService().getGraph();
+        transitIndex = graph.getService(TransitIndexService.class);
         fareService = graph.getService(FareService.class);
     }
 
@@ -133,6 +137,10 @@ public class PlanGenerator {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
                 /* fix up from/to on first/last legs */
+                if (i.legs.size() == 0) {
+                    LOGGER.log(Level.WARNING, "plan has no legs");
+                    continue;
+                }
                 Leg firstLeg = i.legs.get(0);
                 firstLeg.from.orig = request.getFromName();
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
@@ -203,6 +211,22 @@ public class PlanGenerator {
             if (backEdge == null) {
                 continue;
             }
+            
+            TraverseMode mode = backEdgeNarrative.getMode();
+            if (mode != null) {
+                long dt = state.getAbsTimeDeltaSec();
+                if (mode == TraverseMode.BOARDING || 
+                        mode == TraverseMode.ALIGHTING ||
+                        mode == TraverseMode.STL) {
+                    itinerary.waitingTime += dt;
+                } else if (mode.isOnStreetNonTransit()) {
+                    itinerary.walkDistance += backEdgeNarrative.getDistance();
+                    itinerary.walkTime += dt;
+                } else if (mode.isTransit()) {
+                    itinerary.transitTime += dt;
+                } 
+            }
+            
             if (backEdge instanceof FreeEdge) {
                 if(backEdge instanceof PreBoardEdge) {
                     // Add boarding alerts to the next leg
@@ -214,19 +238,12 @@ public class PlanGenerator {
                 continue;
             }
 
-            TraverseMode mode = backEdgeNarrative.getMode();
-            if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING) {
-                itinerary.waitingTime += state.getElapsedTime();
-            }
             if (backEdge instanceof EdgeWithElevation) {
                 PackedCoordinateSequence profile = ((EdgeWithElevation) backEdge)
                         .getElevationProfile();
                 previousElevation = applyElevation(profile, itinerary, previousElevation);
             }
-            if (mode != null && mode.isOnStreetNonTransit()) {
-                itinerary.walkDistance += backEdgeNarrative.getDistance();
-            }
-
+            
             switch (pgstate) {
             case START:
                 if (mode == TraverseMode.WALK) {
@@ -361,7 +378,7 @@ public class PlanGenerator {
                          * any further transit edge, add "from" vertex to intermediate stops
                          */
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
-                            Place stop = makePlace(state.getBackState());
+                            Place stop = makePlace(state.getBackState(), true);
                             leg.stop.add(stop);
                         } else if(leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
@@ -400,9 +417,6 @@ public class PlanGenerator {
                 }
 
                 addNotesToLeg(leg, backEdgeNarrative);
-                if (pgstate == PlanGenState.TRANSIT) {
-                    itinerary.transitTime += state.getElapsedTime();
-                }
 
             }
 
@@ -428,6 +442,11 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
             leg.routeColor = trip.getRoute().getColor();
             leg.routeTextColor = trip.getRoute().getTextColor();
+            if (transitIndex != null) {
+                Agency agency = transitIndex.getAgency(leg.agencyId);
+                leg.agencyName = agency.getName();
+                leg.agencyUrl = agency.getUrl();
+            }
         }
         leg.mode = en.getMode().toString();
         leg.startTime = new Date(state.getBackState().getTimeInMillis());
@@ -441,7 +460,7 @@ public class PlanGenerator {
         leg.endTime = new Date(state.getBackState().getTimeInMillis());
         Geometry geometry = geometryFactory.createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-        leg.to = makePlace(state);
+        leg.to = makePlace(state, true);
         coordinates.clear();
     }
 
@@ -490,7 +509,7 @@ public class PlanGenerator {
         leg.startTime = new Date(s.getBackState().getTimeInMillis());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
-        leg.from = makePlace(en.getFromVertex());
+        leg.from = makePlace(s, false);
         leg.mode = en.getMode().toString();
         return leg;
     }
@@ -521,32 +540,23 @@ public class PlanGenerator {
      * 
      * @return
      */
-    private Place makePlace(State state) {
+    private Place makePlace(State state, boolean time) {
         Vertex v = state.getVertex();
         Coordinate endCoord = v.getCoordinate();
         String name = v.getName();
-        AgencyAndId stopId = null;
-        String stopCode = null;
-        if (v instanceof TransitVertex) {
-            stopId = ((TransitVertex)v).getStopId();
-            stopCode = ((TransitVertex)v).getStopCode();
+        Place place;
+        if (time) {
+            Date timeAtState = new Date(state.getTimeInMillis());
+            place = new Place(endCoord.x, endCoord.y, name, timeAtState);
+        } else {
+            place = new Place(endCoord.x, endCoord.y, name);
         }
-        Date timeAtState = new Date(state.getTimeInMillis());
-        Place place = new Place(endCoord.x, endCoord.y, name, stopId, stopCode, timeAtState);
-        return place;
-    }
 
-    /**
-     * Makes a new Place from a vertex.
-     * 
-     * @return
-     */
-    private Place makePlace(Vertex vertex) {
-        Coordinate endCoord = vertex.getCoordinate();
-        Place place = new Place(endCoord.x, endCoord.y, vertex.getName());
-        if (vertex instanceof TransitVertex) {
-            place.stopId = ((TransitVertex)vertex).getStopId();
-            place.stopCode = ((TransitVertex)vertex).getStopCode();
+        if (v instanceof TransitVertex) {
+            TransitVertex transitVertex = (TransitVertex)v;
+            place.stopId = transitVertex.getStopId();
+            place.stopCode = transitVertex.getStopCode();
+            place.zoneId = state.getZone();
         }
         return place;
     }

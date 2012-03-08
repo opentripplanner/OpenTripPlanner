@@ -54,7 +54,7 @@ public class TestTriangle extends TestCase {
                 new Coordinate(length, 0) // slope = -0.1
         };
         PackedCoordinateSequence elev = new PackedCoordinateSequence.Double(profile);
-        testStreet.setElevationProfile(elev);
+        testStreet.setElevationProfile(elev, false);
         
         double trueLength = ElevationUtils.getLengthMultiplierFromElevation(elev) * length;
         testStreet.setSlopeSpeedEffectiveLength(trueLength); // normalize length

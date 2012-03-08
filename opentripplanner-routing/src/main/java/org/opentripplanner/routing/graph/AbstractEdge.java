@@ -22,7 +22,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.annotation.XmlTransient;
+
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
@@ -31,7 +34,7 @@ import org.opentripplanner.routing.patch.Patch;
 
 public abstract class AbstractEdge implements Edge {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = MavenVersion.UID;
 
     protected Vertex fromv;
 
@@ -159,7 +162,7 @@ public abstract class AbstractEdge implements Edge {
 
     @Override
     public void removePatch(Patch patch) {
-        if (patches.size() == 1) {
+        if (patches == null || patches.size() == 1) {
             patches = null;
         } else {
             patches.remove(patch);
@@ -199,6 +202,7 @@ public abstract class AbstractEdge implements Edge {
     private static final ValidVertexTypes VALID_VERTEX_TYPES =
             new ValidVertexTypes(Vertex.class, Vertex.class);
     
+    @XmlTransient
     @Override
     public ValidVertexTypes getValidVertexTypes() {
         return VALID_VERTEX_TYPES;

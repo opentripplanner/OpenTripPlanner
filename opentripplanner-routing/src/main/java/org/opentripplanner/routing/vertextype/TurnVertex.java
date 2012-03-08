@@ -145,13 +145,12 @@ public class TurnVertex extends StreetVertex {
         return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
 
-    public void setElevationProfile(PackedCoordinateSequence elev) {
+    public void setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
             return;
         }
-        if (slopeOverride) {
-            elev = new PackedCoordinateSequence.Float(new Coordinate[] { elev.getCoordinate(0),
-                    elev.getCoordinate((elev.size() - 1)) }, 2);
+        if (slopeOverride && !computed) {
+            return;
         }
 
         elevationProfile = elev;

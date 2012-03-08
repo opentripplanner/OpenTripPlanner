@@ -21,28 +21,29 @@ package org.opentripplanner.graph_builder.impl.osm;
  */
 public class NotePicker {
 
-	private OSMSpecifier specifier;
-	private NoteProperties noteProperties;
+    private OSMSpecifier specifier;
 
-	public NotePicker(OSMSpecifier specifier, NoteProperties noteProperties) {
-		this.specifier = specifier;
-		this.noteProperties = noteProperties;
-	}
+    private NoteProperties noteProperties;
 
-	public void setSpecifier(OSMSpecifier specifier) {
-		this.specifier = specifier;
-	}
+    public NotePicker(OSMSpecifier specifier, NoteProperties noteProperties) {
+        this.specifier = specifier;
+        this.noteProperties = noteProperties;
+    }
 
-	public OSMSpecifier getSpecifier() {
-		return specifier;
-	}
+    public void setSpecifier(OSMSpecifier specifier) {
+        this.specifier = specifier;
+    }
 
-	public void setNoteProperties(NoteProperties noteProperties) {
-		this.noteProperties = noteProperties;
-	}
+    public OSMSpecifier getSpecifier() {
+        return specifier;
+    }
 
-	public NoteProperties getNoteProperties() {
-		return noteProperties;
-	}
+    public void setNoteProperties(NoteProperties noteProperties) {
+        this.noteProperties = noteProperties;
+    }
+
+    public NoteProperties getNoteProperties() {
+        return noteProperties;
+    }
 
 }
