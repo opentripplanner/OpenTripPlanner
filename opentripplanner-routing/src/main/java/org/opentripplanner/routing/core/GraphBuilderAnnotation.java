@@ -88,7 +88,11 @@ public class GraphBuilderAnnotation implements Serializable {
                 + "This is probably caused by a bug in the graph builder, but could "
                 + "conceivably happen with extremely bad GTFS or OSM data."), 
         NO_FUTURE_DATES("Agency %s has no calendar dates which are after today; "
-                + "no trips will be plannable on this agency");
+                + "no trips will be plannable on this agency"),
+        LEVEL_AMBIGUOUS("Could not infer floor number for layer called '%s' at %s. Vertical " +
+                "movement will still be possible, but elevator cost might be incorrect. " +
+                "Consider an OSM level map."),
+        GRAPH_CONNECTIVITY("Removed/depedestrianized disconnected subgraph containing: %s");
 
         private final String formatString;
 
