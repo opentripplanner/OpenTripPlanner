@@ -21,10 +21,12 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -202,8 +204,8 @@ public class StreetUtils {
     	/* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
             if (island.size() < 20) {
-                _log.warn("Depedestrianizing or deleting floating island at "
-                        + island.iterator().next());
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.GRAPH_CONNECTIVITY, 
+                        island.iterator().next(), island));
                 for (Vertex vertex : island) {
                     depedestrianizeOrRemove(graph, vertex);
                 }
