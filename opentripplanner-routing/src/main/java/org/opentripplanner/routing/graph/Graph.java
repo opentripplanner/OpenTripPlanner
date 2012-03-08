@@ -161,7 +161,7 @@ public class Graph implements Serializable {
     }
 
     public void remove(Vertex vertex) {
-        vertices.remove(vertex);
+        vertices.remove(vertex.getLabel());
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
@@ -169,7 +169,7 @@ public class Graph implements Serializable {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
         vertex.removeAllEdges();
-        vertices.remove(vertex);
+        this.remove(vertex);
     }
 
     public Envelope getExtent() {
@@ -355,6 +355,8 @@ public class Graph implements Serializable {
         for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
+            if (v.getOutgoing().size() + v.getIncoming().size() == 0)
+                LOG.warn("vertex {} has no edges, it will not survive serialization.", v);
         }
         LOG.debug("Assigning vertex/edge ID numbers...");
         this.renumberVerticesAndEdges();
