@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.graph.Edge;
@@ -35,7 +36,7 @@ import org.opentripplanner.routing.edgetype.TurnEdge;
 
 public abstract class AbstractVertex implements Vertex {
 
-    private static final long serialVersionUID = 20111212;
+    private static final long serialVersionUID = MavenVersion.UID;
     
     private static int maxIndex = 0;
 
