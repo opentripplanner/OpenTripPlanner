@@ -137,6 +137,10 @@ public class PlanGenerator {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
                 /* fix up from/to on first/last legs */
+                if (i.legs.size() == 0) {
+                    LOGGER.log(Level.WARNING, "plan has no legs");
+                    continue;
+                }
                 Leg firstLeg = i.legs.get(0);
                 firstLeg.from.orig = request.getFromName();
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
