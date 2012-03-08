@@ -26,6 +26,7 @@ otp.namespace("otp.planner");
 otp.planner.Itinerary = {
     // config
     map            : null,
+    triptab        : null,
     locale         : null,
     templates      : null,
     showStopCodes    : false,
@@ -607,7 +608,7 @@ otp.planner.Itinerary = {
                 // show/hide instructions if our trip has more than 2 legs 
                 step.expanded = false;
                 step.singleClickExpand = true;
-                var id = 'showDetails-' + step.id;
+                var id = 'showDetails-' + this.triptab.id + "-" + step.id;
                 step.text += '<div id="' + id + '" class="togglesteps"> ' + this.templates.getShowDetails() + '</div>';
                 node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
                 node.showDetailsId = id;

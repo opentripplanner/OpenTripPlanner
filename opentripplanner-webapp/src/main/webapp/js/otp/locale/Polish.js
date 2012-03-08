@@ -170,6 +170,7 @@ otp.locale.Polish = {
     labels : 
     {
 // TODO
+        agency_msg   : "Service run by", // TODO
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip Details",

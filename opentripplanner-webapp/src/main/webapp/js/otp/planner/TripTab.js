@@ -377,6 +377,7 @@ otp.planner.TripTab = {
             var itin = this.m_itinerariesStore.getAt(id - 1);
             retVal = new otp.planner.Itinerary( {
                 map              : this.planner.map,
+                triptab          : this,
                 locale           : this.locale,
                 templates        : this.templates,
                 showStopCodes    : this.planner.showStopCodes,

@@ -546,6 +546,7 @@ otp.planner.StaticForms = {
         }
     },
 
+
     /** */
     getMaxDistance : function()
     {
@@ -642,6 +643,7 @@ otp.planner.StaticForms = {
         }
     },
 
+
     /** */
     selectFrom : function(combo, record, num)
     {
@@ -654,6 +656,7 @@ otp.planner.StaticForms = {
         var coord = otp.util.ExtUtils.getCoordinate(record);
         this.m_toForm.setGeocodeCoord(coord, record);
     },
+
 
     /** */
     getContextMenu : function(cm) {
@@ -781,7 +784,8 @@ otp.planner.StaticForms = {
         });
         
     },
-    
+
+
     /**
      * Restore the points of interest when the panel is activated
      * Note that currently planner.js calls this function directly
@@ -796,7 +800,8 @@ otp.planner.StaticForms = {
         {
             this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
             this.THIS.poi.setToCoord(this.THIS.m_toForm.geocodeCoord);
-            this.THIS.poi.zoomToExtent();
+            if(this.THIS.m_fromForm.geocodeCoord && this.THIS.m_toForm.geocodeCoord)
+                this.THIS.poi.zoomToExtent();
         }
     },
 
@@ -807,8 +812,6 @@ otp.planner.StaticForms = {
      */
     makeFromToForms : function()
     {
-        //var thisForms = this;
-        
         // step 1: these give the from & to forms 'memory' -- all submitted strings are saved off in the cookie for latter use
         Ext.state.Manager.setProvider(new Ext.state.CookieProvider());
         Ext.state.Manager.getProvider();
@@ -947,12 +950,10 @@ otp.planner.StaticForms = {
 
         return inputPanel;
     },
-    
+
+
+    /** */
     addIntermediatePlace : function(ll) {
-        /*var comboBoxOptions = {label: '', cls: 'nudgeRight', msgTarget: "under", columnWidth: 0.80};
-        var intFormOptions = Ext.apply({}, {id: 'intPlace.id', name: 'intPlace', emptyText: this.locale.tripPlanner.labels.intermediate}, comboBoxOptions);                
-        var intPlaceForm = new otp.core.ComboBox(intFormOptions);*/
-        
         var intPlaceField = new Ext.form.TextField({
             text: "hello",
             columnWidth: 0.75

@@ -170,6 +170,7 @@ otp.locale.English = {
     // see otp.planner.Templates for use
     labels : 
     {
+        agency_msg   : "Service run by",
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip details",

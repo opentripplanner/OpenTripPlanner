@@ -170,6 +170,7 @@ otp.locale.Turkish = {
     // see otp.planner.Templates for use
     labels : 
     {
+        agency_msg   : "Service run by", // TODO
         about        : "Hakkında",
         stop_id      : "Stop ID",
         trip_details : "Yolculuk detayları",

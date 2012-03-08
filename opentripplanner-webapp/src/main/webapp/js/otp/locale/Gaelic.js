@@ -33,14 +33,14 @@ otp.locale.Gaelic = {
     contextMenu : 
     {
         fromHere         : "Tosaigh turas anseo",
-        toHere           : "Críochnaigh turas anseo",
+        toHere           : "CrÃ­ochnaigh turas anseo",
         intermediateHere : "Add intermediate point",  // TODO localize
 
-        centerHere       : "Cur lár an léarscáil anseo",
-        zoomInHere       : "Zúmáil amach anseo",
-        zoomOutHere      : "Zúmáil isteach anseo",
-        previous         : "Áit ar an léarscáil níos déanaí",
-        next             : "Céad áit eile ar an léarscáil"
+        centerHere       : "Cur lÃ¡r an lÃ©arscÃ¡il anseo",
+        zoomInHere       : "ZÃºmÃ¡il amach anseo",
+        zoomOutHere      : "ZÃºmÃ¡il isteach anseo",
+        previous         : "Ã�it ar an lÃ©arscÃ¡il nÃ­os dÃ©anaÃ­",
+        next             : "CÃ©ad Ã¡it eile ar an lÃ©arscÃ¡il"
     },
 
     // TODO Localize Me
@@ -67,42 +67,42 @@ otp.locale.Gaelic = {
     indicators : 
     {
         ok         : "OK",
-        date       : "Dáta",
+        date       : "DÃ¡ta",
         loading    : "Ag luchtach",
         searching  : "Ag cuardach....",
-        qEmptyText : "Seoladh, crosbhealach, sainchomhartha, nó Stop ID..."
+        qEmptyText : "Seoladh, crosbhealach, sainchomhartha, nÃ³ Stop ID..."
     },
 
     buttons: 
     {
         reverse       : "Ar ais",
-        reverseTip    : "<b>treoracha ar ais</b><br/>Plean turas fillte ag aisiompú na bpointí tús agus críche an turais seo, agus ag choigeartú an am seo ar aghaidh.",
+        reverseTip    : "<b>treoracha ar ais</b><br/>Plean turas fillte ag aisiompÃº na bpointÃ­ tÃºs agus crÃ­che an turais seo, agus ag choigeartÃº an am seo ar aghaidh.",
         reverseMiniTip: "treoracha ar ais",
 
         edit          : "Aithrigh",
-        editTip       : "<b>Aithrigh turas</b><br/>Fill ar ais go dtí príomhfoirm pleanálaí turais le sonraí an turas seo.",
+        editTip       : "<b>Aithrigh turas</b><br/>Fill ar ais go dtÃ­ prÃ­omhfoirm pleanÃ¡laÃ­ turais le sonraÃ­ an turas seo.",
 
         clear         : "Glan",
-        clearTip      : "<b>Glan</b><br/>Glan an léarscáil agus na huirlisí uile atá gníomhach.",
+        clearTip      : "<b>Glan</b><br/>Glan an lÃ©arscÃ¡il agus na huirlisÃ­ uile atÃ¡ gnÃ­omhach.",
 
-        fullScreen    : "Scáileán Iomlán",
-        fullScreenTip : "<b>Scáileán Iomlán</b><br/>Teaspáin -nó- cur i bhfolach painéil uirlis.",
+        fullScreen    : "ScÃ¡ileÃ¡n IomlÃ¡n",
+        fullScreenTip : "<b>ScÃ¡ileÃ¡n IomlÃ¡n</b><br/>TeaspÃ¡in -nÃ³- cur i bhfolach painÃ©il uirlis.",
 
-        print         : "Priontáil",
-        printTip      : "<b>Priontáil</b><br/>Leagan an turasphlean réidh le phriontáil (gan léarscáil).",
+        print         : "PriontÃ¡il",
+        printTip      : "<b>PriontÃ¡il</b><br/>Leagan an turasphlean rÃ©idh le phriontÃ¡il (gan lÃ©arscÃ¡il).",
 
         link          : "Nasc",
         linkTip      : "<b>Nasc</b><br/>Teaspain URL an nasc don turasphlean seo.",
 
         feedback      : "Aiseolas",
-        feedbackTip   : "<b>Aiseolas</b><br/>Seol do thuaraim nó faoin léarscáil.",
+        feedbackTip   : "<b>Aiseolas</b><br/>Seol do thuaraim nÃ³ faoin lÃ©arscÃ¡il.",
 
         submit       : "Cur",
         clearButton  : "Glan",
         ok           : "OK",
-        cancel       : "Dúiltaigh",
+        cancel       : "DÃºiltaigh",
         yes          : "Ar aghaidh",
-        no           : "Ní",
+        no           : "NÃ­",
 // TODO
         showDetails  : "Show details...",
         hideDetails  : "Hide details..."
@@ -120,15 +120,15 @@ otp.locale.Gaelic = {
         south:          "theas",
         east:           "thoir",
         bound:          "faoi cheangal",
-        left:           "Ar chlé",
+        left:           "Ar chlÃ©",
         right:          "Ar dheis",
-        slightly_left:  "beagán ar chlé",
-        slightly_right: "beagán ar dheis",
-        hard_left:      "lán ar chlé",
-        hard_right:     "lán ar dheis",
+        slightly_left:  "beagÃ¡n ar chlÃ©",
+        slightly_right: "beagÃ¡n ar dheis",
+        hard_left:      "lÃ¡n ar chlÃ©",
+        hard_right:     "lÃ¡n ar dheis",
         'continue':     "lean ar aghaidh",
-        to_continue:    "chun leanúint ar",
-        becomes:        "go dti do n-aithríonn sé go",
+        to_continue:    "chun leanÃºint ar",
+        becomes:        "go dti do n-aithrÃ­onn sÃ© go",
         at:             "ag",
 // TODO
         on:             "on",
@@ -172,6 +172,7 @@ otp.locale.Gaelic = {
     labels : 
     {
 // TODO
+        agency_msg   : "Service run by", // TODO
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Weee Trip Details",
@@ -220,13 +221,13 @@ otp.locale.Gaelic = {
     {
 // TODO
         format        : "D, j M H:i",
-        minute        : "nóiméad",
-        minutes       : "nóiméid",
-        minute_abbrev : "nóiméad",
-        minutes_abbrev: "nóiméid",
+        minute        : "nÃ³imÃ©ad",
+        minutes       : "nÃ³imÃ©id",
+        minute_abbrev : "nÃ³imÃ©ad",
+        minutes_abbrev: "nÃ³imÃ©id",
         second_abbrev : "seacaind",
         seconds_abbrev: "seacaind",
-        months:         ['Ean', 'Fea', 'Máirt', 'Aib', 'Beal', 'Meith', 'Iúil', 'Lún', 'M.Fr', 'D.Fr', 'Sam', 'Nollaig']
+        months:         ['Ean', 'Fea', 'MÃ¡irt', 'Aib', 'Beal', 'Meith', 'IÃºil', 'LÃºn', 'M.Fr', 'D.Fr', 'Sam', 'Nollaig']
     },
     
     systemmap :
@@ -241,28 +242,28 @@ otp.locale.Gaelic = {
     {
         labels : 
         {
-            panelTitle    : "Pleanálaí Turais",
-            tabTitle      : "Pleanáil turas",
-            inputTitle    : "Sonraí turais",
+            panelTitle    : "PleanÃ¡laÃ­ Turais",
+            tabTitle      : "PleanÃ¡il turas",
+            inputTitle    : "SonraÃ­ turais",
             optTitle      : "roghanna turais (roghnach)",
-            submitMsg     : "Ag pleanáil do thuras...",
+            submitMsg     : "Ag pleanÃ¡il do thuras...",
             optionalTitle : "",
-            date          : "Dáta",
+            date          : "DÃ¡ta",
             time          : "Am",
             when          : "Cathain",
-            from          : "Ó",
-            fromHere      : "Ón áit seo",
+            from          : "Ã“",
+            fromHere      : "Ã“n Ã¡it seo",
             to            : "Go",
-            toHere        : "Go dtí seo",
+            toHere        : "Go dtÃ­ seo",
             intermediate  : "Intermediate Place",          // TODO
-            minimize      : "Teaspáin dom an",
-            maxWalkDistance: "Súil is faide",
-            maxBikeDistance: "Súil is bike",              // TODO
+            minimize      : "TeaspÃ¡in dom an",
+            maxWalkDistance: "SÃºil is faide",
+            maxBikeDistance: "SÃºil is bike",              // TODO
             arriveDepart  : "Sroic roimh/Imigh ag",
             mode          : "Iompair ar",
-            wheelchair    : "Turas oiriúnach do chathaoireacha rothaí", 
+            wheelchair    : "Turas oiriÃºnach do chathaoireacha rothaÃ­", 
             go            : "Imigh",
-            planTrip      : "Pleanáil do thuras",
+            planTrip      : "PleanÃ¡il do thuras",
             newTrip       : "Turas nua"
         },
 
@@ -294,36 +295,36 @@ otp.locale.Gaelic = {
 
         error:
         {
-            title        : "Thárla earráid sa phleanálaí turais",
-            deadMsg      : "Tá pleanálaí léarscáil an dturais gan freagra a thabhairt faoi láthair. Fan ar feadh cúpla nóiméad chun iarracht eile a dhéanamh, nó déan iarracht as an phleanálaí turais téacs (féach an nasc thíos).",
-            geoFromMsg   : "Roghnaigh an suíomh 'Ó' do do thurais: ",
-            geoToMsg     : "Roghnaigh an suíomh 'Go dtí' do do thurais:"
+            title        : "ThÃ¡rla earrÃ¡id sa phleanÃ¡laÃ­ turais",
+            deadMsg      : "TÃ¡ pleanÃ¡laÃ­ lÃ©arscÃ¡il an dturais gan freagra a thabhairt faoi lÃ¡thair. Fan ar feadh cÃºpla nÃ³imÃ©ad chun iarracht eile a dhÃ©anamh, nÃ³ dÃ©an iarracht as an phleanÃ¡laÃ­ turais tÃ©acs (fÃ©ach an nasc thÃ­os).",
+            geoFromMsg   : "Roghnaigh an suÃ­omh 'Ã“' do do thurais: ",
+            geoToMsg     : "Roghnaigh an suÃ­omh 'Go dtÃ­' do do thurais:"
         },
         
         // default messages from server if a message was not returned
         msgcodes:
         {
             200: "Plean OK",
-            500: "Earráid Fhreastalaí",
+            500: "EarrÃ¡id FhreastalaÃ­",
             400: "Turas as teorainn",
-            404: "Ní bhfuarthas an tslí",
-            406: "Nil amanna idirthurais ar fáil",
+            404: "NÃ­ bhfuarthas an tslÃ­",
+            406: "Nil amanna idirthurais ar fÃ¡il",
             408: "Iarratas imithe thar am",
-            413: "Paraiméadar neamhbhailí",
-            440: "Ní bhfuarthas an geocode 'Ó'",
-            450: "Ní bhfuarthas an geocode 'Go dtí'",
-            460: "Ní bhfuarthas na geocodes 'Ó' nó 'Go dtí'",
-            409: "Ró-chóngarach",
-            340: "Geocode 'Ó' débhríoch",
-            350: "Geocode 'Go dtí' débhríoch",
-            360: "Geocode 'Ó' agus geocode 'Go dtí' débhríoch"
+            413: "ParaimÃ©adar neamhbhailÃ­",
+            440: "NÃ­ bhfuarthas an geocode 'Ã“'",
+            450: "NÃ­ bhfuarthas an geocode 'Go dtÃ­'",
+            460: "NÃ­ bhfuarthas na geocodes 'Ã“' nÃ³ 'Go dtÃ­'",
+            409: "RÃ³-chÃ³ngarach",
+            340: "Geocode 'Ã“' dÃ©bhrÃ­och",
+            350: "Geocode 'Go dtÃ­' dÃ©bhrÃ­och",
+            360: "Geocode 'Ã“' agus geocode 'Go dtÃ­' dÃ©bhrÃ­och"
         },
 
         options: 
         [
-          ['TRANSFERS', 'Aistrithe is lú'],
-          ['QUICK',     'Turas is tapúla'],
-          ['SAFE',      'Turas is sabháilte'],
+          ['TRANSFERS', 'Aistrithe is lÃº'],
+          ['QUICK',     'Turas is tapÃºla'],
+          ['SAFE',      'Turas is sabhÃ¡ilte'],
           ['TRIANGLE',  'Custom trip...']  // TODO localize
         ],
     
@@ -335,28 +336,28 @@ otp.locale.Gaelic = {
     
         maxWalkDistance : 
         [
-            ['200',   '200 méadar'],
-            ['500',   '500 méadar'],
-            ['1000',  '1 ciliméadar'],
-            ['1500',  '1.5 ciliméadar'],
-            ['5000',  '5 chiliméadar'],
-            ['10000', '10 chiliméadar']
+            ['200',   '200 mÃ©adar'],
+            ['500',   '500 mÃ©adar'],
+            ['1000',  '1 cilimÃ©adar'],
+            ['1500',  '1.5 cilimÃ©adar'],
+            ['5000',  '5 chilimÃ©adar'],
+            ['10000', '10 chilimÃ©adar']
         ],
     
         mode : 
         [
             ['TRANSIT,WALK', 'Idirthurais'],
             ['BUSISH,TRAINISH,WALK', 'Bus & traen'],
-            ['BUSISH,WALK', 'Bus amháin'],
-            ['TRAINISH,WALK', 'Traen amháin'],
-            ['WALK', 'Súil amháin'],
+            ['BUSISH,WALK', 'Bus amhÃ¡in'],
+            ['TRAINISH,WALK', 'Traen amhÃ¡in'],
+            ['WALK', 'SÃºil amhÃ¡in'],
             ['BICYCLE', 'Rothar'],
             ['TRANSIT,BICYCLE', 'Idirthurais & Rothar']
         ],
 
         wheelchair :
         [
-            ['false', 'Ní gá'],
+            ['false', 'NÃ­ gÃ¡'],
             ['true', 'Riachtanach']
         ]
     },

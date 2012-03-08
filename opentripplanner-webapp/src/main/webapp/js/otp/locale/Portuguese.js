@@ -167,6 +167,7 @@ otp.locale.Portuguese = {
     // see otp.planner.Templates for use
     labels : 
     {
+        agency_msg   : "Service run by", // TODO
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip details",

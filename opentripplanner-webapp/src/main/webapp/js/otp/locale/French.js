@@ -160,15 +160,16 @@ otp.locale.French = {
 
     // see otp.planner.Templates for use
     labels : {
-        about : "Environ",
-        stop_id : "Id arrêt",
+        agency_msg   : "Service run by", // TODO
+        about        : "Environ",
+        stop_id      : "Id arrêt",
         trip_details : "Détails de l'itinéraire",
-        fare : "Tarif",
-        fare_symbol : "\u20ac",
-        travel : "Départ le",
-        valid : "Calculé le",
-        trip_length : "Durée",
-        with_a_walk : "avec une marche de",
+        fare         : "Tarif",
+        fare_symbol  : "\u20ac",
+        travel       : "Départ le",
+        valid        : "Calculé le",
+        trip_length  : "Durée",
+        with_a_walk  : "avec une marche de",
         alert_for_rt : "Alerte sur la ligne"
     },
 
