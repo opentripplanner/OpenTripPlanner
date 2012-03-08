@@ -86,6 +86,8 @@ otp.planner.Utils = {
                   {name: 'id',               mapping: '@id'},
                   {name: 'mode',             mapping: '@mode'},
                   {name: 'agencyId',         mapping: '@agencyId'},
+                  {name: 'agencyName',       mapping: '@agencyName'},
+                  {name: 'agencyUrl',        mapping: '@agencyUrl'},
                   {name: 'headsign',         mapping: '@headsign'},
                   {name: 'order',            mapping: '@order'},
                   {name: 'interline',        mapping: '@interlineWithPreviousLeg'},

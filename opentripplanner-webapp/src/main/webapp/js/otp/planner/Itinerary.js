@@ -29,7 +29,9 @@ otp.planner.Itinerary = {
     triptab        : null,
     locale         : null,
     templates      : null,
-    showStopCodes    : false,
+    showStopCodes  : false,
+    showAgencyInfo : false,
+
     useRouteLongName : false,
 
     // raw data
@@ -609,7 +611,7 @@ otp.planner.Itinerary = {
                 step.expanded = false;
                 step.singleClickExpand = true;
                 var id = 'showDetails-' + this.triptab.id + "-" + step.id;
-                step.text += '<div id="' + id + '" class="togglesteps"> ' + this.templates.getShowDetails() + '</div>';
+                step.text += '<div id="' + id + '" class="show-hide-details"> ' + this.templates.getShowDetails() + '</div>';
                 node = otp.util.ExtUtils.makeTreeNode(step, clickCallback, scope);
                 node.showDetailsId = id;
                 node.showing = false;

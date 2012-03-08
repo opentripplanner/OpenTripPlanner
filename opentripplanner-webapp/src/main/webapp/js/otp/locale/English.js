@@ -103,8 +103,8 @@ otp.locale.English = {
         cancel       : "Cancel",
         yes          : "Yes",
         no           : "No",
-        showDetails  : "Show details...",
-        hideDetails  : "Hide details..."
+        showDetails  : "&darr; Show details &darr;",
+        hideDetails  : "&uarr; Hide details &uarr;"
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -171,6 +171,7 @@ otp.locale.English = {
     labels : 
     {
         agency_msg   : "Service run by",
+        agency_msg_tt: "Open agency website in separate window...",
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip details",

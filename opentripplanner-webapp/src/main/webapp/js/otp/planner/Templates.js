@@ -147,6 +147,16 @@ otp.planner.Templates = {
                 +   '<span class="stopid">' + this.locale.labels.stop_id + ' {toStopCode}</span>'
                 + '</tpl>'
                 + '</p>'
+                + '<tpl if="agencyName != null && showAgencyInfo == true">'
+                +   '<p class="agency-leg-info">'
+                +     '<tpl if="agencyUrl != null && agencyUrl.length &gt; 1">'
+                +       '<span>' + this.locale.labels.agency_msg + ' <a href="{agencyUrl}" target="#" title="' + this.locale.labels.agency_msg_tt + '">{agencyName}</a>.</span>'
+                +     '</tpl>'
+                +     '<tpl if="agencyUrl == null || agencyUrl.length &lt; 1">'
+                +       '<span>' + this.locale.labels.agency_msg + ' {agencyName}.</span>'
+                +     '</tpl>'
+                +   '</p>'
+                + '</tpl>'
                 + '<tpl if="alerts != null && alerts.length &gt; 0">'
                 + '<tpl for="alerts">'
                 +   '<p class="alert"><img src="images/ui/trip/alert.png" align="absmiddle"/> '
@@ -238,12 +248,12 @@ otp.planner.Templates = {
 
     getShowDetails : function()
     {
-        return '<a href="#">' + this.locale.buttons.showDetails + '</a>';
+        return '<span class="show-details">' + this.locale.buttons.showDetails + '</span>';
     },
 
     getHideDetails : function()
     {
-        return '<a href="#">' + this.locale.buttons.hideDetails + '</a>';
+        return '<span class="hide-details">' + this.locale.buttons.hideDetails + '</span>';
     },
 
 

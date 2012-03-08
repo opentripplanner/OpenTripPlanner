@@ -171,6 +171,7 @@ otp.locale.Turkish = {
     labels : 
     {
         agency_msg   : "Service run by", // TODO
+        agency_msg_tt: "Open agency website in separate window...", // TODO
         about        : "Hakkında",
         stop_id      : "Stop ID",
         trip_details : "Yolculuk detayları",

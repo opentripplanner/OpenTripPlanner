@@ -74,21 +74,6 @@ position: absolute;
 font-size: x-small;
 }
 
-div.togglesteps a:hover {
-    background: #4c4c4c;
-    text-decoration: none;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    border-radius: 3px;
-}
-
-div.togglesteps a {
-    color: #ff8b38;
-    font-family: "Helvetica Neue",Arial,Helvetica,sans-serif;
-    font-size: x-small;
-    font-weight: 700;
-}
-
 .splash-screen {
 font-size: 135%;
 padding: 20px;
@@ -317,15 +302,50 @@ strong {
 
 .stopid {
     color: #808080 !important;
-    font: 11px/13px Arial, Helvetica, sans-serif;
+    font: 95%/105% Arial, Helvetica, sans-serif;
+}
+
+.agency-leg-info {
+    color: #808080 !important;
+    font: 95%/105% Arial, Helvetica, sans-serif;
+    padding: 2px 0px 5px 0px !important;
+}
+
+.agency-leg-info a:link {
+    font-weight: 600;
+    color: #808080 !important;
+}
+
+.agency-leg-info a:visited {
+    font-weight: 600;
+    color: #808080 !important;
+}
+
+.agency-leg-info a:hover {
+    font-weight: 600;
+    text-decoration: underline !important;
+    color: #ff8b38;
+}
+
+.show-hide-details {
+    font: 90%/100% Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    font-weight: 600;
+    padding: 2px 0px 5px 0px !important;
+    color: #808080 !important;
+}
+.show-hide-details span:hover {
+    font-weight: 700;
+    text-decoration: underline !important;
+    color: #ff8b38;
 }
 
 p.alert {
-    margin: 5px 10px 0 5px !important;
-    font: 89%/100% Arial, Helvetica, sans-serif;
+    padding: 10px 10px 8px 2px !important;
+    font: 90%/100% Arial, Helvetica, sans-serif;
 }
 p.alert img {
-    margin-left:-2px;
+    padding-left:-2px;
 }
 
 .duration {
@@ -334,12 +354,12 @@ background-repeat: no-repeat;
 background-position: left center;
 color: #888;
 text-indent: 40px;
-font-size: 80%;
+font-size: 90%;
 }
 
 .transfers {
-color: #888;
-font-size: 80%;
+  color: #888;
+  font-size: 90%;
 }
 
 a:link {

@@ -168,6 +168,7 @@ otp.locale.Italian = {
     labels : 
     {
         agency_msg   : "Service run by", // TODO
+        agency_msg_tt: "Open agency website in separate window...", // TODO
         about        : "Informazioni",
         stop_id      : "ID Fermata",
         trip_details : "Dettagli viaggio",
