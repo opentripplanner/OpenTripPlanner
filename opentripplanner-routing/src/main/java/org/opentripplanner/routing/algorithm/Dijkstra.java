@@ -108,9 +108,9 @@ public class Dijkstra {
 	public BasicShortestPathTree getShortestPathTree(double weightLimit, int nodeLimit) {
         
         // clone targets since they will be checked off destructively
-    	HashSet<String> remainingTargets = null;
+    	HashSet<Vertex> remainingTargets = null;
     	if (targets != null)
-    		remainingTargets = (HashSet<String>) targets.clone();
+    		remainingTargets = (HashSet<Vertex>) targets.clone();
 
         while (!queue.empty()) {
             
