@@ -82,6 +82,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-release-plugin</artifactId>
           <version>2.2.2</version>
+          <configuration>
+            <!-- by default, release:prepare runs goals 'clean' and 'verify'.
+            Javadoc generation in release:perform requires the new release
+            versions of our artifacts to already be installed in the local 
+            repository. -->
+            <preparationGoals>clean install</preparationGoals>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
