@@ -198,7 +198,7 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
             if (height != null) {
                 //visit after children
                 stack.pop();
-                Double maxHeight = outPenalty.get(state);
+                Double maxHeight = outPenalty.get(state.getVertex());
                 if (maxHeight != null && maxHeight > height) {
                     height = maxHeight;
                 }
