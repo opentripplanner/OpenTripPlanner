@@ -12,8 +12,6 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.contraction;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,25 +22,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.Dijkstra;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -50,9 +39,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.util.NullExtraEdges;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -586,6 +573,10 @@ public class ContractionHierarchy implements Serializable {
     	TraverseOptions upOptions = opt.clone();
     	TraverseOptions downOptions = opt.clone();
 
+        if (origin == null || target == null) {
+            return null;
+        }
+
         /** max walk distance cannot be less than distances to nearest transit stops */
         double minWalkDistance = 
                 origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
@@ -601,10 +592,6 @@ public class ContractionHierarchy implements Serializable {
     	//options.maxWalkDistance = Double.MAX_VALUE;
     	
     	final int INITIAL_SIZE = 1000; 
-    	
-        if (origin == null || target == null) {
-            return null;
-        }
         
         if (VERBOSE)
         	_log.debug("origin {} target {}", origin, target);
