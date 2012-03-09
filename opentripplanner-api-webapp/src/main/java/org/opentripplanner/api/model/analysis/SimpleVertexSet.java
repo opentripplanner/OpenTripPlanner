@@ -16,5 +16,8 @@ package org.opentripplanner.api.model.analysis;
 import java.util.ArrayList;
 
 public class SimpleVertexSet extends VertexSet {
+    //this masks the vertices field in the parent class, because
+    //that field cannot hold SimpleVertex instances; the XML,
+    //I think, is correct.
     public ArrayList<SimpleVertex> vertices;
 }
