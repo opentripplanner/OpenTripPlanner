@@ -35,9 +35,7 @@ public interface StreetVertexIndexService {
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options,
-            List<Edge> extraEdges);
-
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options);
+            List<Edge> extraEdges, Collection<Edge> preferredEdges);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
 }

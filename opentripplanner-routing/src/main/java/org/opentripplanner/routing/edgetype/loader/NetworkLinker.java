@@ -14,13 +14,12 @@
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -35,9 +34,14 @@ public class NetworkLinker {
 
     private NetworkLinkerLibrary networkLinkerLibrary;
 
-    public NetworkLinker(Graph graph) {
+    public NetworkLinker(Graph graph, HashMap<Class<?>,Object> extra) {
         this.graph = graph;
-        this.networkLinkerLibrary = new NetworkLinkerLibrary(graph);
+        this.networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
+    }
+
+    public NetworkLinker(Graph graph) {
+        // we should be using Collections.emptyMap(), but it breaks Java's broken-ass type checker
+        this(graph, new HashMap<Class<?>, Object>());
     }
 
     /**

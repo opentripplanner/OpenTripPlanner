@@ -16,7 +16,6 @@ package org.opentripplanner.routing.impl;
 import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,10 +28,11 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -41,8 +41,8 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +57,6 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.operation.distance.GeometryLocation;
 
@@ -96,7 +94,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     public static final double DISTANCE_ERROR = 0.00001;
 
     //if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
-    private static final double MAX_CORNER_DISTANCE = 0.00010;
+    private static final double MAX_CORNER_DISTANCE = 0.0001;
 
     private static final double DIRECTION_ERROR = 0.05;
 
@@ -247,8 +245,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges);
-        CandidateEdge candidate = bundle.closest;
+        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null);
+        CandidateEdge candidate = bundle.best;
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
@@ -292,15 +290,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     }
 
     public static class CandidateEdge {
+        private static final double PLATFORM_PREFERENCE = 2.0;
+        private static final double SIDEWALK_PREFERENCE = 1.5;
         public final DistanceOp op;
         public final StreetEdge edge;
         public final Vertex endwiseVertex;
-        public final double distance;
+        private double score;
         public final Coordinate nearestPointOnEdge;
         public final double directionToEdge;
         public final double directionOfEdge;
         public final double directionDifference;
-        public CandidateEdge(StreetEdge e, Point p) {
+        public final double distance;
+        public CandidateEdge(StreetEdge e, Point p, double preference) {
             edge = e;
             Geometry edgeGeom = edge.getGeometry();
             op = new DistanceOp(p, edgeGeom);
@@ -315,6 +316,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 endwiseVertex = edge.getToVertex();
             else
                 endwiseVertex = null;
+            score = distance;
+            if (endwise()) {
+                score *= 1.5;
+            }
+            score /= preference;
+            if (e.getName().contains("platform")) {
+                //this is kind of a hack, but there's not really a better way to do it
+                score /= PLATFORM_PREFERENCE;
+            }
+            if (e.getName().contains("sidewalk") || !e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                //this is kind of a hack, but there's not really a better way to do it
+                score /= SIDEWALK_PREFERENCE;
+            }
             double xd = nearestPointOnEdge.x - p.getX();
             double yd = nearestPointOnEdge.y - p.getY();
             directionToEdge = Math.atan2(yd, xd);
@@ -335,17 +349,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         public boolean endwise() { return endwiseVertex != null; }
         public boolean parallel()  { return directionDifference < Math.PI / 2; } 
         public boolean perpendicular()  { return !parallel(); } 
+        public double getScore() {
+            return score;
+        }
     }
     
     public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
         private static final long serialVersionUID = 20120222L;
         public Vertex endwiseVertex = null;
-        public CandidateEdge closest = null;
+        public CandidateEdge best = null;
         public boolean add(CandidateEdge ce) {
             if (ce.endwiseVertex != null)
                 this.endwiseVertex = ce.endwiseVertex;
-            if (closest == null || ce.distance < closest.distance)
-                closest = ce;
+            if (best == null || ce.score < best.score)
+                best = ce;
             return super.add(ce);
         }
         public List<StreetEdge> toEdgeList() {
@@ -375,14 +392,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             return bins.values();
         }
         public boolean endwise() { return endwiseVertex != null; }
-    }
-
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options) {
-        return getClosestEdges(coordinate, options, null);
+        public double getScore() {
+            return best.score;
+        }
     }
 
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges) {
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges, Collection<Edge> routeEdges) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
         if (extraEdges != null)
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
@@ -413,7 +429,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 if (options != null && 
                    (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
                     continue;
-                CandidateEdge ce = new CandidateEdge(e, p);
+                double preferrence = 1;
+                if (routeEdges != null && routeEdges.contains(e)) {
+                    preferrence = 3.0;
+                }
+                CandidateEdge ce = new CandidateEdge(e, p, preferrence);
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
@@ -425,19 +445,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         // initially set best bundle to the closest bundle
         CandidateEdgeBundle best = null; 
         for (CandidateEdgeBundle bundle : bundles) {
-            if (best == null || bundle.closest.distance < best.closest.distance)
+            if (best == null || bundle.best.score < best.best.score)
                 best = bundle;
         }
-        // prefer bundles that are not caught end-wise as long as they are not much farther away
-        if (best != null && best.endwise()) {
-            for (CandidateEdgeBundle bundle : bundles) {
-                if (bundle.closest.distance < best.closest.distance * 1.5 &&
-                    ! bundle.endwise()) {
-                    best = bundle;
-                    break;
-                }
-            }
-        }
+
         return best;
     }
 

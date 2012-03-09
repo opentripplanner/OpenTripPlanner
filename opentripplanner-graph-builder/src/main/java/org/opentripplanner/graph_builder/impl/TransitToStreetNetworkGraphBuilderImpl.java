@@ -37,7 +37,7 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        NetworkLinker linker = new NetworkLinker(graph);
+        NetworkLinker linker = new NetworkLinker(graph, extra);
         linker.createLinkage();
     }
 

@@ -35,6 +35,8 @@ public interface TransitIndexService {
 
     public Edge getPrealightEdge(AgencyAndId stop);
 
+    public List<AgencyAndId> getRoutesForStop(AgencyAndId stop);
+
     public Collection<String> getDirectionsForRoute(AgencyAndId route);
 
     public List<TraverseMode> getAllModes();

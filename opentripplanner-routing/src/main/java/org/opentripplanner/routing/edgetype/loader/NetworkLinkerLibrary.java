@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,7 +24,9 @@ import java.util.ListIterator;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -36,9 +39,9 @@ import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdge;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -74,8 +77,15 @@ public class NetworkLinkerLibrary {
 
     private StreetVertexIndexServiceImpl index;
 
-    public NetworkLinkerLibrary(Graph graph) {
+    private EdgesForRoute edgesForRoute;
+
+    private TransitIndexService transitIndex;
+
+    public NetworkLinkerLibrary(Graph graph, HashMap<Class<?>, Object> extra) {
         this.graph = graph;
+        this.transitIndex = graph.getService(TransitIndexService.class);
+        EdgesForRoute edgesForRoute = (EdgesForRoute) extra.get(EdgesForRoute.class);
+        this.edgesForRoute = edgesForRoute;
         _log.debug("constructing index...");
         this.index = new StreetVertexIndexServiceImpl(graph);
         this.index.setup();
@@ -89,7 +99,17 @@ public class NetworkLinkerLibrary {
      * @return true if the links were successfully added, otherwise false
      */
     public boolean connectVertexToStreets(TransitStop v, boolean wheelchairAccessible) {
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v);
+        List<Edge> nearbyEdges = null;
+        if (edgesForRoute != null && transitIndex != null) {
+            nearbyEdges = new ArrayList<Edge>();
+            for (AgencyAndId route : transitIndex.getRoutesForStop(v.getStopId())) {
+                List<Edge> edges = edgesForRoute.get(route);
+                if (edges != null) {
+                    nearbyEdges.addAll(edges);
+                }
+            }
+        }
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges);
         if (nearbyStreetVertices == null) {
             return false;
         } else {
@@ -168,7 +188,7 @@ public class NetworkLinkerLibrary {
      * Used by both the network linker and for adding temporary "extra" edges at the origin 
      * and destination of a search.
      */
-    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v) {
+    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges) {
         Collection<StreetVertex> existing = splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -179,14 +199,9 @@ public class NetworkLinkerLibrary {
         else
             vertexLabel = "link for " + v;
         Coordinate coordinate = v.getCoordinate();
-        /* is the stop right at an intersection? */
-        List<StreetVertex> atIntersection = index.getIntersectionAt(coordinate);
-        if (atIntersection != null) {
-            // if so, the stop can be linked directly to all vertices at the intersection
-            return atIntersection;
-        }
+
         /* is there a bundle of edges nearby to use or split? */
-        CandidateEdgeBundle edges = index.getClosestEdges(coordinate, options);
+        CandidateEdgeBundle edges = index.getClosestEdges(coordinate, options, null, nearbyRouteEdges);
         if (edges == null || edges.size() < 2) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -194,10 +209,18 @@ public class NetworkLinkerLibrary {
         }
         // if the bundle was caught endwise (T intersections and dead ends), 
         // get the intersection instead.
-        if (edges.endwise())
+        if (edges.endwise()) {
             return index.getIntersectionAt(edges.endwiseVertex.getCoordinate());
-        else
+        } else {
+            /* is the stop right at an intersection? */
+            List<StreetVertex> atIntersection = index.getIntersectionAt(coordinate);
+            if (atIntersection != null) {
+                // if so, the stop can be linked directly to all vertices at the intersection
+                if (edges.getScore() > atIntersection.get(0).distance(coordinate))
+                    return atIntersection;
+            }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
+        }
     }
 
     /** 

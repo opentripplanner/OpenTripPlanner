@@ -15,6 +15,7 @@ package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +26,9 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
@@ -150,5 +153,21 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     public void addAgency(Agency agency) {
         agencies.put(agency.getId(), agency);
+    }
+
+    @Override
+    public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
+        HashSet<AgencyAndId> out = new HashSet<AgencyAndId>();
+        Edge edge = preBoardEdges.get(stop);
+        for (Edge e: edge.getToVertex().getOutgoing()) {
+            if (e instanceof PatternBoard) {
+                PatternBoard board = (PatternBoard) e;
+                for (Trip t : board.getPattern().getTrips()) {
+                    out.add(t.getRoute().getId());
+                }
+            }
+            
+        }
+        return new ArrayList<AgencyAndId>(Arrays.asList(out.toArray(new AgencyAndId[0])));
     }
 }

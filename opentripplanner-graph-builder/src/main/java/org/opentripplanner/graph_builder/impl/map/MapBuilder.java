@@ -19,12 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +50,10 @@ public class MapBuilder implements GraphBuilder {
         TransitIndexService transit = graph.getService(TransitIndexService.class);
 
         StreetMatcher matcher = new StreetMatcher(graph);
-        
+
+        EdgesForRoute edgesForRoute = new EdgesForRoute();
+        extra.put(EdgesForRoute.class, edgesForRoute);
+
         for (AgencyAndId route : transit.getAllRouteIds()) {
             for (RouteVariant variant : transit.getVariantsForRoute(route)) {
                 Geometry geometry = variant.getGeometry();
@@ -66,6 +71,7 @@ public class MapBuilder implements GraphBuilder {
                     List<Coordinate> coordinates = new ArrayList<Coordinate>();
                     for (Edge e : edges) {
                         coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
+                        MapUtils.addToMapList(edgesForRoute.edgesForRoute, route, e);
                     }
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
                     LineString ls = gf.createLineString(coordinates.toArray(coordinateArray));

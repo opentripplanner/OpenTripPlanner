@@ -159,6 +159,11 @@ public class TestPatch extends TestCase {
             public Agency getAgency(String id) {
                 return null;
             }
+
+            @Override
+            public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
+                return null;
+            }
         };
         graph.putService(TransitIndexService.class, index);
     }
