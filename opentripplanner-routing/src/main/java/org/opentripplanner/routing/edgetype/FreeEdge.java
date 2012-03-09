@@ -65,7 +65,7 @@ public class FreeEdge extends AbstractEdge {
     }
     
     public boolean equals(Object o) {
-        if (o instanceof FreeEdge) {
+        if (o != null && o instanceof FreeEdge) {
             FreeEdge other = (FreeEdge) o;
             return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
         }
