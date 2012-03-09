@@ -339,7 +339,7 @@ public class PlainStreetEdge extends StreetEdge {
         return id;
     }
 
-    public void writeObject(ObjectOutputStream out) throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         id = null; 
         out.defaultWriteObject();
     }
