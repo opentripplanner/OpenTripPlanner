@@ -372,7 +372,7 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, null, -1, -1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
-                } else if (mode.toString() == leg.mode) {
+                } else if (mode.toString().equals(leg.mode)) {
                     // no mode change, handle intermediate stops
                     if (showIntermediateStops) {
                         /*
@@ -707,7 +707,7 @@ public class PlanGenerator {
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
                 distance = edgeNarrative.getDistance();
-            } else if (step.streetName != streetName
+            } else if ((!step.streetName.equals(streetName))
                     && (step.streetName != null && !step.streetName.equals(streetName)) 
                     && (!step.bogusName || !edgeNarrative.hasBogusName())) {
                 /* street name has changed */
