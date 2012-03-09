@@ -50,7 +50,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
     /** A list of ids of stages which must be provided before this stage */
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit");
+        return Arrays.asList("streets");
     }
     
     private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
