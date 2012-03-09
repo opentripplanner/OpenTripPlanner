@@ -259,4 +259,14 @@ public class AlertPatch extends AbstractPatch {
         }
         return other.alert.equals(alert) && super.equals(other);
     }
+
+    public int hashCode() {
+        return ((direction == null ? 0 : direction.hashCode()) +
+                (agency == null ? 0 : agency.hashCode()) +
+                (trip == null ? 0 : trip.hashCode()) +
+                (stop == null ? 0 : stop.hashCode()) +
+                (route == null ? 0 : route.hashCode()) +
+                (alert == null ? 0 : alert.hashCode())) *
+                (cancelled ? 5 : 7);
+    }
 }

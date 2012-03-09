@@ -71,4 +71,8 @@ public class WayProperties implements Cloneable {
         }
         return false;
     }
+
+    public int hashCode() {
+        return safetyFeatures.hashCode() + permission.hashCode();
+    }
 }

@@ -235,4 +235,9 @@ public class WayPropertySet {
         }
         return false;
     }
+
+    public int hashCode() {
+        return defaultProperties.hashCode() + wayProperties.hashCode() + creativeNamers.hashCode()
+                + slopeOverrides.hashCode();
+    }
 }
