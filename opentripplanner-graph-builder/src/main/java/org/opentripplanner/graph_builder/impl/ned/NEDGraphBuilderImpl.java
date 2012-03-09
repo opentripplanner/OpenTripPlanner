@@ -237,13 +237,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 if (state.backEdge != null) {
                     System.out.println("here");
                 }
-                while (state != null) {
+                while (true) {
                     double elevation = (bestElevation * state.distance + state.initialElevation
                             * bestDistance)
                             / totalDistance;
 
                     elevations.put(state.vertex, elevation);
-                    if (state.backEdge == null)
+                    if (state.backState == null)
                         break;
                     bestDistance += state.backEdge.getDistance();
                     state = state.backState;
