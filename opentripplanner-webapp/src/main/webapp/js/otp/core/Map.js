@@ -320,6 +320,12 @@ otp.core.MapStatic = {
     },
 
     /** */
+    getZoom : function()
+    {
+        return this.map.getZoom();
+    },
+
+    /** */
     zoom : function(x, y, zoom, minZoom, maxZoom)
     {
         if(minZoom == null)
@@ -383,7 +389,7 @@ otp.core.MapStatic = {
 
             // zoom in link if we're close in, else show the zoom out
             var zoom = "";
-            if(self.map.getZoom() < (self.CLOSE_ZOOM - 1))
+            if(self.map.getZoom() < self.CLOSE_ZOOM)
                 zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomAllTheWayIn(' + x + ',' + y  + ');">' + self.locale.contextMenu.zoomInHere + '</a>';
             else
                 zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
@@ -395,9 +401,9 @@ otp.core.MapStatic = {
             var streetview = null;
             if(!this.noStreetview)
             {
-                // if content is longer than 25 characters, we lack tooltip space, so don't break the links to next line nor use the (@Google)
+                // if content is longer than 30 characters, we lack tooltip space, so don't break the links to next line nor use the (@Google)
                 var svConf = {name:'sv', x:x, y:y};
-                if(contentSize && contentSize <= 25)
+                if(contentSize && contentSize <= 30)
                 {
                     html += '<br/>';
                     svConf.name = 'Streetview (&copy; Google)'

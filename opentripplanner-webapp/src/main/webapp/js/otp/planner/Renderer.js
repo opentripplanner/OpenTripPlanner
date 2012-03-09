@@ -37,6 +37,13 @@ otp.planner.Renderer = {
     m_tree        : null,
     m_itinerary   : null,
 
+    // controls how far to zoom into the map on leg clicks -- see legClick() below...
+    zoomInLegClick         : 4,
+    zoomInStartClick       : 2,
+    zoomInEndClick         : 2,
+    zoomInShowDetailsClick : 0,
+    zoomInHideDetailsClick : 5,
+
     /** */
     initialize : function(config)
     {
@@ -181,37 +188,63 @@ otp.planner.Renderer = {
         }
         else
         {
-            var coord = null;
-            if(node.id.indexOf(otp.planner.Utils.FROM_ID) >= 0)
+            var zInc = null; 
+            try
             {
-                coord = this.m_itinerary.getFrom();
+                // change the 'Show Details...' / 'Hide Details...' link string when sub-tree is open / close
+                if(node.showDetailsId)
+                {
+                    var content;
+                    if(node.showing)
+                    {
+                        content = this.templates.getShowDetails();
+                        node.showing = false;
+                        zInc = this.zoomInShowDetailsClick; 
+                    }
+                    else
+                    {
+                        content = this.templates.getHideDetails();
+                        node.showing = true;
+                        showDetails = false;
+                        zInc = this.zoomInHideDetailsClick;
+                    }
+                    Ext.fly(node.showDetailsId).update(content);
+                }
             }
-            else if(node.id.indexOf(otp.planner.Utils.TO_ID) >= 0)
+            catch(e)
             {
-                coord = this.m_itinerary.getTo();
+                console.log("EXCEPTION leg click callback - expand : " + e);
             }
-            else 
-            {
-                coord = this.m_itinerary.getLegStartPoint(node.id);
-            }
-            coord = coord.get('geometry');
-            this.map.zoom(coord.x, coord.y);
 
-            // change the 'Show Details...' / 'Hide Details...' link string when sub-tree is open / close
-            if(node.showDetailsId)
+            try
             {
-                var content;
-                if(node.showing)
+                var coord = null;
+                if(node.id.indexOf(otp.planner.Utils.FROM_ID) >= 0)
                 {
-                    content = this.templates.getShowDetails();
-                    node.showing = false;
+                    coord = this.m_itinerary.getFrom();
+                    zInc = this.zoomInStartClick;
                 }
-                else
+                else if(node.id.indexOf(otp.planner.Utils.TO_ID) >= 0)
                 {
-                    content = this.templates.getHideDetails();
-                    node.showing = true;
+                    coord = this.m_itinerary.getTo();
+                    zInc = this.zoomInEndClick;
                 }
-                Ext.fly(node.showDetailsId).update(content);
+                else 
+                {
+                    coord = this.m_itinerary.getLegStartPoint(node.id);
+                    if(zInc === null)
+                        zInc = this.zoomInLegClick;
+                }
+                coord = coord.get('geometry');
+
+                // zoom the map in x number of zoom levels off of the extent
+                this.map.zoomToExtent(this.m_itinerary.getExtent());
+                var z = this.map.getZoom();
+                this.map.zoom(coord.x, coord.y, z + (zInc || 0));
+            }
+            catch(e)
+            {
+                console.log("EXCEPTION leg click callback - zoom to leg : " + e);
             }
         }
     },
