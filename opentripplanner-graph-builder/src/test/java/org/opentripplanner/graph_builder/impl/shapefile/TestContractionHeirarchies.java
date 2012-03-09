@@ -600,9 +600,10 @@ public class TestContractionHeirarchies extends TestCase {
             }
             Vertex dest = null;
             while (dest == null) {
-                int j = Math.abs(random.nextInt()) % vertices.size();
+                int j = (int) (Math.abs((long) random.nextInt()) % verticesOut.size());
+                dest = verticesOut.get(j);
                 // make sure origin and destination are different
-                if (orig.getLabel() == dest.getLabel()) {
+                if (orig.equals(dest)) {
                     continue;
                 }
                 // make sure destination is on the down graph
