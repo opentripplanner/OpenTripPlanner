@@ -56,7 +56,9 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class Graph implements Serializable {
 
-    private static final long serialVersionUID = MavenVersion.UID;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+
+    private final MavenVersion otpVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
@@ -337,7 +339,7 @@ public class Graph implements Serializable {
             return graph;
         } catch (InvalidClassException ex) {
             LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
-            throw new IllegalStateException("Stored Graph version error", ex);
+            return null;
         }
     }
     

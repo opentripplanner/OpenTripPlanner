@@ -148,7 +148,6 @@ public class GraphServiceImpl implements GraphService {
             if (path == null || !path.exists()) {
                 if (!_createEmptyGraphIfNotFound) {
                     _log.error("Graph not found. Verify path to stored graph: " + path);
-                    throw new IllegalStateException("graph path not found: " + path);
                 }
                 /* Create an empty graph if not graph is found */
                 Graph graph = new Graph();
@@ -158,7 +157,8 @@ public class GraphServiceImpl implements GraphService {
             }
             setGraph(Graph.load(classLoader, path, loadLevel));
         } catch (Exception ex) {
-            throw new IllegalStateException("error loading graph from " + path, ex);
+            _log.error("Exception while loading graph from {}, using empty graph.", path);
+            setGraph(new Graph());
         }
   }
 

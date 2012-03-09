@@ -1,11 +1,8 @@
 package org.opentripplanner.common;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,49 +10,76 @@ public class MavenVersion {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenVersion.class);
 
-    private static final Properties PROPS;
-    public static final String VERSION; 
-    public static final int MAJOR;
-    public static final int MINOR;
-    public static final int INCREMENTAL;
-    public static final String QUALIFIER;
-    public static final long UID;
+    public static final MavenVersion VERSION = fromProperties();
 
-    static {
+    public final String version; 
+    public final int major;
+    public final int minor;
+    public final int incremental;
+    public final String qualifier;
+
+    private static MavenVersion fromProperties() {
         final String FILE = "maven-version.properties";
-        PROPS = new java.util.Properties();
         try {
+            Properties props = new java.util.Properties();
             InputStream in = MavenVersion.class.getClassLoader().getResourceAsStream(FILE);
-            PROPS.load(in);
+            props.load(in);
+            MavenVersion ver = new MavenVersion(props.getProperty("version"));
+            LOG.info("Parsed Maven artifact version: {}", ver.toStringVerbose());
+            return ver;
         } catch (Exception e) {
-            throw new IllegalStateException("Error loading Maven artifact version from properties file.");
+            LOG.error("Error reading Maven build version from properties file: {}", e.getMessage());
+            return new MavenVersion("-1.-1.-1");
         }
-        String v = VERSION = PROPS.getProperty("version");
-        String [] fields = v.split("\\-");
-        if (fields.length > 1)
-            QUALIFIER = fields[1];
-        else
-            QUALIFIER = "";
-        fields = fields[0].split("\\.");
-        if (fields.length > 0)
-            MAJOR = Integer.parseInt(fields[0]);
-        else
-            MAJOR = 0;
-        if (fields.length > 1)
-            MINOR = Integer.parseInt(fields[1]);
-        else
-            MINOR = 0;
-        if (fields.length > 2)
-            INCREMENTAL = Integer.parseInt(fields[2]);
-        else
-            INCREMENTAL = 0;
-        UID = (QUALIFIER.equals("SNAPSHOT") ? -1L : +1L) *
-              (1000000L * MAJOR + 1000L * MINOR + INCREMENTAL);
-        LOG.info("Maven artifact version read: {}", getVersion());
     }
     
-    public static String getVersion() {
+    public MavenVersion (String v) {
+        version = v;
+        String [] fields = v.split("\\-");
+        if (fields.length > 1)
+            qualifier = fields[1];
+        else
+            qualifier = "";
+        fields = fields[0].split("\\.");
+        if (fields.length > 0)
+            major = Integer.parseInt(fields[0]);
+        else
+            major = 0;
+        if (fields.length > 1)
+            minor = Integer.parseInt(fields[1]);
+        else
+            minor = 0;
+        if (fields.length > 2)
+            incremental = Integer.parseInt(fields[2]);
+        else
+            incremental = 0;
+    }
+    
+    public long getUID() {
+        return (long) hashCode();
+    }
+
+    public String toString() {
         return String.format("%s => (%d, %d, %d, %s) UID=%d", 
-                VERSION, MAJOR, MINOR, INCREMENTAL, QUALIFIER, UID);
+                version, major, minor, incremental, qualifier, getUID());
+    }
+
+    public String toStringVerbose() {
+        return String.format("MavenVersion(%s)=%d", version, getUID());
+    }
+
+    public int hashCode () {
+        return (qualifier.equals("SNAPSHOT") ? -1 : +1) *
+                (1000000 * major + 1000 * minor + incremental);
+    }
+
+    public boolean equals (Object other) {
+        if ( ! (other instanceof MavenVersion))
+            return false;
+        MavenVersion that = (MavenVersion) other;
+        return this.major == that.major &&
+               this.minor == that.minor &&
+               this.incremental == that.incremental &&
+               this.qualifier.equals(that.qualifier);
     }
 }
