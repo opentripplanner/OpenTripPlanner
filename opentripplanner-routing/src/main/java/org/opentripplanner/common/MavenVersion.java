@@ -1,16 +1,17 @@
 package org.opentripplanner.common;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MavenVersion {
+public class MavenVersion implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MavenVersion.class);
-
     public static final MavenVersion VERSION = fromProperties();
+    private static final long serialVersionUID = VERSION.getUID();
 
     public final String version; 
     public final int major;
