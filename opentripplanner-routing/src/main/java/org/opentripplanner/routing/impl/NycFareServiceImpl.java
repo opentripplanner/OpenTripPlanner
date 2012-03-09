@@ -172,10 +172,10 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				} else if (ride.classifier.equals(SUBWAY)) {
 					state = NycFareState.SUBWAY_PRE_TRANSFER;
 					totalFare += ORDINARY_FARE;
-					if (SUBWAY_FREE_TRANSFER_STOPS.contains(ride.lastStop)) {
+					if (SUBWAY_FREE_TRANSFER_STOPS.contains(ride.lastStop.getId())) {
 						lexFreeTransfer = true;
 					}
-					if (CANARSIE.contains(ride.lastStop)) {
+					if (CANARSIE.contains(ride.lastStop.getId())) {
 						canarsieFreeTransfer = true;
 					}
 				} else if (ride.classifier.equals(SIR)) {
@@ -187,7 +187,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				} else if (ride.classifier.equals(LOCAL_BUS)) {
 					state = NycFareState.BUS_PRE_TRANSFER;
 					totalFare += ORDINARY_FARE;
-					if (CANARSIE.contains(ride.lastStop)) {
+					if (CANARSIE.contains(ride.lastStop.getId())) {
 						canarsieFreeTransfer = true;
 					}
 					siLocalBus = ride.route.getId().startsWith("S");
@@ -204,15 +204,15 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					// subway-to-subway transfers are verbotten except at
 					// lex and 59/63
 					if (!(lexFreeTransfer && SUBWAY_FREE_TRANSFER_STOPS
-							.contains(ride.firstStop))) {
+							.contains(ride.firstStop.getId()))) {
 						totalFare += ORDINARY_FARE;
 					}
 
 					lexFreeTransfer = canarsieFreeTransfer = false;
-					if (SUBWAY_FREE_TRANSFER_STOPS.contains(ride.lastStop)) {
+					if (SUBWAY_FREE_TRANSFER_STOPS.contains(ride.lastStop.getId())) {
 						lexFreeTransfer = true;
 					}
-					if (CANARSIE.contains(ride.lastStop)) {
+					if (CANARSIE.contains(ride.lastStop.getId())) {
 						canarsieFreeTransfer = true;
 					}
 				}
@@ -228,7 +228,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					state = NycFareState.SIR_POST_TRANSFER_FROM_SUBWAY;
 				} else if (ride.classifier.equals(LOCAL_BUS)) {
 
-					if (CANARSIE.contains(ride.firstStop)
+					if (CANARSIE.contains(ride.firstStop.getId())
 							&& canarsieFreeTransfer) {
 						state = NycFareState.BUS_PRE_TRANSFER;
 					} else {
@@ -244,7 +244,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				break;
 			case BUS_PRE_TRANSFER:
 				if (ride.classifier.equals(SUBWAY)) {
-					if (CANARSIE.contains(ride.firstStop)
+					if (CANARSIE.contains(ride.firstStop.getId())
 							&& canarsieFreeTransfer) {
 						state = NycFareState.SUBWAY_PRE_TRANSFER;
 					} else {
@@ -275,12 +275,12 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				break;
 			case SIR_PRE_TRANSFER:
 				if (ride.classifier.equals(SUBWAY)) {
-					if (sirBonusTransfer && !SIR_BONUS_STOPS.contains(ride.firstStop)) {
+					if (sirBonusTransfer && !SIR_BONUS_STOPS.contains(ride.firstStop.getId())) {
 						//we were relying on the bonus transfer to be in the "pre-transfer state",
 						//but the bonus transfer does not apply here
 						totalFare += ORDINARY_FARE;
 					}
-					if (CANARSIE.contains(ride.lastStop)) {
+					if (CANARSIE.contains(ride.lastStop.getId())) {
 						canarsieFreeTransfer = true;
 					}
 					state = NycFareState.SUBWAY_POST_TRANSFER;
@@ -338,7 +338,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		    		totalFare += ORDINARY_FARE;
 		    		state = NycFareState.SIR_PRE_TRANSFER;
 		    	} else if (ride.classifier.equals(LOCAL_BUS)) {
-		    		if (!(CANARSIE.contains(ride.firstStop)
+		    		if (!(CANARSIE.contains(ride.firstStop.getId())
 		    				&& canarsieFreeTransfer)) {
 		    			totalFare += ORDINARY_FARE;
 		    		}
