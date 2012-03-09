@@ -407,7 +407,7 @@ public class Graph implements Serializable {
         for (Vertex v : toRemove) {
             this.remove(v);
             removed += 1;
-            LOG.debug("removed edgeless vertex {}", v);
+            LOG.trace("removed edgeless vertex {}", v);
         }
         return removed;
     }

@@ -206,43 +206,45 @@ public class StreetUtils {
             if (island.size() < 20) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.GRAPH_CONNECTIVITY, 
                         island.iterator().next(), island));
-                for (Vertex vertex : island) {
-                    depedestrianizeOrRemove(graph, vertex);
-                }
+                depedestrianizeOrRemove(graph, island);
             }
         }
         if (graph.removeEdgelessVertices() > 0) {
-            _log.debug("Removed edgeless vertices after pruning islands.");
+            _log.warn("Removed edgeless vertices after pruning islands.");
         }
     }
 
-    private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
-        Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
-        for (Edge e : outgoing) {
-            if (e instanceof PlainStreetEdge) {
-                PlainStreetEdge pse = (PlainStreetEdge) e;
-                StreetTraversalPermission permission = pse.getPermission();
-                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-                if (permission == StreetTraversalPermission.NONE) {
-                    pse.detach();
-                } else {
-                    pse.setPermission(permission);
+    private static void depedestrianizeOrRemove(Graph graph, Collection<Vertex> vertices) {
+        for (Vertex v : vertices) {
+            Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
+            for (Edge e : outgoing) {
+                if (e instanceof PlainStreetEdge) {
+                    PlainStreetEdge pse = (PlainStreetEdge) e;
+                    StreetTraversalPermission permission = pse.getPermission();
+                    permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    if (permission == StreetTraversalPermission.NONE) {
+                        pse.detach();
+                    } else {
+                        pse.setPermission(permission);
+                    }
                 }
-            }
-            
-            if (e instanceof TurnEdge) {
-                TurnEdge turn = (TurnEdge) e;
-                StreetTraversalPermission permission = turn.getPermission();
-                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-                if (permission == StreetTraversalPermission.NONE) {
-                    turn.detach();
-                } else {
-                    ((TurnVertex) turn.getFromVertex()).setPermission(permission);
+                
+                if (e instanceof TurnEdge) {
+                    TurnEdge turn = (TurnEdge) e;
+                    StreetTraversalPermission permission = turn.getPermission();
+                    permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    if (permission == StreetTraversalPermission.NONE) {
+                        turn.detach();
+                    } else {
+                        ((TurnVertex) turn.getFromVertex()).setPermission(permission);
+                    }
                 }
             }
         }
-        if (v.getOutgoing().size() == 0) {
-            graph.removeVertexAndEdges(v);
+        for (Vertex v : vertices) {
+            if (v.getDegreeOut() + v.getDegreeIn() == 0) {
+                graph.remove(v);
+            }
         }
     }
 
