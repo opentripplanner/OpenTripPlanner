@@ -41,7 +41,6 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     
     @Override
     public int getLowestCost(List<Ride> rides) {
-        StringBuilder description = new StringBuilder();
         List<Ride> bartBlock = null;
         Long sfmtaTransferIssued = null;
         Long alightedBart = null;
