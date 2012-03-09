@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
@@ -27,7 +28,9 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
  * @author andrewbyrd
  *
  */
-public class ServiceDay {
+public class ServiceDay implements Serializable {
+    private static final long serialVersionUID = -1206371243806996680L;
+
     protected long midnight;
     protected Set<AgencyAndId> serviceIdsRunning;
     

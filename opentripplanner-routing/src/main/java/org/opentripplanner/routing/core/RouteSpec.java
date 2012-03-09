@@ -13,10 +13,14 @@
 
 package org.opentripplanner.routing.core;
 
+import java.io.Serializable;
+
 /** 
  * A particular route as a user would see it for the purposes of multiple itineraries.
  */
-public class RouteSpec implements Cloneable {
+public class RouteSpec implements Cloneable, Serializable {
+    private static final long serialVersionUID = 7053858697234679920L;
+
     public String agency;
     public String routeName;
     
