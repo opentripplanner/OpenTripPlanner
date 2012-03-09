@@ -147,7 +147,7 @@ otp.planner.Templates = {
                 +   '<span class="stopid">' + this.locale.labels.stop_id + ' {toStopCode}</span>'
                 + '</tpl>'
                 + '</p>'
-                + '<tpl if="agencyName != null && showAgencyInfo == true">'
+                + '<tpl if="agencyName != null && agencyName.length &gt; 0 && showAgencyInfo == true">'
                 +   '<p class="agency-leg-info">'
                 +     '<tpl if="agencyUrl != null && agencyUrl.length &gt; 1">'
                 +       '<span>' + this.locale.labels.agency_msg + ' <a href="{agencyUrl}" target="#" title="' + this.locale.labels.agency_msg_tt + '">{agencyName}</a>.</span>'
