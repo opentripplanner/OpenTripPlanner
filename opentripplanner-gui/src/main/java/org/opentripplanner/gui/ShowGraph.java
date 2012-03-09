@@ -108,7 +108,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private static double lastLabelY;
     private static final DecimalFormat latFormatter = new DecimalFormat("00.0000°N ; 00.0000°S");
     private static final DecimalFormat lonFormatter = new DecimalFormat("000.0000°E ; 000.0000°W");
-    private static final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+    private final SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
 
     /* Layer constants */
     static final int DRAW_MINIMAL  = 0; // XY coordinates    

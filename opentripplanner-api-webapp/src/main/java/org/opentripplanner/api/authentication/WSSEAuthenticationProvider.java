@@ -48,16 +48,14 @@ public class WSSEAuthenticationProvider implements AuthenticationProvider, Initi
 	private HashSet<String> recentlyUsedNonceSet;
 	private UserDetailsService userDetailsService;
 	private MessageDigest sha1;
-	private static SimpleDateFormat dateFormat = new SimpleDateFormat(
-			"yyyy-MM-dd'T'HH:mm:ss'Z'");
 
 	private static long NONCE_EXPIRATION_MILLIS = 1000 * 60 * 5; // Five minutes
 
-	static {
-		dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
-	
+	private SimpleDateFormat dateFormat;
+
 	WSSEAuthenticationProvider() {
+	        dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
 		recentlyUsedNonceList = new LinkedList<T2<String, Long>>();
 		recentlyUsedNonceSet = new HashSet<String>();
 		try {

@@ -18,12 +18,13 @@ import java.util.Date;
 
 public class DateLibrary {
 
-  // Something very close to ISO 8601 time format
-  private static final SimpleDateFormat _format = new SimpleDateFormat(
+  private static DateLibrary _instance;
+// Something very close to ISO 8601 time format
+  private final SimpleDateFormat _format = new SimpleDateFormat(
       "yyyy-MM-dd'T'HH:mm:ssZ");
 
   public static String getTimeAsIso8601String(Date date) {
-    String timeString = DateLibrary._format.format(date);
+    String timeString = getInstance()._format.format(date);
     return timeString.substring(0, timeString.length() - 2) + ":"
         + timeString.substring(timeString.length() - 2);
   }
@@ -33,7 +34,14 @@ public class DateLibrary {
     int index = value.lastIndexOf(':');
     if (index == value.length() - 3)
       value = value.substring(0, index) + value.substring(index + 1);
-    return DateLibrary._format.parse(value);
+    return getInstance()._format.parse(value);
+  }
+
+  private static synchronized DateLibrary getInstance() {
+    if (_instance == null) {
+        _instance = new DateLibrary();
+    }
+    return _instance;
   }
 
 }
