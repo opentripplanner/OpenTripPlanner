@@ -34,7 +34,7 @@ import org.opentripplanner.routing.patch.Patch;
 
 public abstract class AbstractEdge implements Edge {
 
-    private static final long serialVersionUID = MavenVersion.UID;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     protected Vertex fromv;
 

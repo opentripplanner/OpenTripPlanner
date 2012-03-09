@@ -36,7 +36,7 @@ import org.opentripplanner.routing.edgetype.TurnEdge;
 
 public abstract class AbstractVertex implements Vertex {
 
-    private static final long serialVersionUID = MavenVersion.UID;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
     private static int maxIndex = 0;
 
