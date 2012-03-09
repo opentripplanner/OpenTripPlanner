@@ -33,10 +33,8 @@ public class TransitStop extends OffboardVertex {
 
     public TransitStop(Graph graph, Stop stop) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop);
-        if (stop != null) {
             this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
-        }
-        isEntrance = stop == null ? false : stop.getLocationType() == 2;
+        isEntrance = stop.getLocationType() == 2;
     }
 
     public boolean hasWheelchairEntrance() {
