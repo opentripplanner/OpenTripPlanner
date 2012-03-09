@@ -52,6 +52,7 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -138,7 +139,7 @@ public class PlanGenerator {
                 i.tooSloped = tooSloped;
                 /* fix up from/to on first/last legs */
                 if (i.legs.size() == 0) {
-                    LOGGER.log(Level.WARNING, "plan has no legs");
+                    LOGGER.log(Level.WARNING, "itinerary has no legs");
                     continue;
                 }
                 Leg firstLeg = i.legs.get(0);
@@ -427,6 +428,8 @@ public class PlanGenerator {
         }
 
         itinerary.removeBogusLegs();
+        if (itinerary.legs.size() == 0)
+            throw new TrivialPathException();
         return itinerary;
     }
 

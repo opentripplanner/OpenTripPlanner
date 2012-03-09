@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
+import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.annotation.Required;
@@ -295,6 +296,9 @@ public class Planner {
             // TODO: improve this to distinguish between days/places with no service
             // and dates outside those covered by the feed
             PlannerError error = new PlannerError(Message.NO_TRANSIT_TIMES);
+            response.setError(error);
+        } catch (TrivialPathException e) {
+            PlannerError error = new PlannerError(Message.TOO_CLOSE);
             response.setError(error);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "exception planning trip: ", e);
