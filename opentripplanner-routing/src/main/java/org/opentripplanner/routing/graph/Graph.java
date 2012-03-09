@@ -355,8 +355,8 @@ public class Graph implements Serializable {
         for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not in an outgoing list
             edges.addAll(v.getOutgoing());
-            if (v.getOutgoing().size() + v.getIncoming().size() == 0)
-                LOG.warn("vertex {} has no edges, it will not survive serialization.", v);
+            if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
         }
         LOG.debug("Assigning vertex/edge ID numbers...");
         this.renumberVerticesAndEdges();
@@ -395,6 +395,21 @@ public class Graph implements Serializable {
 
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
+    }
+    
+    public int removeEdgelessVertices() {
+        int removed = 0;
+        List<Vertex> toRemove = new LinkedList<Vertex>();
+        for (Vertex v : this.getVertices())
+            if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                toRemove.add(v);
+        // avoid concurrent vertex map modification
+        for (Vertex v : toRemove) {
+            this.remove(v);
+            removed += 1;
+            LOG.debug("removed edgeless vertex {}", v);
+        }
+        return removed;
     }
 
 }

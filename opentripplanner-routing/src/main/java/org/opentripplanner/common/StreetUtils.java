@@ -211,6 +211,9 @@ public class StreetUtils {
                 }
             }
         }
+        if (graph.removeEdgelessVertices() > 0) {
+            _log.debug("Removed edgeless vertices after pruning islands.");
+        }
     }
 
     private static void depedestrianizeOrRemove(Graph graph, Vertex v) {
