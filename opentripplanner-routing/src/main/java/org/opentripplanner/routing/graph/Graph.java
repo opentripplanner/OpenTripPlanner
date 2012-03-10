@@ -339,7 +339,7 @@ public class Graph implements Serializable {
             return graph;
         } catch (InvalidClassException ex) {
             LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
-            return null;
+            throw new IllegalStateException("Stored Graph version error", ex);
         }
     }
     
