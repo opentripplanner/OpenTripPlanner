@@ -871,7 +871,7 @@ otp.planner.StaticForms = {
 
         var interPlacesController = new Ext.Panel({  
             name:           'interPlacesController',
-            title:          'Intermediate Places',
+            title:          this.locale.tripPlanner.labels.intermediate,
             anchor:         '95%',
             layout:         'column',
             collapsible:    true,

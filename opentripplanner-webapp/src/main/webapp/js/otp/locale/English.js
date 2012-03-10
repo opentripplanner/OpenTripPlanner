@@ -252,7 +252,7 @@ otp.locale.English = {
             fromHere      : "From here",
             to            : "To",
             toHere        : "To here",
-            intermediate  : "Intermediate Place",
+            intermediate  : "Intermediate Places",
             minimize      : "Show me the",
             maxWalkDistance: "Maximum walk",
             maxBikeDistance: "Maximum bike",

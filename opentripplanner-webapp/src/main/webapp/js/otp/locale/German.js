@@ -330,7 +330,7 @@ otp.locale.German = {
     
         maxWalkDistance : 
         [
-            ['500',    '500 meter'],            
+            ['500',    '500 meter'],
             ['1000',   '1 km'],
             ['5000',   '5 km'],
             ['10000',  '10 km'],

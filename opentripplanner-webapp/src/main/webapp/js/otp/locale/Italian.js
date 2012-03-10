@@ -167,8 +167,8 @@ otp.locale.Italian = {
     // see otp.planner.Templates for use
     labels : 
     {
-        agency_msg   : "Service run by", // TODO
-        agency_msg_tt: "Open agency website in separate window...", // TODO
+        agency_msg   : "Servizio offerto da",
+        agency_msg_tt: "Apri il sito dell'azienda in una nuova finestra...",
         about        : "Informazioni",
         stop_id      : "ID Fermata",
         trip_details : "Dettagli viaggio",
