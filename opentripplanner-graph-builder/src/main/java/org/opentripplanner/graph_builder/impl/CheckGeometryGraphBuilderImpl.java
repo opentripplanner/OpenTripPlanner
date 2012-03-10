@@ -78,6 +78,10 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                     Coordinate edgeStartCoord = e.getFromVertex().getCoordinate();
                     Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
                     Coordinate[] geometryCoordinates = g.getCoordinates();
+                    if (geometryCoordinates.length < 2) {
+                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_EDGE_GEOMETRY, e));
+                        continue;
+                    }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
                     if (DistanceLibrary.distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
