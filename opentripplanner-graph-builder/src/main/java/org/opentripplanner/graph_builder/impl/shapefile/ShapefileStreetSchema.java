@@ -19,7 +19,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 public class ShapefileStreetSchema {
 
-    private SimpleFeatureConverter<String> idConverter;
+    private SimpleFeatureConverter<String> idConverter = new FeatureIdConverter();
 
     private SimpleFeatureConverter<String> nameConverter;
 
