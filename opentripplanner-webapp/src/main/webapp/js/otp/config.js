@@ -21,6 +21,7 @@ otp.config_defaults = {
     planner : {
         url            : null,
         printUrl       : null,
+        maxTransfers   : null,    // when maxTransfers > 0, this value will be sent down to the api to override any defaults (current api default == 2 as of 3/2012)
 
         // options to turn stuff on / off on the planner
         options        : {
@@ -33,7 +34,7 @@ otp.config_defaults = {
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
             useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
             appendGeocodeName     : true,   // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP 
-            NOTE: "THIS IS A STRUCTURE USED TO CUSTOMIZE THE TRIP FORMS AND OTHER BEHAVIORS"
+            OPTIONS_NOTE: "THIS IS A STRUCTURE USED TO CUSTOMIZE THE TRIP FORMS AND OTHER BEHAVIORS"
         },
 
         // will add a tree node to the bottom of the itinerary with this message

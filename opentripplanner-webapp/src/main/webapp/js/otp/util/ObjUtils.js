@@ -45,6 +45,21 @@ otp.util.ObjUtils = {
         return !isNaN(lat) && !isNaN(lon);
     },
 
+    isNumber : function(value)
+    {
+        var retVal = false;
+        try
+        {
+            retVal = !isNaN(value - 111);
+        }
+        catch(e)
+        {
+        }
+
+        return retVal; 
+    },
+
+
     /** returns the second value from a comma separated string eg: 0.0,0.returnMe*/
     getLon : function(coord) {
         var retVal = null;

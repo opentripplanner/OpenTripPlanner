@@ -33,12 +33,8 @@ otp.planner.StaticForms = {
     url                   : '/opentripplanner-api-webapp/ws/plan',
 
     // things overridden by config.js
-    showWheelchairForm    : true,
-    showIntermediateForms : true, 
-    useOptionDependencies : false, // form options context dependent based on mode and optimize flag 
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
     geocoder              : null,
-    appendGeocodeName     : false,
 
     // forms & stores
     m_panel               : null,
@@ -182,12 +178,24 @@ otp.planner.StaticForms = {
             }
         }
 
-        this.m_panel.form.submit( {
+        var data = {
             method  : 'GET',
             url     : this.url,
             waitMsg : this.locale.tripPlanner.labels.submitMsg,
             params  : triParams
-        });
+        }
+        if(otp.util.ObjUtils.isNumber(this.planner.maxTransfers))
+        {
+            data.maxTransfers = this.planner.maxTransfers;
+
+// TODO : need to move this down to mainPanel for it to work
+//        need to fix api, so that it can ignore non integer (including null) values for maxTransfers
+            this.m_routerIdForm = new Ext.form.Hidden({
+                name:  'maxTransfers',
+                value: this.planner.maxTransfers
+            });
+        }
+        this.m_panel.form.submit(data);
 
         // analytics
         otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_SUBMIT);
@@ -510,7 +518,7 @@ otp.planner.StaticForms = {
 
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
-            if(params.wheelchair && this.showWheelchairForm)
+            if(params.wheelchair && this.planner.options.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
             this.setDirtyRawInput(params.routerId, forms.m_routerIdForm);
@@ -604,9 +612,9 @@ otp.planner.StaticForms = {
         var d = this.m_maxWalkDistanceForm.getValue();
         retVal.maxWalkDistance = d * 1.0;
         retVal.mode            = this.m_modeForm.getValue();
-        if(this.showWheelchairForm)
+        if(this.planner.options.showWheelchairForm)
             retVal.wheelchair      = this.m_wheelchairForm.getValue();
-        if(this.showIntermediateForms)
+        if(this.planner.options.showIntermediateForms)
             retVal.intermediate_places = ''; //TODO: intermediate stops
 
         try
@@ -688,7 +696,7 @@ otp.planner.StaticForms = {
         ];
 
         // config option to turn on/off itermediate stuff
-        if(this.showIntermediateForms)
+        if(this.planner.options.showIntermediateForms)
         {
             var inter = {
                 text    : this.locale.contextMenu.intermediateHere,
@@ -734,7 +742,7 @@ otp.planner.StaticForms = {
             border:      false,
             items:       optForms
         });
-        
+
         this.m_routerIdForm = new Ext.form.Hidden({
             id:             'trip-routerid-form',
             name:           'routerId',
@@ -817,7 +825,7 @@ otp.planner.StaticForms = {
         Ext.state.Manager.getProvider();
 
         // step 2: create the forms
-        var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.appendGeocodeName};
+        var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.planner.options.appendGeocodeName};
         var fromFormOptions = Ext.apply({}, {id: otp.util.Constants.fromFormID, name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
         var toFormOptions   = Ext.apply({}, {id: otp.util.Constants.toFormID,   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
         if(this.isSolrGeocoderEnabled())
@@ -919,7 +927,7 @@ otp.planner.StaticForms = {
         var inputForms = [];
         var revButtonStyle = 'padding-top:15px';
         inputForms.push(this.m_fromForm.getComboBox());
-        if(this.showIntermediateForms)
+        if(this.planner.options.showIntermediateForms)
         {
             inputForms.push(interPlacesController);
             revButtonStyle = 'padding-top:50px'; // push rev button down
@@ -1175,7 +1183,7 @@ otp.planner.StaticForms = {
         var filter = otp.planner.FormsOptionsManagerStatic.getOptimizeFilter(true, false);
         this.m_optimizeForm.getStore().filterBy(filter);
 
-        if (this.useOptionDependencies) {
+        if (this.planner.options.useOptionDependencies) {
             var usecfg = {
                 mode:         this.m_modeForm,
                 optimize:     this.m_optimizeForm,
@@ -1184,14 +1192,14 @@ otp.planner.StaticForms = {
                 bikeTriangle: this.m_bikeTriangle
             };
 
-            if(this.showWheelchairForm)
+            if(this.planner.options.showWheelchairForm)
                 usecfg.wheelchair = this.m_wheelchairForm;
 
             this.m_optionsManager = new otp.planner.FormsOptionsManager(usecfg);
         }
 
         var retVal = [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm];
-        if(this.showWheelchairForm)
+        if(this.planner.options.showWheelchairForm)
             retVal.push(this.m_wheelchairForm);
 
         return retVal;

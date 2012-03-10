@@ -104,9 +104,8 @@ otp.planner.ItineraryDataFactoryStatic = {
     id           : null,
     store        : null,
     templates    : null,
+    planner      : null,
     locale       : null,
-    showStopCodes  : false,
-    showAgencyInfo : false,
 
     from         : null,
     to           : null,
@@ -115,7 +114,6 @@ otp.planner.ItineraryDataFactoryStatic = {
 
     // optional 
     dontEditStep     : false,
-    useRouteLongName : false,
     LEG_ID           : '-leg-',
 
     // the thing this factory creates
@@ -165,9 +163,8 @@ otp.planner.ItineraryDataFactoryStatic = {
         var numLegs = this.store.getCount();
         for(var i = 0; i < numLegs; i++)
         {
-            var leg                 = this.store.getAt(i);
-            leg.data.showStopCodes  = this.showStopCodes;
-            leg.data.showAgencyInfo = this.showAgencyInfo;
+            var leg = this.store.getAt(i);
+            otp.inherit(leg.data, this.planner.options);
 
             var text         = null;
             var verb         = null;
@@ -265,7 +262,7 @@ otp.planner.ItineraryDataFactoryStatic = {
         var routeName = rec.get('routeShortName');
 
         // step 1: configure parameter must be set to true
-        if(this.useRouteLongName)
+        if(this.planner.options.useRouteLongName)
         {
             var routeLongName = rec.get('routeLongName');
     

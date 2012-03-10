@@ -41,6 +41,7 @@ otp.planner.Planner = {
     geocoder                : null,
     templates               : null,
     routerId                : null,
+    maxTransfers            : null,
     itineraryMessages       : null,
     options                 : null,  // see config.js - planner.options
 
@@ -64,7 +65,6 @@ otp.planner.Planner = {
     {
         this.planner = this;
         otp.configure(this, config);
-        otp.inherit(this, this.options);
 
         if(this.templates == null)
             this.templates = new otp.planner.Templates({locale : this.locale});
@@ -278,7 +278,6 @@ otp.planner.Planner = {
                   id  : ++this.m_tabCount, 
                   request:request
             };
-            otp.inherit(cfg, this.options);
 
             var trip = new otp.planner.TripTab(cfg);
             var newTab = trip.getPanel();

@@ -29,10 +29,7 @@ otp.planner.Itinerary = {
     triptab        : null,
     locale         : null,
     templates      : null,
-    showStopCodes  : false,
-    showAgencyInfo : false,
-
-    useRouteLongName : false,
+    planner        : null,
 
     // raw data
     xml            : null,

@@ -26,6 +26,7 @@ otp.planner.Renderer = {
     map                      : null,
     locale                   : null,
     templates                : null,
+    planner                  : null,
 
     m_markerLayer            : null,
     m_vectorLayer            : null,

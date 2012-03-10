@@ -134,7 +134,7 @@ otp.planner.TripTab = {
 
             var buttons = [r, e];
 
-            if(this.planner.showPrintButton)
+            if(this.planner.options.showPrintButton)
             {
                 var p = new Ext.Toolbar.Button({
                     text:    this.locale.buttons.print,
@@ -146,7 +146,7 @@ otp.planner.TripTab = {
                 buttons.push(p);
             }
 
-            if (this.planner.showLinksButton)
+            if (this.planner.options.showLinksButton)
             {
                 var l = new Ext.Toolbar.Button({
                     text: this.locale.buttons.link,
@@ -380,10 +380,7 @@ otp.planner.TripTab = {
                 triptab          : this,
                 locale           : this.locale,
                 templates        : this.templates,
-                showStopCodes    : this.planner.showStopCodes,
-                showAgencyInfo   : this.planner.showAgencyInfo,
-                useRouteLongName : this.planner.useRouteLongName,
-                itineraryMessages: this.planner.itineraryMessages,
+                planner          : this.planner,
                 xml              : itin,
                 from             : this.m_from,
                 to               : this.m_to,
