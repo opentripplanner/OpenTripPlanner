@@ -54,7 +54,8 @@ public class GraphBuilderAnnotation implements Serializable {
     public static String register(Graph graph, Variety variety, Object... refs) {
         GraphBuilderAnnotation gba = new GraphBuilderAnnotation(variety, refs);
         graph.addBuilderAnnotation(gba);
-        return "(annotation registered) " + gba.toString();
+        LOG.trace("Registering {}", gba);
+        return gba.getMessage() + " (annotation registered)";
     }
 
     public Collection<Object> getReferencedObjects() {
@@ -62,6 +63,10 @@ public class GraphBuilderAnnotation implements Serializable {
     }
 
     public String toString() {
+        return String.format("graph builder annotation of variety %s", variety);
+    }
+
+    public String getMessage() {
         return variety.getMessage(refs);
     }
 
