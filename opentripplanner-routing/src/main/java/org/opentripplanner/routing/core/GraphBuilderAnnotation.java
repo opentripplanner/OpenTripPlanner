@@ -92,7 +92,8 @@ public class GraphBuilderAnnotation implements Serializable {
         LEVEL_AMBIGUOUS("Could not infer floor number for layer called '%s' at %s. Vertical " +
                 "movement will still be possible, but elevator cost might be incorrect. " +
                 "Consider an OSM level map."),
-        GRAPH_CONNECTIVITY("Removed/depedestrianized disconnected subgraph containing: %s");
+        GRAPH_CONNECTIVITY("Removed/depedestrianized disconnected subgraph containing: %s"),
+        ELEVATION_FLATTENED("Edge %s was steeper than Baldwin Street and was flattened.");
 
         private final String formatString;
 

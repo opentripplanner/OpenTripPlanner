@@ -214,7 +214,8 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public void setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
+        public boolean setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed) {
+            return false;
         }
 
         @Override

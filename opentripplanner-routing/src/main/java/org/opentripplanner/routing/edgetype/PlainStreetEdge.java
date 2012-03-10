@@ -141,12 +141,12 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     @Override
-    public void setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
+    public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
-            return;
+            return false;
         }
         if (slopeOverride && !computed) {
-            return;
+            return false;
         }
 
         elevationProfile = elev;
@@ -161,6 +161,7 @@ public class PlainStreetEdge extends StreetEdge {
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
         bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        return costs.flattened;
     }
 
     @Override

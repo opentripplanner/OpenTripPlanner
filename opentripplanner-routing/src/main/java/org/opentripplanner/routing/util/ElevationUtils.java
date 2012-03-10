@@ -58,7 +58,7 @@ public class ElevationUtils {
 
     public static SlopeCosts getSlopeCosts(PackedCoordinateSequence elev, String name) {
         Coordinate[] coordinates = elev.toCoordinateArray();
-
+        boolean flattened = false;
         double maxSlope = 0;
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
@@ -70,13 +70,12 @@ public class ElevationUtils {
                 continue;
             }
             double slope = rise / run;
+            // Baldwin St in Dunedin, NZ, is the steepest street
+            // on earth, and has a grade of 35%. So, this must be a data error.
+            // Then again, steps and footpaths are often very steep...
             if (slope > 0.35 || slope < -0.35) {
-                slope = 0; // Baldwin St in Dunedin, NZ, is the steepest street
-                           // on earth, and has a
-                // grade of 35%. So, this must be a data error.
-                log.warn("Warning: street "
-                        + name
-                        + " steeper than Baldwin Street.  This is an error in the algorithm or the data");
+                slope = 0; 
+                flattened = true;
             }
             if (maxSlope < Math.abs(slope)) {
                 maxSlope = Math.abs(slope);
@@ -96,7 +95,7 @@ public class ElevationUtils {
                 slopeSafetyCost += safetyCost;
             }
         }
-        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope);
+        return new SlopeCosts(slopeSpeedEffectiveLength, slopeWorkCost, slopeSafetyCost, maxSlope, flattened);
     }
 
     public static double slopeSpeedCoefficient(double slope, double altitude) {

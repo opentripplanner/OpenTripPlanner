@@ -145,12 +145,14 @@ public class TurnVertex extends StreetVertex {
         return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
 
-    public void setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
+    // TODO: there is duplicate code in TurnVertex and PlainStreetEdge. 
+    // We may want a separate StreetSegment class/interface.
+    public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         if (elev == null || elev.size() < 2) {
-            return;
+            return false;
         }
         if (slopeOverride && !computed) {
-            return;
+            return false;
         }
 
         elevationProfile = elev;
@@ -165,6 +167,7 @@ public class TurnVertex extends StreetVertex {
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
         bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        return costs.flattened;
     }
 
     public boolean canTraverse(TraverseOptions wo) {

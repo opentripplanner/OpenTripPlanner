@@ -400,7 +400,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     coords[i++] = new Coordinate(d, p.ele);
                 }
-                edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true);
+                // set elevation profile and warn if profile was flattened because it was too steep
+                if(edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true)) {
+                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                }
             }
 
             applyBikeSafetyFactor(graph);
