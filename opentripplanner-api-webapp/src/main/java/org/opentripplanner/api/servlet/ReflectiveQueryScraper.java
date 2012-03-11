@@ -41,26 +41,26 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public abstract class ReflectiveQueryScraper implements Filter {
+public class ReflectiveQueryScraper implements Filter {
+
     private static final Logger LOG = LoggerFactory.getLogger(ReflectiveQueryScraper.class);
-
-    private final Set<Target> targets = new HashSet<Target>();
+    private final Class<?> targetClass;
+    private final Set<Target> targets;
     
-    /* Concrete QueryScrapers must override this method to return the Class they construct */
-    public abstract Class<?> getTargetClass();
-
-    public ReflectiveQueryScraper() {
-        for (Field field : getTargetClass().getFields()) {
+    public ReflectiveQueryScraper(Class<?> targetClass) {
+        this.targetClass = targetClass;
+        targets = new HashSet<Target>();
+        for (Field field : targetClass.getFields()) {
             Target target = FieldTarget.instanceFor(field);
             if (target != null)
                 targets.add(target);
         }
-        for (Method method : getTargetClass().getMethods()) {
+        for (Method method : targetClass.getMethods()) {
             Target target = MethodTarget.instanceFor(method);
             if (target != null)
                 targets.add(target);
         }
-        LOG.info("initialized query scraper for: {}", getTargetClass());
+        LOG.info("initialized query scraper for: {}", targetClass);
         for (Target t : targets)
             LOG.info("-- {}", t);
     }
@@ -76,7 +76,7 @@ public abstract class ReflectiveQueryScraper implements Filter {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
-        request.setAttribute(getTargetClass().getSimpleName(), scrape(request));
+        request.setAttribute(targetClass.getSimpleName(), scrape(request));
         /* pass request and response through to the next filter/servlet in the chain */
         chain.doFilter(request, response); 
     }
@@ -84,11 +84,11 @@ public abstract class ReflectiveQueryScraper implements Filter {
     private Object scrape(ServletRequest request) {
         Object obj = null;
         try {
-            obj = getTargetClass().newInstance();
+            obj = targetClass.newInstance();
             for (Target t : targets)
                 t.apply(request, obj);
         } catch (Exception e) {
-            LOG.warn("exception {} while scraping {}", e, getTargetClass());
+            LOG.warn("exception {} while scraping {}", e, targetClass);
         }
         return obj;
     }
