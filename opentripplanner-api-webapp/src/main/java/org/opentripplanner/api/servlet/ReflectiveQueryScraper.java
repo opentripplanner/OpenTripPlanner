@@ -41,10 +41,10 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public class ReflectiveQueryScraper implements Filter {
+public class ReflectiveQueryScraper {
 
     private static final Logger LOG = LoggerFactory.getLogger(ReflectiveQueryScraper.class);
-    private final Class<?> targetClass;
+    protected final Class<?> targetClass;
     private final Set<Target> targets;
     
     public ReflectiveQueryScraper(Class<?> targetClass) {
@@ -65,23 +65,7 @@ public class ReflectiveQueryScraper implements Filter {
             LOG.info("-- {}", t);
     }
 
-    @Override
-    public void init(FilterConfig fc) throws ServletException {        
-    }
-
-    @Override
-    public void destroy() {
-    }
-
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-        throws IOException, ServletException {
-        request.setAttribute(targetClass.getSimpleName(), scrape(request));
-        /* pass request and response through to the next filter/servlet in the chain */
-        chain.doFilter(request, response); 
-    }
-
-    private Object scrape(ServletRequest request) {
+    public Object scrape(ServletRequest request) {
         Object obj = null;
         try {
             obj = targetClass.newInstance();
