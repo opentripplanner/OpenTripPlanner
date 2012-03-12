@@ -371,7 +371,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 ret.add(ce.edge);
             return ret;
         }
-        public Collection<CandidateEdgeBundle> binByAngleAndDirection() {
+        public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
             Map<P2<Double>, CandidateEdgeBundle> bins = 
                 new HashMap<P2<Double>, CandidateEdgeBundle>(); // (r, theta)
             CANDIDATE : for (CandidateEdge ce : this) {
@@ -441,7 +441,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                     candidateEdges.add(ce);
             }
         }
-        Collection<CandidateEdgeBundle> bundles = candidateEdges.binByAngleAndDirection();
+        Collection<CandidateEdgeBundle> bundles = candidateEdges.binByDistanceAndAngle();
         // initially set best bundle to the closest bundle
         CandidateEdgeBundle best = null; 
         for (CandidateEdgeBundle bundle : bundles) {
