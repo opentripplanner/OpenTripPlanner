@@ -138,6 +138,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             HashMap<Coordinate, TreeSet<String>> coordinateToStreetNames = getCoordinatesToStreetNames(featureList);
             
             for (SimpleFeature feature : featureList) {
+                if (feature.getDefaultGeometry() == null) {
+                    log.warn("feature has no geometry: " + feature.getIdentifier());
+                    continue;
+                }
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
                 Object o = streetIdConverter.convert(feature);
@@ -245,6 +249,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
         while (it.hasNext()) {
             SimpleFeature feature = it.next();
             if (featureSelector != null && !featureSelector.convert(feature)) {
+                continue;
+            }
+            if (feature.getDefaultGeometry() == null) {
+                log.warn("feature has no geometry: " + feature.getIdentifier());
                 continue;
             }
             LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
