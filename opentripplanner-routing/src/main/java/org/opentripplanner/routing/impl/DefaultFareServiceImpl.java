@@ -163,37 +163,43 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         // pick up a random currency from fareAttributes, 
         // we assume that all tickets use the same currency
+        Currency currency = null; 
         WrappedCurrency wrappedCurrency = null;
         if (fareAttributes.size() > 0) {
-            wrappedCurrency = 
-                  new WrappedCurrency(fareAttributes.values().iterator().next().getCurrencyType());
+            currency = Currency.getInstance(
+                fareAttributes.values().iterator().next().getCurrencyType());
+            wrappedCurrency = new WrappedCurrency(currency);
         }
-        int lowestCost = getLowestCost(rides);
-        if (lowestCost < Integer.MAX_VALUE) {
+        float lowestCost = getLowestCost(rides);
+        if (lowestCost != Float.POSITIVE_INFINITY) {
+            int fractionDigits = 2;
+            if (currency != null)
+                fractionDigits = currency.getDefaultFractionDigits();
+            int cents = (int) Math.round(lowestCost * Math.pow(10, fractionDigits));
             Fare fare = new Fare();
-            fare.addFare(FareType.regular, wrappedCurrency, lowestCost);
+            fare.addFare(FareType.regular, wrappedCurrency, cents);
             return fare;
         } else {
             return null;
         }
     }
 
-    public int getLowestCost(List<Ride> rides) {
+    public float getLowestCost(List<Ride> rides) {
         // Dynamic algorithm to calculate fare cost.
         // Cell [i,j] holds the best (lowest) cost for a trip from rides[i] to rides[j]
-        int[][] resultTable = new int[rides.size()][rides.size()];
+        float[][] resultTable = new float[rides.size()][rides.size()];
 
         for (int i = 0; i < rides.size(); i++) {
             // each diagonal
             for (int j = 0; j < rides.size() - i; j++) {
-                int cost = calculateCost(rides.subList(j, j + i + 1));
+                float cost = calculateCost(rides.subList(j, j + i + 1));
                 if (cost < 0) {
                     _log.error("negative cost for a ride sequence");
-                    cost = Integer.MAX_VALUE;
+                    cost = Float.POSITIVE_INFINITY;
                 }
                 resultTable[j][j + i] = cost;
                 for (int k = 0; k < i; k++) {
-                    int via = resultTable[j][j + k] + resultTable[j + k + 1][j + i];
+                    float via = resultTable[j][j + k] + resultTable[j + k + 1][j + i];
                     if (resultTable[j][j + i] > via)
                         resultTable[j][j + i] = via;
                 }
@@ -202,9 +208,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         return resultTable[0][rides.size() - 1];
     }
     
-    protected int calculateCost(List<Ride> rides) {
-        Currency currency = null;
-
+    protected float calculateCost(List<Ride> rides) {
         Set<String> zones = new HashSet<String>();
         Set<AgencyAndId> routes = new HashSet<AgencyAndId>();
         int transfersUsed = -1;
@@ -219,7 +223,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         for (Ride ride : rides) {
             if ( ! ride.route.getAgencyId().equals(agencyId)) {
                 _log.debug("skipped multi-agency ride sequence {}", rides);
-                return Integer.MAX_VALUE;
+                return Float.POSITIVE_INFINITY;
             }
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
@@ -230,7 +234,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         
         FareAttribute bestAttribute = null;
-        float bestFare = Float.MAX_VALUE;
+        float bestFare = Float.POSITIVE_INFINITY;
         long tripTime = lastRideStartTime - startTime;
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
@@ -257,18 +261,15 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 if (newFare < bestFare) {
                     bestAttribute = attribute;
                     bestFare = newFare;
-                    currency = Currency.getInstance(attribute.getCurrencyType());
                 }
             }
         }
         _log.debug("{} best for {}", bestAttribute, rides);
 
-        if (bestFare == Float.MAX_VALUE) {
+        if (bestFare == Float.POSITIVE_INFINITY)
             _log.warn("No fare for a ride sequence: {}", rides);
-            return Integer.MAX_VALUE;
-        }
 
-        return (int) Math.round(bestFare * Math.pow(10, currency.getDefaultFractionDigits()));
+        return bestFare;
 
     }
 
