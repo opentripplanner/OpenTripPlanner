@@ -28,6 +28,8 @@ import org.opengis.coverage.Coverage;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -97,7 +99,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 if (ee instanceof EdgeWithElevation) {
                     EdgeWithElevation edgeWithElevation = (EdgeWithElevation) ee;
                     // if (ee instanceof TurnEdge && ((TurnVertex)ee.getFromVertex()).is
-                    processEdge(edgeWithElevation);
+                    processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null) {
                         edgesWithElevation.add(edgeWithElevation);
                     }
@@ -274,7 +276,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
-                    edge.setElevationProfile(profile, true);
+                    if(edge.setElevationProfile(profile, true)) {
+                        log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                    }
                 }
             }
         }
@@ -284,8 +288,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * Processes a single {@link Street} edge, creating and assigning the elevation profile.
      * 
      * @param ee the street edge
+     * @param graph the graph (used only for error handling)
      */
-    private void processEdge(EdgeWithElevation ee) {
+    private void processEdge(Graph graph, EdgeWithElevation ee) {
         if (ee.getElevationProfile() != null) {
             return; /* already set up */
         }
@@ -323,8 +328,10 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                 coordList.toArray(coordArr));
 
-        ee.setElevationProfile(elevPCS, false);
 
+        if(ee.setElevationProfile(elevPCS, true)) {
+            log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
+        }
     }
 
     /**
