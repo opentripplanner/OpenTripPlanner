@@ -112,21 +112,6 @@ public class HashGrid {
         }
     }
     
-    public static void main (String[] args) {
-        HashGrid hg = new HashGrid(500, 200, 200);
-        Random r = new Random(11);
-        for (int i = 0; i < 20; i++) {
-            double x0 = r.nextDouble();
-            double y0 = r.nextDouble();
-            double x1 = r.nextDouble();
-            double y1 = r.nextDouble();
-            Coordinate a = new Coordinate(x0, y0);
-            Coordinate b = new Coordinate(x1, y1);
-            hg.rasterize(a, b, b);
-        }
-        System.out.println(hg.densityMap());
-    }
-
     public int rasterize(Coordinate a, Coordinate b, Object obj) {
         int n = 0;
         Coordinate c0, c1;
