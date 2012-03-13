@@ -70,7 +70,11 @@ public class GraphBuilderAnnotation implements Serializable {
         return variety.getMessage(refs);
     }
 
-    public enum Variety {
+    public Variety getVariety() {
+        return variety;
+    }
+
+    public static enum Variety {
         GRAPHWIDE("Graph-wide: %s"),
         TRIP_DEGENERATE("Trip %s has fewer than two stops.  We will not use it for routing. "
                 + "This is probably an error in your data"), 

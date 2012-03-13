@@ -237,6 +237,15 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         drawLevel = DRAW_ALL;
     }
 
+    /** Zoom to an envelope. Used for annotation zoom.
+     * @author mattwigway
+     */
+    public void zoomToEnvelope(Envelope e) {
+        modelBounds = e;
+        matchAspect();
+        drawLevel = DRAW_ALL;
+    }     
+
     void matchAspect() {
         /* Basic sinusoidal projection of lat/lon data to square pixels */
         double yCenter = modelBounds.centre().y;
