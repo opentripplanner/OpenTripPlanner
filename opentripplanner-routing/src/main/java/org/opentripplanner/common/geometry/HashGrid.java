@@ -15,11 +15,14 @@ package org.opentripplanner.common.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineSegment;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * A spatial index using a 2D hashtable that wraps around at the edges.
@@ -27,8 +30,8 @@ import com.vividsolutions.jts.geom.Coordinate;
  * preserves proximity allowing 100 percent recall (no false dismissals) in linear time, 
  * at the cost of false positives (hash collisions) which are filtered out of query results.
  * 
- * Currently only handles pointlike objects, but 2d objects could be handled by either
- * rasterizing them into grid cells, or using a hierarchical grid.
+ * 2d objects are handled by 'conservatively' rasterizing them into grid cells.
+ * It would also be possible to use a hierarchical grid.
  * 
  * For more background see:
  * Schornbaum, Florian. Hierarchical Hash Grids for Coarse Collision Detection (2009)
@@ -38,13 +41,13 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @param <T> The type of objects to be stored in the HashGrid. Must implement the Pointlike
  * interface.
  */
-public class HashGrid<T extends Pointlike> {
+public class HashGrid {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
-    private static final double PROJECTION_MERIDIAN = -100;
+//    private static final Logger LOG = LoggerFactory.getLogger(HashGrid.class);
+    private static final double PROJECTION_MERIDIAN = -120;
     private final double binSizeMeters;
     private final int nBinsX, nBinsY;
-    private final List<T>[][] bins;
+    private final List<Object>[][] bins;
     private int nBins = 0;
     private int nEntries = 0;
     
@@ -55,33 +58,153 @@ public class HashGrid<T extends Pointlike> {
         this.binSizeMeters = binSizeMeters;
         this.nBinsX = xBins;
         this.nBinsY = yBins;
-        bins = (List<T>[][]) new List[xBins][yBins];
+        bins = (List<Object>[][]) new List[xBins][yBins];
     }
     
-    public void put(T t) {
-        bin(t).add(t);
-        nEntries +=1;
+    public void put(Coordinate c, Object t) {
+        if (t instanceof Pointlike) {
+            bin(c).add(t);
+            nEntries +=1;
+        } 
+//        else if (t instanceof Linelike) {
+//            rasterize(new Point(0,0), new Point(0,0));
+//            nEntries +=1;
+//        }
     }
 
-    private List<T> bin(Pointlike p) {
-        int xBin = xBin(p); 
-        int yBin = yBin(p);
-        List<T> bin = bins[xBin][yBin];
+    private List<Object> bin(Coordinate c) {
+        int xBin = xBin(c); 
+        int yBin = yBin(c);
+        return bin(xBin, yBin);
+    }
+    
+    private List<Object> bin(int xBin, int yBin) {
+        List<Object> bin = bins[xBin][yBin];
         if (bin == null) {
-            bin = new ArrayList<T>();
+            bin = new ArrayList<Object>();
             bins[xBin][yBin] = bin; 
             nBins += 1;
         }
         return bin;
     }
+
+    // TODO pull class out to application 
+    public static class RasterizedSegment extends LineSegment {
+        public final Object payload;
+        public final double distAlongLinestring;
+        RasterizedSegment(Coordinate c0, Coordinate c1, double d, Object t) {
+            super(c0, c1);
+            distAlongLinestring = d;
+            payload = t;
+        }
+    }
     
-    private int xBin(Pointlike p) {
-        double x = projLon(p.getLon(), p.getLat());
+    // TODO pull method out
+    public void rasterize(LineString ls, Object t) {
+        Coordinate [] coords = ls.getCoordinates();
+        double dist = 0;
+        for (int i = 0; i < coords.length - 1; i++) {
+            Coordinate c0 = coords[i];
+            Coordinate c1 = coords[i+1];
+            RasterizedSegment rs = new RasterizedSegment(c0, c1, dist, t);
+            rasterize(c0, c1, rs);
+            dist += DistanceLibrary.fastDistance(coords[i], coords[i+1]);
+        }
+    }
+    
+    public static void main (String[] args) {
+        HashGrid hg = new HashGrid(500, 200, 200);
+        Random r = new Random(11);
+        for (int i = 0; i < 20; i++) {
+            double x0 = r.nextDouble();
+            double y0 = r.nextDouble();
+            double x1 = r.nextDouble();
+            double y1 = r.nextDouble();
+            Coordinate a = new Coordinate(x0, y0);
+            Coordinate b = new Coordinate(x1, y1);
+            hg.rasterize(a, b, b);
+        }
+        System.out.println(hg.densityMap());
+    }
+
+    public int rasterize(Coordinate a, Coordinate b, Object obj) {
+        int n = 0;
+        Coordinate c0, c1;
+        // we will work in direction of increasing x
+        if (a.x <= b.x) {
+            c0 = a;
+            c1 = b;
+        } else {
+            c0 = b;
+            c1 = a;
+        }
+        double x0, y0, x1, y1;
+        x0 = projLon(c0.x, c0.y);
+        y0 = projLat(c0.y);
+        x1 = projLon(c1.x, c1.y);
+        y1 = projLat(c1.y);
+        // get slope of line segment to rasterize
+        double slope = (y1 - y0) / (x1 - x0);
+        boolean negSlope = slope < 0;
+        // reference point is left edge of the initial bin
+        double xStartBinFloor = Math.floor(x0 / binSizeMeters) * binSizeMeters;
+        double yStartBinFloor = Math.floor(y0 / binSizeMeters) * binSizeMeters;
+        if (negSlope)
+            yStartBinFloor += binSizeMeters;
+        double yBinFloor = yStartBinFloor;
+        double x = x0;
+        double y = y0;
+        // step forward bin by bin
+        int xSteps = 0, ySteps = 0;
+        int xBin = xBin(c0);
+        int yBin = yBin(c0);
+        boolean done = false;
+        while ( ! done) {
+            xSteps += 1;
+            // place x marker at right edge of the current bin column
+            x = xStartBinFloor + xSteps * binSizeMeters;
+            // check for final iteration
+            if (x >= x1) {
+                x = x1;
+                y = y1; // set y (undefined slope in vertical case)
+                done = true;
+            } else {
+                // find y value at current x (usually the right edge of the bin)
+                y = (x-x0) * slope + y0;
+            }
+            // if new y is in a different bin row, advance to that bin row
+            if (negSlope) {
+                while (yBinFloor - binSizeMeters > y) {
+                    bin(xBin, yBin).add(obj);
+                    ySteps += 1;
+                    yBinFloor = yStartBinFloor - ySteps * binSizeMeters;
+                    // advance down to next row of bins
+                    yBin = yWrap(yBin - 1);
+                }
+            } else {
+                while (yBinFloor + binSizeMeters < y) {
+                    bin(xBin, yBin).add(obj);
+                    ySteps += 1;
+                    yBinFloor = yStartBinFloor + ySteps * binSizeMeters;
+                    // advance up to next row of bins
+                    yBin = yWrap(yBin + 1);
+                }
+            }
+            // insert object even if we did not advance to another row
+            bin(xBin, yBin).add(obj);
+            // advance to next column of bins
+            xBin = xWrap(xBin + 1);
+        }
+        return n;
+    }
+    
+    private int xBin(Coordinate c) {
+        double x = projLon(c.x, c.y);
         return xWrap( (int) Math.floor(x / binSizeMeters) );
     }
     
-    private int yBin(Pointlike p) {
-        double y = projLat(p.getLat());
+    private int yBin(Coordinate c) {
+        double y = projLat(c.y);
         return yWrap( (int) Math.floor(y / binSizeMeters) );
     }
 
@@ -99,16 +222,16 @@ public class HashGrid<T extends Pointlike> {
         return y;
     }
     
-    public T closest(double x, double y, double radiusMeters) {
-        return closest(new Point(x, y), radiusMeters);
+    public Object closest(double x, double y, double radiusMeters) {
+        return closest(new Coordinate(x, y), radiusMeters);
     }
         
-    public T closest(Pointlike p, double radiusMeters) {
-        T closestT = null;
+    public Object closest(Coordinate c, double radiusMeters) {
+        Object closestT = null;
         double closestDistance = Double.POSITIVE_INFINITY;
         int radiusBins = (int) Math.ceil(radiusMeters / binSizeMeters);
-        int xBin = xBin(p);
-        int yBin = yBin(p);
+        int xBin = xBin(c);
+        int yBin = yBin(c);
         int minBinX = xBin - radiusBins;
         int maxBinX = xBin + radiusBins;
         int minBinY = yBin - radiusBins;
@@ -117,12 +240,13 @@ public class HashGrid<T extends Pointlike> {
             int wrappedX = xWrap(x);
             for (int y = minBinY; y <=maxBinY; y += 1) {
                 int wrappedY = yWrap(y);
-                List<T> bin = bins[wrappedX][wrappedY];
+                List<Object> bin = bins[wrappedX][wrappedY];
                 if (bin != null) {
-                    for (T t : bin) {
-                        if (t == p)
-                            continue;
-                        double distance = p.fastDistance(t);
+                    for (Object t : bin) {
+                        //if (t == p)
+                        //    continue;
+                        // FIXME
+                        double distance = DistanceLibrary.fastDistance(c, c);
                         // bins may contain distant colliding objects
                         if (distance > radiusMeters)
                             continue;
@@ -137,12 +261,12 @@ public class HashGrid<T extends Pointlike> {
         return closestT;
     }
 
-    public Iterable<T> query (double lon, double lat, double radiusMeters) {
-        Pointlike p = new Point (lon, lat);
-        List<T> ret = new ArrayList<T>();
+    public List<Object> query (double lon, double lat, double radiusMeters) {
+        Coordinate c = new Coordinate(lon, lat);
+        List<Object> ret = new ArrayList<Object>();
         int radiusBins = (int) Math.ceil(radiusMeters / binSizeMeters);
-        int xBin = xBin(p);
-        int yBin = yBin(p);
+        int xBin = xBin(c);
+        int yBin = yBin(c);
         int minBinX = xBin - radiusBins;
         int maxBinX = xBin + radiusBins;
         int minBinY = yBin - radiusBins;
@@ -151,7 +275,7 @@ public class HashGrid<T extends Pointlike> {
             int wrappedX = xWrap(x);
             for (int y = minBinY; y <=maxBinY; y += 1) {
                 int wrappedY = yWrap(y);
-                List<T> bin = bins[wrappedX][wrappedY];
+                List<Object> bin = bins[wrappedX][wrappedY];
                 if (bin != null) {
                     ret.addAll(bin);
                 }
@@ -186,23 +310,21 @@ public class HashGrid<T extends Pointlike> {
     }
 
     public String densityMap() {
+        final int SATURATE_AT = 10;
+        String[] block = new String[] {"░░", "▒▒", "▓▓", "██"};
         StringBuilder sb = new StringBuilder();
         sb.append("HashGrid:\n");
         // flip map for northern hemisphere
         for (int y=nBinsY-1; y>=0; y--) {
             for (int x=0; x<nBinsX; x++) {
                 if (bins[x][y] == null) {
-                    sb.append("__"); 
+                    sb.append("  "); 
                 } else {
                     int z = bins[x][y].size();
-                    if (z < 10) {
-                        sb.append('.');
-                        sb.append(z);
-                    } else if (z < 100) {
-                        sb.append(z);
-                    } else { 
-                        sb.append("XX");
-                    }
+                    int i = z * 3 / SATURATE_AT;
+                    if (i > 3)
+                        i = 3;
+                    sb.append(block[i]);
                 }
             }    
             sb.append('\n');
@@ -210,7 +332,7 @@ public class HashGrid<T extends Pointlike> {
         return sb.toString();
     }
 
-    public class Point implements Pointlike {
+    public static class Point implements Pointlike {
         
         double lon, lat;
         
