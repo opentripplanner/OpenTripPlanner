@@ -156,7 +156,7 @@ public class PlainStreetEdge extends StreetEdge {
         length *= lengthMultiplier;
         bicycleSafetyEffectiveLength *= lengthMultiplier;
 
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, getName());
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, permission.allows(StreetTraversalPermission.CAR));
         slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;

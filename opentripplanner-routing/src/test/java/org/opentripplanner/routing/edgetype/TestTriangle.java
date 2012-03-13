@@ -59,7 +59,7 @@ public class TestTriangle extends TestCase {
         double trueLength = ElevationUtils.getLengthMultiplierFromElevation(elev) * length;
         testStreet.setSlopeSpeedEffectiveLength(trueLength); // normalize length
         
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, "test");
+        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         
         TraverseOptions options = new TraverseOptions(TraverseMode.BICYCLE);
         options.optimizeFor = OptimizeType.TRIANGLE;
