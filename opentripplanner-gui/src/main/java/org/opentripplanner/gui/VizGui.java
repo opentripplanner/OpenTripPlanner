@@ -915,16 +915,15 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
             boolean found = false;
             
             // For highlighting
-            ArrayList<Edge> edges = new ArrayList<Edge>();
             ArrayList<Vertex> vertices = new ArrayList<Vertex>();
 
             for (Object obj : getReferencedObjects()) {
                 if (obj instanceof Edge) {
                     found = true;
                     Edge e = (Edge) obj;
+                    show.enqueueHighlightedEdge(e);
                     env.expandToInclude(e.getFromVertex().getCoordinate());
                     env.expandToInclude(e.getToVertex().getCoordinate());
-                    edges.add(e);
                 }
                 else if (obj instanceof Vertex) {
                     found = true;
@@ -942,7 +941,6 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
 
             // highlight relevant things
             show.clearHighlights();
-            show.setHighlightedEdges(edges);
             show.setHighlightedVertices(vertices);
 
             // zoom the graph display
