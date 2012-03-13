@@ -225,6 +225,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         e.expandToInclude(c);
         e.expandBy(0.002);
         modelBounds = e;
+        matchAspect();
         drawLevel = DRAW_ALL;
     }
 
