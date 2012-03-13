@@ -745,6 +745,9 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         rightPanelTabs.addTab("annotations", amScrollPane);
 
         Dimension size = new Dimension(200, 1600);
+
+        amScrollPane.setMaximumSize(size);
+        amScrollPane.setPreferredSize(size);
         mdScrollPane.setMaximumSize(size);
         mdScrollPane.setPreferredSize(size);
         rightPanelTabs.setMaximumSize(size);
