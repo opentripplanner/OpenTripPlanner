@@ -14,6 +14,7 @@
 package org.opentripplanner.api.ws.analysis;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -23,6 +24,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.IdentityBean;
+import org.opentripplanner.api.model.analysis.Annotation;
+import org.opentripplanner.api.model.analysis.AnnotationObject;
+import org.opentripplanner.api.model.analysis.Annotations;
 import org.opentripplanner.api.model.analysis.EdgeSet;
 import org.opentripplanner.api.model.analysis.EdgesForVertex;
 import org.opentripplanner.api.model.analysis.FeatureCount;
@@ -30,6 +36,7 @@ import org.opentripplanner.api.model.analysis.SimpleVertex;
 import org.opentripplanner.api.model.analysis.SimpleVertexSet;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.analysis.WrappedEdge;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -290,4 +297,56 @@ public class GraphInternals {
                 Double.parseDouble(upperRightParts[0]));
         return envelope;
     }
+
+    @Secured({ "ROLE_USER" })
+    @GET
+    @Path("/annotations")
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Object getAnnotations() {
+        Graph graph = graphService.getGraph();
+        List<GraphBuilderAnnotation> builderAnnotations = graph.getBuilderAnnotations();
+
+        List<Annotation> out = new ArrayList<Annotation>();
+        for (GraphBuilderAnnotation annotation : builderAnnotations) {
+            Annotation outAnnotation = new Annotation();
+            out.add(outAnnotation);
+            outAnnotation.annotation = annotation.getVariety().name();
+            Collection<Object> referencedObjects = annotation.getReferencedObjects();
+            for (Object object : referencedObjects) {
+                AnnotationObject annotationObj = new AnnotationObject();
+                applyObjectToAnnotation(graph, annotationObj, object);
+                outAnnotation.addObject(annotationObj);
+            }
+        }
+
+        Annotations annotations = new Annotations();
+        annotations.annotations = out;
+        return annotations;
+    }
+
+    private void applyObjectToAnnotation(Graph graph, AnnotationObject annotation, Object o) {
+        if (o instanceof Edge) {
+            annotation.edge = graph.getIdForEdge((Edge) o);
+        } else if (o instanceof Vertex) {
+            annotation.vertex = ((Vertex) o).getLabel();
+        } else if (o instanceof String) {
+            annotation.message = (String) o;
+        } else if (o instanceof IdentityBean) {
+            @SuppressWarnings("unchecked")
+            IdentityBean<AgencyAndId> bean = (IdentityBean<AgencyAndId>) o;
+            AgencyAndId id = bean.getId();
+            applyObjectToAnnotation(graph, annotation, id);
+        } else if (o instanceof AgencyAndId) {
+            AgencyAndId id = (AgencyAndId) o;
+            annotation.agency = id.getAgencyId();
+            annotation.id = id.getId();
+        } else if (o instanceof Collection) {
+            Collection<?> collection = (Collection<?>) o;
+            if (collection.isEmpty())
+                return;
+            Object first = collection.iterator().next();
+            applyObjectToAnnotation(graph, annotation, first);
+        }
+    }
+
 }
