@@ -32,6 +32,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
+/**
+ * This is the standard implementation of an edge with fixed from and to Vertex instances;
+ * all standard OTP edges are subclasses of this.  
+ */
 public abstract class AbstractEdge implements Edge {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();

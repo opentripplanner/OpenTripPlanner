@@ -24,6 +24,10 @@ import org.opentripplanner.routing.graph.AbstractVertex.ValidEdgeTypes;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/**
+ * A vertex in the graph. Each vertex has a longitude/latitude location, as well as a set of
+ * incoming and outgoing edges.
+ */
 public interface Vertex extends Serializable, Cloneable, Pointlike {
 
     public abstract String toString();

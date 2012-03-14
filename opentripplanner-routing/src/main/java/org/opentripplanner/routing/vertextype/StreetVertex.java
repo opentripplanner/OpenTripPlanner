@@ -18,6 +18,9 @@ import org.opentripplanner.routing.graph.Graph;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
+/**
+ * Abstract base class for vertices in the street layer of the graph
+ */
 public abstract class StreetVertex extends AbstractVertex {
 
     private static final long serialVersionUID = 1L;

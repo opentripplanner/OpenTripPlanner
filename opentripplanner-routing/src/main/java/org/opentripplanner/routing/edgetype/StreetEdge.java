@@ -16,9 +16,10 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-/*
+/**
  *  Abstract base class for edges in the (open)streetmap layer 
- *  (might be paths, stairs, etc. as well as streets)
+ *  (might be paths, stairs, etc. as well as streets).  This
+ *  can be used as a marker to detect edges in the street layer.
  */
 
 /* package-private ? */ 
