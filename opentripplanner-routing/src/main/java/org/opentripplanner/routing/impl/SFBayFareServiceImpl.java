@@ -31,13 +31,9 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final float CABLE_CAR_FARE = 5.00f;
     public static final float AIRBART_FARE = 3.00f;
     public static final float SFMTA_BART_TRANSFER_FARE = 1.75f;
-    public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>();
+    public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>(Arrays.asList(
+            "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"));
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
-    
-    static {
-        SFMTA_BART_TRANSFER_STOPS.addAll(Arrays.asList(new String[] { 
-            "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"}));
-    }
     
     @Override
     public float getLowestCost(List<Ride> rides) {
