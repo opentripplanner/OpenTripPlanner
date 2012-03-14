@@ -62,14 +62,8 @@ public class HashGrid {
     }
     
     public void put(Coordinate c, Object t) {
-        if (t instanceof Pointlike) {
-            bin(c).add(t);
-            nEntries +=1;
-        } 
-//        else if (t instanceof Linelike) {
-//            rasterize(new Point(0,0), new Point(0,0));
-//            nEntries +=1;
-//        }
+        bin(c).add(t);
+        nEntries +=1;
     }
 
     private List<Object> bin(Coordinate c) {
@@ -315,43 +309,5 @@ public class HashGrid {
             sb.append('\n');
         }
         return sb.toString();
-    }
-
-    public static class Point implements Pointlike {
-        
-        double lon, lat;
-        
-        public Point(Pointlike p) {
-            this.lon = p.getLon();
-            this.lat = p.getLat();
-        }
-        
-        public Point(double lon, double lat) {
-            this.lon = lon;
-            this.lat = lat;
-        }
-        
-        public double getLon() {
-            return lon;
-        }
-        
-        public double getLat() {
-            return lat;
-        }
-        
-        @Override
-        public double distance(Coordinate c) {
-            return DistanceLibrary.distance(lat, lon, c.y, c.x);
-        }
-
-        @Override
-        public double distance(Pointlike p) {
-            return DistanceLibrary.distance(lat, lon, p.getLat(), p.getLon());
-        }
-        
-        @Override
-        public double fastDistance(Pointlike p) {
-            return DistanceLibrary.fastDistance(lat, lon, p.getLat(), p.getLon());
-        }
     }
 }
