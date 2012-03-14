@@ -25,9 +25,8 @@ import org.slf4j.LoggerFactory;
  * field values directly from the query parameters in an HttpRequest. It then seeds the request 
  * scope by storing a reference to the constructed object as an attribute of the HttpRequest itself.
  * 
- * The Class to be constructed is given by the getTargetClass method, which must be overridden in a 
- * concrete subclass. An instance of the requested class is first instantiated via its 0-argument 
- * constructor. Any initialization and defaults should be handled at this point. 
+ * An instance of the requested class is first instantiated via its 0-argument constructor. Any 
+ * initialization and defaults should be handled at this point. 
  * 
  * Next, field and setter method names are matched with query parameters in the incoming 
  * HttpRequest. Fields whose declared type has a constructor taking a single String argument 
