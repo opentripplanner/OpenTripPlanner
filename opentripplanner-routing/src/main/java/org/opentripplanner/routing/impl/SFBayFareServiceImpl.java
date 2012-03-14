@@ -27,10 +27,10 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
     public static final int SFMTA_TRANSFER_DURATION = 60 * 90;
     public static final int BART_TRANSFER_DURATION =  60 * 60;
-    public static final int SFMTA_BASE_FARE = 200;
-    public static final int CABLE_CAR_FARE = 500;
-    public static final int AIRBART_FARE = 300;
-    public static final int SFMTA_BART_TRANSFER_FARE = 175;
+    public static final float SFMTA_BASE_FARE = 2.00f;
+    public static final float CABLE_CAR_FARE = 5.00f;
+    public static final float AIRBART_FARE = 3.00f;
+    public static final float SFMTA_BART_TRANSFER_FARE = 1.75f;
     public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>();
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
     
@@ -40,12 +40,12 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     }
     
     @Override
-    public int getLowestCost(List<Ride> rides) {
+    public float getLowestCost(List<Ride> rides) {
         List<Ride> bartBlock = null;
         Long sfmtaTransferIssued = null;
         Long alightedBart = null;
         String alightedBartStop = null;
-        int cost = 0;
+        float cost = 0f;
         String agencyId = null;
         for (Ride ride : rides) {
             agencyId = ride.route.getAgencyId();
