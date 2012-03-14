@@ -417,8 +417,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             for (ElevationPoint p : elevationPoints) {
-                MapUtils.addToMapList(extraElevationData.data, street, p);
-                MapUtils.addToMapList(extraElevationData.data, backStreet, p.fromBack(length));
+                if (street != null) {
+                    MapUtils.addToMapList(extraElevationData.data, street, p);
+                }
+                if (backStreet != null) {
+                    MapUtils.addToMapList(extraElevationData.data, backStreet, p.fromBack(length));
+                }
             }
         }
 
