@@ -1,7 +1,10 @@
 package org.opentripplanner.api.model.transit;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -25,5 +28,8 @@ public class Stop {
     
     @XmlAttribute 
     public String stopName;
+
+    @XmlElements(value=@XmlElement(name="route"))
+    public List<AgencyAndId> routes;
     
 }

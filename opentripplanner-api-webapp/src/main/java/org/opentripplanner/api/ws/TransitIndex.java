@@ -136,7 +136,13 @@ public class TransitIndex {
             throws JSONException {
         
         List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(new Coordinate(lon, lat), STOP_SEARCH_RADIUS);
-        
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
         StopList response = new StopList();
         for (TransitStop transitStop : stops) {
             AgencyAndId stopId = transitStop.getStopId();
@@ -147,6 +153,7 @@ public class TransitIndex {
             stop.lon = transitStop.getLon();
             stop.stopCode = transitStop.getStopCode();
             stop.stopName = transitStop.getName();
+            stop.routes = transitIndexService.getRoutesForStop(stopId);
             response.stops.add(stop);
         }
         
