@@ -44,6 +44,8 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -114,7 +116,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         try {
-            readGtfs();
+            readGtfs(graph);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -154,7 +156,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
      * Private Methods
      ****/
 
-    private void readGtfs() throws IOException {
+    private void readGtfs(Graph graph) throws IOException {
 
         StoreImpl store = new StoreImpl();
 
@@ -192,8 +194,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                     for (Agency agency : reader.getAgencies()) {
                         GtfsBundle existing = agenciesSeen.get(agency);
                         if (existing != null) {
-                            _log.warn("Agency {} was already defined by {}. Both feeds will refer to " +
-                                      "the same agency. Is this intentional?", agency, existing);
+                            _log.warn(GraphBuilderAnnotation.register(graph, 
+                                      Variety.AGENCY_NAME_COLLISION, agency, existing.toString()));
                         } else {
                             agenciesSeen.put(agency, gtfsBundle);
                         }

@@ -102,7 +102,9 @@ public class GraphBuilderAnnotation implements Serializable {
                 "movement will still be possible, but elevator cost might be incorrect. " +
                 "Consider an OSM level map."),
         GRAPH_CONNECTIVITY("Removed/depedestrianized disconnected subgraph containing: %s"),
-        ELEVATION_FLATTENED("Edge %s was steeper than Baldwin Street and was flattened.");
+        ELEVATION_FLATTENED("Edge %s was steeper than Baldwin Street and was flattened."),
+        AGENCY_NAME_COLLISION("Agency %s was already defined by %s. Both feeds will refer to the " +
+    		"same agency. Is this intentional?");
 
         private final String formatString;
 
