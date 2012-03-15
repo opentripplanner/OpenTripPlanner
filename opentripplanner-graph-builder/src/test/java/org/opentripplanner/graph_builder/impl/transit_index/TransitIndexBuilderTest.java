@@ -60,7 +60,7 @@ public class TransitIndexBuilderTest extends TestCase {
 	
 		assertNotNull(index);
 		
-		Edge prealightEdge = index.getPrealightEdge(new AgencyAndId("agency", "A"));
+		Edge prealightEdge = index.getPreAlightEdge(new AgencyAndId("agency", "A"));
 		assertTrue(prealightEdge instanceof PreAlightEdge);
 		
 		//route 18 is the only bidirectional route in the test data

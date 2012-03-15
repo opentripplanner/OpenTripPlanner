@@ -73,9 +73,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashMap<String, List<RouteVariant>> variantsByAgency = new HashMap<String, List<RouteVariant>>();
 
-    private HashMap<AgencyAndId, Edge> preAlightEdges = new HashMap<AgencyAndId, Edge>();
+    private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges = new HashMap<AgencyAndId, PreAlightEdge>();
 
-    private HashMap<AgencyAndId, Edge> preBoardEdges = new HashMap<AgencyAndId, Edge>();
+    private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges = new HashMap<AgencyAndId, PreBoardEdge>();
 
     private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
 
@@ -147,12 +147,12 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
                 if (e instanceof PreBoardEdge) {
                     TransitStop stop = (TransitStop) e.getFromVertex();
-                    preBoardEdges.put(stop.getStopId(), e);
+                    preBoardEdges.put(stop.getStopId(), (PreBoardEdge) e);
                     start = false;
                 }
                 if (e instanceof PreAlightEdge) {
                     TransitStop stop = (TransitStop) ((PreAlightEdge) e).getToVertex();
-                    preAlightEdges.put(stop.getStopId(), e);
+                    preAlightEdges.put(stop.getStopId(), (PreAlightEdge) e);
                     start = false;
                 }
             }

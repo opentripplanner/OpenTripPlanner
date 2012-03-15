@@ -17,6 +17,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -165,7 +166,8 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 }
             }
 
-            StateEditor s1 = state0.edit(this);
+            EdgeNarrative en = new TransitNarrative(trip, this);
+            StateEditor s1 = state0.edit(this, en);
             int type = pattern.getAlightType(stopIndex + 1);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -194,7 +196,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (state0.getBackEdgeNarrative() instanceof PatternBoard) {
                 return null;
             }
-            StateEditor s1 = state0.edit(this);
+            Trip trip = pattern.getTrip(state0.getTrip());
+            EdgeNarrative en = new TransitNarrative(trip, this);
+            StateEditor s1 = state0.edit(this, en);
             int type = pattern.getAlightType(stopIndex + 1);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;

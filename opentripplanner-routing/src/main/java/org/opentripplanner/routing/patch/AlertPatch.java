@@ -88,11 +88,11 @@ public class AlertPatch extends AbstractPatch {
                 }
             }
         } else if (stop != null) {
-            Edge edge = index.getPreboardEdge(stop);
+            Edge edge = index.getPreBoardEdge(stop);
             if(edge != null)
                 edge.addPatch(this);
 
-            edge = index.getPrealightEdge(stop);
+            edge = index.getPreAlightEdge(stop);
             if(edge != null)
                 edge.addPatch(this);
         }
@@ -133,11 +133,11 @@ public class AlertPatch extends AbstractPatch {
                 }
             }
         } else if (stop != null) {
-            Edge edge = index.getPreboardEdge(stop);
+            Edge edge = index.getPreBoardEdge(stop);
             if(edge != null)
                 edge.removePatch(this);
 
-            edge = index.getPrealightEdge(stop);
+            edge = index.getPreAlightEdge(stop);
             if(edge != null)
                 edge.removePatch(this);
         }

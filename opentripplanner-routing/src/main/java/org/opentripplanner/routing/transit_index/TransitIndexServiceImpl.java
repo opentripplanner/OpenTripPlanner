@@ -29,6 +29,8 @@ import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
@@ -42,9 +44,9 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private HashMap<AgencyAndId, RouteVariant> variantsByTrip;
 
-    private HashMap<AgencyAndId, Edge> preAlightEdges;
+    private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges;
 
-    private HashMap<AgencyAndId, Edge> preBoardEdges;
+    private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges;
 
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
@@ -58,7 +60,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
-            HashMap<AgencyAndId, Edge> preBoardEdges, HashMap<AgencyAndId, Edge> preAlightEdges,
+            HashMap<AgencyAndId, PreBoardEdge> preBoardEdges, HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
         this.variantsByAgency = variantsByAgency;
         this.variantsByRoute = variantsByRoute;
@@ -93,12 +95,12 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     }
 
     @Override
-    public Edge getPrealightEdge(AgencyAndId stop) {
+    public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
         return preAlightEdges.get(stop);
     }
 
     @Override
-    public Edge getPreboardEdge(AgencyAndId stop) {
+    public PreBoardEdge getPreBoardEdge(AgencyAndId stop) {
         return preBoardEdges.get(stop);
     }
 

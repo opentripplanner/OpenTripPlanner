@@ -37,6 +37,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -71,13 +73,13 @@ public class TestPatch extends TestCase {
              * subset of variants for route 1
              */
             @Override
-            public Edge getPrealightEdge(AgencyAndId stop) {
-                return graph.getVertex("agency_A_arrive").getOutgoing().iterator().next();
+            public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
+                return (PreAlightEdge) graph.getVertex("agency_A_arrive").getOutgoing().iterator().next();
             }
 
             @Override
-            public Edge getPreboardEdge(AgencyAndId stop) {
-                return graph.getVertex("agency_A_depart").getIncoming().iterator().next();
+            public PreBoardEdge getPreBoardEdge(AgencyAndId stop) {
+                return (PreBoardEdge) graph.getVertex("agency_A_depart").getIncoming().iterator().next();
             }
 
             @Override
