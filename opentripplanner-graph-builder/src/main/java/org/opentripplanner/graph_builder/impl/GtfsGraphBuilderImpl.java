@@ -157,11 +157,13 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private void readGtfs() throws IOException {
 
         StoreImpl store = new StoreImpl();
-        List<GtfsReader> readers = new ArrayList<GtfsReader>();
 
         EntityHandler counter = new EntityCounter();
 
+        store.open();
+
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
+            _log.info("reading {}", gtfsBundle.toString());
 
             GtfsReader reader = new GtfsReader();
             reader.setInputSource(gtfsBundle.getCsvInputSource());
@@ -180,24 +182,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             if (gtfsBundle.getDefaultBikesAllowed())
                 reader.addEntityHandler(new EntityBikeability(true));
 
-            readers.add(reader);
-        }
-
-        // No feeds?
-        if (readers.isEmpty()) {
-            _log.info("no feeds specified");
-            return;
-        }
-
-        store.open();
-
-        List<Class<?>> entityClasses = readers.get(0).getEntityClasses();
-
-        for (Class<?> entityClass : entityClasses) {
-            _log.info("reading entities: " + entityClass.getName());
-            for (GtfsReader reader : readers) {
-                reader.readEntities(entityClass);
-                store.flush();
+            for (Class<?> entityClass : reader.getEntityClasses()) {
+                _log.info("reading entities: " + entityClass.getName());
+                    reader.readEntities(entityClass);
+                    store.flush();
             }
         }
 
