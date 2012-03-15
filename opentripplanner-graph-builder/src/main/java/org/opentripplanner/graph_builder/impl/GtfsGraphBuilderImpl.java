@@ -160,6 +160,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         EntityHandler counter = new EntityCounter();
 
+        Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle> ();
+
         store.open();
 
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
@@ -184,8 +186,19 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
             for (Class<?> entityClass : reader.getEntityClasses()) {
                 _log.info("reading entities: " + entityClass.getName());
-                    reader.readEntities(entityClass);
-                    store.flush();
+                reader.readEntities(entityClass);
+                store.flush();
+                if (entityClass == Agency.class) {
+                    for (Agency agency : reader.getAgencies()) {
+                        GtfsBundle existing = agenciesSeen.get(agency);
+                        if (existing != null) {
+                            _log.warn("Agency {} was already defined by {}. Both feeds will refer to " +
+                                      "the same agency. Is this intentional?", agency, existing);
+                        } else {
+                            agenciesSeen.put(agency, gtfsBundle);
+                        }
+                    }
+                }
             }
         }
 
