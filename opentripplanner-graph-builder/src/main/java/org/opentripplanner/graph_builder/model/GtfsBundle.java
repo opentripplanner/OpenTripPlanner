@@ -67,6 +67,18 @@ public class GtfsBundle {
         return csvInputSource;
     }
 
+    public String toString () {
+        String src; 
+        if (path != null) {
+            src = path.toString();
+        } else if (url != null) {
+            src = url.toString();
+        } else {
+            src = "(no source)";
+        }
+        return "GTFS bundle at " + src;
+    }
+    
     /**
      * So that you can load multiple gtfs feeds into the same database / system without entity id
      * collisions, everything has an agency id, including entities like stops, shapes, and service
