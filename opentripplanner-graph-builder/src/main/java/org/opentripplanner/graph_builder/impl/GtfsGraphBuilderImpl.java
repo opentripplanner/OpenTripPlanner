@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -190,29 +191,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         store.open();
 
-        List<Agency> agencies = new ArrayList<Agency>(readers.size());
         List<Class<?>> entityClasses = readers.get(0).getEntityClasses();
 
         for (Class<?> entityClass : entityClasses) {
             _log.info("reading entities: " + entityClass.getName());
-
             for (GtfsReader reader : readers) {
-
-                // Agencies are the first entity class to be read.
-                // Accumulate the agencies from all GTFS feeds to allow cross-feed
-                // references in later entity classes.
-
-                // Set each reader's agency list to a copy of the list
-                // containing all agencies seen up to this point
-                if (entityClass.equals(Agency.class))
-                    reader.setAgencies(agencies);
-
                 reader.readEntities(entityClass);
-
-                // Update the list of all agencies seen to include those just read
-                if (entityClass.equals(Agency.class))
-                    agencies = reader.getAgencies();
-
                 store.flush();
             }
         }
