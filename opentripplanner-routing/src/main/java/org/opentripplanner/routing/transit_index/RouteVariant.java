@@ -162,6 +162,24 @@ public class RouteVariant implements Serializable {
         }
     }
 
+    public List<RouteSegment> segmentsAfter(RouteSegment segment) {
+        HashMap<Edge, RouteSegment> successors = new HashMap<Edge, RouteSegment>();
+        for (RouteSegment s : segments) {
+            if (s.hopIn != null) {
+                successors.put(s.hopIn, s);
+            }
+        }
+
+        //skip this seg
+        segment = successors.get(segment.hopOut);
+        ArrayList<RouteSegment> out = new ArrayList<RouteSegment>();
+        while (segment != null) {
+            out.add(segment);
+            segment = successors.get(segment.hopOut);
+        }
+        return out;
+    }
+
     public ArrayList<Stop> getStops() {
         return stops;
     }

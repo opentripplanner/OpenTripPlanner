@@ -45,6 +45,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -227,11 +228,7 @@ public class TransitIndex {
         Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
         Vertex boarding = preBoardEdge.getToVertex();
 
-        TraverseOptions options = new TraverseOptions();
-        if (graphService.getCalendarService() != null) {
-            options.setCalendarService(graphService.getCalendarService());
-            options.setServiceDays(startTime);
-        }
+        TraverseOptions options = makeTraverseOptions(startTime);
 
         //add all departures
         HashSet<AgencyAndId> trips = new HashSet<AgencyAndId>();
@@ -259,6 +256,78 @@ public class TransitIndex {
         return result;
     }
 
+    private TraverseOptions makeTraverseOptions(long startTime) {
+        TraverseOptions options = new TraverseOptions();
+        if (graphService.getCalendarService() != null) {
+            options.setCalendarService(graphService.getCalendarService());
+            options.setServiceDays(startTime);
+        }
+        return options;
+    }
+
+    /**
+     * Return subsequent stop times for a trip
+     */
+    @GET
+    @Path("/stopTimesForTrip")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopTimesForTrip(@QueryParam("stopAgency") String stopAgency,
+            @QueryParam("stopId") String stopId, @QueryParam("tripAgency") String tripAgency,
+            @QueryParam("tripId") String tripId, @QueryParam("time") long time) throws JSONException {
+
+        AgencyAndId firstStop = null;
+        if (stopId != null) {
+            firstStop = new AgencyAndId(stopAgency, stopId);
+        }
+        AgencyAndId trip = new AgencyAndId(tripAgency, tripId);
+
+        TransitIndexService transitIndexService = graphService.getGraph().getService(
+                TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        RouteVariant variant = transitIndexService.getVariantForTrip(trip);
+        TraverseOptions options = makeTraverseOptions(time);
+
+        StopTimeList result = new StopTimeList();
+        result.stopTimes = new ArrayList<StopTime>();
+        State state = null;
+        RouteSegment start = null;
+        for (RouteSegment segment : variant.getSegments()) {
+            //this is all segments across all patterns that match this variant
+            if (segment.stop.equals(firstStop)) {
+                //this might be the correct start segment, but we need to try traversing and see if we get this trip
+                State s0 = new State(time, segment.board.getFromVertex(), options);
+                state = segment.board.traverse(s0);
+                if (state == null) continue;
+                if (state.getBackEdgeNarrative().getTrip().getId().equals(trip)) {
+                    start = segment;
+                    StopTime st = new StopTime();
+                    st.time = state.getTime();
+                    st.stop = segment.stop;
+                    result.stopTimes.add(st);
+                    break;
+                }
+            }
+        }
+        if (start == null) {
+            return null;
+        }
+
+        for (RouteSegment segment :  variant.segmentsAfter(start)) {
+            State s0 = new State(state.getTime(), segment.hopIn.getFromVertex(), options);
+            state = segment.hopIn.traverse(s0);
+            StopTime st = new StopTime();
+            st.time = state.getTime();
+            st.stop = segment.stop;
+            result.stopTimes.add(st);
+        }
+        return result;
+    }
+
     private List<StopTime> getStopTimesForBoardEdge(long startTime, long endTime,
             TraverseOptions options, Edge e) {
         List<StopTime> out = new ArrayList<StopTime>();
@@ -275,6 +344,7 @@ public class TransitIndex {
             stopTime.time = time;
             stopTime.trip = result.getBackEdgeNarrative().getTrip().getId();
             out.add(stopTime);
+
             time += 1; // move to the next board time
         } while (true);
         return out;
