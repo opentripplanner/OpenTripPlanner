@@ -22,9 +22,9 @@
 	</security:http>
 
 	<bean id="wsseProvider"
-		class="org.opentripplanner.api.authentication.WSSEAuthenticationProvider">
+		class="org.opentripplanner.web.authentication.WSSEAuthenticationProvider">
 		<property name="userDetailsService">
-		<bean class="org.opentripplanner.api.authentication.SimpleUserDetailsService">
+		<bean class="org.opentripplanner.web.authentication.SimpleUserDetailsService">
 		<property name="users">
 		<list>
 		<!-- To add a user, do this:
@@ -37,12 +37,12 @@
 	</bean>
 
 	<bean id="wsseAuthenticationEntryPoint"
-		class="org.opentripplanner.api.authentication.WSSEAuthenticationEntryPoint">
+		class="org.opentripplanner.web.authentication.WSSEAuthenticationEntryPoint">
 		<property name="realmName" value="OTP API" />
 	</bean>
 
 	<bean id="wsseAuthenticationFilter"
-		class="org.opentripplanner.api.authentication.WSSEAuthenticationFilter">
+		class="org.opentripplanner.web.authentication.WSSEAuthenticationFilter">
 		<property name="authenticationManager" ref="authenticationManager" />
 		<property name="authenticationEntryPoint" ref="wsseAuthenticationEntryPoint" />
 		<property name="realmName" value="OTP API" />

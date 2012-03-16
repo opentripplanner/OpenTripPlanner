@@ -18,7 +18,7 @@
  
 */
 
-package org.opentripplanner.api.ws;
+package org.opentripplanner.jsonp;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.opentripplanner.jsonp.GenericResponseWrapper;
 
 public class JsonpCallbackFilter implements Filter {
 

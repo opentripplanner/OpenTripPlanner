@@ -18,7 +18,7 @@
  
 */
 
-package org.opentripplanner.api.ws;
+package org.opentripplanner.jsonp;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -26,6 +26,8 @@ import java.io.PrintWriter;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
+
+import org.opentripplanner.jsonp.FilterServletOutputStream;
  
 public class GenericResponseWrapper extends HttpServletResponseWrapper {
  

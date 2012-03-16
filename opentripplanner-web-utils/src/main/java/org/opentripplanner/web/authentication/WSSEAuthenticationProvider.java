@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.authentication;
+package org.opentripplanner.web.authentication;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -24,8 +24,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.TimeZone;
 
-import org.opentripplanner.api.authentication.WSSEAuthentication.WSSEAuthDetails;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.web.authentication.WSSEAuthentication.WSSEAuthDetails;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;

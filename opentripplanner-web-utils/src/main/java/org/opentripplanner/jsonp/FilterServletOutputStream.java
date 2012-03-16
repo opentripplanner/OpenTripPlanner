@@ -18,7 +18,7 @@
  
 */
 
-package org.opentripplanner.api.ws;
+package org.opentripplanner.jsonp;
 
 import java.io.DataOutputStream;
 import java.io.IOException;

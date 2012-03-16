@@ -28,6 +28,7 @@
     <module>opentripplanner-updater</module>
     <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
+    <module>opentripplanner-web-utils</module>
   </modules>
 
   <build>

@@ -46,6 +46,6 @@
 		<property name="pathService" ref="pathService" />
 	</bean>
 	
-	<bean class="org.opentripplanner.api.ws.JsonpCallbackFilter" id="jsonpCallbackFilter" />
+	<bean class="org.opentripplanner.jsonp.JsonpCallbackFilter" id="jsonpCallbackFilter" />
 
 </beans>
