@@ -92,7 +92,8 @@ public class GraphBuilderAnnotation implements Serializable {
         VERTEX_SHAPE_ERROR("Transit edge %s has shape geometry which is far from its "
                 + "start/end vertices.  This could be caused by bad shape geometry, or "
                 + "by incorrect use of defaultAgencyId"), 
-        BOGUS_EDGE_GEOMETRY("Edge %s has bogus geometry (some coordinates are NaN)"), 
+        BOGUS_EDGE_GEOMETRY("Edge %s has bogus geometry (some coordinates are NaN, or geometry" +
+        		"has fewer than two points)"), 
         BOGUS_VERTEX_GEOMETRY("Vertex %s has NaN location; this will cause all sorts of problems. "
                 + "This is probably caused by a bug in the graph builder, but could "
                 + "conceivably happen with extremely bad GTFS or OSM data."), 
