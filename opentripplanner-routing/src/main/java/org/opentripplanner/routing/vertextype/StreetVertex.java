@@ -19,7 +19,9 @@ import org.opentripplanner.routing.graph.Graph;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
- * Abstract base class for vertices in the street layer of the graph
+ * Abstract base class for vertices in the street layer of the graph.
+ * This includes both vertices representing intersections or points (IntersectionVertices) 
+ * and TurnVertices representing travel beginning at one end of a street segment.
  */
 public abstract class StreetVertex extends AbstractVertex {
 
