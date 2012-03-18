@@ -658,7 +658,7 @@ public class GTFSPatternHopFactory {
                     tripPattern);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
-
+            
             int arrivalTime = st1.getArrivalTime();
 
             int departureTime = st0.getDepartureTime();
@@ -834,6 +834,37 @@ public class GTFSPatternHopFactory {
 
         return geometry;
     }
+    
+    /* 
+     * If a shape appears in more than one feed, the shape points will be loaded several
+     * times, and there will be duplicates in the DAO. Filter out duplicates and repeated
+     * coordinates because 1) they are unnecessary, and 2) they define 0-length line segments
+     * which cause JTS location indexed line to return a segment location of NaN, 
+     * which we do not want.
+     */
+    private List<ShapePoint> getUniqueShapePointsForShapeId(AgencyAndId shapeId) {
+        List<ShapePoint> points = _dao.getShapePointsForShapeId(shapeId);
+        ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
+        ShapePoint last = null;
+        for (ShapePoint sp : points) {
+            if (last == null || last.getSequence() != sp.getSequence()) {
+                if (last != null && 
+                    last.getLat() == sp.getLat() && 
+                    last.getLon() == sp.getLon()) {
+                    _log.trace("pair of identical shape points (skipping): {} {}", last, sp);
+                } else {
+                    filtered.add(sp);
+                }
+            }
+            last = sp;
+        }
+        if (filtered.size() != points.size()) {
+            filtered.trimToSize();
+            return filtered;
+        } else {
+            return points;
+        }
+    }
 
     private LineString getLineStringForShapeId(AgencyAndId shapeId) {
 
@@ -842,7 +873,7 @@ public class GTFSPatternHopFactory {
         if (geometry != null) 
             return geometry;
 
-        List<ShapePoint> points = _dao.getShapePointsForShapeId(shapeId);
+        List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
         Coordinate[] coordinates = new Coordinate[points.size()];
         double[] distances = new double[points.size()];
 
