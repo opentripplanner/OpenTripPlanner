@@ -31,6 +31,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -377,6 +378,34 @@ public class GTFSPatternHopFactory {
                             st1 = stopTimes.get(i + 1);
                             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+                            // sanity-check the hop
+                            double hopDistance = DistanceLibrary.fastDistance(
+                                   st0.getStop().getLon(), st0.getStop().getLat(),
+                                   st1.getStop().getLon(), st1.getStop().getLat());
+                            double hopSpeed = hopDistance/runningTime;
+                            if (hopDistance == 0) {
+                                _log.warn(GraphBuilderAnnotation.register(graph, 
+                                        Variety.HOP_ZERO_DISTANCE, runningTime, 
+                                        st0.getTrip().getId(), 
+                                        st0.getStopSequence()));
+                            } 
+                            if (st0.getArrivalTime() == st1.getArrivalTime() &&
+                                st0.getDepartureTime() == st1.getDepartureTime()) {
+                                // series of identical stop times at different stops
+                                // TODO: assume first is timepoint, and interpolate subsequent?
+                                _log.warn(GraphBuilderAnnotation.register(graph, 
+                                          Variety.HOP_ZERO_TIME, hopDistance, 
+                                          st0.getTrip().getRoute(), 
+                                          st0.getTrip().getId(), st0.getStopSequence()));
+                            } else if (hopSpeed > 45) {
+                                // 45 m/sec ~= 100 miles/hr
+                                // elapsed time of 0 will give speed of +inf
+                                _log.warn(GraphBuilderAnnotation.register(graph, 
+                                          Variety.HOP_SPEED, hopSpeed, hopDistance,
+                                          st0.getTrip().getRoute(), 
+                                          st0.getTrip().getId(), st0.getStopSequence()));
+                            }
+                            
                             try {
                                 tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
                                         runningTime, st1.getArrivalTime(), dwellTime, st0.getStopHeadsign(),
