@@ -98,17 +98,21 @@ otp.config_defaults = {
         // If only one layer is defined in the baseLayer array, the layer switcher is disabled.
         // If there are several layers in the baseLayer array, the layer switcher is enabled and the first layer in the array becomes the default layer
         baseLayer: [
-            //Regular Open Street Map server
-            new OpenLayers.Layer.OSM(
-               "Open Street Map"
-            ),
-            //Tiles@home server (it is good to use it to reduce the load on the main OSM server)
-            new OpenLayers.Layer.OSM(
-                "Open Street Map Tiles@home",[
-                    "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                    "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                    "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
-                    ]
+             new OpenLayers.Layer.OSM(
+                     "Mapbox Streets", [
+                     "http://a.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                     "http://b.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                     "http://c.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                     "http://d.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png"
+                     ], 
+                     {
+                       numZoomLevels: 18,
+                       attribution:"<a href='http://mapbox.com/about/maps' target='_blank'>Terms & Feedback</a>"
+                     }
+             ),
+             //Regular Open Street Map server
+             new OpenLayers.Layer.OSM(
+                "Open Street Map"
              ),
             new OpenLayers.Layer.OSM(
                 "Open Cycle Map", [
