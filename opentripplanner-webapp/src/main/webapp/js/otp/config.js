@@ -98,47 +98,53 @@ otp.config_defaults = {
         // If only one layer is defined in the baseLayer array, the layer switcher is disabled.
         // If there are several layers in the baseLayer array, the layer switcher is enabled and the first layer in the array becomes the default layer
         baseLayer: [
-             new OpenLayers.Layer.OSM(
-                     "Mapbox Streets", [
-                     "http://a.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
-                     "http://b.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
-                     "http://c.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
-                     "http://d.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png"
-                     ], 
-                     {
-                       numZoomLevels: 18,
-                       attribution:"<a href='http://mapbox.com/about/maps' target='_blank'>Terms & Feedback</a>"
-                     }
-             ),
-             //Regular Open Street Map server
-             new OpenLayers.Layer.OSM(
-                "Open Street Map"
-             ),
-            new OpenLayers.Layer.OSM(
-                "Open Cycle Map", [
-                    "http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-                    "http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-                    "http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"
-                    ],{
+           // MapBox Streets Layer
+           new OpenLayers.Layer.OSM(
+               "Mapbox Streets", [
+                   "http://a.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://b.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://c.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://d.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png"
+               ],
+               {
+                   numZoomLevels: 18,
+                   attribution:"Data<a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'> CC-BY-SA </a>" +
+                   "by<a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> " +
+                   "Tiles from<a href='http://mapbox.com/about/maps' target='_blank'> MapBox Streets.</a>"
+               }
+           ),
+           // Regular Open Street Map server
+           new OpenLayers.Layer.OSM(
+               "Open Street Map"
+           ),
+           // Cycle map tiles
+           new OpenLayers.Layer.OSM(
+               "Open Cycle Map", [
+                   "http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                   "http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                   "http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"
+                ],
+                {
                     numZoomLevels: 17,
                     attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA</a> by <a href='www.opencyclemap.org'>OpenCycleMap </a> and <a href='http://openstreetmap.org/'> Open Street Map</a>"
-                    }
-            ),
-             // here's the MapQuest baseMap option for basemap tiles
-             new OpenLayers.Layer.OSM(
-                "OSM MapQuest",[
-                    "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
-                    ],{
-                    sphericalMecator : true,
-                    isBaseLayer      : true,
-                    numZoomLevels    : 19,
-                    attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
-                    +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
-                    }
-             )
+                }
+           ),
+           // here's the MapQuest baseMap option for basemap tiles
+           new OpenLayers.Layer.OSM(
+               "OSM MapQuest",[
+                   "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+               ],
+               {
+                   sphericalMecator : true,
+                   isBaseLayer      : true,
+                   numZoomLevels    : 19,
+                   attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
+                   +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
+               }
+           )
         ],
 
         // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
