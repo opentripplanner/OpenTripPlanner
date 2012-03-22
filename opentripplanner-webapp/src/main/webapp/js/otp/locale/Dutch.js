@@ -142,10 +142,10 @@ otp.locale.Dutch = {
     {
         walk         : "Lopen",
         walk_toward  : "Loop richting",
-        walk_verb    : "Lopen",
+        walk_verb    : "Loop"
         bike         : "Fietsen",
         bike_toward  : "Fiets",
-        bike_verb    : "Bike",
+        bike_verb    : "Fiets",
         drive        : "Auto",
         drive_toward : "Rij richting",
         drive_verb   : "Rij",
@@ -174,7 +174,7 @@ otp.locale.Dutch = {
         stop_id      : "Haltenummer",
         trip_details : "Reisdetails",
         fare         : "Ritprijs",
-        fare_symbol  : "&euro;",
+        fare_symbol  : "\u20ac",
         travel       : "Reis",
         valid        : "Geldig",
         trip_length  : "Tijd",
@@ -193,9 +193,9 @@ otp.locale.Dutch = {
         RAIL:           "Trein",
         BUS:            "Bus",
         FERRY:          "Veer",
-        CABLE_CAR:      "Cable Car",
-        GONDOLA:        "Gondola",
-        FUNICULAR:      "Funicular"
+        CABLE_CAR:      "Kabeltram",
+        GONDOLA:        "Cabinelift",
+        FUNICULAR:      "Kabelspoorweg"
     },
 
     ordinal_exit:
@@ -207,7 +207,7 @@ otp.locale.Dutch = {
         5:  "tot de vijfde afslag",
         6:  "tot de zesde afslag",
         7:  "tot de zevende afslag",
-        8:  "tot de achste afslag",
+        8:  "tot de achtste afslag",
         9:  "tot de negende afslag",
         10: "tot de tiende afslag"
     },
@@ -217,7 +217,7 @@ otp.locale.Dutch = {
         minute         : "minuut",
         minutes        : "minuten",
         minute_abbrev  : "min",
-        minutes_abbrev : "mins",
+        minutes_abbrev : "min",
         second_abbrev  : "s",
         seconds_abbrev : "s",
         format         : "j F Y @ H:i",
@@ -228,7 +228,7 @@ otp.locale.Dutch = {
     {
         labels :
         {
-            panelTitle : "System Map"
+            panelTitle : "Lijnenkaart"
         }
     },
 
@@ -299,8 +299,8 @@ otp.locale.Dutch = {
         {
             200: "Plan OK",
             500: "Server fout",
-            400: "Trip out of bounds",
-            404: "Path not found",
+            400: "Reis buiten bekend gebied",
+            404: "Geen route gevonden",
             406: "Geen OV tijden gevonden",
             408: "Resultaat niet op tijd gevonden",
             413: "Ongeldige parameter",
@@ -324,7 +324,7 @@ otp.locale.Dutch = {
     
         arriveDepart: 
         [
-          ['false', 'Vertek'], 
+          ['false', 'Vertrek'], 
           ['true',  'Aankomst']
         ],
     
