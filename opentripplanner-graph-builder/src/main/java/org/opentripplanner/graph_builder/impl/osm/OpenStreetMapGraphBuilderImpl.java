@@ -59,6 +59,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.TranslatedString;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -284,25 +285,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     String ele = segmentStartOSMNode.getTag("ele");
                     if (ele != null) {
-                        ele = ele.toLowerCase();
-                        double unit = 1;
-                        if (ele.endsWith("m")) {
-                            ele = ele.replaceFirst("\\s*m", "");
-                        } else if (ele.endsWith("ft")) {
-                            ele = ele.replaceFirst("\\s*ft", "");
-                            unit = 0.3048;
-                        }
-                        elevationPoints.add(new ElevationPoint(distance, Double.parseDouble(ele) * unit));
+                        elevationPoints.add(
+                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
                     }
 
-                    distance += DistanceLibrary.distance(segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
+                    distance += DistanceLibrary.distance(
+                            segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
                             osmEndNode.getLat(), osmEndNode.getLon());
 
                     if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
-                            elevationPoints.add(new ElevationPoint(distance, Double.parseDouble(ele)));
+                            elevationPoints.add(
+                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
                         }
 
                         geometry = geometryFactory.createLineString(segmentCoordinates

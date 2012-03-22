@@ -289,5 +289,18 @@ public class ElevationUtils {
         Coordinate coordArr[] = new Coordinate[coordList.size()];
         return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
+    
+    /** checks for units (m/ft) in an OSM ele tag value, and returns the value in meters */
+    public static Double parseEleTag(String ele) {
+        ele = ele.toLowerCase();
+        double unit = 1;
+        if (ele.endsWith("m")) {
+            ele = ele.replaceFirst("\\s*m", "");
+        } else if (ele.endsWith("ft")) {
+            ele = ele.replaceFirst("\\s*ft", "");
+            unit = 0.3048;
+        }
+        return Double.parseDouble(ele) * unit;
+    }
 
 }
