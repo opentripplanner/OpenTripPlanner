@@ -207,7 +207,6 @@ otp.planner.Templates = {
     {
         return '<tpl if="duration == 1.0">' + this.locale.time.minute  + '</tpl>' +
                '<tpl if="duration != 1.0">' + this.locale.time.minutes + '</tpl>';
-    
     },
 
     m_transitLeg  : null,

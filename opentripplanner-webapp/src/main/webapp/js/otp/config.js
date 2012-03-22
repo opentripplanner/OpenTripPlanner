@@ -20,7 +20,7 @@ otp.config_defaults = {
 
     planner : {
         url            : null,
-        printUrl       : null,
+        printUrl       : "print.html",
         maxTransfers   : null,    // when maxTransfers > 0, this value will be sent down to the api to override any defaults (current api default == 2 as of 3/2012)
 
         // options to turn stuff on / off on the planner
@@ -213,7 +213,8 @@ otp.config_defaults = {
 };
 try {
     // step 3: apply our default to the existing (possibly empty) otp config
-    otp.inherit(otp.config, otp.config_defaults);
+    otp.inherit(otp.config, otp.config_defaults);       // step 3a: build the object up
+    otp.configure(otp.config, otp.config_defaults);     // step 3b: make sure any / all local changes above get applied
     console.log("otp.config updated with default items from otp.config_static");
 } catch(e) {
     console.log("ERROR: was unable to run otp.inherid override in config.js - got this exception: " + e);
