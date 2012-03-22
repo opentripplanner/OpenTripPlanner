@@ -36,7 +36,7 @@ public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
     }
     
     public List<String> getPrerequisites() {
-        return Arrays.asList("transit", "streets", "linking");
+        return Arrays.asList("transit");
     }
     
     @Override
