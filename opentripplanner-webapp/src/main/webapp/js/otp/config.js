@@ -9,7 +9,7 @@
 // step 1: make sure we have some type of otp.config, and otp.config.local defined
 if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
-if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
+if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.Dutch;
 
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
@@ -61,11 +61,11 @@ otp.config_defaults = {
 
         geocoder  :
         {
-            enabled : false,
-            url     : "/geocoder/geocode",  
+            enabled : true,
+            url     : "http://bag42.nl/api/v0/geocode/otp",  
             addressParamName : "address"
         },
-        fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
+        xxfromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
 
         /* debug geocoder */
         /*  *

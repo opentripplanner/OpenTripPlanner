@@ -42,16 +42,9 @@
     <script src="js/otp/otp.js"></script>
     <script src="js/otp/util/Constants.js"></script>
     <script src="js/otp/util/Modes.js"></script>
+    <script src="js/otp/locale/Dutch.js"></script>
     <script src="js/otp/locale/English.js"></script>
     <script src="js/otp/locale/French.js"></script>
-    <script src="js/otp/locale/Gaelic.js"></script>
-    <script src="js/otp/locale/Hungarian.js"></script>
-    <script src="js/otp/locale/Italian.js"></script>
-    <script src="js/otp/locale/German.js"></script>
-    <script src="js/otp/locale/Marathi.js"></script>
-    <script src="js/otp/locale/Polish.js"></script>
-    <script src="js/otp/locale/Portuguese.js"></script>
-    <script src="js/otp/locale/Spanish.js"></script>
     <script src="js/otp/util/AnalyticsUtils.js"></script>
     <script src="js/otp/util/DateUtils.js"></script>
     <script src="js/otp/util/ObjUtils.js"></script>
@@ -115,13 +108,20 @@
     <div class="logo" id="logo"> 
         <a href="http://opentripplanner.org" title="OpenTripPlanner Home"></a>
     </div>
-    <script>otp.util.AnalyticsUtils.importGoogleAnalytics();</script>
     <script type="text/javascript">
-    Ext.onReady(function()
-    {
-        otp.util.AnalyticsUtils.initGoogleAnalytics();
+    Ext.onReady(function() {
         new otp.application.Controller(otp.config);
     });
     </script>
+      <script type="text/javascript" src="http://p.c42.it/piwik.js"></script>
+          <script type="text/javascript">
+          //<![CDATA[
+            try {
+            var piwikTracker = Piwik.getTracker("http://p.c42.it/piwik.php", 4);
+            piwikTracker.trackPageView(); piwikTracker.enableLinkTracking();
+             } catch( err ) {}
+	   //]]>
+       </script>
+	<noscript><p><img src="http://p.c42.it/piwik.php?idsite= <http://p.c42.it/piwik.php?idsite=1>4" style="border:0" alt="" /></p></noscript>
 </body>
 </html>
