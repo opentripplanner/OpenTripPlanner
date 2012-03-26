@@ -22,6 +22,7 @@ import org.opentripplanner.routing.services.PathService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
@@ -202,8 +203,12 @@ public abstract class GenericMultiplePathServiceFactory {
                 AutowireCapableBeanFactory factory = retval.context.getAutowireCapableBeanFactory();
                 retval.pathService = (PathService) factory
                         .getBean("pathService", PathService.class);
-                retval.patchService = (PatchService) factory.getBean("patchService",
-                        PatchService.class);
+                try {
+                    retval.patchService = (PatchService) factory.getBean("patchService",
+                            PatchService.class);
+                } catch (NoSuchBeanDefinitionException e) {
+                    LOG.warn("No bean 'patchService' defined in application-context.xml, skipping it.");
+                }
                 break;
 
             } catch (BeanCreationException e) {
