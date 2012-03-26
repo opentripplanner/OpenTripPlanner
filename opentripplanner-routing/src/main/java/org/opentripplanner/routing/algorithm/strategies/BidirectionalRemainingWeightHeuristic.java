@@ -20,7 +20,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;

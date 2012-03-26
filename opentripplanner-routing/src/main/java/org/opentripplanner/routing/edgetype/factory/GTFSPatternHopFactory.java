@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
 import org.onebusaway.gtfs.model.Pathway;
@@ -262,6 +263,8 @@ public class GTFSPatternHopFactory {
         loadStops(graph);
         loadPathways(graph);
 
+        loadAgencies(graph);
+        
         // Load hops
         _log.debug("Loading hops");
 
@@ -491,6 +494,12 @@ public class GTFSPatternHopFactory {
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
+
+    private void loadAgencies(Graph graph) {
+        for (Agency agency : _dao.getAllAgencies()) {
+            graph.addAgencyId(agency.getId());
+        }
+    }
 
     private void putInterlineDwell(InterlineSwitchoverKey key, PatternInterlineDwell dwell) {
         interlineDwells.put(key, dwell);

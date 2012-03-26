@@ -86,6 +86,8 @@ public class Graph implements Serializable {
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
+    private Collection<String> agencies = new HashSet<String>();
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
@@ -412,6 +414,14 @@ public class Graph implements Serializable {
             LOG.trace("removed edgeless vertex {}", v);
         }
         return removed;
+    }
+
+    public Collection<String> getAgencyIds() {
+        return agencies;
+    }
+
+    public void addAgencyId(String agency) {
+        agencies.add(agency);
     }
 
 }
