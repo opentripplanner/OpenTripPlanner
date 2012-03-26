@@ -28,6 +28,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.api.model.error.TransitError;
+import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
 import org.opentripplanner.api.model.transit.RouteList;
@@ -41,6 +42,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -73,6 +75,21 @@ public class TransitIndex {
     @Autowired
     public void setIndexService(StreetVertexIndexService indexService) {
         this.streetVertexIndexService = indexService;
+    }
+    /**
+     * Return a list of all agency ids in the graph
+     */
+    @GET
+    @Path("/agencyIds")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getAgencyIds()
+            throws JSONException {
+
+        Graph graph = graphService.getGraph();
+        
+        AgencyList response = new AgencyList();
+        response.agencyIds = graph.getAgencyIds();
+        return response;
     }
 
     /**
