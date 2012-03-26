@@ -512,7 +512,7 @@ public class PlanGenerator {
         leg.startTime = new Date(s.getBackState().getTimeInMillis());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
-        leg.from = makePlace(s, false);
+        leg.from = makePlace(s.getBackState(), false);
         leg.mode = en.getMode().toString();
         return leg;
     }
