@@ -90,7 +90,7 @@ public class GenericAStar {
         // from now on, target means "where this search will terminate"
         // not "the end of the trip from the user's perspective".
 
-        ShortestPathTree spt = createShortestPathTree(origin, options);
+        ShortestPathTree spt = createShortestPathTree(origin, options, graph);
 
         options.setTransferTable(graph.getTransferTable());
 
@@ -287,7 +287,7 @@ public class GenericAStar {
             return v.getTime() > options.worstTime;
     }
 
-    private ShortestPathTree createShortestPathTree(State init, TraverseOptions options) {
+    private ShortestPathTree createShortestPathTree(State init, TraverseOptions options, Graph graph) {
 
         // Return Tree
         ShortestPathTree spt = null;
@@ -299,7 +299,7 @@ public class GenericAStar {
             if (options.getModes().getTransit()) {
                 spt = new MultiShortestPathTree();
                 // if (options.useServiceDays)
-                options.setServiceDays(init.getTime());
+                options.setServiceDays(init.getTime(), graph.getAgencyIds());
             } else {
                 spt = new BasicShortestPathTree();
             }

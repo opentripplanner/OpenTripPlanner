@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -460,7 +461,7 @@ public class TestContractionHeirarchies extends TestCase {
         CalendarServiceImpl calendarService = new CalendarServiceImpl();
         calendarService.setData(data);
         options.setCalendarService(calendarService);
-        options.setServiceDays(startTime);
+        options.setServiceDays(startTime, Arrays.asList("MTA NYCT"));
         options.setTransferTable(graph.getTransferTable());
         
         Vertex start1 = graph.getVertex("0072480");
