@@ -106,7 +106,7 @@ public class Components {
             if (graphService.getCalendarService() != null) {
                 options.setCalendarService(graphService.getCalendarService());
             }
-            options.setServiceDays(dateTime, graph.getAgencyIds());
+            options.setServiceDays(dateTime);
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         

@@ -138,7 +138,7 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
 
-        options.setServiceDays(origin.getTime(), _graphService.getGraph().getAgencyIds());
+        options.setServiceDays(origin.getTime());
         if (options.getModes().getTransit()
             && !_graphService.getGraph().transitFeedCovers(new Date(origin.getTime() * 1000))) {
             // user wants a path through the transit network,

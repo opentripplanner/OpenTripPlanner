@@ -228,7 +228,7 @@ public class TransitIndex {
         Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
         Vertex boarding = preBoardEdge.getToVertex();
 
-        TraverseOptions options = makeTraverseOptions(startTime, transitIndexService.getAllAgencies());
+        TraverseOptions options = makeTraverseOptions(startTime);
 
         //add all departures
         HashSet<AgencyAndId> trips = new HashSet<AgencyAndId>();
@@ -256,11 +256,11 @@ public class TransitIndex {
         return result;
     }
 
-    private TraverseOptions makeTraverseOptions(long startTime, Collection<String> agencies) {
+    private TraverseOptions makeTraverseOptions(long startTime) {
         TraverseOptions options = new TraverseOptions();
         if (graphService.getCalendarService() != null) {
             options.setCalendarService(graphService.getCalendarService());
-            options.setServiceDays(startTime, agencies);
+            options.setServiceDays(startTime);
         }
         return options;
     }
@@ -290,7 +290,7 @@ public class TransitIndex {
         }
 
         RouteVariant variant = transitIndexService.getVariantForTrip(trip);
-        TraverseOptions options = makeTraverseOptions(time, transitIndexService.getAllAgencies());
+        TraverseOptions options = makeTraverseOptions(time);
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();

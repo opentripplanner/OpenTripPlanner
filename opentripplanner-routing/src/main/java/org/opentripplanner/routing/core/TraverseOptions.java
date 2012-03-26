@@ -13,14 +13,14 @@
 
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -231,7 +231,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
      * into StateData, with all that entails.
      */
-    public ArrayList<ServiceDay> serviceDays;
+    public List<ServiceDay> serviceDays;
     
     /**
      * This is true when a GraphPath is being traversed in reverse for optimization purposes.
@@ -476,11 +476,10 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     /* must be called after traverseoptions already has a calendarservice set */
-    public void setServiceDays(long time, Collection<String> agencies) {
+    public void setServiceDays(long time) {
         if( ! useServiceDays )
             return;
         final long SEC_IN_DAY = 60 * 60 * 24;
-
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
@@ -490,19 +489,11 @@ public class TraverseOptions implements Cloneable, Serializable {
         // This should be a valid way to find yesterday and tomorrow,
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
-        for (String agency : agencies) {
-            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, cs, agency));
-        }
+        this.serviceDays.add(new ServiceDay(time - SEC_IN_DAY, cs));
+        this.serviceDays.add(new ServiceDay(time, cs));
+        this.serviceDays.add(new ServiceDay(time + SEC_IN_DAY, cs));
     }
     
-    private static<T> void addIfNotExists(ArrayList<T> list, T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
-
     public boolean isReverseOptimizing() {
         return reverseOptimizing;
     }

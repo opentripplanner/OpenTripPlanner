@@ -134,7 +134,7 @@ public class ContractionPathServiceImpl extends GenericPathService {
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
         options.setTransferTable(_graphService.getGraph().getTransferTable());
-        options.setServiceDays(targetTime.getTime() / 1000, _graphService.getGraph().getAgencyIds());
+        options.setServiceDays(targetTime.getTime() / 1000);
         if (options.getModes().getTransit()
                 && !_graphService.getGraph().transitFeedCovers(targetTime)) {
             // user wants a path through the transit network,
