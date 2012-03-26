@@ -393,7 +393,7 @@ public class GTFSPatternHopFactory {
                                 st0.getDepartureTime() == st1.getDepartureTime()) {
                                 // series of identical stop times at different stops
                                 // TODO: assume first is timepoint, and interpolate subsequent?
-                                _log.warn(GraphBuilderAnnotation.register(graph, 
+                                _log.trace(GraphBuilderAnnotation.register(graph, 
                                           Variety.HOP_ZERO_TIME, hopDistance, 
                                           st0.getTrip().getRoute(), 
                                           st0.getTrip().getId(), st0.getStopSequence()));

@@ -547,12 +547,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (way.hasTag("level")) { // TODO: floating-point levels &c.
                     levelName = way.getTag("level");
                     level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels);
-                } 
-                if ((level == null || level == OSMLevel.DEFAULT) && way.hasTag("layer")) {
+                } else if (way.hasTag("layer")) {
                     levelName = way.getTag("layer");
                     level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
                 } 
-                if (level == null) {
+                if (level == null || ( ! level.reliable)) {
                     _log.warn(GraphBuilderAnnotation.register(graph, Variety.LEVEL_AMBIGUOUS, 
                         levelName, "OSM way " + way.getId()));
                     level = OSMLevel.DEFAULT;
