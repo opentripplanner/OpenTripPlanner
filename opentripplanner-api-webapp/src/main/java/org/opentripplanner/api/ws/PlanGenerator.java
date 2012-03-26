@@ -707,8 +707,7 @@ public class PlanGenerator {
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
                 distance = edgeNarrative.getDistance();
-            } else if ((!step.streetName.equals(streetName))
-                    && (step.streetName != null && !step.streetName.equals(streetName)) 
+            } else if ((step.streetName != null && !step.streetName.equals(streetName)) 
                     && (!step.bogusName || !edgeNarrative.hasBogusName())) {
                 /* street name has changed */
                 if (roundaboutExit > 0) {
