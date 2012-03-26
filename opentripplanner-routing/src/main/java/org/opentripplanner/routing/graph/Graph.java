@@ -353,26 +353,33 @@ public class Graph implements Serializable {
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(
                 new BufferedOutputStream(new FileOutputStream(file)));
-        LOG.debug("Consolidating edges...");
-        // this is not space efficient
-        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-        for (Vertex v : getVertices()) {
-            // there are assumed to be no edges in an incoming list that are not in an outgoing list
-            edges.addAll(v.getOutgoing());
-            if (v.getDegreeOut() + v.getDegreeIn() == 0)
-                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
+        try {
+            LOG.debug("Consolidating edges...");
+            // this is not space efficient
+            List<Edge> edges = new ArrayList<Edge>(this.countEdges());
+            for (Vertex v : getVertices()) {
+                // there are assumed to be no edges in an incoming list that are not in an outgoing
+                // list
+                edges.addAll(v.getOutgoing());
+                if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                    LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
+            }
+            LOG.debug("Assigning vertex/edge ID numbers...");
+            this.renumberVerticesAndEdges();
+            LOG.debug("Writing edges...");
+            out.writeObject(this);
+            out.writeObject(edges);
+            out.writeObject(this.hierarchies);
+            LOG.debug("Writing debug data...");
+            out.writeObject(this.vertexById);
+            out.writeObject(this.edgeById);
+            out.writeObject(this.idForEdge);
+            out.close();
+        } catch (RuntimeException e) {
+            out.close();
+            file.delete(); //remove half-written file
+            throw e;
         }
-        LOG.debug("Assigning vertex/edge ID numbers...");
-        this.renumberVerticesAndEdges();
-        LOG.debug("Writing edges...");
-        out.writeObject(this);
-        out.writeObject(edges);
-        out.writeObject(this.hierarchies);
-        LOG.debug("Writing debug data...");
-        out.writeObject(this.vertexById);
-        out.writeObject(this.edgeById);
-        out.writeObject(this.idForEdge);
-        out.close();
         LOG.info("Graph written.");
     }
     
