@@ -1209,7 +1209,7 @@ otp.planner.StaticForms = {
     /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
     setFormErrorMessage : function(comboBoxIdentifier, message)
     {
-        var errMsg = this.form.locale.tripPlanner.geocoder.error;
+        var errMsg = this.locale.tripPlanner.geocoder.error;
         if(message)
             errMsg = message;
 
