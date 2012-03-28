@@ -15,8 +15,9 @@ package org.opentripplanner.util;
 import java.text.MessageFormat;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The purpose of Properties is to easily read a ResourceBundel (set of localized .properties files), and get the named contents.
@@ -24,7 +25,7 @@ import java.util.logging.Logger;
  */
 public class Properties {
 
-    public static final Logger LOGGER = Logger.getLogger(Properties.class.getCanonicalName());
+    public static final Logger LOG = LoggerFactory.getLogger(Properties.class);
 
     private final String _bundle; 
 
@@ -50,7 +51,7 @@ public class Properties {
             return ResourceBundle.getBundle(name, l);
         }
         catch(Exception e) {
-            Properties.LOGGER.log(Level.ALL, "Uh oh...no .properties file could be found, so things are most definately not going to turn out well!!!", e);
+            LOG.error("Uh oh...no .properties file could be found, so things are most definately not going to turn out well!!!", e);
         }
         return null;
     }
@@ -137,7 +138,7 @@ public class Properties {
             ResourceBundle rb = getBundle(_bundle, l);
             return MessageFormat.format(rb.getString(name), args);
         } catch (Exception e) {
-            LOGGER.log(Level.CONFIG, "couldn't find / format property " + name + "; returning null", e);
+            LOG.warn("couldn't find / format property " + name + "; returning null", e);
         }
 
         return null;
