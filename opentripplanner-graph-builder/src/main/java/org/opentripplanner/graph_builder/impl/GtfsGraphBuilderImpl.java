@@ -169,7 +169,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             GtfsReader reader = new GtfsReader();
             reader.setInputSource(gtfsBundle.getCsvInputSource());
             reader.setEntityStore(store);
-            reader.setInternStrings(true);
+            /* string interning turned off pending a faster custom string table */
+            reader.setInternStrings(false);
 
             if (gtfsBundle.getDefaultAgencyId() != null)
                 reader.setDefaultAgencyId(gtfsBundle.getDefaultAgencyId());
