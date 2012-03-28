@@ -47,13 +47,13 @@ public class TestAStar extends TestCase {
 
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 12, 0, 0);
         spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", startTime, options);
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
 
-        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 13, 29, 0);
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 13, 29, 0);
 
         assertEquals(path.getEndTime(), endTime);
 

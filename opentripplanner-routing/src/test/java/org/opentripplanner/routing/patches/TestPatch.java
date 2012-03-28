@@ -185,7 +185,7 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
 
         path = spt.getPath(stop_e, true);
@@ -197,10 +197,10 @@ public class TestPatch extends TestCase {
 
     public void testTimeRanges() {
         AlertPatch snp1 = new AlertPatch();
-        long breakTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        long breakTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         snp1.addTimePeriod(0, breakTime); // until the beginning of the day
-        long secondPeriodStartTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
-        long secondPeriodEndTime = TestUtils.dateInSeconds(2009, 8, 8, 0, 0, 0);
+        long secondPeriodStartTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
+        long secondPeriodEndTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 8, 0, 0, 0);
         snp1.addTimePeriod(secondPeriodStartTime, secondPeriodEndTime);
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
@@ -214,7 +214,7 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
 
         path = spt.getPath(stop_e, true);
@@ -223,7 +223,7 @@ public class TestPatch extends TestCase {
         assertNull(path.states.get(1).getBackEdgeNarrative().getNotes());
 
         // now a trip during the second period
-        startTime = TestUtils.dateInSeconds(2009, 8, 7, 8, 0, 0);
+        startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
         spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
 
         path = spt.getPath(stop_e, false); // do not optimize because we want the first trip
@@ -249,7 +249,7 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
         spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
 
         path = spt.getPath(stop_e, false);

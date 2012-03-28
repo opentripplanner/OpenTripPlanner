@@ -374,7 +374,7 @@ public class TestContractionHeirarchies extends TestCase {
     public void testNYC() throws Exception {
     	// be sure this date matches your subway gtfs validity period
     	// it could be derived from the Graph's validity dates
-        long startTime = TestUtils.dateInSeconds(2009, 10, 11, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 10, 11, 12, 0, 0);
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;

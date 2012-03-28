@@ -86,12 +86,12 @@ public class TestHopFactory extends TestCase {
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c
                 .getLabel(),
-                TestUtils.dateInSeconds(2009, 8, 7, 8, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0), options);
 
         GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
         assertEquals(6, path.states.size());
-        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 8, 30, 0);
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 30, 0);
         assertEquals(endTime, path.getEndTime());
 
     }
@@ -112,7 +112,7 @@ public class TestHopFactory extends TestCase {
 
         // A to B
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), 
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_b, false);
         assertNotNull(path);
@@ -120,7 +120,7 @@ public class TestHopFactory extends TestCase {
 
         // A to C
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), 
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_c, false);
         assertNotNull(path);
@@ -128,22 +128,22 @@ public class TestHopFactory extends TestCase {
 
         // A to D
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), 
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
         assertTrue(path.states.size() <= 11);
-        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0) + 40 * 60;
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 40 * 60;
         assertEquals(endTime, path.getEndTime());
 
         // A to E
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_e, false);
         assertNotNull(path);
         assertTrue(path.states.size() <= 12);
-        endTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0) + 70 * 60;
+        endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 70 * 60;
         assertEquals(endTime, path.getEndTime());
     }
 }
