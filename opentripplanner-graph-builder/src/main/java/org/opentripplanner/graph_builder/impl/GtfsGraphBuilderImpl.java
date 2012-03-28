@@ -15,7 +15,6 @@ package org.opentripplanner.graph_builder.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -158,15 +156,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private void readGtfs(Graph graph) throws IOException {
 
-        StoreImpl store = new StoreImpl();
-
         EntityHandler counter = new EntityCounter();
 
         Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle> ();
 
-        store.open();
-
         for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
+
+            StoreImpl store = new StoreImpl();
+            store.open();
             _log.info("reading {}", gtfsBundle.toString());
 
             GtfsReader reader = new GtfsReader();
@@ -202,9 +199,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
+
+            store.close();
         }
 
-        store.close();
     }
 
     public void setGtfsGraphBuilders(List<GraphBuilderWithGtfsDao> gtfsGraphBuilders) {

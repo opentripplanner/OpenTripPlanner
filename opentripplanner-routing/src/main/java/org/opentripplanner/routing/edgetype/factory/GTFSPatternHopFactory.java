@@ -226,12 +226,16 @@ public class GTFSPatternHopFactory {
 
     private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
+    HashMap<ScheduledStopPattern, BasicTripPattern> patterns = new HashMap<ScheduledStopPattern, BasicTripPattern>();
+
     /* maps replacing label lookup */
     private Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
     Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
     Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>();
     Map<T2<Stop, Trip>, Vertex> patternArriveNodes = new HashMap<T2<Stop, Trip>, Vertex>(); 
     Map<T2<Stop, Trip>, Vertex> patternDepartNodes = new HashMap<T2<Stop, Trip>, Vertex>(); // exemplar trip
+
+    private HashSet<Stop> stops = new HashSet<Stop>();
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -277,8 +281,6 @@ public class GTFSPatternHopFactory {
 
         // Load hops
         Collection<Trip> trips = _dao.getAllTrips();
-
-        HashMap<ScheduledStopPattern, BasicTripPattern> patterns = new HashMap<ScheduledStopPattern, BasicTripPattern>();
 
         int index = 0;
 
@@ -464,13 +466,7 @@ public class GTFSPatternHopFactory {
                 
                 Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
                 Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
-                
-                List<StopTime> fromStopTimes = getNonduplicateStopTimesForTrip(fromExemplar);
-                int exemplarStopSequence0 = fromStopTimes.get(fromStopTimes.size() - 1).getStopSequence();
-                
-                List<StopTime> toStopTimes = getNonduplicateStopTimesForTrip(toExemplar);
-                int exemplarStopSequence1 = toStopTimes.get(0).getStopSequence();
-                
+
                 PatternInterlineDwell dwell;
                 // do we already have a PID for this dwell?
                 InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(s0, s1, fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
@@ -523,6 +519,10 @@ public class GTFSPatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
+            if (stops.contains(stop)) {
+                continue;
+            }
+            stops .add(stop);
             //add a vertex representing the stop
             TransitStop stopVertex = new TransitStop(graph, stop);
             stopNodes.put(stop, stopVertex);
