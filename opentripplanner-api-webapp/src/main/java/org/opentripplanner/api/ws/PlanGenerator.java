@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
@@ -64,13 +62,16 @@ import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class PlanGenerator {
-    private static final Logger LOGGER = Logger.getLogger(PlanGenerator.class.getCanonicalName());
+	
+    private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
     Request request;
 
@@ -121,15 +122,13 @@ public class PlanGenerator {
                         request.isIntermediatePlacesOrdered(), request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
-            LOGGER.log(Level.INFO, "Vertex not found: " + request.getFrom() + " : "
+            LOG.info("Vertex not found: " + request.getFrom() + " : "
                     + request.getTo(), e);
             throw e;
         }
 
         if (paths == null || paths.size() == 0) {
-            LOGGER
-                    .log(Level.INFO, "Path not found: " + request.getFrom() + " : "
-                            + request.getTo());
+            LOG.info("Path not found: " + request.getFrom() + " : " + request.getTo());
             throw new PathNotFoundException();
         }
 
@@ -139,7 +138,7 @@ public class PlanGenerator {
                 i.tooSloped = tooSloped;
                 /* fix up from/to on first/last legs */
                 if (i.legs.size() == 0) {
-                    LOGGER.log(Level.WARNING, "itinerary has no legs");
+                    LOG.warn("itinerary has no legs");
                     continue;
                 }
                 Leg firstLeg = i.legs.get(0);
@@ -271,7 +270,7 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                    LOG.error("Unexpected state: " + mode);
                 }
                 break;
             case WALK:
@@ -301,7 +300,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                	LOG.error("Unexpected state: " + mode);
                 }
                 break;
             case BICYCLE:
@@ -324,7 +323,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                	LOG.error("Unexpected state: " + mode);
                 }
                 break;
             case CAR:
@@ -342,13 +341,13 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                	LOG.error("Unexpected state: " + mode);
                 }
                 break;
             case PRETRANSIT:
                 if (mode == TraverseMode.BOARDING) {
                     if (leg != null) {
-                        System.out.println("leg unexpectedly not null");
+                    	LOG.error("leg unexpectedly not null");
                     }
                     leg = makeLeg(itinerary, state);
                     leg.boardRule = (String) state.getExtension("boardAlightRule");
@@ -394,7 +393,7 @@ public class PlanGenerator {
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
-                    System.out.println("UNEXPECTED STATE: " + mode);
+                	LOG.error("Unexpected state: " + mode);
                 }
                 break;
             }
