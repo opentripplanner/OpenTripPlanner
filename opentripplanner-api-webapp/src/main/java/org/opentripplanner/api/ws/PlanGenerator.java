@@ -269,8 +269,16 @@ public class PlanGenerator {
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
+                } else if (mode == TraverseMode.TRANSFER) {
+                    //handle the whole thing in one step
+                    leg = makeLeg(itinerary, state);
+                    coordinates = new CoordinateArrayListSequence();
+                    coordinates.add(state.getBackState().getVertex().getCoordinate());
+                    coordinates.add(state.getVertex().getCoordinate());
+                    finalizeLeg(leg, state, path.states, i, i, coordinates);
+                    coordinates.clear();
                 } else {
-                    LOG.error("Unexpected state: " + mode);
+                    LOG.error("Unexpected state (in START): " + mode);
                 }
                 break;
             case WALK:
@@ -300,7 +308,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state: " + mode);
+                	LOG.error("Unexpected state (in WALK): " + mode);
                 }
                 break;
             case BICYCLE:
@@ -323,7 +331,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state: " + mode);
+                	LOG.error("Unexpected state (in BICYCLE): " + mode);
                 }
                 break;
             case CAR:
@@ -341,7 +349,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state: " + mode);
+                	LOG.error("Unexpected state (in CAR): " + mode);
                 }
                 break;
             case PRETRANSIT:
@@ -393,7 +401,7 @@ public class PlanGenerator {
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
-                	LOG.error("Unexpected state: " + mode);
+                	LOG.error("Unexpected state (in TRANSIT): " + mode);
                 }
                 break;
             }

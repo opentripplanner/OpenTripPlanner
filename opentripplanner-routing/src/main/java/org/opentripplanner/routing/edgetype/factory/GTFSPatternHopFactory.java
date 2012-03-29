@@ -45,6 +45,7 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
@@ -55,6 +56,7 @@ import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -236,6 +238,8 @@ public class GTFSPatternHopFactory {
     Map<T2<Stop, Trip>, Vertex> patternDepartNodes = new HashMap<T2<Stop, Trip>, Vertex>(); // exemplar trip
 
     private HashSet<Stop> stops = new HashSet<Stop>();
+
+    private int defaultStreetToStopTime;
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -522,9 +526,10 @@ public class GTFSPatternHopFactory {
             if (stops.contains(stop)) {
                 continue;
             }
-            stops .add(stop);
+            stops.add(stop);
             //add a vertex representing the stop
             TransitStop stopVertex = new TransitStop(graph, stop);
+            stopVertex.setStreetToStopTime(defaultStreetToStopTime);
             stopNodes.put(stop, stopVertex);
             
             if (stop.getLocationType() != 2) {
@@ -539,6 +544,36 @@ public class GTFSPatternHopFactory {
                 //add edges from arrive to stop and stop to depart
                 new PreAlightEdge(arrive, stopVertex);
                 new PreBoardEdge(stopVertex, depart);
+            }
+        }
+
+        /* connect stops to their parent stations */
+        for (Stop stop : _dao.getAllStops()) {
+            String parentStation = stop.getParentStation();
+            if (parentStation != null) {
+                Vertex stopVertex = stopNodes.get(stop);
+
+                String agencyId = stop.getId().getAgencyId();
+                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+
+                Stop parentStop = _dao.getStopForId(parentStationId);
+                Vertex parentStopVertex = stopNodes.get(parentStop);
+
+                new FreeEdge(parentStopVertex, stopVertex);
+                new FreeEdge(stopVertex, parentStopVertex);
+
+                Vertex stopArriveVertex = stopArriveNodes.get(stop);
+                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
+
+                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+
+                Vertex stopDepartVertex = stopDepartNodes.get(stop);
+                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
+
+                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+
             }
         }
     }
@@ -1010,5 +1045,42 @@ public class GTFSPatternHopFactory {
 
     public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
         this.fareServiceFactory = fareServiceFactory;
+    }
+
+    public void createStationTransfers(Graph graph) {
+        for (Transfer transfer : _dao.getAllTransfers()) {
+
+            int type = transfer.getTransferType();
+            if (type == 3)
+                continue;
+
+            Vertex fromv = stopArriveNodes.get(transfer.getFromStop());
+            Vertex tov = stopDepartNodes.get(transfer.getToStop());
+
+            if (fromv.equals(tov))
+                continue;
+
+            double distance = DistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
+            int time;
+            if (transfer.getTransferType() == 2) {
+                time = transfer.getMinTransferTime();
+            } else {
+                time = (int) distance; // fixme: handle timed transfers
+            }
+
+            TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
+            CoordinateSequence sequence = new PackedCoordinateSequence.Float(new Coordinate[] {
+                    fromv.getCoordinate(), tov.getCoordinate() }, 2);
+            Geometry geometry = _factory.createLineString(sequence);
+            transferEdge.setGeometry(geometry);
+        }
+    }
+
+    public int getDefaultStreetToStopTime() {
+        return defaultStreetToStopTime;
+    }
+
+    public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
+        this.defaultStreetToStopTime = defaultStreetToStopTime;
     }
 }
