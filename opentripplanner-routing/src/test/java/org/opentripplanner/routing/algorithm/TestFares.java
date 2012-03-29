@@ -46,7 +46,7 @@ public class TestFares extends TestCase {
         factory.run(gg);
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = TestUtils.dateInSeconds(2009, 8, 7, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
         spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
                 "Caltrain_Mountain View Caltrain", startTime, options);
 
@@ -67,7 +67,7 @@ public class TestFares extends TestCase {
         index.setup();
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = TestUtils.dateInSeconds(2009, 11, 1, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
 
         // from zone 3 to zone 2
         spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", startTime,
@@ -82,7 +82,7 @@ public class TestFares extends TestCase {
 
         // long trip
 
-        startTime = TestUtils.dateInSeconds(2009, 11, 1, 14, 0, 0);
+        startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
         spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", startTime,
                 options);
 
@@ -94,7 +94,7 @@ public class TestFares extends TestCase {
         
         // complex trip
         options.maxTransfers = 5;
-        startTime = TestUtils.dateInSeconds(2009, 11, 1, 14, 0, 0);
+        startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
         spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", startTime,
                 options);
 

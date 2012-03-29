@@ -16,8 +16,9 @@ package org.opentripplanner.util;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * 
@@ -27,7 +28,7 @@ import java.util.logging.Level;
  */
 public class DateUtils implements DateConstants {
 
-    private static final Logger LOGGER = Logger.getLogger(DateUtils.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(DateUtils.class);
 
     /**
      * Returns a Date object based on input date & time parameters Defaults to today / now (when
@@ -184,7 +185,7 @@ public class DateUtils implements DateConstants {
 
             retVal = (hour * 60 * 60) + (min * 60) + sec;
         } catch (Exception e) {
-            LOGGER.log(Level.INFO, time + " didn't parse", e);
+            LOG.info(time + " didn't parse", e);
             retVal = null;
         }
 

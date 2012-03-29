@@ -23,7 +23,7 @@ otp.locale.French = {
         metricsSystem : "international",
         rightClickMsg : "Cliquez avec le bouton droit de la souris sur la carte pour désigner le départ et l'arrivée de votre parcours.",
         attribution : {
-            title : "License Attribution",  // TODO localize
+            title : "Attribution de licence",
             content : "Disclaimer goes here"
         }
     },
@@ -31,7 +31,7 @@ otp.locale.French = {
     contextMenu : {
         fromHere : "Partir d'ici",
         toHere : "Arriver ici",
-        intermediateHere : "Add intermediate point",  // TODO localize
+        intermediateHere : "Ajouter un point de passage",
 
         centerHere : "Centrer la carte ici",
         zoomInHere : "Zoomer ici",
@@ -40,17 +40,16 @@ otp.locale.French = {
         next : "position suivante"
     },
 
-    // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
+        safeName : "Le plus Sûr",
         safeSym  : "S",
 
-        hillName : "Flattest",
-        hillSym  : "F",
+        hillName : "Le plus Plat",
+        hillSym  : "P",
 
-        timeName : "Quickest",
-        timeSym  : "Q"
+        timeName : "Le plus Rapide",
+        timeSym  : "R"
     },
 
     service : {
@@ -97,9 +96,8 @@ otp.locale.French = {
         cancel : "Annuler",
         yes : "Oui",
         no : "Non",
-// TODO
-        showDetails  : "Show details...",
-        hideDetails  : "Hide details..."
+        showDetails  : "Montrer les détails...",
+        hideDetails  : "Masquer les détails..."
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -160,7 +158,7 @@ otp.locale.French = {
 
     // see otp.planner.Templates for use
     labels : {
-        agency_msg   : "Service run by", // TODO
+        agency_msg   : "Service géré par",
         about        : "Environ",
         stop_id      : "Id arrêt",
         trip_details : "Détails de l'itinéraire",
@@ -176,17 +174,17 @@ otp.locale.French = {
     // see otp.planner.Templates for use -- one output are the itinerary leg
     // headers
     modes : {
-        WALK : "MARCHE À PIED",
-        BICYCLE : "VÉLO",
-        CAR : "VOITURE",
-        TRAM : "TRAMWAY",
-        SUBWAY : "MÉTRO",
-        RAIL : "TRAIN",
-        BUS : "BUS",
-        FERRY : "FERRY",
-        CABLE_CAR : "TRAMWAY FUNICULAIRE",
-        GONDOLA : "TÉLÉPHÉRIQUE",
-        FUNICULAR : "FUNICULAIRE"
+        WALK : "Marche à pied",
+        BICYCLE : "Vélo",
+        CAR : "Voiture",
+        TRAM : "Tramway",
+        SUBWAY : "Métro",
+        RAIL : "Train",
+        BUS : "Bus",
+        FERRY : "Ferry",
+        CABLE_CAR : "Tramway funiculaire",
+        GONDOLA : "Téléphérique",
+        FUNICULAR : "Funiculaire"
     },
 
     ordinal_exit : {
@@ -215,7 +213,7 @@ otp.locale.French = {
 
     systemmap : {
         labels : {
-            panelTitle : "System Map"
+            panelTitle : "Carte du réseau"
         }
     },
 
@@ -234,7 +232,7 @@ otp.locale.French = {
             fromHere : "Partir d'ici",
             to : "Arrivée",
             toHere : "Arriver ici",
-            intermediate  : "Intermediate Place",          // TODO
+            intermediate  : "Point de passage",
             minimize : "Optimiser pour",
             maxWalkDistance : "Marche maximum",
             maxBikeDistance : "Parcours à vélo maximum",
@@ -297,7 +295,7 @@ otp.locale.French = {
                 [ 'TRANSFERS', 'Le plus direct' ],
                 [ 'QUICK', 'Le plus rapide' ], 
                 [ 'SAFE', 'Le plus sûr' ],
-                ['TRIANGLE',  'Custom trip...']  // TODO: localize 
+                ['TRIANGLE',  'Personnalisé...'] 
         ],
 
         arriveDepart : [ [ 'false', 'Départ' ], [ 'true', 'Arriver' ] ],

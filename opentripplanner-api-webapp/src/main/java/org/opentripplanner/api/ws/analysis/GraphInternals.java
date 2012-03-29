@@ -332,9 +332,8 @@ public class GraphInternals {
         } else if (o instanceof String) {
             annotation.message = (String) o;
         } else if (o instanceof IdentityBean) {
-            @SuppressWarnings("unchecked")
-            IdentityBean<AgencyAndId> bean = (IdentityBean<AgencyAndId>) o;
-            AgencyAndId id = bean.getId();
+            IdentityBean<?> bean = (IdentityBean<?>) o;
+            Object  id = bean.getId();
             applyObjectToAnnotation(graph, annotation, id);
         } else if (o instanceof AgencyAndId) {
             AgencyAndId id = (AgencyAndId) o;

@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -123,7 +124,7 @@ public class TestPatternHopFactory extends TestCase {
 
         // A to B
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_b, false);
         assertNotNull(path);
@@ -131,7 +132,7 @@ public class TestPatternHopFactory extends TestCase {
 
         // A to C
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_c, false);
         assertNotNull(path);
@@ -139,23 +140,23 @@ public class TestPatternHopFactory extends TestCase {
 
         // A to D (change at C)
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
         // there are two paths of different lengths 
         // both arrive at 40 minutes after midnight
         //assertTrue(path.states.size() == 13);
-        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0) + 40 * 60;
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 40 * 60;
         assertEquals(endTime, path.getEndTime());
 
         //A to E (change at C)
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
         path = spt.getPath(stop_e, false);
         assertNotNull(path);
         assertTrue(path.states.size() == 14);
-        endTime =  TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0) + 70 * 60;
+        endTime =  TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0) + 70 * 60;
         assertEquals(endTime, path.getEndTime());
     }
 
@@ -173,7 +174,7 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path;
 
         spt = AStar.getShortestPathTree(graph, stop_f, stop_h,  
-                TestUtils.dateInSeconds(2009, 8, 18, 5, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 5, 0, 0), options);
 
         path = spt.getPath(stop_h, false);
         assertNotNull(path);
@@ -193,14 +194,14 @@ public class TestPatternHopFactory extends TestCase {
 
         // Friday evening
         spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 18, 23, 20, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 23, 20, 0), options);
 
         path = spt.getPath(stop_h, false);
         assertNotNull(path);
         assertEquals(4, path.states.size());
 
         // Saturday morning
-        long startTime = TestUtils.dateInSeconds(2009, 8, 19, 0, 5, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 0, 5, 0);
 
         spt = AStar.getShortestPathTree(graph, stop_g.getLabel(), stop_h.getLabel(),  
                 startTime, options);
@@ -252,19 +253,19 @@ public class TestPatternHopFactory extends TestCase {
         }
         assertTrue(i == 3);
 
-        long startTime =  TestUtils.dateInSeconds(2009, 8, 19, 12, 0, 0);
+        long startTime =  TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
         TraverseOptions options = new TraverseOptions(context);
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_o, stop_p,  startTime, options );
         GraphPath path = spt.getPath(stop_p, false);
         assertNotNull(path);
-        long endTime = TestUtils.dateInSeconds(2009, 8, 19, 12, 10, 0);
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 10, 0);
         assertEquals(endTime, path.getEndTime());
 
-        startTime = TestUtils.dateInSeconds(2009, 8, 19, 12, 0, 1);
+        startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 1);
         spt = AStar.getShortestPathTree(graph, stop_o, stop_p,  startTime, options );
         path = spt.getPath(stop_p, false);
         assertNotNull(path);
-        endTime =  TestUtils.dateInSeconds(2009, 8, 19, 15, 10, 0);
+        endTime =  TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 15, 10, 0);
         assertEquals(endTime, path.getEndTime());
     }
 
@@ -278,7 +279,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex f_depart = graph.getVertex("agency_F_depart");
         Edge edge = new SimpleEdge(e_arrive, f_depart, 10000, 10000);
         
-        long startTime = TestUtils.dateInSeconds(2009, 8, 18, 0, 50, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex("agency_B_depart");
         Vertex stop_g = graph.getVertex("agency_G_arrive");
         TraverseOptions options = new TraverseOptions(context);
@@ -300,7 +301,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_i = graph.getVertex("agency_I_depart");
         Vertex stop_k = graph.getVertex("agency_K_arrive");
 
-        long startTime = TestUtils.dateInSeconds(2009, 8, 19, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
         TraverseOptions options = new TraverseOptions(context);
 
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_i, stop_k, 
@@ -344,14 +345,14 @@ public class TestPatternHopFactory extends TestCase {
         options.setModes(new TraverseModeSet("TRAINISH"));
 
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 0, 0, 0, 0), options );
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0), options );
 
         //a to b is bus only
         assertNull(spt.getPath(stop_b, false));
         
         options.setModes(new TraverseModeSet("TRAINISH,BUSISH"));
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 0, 0, 0, 0), options );
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0), options );
 
         assertNotNull(spt.getPath(stop_b, false));
     }
@@ -361,11 +362,11 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_c = graph.getVertex("agency_C");
         TraverseOptions options = new TraverseOptions(context);
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_d.getLabel(),stop_c.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 1, 10, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 10, 0, 0), options);
 
         GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
-        assertEquals(TestUtils.dateInSeconds(2009, 8, 1, 11, 0, 0), path.getEndTime());
+        assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 11, 0, 0), path.getEndTime());
     }
 
     public void testTripBikesAllowed() throws Exception {
@@ -382,21 +383,21 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path;
         // route: bikes allowed, trip: no value
         spt = AStar.getShortestPathTree(graph, stop_a, stop_b,  TestUtils.dateInSeconds(
-                2009, 8, 18, 0, 0, 0), options);
+                "America/New_York", 2009, 8, 18, 0, 0, 0), options);
 
         path = spt.getPath(stop_b, false);
         assertNotNull(path);
 
         // route: bikes allowed, trip: bikes not allowed
         spt = AStar.getShortestPathTree(graph, stop_d, stop_c,  TestUtils.dateInSeconds(
-                2009, 8, 18, 0, 0, 0), options);
+                "America/New_York", 2009, 8, 18, 0, 0, 0), options);
 
         path = spt.getPath(stop_c, false);
         assertNull(path);
 
         // route: bikes not allowed, trip: bikes allowed
-        spt = AStar.getShortestPathTree(graph, stop_c, stop_d,  TestUtils.dateInSeconds(
-                2009, 8, 18, 0, 0, 0), options);
+        spt = AStar.getShortestPathTree(graph, stop_c, stop_d,
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0), options);
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
@@ -419,15 +420,15 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
         // stop B is accessible, so there should be a path.
-        spt = AStar.getShortestPathTree(graph, near_a, near_b,  TestUtils.dateInSeconds(
-                2009, 8, 18, 0, 0, 0), options);
+        spt = AStar.getShortestPathTree(graph, near_a, near_b,
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0), options);
 
         path = spt.getPath(near_b, false);
         assertNotNull(path);
 
         // stop C is not accessible, so there should be no path.
         spt = AStar.getShortestPathTree(graph, near_a, near_c,  TestUtils.dateInSeconds(
-                2009, 8, 18, 0, 0, 0), options);
+                "America/New_York", 2009, 8, 18, 0, 0, 0), options);
 
         path = spt.getPath(near_c, false);
         assertNull(path);
@@ -435,6 +436,7 @@ public class TestPatternHopFactory extends TestCase {
         // from stop A to stop D would normally be trip 1.1 to trip 2.1, arriving at 00:30. But trip
         // 2 is not accessible, so we'll do 1.1 to 3.1, arriving at 01:00
         GregorianCalendar time = new GregorianCalendar(2009, 8, 18, 0, 0, 0);
+        time.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         spt = AStar.getShortestPathTree(graph, near_a, split_d,  TestUtils.toSeconds(time)
                , options);
         
@@ -459,6 +461,7 @@ public class TestPatternHopFactory extends TestCase {
         wo.minTransferTime = 0; 
         wo.setGtfsContext(context);
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
+        startTime.setTimeZone(TimeZone.getTimeZone("America/New_York"));
         ShortestPathTree spt = AStar.getShortestPathTree(graph, "agency_Q", destination.getLabel(),
                 TestUtils.toSeconds(startTime), wo);
         GraphPath path = spt.getPath(destination, false);
@@ -481,29 +484,29 @@ public class TestPatternHopFactory extends TestCase {
 
         // U to V - original stop times - shouldn't be used
         spt = AStar.getShortestPathTree(graph, stop_u, stop_v,  
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
         path = spt.getPath(stop_v, false);
         assertNotNull(path);
         assertEquals(4, path.states.size());
-        long endTime = TestUtils.dateInSeconds(2009, 8, 7, 6, 40, 0);
+        long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 6, 40, 0);
         assertEquals(endTime, path.getEndTime());
 
         // U to V - first frequency
         spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 7, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0), options);
         path = spt.getPath(stop_v, false);
         assertNotNull(path);
         assertEquals(4, path.states.size());
-        endTime = TestUtils.dateInSeconds(2009, 8, 7, 7, 40, 0);
+        endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 40, 0);
         assertEquals(endTime, path.getEndTime());
 
         // U to V - second frequency
         spt = AStar.getShortestPathTree(graph, stop_u.getLabel(), stop_v.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 7, 14, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 0, 0), options);
         path = spt.getPath(stop_v, false);
         assertNotNull(path);
         assertEquals(4, path.states.size());
-        endTime = TestUtils.dateInSeconds(2009, 8, 7, 14, 40, 0);
+        endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 40, 0);
         assertEquals(endTime, path.getEndTime());
     }
     
@@ -513,21 +516,21 @@ public class TestPatternHopFactory extends TestCase {
         TraverseOptions options = new TraverseOptions(context);
         options.optimizeFor = OptimizeType.QUICK;
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 1, 16, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0), options);
 
         //when optimizing for speed, take the fast two-bus path
         GraphPath path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        assertEquals(TestUtils.dateInSeconds(2009, 8, 1, 16, 20, 0), path.getEndTime());
+        assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 20, 0), path.getEndTime());
         
         //when optimizing for fewest transfers, take the slow one-bus path
         options.transferPenalty = 1800;
         spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
-                TestUtils.dateInSeconds(2009, 8, 1, 16, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0), options);
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
-        assertEquals(TestUtils.dateInSeconds(2009, 8, 1, 16, 50, 0), path.getEndTime());
+        assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 50, 0), path.getEndTime());
 
     }
 
@@ -540,10 +543,10 @@ public class TestPatternHopFactory extends TestCase {
 
         TraverseOptions options = new TraverseOptions(context);
         ShortestPathTree spt = AStar.getShortestPathTree(graph, entrance, stop,  
-                TestUtils.dateInSeconds(2009, 8, 1, 16, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0), options);
         
         GraphPath path = spt.getPath(stop, false);
         assertNotNull(path);
-        assertEquals(TestUtils.dateInSeconds(2009, 8, 1, 16, 0, 34), path.getEndTime());
+        assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 34), path.getEndTime());
     }
 }

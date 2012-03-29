@@ -63,15 +63,15 @@ public class StreetUtils {
                 for (Edge e_out : v.getOutgoing()) {
                     if (e_in instanceof PlainStreetEdge && e_out instanceof PlainStreetEdge) {
                         PlainStreetEdge pse_in = (PlainStreetEdge) e_in;
-                        TurnVertex tv_in = getTurnVertexForEdge(graph, turnVertices, pse_in);
                         PlainStreetEdge pse_out = (PlainStreetEdge) e_out;
-                        TurnVertex tv_out = getTurnVertexForEdge(graph, turnVertices, pse_out);
                         // do not make turn edges for U turns unless they are dead ends
                         if (pse_in.getFromVertex() == pse_out.getToVertex() && 
                             pse_in.getId().equals(pse_out.getId()) &&
                             v.getDegreeOut() > 1) {
                                 continue;
-                        }   
+                        }
+                        TurnVertex tv_in = getTurnVertexForEdge(graph, turnVertices, pse_in);
+                        TurnVertex tv_out = getTurnVertexForEdge(graph, turnVertices, pse_out);
                         TurnEdge turn = new TurnEdge(tv_in, tv_out);
                         if (restrictions != null) {
                             TurnRestriction restriction = restrictions.get(pse_in);

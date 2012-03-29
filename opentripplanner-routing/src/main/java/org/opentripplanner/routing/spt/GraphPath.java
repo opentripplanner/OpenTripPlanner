@@ -15,7 +15,6 @@ package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
@@ -30,12 +29,14 @@ import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A shortest path on the graph.
  */
 public class GraphPath {
-    private static final Logger LOGGER = Logger.getLogger(GraphPath.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPath.class);
 
     public LinkedList<State> states;
 
@@ -236,7 +237,7 @@ public class GraphPath {
                 orig = orig.getBackState();
             }
         } catch (NullPointerException e) {
-            LOGGER.warning("Cannot reverse path at edge: " + edge
+            LOG.warn("Cannot reverse path at edge: " + edge
                     + " returning unoptimized path.  If edge is a PatternInterlineDwell,"
                     + " this is not totally unexpected; otherwise, you might want to"
                     + " look into it");

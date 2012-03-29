@@ -72,7 +72,7 @@ public enum Message {
             return _c.get(name(), l);
         }
         catch(Exception e) {
-            Properties.LOGGER.log(Level.ALL, "No entry in Message.properties file could be found for string " + name());
+            Properties.LOG.warn("No entry in Message.properties file could be found for string " + name());
         }
         return def;
     }

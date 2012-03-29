@@ -20,7 +20,7 @@ otp.config_defaults = {
 
     planner : {
         url            : null,
-        printUrl       : null,
+        printUrl       : "print.html",
         maxTransfers   : null,    // when maxTransfers > 0, this value will be sent down to the api to override any defaults (current api default == 2 as of 3/2012)
 
         // options to turn stuff on / off on the planner
@@ -98,43 +98,53 @@ otp.config_defaults = {
         // If only one layer is defined in the baseLayer array, the layer switcher is disabled.
         // If there are several layers in the baseLayer array, the layer switcher is enabled and the first layer in the array becomes the default layer
         baseLayer: [
-            //Regular Open Street Map server
-            new OpenLayers.Layer.OSM(
+           // MapBox Streets Layer
+           new OpenLayers.Layer.OSM(
+               "Mapbox Streets", [
+                   "http://a.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://b.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://c.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png",
+                   "http://d.tiles.mapbox.com/v3/mapbox.mapbox-streets/${z}/${x}/${y}.png"
+               ],
+               {
+                   numZoomLevels: 18,
+                   attribution:"Data<a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'> CC-BY-SA </a>" +
+                   "by<a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> " +
+                   "Tiles from<a href='http://mapbox.com/about/maps' target='_blank'> MapBox Streets.</a>"
+               }
+           ),
+           // Regular Open Street Map server
+           new OpenLayers.Layer.OSM(
                "Open Street Map"
-            ),
-            //Tiles@home server (it is good to use it to reduce the load on the main OSM server)
-            new OpenLayers.Layer.OSM(
-                "Open Street Map Tiles@home",[
-                    "http://a.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                    "http://b.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png",
-                    "http://c.tah.openstreetmap.org/Tiles/tile/${z}/${x}/${y}.png"
-                    ]
-             ),
-            new OpenLayers.Layer.OSM(
-                "Open Cycle Map", [
-                    "http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-                    "http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
-                    "http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"
-                    ],{
+           ),
+           // Cycle map tiles
+           new OpenLayers.Layer.OSM(
+               "Open Cycle Map", [
+                   "http://a.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                   "http://b.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png",
+                   "http://c.tile.opencyclemap.org/cycle/${z}/${x}/${y}.png"
+                ],
+                {
                     numZoomLevels: 17,
                     attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA</a> by <a href='www.opencyclemap.org'>OpenCycleMap </a> and <a href='http://openstreetmap.org/'> Open Street Map</a>"
-                    }
-            ),
-             // here's the MapQuest baseMap option for basemap tiles
-             new OpenLayers.Layer.OSM(
-                "OSM MapQuest",[
-                    "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
-                    "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
-                    ],{
-                    sphericalMecator : true,
-                    isBaseLayer      : true,
-                    numZoomLevels    : 19,
-                    attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
-                    +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
-                    }
-             )
+                }
+           ),
+           // here's the MapQuest baseMap option for basemap tiles
+           new OpenLayers.Layer.OSM(
+               "OSM MapQuest",[
+                   "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+               ],
+               {
+                   sphericalMecator : true,
+                   isBaseLayer      : true,
+                   numZoomLevels    : 19,
+                   attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
+                   +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
+               }
+           )
         ],
 
         // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
@@ -203,7 +213,8 @@ otp.config_defaults = {
 };
 try {
     // step 3: apply our default to the existing (possibly empty) otp config
-    otp.inherit(otp.config, otp.config_defaults);
+    otp.inherit(otp.config, otp.config_defaults);       // step 3a: build the object up
+    otp.configure(otp.config, otp.config_defaults);     // step 3b: make sure any / all local changes above get applied
     console.log("otp.config updated with default items from otp.config_static");
 } catch(e) {
     console.log("ERROR: was unable to run otp.inherid override in config.js - got this exception: " + e);

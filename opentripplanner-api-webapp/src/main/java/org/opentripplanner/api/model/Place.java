@@ -14,8 +14,6 @@
 package org.opentripplanner.api.model; 
 
 import java.util.Date;
-import java.util.logging.Logger; 
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
@@ -26,7 +24,6 @@ import org.opentripplanner.util.Constants;
 * A Place is where a journey starts or ends, or a transit stop along the way.
 */ 
 public class Place {
-    protected static final Logger LOGGER = Logger.getLogger(Place.class.getCanonicalName());
 
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
