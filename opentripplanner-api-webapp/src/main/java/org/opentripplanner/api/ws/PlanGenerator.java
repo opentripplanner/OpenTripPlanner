@@ -70,7 +70,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class PlanGenerator {
-	
+
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
     Request request;
@@ -107,23 +107,23 @@ public class PlanGenerator {
         try {
             List<NamedPlace> intermediates = request.getIntermediatePlaces();
             if (intermediates.size() == 0) {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(), request.getDateTime(),
-                        options, request.getNumItineraries());
+                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
+                        request.getDateTime(), options, request.getNumItineraries());
                 if (paths == null && request.getWheelchair()) {
                     // There are no paths that meet the user's slope restrictions.
                     // Try again without slope restrictions (and warn user).
                     options.maxSlope = Double.MAX_VALUE;
-                    paths = pathService.plan(request.getFromPlace(), request.getToPlace(), request
-                            .getDateTime(), options, request.getNumItineraries());
+                    paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
+                            request.getDateTime(), options, request.getNumItineraries());
                     tooSloped = true;
                 }
             } else {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(), intermediates,
-                        request.isIntermediatePlacesOrdered(), request.getDateTime(), options);
+                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
+                        intermediates, request.isIntermediatePlacesOrdered(),
+                        request.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + request.getFrom() + " : "
-                    + request.getTo(), e);
+            LOG.info("Vertex not found: " + request.getFrom() + " : " + request.getTo(), e);
             throw e;
         }
 
@@ -211,27 +211,26 @@ public class PlanGenerator {
             if (backEdge == null) {
                 continue;
             }
-            
+
             TraverseMode mode = backEdgeNarrative.getMode();
             if (mode != null) {
                 long dt = state.getAbsTimeDeltaSec();
-                if (mode == TraverseMode.BOARDING || 
-                        mode == TraverseMode.ALIGHTING ||
-                        mode == TraverseMode.STL) {
+                if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING
+                        || mode == TraverseMode.STL) {
                     itinerary.waitingTime += dt;
                 } else if (mode.isOnStreetNonTransit()) {
                     itinerary.walkDistance += backEdgeNarrative.getDistance();
                     itinerary.walkTime += dt;
                 } else if (mode.isTransit()) {
                     itinerary.transitTime += dt;
-                } 
+                }
             }
-            
+
             if (backEdge instanceof FreeEdge) {
-                if(backEdge instanceof PreBoardEdge) {
+                if (backEdge instanceof PreBoardEdge) {
                     // Add boarding alerts to the next leg
                     postponedAlerts = backEdgeNarrative;
-                } else if(backEdge instanceof PreAlightEdge) {
+                } else if (backEdge instanceof PreAlightEdge) {
                     // Add alighting alerts to the previous leg
                     addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdgeNarrative);
                 }
@@ -243,7 +242,7 @@ public class PlanGenerator {
                         .getElevationProfile();
                 previousElevation = applyElevation(profile, itinerary, previousElevation);
             }
-            
+
             switch (pgstate) {
             case START:
                 if (mode == TraverseMode.WALK) {
@@ -260,7 +259,7 @@ public class PlanGenerator {
                     pgstate = PlanGenState.CAR;
                     leg = makeLeg(itinerary, state);
                     leg.from.orig = nextName;
-                    startWalk = i;                    
+                    startWalk = i;
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
                     pgstate = PlanGenState.PRETRANSIT;
@@ -270,7 +269,7 @@ public class PlanGenerator {
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
                 } else if (mode == TraverseMode.TRANSFER) {
-                    //handle the whole thing in one step
+                    // handle the whole thing in one step
                     leg = makeLeg(itinerary, state);
                     coordinates = new CoordinateArrayListSequence();
                     coordinates.add(state.getBackState().getVertex().getCoordinate());
@@ -297,18 +296,19 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
                 } else if (mode == TraverseMode.BOARDING) {
-                    //this only happens in case of a timed transfer.
+                    // this only happens in case of a timed transfer.
                     pgstate = PlanGenState.PRETRANSIT;
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = makeLeg(itinerary, state);
                     itinerary.transfers++;
                 } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
-                    nextName = state.getBackState().getBackState().getBackState().getVertex().getName();
+                    nextName = state.getBackState().getBackState().getBackState().getVertex()
+                            .getName();
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state (in WALK): " + mode);
+                    LOG.error("Unexpected state (in WALK): " + mode);
                 }
                 break;
             case BICYCLE:
@@ -331,7 +331,7 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state (in BICYCLE): " + mode);
+                    LOG.error("Unexpected state (in BICYCLE): " + mode);
                 }
                 break;
             case CAR:
@@ -349,13 +349,13 @@ public class PlanGenerator {
                     leg = null;
                     pgstate = PlanGenState.START;
                 } else {
-                	LOG.error("Unexpected state (in CAR): " + mode);
+                    LOG.error("Unexpected state (in CAR): " + mode);
                 }
                 break;
             case PRETRANSIT:
                 if (mode == TraverseMode.BOARDING) {
                     if (leg != null) {
-                    	LOG.error("leg unexpectedly not null");
+                        LOG.error("leg unexpectedly not null");
                     }
                     leg = makeLeg(itinerary, state);
                     leg.boardRule = (String) state.getExtension("boardAlightRule");
@@ -388,7 +388,7 @@ public class PlanGenerator {
                         if (!(backEdge instanceof Dwell || backEdge instanceof PatternDwell || backEdge instanceof PatternInterlineDwell)) {
                             Place stop = makePlace(state.getBackState(), true);
                             leg.stop.add(stop);
-                        } else if(leg.stop.size() > 0) {
+                        } else if (leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = new Date(
                                     state.getTimeInMillis());
                         }
@@ -401,7 +401,7 @@ public class PlanGenerator {
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
-                	LOG.error("Unexpected state (in TRANSIT): " + mode);
+                    LOG.error("Unexpected state (in TRANSIT): " + mode);
                 }
                 break;
             }
@@ -419,7 +419,7 @@ public class PlanGenerator {
                     }
                 }
 
-                if(postponedAlerts != null) {
+                if (postponedAlerts != null) {
                     addNotesToLeg(leg, postponedAlerts);
                     postponedAlerts = null;
                 }
@@ -511,7 +511,8 @@ public class PlanGenerator {
 
     /**
      * Makes a new empty leg from a starting edge
-     * @param itinerary 
+     * 
+     * @param itinerary
      */
     private Leg makeLeg(Itinerary itinerary, State s) {
         Leg leg = new Leg();
@@ -563,7 +564,7 @@ public class PlanGenerator {
         }
 
         if (v instanceof TransitVertex) {
-            TransitVertex transitVertex = (TransitVertex)v;
+            TransitVertex transitVertex = (TransitVertex) v;
             place.stopId = transitVertex.getStopId();
             place.stopCode = transitVertex.getStopCode();
             place.zoneId = state.getZone();
@@ -688,14 +689,14 @@ public class PlanGenerator {
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
                 step = createWalkStep(currState);
-                
+
                 // tell the user where to get off the elevator using the exit notation, so the
                 // i18n interface will say 'Elevator to <exit>'
                 // what happens is that the webapp sees name == null and ignores that, and it sees
                 // exit != null and uses to <exit>
                 // the floor name is the AlightEdge name
                 // reset to avoid confusion with 'Elevator on floor 1 to floor 1'
-                step.streetName =((ElevatorAlightEdge) edge).getName();
+                step.streetName = ((ElevatorAlightEdge) edge).getName();
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
 
@@ -708,13 +709,13 @@ public class PlanGenerator {
                 // first step
                 step = createWalkStep(currState);
                 createdNewStep = true;
-                
+
                 steps.add(step);
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
                 distance = edgeNarrative.getDistance();
-            } else if ((step.streetName != null && !step.streetName.equals(streetName)) 
+            } else if ((step.streetName != null && !step.streetName.equals(streetName))
                     && (!step.bogusName || !edgeNarrative.hasBogusName())) {
                 /* street name has changed */
                 if (roundaboutExit > 0) {
@@ -730,7 +731,7 @@ public class PlanGenerator {
                 /* start a new step */
                 step = createWalkStep(currState);
                 createdNewStep = true;
-                
+
                 steps.add(step);
                 if (edgeNarrative.isRoundabout()) {
                     // indicate that we are now on a roundabout
@@ -758,7 +759,7 @@ public class PlanGenerator {
                 if (edgeNarrative.isRoundabout() || direction == RelativeDirection.CONTINUE) {
                     // we are continuing almost straight, or continuing along a roundabout.
                     // just append elevation info onto the existing step.
-                	
+
                 } else {
                     // we are not on a roundabout, and not continuing straight through.
 
@@ -771,13 +772,14 @@ public class PlanGenerator {
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
                             if (alternative instanceof TinyTurnEdge) {
-                                //a tiny turn edge has no geometry, but the next
-                                //edge will be a TurnEdge or PSE and will have direction
-                                alternative = alternative.getToVertex().getOutgoingStreetEdges().get(0);
+                                // a tiny turn edge has no geometry, but the next
+                                // edge will be a TurnEdge or PSE and will have direction
+                                alternative = alternative.getToVertex().getOutgoingStreetEdges()
+                                        .get(0);
                             }
                             if (alternative.getName().equals(streetName)) {
-                                //alternatives that have the same name
-                                //are usually caused by street splits
+                                // alternatives that have the same name
+                                // are usually caused by street splits
                                 continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
@@ -792,20 +794,23 @@ public class PlanGenerator {
                         // do nothing as this will be handled in other cases
                     } else {
                         double angleDiff = getAbsoluteAngleDiff(lastAngle, thisAngle);
-                        //in the case of a turn edge, we actually have to go back two steps to see where
-                        //else we might be, as once we are on the streetvertex leading into this edge,
-                        //we are stuck
+                        // in the case of a turn edge, we actually have to go back two steps to see
+                        // where
+                        // else we might be, as once we are on the streetvertex leading into this
+                        // edge,
+                        // we are stuck
                         State twoStatesBack = backState.getBackState();
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
-                            List<Edge> alternatives = alternative.getToVertex().getOutgoingStreetEdges();
+                            List<Edge> alternatives = alternative.getToVertex()
+                                    .getOutgoingStreetEdges();
                             if (alternatives.size() == 0) {
-                                continue; //this is not an alternative
+                                continue; // this is not an alternative
                             }
                             alternative = alternatives.get(0);
                             if (alternative.getName().equals(streetName)) {
-                                //alternatives that have the same name
-                                //are usually caused by street splits
+                                // alternatives that have the same name
+                                // are usually caused by street splits
                                 continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
@@ -830,9 +835,9 @@ public class PlanGenerator {
                     }
                 }
             }
-            
-            if(!createdNewStep) {
-            	if (step.elevation != null) {
+
+            if (!createdNewStep) {
+                if (step.elevation != null) {
                     String s = encodeElevationProfile(edge, distance);
                     if (step.elevation.length() > 0 && s != null && s.length() > 0)
                         step.elevation += ",";
