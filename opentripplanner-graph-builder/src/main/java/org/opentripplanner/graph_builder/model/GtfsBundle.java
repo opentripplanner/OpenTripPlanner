@@ -36,7 +36,11 @@ public class GtfsBundle {
 
     private Boolean defaultBikesAllowed = false;
 
+    private boolean transfersTxtDefinesStationPaths = false;
+
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
+
+    private int defaultStreetToStopTime;
 
     public void setPath(File path) {
         this.path = path;
@@ -118,5 +122,31 @@ public class GtfsBundle {
 
     public void setDefaultBikesAllowed(Boolean defaultBikesAllowed) {
         this.defaultBikesAllowed = defaultBikesAllowed;
+    }
+
+    /**
+     * Transfers.txt usually specifies where the transit operator prefers people to transfer, 
+     * due to schedule structure and other factors.
+     * 
+     * However, in systems like the NYC subway system, transfers.txt can partially substitute 
+     * for the missing pathways.txt file.  In this case, transfer edges will be created between
+     * stops where transfers are defined.
+     * 
+     * @return
+     */
+    public boolean doesTransfersTxtDefineStationPaths() {
+        return transfersTxtDefinesStationPaths;
+    }
+
+    public void setTransfersTxtDefinesStationPaths(boolean transfersTxtDefinesStationPaths) {
+        this.transfersTxtDefinesStationPaths = transfersTxtDefinesStationPaths;
+    }
+
+    public int getDefaultStreetToStopTime() {
+        return defaultStreetToStopTime;
+    }
+
+    public void setDefaultStreetToStopTime(int time) {
+        defaultStreetToStopTime = time;
     }
 }

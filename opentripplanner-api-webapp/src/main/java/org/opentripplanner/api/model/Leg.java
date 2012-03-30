@@ -106,6 +106,13 @@ public class Leg {
     public String agencyId = null;
     
     /**
+     * For transit legs, the ID of the trip.
+     * For non-transit legs, null.
+     */
+    @XmlAttribute
+    public String tripId = null;
+    
+    /**
      * The Place where the leg originates.
      */
     public Place from = null;

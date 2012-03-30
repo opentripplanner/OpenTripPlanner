@@ -417,13 +417,13 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     }
     
     public boolean stopTimesIdentical (List<StopTime> stopTimes, int insertionPoint) {
-        if (arrivalTimes.length != stopTimes.size() - 1) {
+        if (arrivalTimes != null && arrivalTimes.length != stopTimes.size() - 1) {
             return false;
         }
-        for (int i = 0; i<arrivalTimes.length; i++) {
+        for (int i = 0; i < stopTimes.size() - 1; i++) {
             if (stopTimes.get(i).getDepartureTime() != departureTimes[i].get(insertionPoint))
                 return false;
-            if (stopTimes.get(i+1).getArrivalTime() != arrivalTimes[i].get(insertionPoint))
+            if (stopTimes.get(i+1).getArrivalTime() != (arrivalTimes == null ? stopTimes.get(i+1).getDepartureTime() : arrivalTimes[i].get(insertionPoint)))
                 return false;
         }
         return true;
