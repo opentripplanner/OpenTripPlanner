@@ -136,20 +136,6 @@ public class Graph implements Serializable {
                 vertices.get(v.getLabel()) == v;
     }
 
-    public Vertex nearestVertex(float lat, float lon) {
-        double minDist = Float.MAX_VALUE;
-        Vertex ret = null;
-        Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : getVertices()) {
-            double dist = vv.distance(c);
-            if (dist < minDist) {
-                ret = vv;
-                minDist = dist;
-            }
-        }
-        return ret;
-    }
-
     @SuppressWarnings("unchecked")
     public <T> T putService(Class<T> serviceType, T service) {
         return (T) _services.put(serviceType, service);
