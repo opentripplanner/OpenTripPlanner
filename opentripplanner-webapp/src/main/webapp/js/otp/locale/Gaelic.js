@@ -221,6 +221,8 @@ otp.locale.Gaelic = {
     {
 // TODO
         format        : "D, j M H:i",
+        date_format   : "d-m-Y",
+        time_format   : "H:i",
         minute        : "nóiméad",
         minutes       : "nóiméid",
         minute_abbrev : "nóiméad",
