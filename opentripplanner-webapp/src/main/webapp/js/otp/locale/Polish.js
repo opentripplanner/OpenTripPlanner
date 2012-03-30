@@ -220,6 +220,8 @@ otp.locale.Polish = {
     {
 // TODO
         format        : "D, j M H:i",
+        date_format   : "d-m-Y",
+        time_format   : "H:i",
         minute        : "minute",
         minutes       : "protokół",
         minute_abbrev : "min",

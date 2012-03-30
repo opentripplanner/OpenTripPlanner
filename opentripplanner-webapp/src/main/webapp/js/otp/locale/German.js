@@ -222,6 +222,8 @@ otp.locale.German = {
         second_abbrev  : "s.",
         seconds_abbrev : "s.",
         format         : "D, j M H:i",
+        date_format    : "d-m-Y",
+        time_format    : "H:i",
         months         : ['Jan.', 'Feb.', 'Mär.', 'Apr.', 'Mai.', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.']
     },
 
