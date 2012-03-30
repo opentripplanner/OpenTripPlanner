@@ -219,6 +219,8 @@ otp.locale.Italian = {
         second_abbrev  : "sec",
         seconds_abbrev : "sec",
         format         : "D, j M H:i",
+        date_format    : "d-m-Y",
+        time_format    : "H:i",
         months         : ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Aug', 'Set', 'Ott', 'Nov', 'Dic']
     },
 

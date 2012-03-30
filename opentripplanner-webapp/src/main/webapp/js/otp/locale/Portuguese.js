@@ -220,6 +220,8 @@ otp.locale.Portuguese = {
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
         format         : "D, j M H:i",
+        date_format    : "d-m-Y",
+        time_format    : "H:i",
         months         : ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
     },
 

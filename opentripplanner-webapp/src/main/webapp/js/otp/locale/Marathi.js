@@ -221,6 +221,8 @@ otp.locale.Marathi = {
     {
 // TODO
         format        : "D, j M H:i",
+        date_format   : "d-m-Y",
+        time_format   : "H:i",
         minute        : "मिनिट",
         minutes       : "मिनिटस",
         minute_abbrev : "मिनिट",
