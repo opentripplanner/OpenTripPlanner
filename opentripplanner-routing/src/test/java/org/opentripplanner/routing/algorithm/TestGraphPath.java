@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
-import java.util.GregorianCalendar;
 
 import junit.framework.TestCase;
 
@@ -56,13 +55,13 @@ public class TestGraphPath extends TestCase {
         GraphPath path;
 
         spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
-                TestUtils.dateInSeconds(2009, 8, 7, 0, 0, 0), options);
+                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
 
         path = spt.getPath(stop_e, false); /* do not optimize yet, since we are testing optimization */
         assertNotNull(path);
         assertTrue(path.states.size() == 12);
 
-        long bestStart = TestUtils.dateInSeconds(2009, 8, 7, 0, 20, 0);
+        long bestStart = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 20, 0);
         assertNotSame(bestStart, path.getStartTime());
 
         path = spt.getPath(stop_e, true); /* optimize */

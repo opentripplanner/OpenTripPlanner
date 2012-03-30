@@ -30,12 +30,13 @@ public class OSMLevel implements Comparable<OSMLevel> {
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
     public static final double METERS_PER_FLOOR = 3;
     public static final OSMLevel DEFAULT = 
-        new OSMLevel(0, 0.0, "default level", "default level", Source.NONE);
+        new OSMLevel(0, 0.0, "default level", "default level", Source.NONE, true);
     public final int floorNumber; // 0-based
     public final double altitudeMeters;
     public final String shortName; // localized (potentially 1-based)
     public final String longName; // localized (potentially 1-based)
     public final Source source;
+    public final boolean reliable;
 
     public enum Source {
         LEVEL_MAP,
@@ -45,12 +46,14 @@ public class OSMLevel implements Comparable<OSMLevel> {
         NONE
     }
 
-    public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName, Source source) {
+    public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName, 
+                    Source source, boolean reliable) {
         this.floorNumber = floorNumber;
         this.altitudeMeters = altitudeMeters;
         this.shortName = shortName;
         this.longName = longName;
         this.source = source;
+        this.reliable = reliable;
     }
 
     /** 
@@ -61,6 +64,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
 
         /*  extract any altitude information after the @ character */
         Double altitude = null;
+        boolean reliable = true;
         int lastIndexAt = spec.lastIndexOf('@');
         if (lastIndexAt != -1) {
             try {
@@ -113,6 +117,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         if (floorNumber == null && altitude != null) {
             floorNumber = (int)(altitude / METERS_PER_FLOOR);
             _log.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
+            reliable = false;
         }
 
         /* set default value if parsing failed */
@@ -121,9 +126,12 @@ public class OSMLevel implements Comparable<OSMLevel> {
         }
         /* signal failure to extract any useful level information */
         if (floorNumber == null) {
-            return null;
+            floorNumber = 0;
+            _log.warn("Could not determine floor number for layer {}, assumed to be ground-level.", 
+                 spec, floorNumber);
+            reliable = false;
         }
-        return new OSMLevel(floorNumber, altitude, shortName, longName, source);
+        return new OSMLevel(floorNumber, altitude, shortName, longName, source, reliable);
     }
 
     public static List<OSMLevel> fromSpecList (String specList, Source source, boolean incrementNonNegative) {

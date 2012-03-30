@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -373,7 +374,7 @@ public class TestContractionHeirarchies extends TestCase {
     public void testNYC() throws Exception {
     	// be sure this date matches your subway gtfs validity period
     	// it could be derived from the Graph's validity dates
-        long startTime = TestUtils.dateInSeconds(2009, 10, 11, 12, 0, 0);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 10, 11, 12, 0, 0);
         GraphPath path;
         Graph graph = new Graph();
         ContractionHierarchy hierarchy;
@@ -460,7 +461,7 @@ public class TestContractionHeirarchies extends TestCase {
         CalendarServiceImpl calendarService = new CalendarServiceImpl();
         calendarService.setData(data);
         options.setCalendarService(calendarService);
-        options.setServiceDays(startTime);
+        options.setServiceDays(startTime, Arrays.asList("MTA NYCT"));
         options.setTransferTable(graph.getTransferTable());
         
         Vertex start1 = graph.getVertex("0072480");

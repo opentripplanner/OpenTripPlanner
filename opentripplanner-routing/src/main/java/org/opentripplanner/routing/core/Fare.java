@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.HashMap;
-import java.util.logging.Logger;
 
 /**
  * <p><strong>Fare support has not yet been implemented.</strong>
@@ -22,7 +21,6 @@ import java.util.logging.Logger;
  * Fare is a set of fares for different classes of users.</p>
  */
 public class Fare {
-    protected static final Logger LOGGER = Logger.getLogger(Fare.class.getCanonicalName());
 
     public static enum FareType {
         regular, student, senior, tram, special

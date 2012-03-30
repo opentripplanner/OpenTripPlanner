@@ -39,7 +39,7 @@ otp.core.MapStatic = {
     options          : null,
     baseLayerOptions : null,
     THIS             : null,
-    CLOSE_ZOOM       : 18,
+    CLOSE_ZOOM       : 17,
     tooltipLinks     : true,
     tooltipCleared   : true,
 
@@ -347,7 +347,10 @@ otp.core.MapStatic = {
     {
         var self = otp.core.MapStatic.THIS;
         if(!zoom)
-            zoom=self.CLOSE_ZOOM;
+        {
+            self.CLOSE_ZOOM = self.map.getNumZoomLevels() - 1; 
+            zoom = self.CLOSE_ZOOM;
+        }
 
         // pan before zoom
         if(x && y)

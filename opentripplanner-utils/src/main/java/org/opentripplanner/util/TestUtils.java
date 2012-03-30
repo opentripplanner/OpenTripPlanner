@@ -14,10 +14,14 @@
 package org.opentripplanner.util;
 
 import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 public class TestUtils {
-    public static long dateInSeconds(int year, int month, int day, int hour, int minute, int second) {
-        return new GregorianCalendar(year, month, day, hour, minute, second).getTimeInMillis() / 1000;
+    public static long dateInSeconds(String timeZoneId, int year, int month, int day, int hour, int minute, int second) {
+        TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
+        GregorianCalendar calendar = new GregorianCalendar(year, month, day, hour, minute, second);
+        calendar.setTimeZone(timeZone);
+        return calendar.getTimeInMillis() / 1000;
     }
 
     public static long toSeconds(GregorianCalendar time) {

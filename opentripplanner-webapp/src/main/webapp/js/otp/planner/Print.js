@@ -149,7 +149,10 @@ otp.planner.PrintStatic = {
                 this.print_map.zoomToExtent(this.current_map.getExtent());
             }
         }
-        catch(e) {}
+        catch(e)
+        {
+            console.log("EXCEPTION in Print.renderMap: " + e);
+        }
     },
 
     /** */
@@ -160,7 +163,9 @@ otp.planner.PrintStatic = {
             this.renderMap();
         }
         catch(e)
-        {}
+        {
+            console.log("EXCEPTION in Print.safeRenderMap: " + e);
+        }
     },
 
     /**  */
@@ -170,7 +175,7 @@ otp.planner.PrintStatic = {
 
         // step 1: get itinerary data
         console.log('writeItinerary - step 1: get itinerary data');
-        var cfg  = {templates:this.templates, locale:this.locale, store:this.itinerary.m_legStore, modes:this.itinerary.m_modes, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
+        var cfg  = {templates:this.templates, planner:this.planner, locale:this.locale, store:this.itinerary.m_legStore, modes:this.itinerary.m_modes, details:this.itinerary.xml, from:this.itinerary.from, to:this.itinerary.to, id:1, dontEditStep:true};
         var itin = otp.planner.ItineraryDataFactoryStatic.factory(cfg);
 
         // step 2: get divs that we will write into
@@ -233,7 +238,9 @@ otp.planner.PrintStatic = {
             this.writeItinerary();
         }
         catch(e)
-        {}
+        {
+            console.log("EXCEPTION in Print.safeWriteItinerary: " + e);
+        }
     },
 
 

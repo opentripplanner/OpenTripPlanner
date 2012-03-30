@@ -33,50 +33,45 @@ import org.opentripplanner.routing.services.FareServiceFactory;
  * 
  */
 public class DefaultFareServiceFactory implements FareServiceFactory {
-    protected HashMap<AgencyAndId, FareRuleSet> fareRules;
-    HashMap<AgencyAndId, FareAttribute> fareAttributes;
+    protected HashMap<AgencyAndId, FareRuleSet> fareRules = new HashMap<AgencyAndId, FareRuleSet>();
+    HashMap<AgencyAndId, FareAttribute> fareAttributes = new HashMap<AgencyAndId, FareAttribute>();
 
     public FareService makeFareService() {
         return new DefaultFareServiceImpl(fareRules, fareAttributes);
     }
 
-    private HashMap<AgencyAndId, FareRuleSet> getFareRules(GtfsRelationalDao dao) {
-        if (fareRules == null) {
-            fareRules = new HashMap<AgencyAndId, FareRuleSet>();
-            Collection<FareRule> rules = dao.getAllFareRules();
-            for (FareRule rule : rules) {
-                FareAttribute fare = rule.getFare();
-                AgencyAndId id = fare.getId();
-                FareRuleSet fareRule = fareRules.get(id);
-                if (fareRule == null) {
-                    fareRule = new FareRuleSet();
-                    fareRules.put(id, fareRule);
-                }
-                String contains = rule.getContainsId();
-                if (contains != null) {
-                    fareRule.addContains(contains);
-                }
-                String origin = rule.getOriginId();
-                String destination = rule.getDestinationId();
-                if (origin != null || destination != null) {
-                    fareRule.addOriginDestination(origin, destination);
-                }
-                Route route = rule.getRoute();
-                if (route != null) {
-                    AgencyAndId routeId = route.getId();
-                    fareRule.addRoute(routeId);
-                }
+    private void readFareRules(GtfsRelationalDao dao) {
+        Collection<FareRule> rules = dao.getAllFareRules();
+        for (FareRule rule : rules) {
+            FareAttribute fare = rule.getFare();
+            AgencyAndId id = fare.getId();
+            FareRuleSet fareRule = fareRules.get(id);
+            if (fareRule == null) {
+                fareRule = new FareRuleSet();
+                fareRules.put(id, fareRule);
+            }
+            String contains = rule.getContainsId();
+            if (contains != null) {
+                fareRule.addContains(contains);
+            }
+            String origin = rule.getOriginId();
+            String destination = rule.getDestinationId();
+            if (origin != null || destination != null) {
+                fareRule.addOriginDestination(origin, destination);
+            }
+            Route route = rule.getRoute();
+            if (route != null) {
+                AgencyAndId routeId = route.getId();
+                fareRule.addRoute(routeId);
             }
         }
-        return fareRules;
     }
 
     @Override
     public void setDao(GtfsRelationalDao dao) {
 
-        fareRules = getFareRules(dao);
+        readFareRules(dao);
         Collection<FareAttribute> fA = dao.getAllFareAttributes();
-        fareAttributes = new HashMap<AgencyAndId, FareAttribute>();
         for (FareAttribute fare : fA) {
             fareAttributes.put(fare.getId(), fare);
         }
