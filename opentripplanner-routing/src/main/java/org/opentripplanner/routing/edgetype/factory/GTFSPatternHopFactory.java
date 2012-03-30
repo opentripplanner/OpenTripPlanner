@@ -481,13 +481,22 @@ public class GTFSPatternHopFactory {
         if (stopTimes.size() < 2)
             return;
         StopTime st0 = stopTimes.get(0);
+        if (!st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) {
+            /* set depature time if it is missing */
+            st0.setDepartureTime(st0.getArrivalTime());
+        }
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
             StopTime st1 = stopTimes.get(i);
-            // do not process non-timepoint stoptimes:
-            // they will be identical to other adjacent non-timepoint stoptimes
-            if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet()))
+            if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
+                /* set depature time if it is missing */
+                st1.setDepartureTime(st1.getArrivalTime());
+            }
+            /* do not process non-timepoint stoptimes, 
+             * which are of course identical to other adjacent non-timepoint stoptimes */
+            if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
                 continue;
+            }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
             double hopDistance = DistanceLibrary.fastDistance(
                    st0.getStop().getLon(), st0.getStop().getLat(),
@@ -681,14 +690,6 @@ public class GTFSPatternHopFactory {
             departureTime = st0.getDepartureTime();
 
             /* Interpolate, if necessary, the times of non-timepoint stops */
-
-            /* trivial cases */
-            if (!st0.isDepartureTimeSet() && st0.isArrivalTimeSet()) {
-                st0.setDepartureTime(st0.getArrivalTime());
-            }
-            if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
-                st1.setDepartureTime(st1.getArrivalTime());
-            }
             /* genuine interpolation needed */
             if (!(st0.isDepartureTimeSet() && st0.isArrivalTimeSet())) {
                 // figure out how many such stops there are in a row.
