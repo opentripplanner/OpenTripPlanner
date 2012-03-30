@@ -305,6 +305,7 @@ public class GTFSPatternHopFactory {
             index++;
 
             List<StopTime> originalStopTimes = getNonduplicateStopTimesForTrip(trip);
+            filterStopTimes(originalStopTimes, graph);
             interpolateStopTimes(originalStopTimes);
             if (originalStopTimes.size() < 2) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DEGENERATE, trip));
@@ -387,33 +388,6 @@ public class GTFSPatternHopFactory {
                             st1 = stopTimes.get(i + 1);
                             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-                            // sanity-check the hop
-                            double hopDistance = DistanceLibrary.fastDistance(
-                                   st0.getStop().getLon(), st0.getStop().getLat(),
-                                   st1.getStop().getLon(), st1.getStop().getLat());
-                            double hopSpeed = hopDistance/runningTime;
-                            if (hopDistance == 0) {
-                                _log.warn(GraphBuilderAnnotation.register(graph, 
-                                        Variety.HOP_ZERO_DISTANCE, runningTime, 
-                                        st0.getTrip().getId(), 
-                                        st0.getStopSequence()));
-                            } 
-                            if (st0.getArrivalTime() == st1.getArrivalTime() &&
-                                st0.getDepartureTime() == st1.getDepartureTime()) {
-                                // series of identical stop times at different stops
-                                // TODO: assume first is timepoint, and interpolate subsequent?
-                                _log.trace(GraphBuilderAnnotation.register(graph, 
-                                          Variety.HOP_ZERO_TIME, hopDistance, 
-                                          st0.getTrip().getRoute(), 
-                                          st0.getTrip().getId(), st0.getStopSequence()));
-                            } else if (hopSpeed > 45) {
-                                // 45 m/sec ~= 100 miles/hr
-                                // elapsed time of 0 will give speed of +inf
-                                _log.warn(GraphBuilderAnnotation.register(graph, 
-                                          Variety.HOP_SPEED, hopSpeed, hopDistance,
-                                          st0.getTrip().getRoute(), 
-                                          st0.getTrip().getId(), st0.getStopSequence()));
-                            }
                             
                             try {
                                 tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
@@ -494,6 +468,65 @@ public class GTFSPatternHopFactory {
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
       }
+
+    /**
+     * scan through the given list, looking for clearly incorrect series of stoptimes 
+     * and unsettng / annotatng them. unsetting the arrival/departure time of clearly incorrect
+     * stoptimes will cause them to be interpolated in the next step. 
+     *  
+     * @param stopTimes the stoptimes to be filtered (from a single trip)
+     * @param graph the graph where annotations will be registered
+     */
+    private void filterStopTimes(List<StopTime> stopTimes, Graph graph) {
+        if (stopTimes.size() < 2)
+            return;
+        StopTime st0 = stopTimes.get(0);
+        for (int i = 1; i < stopTimes.size(); i++) {
+            boolean st1bogus = false;
+            StopTime st1 = stopTimes.get(i);
+            // do not process non-timepoint stoptimes:
+            // they will be identical to other adjacent non-timepoint stoptimes
+            if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet()))
+                continue;
+            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+            double hopDistance = DistanceLibrary.fastDistance(
+                   st0.getStop().getLon(), st0.getStop().getLat(),
+                   st1.getStop().getLon(), st1.getStop().getLat());
+            double hopSpeed = hopDistance/runningTime;
+            /* zero-distance hops are probably not harmful, though they could be better represented as dwell times
+            if (hopDistance == 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph, 
+                        Variety.HOP_ZERO_DISTANCE, runningTime, 
+                        st1.getTrip().getId(), 
+                        st1.getStopSequence()));
+            } 
+            */
+            // sanity-check the hop
+            if (st0.getArrivalTime() == st1.getArrivalTime() ||
+                st0.getDepartureTime() == st1.getDepartureTime()) {
+                _log.debug("{} {}", st0, st1);
+                // series of identical stop times at different stops
+                _log.warn(GraphBuilderAnnotation.register(graph, 
+                          Variety.HOP_ZERO_TIME, hopDistance, 
+                          st1.getTrip().getRoute(), 
+                          st1.getTrip().getId(), st1.getStopSequence()));
+                // clear stoptimes that are obviously wrong, causing them to later be interpolated
+                st1.clearArrivalTime();
+                st1.clearDepartureTime();
+                st1bogus = true;
+            } else if (hopSpeed > 45) {
+                // 45 m/sec ~= 100 miles/hr
+                // elapsed time of 0 will give speed of +inf
+                _log.warn(GraphBuilderAnnotation.register(graph, 
+                          Variety.HOP_SPEED, hopSpeed, hopDistance,
+                          st0.getTrip().getRoute(), 
+                          st0.getTrip().getId(), st0.getStopSequence()));
+            }
+            // st0 should reflect the last stoptime that was not clearly incorrect
+            if ( ! st1bogus)  
+                st0 = st1;
+        } // END for loop over stop times
+    }
 
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
@@ -624,6 +657,14 @@ public class GTFSPatternHopFactory {
         trips.add(new InterliningTrip(trip, stopTimes, tripPattern));
     }
 
+    /**
+     * scan through the given list of stoptimes, interpolating the missing ones.
+     * this is currently done by assuming equidistant stops and constant speed.
+     * while we may not be able to improve the constant speed assumption,
+     * TODO: use route matching (or shape distance etc.) to improve inter-stop distances
+     *  
+     * @param stopTimes the stoptimes to be filtered (from a single trip)
+     */
     private void interpolateStopTimes(List<StopTime> stopTimes) {
         int lastStop = stopTimes.size() - 1;
         int numInterpStops = -1;
