@@ -285,8 +285,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     String ele = segmentStartOSMNode.getTag("ele");
                     if (ele != null) {
-                        elevationPoints.add(
-                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
+                        Double elevation = ElevationUtils.parseEleTag(ele);
+                        if (elevation != null) {
+                            elevationPoints.add(
+                                    new ElevationPoint(distance, elevation));
+                        }
                     }
 
                     distance += DistanceLibrary.distance(
@@ -297,8 +300,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
-                            elevationPoints.add(
-                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
+                            Double elevation = ElevationUtils.parseEleTag(ele);
+                            if (elevation != null) {
+                                elevationPoints.add(
+                                        new ElevationPoint(distance, elevation));
+                            }
                         }
 
                         geometry = geometryFactory.createLineString(segmentCoordinates
