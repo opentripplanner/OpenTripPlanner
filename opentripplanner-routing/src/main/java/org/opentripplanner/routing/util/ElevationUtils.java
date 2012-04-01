@@ -303,7 +303,7 @@ public class ElevationUtils {
         try {
             return Double.parseDouble(ele) * unit;
         } catch (NumberFormatException e) {
-            return 0.0;
+            return Double.NaN;
         }
     }
 

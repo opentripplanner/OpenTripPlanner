@@ -286,7 +286,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     String ele = segmentStartOSMNode.getTag("ele");
                     if (ele != null) {
                         double elevation = ElevationUtils.parseEleTag(ele);
-                        if (elevation != 0.0) {
+                        if (elevation != Double.NaN) {
                             elevationPoints.add(
                                     new ElevationPoint(distance, elevation));
                         }
@@ -301,7 +301,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
                             double elevation = ElevationUtils.parseEleTag(ele);
-                            if (elevation != 0.0) {
+                            if (elevation != Double.NaN) {
                                 elevationPoints.add(
                                         new ElevationPoint(distance, elevation));
                             }
