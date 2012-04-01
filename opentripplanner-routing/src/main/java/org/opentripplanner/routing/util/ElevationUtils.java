@@ -300,7 +300,11 @@ public class ElevationUtils {
             ele = ele.replaceFirst("\\s*ft", "");
             unit = 0.3048;
         }
-        return Double.parseDouble(ele) * unit;
+        try {
+            return Double.parseDouble(ele) * unit;
+        } catch (NumberFormatException e) {
+            return 0.0;
+        }
     }
 
 }
