@@ -88,7 +88,8 @@ public class DateUtils implements DateConstants {
 
                 for (String df : dl) {
                     retVal = DateUtils.parseDate(new SimpleDateFormat(df), newString);
-                    if (retVal != null && retVal.getYear() >= 2000)
+                    // getYear() returns (year - 1900)
+                    if (retVal != null && retVal.getYear() + 1900 >= 2000)
                         break;
                 }
             }
