@@ -82,7 +82,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
             // this affects multi-itinerary searches
-            if (state0.getBackEdgeNarrative() instanceof PatternAlight) {
+            if (state0.getBackEdge() instanceof PatternAlight) {
                 return null;
             }
             Trip trip = pattern.getTrip(state0.getTrip());
