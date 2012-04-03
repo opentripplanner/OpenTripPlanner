@@ -118,6 +118,11 @@ public class BidirectionalRemainingWeightHeuristic implements
             while (!q.empty()) {
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
+                // cutting off at 2-3 hours seems to improve reaction time
+                // (this was previously not the case... #656?)
+                // of course in production this would be scaled according to the distance
+                if (uw > 60 * 60 * 3)
+                    break;
                 int ui = u.getIndex();
                 if (uw > weights[ui])
                     continue;
