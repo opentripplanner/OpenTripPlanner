@@ -196,7 +196,6 @@ public class PlanGenerator {
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
         Itinerary itinerary = makeEmptyItinerary(path);
         EdgeNarrative postponedAlerts = null;
-
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
         double previousElevation = Double.MAX_VALUE;
@@ -355,16 +354,18 @@ public class PlanGenerator {
             case PRETRANSIT:
                 if (mode == TraverseMode.BOARDING) {
                     if (leg != null) {
-                        LOG.error("leg unexpectedly not null");
+                        LOG.error("leg unexpectedly not null (boarding loop)");
+                    } else {
+                        leg = makeLeg(itinerary, state);
+                        itinerary.transfers++;
+                        leg.boardRule = (String) state.getExtension("boardAlightRule");
                     }
-                    leg = makeLeg(itinerary, state);
-                    leg.boardRule = (String) state.getExtension("boardAlightRule");
-                    itinerary.transfers++;
-                }
-                if (backEdge instanceof Hop || backEdge instanceof PatternHop) {
+                } else if (backEdge instanceof Hop || backEdge instanceof PatternHop) {
                     pgstate = PlanGenState.TRANSIT;
                     fixupTransitLeg(leg, state);
                     leg.stop = new ArrayList<Place>();
+                } else {
+                    LOG.error("Unexpected state (in PRETRANSIT): " + mode);
                 }
                 break;
             case TRANSIT:
@@ -433,7 +434,6 @@ public class PlanGenerator {
         if (leg != null) {
             finalizeLeg(leg, path.states.getLast(), path.states, startWalk, i, coordinates);
         }
-
         itinerary.removeBogusLegs();
         if (itinerary.legs.size() == 0)
             throw new TrivialPathException();
