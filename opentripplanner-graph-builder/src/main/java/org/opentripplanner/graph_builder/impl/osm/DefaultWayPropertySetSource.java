@@ -393,7 +393,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.ALL, 1.18, 1.18, true);
         setProperties(props, "surface=compacted", 
             StreetTraversalPermission.ALL, 1.18, 1.18, true);
-        setProperties(props, "surface=cobblestones", 
+        setProperties(props, "surface=cobblestone", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=paving_stones", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
