@@ -38,6 +38,9 @@ public class FreeEdge extends AbstractEdge {
     
     @Override
     public State traverse(State s0) {
+        // never follow 2 freeEdges (including STLs) in a row 
+        if (s0.getBackEdge() instanceof FreeEdge)
+            return null;
     	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
     	StateEditor s1 = s0.edit(this, en);
     	s1.incrementWeight(1);
