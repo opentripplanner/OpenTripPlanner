@@ -38,7 +38,6 @@ otp.core.SolrComboBoxStatic = {
         // CALLS THE BASE CONSTRUCTOR this.creator(config);
         otp.configure(this, config);
 
-
         this.template  = this.template || this._makeTemplate(); 
         this.store     = this._makeStore(); 
         this.form      = this._makeForm();

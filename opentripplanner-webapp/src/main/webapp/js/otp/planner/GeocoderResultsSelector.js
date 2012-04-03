@@ -35,15 +35,15 @@ otp.planner.GeocoderResultsSelector = {
     // the format here should be an array of arrays
     // each element should be an array of the form: [lat, lng, description]
     geocoderResults: null,
-    
+
     // ext store holding geocoder results
     // if an appropriate store is passed in, then the geocoder results don't
     // have to be
     store: null,
-    
+
     // grid displaying the geocoder results
     grid: null,
-    
+
     initialize : function(config) {
         otp.configure(this, config);
         var self = this;

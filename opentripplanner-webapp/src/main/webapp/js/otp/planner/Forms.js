@@ -826,8 +826,10 @@ otp.planner.StaticForms = {
 
         // step 2: create the forms
         var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.planner.options.appendGeocodeName};
-        var fromFormOptions = Ext.apply({}, {id: otp.util.Constants.fromFormID, name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
-        var toFormOptions   = Ext.apply({}, {id: otp.util.Constants.toFormID,   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
+        if(this.planner.geocoder && this.planner.geocoder.url)
+            comboBoxOptions.url = this.planner.geocoder.url; 
+        var fromFormOptions = Ext.apply({}, {id:otp.util.Constants.fromFormID, name:'from', emptyText:this.locale.tripPlanner.labels.from}, comboBoxOptions);
+        var toFormOptions   = Ext.apply({}, {id:otp.util.Constants.toFormID,   name:'to',   emptyText:this.locale.tripPlanner.labels.to}, comboBoxOptions);
         if(this.isSolrGeocoderEnabled())
         {
             this.m_fromForm = new otp.core.SolrComboBox(fromFormOptions);
@@ -1209,7 +1211,7 @@ otp.planner.StaticForms = {
     /** TODO refactor and clean this up -- think intermediatePoints geocoding*/
     setFormErrorMessage : function(comboBoxIdentifier, message)
     {
-        var errMsg = this.form.locale.tripPlanner.geocoder.error;
+        var errMsg = this.locale.tripPlanner.geocoder.error;
         if(message)
             errMsg = message;
 
