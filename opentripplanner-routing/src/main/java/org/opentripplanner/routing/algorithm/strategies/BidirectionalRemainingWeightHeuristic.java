@@ -129,8 +129,13 @@ public class BidirectionalRemainingWeightHeuristic implements
                 for (Edge e : edges) {
                     Vertex v = options.isArriveBy() ? 
                         e.getToVertex() : e.getFromVertex();
-                    double vw = uw + (timeNotWeight ? 
-                            e.timeLowerBound(options) : e.weightLowerBound(options));
+                    double ew = timeNotWeight ? 
+                           e.timeLowerBound(options) : e.weightLowerBound(options);
+                    if (ew < 0) {
+                        LOG.error("negative edge weight {} qt {}", ew, e);
+                        continue;
+                    }
+                    double vw = uw + ew;
                     int vi = v.getIndex();
                     if (weights[vi] > vw) {
                         weights[vi] = vw;
