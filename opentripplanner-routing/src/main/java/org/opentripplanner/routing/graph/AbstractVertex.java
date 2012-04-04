@@ -25,6 +25,7 @@ import java.util.List;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.Pointlike;
+
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.graph.Edge;
 import javax.xml.bind.annotation.XmlTransient;
@@ -33,11 +34,15 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractVertex implements Vertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractVertex.class);
+
     private static int maxIndex = 0;
 
     private int index;
@@ -114,7 +119,11 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public void addOutgoing(Edge ee) {
-        outgoing.add(ee);
+        if (outgoing.contains(ee)) {
+            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+        } else {
+            outgoing.add(ee);
+        }
     }
     
     /*
@@ -133,6 +142,9 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void removeOutgoing(Edge ee) {
         outgoing.remove(ee);
+        if (outgoing.contains(ee)) {
+            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+        }
     }
 
     protected synchronized void removeOutgoingConcurrent(Edge ee) {
@@ -150,7 +162,11 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public void addIncoming(Edge ee) {
-        incoming.add(ee);
+        if (incoming.contains(ee)) {
+            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+        } else {
+            incoming.add(ee);
+        }
     }
     
     public synchronized void addIncomingConcurrent(Edge ee) {
@@ -163,6 +179,9 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void removeIncoming(Edge ee) {
         incoming.remove(ee);
+        if (incoming.contains(ee)) {
+            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+        }
     }
 
     protected synchronized void removeIncomingConcurrent(Edge ee) {
