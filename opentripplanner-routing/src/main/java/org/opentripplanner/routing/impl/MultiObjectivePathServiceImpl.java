@@ -161,8 +161,6 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
         BinHeap<State> pq = new BinHeap<State>();
 //        List<State> boundingStates = new ArrayList<State>();
 
-        // initialize heuristic outside loop so table can be reused
-        heuristic.computeInitialWeight(origin, target);
         
         // increase maxWalk repeatedly in case hard limiting is in use 
         WALK: for (double maxWalk = options.getMaxWalkDistance();
@@ -175,6 +173,10 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                 target.getDistanceToNearestTransitStop())) 
                 continue WALK;
             options.setMaxWalkDistance(maxWalk);
+            // cap search / heuristic weight
+            
+            // (used to) initialize heuristic outside loop so table can be reused
+            heuristic.computeInitialWeight(origin, target);
             // reinitialize states for each retry
             HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
             pq.reset();
