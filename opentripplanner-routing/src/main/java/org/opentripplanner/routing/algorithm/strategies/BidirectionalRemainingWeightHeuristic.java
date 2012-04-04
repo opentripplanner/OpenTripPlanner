@@ -40,6 +40,8 @@ public class BidirectionalRemainingWeightHeuristic implements
     private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
     Vertex target;
+    
+    double cutoff;
 
     double[] weights;
 
@@ -57,7 +59,7 @@ public class BidirectionalRemainingWeightHeuristic implements
 
     @Override
     public double computeInitialWeight(State s, Vertex target) {
-        recalculate(target, s.getOptions(), false);
+        recalculate(s.getVertex(), target, s.getOptions(), false);
         return computeForwardWeight(s, target);
     }
 
@@ -85,15 +87,20 @@ public class BidirectionalRemainingWeightHeuristic implements
             return 0;
     }
 
-    private void recalculate(Vertex target, TraverseOptions options, boolean timeNotWeight) {
-        if (target != this.target) {
+    private void recalculate(Vertex origin, Vertex target, TraverseOptions options, boolean timeNotWeight) {
+        final double AVG_TRANSIT_SPEED = 25; // m/sec 
+        // wait time is irrelevant in the heuristic
+        double cutoff = (origin.distance(target) * 1.5) / AVG_TRANSIT_SPEED;
+        cutoff += options.getMaxWalkDistance() * options.walkReluctance;
+        if (target != this.target || cutoff > this.cutoff) {
+            LOG.debug("recalc");
             this.target = target;
+            this.cutoff = cutoff;
             this.nVertices = AbstractVertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             BinHeap<Vertex> q = new BinHeap<Vertex>();
             long t0 = System.currentTimeMillis();
-
             if (target instanceof StreetLocation) {
                 for (Edge de : ((StreetLocation) target).getExtra()) {
                     Vertex gv;
@@ -121,7 +128,7 @@ public class BidirectionalRemainingWeightHeuristic implements
                 // cutting off at 2-3 hours seems to improve reaction time
                 // (this was previously not the case... #656?)
                 // of course in production this would be scaled according to the distance
-                if (uw > 60 * 60 * 3)
+                if (uw > cutoff)
                     break;
                 int ui = u.getIndex();
                 if (uw > weights[ui])
