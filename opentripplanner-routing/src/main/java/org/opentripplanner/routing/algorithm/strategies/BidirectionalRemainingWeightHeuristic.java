@@ -170,7 +170,7 @@ public class BidirectionalRemainingWeightHeuristic implements
      */
     @Override
     public void timeInitialize(State s, Vertex target) {
-        recalculate(target, s.getOptions(), true);
+        recalculate(s.getVertex(), target, s.getOptions(), true);
     }
 
     @Override
