@@ -236,9 +236,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 // for this point
                 double totalDistance = bestDistance + state.distance;
                 // trace backwards, setting states as we go
-                if (state.backEdge != null) {
-                    System.out.println("here");
-                }
                 while (true) {
                     double elevation = (bestElevation * state.distance + state.initialElevation
                             * bestDistance)
@@ -267,6 +264,10 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
                     if (fromElevation == null || toElevation == null) {
                         log.warn("Unexpectedly missing elevation for edge " + edge);
+                        continue;
+                    }
+
+                    if (edge.getElevationProfile() != null && edge.getElevationProfile().size() > 2) {
                         continue;
                     }
 
