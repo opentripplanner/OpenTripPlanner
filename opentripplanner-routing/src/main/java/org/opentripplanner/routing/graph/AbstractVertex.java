@@ -21,6 +21,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.MavenVersion;
@@ -61,9 +63,9 @@ public abstract class AbstractVertex implements Vertex {
     
     private double distanceToNearestTransitStop = 0;
 
-    private transient ArrayList<Edge> incoming = new ArrayList<Edge>();
+    private transient Set<Edge> incoming = new CopyOnWriteArraySet<Edge>();
 
-    private transient ArrayList<Edge> outgoing = new ArrayList<Edge>();
+    private transient Set<Edge> outgoing = new CopyOnWriteArraySet<Edge>();
 
     
     /* PUBLIC CONSTRUCTORS */
@@ -125,32 +127,12 @@ public abstract class AbstractVertex implements Vertex {
         outgoing.add(ee);
     }
     
-    /*
-     *  Copy-on-write modification of edgelist to avoid concurrent modification during search.
-     *  Could be used instead of extraEdges OverlayGraph.
-     *  As of Java 6 intrinsic locks are apparently just as fast as an explicit reentrantlock.
-     */
-    // should really be protected but methods in interfaces cannot be protected...
-    public synchronized void addOutgoingConcurrent(Edge ee) { // create TemporaryEdge type?
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
-        newOutgoing.add(ee);
-        outgoing = newOutgoing;
-    }
-
     @Override
     public void removeOutgoing(Edge ee) {
         outgoing.remove(ee);
         if (outgoing.contains(ee)) {
             LOG.trace("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
-    }
-
-    protected synchronized void removeOutgoingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
-        newOutgoing.remove(ee);
-        outgoing = newOutgoing;
     }
 
     /** Get a collection containing all the edges leading from this vertex to other vertices. */
@@ -167,26 +149,12 @@ public abstract class AbstractVertex implements Vertex {
         incoming.add(ee);
     }
     
-    public synchronized void addIncomingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
-        newIncoming.add(ee);
-        outgoing = newIncoming;
-    }
-
     @Override
     public void removeIncoming(Edge ee) {
         incoming.remove(ee);
         if (incoming.contains(ee)) {
             LOG.trace("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
-    }
-
-    protected synchronized void removeIncomingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
-        newIncoming.remove(ee);
-        outgoing = newIncoming;
     }
 
     /** Get a collection containing all the edges leading from other vertices to this vertex. */
@@ -296,15 +264,16 @@ public abstract class AbstractVertex implements Vertex {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.incoming = new ArrayList<Edge>(2);
-        this.outgoing = new ArrayList<Edge>(2);
+        this.incoming = new CopyOnWriteArraySet<Edge>();
+        this.outgoing = new CopyOnWriteArraySet<Edge>();
         index = maxIndex++;
     }
 
     @Override
     public void compact() {
-        this.outgoing.trimToSize();
-        this.incoming.trimToSize();
+// copy-on-write array list never has extra empty slots
+//        this.outgoing.trimToSize();
+//        this.incoming.trimToSize();
     }
     
 
@@ -361,8 +330,8 @@ public abstract class AbstractVertex implements Vertex {
                 source.removeOutgoing(e);
             }
         }
-        incoming = new ArrayList<Edge>();
-        outgoing = new ArrayList<Edge>();
+        incoming = new CopyOnWriteArraySet<Edge>();
+        outgoing = new CopyOnWriteArraySet<Edge>();
     }
     
     @Override
