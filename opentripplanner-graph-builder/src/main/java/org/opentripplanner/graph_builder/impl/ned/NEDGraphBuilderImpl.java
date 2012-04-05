@@ -95,6 +95,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
         List<EdgeWithElevation> edgesWithElevation = new ArrayList<EdgeWithElevation>();
         int nProcessed = 0;
+        int nTotal = graph.countEdges();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof EdgeWithElevation) {
@@ -105,7 +106,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                         edgesWithElevation.add(edgeWithElevation);
                         nProcessed += 1;
                         if (nProcessed % 50000 == 0)
-                            log.info("set elevation on {} edges", nProcessed);
+                            log.info("set elevation on {}/{} edges", nProcessed, nTotal);
                     }
                 }
             }
@@ -140,8 +141,8 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
         BinHeap<ElevationRepairState> secondary_pq = new BinHeap<ElevationRepairState>();
-        // init queue with all vertices which already have known elevation
 
+        // init queue with all vertices which already have known elevation
         HashMap<Vertex, Double> elevations = new HashMap<Vertex, Double>();
 
         for (EdgeWithElevation e : edgesWithElevation) {
@@ -241,11 +242,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 double totalDistance = bestDistance + state.distance;
                 // trace backwards, setting states as we go
                 while (true) {
-                    double elevation = (bestElevation * state.distance + state.initialElevation
-                            * bestDistance)
-                            / totalDistance;
-
-                    elevations.put(state.vertex, elevation);
+                    if (totalDistance == 0)
+                        elevations.put(state.vertex, bestElevation);
+                    else {
+                        double elevation = (bestElevation * state.distance + 
+                               state.initialElevation * bestDistance) / totalDistance;
+                        elevations.put(state.vertex, elevation);
+                    }
                     if (state.backState == null)
                         break;
                     bestDistance += state.backEdge.getDistance();
