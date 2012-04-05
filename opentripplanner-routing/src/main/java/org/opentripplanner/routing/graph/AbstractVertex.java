@@ -121,9 +121,8 @@ public abstract class AbstractVertex implements Vertex {
     public void addOutgoing(Edge ee) {
         if (outgoing.contains(ee)) {
             LOG.error("repeatedly added edge {} to vertex {}", ee, this);
-        } else {
-            outgoing.add(ee);
         }
+        outgoing.add(ee);
     }
     
     /*
@@ -164,9 +163,8 @@ public abstract class AbstractVertex implements Vertex {
     public void addIncoming(Edge ee) {
         if (incoming.contains(ee)) {
             LOG.error("repeatedly added edge {} to vertex {}", ee, this);
-        } else {
-            incoming.add(ee);
-        }
+        } 
+        incoming.add(ee);
     }
     
     public synchronized void addIncomingConcurrent(Edge ee) {
