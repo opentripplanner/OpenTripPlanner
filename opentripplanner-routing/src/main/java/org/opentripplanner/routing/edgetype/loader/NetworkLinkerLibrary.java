@@ -397,7 +397,7 @@ public class NetworkLinkerLibrary {
          * and thus the same location as the destination of startVertex's outgoing edges.
          */
         StreetVertex newEnd = new IntersectionVertex(graph, "replace " + endVertex.getLabel(), endVertex.getX(),
-                endVertex.getY());
+                endVertex.getY(), endVertex.getName());
 
         for (Edge e: startVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
@@ -416,7 +416,7 @@ public class NetworkLinkerLibrary {
 
         /* and likewise for start */
         StreetVertex newStart = new IntersectionVertex(graph, "replace " + startVertex.getLabel(),
-                startVertex.getX(), startVertex.getY());
+                startVertex.getX(), startVertex.getY(), startVertex.getName());
 
         for (Edge e: endVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();

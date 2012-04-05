@@ -94,6 +94,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
 
         List<EdgeWithElevation> edgesWithElevation = new ArrayList<EdgeWithElevation>();
+        int nProcessed = 0;
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof EdgeWithElevation) {
@@ -102,6 +103,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null) {
                         edgesWithElevation.add(edgeWithElevation);
+                        nProcessed += 1;
+                        if (nProcessed % 50000 == 0)
+                            log.info("set elevation on {} edges", nProcessed);
                     }
                 }
             }
@@ -236,9 +240,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 // for this point
                 double totalDistance = bestDistance + state.distance;
                 // trace backwards, setting states as we go
-                if (state.backEdge != null) {
-                    System.out.println("here");
-                }
                 while (true) {
                     double elevation = (bestElevation * state.distance + state.initialElevation
                             * bestDistance)
@@ -270,6 +271,10 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
 
+                    if (edge.getElevationProfile() != null && edge.getElevationProfile().size() > 2) {
+                        continue;
+                    }
+
                     Coordinate[] coords = new Coordinate[2];
                     coords[0] = new Coordinate(0, fromElevation);
                     coords[1] = new Coordinate(edge.getDistance(), toElevation);
@@ -277,7 +282,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if(edge.setElevationProfile(profile, true)) {
-                        log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                        log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
                     }
                 }
             }
@@ -330,7 +335,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
 
         if(ee.setElevationProfile(elevPCS, true)) {
-            log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
+            log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
         }
     }
 

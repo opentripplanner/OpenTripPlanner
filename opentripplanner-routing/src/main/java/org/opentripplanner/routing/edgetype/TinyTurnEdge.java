@@ -94,14 +94,6 @@ public class TinyTurnEdge extends FreeEdge {
         return s1.makeState();
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof TinyTurnEdge) {
-            TinyTurnEdge other = (TinyTurnEdge) o;
-            return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
-        }
-        return false;
-    }
-
     public String toString() {
         return "TinyTurnEdge(" + fromv + " -> " + tov + ")";
     }

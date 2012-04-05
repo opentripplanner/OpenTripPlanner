@@ -46,6 +46,8 @@ public class StreetLocation extends AbstractVertex {
 
     private boolean wheelchairAccessible;
 
+    private ArrayList<StreetEdge> edges;
+
     // maybe name should just be pulled from street being split
     public StreetLocation(String id, Coordinate nearestPoint, String name) {
         // calling constructor with null graph means this vertex is temporary
@@ -112,9 +114,20 @@ public class StreetLocation extends AbstractVertex {
         }
 
         location.setWheelchairAccessible(wheelchairAccessible);
-
+        location.setSourceEdges(edges);
         return location;
 
+    }
+
+    private void setSourceEdges(Iterable<StreetEdge> edges) {
+        this.edges = new ArrayList<StreetEdge>();
+        for (StreetEdge edge : edges) {
+            this.edges.add(edge);
+        }
+    }
+
+    public List<StreetEdge> getSourceEdges() {
+        return edges;
     }
 
     private static TurnVertex createHalfLocation(StreetLocation base, String label,

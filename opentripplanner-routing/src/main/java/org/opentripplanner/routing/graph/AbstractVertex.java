@@ -21,10 +21,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.Pointlike;
+
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.graph.Edge;
 import javax.xml.bind.annotation.XmlTransient;
@@ -33,11 +36,15 @@ import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractVertex implements Vertex {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractVertex.class);
+
     private static int maxIndex = 0;
 
     private int index;
@@ -56,9 +63,9 @@ public abstract class AbstractVertex implements Vertex {
     
     private double distanceToNearestTransitStop = 0;
 
-    private transient ArrayList<Edge> incoming = new ArrayList<Edge>();
+    private transient Set<Edge> incoming = new CopyOnWriteArraySet<Edge>();
 
-    private transient ArrayList<Edge> outgoing = new ArrayList<Edge>();
+    private transient Set<Edge> outgoing = new CopyOnWriteArraySet<Edge>();
 
     
     /* PUBLIC CONSTRUCTORS */
@@ -114,32 +121,19 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public void addOutgoing(Edge ee) {
-        outgoing.add(ee);
+        if (outgoing.contains(ee)) {
+            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+        } else {
+            outgoing.add(ee);
+        }
     }
     
-    /*
-     *  Copy-on-write modification of edgelist to avoid concurrent modification during search.
-     *  Could be used instead of extraEdges OverlayGraph.
-     *  As of Java 6 intrinsic locks are apparently just as fast as an explicit reentrantlock.
-     */
-    // should really be protected but methods in interfaces cannot be protected...
-    public synchronized void addOutgoingConcurrent(Edge ee) { // create TemporaryEdge type?
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
-        newOutgoing.add(ee);
-        outgoing = newOutgoing;
-    }
-
     @Override
     public void removeOutgoing(Edge ee) {
         outgoing.remove(ee);
-    }
-
-    protected synchronized void removeOutgoingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newOutgoing = (ArrayList<Edge>) outgoing.clone();
-        newOutgoing.remove(ee);
-        outgoing = newOutgoing;
+        if (outgoing.contains(ee)) {
+            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+        }
     }
 
     /** Get a collection containing all the edges leading from this vertex to other vertices. */
@@ -150,26 +144,19 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public void addIncoming(Edge ee) {
-        incoming.add(ee);
+        if (incoming.contains(ee)) {
+            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+        } else {        
+            incoming.add(ee);
+        }
     }
     
-    public synchronized void addIncomingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
-        newIncoming.add(ee);
-        outgoing = newIncoming;
-    }
-
     @Override
     public void removeIncoming(Edge ee) {
         incoming.remove(ee);
-    }
-
-    protected synchronized void removeIncomingConcurrent(Edge ee) {
-        @SuppressWarnings("unchecked")
-        ArrayList<Edge> newIncoming = (ArrayList<Edge>) incoming.clone();
-        newIncoming.remove(ee);
-        outgoing = newIncoming;
+        if (incoming.contains(ee)) {
+            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+        }
     }
 
     /** Get a collection containing all the edges leading from other vertices to this vertex. */
@@ -279,15 +266,16 @@ public abstract class AbstractVertex implements Vertex {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.incoming = new ArrayList<Edge>(2);
-        this.outgoing = new ArrayList<Edge>(2);
+        this.incoming = new CopyOnWriteArraySet<Edge>();
+        this.outgoing = new CopyOnWriteArraySet<Edge>();
         index = maxIndex++;
     }
 
     @Override
     public void compact() {
-        this.outgoing.trimToSize();
-        this.incoming.trimToSize();
+// copy-on-write array list never has extra empty slots
+//        this.outgoing.trimToSize();
+//        this.incoming.trimToSize();
     }
     
 
@@ -344,8 +332,8 @@ public abstract class AbstractVertex implements Vertex {
                 source.removeOutgoing(e);
             }
         }
-        incoming = new ArrayList<Edge>();
-        outgoing = new ArrayList<Edge>();
+        incoming = new CopyOnWriteArraySet<Edge>();
+        outgoing = new CopyOnWriteArraySet<Edge>();
     }
     
     @Override

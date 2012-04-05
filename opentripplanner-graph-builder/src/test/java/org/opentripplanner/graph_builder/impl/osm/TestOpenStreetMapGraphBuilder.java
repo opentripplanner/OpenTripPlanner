@@ -232,17 +232,18 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                 namer.generateCreativeName(way));
     }
 
-    @Test
-    public void testMultipolygon() throws Exception {
-        Graph gg = new Graph();
-        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
-
-        FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
-        pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
-        loader.setProvider(pr);
-
-        loader.buildGraph(gg, extra);
-
-        assertNotNull(gg.getVertex("way -3535 from 4"));
-    }
+// disabled pending discussion with author (AMB)
+//    @Test
+//    public void testMultipolygon() throws Exception {
+//        Graph gg = new Graph();
+//        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+//
+//        FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
+//        pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
+//        loader.setProvider(pr);
+//
+//        loader.buildGraph(gg, extra);
+//
+//        assertNotNull(gg.getVertex("way -3535 from 4"));
+//    }
 }

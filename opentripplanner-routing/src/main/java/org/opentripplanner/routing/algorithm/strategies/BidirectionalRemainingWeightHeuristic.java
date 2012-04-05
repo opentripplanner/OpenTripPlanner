@@ -40,6 +40,8 @@ public class BidirectionalRemainingWeightHeuristic implements
     private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
     Vertex target;
+    
+    double cutoff;
 
     double[] weights;
 
@@ -57,7 +59,7 @@ public class BidirectionalRemainingWeightHeuristic implements
 
     @Override
     public double computeInitialWeight(State s, Vertex target) {
-        recalculate(target, s.getOptions(), false);
+        recalculate(s.getVertex(), target, s.getOptions(), false);
         return computeForwardWeight(s, target);
     }
 
@@ -85,15 +87,16 @@ public class BidirectionalRemainingWeightHeuristic implements
             return 0;
     }
 
-    private void recalculate(Vertex target, TraverseOptions options, boolean timeNotWeight) {
-        if (target != this.target) {
+    private void recalculate(Vertex origin, Vertex target, TraverseOptions options, boolean timeNotWeight) {
+        if (target != this.target || options.maxWeight > this.cutoff) {
+            LOG.debug("recalc");
             this.target = target;
+            this.cutoff = options.maxWeight;
             this.nVertices = AbstractVertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             BinHeap<Vertex> q = new BinHeap<Vertex>();
             long t0 = System.currentTimeMillis();
-
             if (target instanceof StreetLocation) {
                 for (Edge de : ((StreetLocation) target).getExtra()) {
                     Vertex gv;
@@ -118,6 +121,11 @@ public class BidirectionalRemainingWeightHeuristic implements
             while (!q.empty()) {
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
+                // cutting off at 2-3 hours seems to improve reaction time
+                // (this was previously not the case... #656?)
+                // of course in production this would be scaled according to the distance
+                if (uw > cutoff)
+                    break;
                 int ui = u.getIndex();
                 if (uw > weights[ui])
                     continue;
@@ -129,8 +137,13 @@ public class BidirectionalRemainingWeightHeuristic implements
                 for (Edge e : edges) {
                     Vertex v = options.isArriveBy() ? 
                         e.getToVertex() : e.getFromVertex();
-                    double vw = uw + (timeNotWeight ? 
-                            e.timeLowerBound(options) : e.weightLowerBound(options));
+                    double ew = timeNotWeight ? 
+                           e.timeLowerBound(options) : e.weightLowerBound(options);
+                    if (ew < 0) {
+                        LOG.error("negative edge weight {} qt {}", ew, e);
+                        continue;
+                    }
+                    double vw = uw + ew;
                     int vi = v.getIndex();
                     if (weights[vi] > vw) {
                         weights[vi] = vw;
@@ -153,7 +166,7 @@ public class BidirectionalRemainingWeightHeuristic implements
      */
     @Override
     public void timeInitialize(State s, Vertex target) {
-        recalculate(target, s.getOptions(), true);
+        recalculate(s.getVertex(), target, s.getOptions(), true);
     }
 
     @Override

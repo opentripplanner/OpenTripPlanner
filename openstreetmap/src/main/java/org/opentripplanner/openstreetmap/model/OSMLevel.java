@@ -84,6 +84,12 @@ public class OSMLevel implements Comparable<OSMLevel> {
             // set them both the same, the trailing @altitude has already been discarded
             shortName = longName = spec;
         }
+        if (longName.startsWith("+")) {
+            longName = longName.substring(1);
+        }
+        if (shortName.startsWith("+")) {
+            shortName = shortName.substring(1);
+        }
 
         /* try to parse a floor number out of names */
         Integer floorNumber = null;
