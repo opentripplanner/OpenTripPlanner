@@ -137,14 +137,18 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         }
     }
 
+    /**
+     * 
+     */
     private void assignMissingElevations(Graph graph, List<EdgeWithElevation> edgesWithElevation) {
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
         BinHeap<ElevationRepairState> secondary_pq = new BinHeap<ElevationRepairState>();
 
-        // init queue with all vertices which already have known elevation
+        // elevation for each vertex (known or interpolated)
         HashMap<Vertex, Double> elevations = new HashMap<Vertex, Double>();
 
+        // initialize queue with all vertices which already have known elevation
         for (EdgeWithElevation e : edgesWithElevation) {
             PackedCoordinateSequence profile = e.getElevationProfile();
 
@@ -165,6 +169,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             }
         }
 
+        // Grow an SPT outward from vertices with known elevations into regions where the
+        // elevation is not known. when a branch hits a region with known elevation, follow the
+        // back pointers through the region of unknown elevation, setting elevations via interpolation.
         while (!pq.empty()) {
             double key = pq.peek_min_key();
             ElevationRepairState state = pq.extract_min();
@@ -242,6 +249,8 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 double totalDistance = bestDistance + state.distance;
                 // trace backwards, setting states as we go
                 while (true) {
+                    // watch out for division by 0 here, which will propagate NaNs 
+                    // all the way out to edge lengths 
                     if (totalDistance == 0)
                         elevations.put(state.vertex, bestElevation);
                     else {
