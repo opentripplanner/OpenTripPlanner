@@ -91,18 +91,6 @@ public class TransferEdge extends AbstractEdge {
         return s1.makeState();
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof TransferEdge)) {
-            return false;
-        }
-        TransferEdge t = (TransferEdge) o;
-        return t.getToVertex().equals(getToVertex()) && t.getFromVertex().equals(getFromVertex());
-    }
-    
-    public int hashCode() {
-        return tov.hashCode() ^ fromv.hashCode();
-    }
-
     public void setGeometry(Geometry geometry) {
         this.geometry  = geometry;
     }

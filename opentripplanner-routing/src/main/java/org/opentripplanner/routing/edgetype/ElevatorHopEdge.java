@@ -91,14 +91,6 @@ public class ElevatorHopEdge extends AbstractEdge {
         return null;
     }
     
-    public boolean equals(Object o) {
-        if (o instanceof ElevatorHopEdge) {
-            ElevatorHopEdge other = (ElevatorHopEdge) o;
-            return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
-        }
-        return false;
-    }
-    
     public String toString() {
         return "ElevatorHopEdge(" + fromv + " -> " + tov + ")";
     }

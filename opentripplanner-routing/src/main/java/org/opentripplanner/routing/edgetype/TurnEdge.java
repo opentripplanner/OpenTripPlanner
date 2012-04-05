@@ -241,32 +241,6 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).setElevationProfile(elev, computed);
     }
     
-    public boolean equals(Object o) {
-        if (o instanceof TurnEdge) {
-            TurnEdge other = (TurnEdge) o;
-            if (other.fromv == null) {
-                if (fromv != null) {
-                    return false;
-                }
-            } else {
-                if (!other.fromv.equals(fromv)) {
-                    return false;
-                }
-            }
-            if (other.tov == null) {
-                return tov == null;
-            } else {
-                return other.tov.equals(tov);
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return ((TurnVertex) fromv).hashCode() * 31 + tov.hashCode();
-    }
-
     @Override
     public void addPatch(Patch patch) {
         if (patches == null) {

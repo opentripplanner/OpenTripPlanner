@@ -104,14 +104,6 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
         return false;
     }
     
-    public boolean equals(Object o) {
-        if (o instanceof ElevatorAlightEdge) {
-            ElevatorAlightEdge other = (ElevatorAlightEdge) o;
-            return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
-        }
-        return false;
-    }
-    
     public String toString() {
         return "ElevatorAlightEdge(" + fromv + " -> " + tov + ")";
     }

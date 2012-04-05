@@ -73,14 +73,6 @@ public class TimedTransferEdge extends AbstractEdge {
         return null;
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof TimedTransferEdge) {
-            TimedTransferEdge other = (TimedTransferEdge) o;
-            return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
-        }
-        return false;
-    }
-
     public String toString() {
         return "Timed transfer from " + fromv + " to " + tov;
     }
