@@ -120,7 +120,7 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void addOutgoing(Edge ee) {
         if (outgoing.contains(ee)) {
-            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+            LOG.trace("repeatedly added edge {} to vertex {}", ee, this);
         }
         outgoing.add(ee);
     }
@@ -142,7 +142,7 @@ public abstract class AbstractVertex implements Vertex {
     public void removeOutgoing(Edge ee) {
         outgoing.remove(ee);
         if (outgoing.contains(ee)) {
-            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+            LOG.trace("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
     }
 
@@ -162,7 +162,7 @@ public abstract class AbstractVertex implements Vertex {
     @Override
     public void addIncoming(Edge ee) {
         if (incoming.contains(ee)) {
-            LOG.error("repeatedly added edge {} to vertex {}", ee, this);
+            LOG.trace("repeatedly added edge {} to vertex {}", ee, this);
         } 
         incoming.add(ee);
     }
@@ -178,7 +178,7 @@ public abstract class AbstractVertex implements Vertex {
     public void removeIncoming(Edge ee) {
         incoming.remove(ee);
         if (incoming.contains(ee)) {
-            LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
+            LOG.trace("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
     }
 
