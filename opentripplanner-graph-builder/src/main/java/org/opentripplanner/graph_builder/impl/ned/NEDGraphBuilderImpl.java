@@ -282,8 +282,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if(edge.setElevationProfile(profile, true)) {
-                        log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
-                        
+                        log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
                     }
                 }
             }
@@ -336,7 +335,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
 
         if(ee.setElevationProfile(elevPCS, true)) {
-            log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
+            log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
         }
     }
 
