@@ -88,14 +88,10 @@ public class BidirectionalRemainingWeightHeuristic implements
     }
 
     private void recalculate(Vertex origin, Vertex target, TraverseOptions options, boolean timeNotWeight) {
-        final double AVG_TRANSIT_SPEED = 25; // m/sec 
-        // wait time is irrelevant in the heuristic
-        double cutoff = (origin.distance(target) * 1.5) / AVG_TRANSIT_SPEED;
-        cutoff += options.getMaxWalkDistance() * options.walkReluctance;
-        if (target != this.target || cutoff > this.cutoff) {
+        if (target != this.target || options.maxWeight > this.cutoff) {
             LOG.debug("recalc");
             this.target = target;
-            this.cutoff = cutoff;
+            this.cutoff = options.maxWeight;
             this.nVertices = AbstractVertex.getMaxIndex();
             weights = new double[nVertices];
             Arrays.fill(weights, Double.POSITIVE_INFINITY);

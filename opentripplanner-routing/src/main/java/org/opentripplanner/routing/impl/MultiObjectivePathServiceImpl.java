@@ -173,10 +173,18 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                 target.getDistanceToNearestTransitStop())) 
                 continue WALK;
             options.setMaxWalkDistance(maxWalk);
+            
             // cap search / heuristic weight
+            final double AVG_TRANSIT_SPEED = 25; // m/sec 
+            double cutoff = (origin.getVertex().distance(target) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
+            cutoff += options.getMaxWalkDistance() * options.walkReluctance;
+            options.maxWeight = cutoff;
             
             // (used to) initialize heuristic outside loop so table can be reused
             heuristic.computeInitialWeight(origin, target);
+            
+            options.maxWeight = cutoff + 30 * 60 * options.waitReluctance;
+            
             // reinitialize states for each retry
             HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
             pq.reset();
@@ -196,6 +204,11 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                     }
                 }
     
+                if (pq.peek_min_key() > options.maxWeight) {
+                    LOG.debug("max weight {} exceeded", options.maxWeight);
+                    break QUEUE;
+                }
+                
                 State su = pq.extract_min();
     
 //                for (State bs : boundingStates) {
