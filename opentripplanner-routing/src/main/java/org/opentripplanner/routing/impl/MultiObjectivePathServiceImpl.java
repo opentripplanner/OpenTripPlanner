@@ -204,10 +204,10 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                     }
                 }
     
-                if (pq.peek_min_key() > options.maxWeight) {
-                    LOG.debug("max weight {} exceeded", options.maxWeight);
-                    break QUEUE;
-                }
+//                if (pq.peek_min_key() > options.maxWeight) {
+//                    LOG.debug("max weight {} exceeded", options.maxWeight);
+//                    break QUEUE;
+//                }
                 
                 State su = pq.extract_min();
     
