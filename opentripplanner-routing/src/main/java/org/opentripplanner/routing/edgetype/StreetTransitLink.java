@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -39,14 +40,18 @@ public class StreetTransitLink extends AbstractEdge {
 
     private static GeometryFactory _geometryFactory = new GeometryFactory();
     private boolean wheelchairAccessible;
-        
-    public StreetTransitLink(StreetVertex fromv, TransitVertex tov, boolean wheelchairAccessible) {
+
+    private TransitStop transitStop;
+
+    public StreetTransitLink(StreetVertex fromv, TransitStop tov, boolean wheelchairAccessible) {
     	super(fromv, tov);
+    	transitStop = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public StreetTransitLink(TransitVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public StreetTransitLink(TransitStop fromv, StreetVertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
+        transitStop = fromv;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
@@ -84,8 +89,8 @@ public class StreetTransitLink extends AbstractEdge {
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.
         StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(1);
-        s1.incrementWeight(STL_TRAVERSE_COST);
+        s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + 1);
+        s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         return s1.makeState();
     }
 
@@ -101,7 +106,6 @@ public class StreetTransitLink extends AbstractEdge {
     public double weightLowerBound(TraverseOptions options) {
         return options.transitAllowed() ? 0 : Double.POSITIVE_INFINITY;
     }
-
 
     public Vertex getFromVertex() {
         return fromv;

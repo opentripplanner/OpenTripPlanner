@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +46,8 @@ public class GraphBuilderTask implements Runnable {
     private List<TraverseOptions> _modeList;
 
     private double _contractionFactor = 1.0;
+    
+    private String _baseGraph = null;
 
     @Autowired
     public void setGraphService(GraphService graphService) {
@@ -66,6 +70,10 @@ public class GraphBuilderTask implements Runnable {
         _alwaysRebuild = alwaysRebuild;
     }
     
+    public void setBaseGraph(String baseGraph) {
+        _baseGraph = baseGraph;
+    }
+
     public void addMode(TraverseOptions mo) {
         _modeList.add(mo);
     }
@@ -80,7 +88,17 @@ public class GraphBuilderTask implements Runnable {
 
     public void run() {
         
-        Graph graph = _graphService.getGraph();
+        Graph graph;
+        
+        if (_baseGraph != null) {
+            try {
+                graph = Graph.load(new File(_baseGraph), LoadLevel.FULL);
+            } catch (Exception e) {
+                throw new RuntimeException("error loading base graph");
+            }
+        } else {
+            graph = _graphService.getGraph();
+        }
 
         if (_graphBundle == null) {
             throw new RuntimeException("graphBuilderTask has no attribute graphBundle.");
@@ -107,7 +125,9 @@ public class GraphBuilderTask implements Runnable {
             }
             provided.addAll(builder.provides());
         }
-        if (bad)
+        if (_baseGraph != null)
+            _log.warn("base graph loaded, not enforcing prerequisites");
+        else if (bad)
             throw new RuntimeException("Prerequisites unsatisfied");
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();

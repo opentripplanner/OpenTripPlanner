@@ -826,8 +826,10 @@ otp.planner.StaticForms = {
 
         // step 2: create the forms
         var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.planner.options.appendGeocodeName};
-        var fromFormOptions = Ext.apply({}, {id: otp.util.Constants.fromFormID, name: 'from', emptyText: this.locale.tripPlanner.labels.from}, comboBoxOptions);
-        var toFormOptions   = Ext.apply({}, {id: otp.util.Constants.toFormID,   name: 'to',   emptyText: this.locale.tripPlanner.labels.to},   comboBoxOptions);
+        if(this.planner.geocoder && this.planner.geocoder.url)
+            comboBoxOptions.url = this.planner.geocoder.url; 
+        var fromFormOptions = Ext.apply({}, {id:otp.util.Constants.fromFormID, name:'from', emptyText:this.locale.tripPlanner.labels.from}, comboBoxOptions);
+        var toFormOptions   = Ext.apply({}, {id:otp.util.Constants.toFormID,   name:'to',   emptyText:this.locale.tripPlanner.labels.to}, comboBoxOptions);
         if(this.isSolrGeocoderEnabled())
         {
             this.m_fromForm = new otp.core.SolrComboBox(fromFormOptions);
@@ -1008,11 +1010,11 @@ otp.planner.StaticForms = {
             id:         'trip-date-form',
             fieldLabel: this.locale.tripPlanner.labels.date,
             name:       'date',
-            format:     'm/d/Y',
+            format:     this.locale.time.date_format,
             allowBlank: false,
             msgTarget:  'qtip',
             anchor:     "87%",
-            value:      new Date().format('m/d/Y')
+            value:      new Date().format(this.locale.time.date_format)
         });
 
         this.m_arriveByStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
@@ -1042,8 +1044,8 @@ otp.planner.StaticForms = {
                 accelerate : true,
                 width      : 85,
                 msgTarget  : 'qtip',
-                value      : new Date().format('g:i a'),
-                strategy   : new Ext.ux.form.Spinner.TimeStrategy({format:'g:i a'}),
+                value      : new Date().format(this.locale.time.time_format),
+                strategy   : new Ext.ux.form.Spinner.TimeStrategy({format:this.locale.time.time_format}),
                 name       : 'time'
         });
 

@@ -129,7 +129,11 @@ public class CoordinateArrayListSequence implements CoordinateSequence, Cloneabl
     public void extend(Coordinate[] newCoordinates, int start, int end) {
         coordinates.addAll(Arrays.asList(newCoordinates).subList(start, end));
     }
-    
+
+    public void add(Coordinate newCoordinate) {
+        coordinates.add(newCoordinate);
+    }
+
     public void clear() {
     	coordinates = new ArrayList<Coordinate>();
     }

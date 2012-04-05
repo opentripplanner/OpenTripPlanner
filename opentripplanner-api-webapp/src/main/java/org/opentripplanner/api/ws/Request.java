@@ -17,12 +17,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.util.DateUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -30,6 +33,8 @@ import org.opentripplanner.util.DateUtils;
  * route.
  */
 public class Request implements RequestInf {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Request.class);
 
     /**
      * The router ID -- internal ID to switch between router implementation (or graphs)
@@ -289,6 +294,8 @@ public class Request implements RequestInf {
         paramPush(DATE, date);
         paramPush(TIME, time);
         dateTime = DateUtils.toDate(date, time);
+        LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
+        LOG.debug("Request datetime parsed as {}", dateTime);
     }
 
     /**

@@ -13,8 +13,6 @@
 package org.opentripplanner.api.ws;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -34,6 +32,8 @@ import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.PathServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -45,7 +45,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Planner {
 
-    private static final Logger LOGGER = Logger.getLogger(Planner.class.getCanonicalName());
+    private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
     private static final int MAX_ITINERARIES = 3;
     private static final int MAX_TRANSFERS = 4;
@@ -301,7 +301,7 @@ public class Planner {
             PlannerError error = new PlannerError(Message.TOO_CLOSE);
             response.setError(error);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "exception planning trip: ", e);
+            LOG.error("exception planning trip: ", e);
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
         }

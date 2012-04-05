@@ -18,23 +18,25 @@ public class MavenVersion implements Serializable {
     public final int minor;
     public final int incremental;
     public final String qualifier;
-
+    public final String commit;
+    
     private static MavenVersion fromProperties() {
         final String FILE = "maven-version.properties";
         try {
             Properties props = new java.util.Properties();
             InputStream in = MavenVersion.class.getClassLoader().getResourceAsStream(FILE);
             props.load(in);
-            MavenVersion ver = new MavenVersion(props.getProperty("version"));
-            LOG.info("Parsed Maven artifact version: {}", ver.toStringVerbose());
-            return ver;
+            MavenVersion version = new MavenVersion(props.getProperty("project.version"), 
+                                                    props.getProperty("git.commit.id"));
+            LOG.info("Parsed Maven artifact version: {}", version.toStringVerbose());
+            return version;
         } catch (Exception e) {
-            LOG.error("Error reading Maven build version from properties file: {}", e.getMessage());
-            return new MavenVersion("-1.-1.-1");
+            LOG.error("Error reading version from properties file: {}", e.getMessage());
+            return new MavenVersion("0.0.0-ParseFailure", "0");
         }
     }
     
-    public MavenVersion (String v) {
+    public MavenVersion (String v, String c) {
         version = v;
         String [] fields = v.split("\\-");
         if (fields.length > 1)
@@ -54,6 +56,7 @@ public class MavenVersion implements Serializable {
             incremental = Integer.parseInt(fields[2]);
         else
             incremental = 0;
+        commit = c;
     }
     
     public long getUID() {
@@ -61,12 +64,12 @@ public class MavenVersion implements Serializable {
     }
 
     public String toString() {
-        return String.format("%s => (%d, %d, %d, %s) UID=%d", 
-                version, major, minor, incremental, qualifier, getUID());
+        return String.format("MavenVersion(%d, %d, %d, %s, %s)", 
+               major, minor, incremental, qualifier, commit);
     }
 
     public String toStringVerbose() {
-        return String.format("MavenVersion(%s)=%d", version, getUID());
+        return String.format("%s => %s UID=%d", version, this.toString(), getUID());
     }
 
     public int hashCode () {

@@ -223,6 +223,8 @@ otp.locale.Turkish = {
         second_abbrev  : "san",
         seconds_abbrev : "san",
         format         : "F jS, Y @ g:ia",
+        date_format    : "d-m-Y",
+        time_format    : "H:i",
         months         : ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara']
     },
 

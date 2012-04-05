@@ -285,8 +285,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     String ele = segmentStartOSMNode.getTag("ele");
                     if (ele != null) {
-                        elevationPoints.add(
-                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
+                        Double elevation = ElevationUtils.parseEleTag(ele);
+                        if (elevation != null) {
+                            elevationPoints.add(
+                                    new ElevationPoint(distance, elevation));
+                        }
                     }
 
                     distance += DistanceLibrary.distance(
@@ -297,8 +300,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
-                            elevationPoints.add(
-                                new ElevationPoint(distance, ElevationUtils.parseEleTag(ele)));
+                            Double elevation = ElevationUtils.parseEleTag(ele);
+                            if (elevation != null) {
+                                elevationPoints.add(
+                                        new ElevationPoint(distance, elevation));
+                            }
                         }
 
                         geometry = geometryFactory.createLineString(segmentCoordinates
@@ -653,7 +659,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addWay(OSMWay way) {
+            /* only add ways once */
             if (_ways.containsKey(way.getId()))
+                return;
+            /* filter out ways that are not relevant for routing */
+            if (!(way.hasTag("highway") || way.isTag("railway", "platform")))
+                return;
+            if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed"))
+                return;
+            if (way.isTag("area", "yes"))
+                // routing on areas is not yet supported. areas can cause problems with stop linking.
+                // (24th & Mission BART plaza is both highway=pedestrian and area=yes)
                 return;
 
             _ways.put(way.getId(), way);
@@ -687,24 +703,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // the way purging keeps the needed way around.
             // Multipolygons may be processed more than once, which may be needed since
             // some member might be in different files for the same multipolygon.
+            
+            // NOTE (AMB): this purging phase may not be necessary if highway tags are not
+            // copied over from multipolygon relations. Perhaps we can get by with 
+            // only 2 steps -- ways+relations, followed by used nodes.
+            // Ways can be tag-filtered in phase 1. 
+            
             processMultipolygons();
 
             for (Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext();) {
                 OSMWay way = it.next();
-                if (!(way.hasTag("highway") || way.isTag("railway", "platform"))) {
-                    it.remove();
-                } else if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed")) {
-                    it.remove();
-                } else if (way.isTag("area", "yes")) {
-                    // routing on areas is not yet supported. areas can cause problems with stop linking.
-                    // (24th & Mission BART plaza is both highway=pedestrian and area=yes)
-                    it.remove(); 
-                } else {
-                    // Since the way is kept, update nodes-with-neighbors
-                    List<Long> nodes = way.getNodeRefs();
-                    if (nodes.size() > 1) {
-                        _nodesWithNeighbors.addAll(nodes);
-                    }
+                // Since the way is kept, update nodes-with-neighbors
+                List<Long> nodes = way.getNodeRefs();
+                if (nodes.size() > 1) {
+                    _nodesWithNeighbors.addAll(nodes);
                 }
             }
 

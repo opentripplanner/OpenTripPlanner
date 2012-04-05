@@ -21,9 +21,17 @@ import org.opentripplanner.routing.graph.Graph;
 
 public class TransitStop extends OffboardVertex {
     private static final long serialVersionUID = 1L;
+
     private boolean wheelchairEntrance;
+
     private boolean isEntrance;
-    
+
+    /**
+     * For stops that are deep underground, there is a time cost to entering and exiting the stop;
+     * all stops are assumed to be at street level unless we have configuration to the contrary
+     */
+    private int streetToStopTime = 0;
+
     /** A stop is local iff, for each of its possible transfers to another trip pattern,
      * the same transfers can be made at the previous stop or the next stop.  Once
      * one boards at a local stop, one can never board at another local stop; once 
@@ -59,5 +67,13 @@ public class TransitStop extends OffboardVertex {
             }
         }
         return false;
+    }
+
+    public int getStreetToStopTime() {
+        return streetToStopTime;
+    }
+
+    public void setStreetToStopTime(int streetToStopTime) {
+        this.streetToStopTime = streetToStopTime;
     }
 }

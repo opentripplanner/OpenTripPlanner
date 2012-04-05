@@ -22,7 +22,7 @@ otp.locale.Polish = {
     config : 
     {
         metricsSystem : "international",
-        rightClickMsg : "TODO - localize me - Right-click on the map to designate the start and end of your trip.",
+        rightClickMsg : "Kliknij prawym przyciskiem myszy i wybierz początke i koniec podróży.",
         attribution   : {
             title   : "License Attribution",
             content : "Disclaimer goes here"
@@ -32,26 +32,26 @@ otp.locale.Polish = {
     contextMenu : 
     {
         fromHere         : "Rozpocznij podróż tutaj",
-        toHere           : "Zakoñcz podróż tutaj",
-        intermediateHere : "Add intermediate point",  // TODO localize
+        toHere           : "Zakończ podróż tutaj",
+        intermediateHere : "Dodaj punkt pośredni",  // TODO localize
 
-        centerHere       : "Centruj mapê tutaj",
+        centerHere       : "Centruj mapę tutaj",
         zoomInHere       : "Przybliż tutaj",
-        zoomOutHere      : "Oddal st¹d",
+        zoomOutHere      : "Oddal stąd",
         previous         : "Poprzednia pozycja na mapie",
-        next             : "Nastêpna pozycja na mapie"
+        next             : "Następna pozycja na mapie"
     },
 
     // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
+        safeName : "Najbezpieczniejsza",
         safeSym  : "S",
 
-        hillName : "Flattest",
+        hillName : "Najbardziej płaska",
         hillSym  : "F",
 
-        timeName : "Quickest",
+        timeName : "Najszybsza",
         timeSym  : "Q"
     },
 
@@ -60,32 +60,32 @@ otp.locale.Polish = {
         weekdays:  "Dni robocze",
         saturday:  "Sobota",
         sunday:    "Niedziela",
-        schedule:  "Rozk³ad"
+        schedule:  "Rozkład"
     },
 
     indicators : 
     {
         ok         : "OK",
         date       : "Data",
-        loading    : "£adowanie",
+        loading    : "Ładowanie",
         searching  : "Szukanie...",
         qEmptyText : "Adres, skrzyżowanie, obiekt lub ID przystanku..."
     },
 
     buttons: 
     {
-        reverse       : "Odwróæ",
-        reverseTip    : "<b>Odwróæ kierunki</b><br/>Zaplanuj podróż powrotn¹ poprzez zamianê miejscami punktu startowego i koñcowego podróży i przeskok czasu do przodu.",
-        reverseMiniTip: "Odwróæ kierunki",
+        reverse       : "Odwróć",
+        reverseTip    : "<b>Odwróć kierunki</b><br/>Zaplanuj podróż powrotną poprzez zamianę miejscami punktu startowego i końcowego podróży i przeskok czasu do przodu.",
+        reverseMiniTip: "Odwróć kierunki",
 
         edit          : "Edytuj",
-        editTip       : "<b>Edytuj podróż</b><br/>Powróæ do planowania podróży z detalami tej podróży.",
+        editTip       : "<b>Edytuj podróż</b><br/>Powróć do planowania podróży z detalami tej podróży.",
 
-        clear         : "Wyczyœæ",
-        clearTip      : "<b>Wyczyœæ</b><br/>Wyczyœæ mapê i wszystkie aktywne narzêdzia.",
+        clear         : "Wyczyść",
+        clearTip      : "<b>Wyczyść</b><br/>Wyczyść mapę i wszystkie aktywne narzędzia.",
 
-        fullScreen    : "Pe³en ekran",
-        fullScreenTip : "<b>Pe³en ekran</b><br/>Pokaż lub ukryj panele narzêdzi",
+        fullScreen    : "Pełen ekran",
+        fullScreenTip : "<b>Pełen ekran</b><br/>Pokaż lub ukryj panele narzędzi",
 
         print         : "Drukuj",
         printTip      : "<b>Drukuj</b><br/>Wydrukuj plan podróży (bez mapy).",
@@ -94,10 +94,10 @@ otp.locale.Polish = {
         linkTip      : "<b>Link</b><br/>Pokaż link do tego planu podróży.",
 
         feedback      : "Opinie",
-        feedbackTip   : "<b>Opinie</b><br/>Wyœlij swoje uwagi i doœwiadczenia z narzêdzia",
+        feedbackTip   : "<b>Opinie</b><br/>Wyślij swoje uwagi i doświadczenia z narzędzia",
 
-        submit       : "Wyœlij",
-        clearButton  : "Wyczyœæ",
+        submit       : "Wyślij",
+        clearButton  : "Wyczyść",
         ok           : "OK",
         cancel       : "Anuluj",
         yes          : "Tak",
@@ -110,13 +110,13 @@ otp.locale.Polish = {
     // note: keep these lower case (and uppercase via template / code if needed)
     directions : 
     {
-        southeast:      "po³udniowy wschód",
-        southwest:      "po³udniowy zachód",
-        northeast:      "pó³nocny wschód",
-        northwest:      "pó³nocny zachód",
-        north:          "pó³noc",
+        southeast:      "południowy wschód",
+        southwest:      "południowy zachód",
+        northeast:      "północny wschód",
+        northwest:      "północny zachód",
+        north:          "północ",
         west:           "zachód",
-        south:          "po³udnie",
+        south:          "południe",
         east:           "wschód",
         bound:          "w kierunku",
         left:           "lewo",
@@ -126,62 +126,60 @@ otp.locale.Polish = {
         hard_left:      "mocno w lewo",
         hard_right:     "mocno w prawo",
         'continue':     "kontynuuj",
-        to_continue:    "kontynuowaæ",
-        becomes:        "zmienia siê w",
+        to_continue:    "kontynuować",
+        becomes:        "zmienia się w",
         at:             "o",
-// TODO
-        on:             "on",
-        to:             "to",
-        via:            "via",
-        circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise"
+        on:             "na",
+        to:             "do",
+        via:            "przez",
+        circle_counterclockwise: "okrąż rondo przeciwnie do kierunku wskazówek zegara",
+        circle_clockwise:        "okrąż rondo zgodnie ze wskazówkami zegara"
     },
 
     // see otp.planner.Templates for use ... these are used on the trip itinerary as well as forms and other places
     instructions :
     {
 // TODO
-        walk         : "Walk",
-        walk_toward  : "Walk",
-        walk_verb    : "Walk",
-        bike         : "Bike",
-        bike_toward  : "Bike",
-        bike_verb    : "Bike",
-        drive        : "Drive",
-        drive_toward : "Drive",
-        drive_verb   : "Drive",
-        move         : "Proceed",
-        move_toward  : "Proceed",
+        walk         : "Idź",
+        walk_toward  : "Idż",
+        walk_verb    : "Idź",
+        bike         : "Jedź",
+        bike_toward  : "Jedź",
+        bike_verb    : "Jedź",
+        drive        : "Jedź",
+        drive_toward : "Jedź",
+        drive_verb   : "Jedź",
+        move         : "Podążaj",
+        move_toward  : "Podążaj",
 
-        transfer     : "transfer",
-        transfers    : "transfers",
+        transfer     : "przesiadka",
+        transfers    : "przesiadek",
 
-        continue_as  : "Continues as",
-        stay_aboard  : "stay on board",
+        continue_as  : "Kontynuuje jako",
+        stay_aboard  : "pozostań w pojeździe",
 
-        depart       : "Depart",
-        arrive       : "Arrive",
+        depart       : "Odjeżdza",
+        arrive       : "Przyjeżdza",
 
-        start_at     : "Start at",
-        end_at       : "End at"
+        start_at     : "Rozpocznij",
+        end_at       : "Skończ"
     },
 
     // see otp.planner.Templates for use
     labels : 
     {
-// TODO
-        agency_msg   : "Service run by", // TODO
-        agency_msg_tt: "Open agency website in separate window...", // TODO
-        about        : "About",
-        stop_id      : "Stop ID",
-        trip_details : "Trip Details",
-        fare         : "Fare",
-        fare_symbol  : "\u20ac",
-        travel       : "Travel",
-        valid        : "Valid",
+        agency_msg   : "Linia obsługiwana przez", 
+        agency_msg_tt: "Otwórz stronę przewoźnika w nowym oknie...", 
+        about        : "Informacje",
+        stop_id      : "ID Przystanku",
+        trip_details : "Szczegóły trasy",
+        fare         : "Opłata",
+        fare_symbol  : "zł",
+        travel       : "Początek podróży",
+        valid        : "Ważny",
         trip_length  : "Czasowy",
-        with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        with_a_walk  : "wraz z dojściem",
+        alert_for_rt : "Wiadomość dla linii"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
@@ -204,24 +202,26 @@ otp.locale.Polish = {
     ordinal_exit:
     {
 // TODO
-        1:  "to first exit",
-        2:  "to second exit",
-        3:  "to third exit",
-        4:  "to fourth exit",
-        5:  "to fifth exit",
-        6:  "to sixth exit",
-        7:  "to seventh exit",
-        8:  "to eighth exit",
-        9:  "to ninth exit",
-        10: "to tenth exit"
+        1:  "do pierwszego wyjśćia",
+        2:  "do drugiego wyjśćia",
+        3:  "do trzeciego wyjśćia",
+        4:  "do czwartego wyjśćia",
+        5:  "do piątego wyjśćia",
+        6:  "do szóstego wyjśćia",
+        7:  "do siódmego wyjśćia",
+        8:  "do ósmego wyjśćia",
+        9:  "do dziewiątego wyjśćia",
+        10: "do dziesiątego wyjśćia"
     },
 
     time:
     {
 // TODO
         format        : "D, j M H:i",
-        minute        : "minute",
-        minutes       : "protokół",
+        date_format   : "d-m-Y",
+        time_format   : "H:i",
+        minute        : "minuta",
+        minutes       : "minut",
         minute_abbrev : "min",
         minutes_abbrev: "minut",
         second_abbrev : "sek",
@@ -243,26 +243,26 @@ otp.locale.Polish = {
         {
             panelTitle    : "Planer podróży",
             tabTitle      : "Zaplanuj podróż",
-            inputTitle    : "Szczegó³y podróży",
+            inputTitle    : "Szczegóły podróży",
             optTitle      : "Preferencje podróży (opcjonalne)",
-            submitMsg     : "Planuje Twoj¹ podróż...",
+            submitMsg     : "Planuje Twoją podróż...",
             optionalTitle : "",
             date          : "Data",
             time          : "Godzina",
             when          : "Kiedy",
             from          : "Z",
-            fromHere      : "Sk¹d",
+            fromHere      : "Skąd",
             to            : "Do",
-            toHere        : "Dok¹d",
+            toHere        : "Dokąd",
             intermediate  : "Intermediate Place",            // TODO
             minimize      : "Pokaż",
             maxWalkDistance: "Maksymalny spacer",
             maxBikeDistance: "Maksymalny bike",              // TODO
             arriveDepart  : "Dojazd/odjazd o",
             mode          : "Podróżuj",
-            wheelchair    : "Podróż dostêpna dla niepe³nosprawnych", 
-            go            : "IdŸ",
-            planTrip      : "Planuj swoj¹ podróż",
+            wheelchair    : "Podróż dostępna dla niepełnosprawnych", 
+            go            : "Idź",
+            planTrip      : "Planuj swoją podróż",
             newTrip       : "Nowa podróż"
         },
 
@@ -270,7 +270,7 @@ otp.locale.Polish = {
         link : 
         {
 // TODO
-            text           : "Link to this trip (OTP)",
+            text           : "Link do tej podróży (OTP)",
             trip_separator : "This trip on other transit planners",
             bike_separator : "On other bike trip planners",
             walk_separator : "On other walking direction planners",
@@ -284,32 +284,32 @@ otp.locale.Polish = {
         geocoder:
         {
 //TODO
-            working      : "Looking up address ....",
-            error        : "Did not receive any results",
-            msg_title    : "Voudrais vous review trip plan",
+            working      : "Poszukuje adresu ....",
+            error        : "Brak pasujących wyników",
+            msg_title    : "Czy chciałbyś ocenić zaproponowana podróż",
             msg_content  : "Les correct errors before planning your trip",
-            select_result_title : "Please select a result",
-            address_header : "Address"
+            select_result_title : "Wybierz adres",
+            address_header : "Adres"
         },
 
         error:
         {
-            title        : 'B³ad planera podróży',
+            title        : 'Bład planera podróży',
             deadMsg      : "Planer podróży nie odpowiada. Odczekaj kilka minut i spróbuj ponownie, lub spróbuj wersji tekstowej planera (zobacz link poniżej).",
-            geoFromMsg   : "Wybierz lokalizacjê 'Z' dla Twojej podróży: ",
-            geoToMsg     : "Wybierz lokalizacjê 'Do' dla Twojej podróży: "
+            geoFromMsg   : "Wybierz lokalizację 'Z' dla Twojej podróży: ",
+            geoToMsg     : "Wybierz lokalizację 'Do' dla Twojej podróży: "
         },
         
         // default messages from server if a message was not returned
         msgcodes:
         {
             200: "Plan OK",
-            500: "B³¹d serwera",
-            400: "Podróż poza obs³ugiwanym obszarem",
+            500: "Błąd serwera",
+            400: "Podróż poza obsługiwanym obszarem",
             404: "Trasa nieodnaleziona",
-            406: "Brak czasów w rozk³adzie",
-            408: "Limit czasu osi¹gniêty",
-            413: "Niew³aœciwy parametr",
+            406: "Brak czasów w rozkładzie",
+            408: "Limit czasu osiągnięty",
+            413: "Niewłaściwy parametr",
             440: "Geokod Z nieodnaleziony",
             450: "Geokod Do nieodnaleziony",
             460: "Geokody Z i Do nieodnalezione",
@@ -321,10 +321,10 @@ otp.locale.Polish = {
 
         options: 
         [
-          ['TRANSFERS', 'Ma³o przesiadek'],
+          ['TRANSFERS', 'Mało przesiadek'],
           ['QUICK',     'Najszybsza podróż'],
           ['SAFE',      'Najbezpieczniejsza podróż'],
-          ['TRIANGLE',  'Custom trip...']  // TODO localize
+          ['TRIANGLE',  'Mieszane preferencje...']  // TODO localize
         ],
     
         arriveDepart: 

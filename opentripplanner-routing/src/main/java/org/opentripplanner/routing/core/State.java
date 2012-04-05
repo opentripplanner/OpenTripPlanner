@@ -146,6 +146,7 @@ public class State implements Cloneable {
                 " b=" + this.getNumBoardings();
     }
     
+    /** Returns time in seconds since epoch */
     public long getTime() {
         return this.time;
     }

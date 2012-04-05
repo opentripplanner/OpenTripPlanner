@@ -118,6 +118,19 @@
                     <ignore />
                   </action>
                 </pluginExecution>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <versionRange>[1.0,)</versionRange>
+                    <goals>
+                      <goal>revision</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <execute />
+                  </action>
+                </pluginExecution>
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
@@ -163,7 +176,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <links>
-            <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.4/</link>
+            <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.2.6/</link>
           </links>
         </configuration>
         <reportSets>
@@ -277,9 +290,7 @@
     <dependency>
       <groupId>org.onebusaway</groupId>
       <artifactId>onebusaway-gtfs</artifactId>
-      <version>1.2.4</version>
-      <type>jar</type>
-      <scope>compile</scope>
+      <version>1.2.6</version>
     </dependency>
   </dependencies>
 

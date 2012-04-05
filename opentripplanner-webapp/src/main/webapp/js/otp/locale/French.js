@@ -202,6 +202,8 @@ otp.locale.French = {
 
     time : {
         format : "d.m.Y \\à H:i",
+        date_format : "d-m-Y",
+        time_format : "H:i",
         minute : "minute",
         minutes : "minutes",
         minute_abbrev : "min",

@@ -78,9 +78,10 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
             tmp.setLon(parseLon(i.getLon()));
 
             for (int j = 0; j < i.getKeysCount(); j++) {
-                OSMTag tag = new OSMTag();
                 String key = getStringById(i.getKeys(j)).intern();
+                // if _handler.retain_tag(key) // TODO: filter tags
                 String value = getStringById(i.getVals(j)).intern();
+                OSMTag tag = new OSMTag();
                 tag.setK(key);
                 tag.setV(value);
                 tmp.addTag(tag);

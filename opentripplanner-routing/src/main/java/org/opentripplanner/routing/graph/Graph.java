@@ -58,7 +58,7 @@ public class Graph implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    private final MavenVersion otpVersion = MavenVersion.VERSION;
+    private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
     
@@ -134,20 +134,6 @@ public class Graph implements Serializable {
     public boolean containsVertex(Vertex v) {
         return (v != null) &&
                 vertices.get(v.getLabel()) == v;
-    }
-
-    public Vertex nearestVertex(float lat, float lon) {
-        double minDist = Float.MAX_VALUE;
-        Vertex ret = null;
-        Coordinate c = new Coordinate(lon, lat);
-        for (Vertex vv : getVertices()) {
-            double dist = vv.distance(c);
-            if (dist < minDist) {
-                ret = vv;
-                minDist = dist;
-            }
-        }
-        return ret;
     }
 
     @SuppressWarnings("unchecked")
@@ -312,6 +298,8 @@ public class Graph implements Serializable {
         try {
             Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info and annotations read.");
+            if (graph.graphVersionMismatch())
+                throw new RuntimeException("Graph version mismatch detected.");
             if (level == LoadLevel.BASIC)
                 return graph;
             // vertex edge lists are transient to avoid excessive recursion depth
@@ -344,7 +332,40 @@ public class Graph implements Serializable {
             throw new IllegalStateException("Stored Graph version error", ex);
         }
     }
-    
+
+    /**
+     * Compares the OTP version number stored in the graph with that of the currently running 
+     * instance. Logs warnings explaining that mismatched versions can cause problems.
+     * @return false if Maven versions match (even if commit ids do not match),
+     * true if Maven version of graph does not match this version of OTP or graphs are otherwise
+     * obviously incompatible.
+     */
+    private boolean graphVersionMismatch() {
+        MavenVersion v = MavenVersion.VERSION;
+        MavenVersion gv = this.mavenVersion;
+        LOG.info("Graph version: {}", gv);
+        LOG.info("OTP version:   {}", v);
+        if ( ! v.equals(gv)) {
+            LOG.error("This graph was built with a different version of OTP. Please rebuild it.");
+            return true; // do not allow graph use
+        } else if ( ! v.commit.equals(gv.commit)) {
+            if (v.qualifier.equals("SNAPSHOT")) {
+                LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a " +
+                         "different commit. Please rebuild the graph if you experience incorrect " +
+                         "behavior. ");
+                return false; // graph might still work
+            } else { 
+                LOG.error("Commit mismatch in non-SNAPSHOT version. This implies a problem with " +
+            		 "the build or release process.");
+                return true; // major problem
+            }
+        } else {
+            // no version mismatch, no commit mismatch
+            LOG.info("This graph was built with the currently running version and commit of OTP.");
+            return false;
+        }
+    }
+
     public void save(File file) throws IOException {
         if (!file.getParentFile().exists())
             if (!file.getParentFile().mkdirs())
