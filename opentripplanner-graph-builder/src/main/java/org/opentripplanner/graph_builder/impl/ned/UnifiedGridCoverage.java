@@ -17,10 +17,13 @@ import java.util.ArrayList;
 
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
+import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.DirectPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,13 +59,18 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     public double[] evaluate(DirectPosition point, double[] values)
             throws PointOutsideCoverageException, CannotEvaluateException {
         for (Coverage region : regions) {
-            double[] result;
-            try {
-                result = region.evaluate(point, values);
-            } catch (PointOutsideCoverageException e) {
-                continue;
+            // GeneralEnvelope has a contains method, OpenGIS Envelope does not
+            GeneralEnvelope env = ((GeneralEnvelope)region.getEnvelope());
+            // avoid incurring exception construction overhead when there are many regions
+            if (env.contains(point)) {
+                double[] result;
+                try {
+                    result = region.evaluate(point, values);
+                } catch (PointOutsideCoverageException e) {
+                    continue;
+                }
+                return result;
             }
-            return result;
         }
         /* not found */
         log.warn("Point not found: " + point);

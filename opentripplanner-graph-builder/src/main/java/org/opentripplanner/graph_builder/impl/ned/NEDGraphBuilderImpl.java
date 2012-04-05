@@ -94,6 +94,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
 
         List<EdgeWithElevation> edgesWithElevation = new ArrayList<EdgeWithElevation>();
+        int nProcessed = 0;
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof EdgeWithElevation) {
@@ -102,6 +103,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null) {
                         edgesWithElevation.add(edgeWithElevation);
+                        nProcessed += 1;
+                        if (nProcessed % 50000 == 0)
+                            log.info("set elevation on {} edges", nProcessed);
                     }
                 }
             }
@@ -279,6 +283,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
                     if(edge.setElevationProfile(profile, true)) {
                         log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                        
                     }
                 }
             }
