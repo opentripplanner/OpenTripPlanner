@@ -120,7 +120,7 @@ otp.planner.GeocoderStatic = {
         var errorNode = Ext.DomQuery.selectNode("error", xml);
         if (errorNode) {
             console.log("GEOCODE ERROR: " + errorNode.firstChild.nodeValue);
-            this.form.setErrorMessage(comboBoxIdentifier);
+            this.form.setFormErrorMessage(comboBoxIdentifier);
             return;
         }
 
@@ -130,7 +130,7 @@ otp.planner.GeocoderStatic = {
         // step 3: error process condition where we have an
         if (!countNode) {
             console.log("GEOCODE ERROR: can't seem to parse the retured XML")
-            this.form.setErrorMessage(comboBoxIdentifier);
+            this.form.setFormErrorMessage(comboBoxIdentifier);
             return;
         }
 
@@ -139,7 +139,7 @@ otp.planner.GeocoderStatic = {
         if (isNaN(count) || count < 1)
         {
             console.log("GEOCODE ERROR: got ZERO geocodes back in the return");
-            this.form.setErrorMessage(comboBoxIdentifier);
+            this.form.setFormErrorMessage(comboBoxIdentifier);
             return;
         }
 

@@ -91,7 +91,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
     public static final double MAX_DISTANCE_FROM_STREET = 0.01000;
 
     // maximum difference in distance for two geometries to be considered coincident
-    public static final double DISTANCE_ERROR = 0.00001;
+    public static final double DISTANCE_ERROR = 0.000001;
 
     //if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
     private static final double MAX_CORNER_DISTANCE = 0.0001;

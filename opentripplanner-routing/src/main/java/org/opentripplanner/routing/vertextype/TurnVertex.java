@@ -20,6 +20,7 @@ import java.util.Set;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -27,6 +28,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -38,6 +41,8 @@ import com.vividsolutions.jts.geom.LineString;
 public class TurnVertex extends StreetVertex {
 
     private static final long serialVersionUID = -385126804908021091L;
+
+    private static final Logger LOG = LoggerFactory.getLogger(TurnVertex.class);
 
     /**
      * This declares that greenways are streets that are more than 10x as safe as ordinary streets.
@@ -159,6 +164,10 @@ public class TurnVertex extends StreetVertex {
 
         // compute the various costs of the elevation changes
         double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
+        if (Double.isNaN(lengthMultiplier)) {
+            LOG.error("lengthMultiplier from elevation profile is NaN, setting to 1");
+            lengthMultiplier = 1;
+        }
         length *= lengthMultiplier;
         bicycleSafetyEffectiveLength *= lengthMultiplier;
 

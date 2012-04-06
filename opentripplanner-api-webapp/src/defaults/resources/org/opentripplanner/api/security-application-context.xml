@@ -10,6 +10,21 @@
 	<security:global-method-security
 		secured-annotations="enabled" jsr250-annotations="enabled" />
 
+<!-- This is the simple basic auth configuration.   
+   <security:http>
+        <security:http-basic></security:http-basic>
+        <security:intercept-url method="POST" pattern="/**" access="ROLE_USER" />
+    </security:http>
+
+	<security:authentication-manager  alias="authenticationManager">
+    	<security:authentication-provider>
+        	<security:user-service>
+	            <security:user name="admin" password="{password}" authorities="ROLE_USER" />
+        	</security:user-service>
+    	</security:authentication-provider>
+	</security:authentication-manager>
+	-->
+
 	<security:http entry-point-ref="wsseAuthenticationEntryPoint">
 		<security:intercept-url pattern="/ws/patch*"
 			access="ROLE_USER" />
