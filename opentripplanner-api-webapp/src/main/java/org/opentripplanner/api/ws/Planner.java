@@ -12,13 +12,9 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.ws;
 
-import java.util.List;
-
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -26,8 +22,6 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -39,9 +33,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
 
-// NOTE - /ws/plan is the full path -- see web.xml
-
-@Path("/plan")
+@Path("/plan") // NOTE - /ws/plan is the full path -- see web.xml
 @XmlRootElement
 @Autowire
 public class Planner extends SearchResource {
@@ -91,7 +83,7 @@ public class Planner extends SearchResource {
             return response;
         }
 
-        /* use request to generate trip */
+        /* generate trip plan from request, and return it in a response */
         try {
             PlanGenerator generator = new PlanGenerator(request, pathServiceFactory);
             TripPlan plan = generator.generate();
