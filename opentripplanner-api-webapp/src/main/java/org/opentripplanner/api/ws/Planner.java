@@ -43,7 +43,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Path("/plan")
 @XmlRootElement
 @Autowire
-public class Planner {
+public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
@@ -64,92 +64,6 @@ public class Planner {
      * Some parameters may not be honored by the trip planner for some or all itineraries. For
      * example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
      * 
-     * @param fromPlace
-     *            The start location -- either latitude, longitude pair in degrees or a Vertex
-     *            label. For example, <code>40.714476,-74.005966</code> or
-     *            <code>mtanyctsubway_A27_S</code>.
-     * 
-     * @param toPlace
-     *            The end location (see fromPlace for format).
-     * 
-     * @param intermediatePlaces
-     *            An unordered list of intermediate locations to be visited (see the fromPlace for
-     *            format).
-     * 
-     * @param date
-     *            The date that the trip should depart (or arrive, for requests where arriveBy is
-     *            true).
-     * 
-     * @param time
-     *            The time that the trip should depart (or arrive, for requests where arriveBy is
-     *            true).
-     * 
-     * @param routerId
-     *            Router ID used when in multiple graph mode. Unused in singleton graph mode.
-     * 
-     * @param arriveBy
-     *            Whether the trip should depart or arrive at the specified date and time.
-     * 
-     * @param wheelchair
-     *            Whether the trip must be wheelchair accessible.
-     * 
-     * @param maxWalkDistance
-     *            The maximum distance (in meters) the user is willing to walk. Defaults to
-     *            approximately 1/2 mile.
-     * 
-     * @param walkSpeed
-     *            The user's walking speed in meters/second. Defaults to approximately 3 MPH.
-     *
-     * @param triangleSafetyFactor
-     *            For bike triangle routing, how much safety matters (range 0-1).
-     *
-     * @param triangleSlopeFactor
-     *            For bike triangle routing, how much slope matters (range 0-1).
-     *
-     * @param triangleTimeFactor
-     *            For bike triangle routing, how much time matters (range 0-1).            
-     * 
-     * @param optimize
-     *            The set of characteristics that the user wants to optimize for. @See OptimizeType
-     * 
-     * @param modes
-     *            The set of modes that a user is willing to use.
-     * 
-     * @param numItineraries
-     *            The maximum number of possible itineraries to return.
-     *            
-     * @param preferredRoutes
-     *            The list of preferred routes.  The format is agency_route, so TriMet_100.
-     * 
-     * @param unpreferredRoutes
-     *            The list of unpreferred routes.  The format is agency_route, so TriMet_100.
-     * 
-     * @param bannedRoutes
-     *            The list of banned routes.  The format is agency_route, so TriMet_100.
-     * 
-     * @param minTransferTime
-     *            The minimum time, in seconds, between successive trips on different vehicles.
-     *            This is designed to allow for imperfect schedule adherence.  This is a minimum;
-     *            transfers over longer distances might use a longer time.
-     * 
-     * @param showIntermediateStops
-     *             Whether intermediate stops -- those that the itinerary passes in a vehicle, but 
-     *             does not board or alight at -- should be returned in the response.  For example,
-     *             on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and 
-     *             Atlantic Avenue should be included.
-     * 
-     * @param transferPenalty
-     *             An additional penalty added to boardings after the first.  The value is in OTP's
-     *             internal weight units, which are roughly equivalent to seconds.  Set this to a high
-     *             value to discourage transfers.  Of course, transfers that save significant
-     *             time or walking will still be taken.
-     * 
-     * @param maxTransfers
-     *          The maximum number of transfers (that is, one plus the maximum number of boardings)
-     *          that a trip will be allowed.  Larger values will slow performance, but could give
-     *          better routes.  This is limited on the server side by the MAX_TRANSFERS value in 
-     *          org.opentripplanner.api.ws.Planner.
-     * 
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
      * 
@@ -157,39 +71,13 @@ public class Planner {
      */
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getItineraries(
-            @QueryParam(RequestInf.FROM) String fromPlace,
-            @QueryParam(RequestInf.TO) String toPlace,
-            @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces,
-            @DefaultValue("false") @QueryParam(RequestInf.INTERMEDIATE_PLACES_ORDERED) Boolean intermediatePlacesOrdered,
-            @QueryParam(RequestInf.DATE) String date,
-            @QueryParam(RequestInf.TIME) String time,
-            @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId,
-            @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy,
-            @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair,
-            @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance,
-            @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed,
-            @QueryParam(RequestInf.TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor,
-            @QueryParam(RequestInf.TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor,
-            @QueryParam(RequestInf.TRIANGLE_TIME_FACTOR) Double triangleTimeFactor,
-            @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize,
-            @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes,
-            @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime,
-            @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries,
-            @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops,
-            @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes,
-            @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes,
-            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes,
-            @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty,
-            @DefaultValue("2") @QueryParam(RequestInf.MAX_TRANSFERS) Integer maxTransfers)
-            throws JSONException {
+    public Response getItineraries() throws JSONException {
 
         // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-
         // TODO: test inputs, and prepare an error if we can't use said input.
         // TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
         // / vertext ids to planner (or error back to user)
-        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstrct that
+        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
         // out so it's used here too...
 
         /* create request */
