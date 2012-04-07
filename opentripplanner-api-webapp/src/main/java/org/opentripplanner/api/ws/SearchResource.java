@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 
+import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.springframework.context.annotation.Scope;
@@ -107,8 +108,11 @@ public abstract class SearchResource {
     private static final int MAX_ITINERARIES = 3;
     private static final int MAX_TRANSFERS = 4;
 
-    /** Range/sanity check the query parameter fields and build a Request object from them. */
-    protected Request buildRequestFromQueryParamFields() {
+    /** 
+     * Range/sanity check the query parameter fields and build a Request object from them. 
+     * @throws ParameterException 
+     */
+    protected Request buildRequestFromQueryParamFields() throws ParameterException {
         Request request = new Request();
         request.setRouterId(routerId);
         request.setFrom(fromPlace);
@@ -132,23 +136,23 @@ public abstract class SearchResource {
         }
         if (triangleSafetyFactor != null || triangleSlopeFactor != null || triangleTimeFactor != null) {
             if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-                return error(request, Message.UNDERSPECIFIED_TRIANGLE);
+                throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
             }
             if (optimize == null) {
                 optimize = OptimizeType.TRIANGLE;
             }
             if (optimize != OptimizeType.TRIANGLE) {
-                return error(request, Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET);
+                throw new ParameterException(Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET);
             }
             if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-                return error(request, Message.TRIANGLE_NOT_AFFINE);
+                throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
             }
             
             request.setTriangleSafetyFactor(triangleSafetyFactor);
             request.setTriangleSlopeFactor(triangleSlopeFactor);
             request.setTriangleTimeFactor(triangleTimeFactor);
         } else if (optimize == OptimizeType.TRIANGLE) {
-            return error(request, Message.TRIANGLE_VALUES_NOT_SET);
+            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
         }
         if (arriveBy != null && arriveBy) {
             request.setArriveBy(true);

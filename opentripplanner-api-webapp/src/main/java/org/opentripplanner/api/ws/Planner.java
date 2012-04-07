@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -78,8 +79,22 @@ public class Planner extends SearchResource {
         // out so it's used here too...
 
         /* create request */
-        Request request = buildRequestFromQueryParamFields();
+        Request request;
+        try {
+            request = buildRequestFromQueryParamFields();
+        } catch (ParameterException pe) {
+            Response response = new Response();
+            PlannerError error = new PlannerError(pe.message);
+            response.setError(error);
+            return response;
+        }
 
+
+// alternatively:
+//        if (request.getError() != null) {
+//            
+//        }
+        
         /* use request to generate trip */
         Response response = new Response(request);
         try {
