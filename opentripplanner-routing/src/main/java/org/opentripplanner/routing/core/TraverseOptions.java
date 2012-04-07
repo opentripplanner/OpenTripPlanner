@@ -25,6 +25,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
@@ -35,9 +36,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TraverseOptions implements Cloneable, Serializable {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
 
     /** max speed along streets, in meters per second */
     public double speed;
@@ -484,7 +485,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
-            _log.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
+            LOG.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
             return;
         }
         // This should be a valid way to find yesterday and tomorrow,
