@@ -21,9 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 
-/**
- *
- */
+/** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 @XmlRootElement
 public class Response {
 
