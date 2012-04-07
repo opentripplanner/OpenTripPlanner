@@ -2,8 +2,10 @@ package org.opentripplanner.api.ws;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 
 import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -103,7 +105,9 @@ public abstract class SearchResource {
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
      *  org.opentripplanner.api.ws.Planner. */
     @DefaultValue("2") @QueryParam(RequestInf.MAX_TRANSFERS) Integer maxTransfers;
- 
+
+    /** Inject the servlet request so we have access to the query parameter map */
+    @Context HttpServletRequest httpServletRequest;
     
     private static final int MAX_ITINERARIES = 3;
     private static final int MAX_TRANSFERS = 4;

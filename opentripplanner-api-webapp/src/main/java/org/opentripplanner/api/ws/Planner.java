@@ -78,25 +78,20 @@ public class Planner extends SearchResource {
         // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
         // out so it's used here too...
 
+        /* create response object, containing a copy of all request parameters */
+        Response response = new Response(httpServletRequest);
+
         /* create request */
         Request request;
         try {
             request = buildRequestFromQueryParamFields();
         } catch (ParameterException pe) {
-            Response response = new Response();
             PlannerError error = new PlannerError(pe.message);
             response.setError(error);
             return response;
         }
 
-
-// alternatively:
-//        if (request.getError() != null) {
-//            
-//        }
-        
         /* use request to generate trip */
-        Response response = new Response(request);
         try {
             PlanGenerator generator = new PlanGenerator(request, pathServiceFactory);
             TripPlan plan = generator.generate();
@@ -127,12 +122,4 @@ public class Planner extends SearchResource {
         return response;
     }
 
-    private Response error(Request request, Message message) {
-        PlannerError error = new PlannerError(message);
-        Response response = new Response(request);
-        response.setError(error);
-        return response;
-    }
-
-    
 }
