@@ -53,7 +53,7 @@ public class Metadata {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public GraphMetadata getMetadata(
-            @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId)
+            @DefaultValue("") @QueryParam(SearchResource.ROUTER_ID) String routerId)
             throws JSONException {
         return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
     }

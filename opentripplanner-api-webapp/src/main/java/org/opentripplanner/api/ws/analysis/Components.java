@@ -29,6 +29,7 @@ import org.opentripplanner.analysis.AnalysisUtils;
 import org.opentripplanner.api.model.analysis.GraphComponent;
 import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
 import org.opentripplanner.api.ws.RequestInf;
+import org.opentripplanner.api.ws.SearchResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -82,8 +83,8 @@ public class Components {
     @Produces({ MediaType.APPLICATION_JSON })
     public GraphComponentPolygons getComponentPolygons(
             @DefaultValue("TRANSIT,WALK") @QueryParam("modes") TraverseModeSet modes,
-            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time,
-            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes) {
+            @QueryParam(SearchResource.DATE) String date, @QueryParam(SearchResource.TIME) String time,
+            @DefaultValue("") @QueryParam(SearchResource.BANNED_ROUTES) String bannedRoutes) {
 
         TraverseOptions options = new TraverseOptions(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();

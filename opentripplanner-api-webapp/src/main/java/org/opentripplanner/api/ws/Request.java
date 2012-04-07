@@ -32,9 +32,14 @@ import org.slf4j.LoggerFactory;
  * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
  * route.
  */
-public class Request implements RequestInf {
+public class Request {
 
     private static final Logger LOG = LoggerFactory.getLogger(Request.class);
+    
+    /** 
+     * The complete list of incoming query parameters.
+     */
+    private final HashMap<String, String> parameters = new HashMap<String, String>();
 
     /**
      * The router ID -- internal ID to switch between router implementation (or graphs)
@@ -112,10 +117,6 @@ public class Request implements RequestInf {
      */
     private String[] unpreferredRoutes;
     
-    /** 
-     * The complete list of parameters.
-     */
-    private final HashMap<String, String> parameters = new HashMap<String, String>();
     private Integer minTransferTime;
     private String[] bannedRoutes;
     private Integer transferPenalty;
@@ -135,12 +136,6 @@ public class Request implements RequestInf {
         return parameters;
     }
 
-    /** add stuff to the inputs array */
-    private void paramPush(String param, Object o) {
-        if (o != null)
-            parameters.put(param, o.toString());
-    }
-
     /**
      * @return router ID
      */
@@ -153,7 +148,6 @@ public class Request implements RequestInf {
      *            the router ID, used to switch between router instances.
      */
     public void setRouterId(String routerId) {
-        paramPush(ROUTER_ID, routerId);
         this.routerId = routerId;
     }
 
@@ -168,8 +162,8 @@ public class Request implements RequestInf {
      * @param from
      *            the from to set
      */
+    // TODO factor out splitting code which appears in 3 places
     public void setFrom(String from) {
-        paramPush(FROM, from);
         if (from.contains("::")) {
             String[] parts = from.split("::");
             this.fromName = parts[0];
@@ -191,7 +185,6 @@ public class Request implements RequestInf {
      *            the to to set
      */
     public void setTo(String to) {
-        paramPush(TO, to);
         if (to.contains("::")) {
             String[] parts = to.split("::");
             this.toName = parts[0];
@@ -213,7 +206,6 @@ public class Request implements RequestInf {
      *            the (soft) maximum walk distance to set
      */
     public void setMaxWalkDistance(Double walk) {
-        paramPush(MAX_WALK_DISTANCE, walk);
         this.maxWalkDistance = walk;
     }
 
@@ -225,6 +217,7 @@ public class Request implements RequestInf {
     }
 
     /** */
+    // TODO move this into TraverseModeSet
     public String getModesAsStr() {
         String retVal = null;
         for (TraverseMode m : modes.getModes()) {
@@ -244,7 +237,6 @@ public class Request implements RequestInf {
      */
     public void addMode(TraverseMode mode) {
         modes.setMode(mode, true);
-        paramPush(MODE, modes);
     }
 
     /** */
@@ -252,7 +244,6 @@ public class Request implements RequestInf {
         for (TraverseMode m : mList) {
             addMode(m);
         }
-        paramPush(MODE, modes);
     }
 
     /**
@@ -268,7 +259,6 @@ public class Request implements RequestInf {
      */
     public void setOptimize(OptimizeType opt) {
         optimize = opt;
-        paramPush(OPTIMIZE, optimize);
     }
 
     /**
@@ -291,8 +281,6 @@ public class Request implements RequestInf {
      *            the dateTime to set
      */
     public void setDateTime(String date, String time) {
-        paramPush(DATE, date);
-        paramPush(TIME, time);
         dateTime = DateUtils.toDate(date, time);
         LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
         LOG.debug("Request datetime parsed as {}", dateTime);
@@ -306,7 +294,6 @@ public class Request implements RequestInf {
     }
 
     public void setArriveBy(boolean arriveBy) {
-        paramPush(ARRIVE_BY, arriveBy);
         this.arriveBy = arriveBy;
     }
 
@@ -324,17 +311,18 @@ public class Request implements RequestInf {
     public void setNumItineraries(Integer numItineraries) {
         if (numItineraries < 1 || numItineraries > 10)
             numItineraries = 3;
-        paramPush(NUMBER_ITINERARIES, numItineraries);
         this.numItineraries = numItineraries;
     }
 
     /** */
     public String toHtmlString() {
+        // What?
         return toString("<br/>");
     }
 
     /** */
     public String toString() {
+        // What?
         return toString(" ");
     }
 
@@ -344,27 +332,23 @@ public class Request implements RequestInf {
                 + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
                 + getNumItineraries();
     }
-
+    
     public TraverseModeSet getModeSet() {
         return modes;
     }
 
-    @Override
     public void removeMode(TraverseMode mode) {
         modes.setMode(mode, false);
-        paramPush(MODE, modes);
     }
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
-        paramPush(MODE, modes);
 
     }
 
     /** Set whether the trip must be wheelchair accessible */
     public void setWheelchair(boolean wheelchair) {
         this.wheelchair = wheelchair;
-        paramPush(WHEELCHAIR, wheelchair);
     }
 
     /** return whether the trip must be wheelchair accessible */
@@ -416,7 +400,6 @@ public class Request implements RequestInf {
      */
     public void setShowIntermediateStops(boolean showIntermediateStops) {
         this.showIntermediateStops = showIntermediateStops;
-        paramPush(SHOW_INTERMEDIATE_STOPS, showIntermediateStops);
     }
 
     /** 
@@ -498,12 +481,10 @@ public class Request implements RequestInf {
         return triangleTimeFactor;
     }
 
-    @Override
     public void setMaxTransfers(Integer maxTransfers) {
         this.maxTransfers = maxTransfers;
     }
 
-    @Override
     public Integer getMaxTransfers() {
         return maxTransfers;
     }
@@ -512,7 +493,6 @@ public class Request implements RequestInf {
         this.intermediatePlacesOrdered = intermediatePlacesOrdered;
     }
 
-    @Override
     public boolean isIntermediatePlacesOrdered() {
         return intermediatePlacesOrdered;
     }

@@ -22,95 +22,124 @@ import org.springframework.context.annotation.Scope;
 @Scope("request")
 public abstract class SearchResource {
 
+    public static final String ROUTER_ID = "routerId";
+    public static final String FROM = "fromPlace";
+    public static final String TO = "toPlace";
+    public static final String INTERMEDIATE_PLACES = "intermediatePlaces";
+    public static final String DATE = "date";
+    public static final String TIME = "time";
+
+    public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
+    public static final String OPTIMIZE = "optimize";
+    public static final String MODE = "mode";
+    public static final String NUMBER_ITINERARIES = "numItineraries";
+    public static final String SHOW_INTERMEDIATE_STOPS = "showIntermediateStops";
+
+    public static final String PREFERRED_ROUTES = "preferredRoutes";
+    public static final String UNPREFERRED_ROUTES = "unpreferredRoutes";
+    public static final String BANNED_ROUTES = "bannedRoutes";
+    
+    public static final String ARRIVE_BY = "arriveBy";
+    public static final String WALK_SPEED = "walkSpeed";
+    public static final String WHEELCHAIR = "wheelchair";
+    public static final String MIN_TRANSFER_TIME = "minTransferTime";
+    public static final String TRIANGLE_TIME_FACTOR = "triangleTimeFactor";
+    public static final String TRIANGLE_SAFETY_FACTOR = "triangleSafetyFactor";
+    public static final String TRIANGLE_SLOPE_FACTOR = "triangleSlopeFactor";
+    public static final String TRANSFER_PENALTY = "transferPenalty";
+    public static final String LANGUAGE = "lang";
+    public static final String MAX_TRANSFERS = "maxTransfers";
+    public static final String INTERMEDIATE_PLACES_ORDERED = "intermediatePlacesOrdered";
+
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
      *  <code>mtanyctsubway_A27_S</code>.  */
-    @QueryParam(RequestInf.FROM) String fromPlace;
+    @QueryParam(FROM) String fromPlace;
 
     /** The end location (see fromPlace for format). */
-    @QueryParam(RequestInf.TO) String toPlace;
+    @QueryParam(TO) String toPlace;
 
     /** An unordered list of intermediate locations to be visited (see the fromPlace for format). */
-    @QueryParam(RequestInf.INTERMEDIATE_PLACES) List<String> intermediatePlaces;
+    @QueryParam(INTERMEDIATE_PLACES) List<String> intermediatePlaces;
     
-    @DefaultValue("false") @QueryParam(RequestInf.INTERMEDIATE_PLACES_ORDERED) Boolean intermediatePlacesOrdered;
+    @DefaultValue("false") @QueryParam(INTERMEDIATE_PLACES_ORDERED) Boolean intermediatePlacesOrdered;
     
     /** The date that the trip should depart (or arrive, for requests where arriveBy is true). */
-    @QueryParam(RequestInf.DATE) String date;
+    @QueryParam(DATE) String date;
     
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
-    @QueryParam(RequestInf.TIME) String time;
+    @QueryParam(TIME) String time;
     
     /** Router ID used when in multiple graph mode. Unused in singleton graph mode. */
-    @DefaultValue("") @QueryParam(RequestInf.ROUTER_ID) String routerId;
+    @DefaultValue("") @QueryParam(ROUTER_ID) String routerId;
     
     /** Whether the trip should depart or arrive at the specified date and time. */
-    @DefaultValue("false") @QueryParam(RequestInf.ARRIVE_BY) Boolean arriveBy;
+    @DefaultValue("false") @QueryParam(ARRIVE_BY) Boolean arriveBy;
     
     /** Whether the trip must be wheelchair accessible. */
-    @DefaultValue("false") @QueryParam(RequestInf.WHEELCHAIR) Boolean wheelchair;
+    @DefaultValue("false") @QueryParam(WHEELCHAIR) Boolean wheelchair;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to approximately 1/2 mile. */
-    @DefaultValue("800") @QueryParam(RequestInf.MAX_WALK_DISTANCE) Double maxWalkDistance;
+    @DefaultValue("800") @QueryParam(MAX_WALK_DISTANCE) Double maxWalkDistance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
-    @QueryParam(RequestInf.WALK_SPEED) Double walkSpeed;
+    @QueryParam(WALK_SPEED) Double walkSpeed;
 
     /** For bike triangle routing, how much safety matters (range 0-1). */
-    @QueryParam(RequestInf.TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor;
+    @QueryParam(TRIANGLE_SAFETY_FACTOR) Double triangleSafetyFactor;
     
     /** For bike triangle routing, how much slope matters (range 0-1). */
-    @QueryParam(RequestInf.TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor;
+    @QueryParam(TRIANGLE_SLOPE_FACTOR) Double triangleSlopeFactor;
     
     /** For bike triangle routing, how much time matters (range 0-1). */            
-    @QueryParam(RequestInf.TRIANGLE_TIME_FACTOR) Double triangleTimeFactor;
+    @QueryParam(TRIANGLE_TIME_FACTOR) Double triangleTimeFactor;
 
     /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
-    @DefaultValue("QUICK") @QueryParam(RequestInf.OPTIMIZE) OptimizeType optimize;
+    @DefaultValue("QUICK") @QueryParam(OPTIMIZE) OptimizeType optimize;
     
     /** The set of modes that a user is willing to use. */
-    @DefaultValue("TRANSIT,WALK") @QueryParam(RequestInf.MODE) TraverseModeSet modes;
+    @DefaultValue("TRANSIT,WALK") @QueryParam(MODE) TraverseModeSet modes;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
-    @DefaultValue("240") @QueryParam(RequestInf.MIN_TRANSFER_TIME) Integer minTransferTime;
+    @DefaultValue("240") @QueryParam(MIN_TRANSFER_TIME) Integer minTransferTime;
 
     /** The maximum number of possible itineraries to return. */
-    @DefaultValue("3") @QueryParam(RequestInf.NUMBER_ITINERARIES) Integer numItineraries;
+    @DefaultValue("3") @QueryParam(NUMBER_ITINERARIES) Integer numItineraries;
 
     /** The list of preferred routes.  The format is agency_route, so TriMet_100. */
-    @DefaultValue("") @QueryParam(RequestInf.PREFERRED_ROUTES) String preferredRoutes;
+    @DefaultValue("") @QueryParam(PREFERRED_ROUTES) String preferredRoutes;
     
     /** The list of unpreferred routes.  The format is agency_route, so TriMet_100. */
-    @DefaultValue("") @QueryParam(RequestInf.UNPREFERRED_ROUTES) String unpreferredRoutes;
+    @DefaultValue("") @QueryParam(UNPREFERRED_ROUTES) String unpreferredRoutes;
 
     /** Whether intermediate stops -- those that the itinerary passes in a vehicle, but 
      *  does not board or alight at -- should be returned in the response.  For example,
      *  on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and
      *  Atlantic Avenue should be included. */
-    @DefaultValue("false") @QueryParam(RequestInf.SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops;
+    @DefaultValue("false") @QueryParam(SHOW_INTERMEDIATE_STOPS) Boolean showIntermediateStops;
 
     /** The list of banned routes.  The format is agency_route, so TriMet_100. */
-    @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes;
+    @DefaultValue("") @QueryParam(BANNED_ROUTES) String bannedRoutes;
 
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
      *  value to discourage transfers.  Of course, transfers that save significant
      *  time or walking will still be taken.*/
-    @DefaultValue("0") @QueryParam(RequestInf.TRANSFER_PENALTY) Integer transferPenalty;
+    @DefaultValue("0") @QueryParam(TRANSFER_PENALTY) Integer transferPenalty;
     
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
      *  org.opentripplanner.api.ws.Planner. */
-    @DefaultValue("2") @QueryParam(RequestInf.MAX_TRANSFERS) Integer maxTransfers;
+    @DefaultValue("2") @QueryParam(MAX_TRANSFERS) Integer maxTransfers;
 
     /** Inject the servlet request so we have access to the query parameter map */
     @Context HttpServletRequest httpServletRequest;
     
-    private static final int MAX_ITINERARIES = 3;
-    private static final int MAX_TRANSFERS = 4;
+    private static final int CLAMP_ITINERARIES = 3;
+    private static final int CLAMP_TRANSFERS = 4;
 
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
@@ -124,9 +153,10 @@ public abstract class SearchResource {
         request.setDateTime(date, time);
         request.setWheelchair(wheelchair);
         if (numItineraries != null) {
-            if (numItineraries > MAX_ITINERARIES) {
-                numItineraries = MAX_ITINERARIES;
+            if (numItineraries > CLAMP_ITINERARIES) {
+                numItineraries = CLAMP_ITINERARIES;
             }
+            // TODO: ELIMINATE SIDE EFFECTS
             if (numItineraries < 1) {
                 numItineraries = 1;
             }
@@ -195,8 +225,8 @@ public abstract class SearchResource {
         request.setMinTransferTime(minTransferTime);
 
         if (maxTransfers != null) {
-            if (maxTransfers > MAX_TRANSFERS) {
-                maxTransfers = MAX_TRANSFERS;
+            if (maxTransfers > CLAMP_TRANSFERS) {
+                maxTransfers = CLAMP_TRANSFERS;
             }
             request.setMaxTransfers(maxTransfers);
         }
