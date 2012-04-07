@@ -36,87 +36,43 @@ public class Request {
 
     private static final Logger LOG = LoggerFactory.getLogger(Request.class);
     
-    /** 
-     * The complete list of incoming query parameters.
-     */
+    /** The complete list of incoming query parameters. */
     private final HashMap<String, String> parameters = new HashMap<String, String>();
-
-    /**
-     * The router ID -- internal ID to switch between router implementation (or graphs)
-     */
+    /** The router ID -- internal ID to switch between router implementation (or graphs) */
     private String routerId;
-    /**
-     * The start location -- either a Vertex name or latitude, longitude in degrees
-     */
+    /** The start location -- either a Vertex name or latitude, longitude in degrees */
+    // TODO change this to Doubles and a Vertex
     private String from;
-    /**
-     * The start location's user-visible name
-     */
+    /** The start location's user-visible name */
     private String fromName;
-    /**
-     * The end location (see the from field for format).
-     */
+    /** The end location (see the from field for format). */
     private String to;
-    /**
-     * The end location's user-visible name
-     */
+    /** The end location's user-visible name */
     private String toName;
-    /**
-     * An unordered list of intermediate locations to be visited (see the from field for format).
-     */
+    /** An unordered list of intermediate locations to be visited (see the from field for format). */
     private List<NamedPlace> intermediatePlaces;
-    /**
-     * The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile.
-     */
+    /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
     private Double maxWalkDistance = Double.MAX_VALUE;
-    /**
-     * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
-     */
+    /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     private TraverseModeSet modes; // defaults in constructor
-    /**
-     * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
-     * optimize for transit time.
-     */
+    /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     private OptimizeType optimize = OptimizeType.QUICK;
-    
-    /**
-     * The date/time that the trip should depart (or arrive, for requests where arriveBy is true)
-     */
+    /** The date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     private Date dateTime = new Date();
-    /**
-     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
-     */
+    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
     private boolean arriveBy = false;
-    /**
-     * Whether the trip must be wheelchair accessible.
-     */
+    /** Whether the trip must be wheelchair accessible. */
     private boolean wheelchair = false;
-  
-    /**
-     * The maximum number of possible itineraries to return.
-     */
+    /** The maximum number of possible itineraries to return. */
     private Integer numItineraries = 3;
-
-    /**
-     * The maximum slope of streets for wheelchair trips.
-     */
+    /** The maximum slope of streets for wheelchair trips. */
     private double maxSlope = -1;
-    
-    /**
-     * Whether the planner should return intermediate stops lists for transit legs.
-     */
+    /** Whether the planner should return intermediate stops lists for transit legs. */
     private boolean showIntermediateStops = false;
-    
-    /**
-     * List of preffered routes. 
-     */
+    /** List of preffered routes. */
     private String[] preferredRoutes;
-    
-    /**
-     * List of unpreferred routes.
-     */
+    /** List of unpreferred routes. */
     private String[] unpreferredRoutes;
-    
     private Integer minTransferTime;
     private String[] bannedRoutes;
     private Integer transferPenalty;
