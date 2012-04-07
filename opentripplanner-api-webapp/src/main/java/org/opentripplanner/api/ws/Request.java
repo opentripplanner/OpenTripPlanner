@@ -532,4 +532,12 @@ public class Request implements RequestInf {
     public NamedPlace getToPlace() {
         return new NamedPlace(toName, to);
     }
+    
+    /**
+     * Build a request from the parameters in a concrete subclass of SearchResource.
+     */
+//    public Request(SearchResource) {
+//        
+//    }
+    
 }

@@ -47,9 +47,6 @@ public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
-    private static final int MAX_ITINERARIES = 3;
-    private static final int MAX_TRANSFERS = 4;
-
     private PathServiceFactory pathServiceFactory;
 
     @Required
@@ -81,89 +78,8 @@ public class Planner extends SearchResource {
         // out so it's used here too...
 
         /* create request */
-        Request request = new Request();
-        request.setRouterId(routerId);
-        request.setFrom(fromPlace);
-        request.setTo(toPlace);
-        request.setDateTime(date, time);
-        request.setWheelchair(wheelchair);
-        if (numItineraries != null) {
-            if (numItineraries > MAX_ITINERARIES) {
-                numItineraries = MAX_ITINERARIES;
-            }
-            if (numItineraries < 1) {
-                numItineraries = 1;
-            }
-            request.setNumItineraries(numItineraries);
-        }
-        if (maxWalkDistance != null) {
-            request.setMaxWalkDistance(maxWalkDistance);
-        }
-        if (walkSpeed != null) {
-            request.setWalkSpeed(walkSpeed);
-        }
-        if (triangleSafetyFactor != null || triangleSlopeFactor != null || triangleTimeFactor != null) {
-            if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
-                return error(request, Message.UNDERSPECIFIED_TRIANGLE);
-            }
-            if (optimize == null) {
-                optimize = OptimizeType.TRIANGLE;
-            }
-            if (optimize != OptimizeType.TRIANGLE) {
-                return error(request, Message.TRIANGLE_OPTIMIZE_TYPE_NOT_SET);
-            }
-            if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
-                return error(request, Message.TRIANGLE_NOT_AFFINE);
-            }
-            
-            request.setTriangleSafetyFactor(triangleSafetyFactor);
-            request.setTriangleSlopeFactor(triangleSlopeFactor);
-            request.setTriangleTimeFactor(triangleTimeFactor);
-        } else if (optimize == OptimizeType.TRIANGLE) {
-            return error(request, Message.TRIANGLE_VALUES_NOT_SET);
-        }
-        if (arriveBy != null && arriveBy) {
-            request.setArriveBy(true);
-        }
-        if (showIntermediateStops != null && showIntermediateStops) {
-            request.setShowIntermediateStops(true);
-        }
-        if (intermediatePlaces != null && intermediatePlaces.size() > 0
-                && !intermediatePlaces.get(0).equals("")) {
-            request.setIntermediatePlaces(intermediatePlaces);
-        }
-        if (intermediatePlacesOrdered != null) {
-            request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
-        }
-        if (preferredRoutes != null && !preferredRoutes.equals("")) {
-            String[] table = preferredRoutes.split(",");
-            request.setPreferredRoutes(table);
-        }
-        if (unpreferredRoutes != null && !unpreferredRoutes.equals("")) {
-            String[] table = unpreferredRoutes.split(",");
-            request.setUnpreferredRoutes(table);
-        }
-        if (bannedRoutes != null && !bannedRoutes.equals("")) {
-            String[] table = bannedRoutes.split(",");
-            request.setBannedRoutes(table);
-        }
+        Request request = buildRequestFromQueryParamFields();
 
-        //replace deprecated optimization preference
-        if (optimize == OptimizeType.TRANSFERS) {
-            optimize = OptimizeType.QUICK;
-            transferPenalty += 1800;
-        }
-        request.setTransferPenalty(transferPenalty);
-        request.setOptimize(optimize);
-        request.setModes(modes);
-        request.setMinTransferTime(minTransferTime);
-
-        if (maxTransfers != null) {
-            if (maxTransfers > MAX_TRANSFERS) {
-                maxTransfers = MAX_TRANSFERS;
-            }
-            request.setMaxTransfers(maxTransfers);
-        }
         /* use request to generate trip */
         Response response = new Response(request);
         try {
