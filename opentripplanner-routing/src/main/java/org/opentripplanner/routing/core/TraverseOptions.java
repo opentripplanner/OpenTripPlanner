@@ -367,10 +367,11 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
 
-    public TraverseOptions reversedClone() {
+    public TraverseOptions reversedClone(long finalTime) {
     	TraverseOptions ret = this.clone();
     	ret.setArriveBy( ! ret.isArriveBy());
-    	ret.reverseOptimizing = ! ret.reverseOptimizing;
+    	ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
+    	ret.dateTime = new Date(finalTime);
     	return ret;
     }
     
@@ -853,9 +854,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     /** Builds an initial State for a search based on this set of options. */
     public State getInitialState() {
-        Vertex initialVertex = arriveBy ? toVertex : fromVertex;
-        State initialState = new State((int)(dateTime.getTime() / 1000), initialVertex, this);
-        return initialState;
+        return new State(this);
     }
     
     private static<T> void addIfNotExists(ArrayList<T> list, T item) {

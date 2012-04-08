@@ -55,27 +55,16 @@ public class State implements Cloneable {
     /* CONSTRUCTORS */
 
     /**
-     * Create a state representing the beginning of a trip at the given vertex, at the current
-     * system time.
+     * Create a state representing the beginning of a search for the given options.
      */
-    public State(Vertex v, TraverseOptions opt) {
-        this((int) (System.currentTimeMillis() / 1000), v, opt);
-    }
-
-    /**
-     * Create a state representing the beginning of a search at the given vertex, at the given time.
-     * 
-     * @param time - The time at which the search will start
-     * @param v - The origin vertex of the search
-     */
-    public State(long time, Vertex vertex, TraverseOptions opt) {
+    public State(TraverseOptions opt) {
         // parent-less states can only be created at the beginning of a trip.
         // elsewhere, all states must be created from a parent
         // and associated with an edge.
 
-        this.time = time;
+        this.time = opt.dateTime.getTime() / 1000;
         this.weight = 0;
-        this.vertex = vertex;
+        this.vertex = opt.arriveBy ? opt.toVertex : opt.fromVertex;
         this.backState = null;
         this.backEdge = null;
         this.backEdgeNarrative = null;
@@ -85,10 +74,6 @@ public class State implements Cloneable {
         stateData.startTime = time;
         stateData.tripSeqHash = 0;
         // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
-    }
-
-    public State createState(long time, Vertex vertex, TraverseOptions options) {
-        return new State(time, vertex, options);
     }
 
     /**
@@ -330,7 +315,7 @@ public class State implements Cloneable {
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        return createState(this.time, this.vertex, stateData.options.reversedClone());
+        return new State(stateData.options.reversedClone(this.time));
     }
 
     public void dumpPath() {
