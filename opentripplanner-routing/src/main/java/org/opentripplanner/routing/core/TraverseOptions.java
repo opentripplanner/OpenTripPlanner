@@ -783,6 +783,17 @@ public class TraverseOptions implements Cloneable, Serializable {
     /* INSTANCE METHODS */
     
     /**
+     * Call when all search request parameters have been set to fill the service days cache,
+     * set some other values.
+     */
+    // could even be setGraph
+    public void prepareForSearch(Graph graph) {
+        this.graph = graph;
+        
+        //setServiceDays();
+    }
+    
+    /**
      *  Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative
      *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were
      *  identified as a performance bottleneck. Must be called after the TraverseOptions already has a CalendarService set. 
