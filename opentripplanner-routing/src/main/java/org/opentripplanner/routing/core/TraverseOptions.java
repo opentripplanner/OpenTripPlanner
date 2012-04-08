@@ -65,47 +65,47 @@ public class TraverseOptions implements Cloneable, Serializable {
     /* EX-REQUEST FIELDS */
 
     /** The complete list of incoming query parameters. */
-    private final HashMap<String, String> parameters = new HashMap<String, String>();
+    public final HashMap<String, String> parameters = new HashMap<String, String>();
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
-    private String routerId;
+    public String routerId;
     /** The start location -- either a Vertex name or latitude, longitude in degrees */
     // TODO change this to Doubles and a Vertex
-    private String from;
+    public String from;
     /** The start location's user-visible name */
-    private String fromName;
+    public String fromName;
     /** The end location (see the from field for format). */
-    private String to;
+    public String to;
     /** The end location's user-visible name */
-    private String toName;
+    public String toName;
     /** An unordered list of intermediate locations to be visited (see the from field for format). */
-    private List<NamedPlace> intermediatePlaces;
+    public List<NamedPlace> intermediatePlaces;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
-    private double maxWalkDistance = Double.MAX_VALUE;
+    public double maxWalkDistance = Double.MAX_VALUE;
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
-    private TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
+    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
-    private OptimizeType optimize = OptimizeType.QUICK;
+    public OptimizeType optimize = OptimizeType.QUICK;
     /** The date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    private Date dateTime = new Date();
+    public Date dateTime = new Date();
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
-    private boolean arriveBy = false;
+    public boolean arriveBy = false;
     /** Whether the trip must be wheelchair accessible. */
-    private boolean wheelchair = false;
+    public boolean wheelchair = false;
     /** The maximum number of possible itineraries to return. */
-    private Integer numItineraries = 3;
+    public Integer numItineraries = 3;
     /** The maximum slope of streets for wheelchair trips. */
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
-    private boolean showIntermediateStops = false;
+    public boolean showIntermediateStops = false;
     
     /** max walk/bike speed along streets, in meters per second */
-    private double speed; // walkSpeed
-    // private double walkSpeed;
+    public double speed; // walkSpeed
+    // public double walkSpeed;
 
     /** max biking speed along streets, in meters per second */
-    // private double bikeSpeed;
+    // public double bikeSpeed;
     
-    private boolean intermediatePlacesOrdered;
+    public boolean intermediatePlacesOrdered;
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
      * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
@@ -122,9 +122,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     public Calendar calendar;
 
-    private CalendarService calendarService;
+    public CalendarService calendarService;
 
-    private Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
+    public Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
 
     public boolean wheelchairAccessible = false;
 
@@ -238,7 +238,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      * set. We provide an extension point for adding arbitrary parameters with an extension-specific
      * key.
      */
-    private Map<Object, Object> extensions = new HashMap<Object, Object>();
+    public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
     public int nonpreferredTransferPenalty = 120; 
@@ -247,16 +247,16 @@ public class TraverseOptions implements Cloneable, Serializable {
      * For the bike triangle, how important time is.  
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1 
      */
-    private double triangleTimeFactor;
+    public double triangleTimeFactor;
     /** For the bike triangle, how important slope is */
-    private double triangleSlopeFactor;
+    public double triangleSlopeFactor;
     /** For the bike triangle, how important safety is */
-    private double triangleSafetyFactor;
+    public double triangleSafetyFactor;
 
     
     /* FIELDS FOR SEARCH CONTEXT AND CACHED VALUES */
 
-    private TraverseOptions walkingOptions;
+    public TraverseOptions walkingOptions;
 
     public GenericAStarFactory aStarSearchFactory = null;
     
@@ -264,7 +264,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
 
-    private TransferTable transferTable;
+    public TransferTable transferTable;
 
     /**
      * With this flag, you can selectively enable or disable the use of the {@link #serviceDays}
@@ -281,7 +281,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public ArrayList<ServiceDay> serviceDays;
     
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
-    private boolean reverseOptimizing = false;
+    public boolean reverseOptimizing = false;
     
     /* CONSTRUCTORS */
     
