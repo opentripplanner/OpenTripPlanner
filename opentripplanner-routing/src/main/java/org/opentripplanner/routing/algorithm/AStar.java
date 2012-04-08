@@ -68,8 +68,7 @@ public class AStar implements SPTService {
     }
 
     @Override
-    public ShortestPathTree getShortestPathTree(TraverseOptions req) {
-        // TODO Auto-generated method stub
-        return null;
+    public ShortestPathTree getShortestPathTree(TraverseOptions options) {
+        return _instance.getShortestPathTree(options.graph, options.getInitialState(), options.getTargetVertex());
     }
 }
