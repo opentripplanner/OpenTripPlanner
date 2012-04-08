@@ -140,10 +140,6 @@ public abstract class SearchResource {
     /** Inject the servlet request so we have access to the query parameter map */
     @Context HttpServletRequest httpServletRequest;
 
-    /* TODO: move this logic into TraverseOptions itself */
-    private static final int CLAMP_ITINERARIES = 3;
-    private static final int CLAMP_TRANSFERS = 4;
-
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -156,13 +152,6 @@ public abstract class SearchResource {
         request.setDateTime(date, time);
         request.setWheelchair(wheelchair);
         if (numItineraries != null) {
-            if (numItineraries > CLAMP_ITINERARIES) {
-                numItineraries = CLAMP_ITINERARIES;
-            }
-            // TODO: ELIMINATE SIDE EFFECTS
-            if (numItineraries < 1) {
-                numItineraries = 1;
-            }
             request.setNumItineraries(numItineraries);
         }
         if (maxWalkDistance != null) {
@@ -225,9 +214,6 @@ public abstract class SearchResource {
         request.setMinTransferTime(minTransferTime);
 
         if (maxTransfers != null) {
-            if (maxTransfers > CLAMP_TRANSFERS) {
-                maxTransfers = CLAMP_TRANSFERS;
-            }
             request.setMaxTransfers(maxTransfers);
         }
         return request;

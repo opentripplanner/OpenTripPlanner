@@ -52,8 +52,9 @@ import org.slf4j.LoggerFactory;
 public class TraverseOptions implements Cloneable, Serializable {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-
     private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
+    private static final int CLAMP_ITINERARIES = 3;
+    private static final int CLAMP_TRANSFERS = 4;
 
     /* NEW FIELDS */
     
@@ -597,9 +598,12 @@ public class TraverseOptions implements Cloneable, Serializable {
         return numItineraries; 
     }
 
-    public void setNumItineraries(Integer numItineraries) {
-        if (numItineraries < 1 || numItineraries > 10)
-            numItineraries = 3;
+    public void setNumItineraries(int numItineraries) {
+        if (numItineraries > CLAMP_ITINERARIES) {
+            numItineraries = CLAMP_ITINERARIES;
+        } else if (numItineraries < 1) {
+            numItineraries = 1;
+        }
         this.numItineraries = numItineraries;
     }
 
@@ -732,7 +736,10 @@ public class TraverseOptions implements Cloneable, Serializable {
         return triangleTimeFactor;
     }
 
-    public void setMaxTransfers(Integer maxTransfers) {
+    public void setMaxTransfers(int maxTransfers) {
+        if (maxTransfers > CLAMP_TRANSFERS) {
+            maxTransfers = CLAMP_TRANSFERS;
+        }
         this.maxTransfers = maxTransfers;
     }
 
