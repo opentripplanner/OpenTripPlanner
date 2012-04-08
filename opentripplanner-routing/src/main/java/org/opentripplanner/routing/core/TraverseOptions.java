@@ -392,6 +392,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
+        assert (modes.isValid());
         if (modes.getBicycle()) {
             speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
             boardCost = 10 * 60; // cyclists hate loading their bike a second time
@@ -473,16 +474,16 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
 
-    public void SetPreferredRoutes(String s) {
-        
+    public void setPreferredRoutes(String s) {
+        preferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
     
-    public void SetUnpreferredRoutes(String s) {
-        
+    public void setUnpreferredRoutes(String s) {
+        unpreferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
 
-    public void SetBannedRoutes(String s) {
-        
+    public void setBannedRoutes(String s) {
+        bannedRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
     
     public final static int MIN_SIMILARITY = 1000;

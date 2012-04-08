@@ -139,13 +139,14 @@ public abstract class SearchResource {
 
     /** Inject the servlet request so we have access to the query parameter map */
     @Context HttpServletRequest httpServletRequest;
-    
+
+    /* TODO: move this logic into TraverseOptions itself */
     private static final int CLAMP_ITINERARIES = 3;
     private static final int CLAMP_TRANSFERS = 4;
 
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
-     * @throws ParameterException 
+     * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected TraverseOptions buildRequestFromQueryParamFields() throws ParameterException {
         TraverseOptions request = new TraverseOptions();
