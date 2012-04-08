@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -36,10 +35,6 @@ public class Response {
     public Response() {
     }
 
-    public Response(Request req) {
-        this.requestParameters = req.getParameters();
-    }
-
     public Response(ServletRequest sr) {
         this.requestParameters = new HashMap<String, String>();
         // include only the first instance of each query parameter
@@ -48,11 +43,6 @@ public class Response {
         for (Entry<String, String[]> e : params.entrySet()) {
             requestParameters.put(e.getKey(), e.getValue()[0]);
         }
-    }
-
-    public Response(Request req, TripPlan plan) {
-        this(req);
-        this.plan = plan;
     }
 
     // note order the getters below is semi-important, in that that's the order printed by jersey in the return
