@@ -36,6 +36,7 @@ import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHe
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -94,7 +95,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** Whether the trip must be wheelchair accessible. */
     public boolean wheelchair = false;
     /** The maximum number of possible itineraries to return. */
-    public Integer numItineraries = 3;
+    public int numItineraries = 3;
     /** The maximum slope of streets for wheelchair trips. */
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
@@ -793,6 +794,26 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void prepareForSearch(Graph graph) {
         this.graph = graph;
         findEndpointVertices();
+        
+        setCalendarService(graph.getService(CalendarService.class));
+        setTransferTable(graph.getTransferTable());
+        setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
+        if (getModes().getTransit()
+            && ! graph.transitFeedCovers(dateTime)) {
+            // user wants a path through the transit network,
+            // but the date provided is outside those covered by the transit feed.
+            throw new TransitTimesException();
+        }
+        
+        // decide which A* heuristic to use
+        remainingWeightHeuristic = _remainingWeightHeuristicFactory.getInstanceForSearch(this);
+        LOG.debug("Applied A* heuristic: {}", remainingWeightHeuristic);
+
+        // If transit is not to be used, disable walk limit and only search for one itinerary.
+        if (! getModes().getTransit()) {
+            numItineraries = 1;
+            setMaxWalkDistance(Double.MAX_VALUE);
+        }
 
         //setServiceDays();
     }

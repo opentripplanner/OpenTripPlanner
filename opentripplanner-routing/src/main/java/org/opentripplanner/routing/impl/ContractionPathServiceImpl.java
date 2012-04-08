@@ -94,29 +94,6 @@ public class ContractionPathServiceImpl extends GenericPathService {
     @Override
     public List<GraphPath> getPaths(TraverseOptions options) {
 
-        Date targetTime = new Date(origin.getTime() * 1000);
-
-        if (_graphService.getCalendarService() != null)
-            options.setCalendarService(_graphService.getCalendarService());
-        options.setTransferTable(_graphService.getGraph().getTransferTable());
-        options.setServiceDays(targetTime.getTime() / 1000, _graphService.getGraph().getAgencyIds());
-        if (options.getModes().getTransit()
-                && !_graphService.getGraph().transitFeedCovers(targetTime)) {
-            // user wants a path through the transit network,
-            // but the date provided is outside those covered by the transit feed.
-            throw new TransitTimesException();
-        }
-        // decide which A* heuristic to use
-        options.remainingWeightHeuristic = 
-        	_remainingWeightHeuristicFactory.getInstanceForSearch(options, target);
-        LOG.debug("Applied A* heuristic: {}", options.remainingWeightHeuristic);
-
-        // If transit is not to be used, disable walk limit and only search for one itinerary.
-        if (!options.getModes().getTransit()) {
-            nItineraries = 1;
-            options.setMaxWalkDistance(Double.MAX_VALUE);
-        }
-
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
         // convert relative timeouts to absolute timeouts
@@ -143,16 +120,13 @@ public class ContractionPathServiceImpl extends GenericPathService {
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
-        while (paths.size() < nItineraries) {
+        while (paths.size() < options.numItineraries) {
             options = optionQueue.poll();
             if (options == null) {
                 LOG.debug("Ran out of options to try.");
                 break;
             }
             options.setMaxWalkDistance(maxWalk);
-            StateEditor editor = new StateEditor(origin, null);
-            editor.setTraverseOptions(options);
-            origin = editor.makeState();
             
             // apply appropriate timeout
             options.searchAbortTime = paths.isEmpty() ? abortFirst : abortMulti;
@@ -161,8 +135,9 @@ public class ContractionPathServiceImpl extends GenericPathService {
             // options.worstTime = maxTime;
             options.maxWeight = maxWeight;
             long subsearchBeginTime = System.currentTimeMillis();
+            
             LOG.debug("BEGIN SUBSEARCH");
-            List<GraphPath> somePaths = _routingService.route(origin, target);
+            List<GraphPath> somePaths = _routingService.route(options);
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);
