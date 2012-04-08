@@ -96,7 +96,14 @@ public class TraverseOptions implements Cloneable, Serializable {
     private double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
     private boolean showIntermediateStops = false;
-    private double walkSpeed;
+    
+    /** max walk/bike speed along streets, in meters per second */
+    private double speed; // walkSpeed
+    // private double walkSpeed;
+
+    /** max biking speed along streets, in meters per second */
+    // private double bikeSpeed;
+    
     private boolean intermediatePlacesOrdered;
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
@@ -112,9 +119,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     /***** ORIGNAL TRAVERSEOPTIONS FIELDS *****/
     
-    /** max speed along streets, in meters per second */
-    public double speed;
-
     public Calendar calendar;
 
     private CalendarService calendarService;
@@ -787,12 +791,12 @@ public class TraverseOptions implements Cloneable, Serializable {
         return transferPenalty;
     }
 
-    public void setWalkSpeed(double walkSpeed) {
-        this.walkSpeed = walkSpeed;
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     public double getWalkSpeed() {
-        return walkSpeed;
+        return this.speed;
     }
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
