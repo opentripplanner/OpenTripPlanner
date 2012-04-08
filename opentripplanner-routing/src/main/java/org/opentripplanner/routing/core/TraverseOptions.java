@@ -549,6 +549,16 @@ public class TraverseOptions implements Cloneable, Serializable {
             this.to = to;
         }
     }
+    
+    /** return the vertex where this search will begin, accounting for arriveBy */
+    public Vertex getOriginVertex() {
+        return arriveBy ? toVertex : fromVertex;
+    }
+    
+    /** return the vertex where this search will end, accounting for arriveBy */
+    public Vertex getTargetVertex() {
+        return arriveBy ? fromVertex : toVertex;
+    }
 
     /** @param walk - the (soft) maximum walk distance to set */
     public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }

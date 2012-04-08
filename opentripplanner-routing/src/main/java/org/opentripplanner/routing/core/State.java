@@ -64,7 +64,7 @@ public class State implements Cloneable {
 
         this.time = opt.dateTime.getTime() / 1000;
         this.weight = 0;
-        this.vertex = opt.arriveBy ? opt.toVertex : opt.fromVertex;
+        this.vertex = opt.getOriginVertex();
         this.backState = null;
         this.backEdge = null;
         this.backEdgeNarrative = null;
