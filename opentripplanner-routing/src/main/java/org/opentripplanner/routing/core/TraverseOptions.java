@@ -433,31 +433,17 @@ public class TraverseOptions implements Cloneable, Serializable {
     /**
      * Add an extension parameter with the specified key. Extensions allow you to add arbitrary
      * traversal options.
-     * 
-     * @param key
-     * @param value
      */
     public void putExtension(Object key, Object value) {
         extensions.put(key, value);
     }
 
-    /**
-     * Determine if a particular extension parameter is present for the specified key.
-     * 
-     * @param key
-     * @return
-     */
+    /** Determine if a particular extension parameter is present for the specified key. */
     public boolean containsExtension(Object key) {
         return extensions.containsKey(key);
     }
 
-    /**
-     * Get the extension parameter with the specified key.
-     * 
-     * @param <T>
-     * @param key
-     * @return
-     */
+    /** Get the extension parameter with the specified key. */
     @SuppressWarnings("unchecked")
     public <T> T getExtension(Object key) {
         return (T) extensions.get(key);
@@ -469,34 +455,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setTransferTable(TransferTable transferTable) {
         this.transferTable = transferTable;
-    }
-
-    /* must be called after traverseoptions already has a calendarservice set */
-    public void setServiceDays(long time, Collection<String> agencies) {
-        if( ! useServiceDays )
-            return;
-        final long SEC_IN_DAY = 60 * 60 * 24;
-
-        this.serviceDays = new ArrayList<ServiceDay>(3);
-        CalendarService cs = this.getCalendarService();
-        if (cs == null) {
-            LOG.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
-            return;
-        }
-        // This should be a valid way to find yesterday and tomorrow,
-        // since DST changes more than one hour after midnight in US/EU.
-        // But is this true everywhere?
-        for (String agency : agencies) {
-            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, cs, agency));
-        }
-    }
-    
-    private static<T> void addIfNotExists(ArrayList<T> list, T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
     }
 
     public boolean isReverseOptimizing() {
@@ -804,6 +762,38 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     /* INSTANCE METHODS */
     
+    /**
+     *  Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative
+     *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were
+     *  identified as a performance bottleneck. Must be called after the TraverseOptions already has a CalendarService set. 
+     */
+    public void setServiceDays(long time, Collection<String> agencies) {
+        if( ! useServiceDays )
+            return;
+        final long SEC_IN_DAY = 60 * 60 * 24;
+
+        this.serviceDays = new ArrayList<ServiceDay>(3);
+        CalendarService cs = this.getCalendarService();
+        if (cs == null) {
+            LOG.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
+            return;
+        }
+        // This should be a valid way to find yesterday and tomorrow,
+        // since DST changes more than one hour after midnight in US/EU.
+        // But is this true everywhere?
+        for (String agency : agencies) {
+            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, cs, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(time, cs, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, cs, agency));
+        }
+    }
+
+    private static<T> void addIfNotExists(ArrayList<T> list, T item) {
+        if (!list.contains(item)) {
+            list.add(item);
+        }
+    }
+
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions to = (TraverseOptions) o;
