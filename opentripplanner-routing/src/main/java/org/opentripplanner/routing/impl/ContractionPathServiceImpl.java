@@ -92,20 +92,9 @@ public class ContractionPathServiceImpl extends GenericPathService {
     }
 
     @Override
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
-            TraverseOptions options, int nItineraries) {
-
-
-        
-
-        return plan(state, target, nItineraries);
-    }
-
-    @Override
-    public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
+    public List<GraphPath> getPaths(TraverseOptions options) {
 
         Date targetTime = new Date(origin.getTime() * 1000);
-        TraverseOptions options = origin.getOptions();
 
         if (_graphService.getCalendarService() != null)
             options.setCalendarService(_graphService.getCalendarService());
