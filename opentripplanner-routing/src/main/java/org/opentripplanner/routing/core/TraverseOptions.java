@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TraverseOptions implements Cloneable, Serializable {
+    
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
@@ -249,6 +250,13 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     private double triangleSafetyFactor;
 
+    
+    /* Search context and cached aux information */
+    //
+    //
+    //
+    
+    
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking

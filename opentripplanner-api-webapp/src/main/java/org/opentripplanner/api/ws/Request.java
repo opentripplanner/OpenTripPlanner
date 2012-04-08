@@ -69,7 +69,7 @@ public class Request {
     private double maxSlope = -1;
     /** Whether the planner should return intermediate stops lists for transit legs. */
     private boolean showIntermediateStops = false;
-    /** List of preffered routes. */
+    /** List of preferred routes. */
     private String[] preferredRoutes;
     /** List of unpreferred routes. */
     private String[] unpreferredRoutes;

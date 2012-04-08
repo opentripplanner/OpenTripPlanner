@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Scope;
 @Scope("request")
 public abstract class SearchResource {
 
+    /* not sure if it's really worth using symbolic constants here but that's how it was done in RequestInf */
     public static final String ROUTER_ID = "routerId";
     public static final String FROM = "fromPlace";
     public static final String TO = "toPlace";

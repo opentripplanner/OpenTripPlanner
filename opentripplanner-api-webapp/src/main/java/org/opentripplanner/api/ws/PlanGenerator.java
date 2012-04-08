@@ -620,6 +620,7 @@ public class PlanGenerator {
             options.maxTransfers = request.getMaxTransfers();
         }
         if (request.getPreferredRoutes() != null) {
+            /* TODO: Factor 3x code block out into RouteSpec */
             for (String element : request.getPreferredRoutes()) {
                 String[] routeSpec = element.split("_", 2);
                 if (routeSpec.length != 2) {

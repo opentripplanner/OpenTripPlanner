@@ -27,4 +27,5 @@ import org.opentripplanner.routing.core.TraverseOptions;
 public interface GenericAStarFactory {
 
     public GenericAStar createAStarInstance();
+    
 }

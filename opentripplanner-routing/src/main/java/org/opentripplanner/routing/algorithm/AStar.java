@@ -17,12 +17,13 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * Find the shortest path between graph vertices using A*.
  */
-public class AStar {
+public class AStar implements SPTService {
 
     private static final GenericAStar _instance = new GenericAStar();
 
@@ -34,11 +35,6 @@ public class AStar {
      * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the given time
      * depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
-     * @param graph
-     * @param origin
-     * @param target
-     * @param init
-     * @param options
      * @return the shortest path, or null if none is found
      */
     public static ShortestPathTree getShortestPathTree(Graph graph, String from_label,
@@ -55,11 +51,6 @@ public class AStar {
      * Plots a path on graph from origin to target, either DEPARTING or ARRIVING at the given time
      * depending on the TraverseOptions (use TraverseOptions.setArriveBy).
      * 
-     * @param graph
-     * @param origin
-     * @param target
-     * @param init
-     * @param options
      * @return the shortest path, or null if none is found
      */
     public static ShortestPathTree getShortestPathTree(Graph graph, Vertex origin, Vertex target,
