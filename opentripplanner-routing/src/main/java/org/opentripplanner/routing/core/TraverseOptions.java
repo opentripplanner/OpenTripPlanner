@@ -17,30 +17,100 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A trip planning request. Some parameters may not be honored by the trip planner for some or all
+ * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
+ * route.
+ * 
+ * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS
+ */
 public class TraverseOptions implements Cloneable, Serializable {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
 
+    /**** NEW FIELDS ****/
+    public Graph graph;
+    public Vertex fromVertex;
+    public Vertex toVertex;
+    
+    /****** EX-REQUEST FIELDS ******/
+
+    /** The complete list of incoming query parameters. */
+    private final HashMap<String, String> parameters = new HashMap<String, String>();
+    /** The router ID -- internal ID to switch between router implementation (or graphs) */
+    private String routerId;
+    /** The start location -- either a Vertex name or latitude, longitude in degrees */
+    // TODO change this to Doubles and a Vertex
+    private String from;
+    /** The start location's user-visible name */
+    private String fromName;
+    /** The end location (see the from field for format). */
+    private String to;
+    /** The end location's user-visible name */
+    private String toName;
+    /** An unordered list of intermediate locations to be visited (see the from field for format). */
+    private List<NamedPlace> intermediatePlaces;
+    /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
+    private Double maxWalkDistance = Double.MAX_VALUE;
+    /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
+    private TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
+    /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
+    private OptimizeType optimize = OptimizeType.QUICK;
+    /** The date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
+    private Date dateTime = new Date();
+    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
+    private boolean arriveBy = false;
+    /** Whether the trip must be wheelchair accessible. */
+    private boolean wheelchair = false;
+    /** The maximum number of possible itineraries to return. */
+    private Integer numItineraries = 3;
+    /** The maximum slope of streets for wheelchair trips. */
+    private double maxSlope = -1;
+    /** Whether the planner should return intermediate stops lists for transit legs. */
+    private boolean showIntermediateStops = false;
+    /** List of preferred routes. */
+    private String[] preferredRoutes;
+    /** List of unpreferred routes. */
+    private String[] unpreferredRoutes;
+    private Integer minTransferTime;
+    private String[] bannedRoutes;
+    private Integer transferPenalty;
+    private double walkSpeed;
+    private double triangleSafetyFactor;
+    private double triangleSlopeFactor;
+    private double triangleTimeFactor;
+    private Integer maxTransfers;
+    private boolean intermediatePlacesOrdered;
+
+    /***** ORIGNAL TRAVERSEOPTIONS FIELDS *****/
+    
     /** max speed along streets, in meters per second */
     public double speed;
 
@@ -264,6 +334,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
         calendar = Calendar.getInstance();
         walkingOptions = this;
+        setIntermediatePlaces(new ArrayList<String>());
     }
 
     public TraverseOptions(TraverseModeSet modes) {
@@ -571,4 +642,308 @@ public class TraverseOptions implements Cloneable, Serializable {
         this.triangleTimeFactor = triangleTimeFactor;
         walkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
+    
+    /**** EX-REQUEST METHODS ****/
+    public HashMap<String, String> getParameters() {
+        return parameters;
+    }
+
+    public String getRouterId() {
+        return routerId;
+    }
+
+    /** @param routerId the router ID, used to switch between router instances. */
+    public void setRouterId(String routerId) {
+        this.routerId = routerId;
+    }
+
+    public String getFrom() { return from; }
+
+    // TODO factor out splitting code which appears in 3 places
+    public void setFrom(String from) {
+        if (from.contains("::")) {
+            String[] parts = from.split("::");
+            this.fromName = parts[0];
+            this.from = parts[1];
+        } else {
+            this.from = from;
+        }
+    }
+
+    public String getTo() { return to; }
+
+    public void setTo(String to) {
+        if (to.contains("::")) {
+            String[] parts = to.split("::");
+            this.toName = parts[0];
+            this.to = parts[1];
+        } else {
+            this.to = to;
+        }
+    }
+
+    /** @return the (soft) maximum walk distance */
+    public Double getMaxWalkDistance() { return maxWalkDistance; }
+
+    /** @param walk - the (soft) maximum walk distance to set */
+    public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }
+
+    public TraverseModeSet getModes() { return modes; }
+
+    // TODO move this into TraverseModeSet
+    public String getModesAsStr() {
+        String retVal = null;
+        for (TraverseMode m : modes.getModes()) {
+            if (retVal == null)
+                retVal = "";
+            else
+                retVal += ", ";
+            retVal += m;
+        }
+        return retVal;
+    }
+
+    public void addMode(TraverseMode mode) { 
+        modes.setMode(mode, true); 
+    }
+
+    public void addMode(List<TraverseMode> mList) {
+        for (TraverseMode m : mList) {
+            addMode(m);
+        }
+    }
+
+    public OptimizeType getOptimize() { 
+        return optimize; 
+    }
+
+    public void setOptimize(OptimizeType opt) { 
+        optimize = opt; 
+    }
+
+    public Date getDateTime() { 
+        return dateTime; 
+    }
+
+    public void setDateTime(Date dateTime) {
+        this.dateTime = new Date(dateTime.getTime());
+    }
+
+    public void setDateTime(String date, String time) {
+        dateTime = DateUtils.toDate(date, time);
+        LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
+        LOG.debug("Request datetime parsed as {}", dateTime);
+    }
+
+    public boolean isArriveBy() { 
+        return arriveBy; 
+    }
+
+    public void setArriveBy(boolean arriveBy) { 
+        this.arriveBy = arriveBy; 
+    }
+
+    public Integer getNumItineraries() { 
+        return numItineraries; 
+    }
+
+    public void setNumItineraries(Integer numItineraries) {
+        if (numItineraries < 1 || numItineraries > 10)
+            numItineraries = 3;
+        this.numItineraries = numItineraries;
+    }
+
+    public String toHtmlString() {
+        return toString("<br/>");
+    }
+
+    public String toString() {
+        return toString(" ");
+    }
+
+    public String toString(String sep) {
+        return getFrom() + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
+                + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
+                + getNumItineraries();
+    }
+    
+    public TraverseModeSet getModeSet() { 
+        return modes; 
+    }
+
+    public void removeMode(TraverseMode mode) { 
+        modes.setMode(mode, false); 
+    }
+
+    public void setModes(TraverseModeSet modes) { 
+        this.modes = modes; 
+    }
+
+    /** Set whether the trip must be wheelchair accessible */
+    public void setWheelchair(boolean wheelchair) { this.wheelchair = wheelchair; }
+
+    /** return whether the trip must be wheelchair accessible */
+    public boolean getWheelchair() { return wheelchair; }
+
+    public void setIntermediatePlaces(List<String> intermediates) {
+        this.intermediatePlaces = new ArrayList<NamedPlace>(intermediates.size());
+        for (String place : intermediates) {
+            String name = place;
+            if (place.contains("::")) {
+                String[] parts = place.split("::");
+                name = parts[0];
+                place = parts[1];
+            }
+            NamedPlace intermediate = new NamedPlace(name, place);
+            intermediatePlaces.add(intermediate);
+        }
+    }
+
+    /**
+     * @return the intermediatePlaces
+     */
+    public List<NamedPlace> getIntermediatePlaces() {
+        return intermediatePlaces;
+    }
+
+    /**
+     * @return the maximum street slope for wheelchair trips
+     */
+    public double getMaxSlope() {
+        return maxSlope;
+    }
+    
+    /**
+     * @param maxSlope the maximum street slope for wheelchair trpis
+     */
+    public void setMaxSlope(double maxSlope) {
+        this.maxSlope = maxSlope;
+    }
+    
+    /** 
+     * @param showIntermediateStops
+     *          whether the planner should return intermediate stop lists for transit legs 
+     */
+    public void setShowIntermediateStops(boolean showIntermediateStops) {
+        this.showIntermediateStops = showIntermediateStops;
+    }
+
+    /** 
+     * @return whether the planner should return intermediate stop lists for transit legs 
+     */
+    public boolean getShowIntermediateStops() {
+        return showIntermediateStops;
+    }
+
+    public void setMinTransferTime(Integer minTransferTime) {
+        this.minTransferTime = minTransferTime;
+    }
+    
+    public Integer getMinTransferTime() {
+        return minTransferTime;
+    }
+    
+    public void setPreferredRoutes(String[] preferredRoutes) {
+        this.preferredRoutes = preferredRoutes.clone();
+    }
+
+    public String[] getPreferredRoutes() {
+        return preferredRoutes;
+    }
+
+    public void setUnpreferredRoutes(String[] unpreferredRoutes) {
+        this.unpreferredRoutes = unpreferredRoutes.clone();
+    }
+
+    public String[] getUnpreferredRoutes() {
+        return unpreferredRoutes;
+    }
+
+    public void setBannedRoutes(String[] bannedRoutes) {
+        this.bannedRoutes = bannedRoutes.clone();
+    }
+
+    public String[] getBannedRoutes() {
+        return bannedRoutes;
+    }
+
+    public void setTransferPenalty(Integer transferPenalty) {
+        this.transferPenalty = transferPenalty;
+    }
+
+    public Integer getTransferPenalty() {
+        return transferPenalty;
+    }
+
+    public void setWalkSpeed(double walkSpeed) {
+        this.walkSpeed = walkSpeed;
+    }
+
+    public double getWalkSpeed() {
+        return walkSpeed;
+    }
+
+    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
+        this.triangleSafetyFactor = triangleSafetyFactor;
+    }
+
+    public double getTriangleSafetyFactor() {
+        return triangleSafetyFactor;
+    }
+
+    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
+        this.triangleSlopeFactor = triangleSlopeFactor;
+    }
+
+    public double getTriangleSlopeFactor() {
+        return triangleSlopeFactor;
+    }
+
+    public void setTriangleTimeFactor(double triangleTimeFactor) {
+        this.triangleTimeFactor = triangleTimeFactor;
+    }
+
+    public double getTriangleTimeFactor() {
+        return triangleTimeFactor;
+    }
+
+    public void setMaxTransfers(Integer maxTransfers) {
+        this.maxTransfers = maxTransfers;
+    }
+
+    public Integer getMaxTransfers() {
+        return maxTransfers;
+    }
+
+    public void setIntermediatePlacesOrdered(boolean intermediatePlacesOrdered) {
+        this.intermediatePlacesOrdered = intermediatePlacesOrdered;
+    }
+
+    public boolean isIntermediatePlacesOrdered() {
+        return intermediatePlacesOrdered;
+    }
+
+    public String getFromName() {
+        return fromName;
+    }
+
+    public String getToName() {
+        return toName;
+    }
+
+    public NamedPlace getFromPlace() {
+        return new NamedPlace(fromName, from);
+    }
+
+    public NamedPlace getToPlace() {
+        return new NamedPlace(toName, to);
+    }
+    
+    /**
+     * Build a request from the parameters in a concrete subclass of SearchResource.
+     */
+//    public Request(SearchResource) {
+//        
+//    }
+ 
 }
