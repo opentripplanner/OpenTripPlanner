@@ -56,6 +56,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
 
     /**** NEW FIELDS ****/
+    
     public Graph graph;
     public Vertex fromVertex;
     public Vertex toVertex;
@@ -78,7 +79,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** An unordered list of intermediate locations to be visited (see the from field for format). */
     private List<NamedPlace> intermediatePlaces;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
-    private Double maxWalkDistance = Double.MAX_VALUE;
+    private double maxWalkDistance = Double.MAX_VALUE;
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     private TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
@@ -92,29 +93,27 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** The maximum number of possible itineraries to return. */
     private Integer numItineraries = 3;
     /** The maximum slope of streets for wheelchair trips. */
-    private double maxSlope = -1;
+    private double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
     private boolean showIntermediateStops = false;
-    /** List of preferred routes. */
-    private String[] preferredRoutes;
-    /** List of unpreferred routes. */
-    private String[] unpreferredRoutes;
-    private Integer minTransferTime;
-    private String[] bannedRoutes;
-    private Integer transferPenalty;
     private double walkSpeed;
-    private double triangleSafetyFactor;
-    private double triangleSlopeFactor;
-    private double triangleTimeFactor;
-    private Integer maxTransfers;
     private boolean intermediatePlacesOrdered;
+    /**
+     * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
+     * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
+     * Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to wait until midnight,
+     * when the 4 train runs local the whole way. The actual fastest route is the 2/3 to the 4/5 at
+     * Nevins to the 6 at Union Square, which takes half an hour. Even someone optimizing for fewest
+     * transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave
+     * and take the Q to Union Square, then transfer to the 6. If this takes less than
+     * optimize_transfer_penalty seconds, then that's what we'll return.
+     */
+    public int transferPenalty = 0;
 
     /***** ORIGNAL TRAVERSEOPTIONS FIELDS *****/
     
     /** max speed along streets, in meters per second */
     public double speed;
-
-    private TraverseModeSet modes;
 
     public Calendar calendar;
 
@@ -128,24 +127,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public OptimizeType optimizeFor = OptimizeType.QUICK;
 
-    /**
-     * A maxWalkDistance of Double.MAX_VALUE indicates no limit
-     */
-    double maxWalkDistance = Double.MAX_VALUE;
 
-    /**
-     * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
-     * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
-     * Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to wait until midnight,
-     * when the 4 train runs local the whole way. The actual fastest route is the 2/3 to the 4/5 at
-     * Nevins to the 6 at Union Square, which takes half an hour. Even someone optimizing for fewest
-     * transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave
-     * and take the Q to Union Square, then transfer to the 6. If this takes less than
-     * optimize_transfer_penalty seconds, then that's what we'll return.
-     */
-    public int transferPenalty = 0;
-
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /**
      * How much worse walking is than waiting for an equivalent length of time, as a multiplier.
@@ -248,8 +230,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      * to time it might take to walk between transit stops. This time should also be overridden by
      * specific transfer timing information in transfers.txt
      */
-    // initialize to zero so this does not inadvertently affect tests
-    // let Planner handle defaults
+    // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
     public int minTransferTime = 0;
 
     public int maxTransfers = 2;
@@ -350,19 +331,19 @@ public class TraverseOptions implements Cloneable, Serializable {
     public TraverseOptions(TraverseMode mode) {
     	this();
     	this.setModes(new TraverseModeSet(mode));
-	}
+    }
 
     public TraverseOptions(TraverseMode mode, OptimizeType optimize) {
     	this(new TraverseModeSet(mode), optimize);
-	}
+    }
 
     public TraverseOptions(TraverseModeSet modeSet, OptimizeType optimize) {
     	this();
         this.optimizeFor = optimize;
     	this.setModes(modeSet);
-	}
+    }    
 
-	public void setGtfsContext(GtfsContext context) {
+    public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
     }
 
@@ -460,10 +441,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         } else {
             this.worstTime = Long.MAX_VALUE;
         }
-    }
-
-    public boolean isArriveBy() {
-        return back;
     }
 
     public TraverseOptions getWalkingOptions() {
@@ -587,6 +564,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return reverseOptimizing;
     }
 
+    /** @return the (soft) maximum walk distance */
     public double getMaxWalkDistance() {
         return maxWalkDistance;
     }
@@ -616,32 +594,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return s;
     }
 
-    public double getTriangleSafetyFactor() {
-        return triangleSafetyFactor;
-    }
 
-    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
-        this.triangleSafetyFactor = triangleSafetyFactor;
-        walkingOptions.triangleSafetyFactor = triangleSafetyFactor;
-    }
-
-    public double getTriangleSlopeFactor() {
-        return triangleSlopeFactor;
-    }
-
-    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
-        this.triangleSlopeFactor = triangleSlopeFactor;
-        walkingOptions.triangleSlopeFactor = triangleSlopeFactor;
-    }
-
-    public double getTriangleTimeFactor() {
-        return triangleTimeFactor;
-    }
-
-    public void setTriangleTimeFactor(double triangleTimeFactor) {
-        this.triangleTimeFactor = triangleTimeFactor;
-        walkingOptions.triangleTimeFactor = triangleTimeFactor;
-    }
     
     /**** EX-REQUEST METHODS ****/
     public HashMap<String, String> getParameters() {
@@ -682,13 +635,8 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
 
-    /** @return the (soft) maximum walk distance */
-    public Double getMaxWalkDistance() { return maxWalkDistance; }
-
     /** @param walk - the (soft) maximum walk distance to set */
     public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }
-
-    public TraverseModeSet getModes() { return modes; }
 
     // TODO move this into TraverseModeSet
     public String getModesAsStr() {
@@ -717,10 +665,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         return optimize; 
     }
 
-    public void setOptimize(OptimizeType opt) { 
-        optimize = opt; 
-    }
-
     public Date getDateTime() { 
         return dateTime; 
     }
@@ -737,10 +681,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public boolean isArriveBy() { 
         return arriveBy; 
-    }
-
-    public void setArriveBy(boolean arriveBy) { 
-        this.arriveBy = arriveBy; 
     }
 
     public Integer getNumItineraries() { 
@@ -773,10 +713,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void removeMode(TraverseMode mode) { 
         modes.setMode(mode, false); 
-    }
-
-    public void setModes(TraverseModeSet modes) { 
-        this.modes = modes; 
     }
 
     /** Set whether the trip must be wheelchair accessible */
@@ -843,30 +779,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         return minTransferTime;
     }
     
-    public void setPreferredRoutes(String[] preferredRoutes) {
-        this.preferredRoutes = preferredRoutes.clone();
-    }
-
-    public String[] getPreferredRoutes() {
-        return preferredRoutes;
-    }
-
-    public void setUnpreferredRoutes(String[] unpreferredRoutes) {
-        this.unpreferredRoutes = unpreferredRoutes.clone();
-    }
-
-    public String[] getUnpreferredRoutes() {
-        return unpreferredRoutes;
-    }
-
-    public void setBannedRoutes(String[] bannedRoutes) {
-        this.bannedRoutes = bannedRoutes.clone();
-    }
-
-    public String[] getBannedRoutes() {
-        return bannedRoutes;
-    }
-
     public void setTransferPenalty(Integer transferPenalty) {
         this.transferPenalty = transferPenalty;
     }
@@ -885,22 +797,25 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
         this.triangleSafetyFactor = triangleSafetyFactor;
+        walkingOptions.triangleSafetyFactor = triangleSafetyFactor;
+    }
+
+    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
+        this.triangleSlopeFactor = triangleSlopeFactor;
+        walkingOptions.triangleSlopeFactor = triangleSlopeFactor;
+    }
+
+    public void setTriangleTimeFactor(double triangleTimeFactor) {
+        this.triangleTimeFactor = triangleTimeFactor;
+        walkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
 
     public double getTriangleSafetyFactor() {
         return triangleSafetyFactor;
     }
 
-    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
-        this.triangleSlopeFactor = triangleSlopeFactor;
-    }
-
     public double getTriangleSlopeFactor() {
         return triangleSlopeFactor;
-    }
-
-    public void setTriangleTimeFactor(double triangleTimeFactor) {
-        this.triangleTimeFactor = triangleTimeFactor;
     }
 
     public double getTriangleTimeFactor() {
