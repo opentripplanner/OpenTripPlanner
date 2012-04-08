@@ -22,10 +22,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -487,6 +490,49 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
             }
         }
         return out;
+    }
+    
+    /* EX-GENERICPATHSERVICE */
+    
+    private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
+
+    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
+            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
+
+    @Override
+    public Vertex getVertexForPlace(NamedPlace place, TraverseOptions options) {
+        return getVertexForPlace(place, options, null);
+    }
+
+    @Override
+    public Vertex getVertexForPlace(NamedPlace place, TraverseOptions options, Vertex other) {
+        Matcher matcher = _latLonPattern.matcher(place.place);
+        if (matcher.matches()) {
+            double lat = Double.parseDouble(matcher.group(1));
+            double lon = Double.parseDouble(matcher.group(4));
+            Coordinate location = new Coordinate(lon, lat);
+            if (other instanceof StreetLocation) {
+                return getClosestVertex(location, place.name, options, ((StreetLocation) other).getExtra());
+            } else {
+                return getClosestVertex(location, place.name, options);
+            }
+        }
+        // this should probably only be used in tests
+        return graphService.getGraph().getVertex(place.place);
+    }
+
+    @Override
+    public boolean isAccessible(NamedPlace place, TraverseOptions options) {
+        /* fixme: take into account slope for wheelchair accessibility */
+        Vertex vertex = getVertexForPlace(place, options);
+        if (vertex instanceof TransitStop) {
+            TransitStop ts = (TransitStop) vertex;
+            return ts.hasWheelchairEntrance();
+        } else if (vertex instanceof StreetLocation) {
+            StreetLocation sl = (StreetLocation) vertex;
+            return sl.isWheelchairAccessible();
+        }
+        return true;
     }
 
 }

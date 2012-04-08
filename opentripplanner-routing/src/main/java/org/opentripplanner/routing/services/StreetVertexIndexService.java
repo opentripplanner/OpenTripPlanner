@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.List;
 
+import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -38,4 +39,10 @@ public interface StreetVertexIndexService {
             List<Edge> extraEdges, Collection<Edge> preferredEdges);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
+
+    Vertex getVertexForPlace(NamedPlace place, TraverseOptions options);
+
+    Vertex getVertexForPlace(NamedPlace place, TraverseOptions options, Vertex other);
+
+    boolean isAccessible(NamedPlace place, TraverseOptions options);
 }
