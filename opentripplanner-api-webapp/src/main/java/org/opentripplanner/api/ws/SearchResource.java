@@ -173,7 +173,6 @@ public abstract class SearchResource {
             if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
                 throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
             }
-            
             request.setTriangleSafetyFactor(triangleSafetyFactor);
             request.setTriangleSlopeFactor(triangleSlopeFactor);
             request.setTriangleTimeFactor(triangleTimeFactor);
@@ -202,7 +201,6 @@ public abstract class SearchResource {
         if (bannedRoutes != null && !bannedRoutes.equals("")) {
             request.setBannedRoutes(bannedRoutes);
         }
-
         //replace deprecated optimization preference
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;

@@ -22,6 +22,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -29,6 +30,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -74,7 +76,7 @@ public class Planner extends SearchResource {
         Response response = new Response(httpServletRequest);
 
         /* create request */
-        Request request;
+        TraverseOptions request;
         try {
             request = buildRequestFromQueryParamFields();
         } catch (ParameterException pe) {

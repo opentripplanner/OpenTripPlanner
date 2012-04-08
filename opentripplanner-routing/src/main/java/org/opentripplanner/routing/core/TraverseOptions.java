@@ -94,7 +94,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** The maximum number of possible itineraries to return. */
     private Integer numItineraries = 3;
     /** The maximum slope of streets for wheelchair trips. */
-    private double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
     private boolean showIntermediateStops = false;
     

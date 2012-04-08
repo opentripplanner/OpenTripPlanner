@@ -30,10 +30,8 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Dwell;
@@ -73,7 +71,7 @@ public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
-    Request request;
+    TraverseOptions options;
 
     private PathService pathService;
 
@@ -83,9 +81,9 @@ public class PlanGenerator {
 
     private TransitIndexService transitIndex;
 
-    public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
-        this.request = request;
-        pathService = pathServiceFactory.getPathService(request.getRouterId());
+    public PlanGenerator(TraverseOptions options, PathServiceFactory pathServiceFactory) {
+        this.options = options;
+        pathService = pathServiceFactory.getPathService(options.getRouterId());
         Graph graph = pathService.getGraphService().getGraph();
         transitIndex = graph.getService(TransitIndexService.class);
         fareService = graph.getService(FareService.class);
@@ -97,42 +95,40 @@ public class PlanGenerator {
      */
     public TripPlan generate() {
 
-        TraverseOptions options = getOptions(request);
-
-        checkLocationsAccessible(request, options);
+        checkLocationsAccessible(options);
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
-            List<NamedPlace> intermediates = request.getIntermediatePlaces();
+            List<NamedPlace> intermediates = options.getIntermediatePlaces();
             if (intermediates.size() == 0) {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                        request.getDateTime(), options, request.getNumItineraries());
-                if (paths == null && request.getWheelchair()) {
+                paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
+                        options.getDateTime(), options, options.getNumItineraries());
+                if (paths == null && options.getWheelchair()) {
                     // There are no paths that meet the user's slope restrictions.
                     // Try again without slope restrictions (and warn user).
                     options.maxSlope = Double.MAX_VALUE;
-                    paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                            request.getDateTime(), options, request.getNumItineraries());
+                    paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
+                            options.getDateTime(), options, options.getNumItineraries());
                     tooSloped = true;
                 }
             } else {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                        intermediates, request.isIntermediatePlacesOrdered(),
-                        request.getDateTime(), options);
+                paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
+                        intermediates, options.isIntermediatePlacesOrdered(),
+                        options.getDateTime(), options);
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + request.getFrom() + " : " + request.getTo(), e);
+            LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
             throw e;
         }
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + request.getFrom() + " : " + request.getTo());
+            LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
             throw new PathNotFoundException();
         }
 
-        TripPlan plan = generatePlan(paths, request);
+        TripPlan plan = generatePlan(paths, options);
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
@@ -142,9 +138,9 @@ public class PlanGenerator {
                     continue;
                 }
                 Leg firstLeg = i.legs.get(0);
-                firstLeg.from.orig = request.getFromName();
+                firstLeg.from.orig = options.getFromName();
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
-                lastLeg.to.orig = request.getToName();
+                lastLeg.to.orig = options.getToName();
             }
         }
 
@@ -154,7 +150,7 @@ public class PlanGenerator {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public TripPlan generatePlan(List<GraphPath> paths, Request request) {
+    public TripPlan generatePlan(List<GraphPath> paths, TraverseOptions request) {
 
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
@@ -577,11 +573,11 @@ public class PlanGenerator {
      * Throw an exception if the start and end locations are not wheelchair accessible given the
      * user's specified maximum slope.
      */
-    private void checkLocationsAccessible(Request request, TraverseOptions options) {
-        if (request.getWheelchair()) {
+    private void checkLocationsAccessible(TraverseOptions options) {
+        if (options.getWheelchair()) {
             // check if the start and end locations are accessible
-            if (!pathService.isAccessible(request.getFromPlace(), options)
-                    || !pathService.isAccessible(request.getToPlace(), options)) {
+            if (!pathService.isAccessible(options.getFromPlace(), options)
+                    || !pathService.isAccessible(options.getToPlace(), options)) {
                 throw new LocationNotAccessible();
             }
 
