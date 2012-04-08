@@ -10,6 +10,7 @@ import javax.ws.rs.core.Context;
 import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -146,8 +147,8 @@ public abstract class SearchResource {
      * Range/sanity check the query parameter fields and build a Request object from them. 
      * @throws ParameterException 
      */
-    protected Request buildRequestFromQueryParamFields() throws ParameterException {
-        Request request = new Request();
+    protected TraverseOptions buildRequestFromQueryParamFields() throws ParameterException {
+        TraverseOptions request = new TraverseOptions();
         request.setRouterId(routerId);
         request.setFrom(fromPlace);
         request.setTo(toPlace);
@@ -167,7 +168,7 @@ public abstract class SearchResource {
             request.setMaxWalkDistance(maxWalkDistance);
         }
         if (walkSpeed != null) {
-            request.setWalkSpeed(walkSpeed);
+            request.setSpeed(walkSpeed);
         }
         if (triangleSafetyFactor != null || triangleSlopeFactor != null || triangleTimeFactor != null) {
             if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
@@ -203,16 +204,13 @@ public abstract class SearchResource {
             request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
         }
         if (preferredRoutes != null && !preferredRoutes.equals("")) {
-            String[] table = preferredRoutes.split(",");
-            request.setPreferredRoutes(table);
+            request.setPreferredRoutes(preferredRoutes);
         }
         if (unpreferredRoutes != null && !unpreferredRoutes.equals("")) {
-            String[] table = unpreferredRoutes.split(",");
-            request.setUnpreferredRoutes(table);
+            request.setUnpreferredRoutes(unpreferredRoutes);
         }
         if (bannedRoutes != null && !bannedRoutes.equals("")) {
-            String[] table = bannedRoutes.split(",");
-            request.setBannedRoutes(table);
+            request.setBannedRoutes(bannedRoutes);
         }
 
         //replace deprecated optimization preference

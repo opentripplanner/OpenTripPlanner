@@ -473,6 +473,18 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
 
+    public void SetPreferredRoutes(String s) {
+        
+    }
+    
+    public void SetUnpreferredRoutes(String s) {
+        
+    }
+
+    public void SetBannedRoutes(String s) {
+        
+    }
+    
     public final static int MIN_SIMILARITY = 1000;
 
     public int similarity(TraverseOptions options) {
