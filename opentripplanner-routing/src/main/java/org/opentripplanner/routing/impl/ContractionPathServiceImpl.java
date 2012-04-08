@@ -95,32 +95,8 @@ public class ContractionPathServiceImpl extends GenericPathService {
     public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
             TraverseOptions options, int nItineraries) {
 
-        ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = getVertexForPlace(fromPlace, options);
-        if (fromVertex == null) {
-            notFound.add("from");
-        }
-        Vertex toVertex = getVertexForPlace(toPlace, options, fromVertex);
-        if (toVertex == null) {
-            notFound.add("to");
-        }
 
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }
-
-        Vertex origin = null;
-        Vertex target = null;
-
-        if (options.isArriveBy()) {
-            origin = toVertex;
-            target = fromVertex;
-        } else {
-            origin = fromVertex;
-            target = toVertex;
-        }
-
-        State state = new State((int)(targetTime.getTime() / 1000), origin, options);
+        
 
         return plan(state, target, nItineraries);
     }

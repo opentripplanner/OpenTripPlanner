@@ -36,8 +36,10 @@ import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHe
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -789,10 +791,40 @@ public class TraverseOptions implements Cloneable, Serializable {
     // could even be setGraph
     public void prepareForSearch(Graph graph) {
         this.graph = graph;
-        
+        findEndpointVertices();
+
         //setServiceDays();
     }
     
+    private void findEndpointVertices() {
+        if (graph == null)
+            return;
+        StreetVertexIndexService index = graph.getService(StreetVertexIndexService.class);
+        if (index == null)
+            return;
+        ArrayList<String> notFound = new ArrayList<String>();
+        Vertex fromVertex = index.getVertexForPlace(fromPlace, this);
+        if (fromVertex == null) {
+            notFound.add("from");
+        }
+        Vertex toVertex = getVertexForPlace(toPlace, options, fromVertex);
+        if (toVertex == null) {
+            notFound.add("to");
+        }
+        if (notFound.size() > 0) {
+            throw new VertexNotFoundException(notFound);
+        }
+        Vertex origin = null;
+        Vertex target = null;
+        if (options.isArriveBy()) {
+            origin = toVertex;
+            target = fromVertex;
+        } else {
+            origin = fromVertex;
+            target = toVertex;
+        }
+    }
+
     /**
      *  Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative
      *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were
@@ -819,6 +851,13 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
 
+    /** Builds an initial State for a search based on this set of options. */
+    public State getInitialState() {
+        Vertex initialVertex = arriveBy ? toVertex : fromVertex;
+        State initialState = new State((int)(dateTime.getTime() / 1000), initialVertex, this);
+        return initialState;
+    }
+    
     private static<T> void addIfNotExists(ArrayList<T> list, T item) {
         if (!list.contains(item)) {
             list.add(item);
