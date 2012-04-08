@@ -139,7 +139,7 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
         options.setTransferTable(_graphService.getGraph().getTransferTable());
 
         options.setServiceDays(origin.getTime(), _graphService.getGraph().getAgencyIds());
-        if (options.getModes().getTransit()
+        if (options.getModes().isTransit()
             && !_graphService.getGraph().transitFeedCovers(new Date(origin.getTime() * 1000))) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
@@ -226,7 +226,7 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
                 if (u.equals(target)) {
 //                    boundingStates.add(su);
                     returnStates.add(su);
-                    if ( ! options.getModes().getTransit())
+                    if ( ! options.getModes().isTransit())
                         break QUEUE;
                     // options should contain max itineraries
                     if (returnStates.size() >= _maxPaths)

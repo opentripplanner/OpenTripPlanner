@@ -296,7 +296,7 @@ public class GenericAStar {
             spt = _shortestPathTreeFactory.create();
 
         if (spt == null) {
-            if (options.getModes().getTransit()) {
+            if (options.getModes().isTransit()) {
                 spt = new MultiShortestPathTree();
                 // if (options.useServiceDays)
                 options.setServiceDays(init.getTime(), graph.getAgencyIds());

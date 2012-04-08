@@ -52,7 +52,7 @@ public class PreAlightEdge extends FreeEdge {
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only
             // options can be used to find transit stops without boarding vehicles.
-            if (!options.getModes().getTransit())
+            if (!options.getModes().isTransit())
                 return null;
 
             // Do not board if passenger has alighted from a local stop

@@ -47,7 +47,7 @@ public class LBGRemainingWeightHeuristicFactoryImpl implements
 	@Override
 	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt,
 			Vertex target) {
-		if (opt.getModes().getTransit()) {
+		if (opt.getModes().isTransit()) {
 			LOG.debug("Transit itinerary requested.");
 			return new LBGRemainingWeightHeuristic(_graphService.getGraph(), opt);
 		} else {

@@ -281,7 +281,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
 
     /** Returns true if any the trip may use some transit mode */
-    public boolean getTransit() {
+    public boolean isTransit() {
         return (modes & (MODE_TRANSIT)) != 0;
     }
 

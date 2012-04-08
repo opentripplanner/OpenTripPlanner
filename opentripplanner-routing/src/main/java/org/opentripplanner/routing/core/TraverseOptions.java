@@ -347,7 +347,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public boolean transitAllowed() {
-        return getModes().getTransit();
+        return getModes().isTransit();
     }
 
     @SuppressWarnings("unchecked")
@@ -798,7 +798,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         setCalendarService(graph.getService(CalendarService.class));
         setTransferTable(graph.getTransferTable());
         setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
-        if (getModes().getTransit()
+        if (getModes().isTransit()
             && ! graph.transitFeedCovers(dateTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
@@ -810,7 +810,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         LOG.debug("Applied A* heuristic: {}", remainingWeightHeuristic);
 
         // If transit is not to be used, disable walk limit and only search for one itinerary.
-        if (! getModes().getTransit()) {
+        if (! getModes().isTransit()) {
             numItineraries = 1;
             setMaxWalkDistance(Double.MAX_VALUE);
         }
