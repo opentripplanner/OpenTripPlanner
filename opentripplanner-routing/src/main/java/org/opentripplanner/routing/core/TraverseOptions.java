@@ -125,8 +125,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     private Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
 
-    private boolean back = false;
-
     public boolean wheelchairAccessible = false;
 
     public OptimizeType optimizeFor = OptimizeType.QUICK;
@@ -437,10 +435,10 @@ public class TraverseOptions implements Cloneable, Serializable {
                 ;
     }
 
-    public void setArriveBy(boolean back) {
-        this.back = back;
-        walkingOptions.back = back;
-        if (back) {
+    public void setArriveBy(boolean arriveBy) {
+        this.arriveBy = arriveBy;
+        walkingOptions.arriveBy = arriveBy;
+        if (arriveBy) {
             this.worstTime = 0;
         } else {
             this.worstTime = Long.MAX_VALUE;
