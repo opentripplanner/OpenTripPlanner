@@ -55,13 +55,13 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
 
-    /**** NEW FIELDS ****/
+    /* NEW FIELDS */
     
     public Graph graph;
     public Vertex fromVertex;
     public Vertex toVertex;
     
-    /****** EX-REQUEST FIELDS ******/
+    /* EX-REQUEST FIELDS */
 
     /** The complete list of incoming query parameters. */
     private final HashMap<String, String> parameters = new HashMap<String, String>();
@@ -117,7 +117,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public int transferPenalty = 0;
 
-    /***** ORIGNAL TRAVERSEOPTIONS FIELDS *****/
+    /* ORIGNAL TRAVERSEOPTIONS FIELDS */
     
     public Calendar calendar;
 
@@ -129,11 +129,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public OptimizeType optimizeFor = OptimizeType.QUICK;
 
-
-
-    /**
-     * How much worse walking is than waiting for an equivalent length of time, as a multiplier.
-     */
+    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier */
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
@@ -147,19 +143,13 @@ public class TraverseOptions implements Cloneable, Serializable {
     // TODO: how long does it /really/ take to get an elevator?
     public int elevatorBoardTime = 90;
 
-    /**
-     * What is the cost of boarding an elevator?
-     */
+    /** What is the cost of boarding an elevator? */
     public int elevatorBoardCost = 90;
 
-    /**
-     * How long does it take to advance one floor on an elevator?
-     */
+    /** How long does it take to advance one floor on an elevator? */
     public int elevatorHopTime = 20;
 
-    /**
-     * What is the cost of travelling one floor on an elevator?
-     */
+    /** What is the cost of travelling one floor on an elevator? */
     public int elevatorHopCost = 20;
 
     // it is assumed that getting off an elevator is completely free
@@ -174,27 +164,19 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public double waitReluctance = 0.95;
 
-    /**
-     * How much less bad is waiting at the beginning of the trip
-     */
+    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance) */
     public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
     public int boardCost = 60 * 5;
 
-    /**
-     * Do not use certain named routes
-     */
+    /** Do not use certain named routes */
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
     
-    /**
-     * Do not use certain trips
-     */
+    /** Do not use certain trips */
     public HashSet<AgencyAndId> bannedTrips = new HashSet<AgencyAndId>();
 
-    /**
-     * Set of preferred routes by user.
-     */
+    /** Set of preferred routes by user. */
     public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
     
     /**
@@ -203,9 +185,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public int useAnotherThanPreferredRoutesPenalty = 300;
     
-    /**
-     * Set of unpreferred routes for given user.
-     */
+    /** Set of unpreferred routes for given user. */
     public HashSet<RouteSpec> unpreferredRoutes = new HashSet<RouteSpec>();
 
     /**
@@ -221,9 +201,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public long worstTime = Long.MAX_VALUE;
 
-    /**
-     * The worst possible weight that we will accept when planning a trip.
-     */
+    /** The worst possible weight that we will accept when planning a trip. */
     public double maxWeight = Double.MAX_VALUE;
 
     /**
@@ -254,14 +232,6 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public long searchAbortTime = 0;
     
-    private TraverseOptions walkingOptions;
-    
-    public GenericAStarFactory aStarSearchFactory = null;
-    
-    public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
-
-    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
-
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default
      * set. We provide an extension point for adding arbitrary parameters with an extension-specific
@@ -269,29 +239,8 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     private Map<Object, Object> extensions = new HashMap<Object, Object>();
 
-    private TransferTable transferTable;
-
-    public int nonpreferredTransferPenalty = 120; /* penalty for using a non-preferred transfer */
-    
-
-    /**
-     * With this flag, you can selectively enable or disable the use of the {@link #serviceDays}
-     * cache. It is enabled by default, but you can disable it if you don't need this functionality.
-     */
-    public boolean useServiceDays = true;
-
-    /*
-     * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
-     * TraverseOptions to a particular start time for the duration of a search so the same options
-     * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
-     * into StateData, with all that entails.
-     */
-    public ArrayList<ServiceDay> serviceDays;
-    
-    /**
-     * This is true when a GraphPath is being traversed in reverse for optimization purposes.
-     */
-    private boolean reverseOptimizing = false;
+    /** Penalty for using a non-preferred transfer */
+    public int nonpreferredTransferPenalty = 120; 
 
     /** 
      * For the bike triangle, how important time is.  
@@ -304,11 +253,36 @@ public class TraverseOptions implements Cloneable, Serializable {
     private double triangleSafetyFactor;
 
     
-    /* Search context and cached aux information */
-    //
-    //
-    //
+    /* FIELDS FOR SEARCH CONTEXT AND CACHED VALUES */
+
+    private TraverseOptions walkingOptions;
+
+    public GenericAStarFactory aStarSearchFactory = null;
     
+    public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
+    
+    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
+
+    private TransferTable transferTable;
+
+    /**
+     * With this flag, you can selectively enable or disable the use of the {@link #serviceDays}
+     * cache. It is enabled by default, but you can disable it if you don't need this functionality.
+     */
+    public boolean useServiceDays = true;
+    
+    /**
+     * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
+     * TraverseOptions to a particular start time for the duration of a search so the same options
+     * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
+     * into StateData, with all that entails.
+     */
+    public ArrayList<ServiceDay> serviceDays;
+    
+    /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
+    private boolean reverseOptimizing = false;
+    
+    /* CONSTRUCTORS */
     
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
@@ -345,6 +319,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     	this.setModes(modeSet);
     }    
 
+    /* ACCESSOR METHODS */
+    
     public void setGtfsContext(GtfsContext context) {
         calendarService = context.getCalendarService();
     }
@@ -395,45 +371,6 @@ public class TraverseOptions implements Cloneable, Serializable {
     	return ret;
     }
     
-    public boolean equals(Object o) {
-        if (o instanceof TraverseOptions) {
-            TraverseOptions to = (TraverseOptions) o;
-            return speed == to.speed && maxWeight == to.maxWeight && worstTime == to.worstTime
-                    && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
-                    && wheelchairAccessible == to.wheelchairAccessible
-                    && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
-                    && transferPenalty == to.transferPenalty
-                    && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
-                    && waitReluctance == to.waitReluctance && boardCost == to.boardCost
-                    && bannedRoutes.equals(to.bannedRoutes)
-                    && bannedTrips.equals(to.bannedTrips)
-                    && minTransferTime == to.minTransferTime
-                    && nonpreferredTransferPenalty == to.nonpreferredTransferPenalty
-                    && transferPenalty == to.transferPenalty
-                    && triangleSafetyFactor == to.triangleSafetyFactor
-                    && triangleSlopeFactor == to.triangleSlopeFactor
-                    && triangleTimeFactor == to.triangleTimeFactor
-                    && stairsReluctance == to.stairsReluctance;
-        }
-        return false;
-    }
-
-    public int hashCode() {
-        return new Double(speed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
-                + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
-                + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
-                + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
-                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373
-                + minTransferTime * 20996011 + (int) nonpreferredTransferPenalty
-                + (int) transferPenalty * 163013803 
-                + new Double(triangleSafetyFactor).hashCode() * 195233277
-                + new Double(triangleSlopeFactor).hashCode() * 136372361
-                + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321
-                ;
-    }
 
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
@@ -856,11 +793,55 @@ public class TraverseOptions implements Cloneable, Serializable {
         return new NamedPlace(toName, to);
     }
     
-    /**
-     * Build a request from the parameters in a concrete subclass of SearchResource.
-     */
+    /* STATIC METHODS */
+    
+//    /**
+//     * Build a request from the parameters in a concrete subclass of SearchResource.
+//     */
 //    public Request(SearchResource) {
 //        
 //    }
- 
+
+    /* INSTANCE METHODS */
+    
+    public boolean equals(Object o) {
+        if (o instanceof TraverseOptions) {
+            TraverseOptions to = (TraverseOptions) o;
+            return speed == to.speed && maxWeight == to.maxWeight && worstTime == to.worstTime
+                    && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
+                    && wheelchairAccessible == to.wheelchairAccessible
+                    && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
+                    && transferPenalty == to.transferPenalty
+                    && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
+                    && waitReluctance == to.waitReluctance && boardCost == to.boardCost
+                    && bannedRoutes.equals(to.bannedRoutes)
+                    && bannedTrips.equals(to.bannedTrips)
+                    && minTransferTime == to.minTransferTime
+                    && nonpreferredTransferPenalty == to.nonpreferredTransferPenalty
+                    && transferPenalty == to.transferPenalty
+                    && triangleSafetyFactor == to.triangleSafetyFactor
+                    && triangleSlopeFactor == to.triangleSlopeFactor
+                    && triangleTimeFactor == to.triangleTimeFactor
+                    && stairsReluctance == to.stairsReluctance;
+        }
+        return false;
+    }
+
+    public int hashCode() {
+        return new Double(speed).hashCode() + new Double(maxWeight).hashCode()
+                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
+                + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
+                + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
+                + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
+                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373
+                + minTransferTime * 20996011 + (int) nonpreferredTransferPenalty
+                + (int) transferPenalty * 163013803 
+                + new Double(triangleSafetyFactor).hashCode() * 195233277
+                + new Double(triangleSlopeFactor).hashCode() * 136372361
+                + new Double(triangleTimeFactor).hashCode() * 790052899
+                + new Double(stairsReluctance).hashCode() * 315595321
+                ;
+    }
+
 }
