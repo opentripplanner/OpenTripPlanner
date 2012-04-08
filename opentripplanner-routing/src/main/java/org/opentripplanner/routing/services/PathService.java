@@ -13,44 +13,27 @@
 
 package org.opentripplanner.routing.services;
 
-import java.util.Date;
 import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
 public interface PathService {
 
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
-            TraverseOptions options, int nItineraries);
+    public List<GraphPath> getPaths(TraverseOptions options);
 
     /**
      * In the case of "arrive-by" routing, the origin state is actually the user's end location and
      * the target vertex is the user's start location.
-     * 
-     * @param origin
-     * @param target
-     * @param nItineraries
-     * @return
      */
-    public List<GraphPath> plan(State origin, Vertex target, int nItineraries);
 
     /**
+     * TODO: there was a separate method to handle intermediates; now the pathservice should just figure this out from the request.
+     * 
      * Here we wish to plan a trip that starts at "fromPlace", travels through the intermediate
      * places in some arbitrary but hopefully optimal order, and eventually end up at "toPlace".
-     * 
-     * @param fromPlace
-     * @param toPlace
-     * @param intermediatePlaces
-     * @param dateTime
-     * @param options
-     * @return
      */
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediatePlaces,
-            boolean ordered, Date dateTime, TraverseOptions options);
 
     public void setGraphService(GraphService graphService);
 

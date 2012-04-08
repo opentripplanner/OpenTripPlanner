@@ -89,10 +89,7 @@ public class PlanGenerator {
         fareService = graph.getService(FareService.class);
     }
 
-    /**
-     * Generates a TripPlan from a Request;
-     * 
-     */
+    /** Generates a TripPlan from a Request */
     public TripPlan generate() {
 
         checkLocationsAccessible(options);
@@ -101,22 +98,13 @@ public class PlanGenerator {
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
-            List<NamedPlace> intermediates = options.getIntermediatePlaces();
-            if (intermediates.size() == 0) {
-                paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
-                        options.getDateTime(), options, options.getNumItineraries());
-                if (paths == null && options.getWheelchair()) {
-                    // There are no paths that meet the user's slope restrictions.
-                    // Try again without slope restrictions (and warn user).
-                    options.maxSlope = Double.MAX_VALUE;
-                    paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
-                            options.getDateTime(), options, options.getNumItineraries());
-                    tooSloped = true;
-                }
-            } else {
-                paths = pathService.plan(options.getFromPlace(), options.getToPlace(),
-                        intermediates, options.isIntermediatePlacesOrdered(),
-                        options.getDateTime(), options);
+            paths = pathService.getPaths(options);
+            if (paths == null && options.getWheelchair()) {
+                // There are no paths that meet the user's slope restrictions.
+                // Try again without slope restrictions (and warn user).
+                options.maxSlope = Double.MAX_VALUE;
+                paths = pathService.getPaths(options);
+                tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
             LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
