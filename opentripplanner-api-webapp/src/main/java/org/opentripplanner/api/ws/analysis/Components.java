@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.opentripplanner.analysis.AnalysisUtils;
 import org.opentripplanner.api.model.analysis.GraphComponent;
 import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
-import org.opentripplanner.api.ws.RequestInf;
 import org.opentripplanner.api.ws.SearchResource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
