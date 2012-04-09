@@ -11,6 +11,8 @@ import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.services.GraphService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
 /**
@@ -140,6 +142,8 @@ public abstract class SearchResource {
     /** Inject the servlet request so we have access to the query parameter map */
     @Context HttpServletRequest httpServletRequest;
 
+    @Autowired GraphService graphService; 
+    
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -214,6 +218,7 @@ public abstract class SearchResource {
         if (maxTransfers != null) {
             request.setMaxTransfers(maxTransfers);
         }
+        request.prepareForSearch(graphService.getGraph());
         return request;
     }
 
