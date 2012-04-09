@@ -42,8 +42,10 @@ import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -921,6 +923,27 @@ public class TraverseOptions implements Cloneable, Serializable {
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321
                 ;
+    }
+
+    /** check if the start and end locations are accessible */
+    public boolean isAccessible() {
+        if (getWheelchair()) {
+            return isWheelchairAccessible(fromVertex) &&
+                   isWheelchairAccessible(toVertex);
+        }
+        return true;
+    }
+
+    // this could be handled by method overloading on Vertex
+    public boolean isWheelchairAccessible(Vertex v) {
+        if (v instanceof TransitStop) {
+            TransitStop ts = (TransitStop) v;
+            return ts.hasWheelchairEntrance();
+        } else if (v instanceof StreetLocation) {
+            StreetLocation sl = (StreetLocation) v;
+            return sl.isWheelchairAccessible();
+        }
+        return true;
     }
 
 }

@@ -54,6 +54,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -62,6 +63,7 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -80,11 +82,11 @@ public class PlanGenerator {
     private GeometryFactory geometryFactory = new GeometryFactory();
 
     private TransitIndexService transitIndex;
-
+    
     public PlanGenerator(TraverseOptions options, PathServiceFactory pathServiceFactory) {
         this.options = options;
         pathService = pathServiceFactory.getPathService(options.getRouterId());
-        Graph graph = pathService.getGraphService().getGraph();
+        Graph graph = options.graph;
         transitIndex = graph.getService(TransitIndexService.class);
         fareService = graph.getService(FareService.class);
     }
@@ -92,7 +94,8 @@ public class PlanGenerator {
     /** Generates a TripPlan from a Request */
     public TripPlan generate() {
 
-        checkLocationsAccessible(options);
+        if ( ! options.isAccessible())
+            throw new LocationNotAccessible();
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
@@ -555,21 +558,6 @@ public class PlanGenerator {
             place.zoneId = state.getZone();
         }
         return place;
-    }
-
-    /**
-     * Throw an exception if the start and end locations are not wheelchair accessible given the
-     * user's specified maximum slope.
-     */
-    private void checkLocationsAccessible(TraverseOptions options) {
-        if (options.getWheelchair()) {
-            // check if the start and end locations are accessible
-            if (!pathService.isAccessible(options.getFromPlace(), options)
-                    || !pathService.isAccessible(options.getToPlace(), options)) {
-                throw new LocationNotAccessible();
-            }
-
-        }
     }
 
     /**

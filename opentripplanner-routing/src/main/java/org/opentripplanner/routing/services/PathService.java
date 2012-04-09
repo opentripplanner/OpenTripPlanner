@@ -35,6 +35,4 @@ public interface PathService {
      * places in some arbitrary but hopefully optimal order, and eventually end up at "toPlace".
      */
 
-    public boolean isAccessible(NamedPlace place, TraverseOptions options);
-
 }
