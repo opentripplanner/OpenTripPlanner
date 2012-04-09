@@ -94,8 +94,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
-    /** The date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
-    public Date dateTime = new Date();
+    /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
+    public long dateTime = new Date().getTime() / 1000;
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
     public boolean arriveBy = false;
     /** Whether the trip must be wheelchair accessible. */
@@ -372,12 +372,13 @@ public class TraverseOptions implements Cloneable, Serializable {
             throw new RuntimeException(e);
         }
     }
-
+    
+    /** @param finalTime in seconds since the epoch */
     public TraverseOptions reversedClone(long finalTime) {
     	TraverseOptions ret = this.clone();
     	ret.setArriveBy( ! ret.isArriveBy());
     	ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
-    	ret.dateTime = new Date(finalTime * 1000);
+    	ret.dateTime = finalTime;
     	return ret;
     }
     
@@ -583,17 +584,18 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public Date getDateTime() { 
-        return dateTime; 
+        return new Date(dateTime * 1000); 
     }
 
     public void setDateTime(Date dateTime) {
-        this.dateTime = new Date(dateTime.getTime());
+        this.dateTime = dateTime.getTime() / 1000;
     }
 
     public void setDateTime(String date, String time) {
-        dateTime = DateUtils.toDate(date, time);
+        Date dateObject = DateUtils.toDate(date, time);
         LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
-        LOG.debug("Request datetime parsed as {}", dateTime);
+        LOG.debug("Request datetime parsed as {}", dateObject);
+        setDateTime(dateObject);
     }
 
     public boolean isArriveBy() { 
@@ -825,7 +827,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
     
     public long getSecondsSinceEpoch() {
-        return dateTime.getTime() / 1000;
+        return dateTime;
     }
     
     // TODO: this should be done in SearchResource so we don't have to pass in a street index

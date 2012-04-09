@@ -203,8 +203,7 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(Date d) {
-        long t = d.getTime();
+    public boolean transitFeedCovers(long t) {
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 

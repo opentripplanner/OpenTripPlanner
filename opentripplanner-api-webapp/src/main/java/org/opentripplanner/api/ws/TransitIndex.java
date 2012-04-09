@@ -281,7 +281,7 @@ public class TransitIndex {
 //            options.setServiceDays(startTime, agencies);
 //        }
         // TODO: verify correctness
-        options.dateTime = new Date(startTime * 1000); // give options a method for setting from sec?
+        options.dateTime = startTime;
         options.graph = this.graphService.getGraph();
         options.prepareForSearch();
         return options;
@@ -344,7 +344,7 @@ public class TransitIndex {
         for (RouteSegment segment :  variant.segmentsAfter(start)) {
             // TODO: verify options/state init correctness
             options.fromVertex = segment.hopIn.getFromVertex();
-            options.dateTime = new Date(state.getTime() * 1000);
+            options.dateTime = state.getTime();
             State s0 = new State(options);
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
@@ -362,7 +362,7 @@ public class TransitIndex {
         long time = startTime;
         do {
             // TODO verify options/state correctness
-            options.dateTime = new Date(time*1000); // add method
+            options.dateTime = time;
             options.fromVertex = e.getFromVertex();
             State s0 = new State(options);
             result = e.traverse(s0);
