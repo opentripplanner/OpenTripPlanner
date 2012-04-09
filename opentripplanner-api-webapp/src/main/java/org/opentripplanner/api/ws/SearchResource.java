@@ -13,6 +13,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -144,10 +145,12 @@ public abstract class SearchResource {
     /** Inject the servlet request so we have access to the query parameter map */
     @Context HttpServletRequest httpServletRequest;
 
-    @Autowired GraphService graphService; 
+    @Autowired private GraphService _graphService; 
 
-    @Autowired RemainingWeightHeuristicFactory heuristicFactory;
+    @Autowired private RemainingWeightHeuristicFactory _heuristicFactory;
     
+    @Autowired private StreetVertexIndexService _streetIndex;
+
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -222,8 +225,10 @@ public abstract class SearchResource {
         if (maxTransfers != null) {
             request.setMaxTransfers(maxTransfers);
         }
-        request.graph = graphService.getGraph();
-        request.remainingWeightHeuristic = this.heuristicFactory.getInstanceForSearch(request);
+        request.graph = _graphService.getGraph();
+        request.remainingWeightHeuristic = _heuristicFactory.getInstanceForSearch(request);
+        // this is ugly but needed here for now
+        request.streetIndex = _streetIndex; 
         request.prepareForSearch();
         return request;
     }

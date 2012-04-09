@@ -43,9 +43,11 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all
@@ -67,7 +69,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     public Vertex fromVertex;
     public Vertex toVertex;
     boolean initialized = false;
-    
+    public StreetVertexIndexService streetIndex;
+
     /* EX-REQUEST FIELDS */
 
     /** The complete list of incoming query parameters. */
@@ -807,6 +810,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void prepareForSearch() {
         if (graph == null)
             throw new IllegalStateException("Graph must be set before preparing for search.");
+        
         findEndpointVertices();
         CalendarServiceData csData = graph.getService(CalendarServiceData.class);
         if (csData != null) {
@@ -834,18 +838,18 @@ public class TraverseOptions implements Cloneable, Serializable {
         return dateTime.getTime() / 1000;
     }
     
+    // TODO: this should be done in SearchResource so we don't have to pass in a street index
     private void findEndpointVertices() {
         if (graph == null)
-            return;
-        StreetVertexIndexService index = graph.getService(StreetVertexIndexService.class);
-        if (index == null)
-            return;
+            throw new RuntimeException("graph not yet set, cannot find endpoints");
+        if (streetIndex == null)
+            throw new RuntimeException("street index not yet set, cannot find endpoints");
         ArrayList<String> notFound = new ArrayList<String>();
-        fromVertex = index.getVertexForPlace(getFromPlace(), this);
+        fromVertex = streetIndex.getVertexForPlace(getFromPlace(), this);
         if (fromVertex == null) {
             notFound.add("from");
         }
-        toVertex = index.getVertexForPlace(getToPlace(), this, fromVertex);
+        toVertex = streetIndex.getVertexForPlace(getToPlace(), this, fromVertex);
         if (toVertex == null) {
             notFound.add("to");
         }
