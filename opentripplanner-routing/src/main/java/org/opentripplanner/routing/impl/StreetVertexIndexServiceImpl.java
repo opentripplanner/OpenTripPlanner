@@ -517,7 +517,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
                 return getClosestVertex(location, place.name, options);
             }
         }
-        // this should probably only be used in tests
+        // did not match lat/lon, interpret place as a vertex label.
+        // this should probably only be used in tests.
         return graphService.getGraph().getVertex(place.place);
     }
 
