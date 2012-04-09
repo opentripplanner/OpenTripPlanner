@@ -569,19 +569,6 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** @param walk - the (soft) maximum walk distance to set */
     public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }
 
-    // TODO move this into TraverseModeSet
-    public String getModesAsStr() {
-        String retVal = null;
-        for (TraverseMode m : modes.getModes()) {
-            if (retVal == null)
-                retVal = "";
-            else
-                retVal += ", ";
-            retVal += m;
-        }
-        return retVal;
-    }
-
     public void addMode(TraverseMode mode) { 
         modes.setMode(mode, true); 
     }
