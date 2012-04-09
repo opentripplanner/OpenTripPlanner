@@ -134,6 +134,7 @@ public class RetryingPathServiceImpl implements PathService {
                     System.currentTimeMillis() - searchBeginTime);
             if (somePaths == null) {
                 // search failed, likely due to timeout
+                // this could be signaled with an exception
                 LOG.warn("Aborting search. {} paths found, elapsed time {} sec", 
                         paths.size(), (System.currentTimeMillis() - searchBeginTime) / 1000.0);
                 break;
