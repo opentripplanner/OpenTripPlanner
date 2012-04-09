@@ -36,6 +36,7 @@ import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,29 +45,20 @@ public class RetryingPathServiceImpl implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RetryingPathServiceImpl.class);
 
-    @Autowired GraphService graphService;
-    
-    @Autowired SPTService sptService;
-    
-    @Autowired RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
-
     private static final int MAX_TIME_FACTOR = 2;
-
     private static final int MAX_WEIGHT_FACTOR = 2;
 
-    private RoutingService _routingService;
+    @Autowired GraphService graphService;
+    @Autowired SPTService sptService;
+    @Autowired RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
 
+    private double firstPathTimeout = 0; // seconds
+    private double multiPathTimeout = 0; // seconds
     
-    private double _firstPathTimeout = 0; // seconds
-    
-    private double _multiPathTimeout = 0; // seconds
-    
-    /**
-     * Give up on searching for itineraries after this many seconds have elapsed.
-     */
+    /** Give up on searching for itineraries after this many seconds have elapsed. */
     public void setTimeout (double seconds) {
-        _firstPathTimeout = seconds;
-        _multiPathTimeout = seconds;
+        firstPathTimeout = seconds;
+        multiPathTimeout = seconds;
     }
 
     /**
@@ -74,7 +66,7 @@ public class RetryingPathServiceImpl implements PathService {
      * A negative or zero value means search forever. 
      */
     public void setFirstPathTimeout (double seconds) {
-        _firstPathTimeout = seconds;
+        firstPathTimeout = seconds;
     }
     
     /**
@@ -86,17 +78,7 @@ public class RetryingPathServiceImpl implements PathService {
      * response time down while assuring that the end user will get at least one response.
      */
     public void setMultiPathTimeout (double seconds) {
-        _multiPathTimeout = seconds;
-    }
-
-    @Autowired
-    public void setRemainingWeightHeuristicFactory(RemainingWeightHeuristicFactory hf) {
-        _remainingWeightHeuristicFactory = hf;
-    }
-
-    @Autowired
-    public void setRoutingService(RoutingService routingService) {
-        _routingService = routingService;
+        multiPathTimeout = seconds;
     }
 
     @Override
@@ -104,12 +86,12 @@ public class RetryingPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
-        // convert relative timeouts to absolute timeouts
+        // convert relative timeouts to absolute timeouts (maybe this should be in options)
         long searchBeginTime = System.currentTimeMillis();
-        long abortFirst = _firstPathTimeout <= 0 ? 0 :
-                (long) (searchBeginTime + _firstPathTimeout * 1000);
-        long abortMulti = _multiPathTimeout <= 0 ? 0 :
-                (long) (searchBeginTime + _multiPathTimeout * 1000);
+        long abortFirst = firstPathTimeout <= 0 ? 0 :
+                (long) (searchBeginTime + firstPathTimeout * 1000);
+        long abortMulti = multiPathTimeout <= 0 ? 0 :
+                (long) (searchBeginTime + multiPathTimeout * 1000);
         
         // The list of options specifying various modes, banned routes, etc to try for multiple
         // itineraries
@@ -145,7 +127,8 @@ public class RetryingPathServiceImpl implements PathService {
             long subsearchBeginTime = System.currentTimeMillis();
             
             LOG.debug("BEGIN SUBSEARCH");
-            List<GraphPath> somePaths = _routingService.route(options);
+            ShortestPathTree spt = sptService.getShortestPathTree(options);
+            List<GraphPath> somePaths = spt.getPaths(options.getTargetVertex(), true);
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);
@@ -156,9 +139,7 @@ public class RetryingPathServiceImpl implements PathService {
                 break;
             }
             if (maxWeight == Double.MAX_VALUE) {
-                /*
-                 * the worst trip we are willing to accept is at most twice as bad or twice as long.
-                 */
+                /* the worst trip we are willing to accept is at most twice as bad or twice as long */
                 if (somePaths.isEmpty()) {
                     // if there is no first path, there won't be any other paths
                     return null;
@@ -186,8 +167,6 @@ public class RetryingPathServiceImpl implements PathService {
                     if (path.getWalkDistance() > maxWalk) {
                         maxWalk = path.getWalkDistance() * 1.25;
                     }
-                    // DEBUG
-                    // path.dump();
                     paths.add(path);
                     // now, create a list of options, one with each trip in this journey banned.
 
@@ -196,29 +175,18 @@ public class RetryingPathServiceImpl implements PathService {
                     for (AgencyAndId trip : path.getTrips()) {
                         newOptions.bannedTrips.add(trip);
                     }
-
                     if (!optionQueue.contains(newOptions)) {
                         optionQueue.add(newOptions);
                     }
-                    /*
-                     * // now, create a list of options, one with each route in this trip banned. //
-                     * the HashSet banned is not strictly necessary as the optionsQueue will //
-                     * already remove duplicate options, but it might be slightly faster as //
-                     * hashing TraverseOptions is slow. LOG.debug("New routespecs: {}",
-                     * path.getRouteSpecs()); for (RouteSpec spec : path.getRouteSpecs()) {
-                     * TraverseOptions newOptions = options.clone();
-                     * newOptions.bannedRoutes.add(spec); if (!optionQueue.contains(newOptions)) {
-                     * optionQueue.add(newOptions); } }
-                     */
                 }
             }
-            LOG.debug("{} / {} itineraries", paths.size(), nItineraries);
+            LOG.debug("{} / {} itineraries", paths.size(), options.numItineraries);
         }
         if (paths.size() == 0) {
             return null;
         }
         // We order the list of returned paths by the time of arrival or departure (not path duration)
-        Collections.sort(paths, new PathComparator(origin.getOptions().isArriveBy()));
+        Collections.sort(paths, new PathComparator(options.isArriveBy()));
         return paths;
     }
 
