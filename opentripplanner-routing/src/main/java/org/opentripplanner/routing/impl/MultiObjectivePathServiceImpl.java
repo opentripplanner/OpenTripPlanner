@@ -109,12 +109,14 @@ public class MultiObjectivePathServiceImpl implements PathService {
         // Populate any extra edges
         final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
         OverlayGraph extraEdges = new OverlayGraph();
-        extraEdgesStrategy.addEdgesFor(extraEdges, origin.getVertex());
-        extraEdgesStrategy.addEdgesFor(extraEdges, target);
+        extraEdgesStrategy.addEdgesFor(extraEdges, options.getOriginVertex());
+        extraEdgesStrategy.addEdgesFor(extraEdges, options.getTargetVertex());
         
         BinHeap<State> pq = new BinHeap<State>();
 //        List<State> boundingStates = new ArrayList<State>();
-
+        
+        Vertex originVertex = options.getOriginVertex();
+        Vertex targetVertex = options.getTargetVertex();
         
         // increase maxWalk repeatedly in case hard limiting is in use 
         WALK: for (double maxWalk = options.getMaxWalkDistance();
@@ -122,20 +124,21 @@ public class MultiObjectivePathServiceImpl implements PathService {
                           maxWalk *= 2) {
             LOG.debug("try search with max walk {}", maxWalk);
             // increase maxWalk if settings make trip impossible
-            if (maxWalk < Math.min(origin.getVertex().distance(target), 
-                origin.getVertex().getDistanceToNearestTransitStop() +
-                target.getDistanceToNearestTransitStop())) 
+            if (maxWalk < Math.min(originVertex.distance(targetVertex), 
+                originVertex.getDistanceToNearestTransitStop() +
+                targetVertex.getDistanceToNearestTransitStop())) 
                 continue WALK;
             options.setMaxWalkDistance(maxWalk);
             
             // cap search / heuristic weight
             final double AVG_TRANSIT_SPEED = 25; // m/sec 
-            double cutoff = (origin.getVertex().distance(target) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
+            double cutoff = (originVertex.distance(targetVertex) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
             cutoff += options.getMaxWalkDistance() * options.walkReluctance;
             options.maxWeight = cutoff;
             
+            State origin = options.getInitialState();
             // (used to) initialize heuristic outside loop so table can be reused
-            heuristic.computeInitialWeight(origin, target);
+            heuristic.computeInitialWeight(origin, targetVertex);
             
             options.maxWeight = cutoff + 30 * 60 * options.waitReluctance;
             
@@ -177,7 +180,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                     traverseVisitor.visitVertex(su);
                 }
     
-                if (u.equals(target)) {
+                if (u.equals(targetVertex)) {
 //                    boundingStates.add(su);
                     returnStates.add(su);
                     if ( ! options.getModes().isTransit())
@@ -200,7 +203,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                             traverseVisitor.visitEdge(e, new_sv);
                         }
 
-                        double h = heuristic.computeForwardWeight(new_sv, target);
+                        double h = heuristic.computeForwardWeight(new_sv, targetVertex);
 //                    for (State bs : boundingStates) {
 //                        if (eDominates(bs, new_sv)) {
 //                            continue STATE;
@@ -263,7 +266,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
 //               s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
 //               s0.getNumBoardings() <= s1.getNumBoardings();
 //    }
-
+    
+    // TODO: move into an epsilon-dominance shortest path tree
     private boolean eDominates(State s0, State s1) {
         final double EPSILON = 0.05;
         if (s0.similarTripSeq(s1)) {
@@ -311,11 +315,5 @@ public class MultiObjectivePathServiceImpl implements PathService {
 //                s0.getTime() <= s1.getTime() * (1 + EPSILON) && 
 //               s0.getNumBoardings() <= s1.getNumBoardings();
 //    }
-
-    @Override
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates,
-            boolean ordered, Date targetTime, TraverseOptions options) {
-        return null;
-    }
 
 }
