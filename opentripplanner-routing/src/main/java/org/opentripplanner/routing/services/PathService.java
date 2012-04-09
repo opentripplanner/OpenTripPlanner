@@ -15,7 +15,6 @@ package org.opentripplanner.routing.services;
 
 import java.util.List;
 
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.spt.GraphPath;
 
