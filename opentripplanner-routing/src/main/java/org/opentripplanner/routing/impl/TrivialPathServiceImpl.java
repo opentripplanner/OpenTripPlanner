@@ -29,16 +29,6 @@ public class TrivialPathServiceImpl implements PathService {
     }
 
     @Override
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
-
-    @Override
-    public GraphService getGraphService() {
-        return graphService;
-    }
-
-    @Override
     public boolean isAccessible(NamedPlace place, TraverseOptions options) {
         // TODO Auto-generated method stub
         return false;
