@@ -1,6 +1,5 @@
-package org.opentripplanner.api.model.error;
+package org.opentripplanner.api.common;
 
-import org.opentripplanner.api.ws.Message;
 
 /**
  * Signals a problem parsing or interpreting a query parameter.

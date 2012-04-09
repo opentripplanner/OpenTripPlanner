@@ -16,7 +16,7 @@ package org.opentripplanner.api.model.error;
 
 import java.util.List;
 
-import org.opentripplanner.api.ws.Message;
+import org.opentripplanner.api.common.Message;
 
 /**
  * This represents an error in trip planning.

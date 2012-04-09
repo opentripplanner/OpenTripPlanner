@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.opentripplanner.api.common.SearchResource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;

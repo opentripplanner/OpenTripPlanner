@@ -10,7 +10,7 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-package org.opentripplanner.api.ws;
+package org.opentripplanner.api.common;
 
 import java.util.Locale;
 import java.util.logging.Level;

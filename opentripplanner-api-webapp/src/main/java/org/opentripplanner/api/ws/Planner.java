@@ -19,8 +19,10 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.api.common.SearchResource;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.error.PathNotFoundException;

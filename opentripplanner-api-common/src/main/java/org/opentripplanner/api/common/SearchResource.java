@@ -1,4 +1,4 @@
-package org.opentripplanner.api.ws;
+package org.opentripplanner.api.common;
 
 import java.util.List;
 
@@ -7,14 +7,12 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-import org.opentripplanner.api.model.error.ParameterException;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -143,7 +141,8 @@ public abstract class SearchResource {
     @DefaultValue("2") @QueryParam(MAX_TRANSFERS) Integer maxTransfers;
 
     /** Inject the servlet request so we have access to the query parameter map */
-    @Context HttpServletRequest httpServletRequest;
+    @Context
+    protected HttpServletRequest httpServletRequest;
 
     @Autowired private GraphService _graphService; 
 
