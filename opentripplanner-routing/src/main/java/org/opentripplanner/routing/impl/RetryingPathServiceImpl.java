@@ -191,48 +191,4 @@ public class RetryingPathServiceImpl implements PathService {
         return paths;
     }
 
-    @Override
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, List<NamedPlace> intermediates, 
-            boolean ordered, Date targetTime, TraverseOptions options) {
-
-        if (options.getModes().contains(TraverseMode.TRANSIT)) {
-            throw new UnsupportedOperationException("TSP is not supported for transit trips");
-        }
-
-        ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = getVertexForPlace(fromPlace, options);
-        if (fromVertex == null) {
-            notFound.add("from");
-        }
-        Vertex toVertex = getVertexForPlace(toPlace, options);
-        if (toVertex == null) {
-            notFound.add("to");
-        }
-        ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
-
-        int i = 0;
-        for (NamedPlace intermediate : intermediates) {
-            Vertex vertex = getVertexForPlace(intermediate, options);
-            if (vertex == null) {
-                notFound.add("intermediate." + i);
-            } else {
-                intermediateVertices.add(vertex);
-            }
-            i += 1;
-        }
-
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }
-
-        if (_graphService.getCalendarService() != null)
-            options.setCalendarService(_graphService.getCalendarService());
-
-        options.setTransferTable(_graphService.getGraph().getTransferTable());
-        GraphPath path = _routingService.route(fromVertex, toVertex, intermediateVertices, ordered,
-                (int)(targetTime.getTime() / 1000), options);
-
-        return Arrays.asList(path);
-    }
-
 }

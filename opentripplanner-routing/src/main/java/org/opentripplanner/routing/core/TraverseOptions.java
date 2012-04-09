@@ -87,6 +87,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public String toName;
     /** An unordered list of intermediate locations to be visited (see the from field for format). */
     public List<NamedPlace> intermediatePlaces;
+    public boolean intermediatePlacesOrdered;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
     public double maxWalkDistance = Double.MAX_VALUE;
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
@@ -113,7 +114,6 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** max biking speed along streets, in meters per second */
     // public double bikeSpeed;
     
-    public boolean intermediatePlacesOrdered;
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
      * can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in
@@ -794,10 +794,15 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     // could even be setGraph
     public void prepareForSearch() {
+        if (initialized == true)
+            throw new IllegalStateException("A TraverseOptions should only be initialized once.");
         if (graph == null)
             throw new IllegalStateException("Graph must be set before preparing for search.");
         
         findEndpointVertices();
+        if (intermediatePlaces != null && ! intermediatePlaces.isEmpty())
+            this.findIntermediateVertices();
+        
         CalendarServiceData csData = graph.getService(CalendarServiceData.class);
         if (csData != null) {
             CalendarServiceImpl calendarService = new CalendarServiceImpl();
@@ -842,6 +847,29 @@ public class TraverseOptions implements Cloneable, Serializable {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
+    }
+    
+    private void findIntermediateVertices() {
+        if (getModes().contains(TraverseMode.TRANSIT)) {
+            throw new UnsupportedOperationException("TSP is not supported for transit trips");
+        }
+        if (intermediatePlaces == null)
+            return;
+        ArrayList<String> notFound = new ArrayList<String>();
+        ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
+        int i = 0;
+        for (NamedPlace intermediate : intermediatePlaces) {
+            Vertex vertex = streetIndex.getVertexForPlace(intermediate, this);
+            if (vertex == null) {
+                notFound.add("intermediate." + i);
+            } else {
+                intermediateVertices.add(vertex);
+            }
+            i += 1;
+        }
+        if (notFound.size() > 0) {
+            throw new VertexNotFoundException(notFound);
+        }        
     }
 
     /**
