@@ -16,6 +16,8 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
+import com.sun.jersey.api.core.InjectParam;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to be inherited
  * by other REST resource classes (the trip planner and the Analyst WMS or tile resource). They will be properly
@@ -23,7 +25,6 @@ import org.springframework.context.annotation.Scope;
  * 
  * @author abyrd
  */
-@Scope("request")
 public abstract class SearchResource {
 
     /* not sure if it's really worth using symbolic constants here but that's how it was done in RequestInf */
@@ -141,14 +142,13 @@ public abstract class SearchResource {
     @DefaultValue("2") @QueryParam(MAX_TRANSFERS) Integer maxTransfers;
 
     /** Inject the servlet request so we have access to the query parameter map */
-    @Context
-    protected HttpServletRequest httpServletRequest;
+    @Context protected HttpServletRequest httpServletRequest;
 
-    @Autowired private GraphService _graphService; 
+    @InjectParam private GraphService _graphService; 
 
-    @Autowired private RemainingWeightHeuristicFactory _heuristicFactory;
+    @InjectParam private RemainingWeightHeuristicFactory _heuristicFactory;
     
-    @Autowired private StreetVertexIndexService _streetIndex;
+    @InjectParam private StreetVertexIndexService _streetIndex;
 
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
