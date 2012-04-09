@@ -803,7 +803,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     // could even be setGraph
     public void prepareForSearch() {
-        if (graph != null)
+        if (graph == null)
             throw new IllegalStateException("Graph must be set before preparing for search.");
         findEndpointVertices();
         setCalendarService(graph.getService(CalendarService.class));
@@ -834,25 +834,16 @@ public class TraverseOptions implements Cloneable, Serializable {
         if (index == null)
             return;
         ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = index.getVertexForPlace(fromPlace, this);
+        fromVertex = index.getVertexForPlace(getFromPlace(), this);
         if (fromVertex == null) {
             notFound.add("from");
         }
-        Vertex toVertex = getVertexForPlace(toPlace, options, fromVertex);
+        toVertex = index.getVertexForPlace(getToPlace(), this, fromVertex);
         if (toVertex == null) {
             notFound.add("to");
         }
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
-        }
-        Vertex origin = null;
-        Vertex target = null;
-        if (options.isArriveBy()) {
-            origin = toVertex;
-            target = fromVertex;
-        } else {
-            origin = fromVertex;
-            target = toVertex;
         }
     }
 
