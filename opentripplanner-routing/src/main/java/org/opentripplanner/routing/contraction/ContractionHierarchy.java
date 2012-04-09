@@ -571,21 +571,24 @@ public class ContractionHierarchy implements Serializable {
             TraverseOptions opt) {
 
     	TraverseOptions upOptions = opt.clone();
-    	TraverseOptions downOptions = opt.clone();
 
         if (origin == null || target == null) {
             return null;
         }
 
-        /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = 
-                origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
-        upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
-        downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
-
+        //TODO: verify set to/from are correct (AMB)
     	upOptions.setArriveBy(false);
-    	downOptions.setArriveBy(true);
-    	
+    	upOptions.dateTime = time;
+    	upOptions.fromVertex = origin;
+    	upOptions.toVertex = target;
+    	TraverseOptions downOptions = upOptions.reversedClone(time);
+
+    	/** max walk distance cannot be less than distances to nearest transit stops */
+    	double minWalkDistance = 
+    	        origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
+    	upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
+    	downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
+        
     	final boolean VERBOSE = false;
     	
     	// DEBUG no walk limit
@@ -608,13 +611,13 @@ public class ContractionHierarchy implements Serializable {
         HashSet<Vertex> upclosed = new HashSet<Vertex>(INITIAL_SIZE);
         HashSet<Vertex> downclosed = new HashSet<Vertex>(INITIAL_SIZE);
 
-        State upInit = new State(time, origin, upOptions);
+        State upInit = new State(upOptions);
         upspt.add(upInit);
         upqueue.insert(upInit, upInit.getWeight());
 
         /* FIXME: insert extra bike walking targets */
 
-        State downInit = new State(time, target, downOptions);
+        State downInit = new State(downOptions);
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
         

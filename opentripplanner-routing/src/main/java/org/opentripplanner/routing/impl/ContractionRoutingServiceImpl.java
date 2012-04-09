@@ -108,6 +108,9 @@ public class ContractionRoutingServiceImpl implements RoutingService {
         return Collections.emptyList();
     }
 
+    
+    // TODO: pull out multiple path / TSP logic
+    
     @Override
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediates,
             boolean ordered, int time, TraverseOptions options) {
