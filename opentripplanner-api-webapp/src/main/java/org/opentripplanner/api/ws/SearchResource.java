@@ -12,6 +12,8 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -143,6 +145,8 @@ public abstract class SearchResource {
     @Context HttpServletRequest httpServletRequest;
 
     @Autowired GraphService graphService; 
+
+    @Autowired RemainingWeightHeuristicFactory heuristicFactory;
     
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
@@ -218,7 +222,9 @@ public abstract class SearchResource {
         if (maxTransfers != null) {
             request.setMaxTransfers(maxTransfers);
         }
-        request.prepareForSearch(graphService.getGraph());
+        request.graph = graphService.getGraph();
+        request.remainingWeightHeuristic = this.heuristicFactory.getInstanceForSearch(this);
+        request.prepareForSearch();
         return request;
     }
 

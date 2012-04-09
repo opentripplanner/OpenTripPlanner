@@ -64,6 +64,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public Graph graph;
     public Vertex fromVertex;
     public Vertex toVertex;
+    boolean initialized = false;
     
     /* EX-REQUEST FIELDS */
 
@@ -801,10 +802,10 @@ public class TraverseOptions implements Cloneable, Serializable {
      * set some other values.
      */
     // could even be setGraph
-    public void prepareForSearch(Graph graph) {
-        this.graph = graph;
+    public void prepareForSearch() {
+        if (graph != null)
+            throw new IllegalStateException("Graph must be set before preparing for search.");
         findEndpointVertices();
-        
         setCalendarService(graph.getService(CalendarService.class));
         setTransferTable(graph.getTransferTable());
         setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
@@ -814,18 +815,16 @@ public class TraverseOptions implements Cloneable, Serializable {
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
         }
-        
         // decide which A* heuristic to use
         remainingWeightHeuristic = _remainingWeightHeuristicFactory.getInstanceForSearch(this);
         LOG.debug("Applied A* heuristic: {}", remainingWeightHeuristic);
-
         // If transit is not to be used, disable walk limit and only search for one itinerary.
         if (! getModes().isTransit()) {
             numItineraries = 1;
             setMaxWalkDistance(Double.MAX_VALUE);
         }
-
-        //setServiceDays();
+        setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
+        this.initialized = true;
     }
     
     private void findEndpointVertices() {
