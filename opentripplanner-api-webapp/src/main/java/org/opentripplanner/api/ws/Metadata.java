@@ -22,7 +22,9 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathServiceFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -39,6 +41,8 @@ public class Metadata {
         this.pathServiceFactory = pathServiceFactory;
     }
 
+    @Autowired GraphService graphService;
+    
     /**
      * Returns metadata about the graph -- presently, this is just the extent of the graph.
      *
@@ -55,6 +59,7 @@ public class Metadata {
     public GraphMetadata getMetadata(
             @DefaultValue("") @QueryParam(SearchResource.ROUTER_ID) String routerId)
             throws JSONException {
-        return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
+        //return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
+        return new GraphMetadata(graphService);
     }
 }
