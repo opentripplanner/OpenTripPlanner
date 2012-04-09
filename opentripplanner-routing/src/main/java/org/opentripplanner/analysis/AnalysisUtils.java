@@ -55,7 +55,7 @@ public class AnalysisUtils {
         Map<Integer, List<Coordinate>> componentCoordinates = new HashMap<Integer, List<Coordinate>>();
         for (Vertex v : graph.getVertices()) {
             for (Edge e : v.getOutgoing()) {
-                State s0 = new State(time, v, options);
+                State s0 = new State(v, time, options);
                 State s1 = e.traverse(s0);
                 if (s1 != null) {
                     Integer component = components.find(e.getFromVertex());
