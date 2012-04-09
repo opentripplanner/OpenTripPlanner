@@ -40,7 +40,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
@@ -57,7 +57,7 @@ import junit.framework.TestCase;
 class DataHolder {
     public Graph graph = null;
     public Planner planner = null;
-    public ContractionPathServiceImpl pathService = null;
+    public RetryingPathServiceImpl pathService = null;
     
     private static DataHolder instance = null;
     public static DataHolder getInstance() {
@@ -70,7 +70,7 @@ class DataHolder {
 
 public class TestRequest extends TestCase {
 
-    private ContractionPathServiceImpl pathService;
+    private RetryingPathServiceImpl pathService;
     private Graph graph;
     private Planner planner;
     
@@ -97,7 +97,7 @@ public class TestRequest extends TestCase {
             return;
         }
         planner = new Planner();
-        pathService = new ContractionPathServiceImpl();
+        pathService = new RetryingPathServiceImpl();
         graph = new Graph();
         pathService.setRemainingWeightHeuristicFactory(
                 new DefaultRemainingWeightHeuristicFactoryImpl());

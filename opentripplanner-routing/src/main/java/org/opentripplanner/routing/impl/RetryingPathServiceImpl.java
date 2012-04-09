@@ -30,24 +30,32 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.RoutingService;
+import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class ContractionPathServiceImpl extends GenericPathService {
+public class RetryingPathServiceImpl implements PathService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(RetryingPathServiceImpl.class);
+
+    @Autowired GraphService graphService;
+    
+    @Autowired SPTService sptService;
+    
+    @Autowired RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
 
     private static final int MAX_TIME_FACTOR = 2;
 
     private static final int MAX_WEIGHT_FACTOR = 2;
 
-    private static final Logger LOG = LoggerFactory.getLogger(ContractionPathServiceImpl.class);
-
     private RoutingService _routingService;
 
-    private RemainingWeightHeuristicFactory _remainingWeightHeuristicFactory;
     
     private double _firstPathTimeout = 0; // seconds
     

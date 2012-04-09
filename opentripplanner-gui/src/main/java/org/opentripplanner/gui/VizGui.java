@@ -76,7 +76,7 @@ import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.ContractionPathServiceImpl;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
@@ -250,7 +250,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
 
     private JLabel serviceIdLabel;
 
-    private ContractionPathServiceImpl pathservice;
+    private RetryingPathServiceImpl pathservice;
 
     private Graph graph;
 
@@ -1011,7 +1011,7 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         
         graph = graphService.getGraph();
 
-        pathservice = new ContractionPathServiceImpl();
+        pathservice = new RetryingPathServiceImpl();
         pathservice.setGraphService(graphService);
         pathservice.setRemainingWeightHeuristicFactory(
                 new DefaultRemainingWeightHeuristicFactoryImpl());
