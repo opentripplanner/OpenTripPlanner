@@ -624,7 +624,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public String toString(String sep) {
         return getFrom() + sep + getTo() + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + isArriveBy() + sep + getOptimize() + sep + getModesAsStr() + sep
+                + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }
     
