@@ -25,7 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.MavenVersion;
@@ -806,7 +808,12 @@ public class TraverseOptions implements Cloneable, Serializable {
         if (graph == null)
             throw new IllegalStateException("Graph must be set before preparing for search.");
         findEndpointVertices();
-        setCalendarService(graph.getService(CalendarService.class));
+        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
+        if (csData != null) {
+            CalendarServiceImpl calendarService = new CalendarServiceImpl();
+            calendarService.setData(csData);
+            setCalendarService(calendarService);
+        }
         setTransferTable(graph.getTransferTable());
         setServiceDays();
         if (getModes().isTransit()
