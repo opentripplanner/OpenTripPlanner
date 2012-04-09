@@ -800,8 +800,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             throw new IllegalStateException("Graph must be set before preparing for search.");
         
         findEndpointVertices();
-        if (intermediatePlaces != null && ! intermediatePlaces.isEmpty())
-            this.findIntermediateVertices();
+        findIntermediateVertices();
         
         CalendarServiceData csData = graph.getService(CalendarServiceData.class);
         if (csData != null) {
@@ -850,9 +849,6 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
     
     private void findIntermediateVertices() {
-        if (getModes().contains(TraverseMode.TRANSIT)) {
-            throw new UnsupportedOperationException("TSP is not supported for transit trips");
-        }
         if (intermediatePlaces == null)
             return;
         ArrayList<String> notFound = new ArrayList<String>();

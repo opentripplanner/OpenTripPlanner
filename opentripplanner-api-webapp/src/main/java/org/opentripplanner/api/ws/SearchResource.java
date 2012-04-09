@@ -217,11 +217,13 @@ public abstract class SearchResource {
             optimize = OptimizeType.QUICK;
             transferPenalty += 1800;
         }
+        if (intermediatePlaces != null && intermediatePlacesOrdered && request.getModes().isTransit()) {
+            throw new UnsupportedOperationException("TSP is not supported for transit trips");
+        }
         request.setTransferPenalty(transferPenalty);
         request.setOptimize(optimize);
         request.setModes(modes);
         request.setMinTransferTime(minTransferTime);
-
         if (maxTransfers != null) {
             request.setMaxTransfers(maxTransfers);
         }
