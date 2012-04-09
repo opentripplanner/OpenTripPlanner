@@ -808,23 +808,23 @@ public class TraverseOptions implements Cloneable, Serializable {
         findEndpointVertices();
         setCalendarService(graph.getService(CalendarService.class));
         setTransferTable(graph.getTransferTable());
-        setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
+        setServiceDays();
         if (getModes().isTransit()
             && ! graph.transitFeedCovers(dateTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
         }
-        // decide which A* heuristic to use
-        remainingWeightHeuristic = _remainingWeightHeuristicFactory.getInstanceForSearch(this);
-        LOG.debug("Applied A* heuristic: {}", remainingWeightHeuristic);
         // If transit is not to be used, disable walk limit and only search for one itinerary.
         if (! getModes().isTransit()) {
             numItineraries = 1;
             setMaxWalkDistance(Double.MAX_VALUE);
         }
-        setServiceDays(dateTime.getTime() / 1000, graph.getAgencyIds());
         this.initialized = true;
+    }
+    
+    public long getSecondsSinceEpoch() {
+        return dateTime.getTime() / 1000;
     }
     
     private void findEndpointVertices() {
@@ -861,11 +861,12 @@ public class TraverseOptions implements Cloneable, Serializable {
      *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were
      *  identified as a performance bottleneck. Must be called after the TraverseOptions already has a CalendarService set. 
      */
-    public void setServiceDays(long time, Collection<String> agencies) {
+    public void setServiceDays() {
         if( ! useServiceDays )
             return;
         final long SEC_IN_DAY = 60 * 60 * 24;
 
+        final long time = this.getSecondsSinceEpoch();
         this.serviceDays = new ArrayList<ServiceDay>(3);
         CalendarService cs = this.getCalendarService();
         if (cs == null) {
@@ -875,7 +876,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         // This should be a valid way to find yesterday and tomorrow,
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
-        for (String agency : agencies) {
+        for (String agency : graph.getAgencyIds()) {
             addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, cs, agency));
             addIfNotExists(this.serviceDays, new ServiceDay(time, cs, agency));
             addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, cs, agency));
