@@ -26,6 +26,6 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public interface RemainingWeightHeuristicFactory {
 
-	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target);
+	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt);
 		
 }

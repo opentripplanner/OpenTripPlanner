@@ -27,17 +27,16 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public class DefaultRemainingWeightHeuristicFactoryImpl implements
-		RemainingWeightHeuristicFactory {
+public class DefaultRemainingWeightHeuristicFactoryImpl 
+    implements RemainingWeightHeuristicFactory {
 
     private static final Logger LOG = 
     	LoggerFactory.getLogger(DefaultRemainingWeightHeuristicFactoryImpl.class);
 
-	@Override
-	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt,
-			Vertex target) {
+    @Override
+    public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt) {
         LOG.debug("Using Euclidean heuristic independent of search type.");
         return new DefaultRemainingWeightHeuristic();
- 	}
+    }
 
 }

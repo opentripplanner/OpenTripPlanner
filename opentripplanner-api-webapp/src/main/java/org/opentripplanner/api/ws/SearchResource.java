@@ -223,7 +223,7 @@ public abstract class SearchResource {
             request.setMaxTransfers(maxTransfers);
         }
         request.graph = graphService.getGraph();
-        request.remainingWeightHeuristic = this.heuristicFactory.getInstanceForSearch(this);
+        request.remainingWeightHeuristic = this.heuristicFactory.getInstanceForSearch(request);
         request.prepareForSearch();
         return request;
     }
