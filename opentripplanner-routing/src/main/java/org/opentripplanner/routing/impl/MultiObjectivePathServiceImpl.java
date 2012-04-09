@@ -64,7 +64,7 @@ import org.springframework.stereotype.Component;
  *
  * @author andrewbyrd
  */
-@Component
+//@Component
 public class MultiObjectivePathServiceImpl extends GenericPathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
