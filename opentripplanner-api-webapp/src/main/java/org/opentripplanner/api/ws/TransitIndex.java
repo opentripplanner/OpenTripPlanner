@@ -14,6 +14,7 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -245,7 +246,7 @@ public class TransitIndex {
         Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
         Vertex boarding = preBoardEdge.getToVertex();
 
-        TraverseOptions options = makeTraverseOptions(startTime, transitIndexService.getAllAgencies());
+        TraverseOptions options = makeTraverseOptions(startTime);
 
         //add all departures
         HashSet<AgencyAndId> trips = new HashSet<AgencyAndId>();
@@ -273,12 +274,16 @@ public class TransitIndex {
         return result;
     }
 
-    private TraverseOptions makeTraverseOptions(long startTime, Collection<String> agencies) {
+    private TraverseOptions makeTraverseOptions(long startTime) {
         TraverseOptions options = new TraverseOptions();
-        if (graphService.getCalendarService() != null) {
-            options.setCalendarService(graphService.getCalendarService());
-            options.setServiceDays(startTime, agencies);
-        }
+//        if (graphService.getCalendarService() != null) {
+//            options.setCalendarService(graphService.getCalendarService());
+//            options.setServiceDays(startTime, agencies);
+//        }
+        // TODO: verify correctness
+        options.dateTime = new Date(startTime * 1000); // give options a method for setting from sec?
+        options.graph = this.graphService.getGraph();
+        options.prepareForSearch();
         return options;
     }
 
@@ -307,7 +312,7 @@ public class TransitIndex {
         }
 
         RouteVariant variant = transitIndexService.getVariantForTrip(trip);
-        TraverseOptions options = makeTraverseOptions(time, transitIndexService.getAllAgencies());
+        TraverseOptions options = makeTraverseOptions(time);
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();
@@ -317,7 +322,9 @@ public class TransitIndex {
             //this is all segments across all patterns that match this variant
             if (segment.stop.equals(firstStop)) {
                 //this might be the correct start segment, but we need to try traversing and see if we get this trip
-                State s0 = new State(time, segment.board.getFromVertex(), options);
+                // TODO: verify options and state creation correctness (AMB)
+                options.fromVertex = segment.board.getFromVertex();
+                State s0 = new State(options);
                 state = segment.board.traverse(s0);
                 if (state == null) continue;
                 if (state.getBackEdgeNarrative().getTrip().getId().equals(trip)) {
@@ -335,7 +342,10 @@ public class TransitIndex {
         }
 
         for (RouteSegment segment :  variant.segmentsAfter(start)) {
-            State s0 = new State(state.getTime(), segment.hopIn.getFromVertex(), options);
+            // TODO: verify options/state init correctness
+            options.fromVertex = segment.hopIn.getFromVertex();
+            options.dateTime = new Date(state.getTime() * 1000);
+            State s0 = new State(options);
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
             st.time = state.getTime();
@@ -351,7 +361,10 @@ public class TransitIndex {
         State result;
         long time = startTime;
         do {
-            State s0 = new State(time, e.getFromVertex(), options);
+            // TODO verify options/state correctness
+            options.dateTime = new Date(time*1000); // add method
+            options.fromVertex = e.getFromVertex();
+            State s0 = new State(options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
@@ -372,9 +385,11 @@ public class TransitIndex {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = endTime;
-        options = options.reversedClone();
+        options = options.reversedClone(time);
+        options.toVertex = e.getToVertex();
         do {
-            State s0 = new State(time, e.getToVertex(), options);
+            // TODO: verify options/state correctness
+            State s0 = new State(options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
@@ -388,6 +403,7 @@ public class TransitIndex {
         } while (true);
         return out;
     }
+    
     /**
      * Return a list of all available transit modes supported, if any.
      * 
