@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -43,7 +44,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Find the shortest path between graph vertices using A*.
  */
-public class GenericAStar {
+public class GenericAStar implements SPTService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
@@ -79,13 +80,15 @@ public class GenericAStar {
      * @param target
      * @return the shortest path, or null if none is found
      */
-    public ShortestPathTree getShortestPathTree(Graph graph, State origin, Vertex target) {
+    public ShortestPathTree getShortestPathTree(TraverseOptions options) {
+        
+        Graph graph = options.graph;
+        State origin = options.getInitialState();
+        Vertex target = options.getTargetVertex();
 
         if (origin == null || target == null) {
             return null;
         }
-
-        TraverseOptions options = origin.getOptions();
 
         // from now on, target means "where this search will terminate"
         // not "the end of the trip from the user's perspective".
