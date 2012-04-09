@@ -62,7 +62,7 @@ public class State implements Cloneable {
         // elsewhere, all states must be created from a parent
         // and associated with an edge.
 
-        this.time = opt.dateTime.getTime() / 1000;
+        this.time = opt.getSecondsSinceEpoch();
         this.weight = 0;
         this.vertex = opt.getOriginVertex();
         this.backState = null;
@@ -315,7 +315,8 @@ public class State implements Cloneable {
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        return new State(stateData.options.reversedClone(this.time));
+        TraverseOptions reversedClone = stateData.options.reversedClone(this.time); 
+        return new State(reversedClone);
     }
 
     public void dumpPath() {

@@ -377,7 +377,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     	TraverseOptions ret = this.clone();
     	ret.setArriveBy( ! ret.isArriveBy());
     	ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
-    	ret.dateTime = new Date(finalTime);
+    	ret.dateTime = new Date(finalTime * 1000);
     	return ret;
     }
     
