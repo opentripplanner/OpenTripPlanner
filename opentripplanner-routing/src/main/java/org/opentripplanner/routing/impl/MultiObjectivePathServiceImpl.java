@@ -33,6 +33,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
@@ -65,7 +66,7 @@ import org.springframework.stereotype.Component;
  * @author andrewbyrd
  */
 //@Component
-public class MultiObjectivePathServiceImpl extends GenericPathService {
+public class MultiObjectivePathServiceImpl implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 
@@ -96,59 +97,12 @@ public class MultiObjectivePathServiceImpl extends GenericPathService {
     }
 
     @Override
-    public List<GraphPath> plan(NamedPlace fromPlace, NamedPlace toPlace, Date targetTime,
-            TraverseOptions options, int nItineraries) {
+    public List<GraphPath> getPaths(TraverseOptions options) {
 
-        ArrayList<String> notFound = new ArrayList<String>();
-        Vertex fromVertex = getVertexForPlace(fromPlace, options);
-        if (fromVertex == null) {
-            notFound.add("from");
-        }
-        Vertex toVertex = getVertexForPlace(toPlace, options);
-        if (toVertex == null) {
-            notFound.add("to");
-        }
-
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }
-
-        Vertex origin = null;
-        Vertex target = null;
-
-        if (options.isArriveBy()) {
-            origin = toVertex;
-            target = fromVertex;
-        } else {
-            origin = fromVertex;
-            target = toVertex;
-        }
-
-        State state = new State((int)(targetTime.getTime() / 1000), origin, options);
-
-        return plan(state, target, nItineraries);
-    }
-
-    @Override
-    public List<GraphPath> plan(State origin, Vertex target, int nItineraries) {
-
-        TraverseOptions options = origin.getOptions();
-
-        if (_graphService.getCalendarService() != null)
-            options.setCalendarService(_graphService.getCalendarService());
-        options.setTransferTable(_graphService.getGraph().getTransferTable());
-
-        options.setServiceDays(origin.getTime(), _graphService.getGraph().getAgencyIds());
-        if (options.getModes().isTransit()
-            && !_graphService.getGraph().transitFeedCovers(new Date(origin.getTime() * 1000))) {
-            // user wants a path through the transit network,
-            // but the date provided is outside those covered by the transit feed.
-            throw new TransitTimesException();
-        }
-        
         // always use the bidirectional heuristic because the others are not precise enough
-        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(_graphService.getGraph());
-                
+        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.graph);
+        options.remainingWeightHeuristic = heuristic;
+        
         // the states that will eventually be turned into paths and returned
         List<State> returnStates = new LinkedList<State>();
 
