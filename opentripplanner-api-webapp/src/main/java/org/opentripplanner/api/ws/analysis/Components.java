@@ -102,11 +102,10 @@ public class Components {
         if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {
             cachedOptions = options;
             cachedDateTime = dateTime;
+            // TODO: verify correctness (AMB)
             Graph graph = graphService.getGraph();
-            if (graphService.getCalendarService() != null) {
-                options.setCalendarService(graphService.getCalendarService());
-            }
-            options.setServiceDays(dateTime, graph.getAgencyIds());
+            options.graph = graph;
+            options.prepareForSearch();
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         
