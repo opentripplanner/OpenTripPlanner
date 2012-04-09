@@ -54,9 +54,7 @@ public class State implements Cloneable {
 
     /* CONSTRUCTORS */
 
-    /**
-     * Create a state representing the beginning of a search for the given options.
-     */
+    /** Create a state representing the beginning of a search for the given options. */
     public State(TraverseOptions opt) {
         // parent-less states can only be created at the beginning of a trip.
         // elsewhere, all states must be created from a parent
@@ -76,6 +74,20 @@ public class State implements Cloneable {
         // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
     }
 
+    /** Create a state, forcing the initial vertex to the specified vertex. */
+    public State(Vertex vertex, TraverseOptions opt) {
+        this(opt);
+        this.vertex = vertex;
+    }
+
+    /** Create a state, forcing the initial vertex and time to the specified values. 
+     *  Useful for reusing a TraverseOptions in TransitIndex, etc. */
+    public State(Vertex vertex, long time, TraverseOptions opt) {
+        this(opt);
+        this.vertex = vertex;
+        this.time = time;
+    }
+    
     /**
      * Create a state editor to produce a child of this state, which will be the result of
      * traversing the given edge.

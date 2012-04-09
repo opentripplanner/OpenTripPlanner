@@ -323,8 +323,7 @@ public class TransitIndex {
             if (segment.stop.equals(firstStop)) {
                 //this might be the correct start segment, but we need to try traversing and see if we get this trip
                 // TODO: verify options and state creation correctness (AMB)
-                options.fromVertex = segment.board.getFromVertex();
-                State s0 = new State(options);
+                State s0 = new State(segment.board.getFromVertex(), options);
                 state = segment.board.traverse(s0);
                 if (state == null) continue;
                 if (state.getBackEdgeNarrative().getTrip().getId().equals(trip)) {
@@ -343,9 +342,7 @@ public class TransitIndex {
 
         for (RouteSegment segment :  variant.segmentsAfter(start)) {
             // TODO: verify options/state init correctness
-            options.fromVertex = segment.hopIn.getFromVertex();
-            options.dateTime = state.getTime();
-            State s0 = new State(options);
+            State s0 = new State(segment.hopIn.getFromVertex(), state.getTime(), options);
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
             st.time = state.getTime();
@@ -362,9 +359,7 @@ public class TransitIndex {
         long time = startTime;
         do {
             // TODO verify options/state correctness
-            options.dateTime = time;
-            options.fromVertex = e.getFromVertex();
-            State s0 = new State(options);
+            State s0 = new State(e.getFromVertex(), time, options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
@@ -386,10 +381,9 @@ public class TransitIndex {
         State result;
         long time = endTime;
         options = options.reversedClone(time);
-        options.toVertex = e.getToVertex();
         do {
             // TODO: verify options/state correctness
-            State s0 = new State(options);
+            State s0 = new State(e.getToVertex(), options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
