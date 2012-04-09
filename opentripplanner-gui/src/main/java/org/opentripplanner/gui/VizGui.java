@@ -206,7 +206,7 @@ class VertexList extends AbstractListModel {
  * bunch of weird buttons designed to debug specific cases.
  * 
  */
-public class VizGui extends JFrame implements VertexSelectionListener, RemainingWeightHeuristicFactory {
+public class VizGui extends JFrame implements VertexSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -871,13 +871,14 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
     	// there should be a ui element for walk distance and optimize type
     	options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
-
+        options.remainingWeightHeuristic = new BidirectionalRemainingWeightHeuristic(graph);
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
-
-    	List<GraphPath> paths = pathservice.plan(new NamedPlace(from), new NamedPlace(to), when, options, 1);
+        // TODO: check options properly intialized (AMB)
+        options.prepareForSearch();
+    	List<GraphPath> paths = pathservice.getPaths(options);
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);
@@ -1012,29 +1013,15 @@ public class VizGui extends JFrame implements VertexSelectionListener, Remaining
         graph = graphService.getGraph();
 
         pathservice = new RetryingPathServiceImpl();
-        pathservice.setGraphService(graphService);
-        pathservice.setRemainingWeightHeuristicFactory(
-                new DefaultRemainingWeightHeuristicFactoryImpl());
         indexService = new StreetVertexIndexServiceImpl();
         indexService.setGraphService(graphService);
         indexService.setup();
-        pathservice.setIndexService(indexService);
         routingService = new ContractionRoutingServiceImpl();
         routingService.setGraphService(graphService);
-        pathservice.setRoutingService(routingService);
-        pathservice.setRemainingWeightHeuristicFactory(this);
     }
     
     public Graph getGraph() {
         return graph;
     }
 
-    @Override
-    // the vizgui serves as its own remainingweightheuristicfactory
-    // so ui elements could be used to select the heuristic
-    public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt, Vertex target) {
-        return new BidirectionalRemainingWeightHeuristic(graph);
-        //return new DefaultRemainingWeightHeuristic();
-        //return new ReachRemainingWeightHeuristic();
-    }
 }
