@@ -1017,7 +1017,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         indexService.setGraphService(graphService);
         indexService.setup();
         routingService = new ContractionRoutingServiceImpl();
-        routingService.setGraphService(graphService);
     }
     
     public Graph getGraph() {

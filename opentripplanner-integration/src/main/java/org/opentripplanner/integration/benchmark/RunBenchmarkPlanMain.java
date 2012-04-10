@@ -103,8 +103,12 @@ public class RunBenchmarkPlanMain {
         String to = plan.latTo + " " + plan.lonTo;
 
         try {
+          TraverseOptions opt = new TraverseOptions();
+          opt.setDateTime(plan.time);
+          opt.setFrom(from);
+          opt.setTo(to);
           long t0 = System.currentTimeMillis();
-          service.plan(new NamedPlace(from), new NamedPlace(to), plan.time, new TraverseOptions(), 1);
+          service.getPaths(opt);
           long t1 = System.currentTimeMillis();
 
           System.out.println("t=" + (t1 - t0));
