@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -13,6 +14,8 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 
@@ -26,6 +29,8 @@ import com.sun.jersey.api.core.InjectParam;
  * @author abyrd
  */
 public abstract class SearchResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
     /* not sure if it's really worth using symbolic constants here but that's how it was done in RequestInf */
     public static final String ROUTER_ID = "routerId";
@@ -159,7 +164,17 @@ public abstract class SearchResource {
         request.setRouterId(routerId);
         request.setFrom(fromPlace);
         request.setTo(toPlace);
-        request.setDateTime(date, time);
+        if (date == null && time != null) { 
+            LOG.debug("parsing ISO datetime {}", time);
+            try { // Full ISO date in time param ?
+                request.setDateTime(javax.xml.datatype.DatatypeFactory.newInstance()
+                       .newXMLGregorianCalendar(time).toGregorianCalendar().getTime());
+            } catch (DatatypeConfigurationException e) {
+                request.setDateTime(date, time);
+            }
+        } else {
+            request.setDateTime(date, time);
+        }
         request.setWheelchair(wheelchair);
         if (numItineraries != null) {
             request.setNumItineraries(numItineraries);
