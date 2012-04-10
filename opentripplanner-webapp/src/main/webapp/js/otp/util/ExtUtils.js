@@ -153,7 +153,7 @@ catch(e)
  */
 otp.util.ExtUtils = {
 
-    MAP_ATTRIBUTION    : '<a href="#" onclick="otp.util.ExtUtils.toggleAboutMap();">Powered by OpenGeo</a>',
+    MAP_ATTRIBUTION    : '<a href="javascript:void;" onclick="otp.util.ExtUtils.toggleAboutMap();">Powered by OpenGeo</a>',
     ABOUT_MAP_WINDOW   : null,
 
 
@@ -556,7 +556,7 @@ otp.util.ExtUtils = {
     makeTreeNode : function(treeNodeConfig, clickCallback, scope, overCallback, outCallback)
     {
         // NOTE: href:# fixes the bug where clicking / dbl-clicking on tree nodes reloads the app url (trip details node)
-        var configDefaults = {href:"#", margins: '0 0 0 0', cmargins: '0 2 0 0', expanded: true, collapsible: true};
+        var configDefaults = {href:"javascript:void;", margins: '0 0 0 0', cmargins: '0 2 0 0', expanded: true, collapsible: true};
         var config = Ext.apply({}, treeNodeConfig, configDefaults);
         var treeNode = new Ext.tree.TreeNode(config);
         this.setClickCallback(treeNode,     clickCallback, scope);

@@ -393,9 +393,9 @@ otp.core.MapStatic = {
             // zoom in link if we're close in, else show the zoom out
             var zoom = "";
             if(self.map.getZoom() < self.CLOSE_ZOOM)
-                zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomAllTheWayIn(' + x + ',' + y  + ');">' + self.locale.contextMenu.zoomInHere + '</a>';
+                zoom = ' <a href="javascript:void;" onClick="otp.core.MapStatic.zoomAllTheWayIn(' + x + ',' + y  + ');">' + self.locale.contextMenu.zoomInHere + '</a>';
             else
-                zoom = ' <a href="#" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
+                zoom = ' <a href="javascript:void;" onClick="otp.core.MapStatic.zoomOut();">' + self.locale.contextMenu.zoomOutHere + '</a>';
 
             // IE can't do streetview in these map tooltips (freeze's the browser)
             if(Ext.isIE)
