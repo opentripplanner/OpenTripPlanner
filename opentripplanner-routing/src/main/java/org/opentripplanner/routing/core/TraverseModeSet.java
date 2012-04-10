@@ -367,5 +367,16 @@ public class TraverseModeSet implements Cloneable, Serializable {
         }
         return null;
     }
+    
+    public int hashCode() {
+        return modes;
+    }
+
+    public boolean equals(Object other) {
+        if (other instanceof TraverseModeSet) {
+            return modes == ((TraverseModeSet)other).modes;
+        }
+        return false;
+    }
 
 }
