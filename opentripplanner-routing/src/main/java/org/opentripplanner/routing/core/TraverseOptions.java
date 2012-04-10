@@ -589,12 +589,12 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setDateTime(Date dateTime) {
         this.dateTime = dateTime.getTime() / 1000;
+        LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
+        LOG.debug("Request datetime parsed as {}", dateTime);
     }
 
     public void setDateTime(String date, String time) {
         Date dateObject = DateUtils.toDate(date, time);
-        LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
-        LOG.debug("Request datetime parsed as {}", dateObject);
         setDateTime(dateObject);
     }
 
@@ -910,29 +910,31 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
-            TraverseOptions to = (TraverseOptions) o;
-            return speed == to.speed && maxWeight == to.maxWeight && worstTime == to.worstTime
-                    && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
-                    && wheelchairAccessible == to.wheelchairAccessible
-                    && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
-                    && transferPenalty == to.transferPenalty
-                    && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
-                    && waitReluctance == to.waitReluctance && boardCost == to.boardCost
-                    && bannedRoutes.equals(to.bannedRoutes)
-                    && bannedTrips.equals(to.bannedTrips)
-                    && minTransferTime == to.minTransferTime
-                    && nonpreferredTransferPenalty == to.nonpreferredTransferPenalty
-                    && transferPenalty == to.transferPenalty
-                    && triangleSafetyFactor == to.triangleSafetyFactor
-                    && triangleSlopeFactor == to.triangleSlopeFactor
-                    && triangleTimeFactor == to.triangleTimeFactor
-                    && stairsReluctance == to.stairsReluctance;
+            TraverseOptions other = (TraverseOptions) o;
+            return from.equals(other.from) && to.equals(other.to) 
+                    && speed == other.speed && maxWeight == other.maxWeight && worstTime == other.worstTime
+                    && getModes().equals(other.getModes()) && isArriveBy() == other.isArriveBy()
+                    && wheelchairAccessible == other.wheelchairAccessible
+                    && optimizeFor == other.optimizeFor && maxWalkDistance == other.maxWalkDistance
+                    && transferPenalty == other.transferPenalty
+                    && maxSlope == other.maxSlope && walkReluctance == other.walkReluctance
+                    && waitReluctance == other.waitReluctance && boardCost == other.boardCost
+                    && bannedRoutes.equals(other.bannedRoutes)
+                    && bannedTrips.equals(other.bannedTrips)
+                    && minTransferTime == other.minTransferTime
+                    && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
+                    && transferPenalty == other.transferPenalty
+                    && triangleSafetyFactor == other.triangleSafetyFactor
+                    && triangleSlopeFactor == other.triangleSlopeFactor
+                    && triangleTimeFactor == other.triangleTimeFactor
+                    && stairsReluctance == other.stairsReluctance;
         }
         return false;
     }
 
     public int hashCode() {
-        return new Double(speed).hashCode() + new Double(maxWeight).hashCode()
+        return from.hashCode() * 524287 + to.hashCode() * 1327144003 
+                + new Double(speed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
