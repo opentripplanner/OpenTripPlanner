@@ -67,7 +67,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     public Graph graph;
     public Vertex fromVertex;
     public Vertex toVertex;
-    boolean initialized = false;
+    public boolean initialized = false;
+    public boolean goalDirection = true;
     public StreetVertexIndexService streetIndex;
 
     /* EX-REQUEST FIELDS */

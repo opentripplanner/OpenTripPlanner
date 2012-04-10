@@ -26,6 +26,7 @@ import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
@@ -95,8 +96,6 @@ public class GenericAStar implements SPTService {
 
         ShortestPathTree spt = createShortestPathTree(origin, options, graph);
 
-        options.setTransferTable(graph.getTransferTable());
-
         /**
          * Populate any extra edges
          */
@@ -114,7 +113,8 @@ public class GenericAStar implements SPTService {
         if (extraEdges.isEmpty())
             extraEdges = Collections.emptyMap();
 
-        final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
+        final RemainingWeightHeuristic heuristic = options.goalDirection ? 
+                options.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
 
         double initialWeight = heuristic.computeInitialWeight(origin, target);
         spt.add(origin);
@@ -187,7 +187,7 @@ public class GenericAStar implements SPTService {
                 if (!_searchTerminationStrategy.shouldSearchContinue(origin.getVertex(), target, u,
                         spt, options))
                     break;
-            } else if (u_vertex == target) {
+            } else if (options.goalDirection && u_vertex == target) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;

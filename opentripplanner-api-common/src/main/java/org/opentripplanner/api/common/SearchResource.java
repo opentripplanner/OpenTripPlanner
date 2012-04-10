@@ -8,6 +8,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -146,6 +147,9 @@ public abstract class SearchResource {
      *  org.opentripplanner.api.ws.Planner. */
     @DefaultValue("2") @QueryParam(MAX_TRANSFERS) Integer maxTransfers;
 
+    /** If true, goal direction is turned off and a full path tree is built */
+    @DefaultValue("false") @QueryParam("batch") Boolean batch;
+    
     /** Inject the servlet request so we have access to the query parameter map */
     @Context protected HttpServletRequest httpServletRequest;
 
@@ -238,9 +242,10 @@ public abstract class SearchResource {
         request.setOptimize(optimize);
         request.setModes(modes);
         request.setMinTransferTime(minTransferTime);
-        if (maxTransfers != null) {
+        if (maxTransfers != null)
             request.setMaxTransfers(maxTransfers);
-        }
+        if (batch != null)
+            request.goalDirection = ! batch;
         request.graph = _graphService.getGraph();
         request.remainingWeightHeuristic = _heuristicFactory.getInstanceForSearch(request);
         // this is ugly but needed here for now
