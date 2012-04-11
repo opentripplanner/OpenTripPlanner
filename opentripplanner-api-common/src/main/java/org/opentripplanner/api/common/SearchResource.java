@@ -154,12 +154,6 @@ public abstract class SearchResource { // RoutingResource
     /** Inject the servlet request so we have access to the query parameter map */
     @Context protected HttpServletRequest httpServletRequest;
 
-    @InjectParam private GraphService _graphService; 
-
-    @InjectParam private RemainingWeightHeuristicFactory _heuristicFactory;
-    
-    @InjectParam private StreetVertexIndexService _streetIndex;
-
     /** 
      * Range/sanity check the query parameter fields and build a Request object from them. 
      * @throws ParameterException when there is a problem interpreting a query parameter
