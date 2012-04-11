@@ -82,16 +82,14 @@ public class PlanGenerator {
     public PlanGenerator(TraverseOptions options, PathServiceFactory pathServiceFactory) {
         this.options = options;
         pathService = pathServiceFactory.getPathService(options.getRouterId());
-        Graph graph = options.graph;
-        transitIndex = graph.getService(TransitIndexService.class);
-        fareService = graph.getService(FareService.class);
     }
 
     /** Generates a TripPlan from a Request */
     public TripPlan generate() {
 
-        if ( ! options.isAccessible())
-            throw new LocationNotAccessible();
+        // TODO: this seems to only check the endpoints, which are usually auto-generated
+        //if ( ! options.isAccessible())
+        //    throw new LocationNotAccessible();
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
@@ -114,6 +112,10 @@ public class PlanGenerator {
             LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
             throw new PathNotFoundException();
         }
+
+        Graph graph = paths.get(0).getRoutingContext().graph;
+        transitIndex = graph.getService(TransitIndexService.class);
+        fareService = graph.getService(FareService.class);
 
         TripPlan plan = generatePlan(paths, options);
         if (plan != null) {
