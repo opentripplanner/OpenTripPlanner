@@ -22,6 +22,11 @@ import java.util.Set;
 
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 
+/**
+ * A simplistic implementation of OSMContentHandler that simply stores all of the ways, nodes, and
+ * relations in maps keyed by ids. For memory usage reasons, this is only used in tests.
+ * 
+ */
 public class OSMMap implements OpenStreetMapContentHandler {
 
   private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();

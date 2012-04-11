@@ -399,6 +399,7 @@ public class PlanGenerator {
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
                         fixupTransitLeg(leg, state);
+                        leg.startTime = new Date(state.getTimeInMillis());
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
