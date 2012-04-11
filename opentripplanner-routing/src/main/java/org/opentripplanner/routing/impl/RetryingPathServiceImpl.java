@@ -23,6 +23,7 @@ import java.util.Queue;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -128,7 +129,7 @@ public class RetryingPathServiceImpl implements PathService {
             
             LOG.debug("BEGIN SUBSEARCH");
             ShortestPathTree spt = sptService.getShortestPathTree(options);
-            List<GraphPath> somePaths = spt.getPaths(options.getTargetVertex(), true);
+            List<GraphPath> somePaths = spt.getPaths();
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);

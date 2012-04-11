@@ -22,7 +22,7 @@ public class TrivialPathServiceImpl implements PathService {
         ShortestPathTree spt = sptService.getShortestPathTree(options);
         if (spt == null)
             return Collections.emptyList();
-        return spt.getPaths(options.toVertex, true);
+        return spt.getPaths();
     }
 
 }
