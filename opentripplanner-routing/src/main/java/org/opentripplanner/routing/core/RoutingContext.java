@@ -19,9 +19,11 @@ import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -32,6 +34,7 @@ public class RoutingContext {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
     
     private static GraphService graphService = new GraphServiceImpl(); 
+    private static RemainingWeightHeuristicFactory heuristicFactory = new DefaultRemainingWeightHeuristicFactoryImpl();
     
     private TraverseOptions opt;
     public final Graph graph;
@@ -45,7 +48,7 @@ public class RoutingContext {
     public final CalendarService calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public final GenericAStarFactory aStarSearchFactory = null;
-    public final RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
+    public final RemainingWeightHeuristic remainingWeightHeuristic;
     public final ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
     public final TransferTable transferTable;
     
@@ -99,6 +102,7 @@ public class RoutingContext {
         transferTable = graph.getTransferTable();
         if (useServiceDays)
             setServiceDays();
+        remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
         if (opt.getModes().isTransit()
             && ! graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,

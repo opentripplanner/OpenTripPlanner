@@ -244,13 +244,6 @@ public abstract class SearchResource {
         request.setMinTransferTime(minTransferTime);
         if (maxTransfers != null)
             request.setMaxTransfers(maxTransfers);
-        if (batch != null)
-            request.goalDirection = ! batch;
-        request.graph = _graphService.getGraph();
-        request.remainingWeightHeuristic = _heuristicFactory.getInstanceForSearch(request);
-        // this is ugly but needed here for now
-        request.streetIndex = _streetIndex; 
-        request.prepareForSearch();
         return request;
     }
 
