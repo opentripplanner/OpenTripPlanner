@@ -507,7 +507,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     name = "Bike rental " + node.getId();
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
-                    capacity = Integer.parseInt(node.getTag("capacity"));
+                    try {
+                        capacity = Integer.parseInt(node.getTag("capacity"));
+                    } catch (NumberFormatException e) {
+                        _log.warn("Capacity is not a number: " + node.getTag("capacity"));
+                    }
                 }
                 BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "bike rental "
                         + node.getId(), node.getLon(), node.getLat(),
