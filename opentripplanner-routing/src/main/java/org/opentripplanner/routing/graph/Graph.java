@@ -43,6 +43,8 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparator;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,6 +85,8 @@ public class Graph implements Serializable {
     private transient Map<Integer, Edge> edgeById;
     
     private transient Map<Edge, Integer> idForEdge;
+    
+    public transient StreetVertexIndexService streetIndex;
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
@@ -314,6 +318,8 @@ public class Graph implements Serializable {
             for (Vertex v : graph.getVertices())
                 v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+            LOG.debug("street index built.");
             if (level == LoadLevel.NO_HIERARCHIES)
                 return graph;
             graph.hierarchies = (ContractionHierarchySet) in.readObject();

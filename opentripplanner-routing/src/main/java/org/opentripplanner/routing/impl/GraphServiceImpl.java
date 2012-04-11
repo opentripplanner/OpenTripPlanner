@@ -31,7 +31,6 @@ import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of {@link GraphService} that loads the graph from a file.
@@ -91,7 +90,7 @@ public class GraphServiceImpl implements GraphService {
     }
   }
 
-  @Autowired
+  //@Autowired
   public void setGraphRefreshListeners(
       List<GraphRefreshListener> graphRefreshListeners) {
     _graphRefreshListeners = graphRefreshListeners;

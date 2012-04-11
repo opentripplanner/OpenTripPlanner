@@ -71,10 +71,10 @@ import com.vividsolutions.jts.operation.distance.GeometryLocation;
  * on input latitude and longitude. Instantiating this class is expensive, because it creates a
  * spatial index of all of the intersections in the graph.
  */
-@Component
-public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, GraphRefreshListener {
+//@Component
+public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
-    private GraphService graphService;
+    private Graph graph;
 
     /**
      * Contains only instances of {@link StreetEdge}
@@ -103,16 +103,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
 
     private static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
-    public StreetVertexIndexServiceImpl() {
-    }
-
     public StreetVertexIndexServiceImpl(Graph graph) {
-        this.graphService = new GraphServiceBeanImpl(graph);
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
+        this.graph = graph;
+        setup();
     }
 
     public void setup_modifiable() {
@@ -126,15 +119,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         ((STRtree) edgeTree).build();
     }
 
-    @Override
-    public void handleGraphRefresh(GraphService graphService) {
-        this.graphService = graphService;
-        setup();
-    }
-
     private void postSetup() {
-
-        Graph graph = graphService.getGraph();
 
         transitStopTree = new STRtree();
         intersectionTree = new STRtree();
@@ -519,7 +504,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService, G
         }
         // did not match lat/lon, interpret place as a vertex label.
         // this should probably only be used in tests.
-        return graphService.getGraph().getVertex(place.place);
+        return graph.getVertex(place.place);
     }
 
     @Override
