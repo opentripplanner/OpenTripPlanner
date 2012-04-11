@@ -1,5 +1,6 @@
 package org.opentripplanner.api.common;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +30,7 @@ import com.sun.jersey.api.core.InjectParam;
  * 
  * @author abyrd
  */
-public abstract class SearchResource {
+public abstract class SearchResource { // RoutingResource
 
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
 
@@ -245,6 +246,15 @@ public abstract class SearchResource {
         if (maxTransfers != null)
             request.setMaxTransfers(maxTransfers);
         return request;
+    }
+    
+    private <T> T get(List<T> l, int i) {
+        if (l.size() == 0)
+            return null;
+        int maxIndex = l.size() - 1;
+        if (i > maxIndex)
+            i = maxIndex;
+        return l.get(i);
     }
 
 }
