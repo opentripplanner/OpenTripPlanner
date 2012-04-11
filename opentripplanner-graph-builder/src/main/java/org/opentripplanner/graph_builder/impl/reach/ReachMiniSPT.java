@@ -27,6 +27,7 @@ import java.util.Stack;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.AbstractShortestPathTree;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class ReachMiniSPT extends AbstractShortestPathTree {
@@ -46,8 +47,8 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
      * Constructor that uses a default capacity for internal vertex-keyed data
      * structures.
      */
-    public ReachMiniSPT(double epsilon) {
-        this(DEFAULT_CAPACITY, epsilon);
+    public ReachMiniSPT(RoutingContext rctx, double epsilon) {
+        this(rctx, DEFAULT_CAPACITY, epsilon);
     }
 
     /**
@@ -56,7 +57,8 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
      * 
      * @param n - the initial size of vertex-keyed maps
      */
-    public ReachMiniSPT(int n, double epsilon) {
+    public ReachMiniSPT(RoutingContext rctx, int n, double epsilon) {
+        super(rctx);
         states = new IdentityHashMap<Vertex, ReachState>(n);
         this.epsilon = epsilon;
     }
