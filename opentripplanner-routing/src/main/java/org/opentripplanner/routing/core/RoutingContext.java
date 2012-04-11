@@ -29,6 +29,13 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions,
+ * on a specific graph. Includes things like (temporary) endpoint vertices, transfer tables, 
+ * service day caches, etc.
+ * 
+ * @author abyrd
+ */
 public class RoutingContext {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
@@ -42,6 +49,7 @@ public class RoutingContext {
     public final Vertex toVertex;
     public final Vertex origin;
     public final Vertex target;
+    public final State initialState;
     public final boolean goalDirection = true;
     public final StreetVertexIndexService streetIndex;
     //public final Calendar calendar;
@@ -85,12 +93,14 @@ public class RoutingContext {
 
     public RoutingContext(TraverseOptions traverseOptions, boolean useServiceDays) {
         graph = graphService.getGraph(); // opt.routerId
+        opt.graph = graph; // TODO: add routingcontext to SPT
         streetIndex = graph.getService(StreetVertexIndexService.class);
         fromVertex = streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
         toVertex = streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
         // state.reversedClone() will have to set the vertex, not get it from opts
         origin = opt.arriveBy ? toVertex : fromVertex;
         target = opt.arriveBy ? fromVertex : toVertex;
+        initialState = new State(origin, opt);
         checkEndpointVertices();
         findIntermediateVertices();
 //        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
@@ -191,6 +201,12 @@ public class RoutingContext {
         return true;
     }
 
-    // TODO: method to add/remove temporary edges from graph
-    
+    /** 
+     * When a routing context is garbage collected, there should be no more references
+     * to the temporary vertices it created. We need to detach its edges from the permanent graph.
+     */
+    @Override public void finalize() {
+        LOG.debug("garbage routing context collected");
+    }
+
 }
