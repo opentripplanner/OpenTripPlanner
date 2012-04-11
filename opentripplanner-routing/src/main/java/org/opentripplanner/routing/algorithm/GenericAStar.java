@@ -27,25 +27,29 @@ import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Find the shortest path between graph vertices using A*.
  */
-public class GenericAStar implements SPTService {
+public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
@@ -60,6 +64,9 @@ public class GenericAStar implements SPTService {
 
     private TraverseVisitor traverseVisitor;
 
+    @Autowired private GraphService graphService;
+
+
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
     }
@@ -71,71 +78,59 @@ public class GenericAStar implements SPTService {
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
         _searchTerminationStrategy = searchTerminationStrategy;
     }
+    
+    @Override
+    public ShortestPathTree getShortestPathTree(TraverseOptions req) {
+        return getShortestPathTree(req, -1); // negative timeout means no timeout
+    }
 
-    /**
-     * Plots a path on graph from origin to target. In the case of "arrive-by" routing, the origin
-     * state is actually the user's end location and the target vertex is the user's start location.
-     * 
-     * @param graph
-     * @param origin
-     * @param target
-     * @return the shortest path, or null if none is found
-     */
-    public ShortestPathTree getShortestPathTree(TraverseOptions options) {
+    /** @return the shortest path, or null if none is found */
+    public ShortestPathTree getShortestPathTree(TraverseOptions options, double relTimeout) {
+
+        RoutingContext rctx = options.getRoutingContext(graphService);
+        long abortTime = DateUtils.absoluteTimeout(relTimeout);
         
-        Graph graph = options.graph;
-        State origin = options.getInitialState();
-        Vertex target = options.getTargetVertex();
-
-        if (origin == null || target == null) {
+        if (rctx.origin == null || rctx.target == null) {
             return null;
         }
 
-        // from now on, target means "where this search will terminate"
-        // not "the end of the trip from the user's perspective".
-
-        ShortestPathTree spt = createShortestPathTree(origin, options, graph);
+        ShortestPathTree spt = createShortestPathTree(rctx);
 
         /**
          * Populate any extra edges
          */
-        final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
+        final ExtraEdgesStrategy extraEdgesStrategy = rctx.extraEdgesStrategy;
         Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
         // conditional could be eliminated by placing this before the o/d swap above
         if (options.isArriveBy()) {
-            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
+            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, rctx.origin);
+            extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, rctx.target);
         } else {
-            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
+            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, rctx.origin);
+            extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, rctx.target);
         }
 
         if (extraEdges.isEmpty())
             extraEdges = Collections.emptyMap();
 
-        final RemainingWeightHeuristic heuristic = options.goalDirection ? 
-                options.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
+        final RemainingWeightHeuristic heuristic = rctx.goalDirection ? 
+                rctx.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
 
-        double initialWeight = heuristic.computeInitialWeight(origin, target);
-        spt.add(origin);
+        // heuristic calc could actually be done when states are constructed, inside state
+        double initialWeight = heuristic.computeInitialWeight(rctx.initialState, rctx.target);
+        spt.add(rctx.initialState);
 
         // Priority Queue
-        OTPPriorityQueueFactory factory = BinHeap.FACTORY;
-        OTPPriorityQueue<State> pq = factory.create(graph.getVertices().size() + extraEdges.size());
+        OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
+        OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size() + extraEdges.size());
         // this would allow continuing a search from an existing state
-        pq.insert(origin, origin.getWeight() + initialWeight);
+        pq.insert(rctx.initialState, initialWeight);
 
-        options = options.clone();
-        /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
-                + target.getDistanceToNearestTransitStop();
-        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), minWalkDistance));
-
-        long abortTime = Long.MAX_VALUE;
-        if (options.searchAbortTime > 0)
-            abortTime = Math.min(abortTime, options.searchAbortTime);
-        if (options.maxComputationTime > 0)
-            abortTime = Math.min(abortTime, System.currentTimeMillis() + options.maxComputationTime);
+//        options = options.clone();
+//        /** max walk distance cannot be less than distances to nearest transit stops */
+//        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
+//                + target.getDistanceToNearestTransitStop();
+//        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
 
         int nVisited = 0;
 
@@ -151,12 +146,12 @@ public class GenericAStar implements SPTService {
              * Terminate the search prematurely if we've hit our computation wall.
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", origin, target);
+                LOG.warn("Search timeout. origin={} target={}", rctx.origin, rctx.target);
                 // Returning null indicates something went wrong and search should be aborted.
                 // This is distinct from the empty list of paths which implies that a result may still
                 // be found by retrying with altered options (e.g. max walk distance)
                 storeMemory();
-                return null;
+                return null; // throw timeout exception
             }
 
             // get the lowest-weight state in the queue
@@ -184,16 +179,16 @@ public class GenericAStar implements SPTService {
              * Should we terminate the search?
              */
             if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(origin.getVertex(), target, u,
-                        spt, options))
+                if (!_searchTerminationStrategy.shouldSearchContinue(
+                    rctx.origin, rctx.target, u, spt, options))
                     break;
-            } else if (options.goalDirection && u_vertex == target) {
+            } else if (rctx.goalDirection && u_vertex == rctx.target) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;
             }
 
-            Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, u_vertex, options);
+            Collection<Edge> edges = getEdgesForVertex(rctx.graph, extraEdges, u_vertex, options);
 
             nVisited += 1;
 
@@ -217,10 +212,10 @@ public class GenericAStar implements SPTService {
 
                     if (_skipTraversalResultStrategy != null
                             && _skipTraversalResultStrategy.shouldSkipTraversalResult(
-                                    origin.getVertex(), target, u, v, spt, options))
+                                    rctx.origin, rctx.target, u, v, spt, options))
                         continue;
 
-                    double remaining_w = computeRemainingWeight(heuristic, v, target, options);
+                    double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                         continue;
                     }
@@ -233,11 +228,11 @@ public class GenericAStar implements SPTService {
                                 + v.getVertex());
                     }
 
-                    if (estimate > options.maxWeight) {
+                    if (estimate > rctx.maxWeight) {
                         // too expensive to get here
                         if (_verbose)
                             System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                    } else if (isWorstTimeExceeded(v, options)) {
+                    } else if (isWorstTimeExceeded(v, rctx)) {
                         // too much time to get here
                     	if (_verbose)
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTime());
@@ -283,26 +278,26 @@ public class GenericAStar implements SPTService {
             return heuristic.computeForwardWeight(v, target);
     }
 
-    private boolean isWorstTimeExceeded(State v, TraverseOptions options) {
-        if (options.isArriveBy())
-            return v.getTime() < options.worstTime;
+    private boolean isWorstTimeExceeded(State v, RoutingContext rctx) {
+        if (rctx.opt.isArriveBy())
+            return v.getTime() < rctx.worstTime;
         else
-            return v.getTime() > options.worstTime;
+            return v.getTime() > rctx.worstTime;
     }
 
-    private ShortestPathTree createShortestPathTree(State init, TraverseOptions options, Graph graph) {
+    private ShortestPathTree createShortestPathTree(RoutingContext rctx) {
 
         // Return Tree
         ShortestPathTree spt = null;
 
         if (_shortestPathTreeFactory != null)
-            spt = _shortestPathTreeFactory.create();
+            spt = _shortestPathTreeFactory.create(rctx);
 
         if (spt == null) {
-            if (options.getModes().isTransit()) {
-                spt = new MultiShortestPathTree();
+            if (rctx.opt.getModes().isTransit()) {
+                spt = new MultiShortestPathTree(rctx);
             } else {
-                spt = new BasicShortestPathTree();
+                spt = new BasicShortestPathTree(rctx);
             }
         }
 
@@ -312,4 +307,5 @@ public class GenericAStar implements SPTService {
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
+
 }
