@@ -320,10 +320,10 @@ public class DateUtils implements DateConstants {
         return null;
     }
     
-    public static long absoluteTimeout(int relativeTimeoutSeconds) {
+    public static long absoluteTimeout(double relativeTimeoutSeconds) {
         if (relativeTimeoutSeconds <= 0)
             return Long.MAX_VALUE;
         else
-            return System.currentTimeMillis() + relativeTimeoutSeconds * 1000;
+            return System.currentTimeMillis() + (long)(relativeTimeoutSeconds * 1000.0);
     }
 }
