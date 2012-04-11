@@ -25,6 +25,7 @@ import java.util.TimeZone;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -166,16 +167,6 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public int useUnpreferredRoutesPenalty = 300;
     
-
-    /**
-     * The worst possible time (latest for depart-by and earliest for arrive-by) that we will accept
-     * when planning a trip.
-     */
-    public long worstTime = Long.MAX_VALUE;
-
-    /** The worst possible weight that we will accept when planning a trip. */
-    public double maxWeight = Double.MAX_VALUE;
-
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
      * must pass between exiting one transit vehicle and boarding another. This time is in addition
@@ -187,23 +178,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public int maxTransfers = 2;
 
-    /**
-     * Set a hard limit on computation time. Any positive value will be treated as a limit on the
-     * computation time for one search instance, in milliseconds relative to search start time. 
-     * A zero or negative value implies no limit.
-     */
-    public long maxComputationTime = 0;
-
-    /**
-     * The search will be aborted if it is still running after this time (in milliseconds since the 
-     * epoch). A negative or zero value implies no limit. 
-     * This provides an absolute timeout, whereas the maxComputationTime is relative to the 
-     * beginning of an individual search. While the two might seem equivalent, we trigger search 
-     * retries in various places where it is difficult to update relative timeout value. 
-     * The earlier of the two timeouts is applied. 
-     */
-    public long searchAbortTime = 0;
-    
     /**
      * Extensions to the trip planner will require additional traversal options beyond the default
      * set. We provide an extension point for adding arbitrary parameters with an extension-specific
@@ -277,11 +251,6 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
         walkingOptions.arriveBy = arriveBy;
-        if (arriveBy) {
-            this.worstTime = 0;
-        } else {
-            this.worstTime = Long.MAX_VALUE;
-        }
     }
 
     public TraverseOptions getWalkingOptions() {
@@ -690,11 +659,10 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
     
     /** @param finalTime in seconds since the epoch */
-    public TraverseOptions reversedClone(long finalTime) {
+    public TraverseOptions reversedClone() {
         TraverseOptions ret = this.clone();
         ret.setArriveBy( ! ret.isArriveBy());
         ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
-        ret.dateTime = finalTime; // TODO: just force the new State's vertex and time.
         return ret;
     }
 
@@ -702,17 +670,12 @@ public class TraverseOptions implements Cloneable, Serializable {
         return new RoutingContext(this);
     }
 
-    /** Builds an initial State for a search based on this set of options. */
-    public State getInitialState() {
-        return new State(this);
-    }
-    
     @Override
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions other = (TraverseOptions) o;
             return from.equals(other.from) && to.equals(other.to) 
-                    && speed == other.speed && maxWeight == other.maxWeight && worstTime == other.worstTime
+                    && speed == other.speed 
                     && getModes().equals(other.getModes()) && isArriveBy() == other.isArriveBy()
                     && wheelchairAccessible == other.wheelchairAccessible
                     && optimizeFor == other.optimizeFor && maxWalkDistance == other.maxWalkDistance
@@ -735,8 +698,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     @Override
     public int hashCode() {
         return from.hashCode() * 524287 + to.hashCode() * 1327144003 
-                + new Double(speed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + getModes().hashCode()
+                + new Double(speed).hashCode() + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
@@ -750,4 +712,7 @@ public class TraverseOptions implements Cloneable, Serializable {
                 + new Double(stairsReluctance).hashCode() * 315595321;
     }
 
+    /* temp kludge until spts contain routingcontext */
+    public Graph graph;
+    
 }

@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,7 +10,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -43,11 +41,15 @@ public class RoutingContext {
     private static GraphService graphService = new GraphServiceImpl(); 
     private static RemainingWeightHeuristicFactory heuristicFactory = new DefaultRemainingWeightHeuristicFactoryImpl();
     
-    private TraverseOptions opt;
+    /* FINAL FIELDS */
+    
+    public TraverseOptions opt; // not final so we can reverse-optimize
     public final Graph graph;
     public final Vertex fromVertex;
     public final Vertex toVertex;
+    // origin means "where the initial state will be located" not "the beginning of the trip from the user's perspective"
     public final Vertex origin;
+    // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
     public final State initialState;
     public final boolean goalDirection = true;
@@ -59,7 +61,6 @@ public class RoutingContext {
     public final RemainingWeightHeuristic remainingWeightHeuristic;
     public final ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
     public final TransferTable transferTable;
-    
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
      * TraverseOptions to a particular start time for the duration of a search so the same options
@@ -68,6 +69,43 @@ public class RoutingContext {
      */
     public ArrayList<ServiceDay> serviceDays;
 
+    /* VARIABLE FIELDS (may vary over the course of an SPTService search) */
+    
+    /**
+     * Initialized to, but distinct from TraverseOptions.maxWalkDistace. This value may be raised to retry searches or account for the minimum
+     * possible walk distance to transit stops.
+     */
+    public double maxWalkDistace; 
+    
+    /**
+     * The worst possible time (latest for depart-by and earliest for arrive-by) that we will accept
+     * when planning a trip.
+     */
+    public long worstTime = Long.MAX_VALUE;
+
+    /** The worst possible weight that we will accept when planning a trip. */
+    public double maxWeight = Double.MAX_VALUE;
+
+    /**
+     * Set a hard limit on computation time. Any positive value will be treated as a limit on the
+     * computation time for one search instance, in milliseconds relative to search start time. 
+     * A zero or negative value implies no limit.
+     */
+    public long maxComputationTime = 0;
+
+    /**
+     * The search will be aborted if it is still running after this time (in milliseconds since the 
+     * epoch). A negative or zero value implies no limit. 
+     * This provides an absolute timeout, whereas the maxComputationTime is relative to the 
+     * beginning of an individual search. While the two might seem equivalent, we trigger search 
+     * retries in various places where it is difficult to update relative timeout value. 
+     * The earlier of the two timeouts is applied. 
+     */
+    public long searchAbortTime = 0;
+    
+    
+    /* CONSTRUCTORS */
+    
     public RoutingContext(TraverseOptions traverseOptions) {
         this(traverseOptions, true);
     }
@@ -92,6 +130,7 @@ public class RoutingContext {
     }
 
     public RoutingContext(TraverseOptions traverseOptions, boolean useServiceDays) {
+        opt = traverseOptions;
         graph = graphService.getGraph(); // opt.routerId
         opt.graph = graph; // TODO: add routingcontext to SPT
         streetIndex = graph.getService(StreetVertexIndexService.class);
@@ -100,7 +139,7 @@ public class RoutingContext {
         // state.reversedClone() will have to set the vertex, not get it from opts
         origin = opt.arriveBy ? toVertex : fromVertex;
         target = opt.arriveBy ? fromVertex : toVertex;
-        initialState = new State(origin, opt);
+        initialState = new State(this);
         checkEndpointVertices();
         findIntermediateVertices();
 //        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
@@ -113,6 +152,7 @@ public class RoutingContext {
         if (useServiceDays)
             setServiceDays();
         remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
+        this.worstTime = opt.arriveBy ? 0 : Long.MAX_VALUE;
         if (opt.getModes().isTransit()
             && ! graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,
@@ -120,6 +160,9 @@ public class RoutingContext {
             throw new TransitTimesException();
         }
     }
+    
+    
+    /* INSTANCE METHODS */
     
     private void checkEndpointVertices() {
         ArrayList<String> notFound = new ArrayList<String>();
@@ -201,6 +244,17 @@ public class RoutingContext {
         return true;
     }
 
+    public RoutingContext reversedClone() {
+        try {
+            RoutingContext ret = (RoutingContext) this.clone();
+            ret.opt = ret.opt.reversedClone();
+            return ret;
+        } catch (CloneNotSupportedException e) {
+            // I <3 checked exceptions
+            return null;
+        }
+    }
+    
     /** 
      * When a routing context is garbage collected, there should be no more references
      * to the temporary vertices it created. We need to detach its edges from the permanent graph.
