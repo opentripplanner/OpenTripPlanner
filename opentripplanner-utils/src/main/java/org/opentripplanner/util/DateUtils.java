@@ -319,4 +319,11 @@ public class DateUtils implements DateConstants {
         }
         return null;
     }
+    
+    public static long absoluteTimeout(int relativeTimeoutSeconds) {
+        if (relativeTimeoutSeconds <= 0)
+            return Long.MAX_VALUE;
+        else
+            return System.currentTimeMillis() + relativeTimeoutSeconds * 1000;
+    }
 }
