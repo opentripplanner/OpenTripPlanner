@@ -35,6 +35,11 @@ public abstract class AbstractShortestPathTree implements ShortestPathTree {
     }
     
     @Override
+    public List<GraphPath> getPaths() {
+        return getPaths(rctx.target, true);
+    }
+    
+    @Override
     public List<GraphPath> getPaths(Vertex dest, boolean optimize) {
         List<? extends State> stateList = getStates(dest);
         if (stateList == null)

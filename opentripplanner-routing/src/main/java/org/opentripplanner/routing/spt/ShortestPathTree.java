@@ -95,6 +95,9 @@ public interface ShortestPathTree {
      */
     public List<GraphPath> getPaths(Vertex dest, boolean optimize);
 
+    /** Return a default set of back-optimized paths to the target vertex */
+    public List<GraphPath> getPaths();
+
     public GraphPath getPath(Vertex dest, boolean optimize);
 
     /**
