@@ -1,6 +1,5 @@
 package org.opentripplanner.api.common;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -9,19 +8,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-
-import com.sun.jersey.api.core.InjectParam;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to be inherited
@@ -151,7 +142,7 @@ public abstract class SearchResource { // RoutingResource
     /** If true, goal direction is turned off and a full path tree is built */
     @DefaultValue("false") @QueryParam("batch") Boolean batch;
     
-    /** Inject the servlet request so we have access to the query parameter map */
+    /* Inject the servlet request so we have access to the query parameter map */
     @Context protected HttpServletRequest httpServletRequest;
 
     /** 
