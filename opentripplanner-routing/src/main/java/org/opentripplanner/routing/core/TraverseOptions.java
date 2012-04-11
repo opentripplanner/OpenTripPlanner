@@ -15,35 +15,16 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TimeZone;
 
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,16 +43,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     private static final int CLAMP_ITINERARIES = 3;
     private static final int CLAMP_TRANSFERS = 4;
 
-    /* NEW FIELDS */
-    
-    public Graph graph;
-    public Vertex fromVertex;
-    public Vertex toVertex;
-    public boolean initialized = false;
-    public boolean goalDirection = true;
-    public StreetVertexIndexService streetIndex;
-
-    /* EX-REQUEST FIELDS */
+    /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /** The complete list of incoming query parameters. */
     public final HashMap<String, String> parameters = new HashMap<String, String>();
@@ -107,11 +79,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
     /** Whether the planner should return intermediate stops lists for transit legs. */
     public boolean showIntermediateStops = false;
-    
     /** max walk/bike speed along streets, in meters per second */
     public double speed; // walkSpeed
     // public double walkSpeed;
-
     /** max biking speed along streets, in meters per second */
     // public double bikeSpeed;
     
@@ -126,14 +96,6 @@ public class TraverseOptions implements Cloneable, Serializable {
      * optimize_transfer_penalty seconds, then that's what we'll return.
      */
     public int transferPenalty = 0;
-
-    /* ORIGNAL TRAVERSEOPTIONS FIELDS */
-    
-    public Calendar calendar;
-
-    public CalendarService calendarService;
-
-    public Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
 
     public boolean wheelchairAccessible = false;
 
@@ -262,35 +224,12 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     public double triangleSafetyFactor;
 
-    
-    /* FIELDS FOR SEARCH CONTEXT AND CACHED VALUES */
-
+    /** A sub-traverse options for another mode */
     public TraverseOptions walkingOptions;
-
-    public GenericAStarFactory aStarSearchFactory = null;
-    
-    public RemainingWeightHeuristic remainingWeightHeuristic = new DefaultRemainingWeightHeuristic();
-    
-    public ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
-
-    public TransferTable transferTable;
-
-    /**
-     * With this flag, you can selectively enable or disable the use of the {@link #serviceDays}
-     * cache. It is enabled by default, but you can disable it if you don't need this functionality.
-     */
-    public boolean useServiceDays = true;
-    
-    /**
-     * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
-     * TraverseOptions to a particular start time for the duration of a search so the same options
-     * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
-     * into StateData, with all that entails.
-     */
-    public ArrayList<ServiceDay> serviceDays;
     
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
+    
     
     /* CONSTRUCTORS */
     
@@ -299,19 +238,14 @@ public class TraverseOptions implements Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
-        calendar = Calendar.getInstance();
+        //calendar = Calendar.getInstance();
         walkingOptions = this;
-        setIntermediatePlaces(new ArrayList<String>());
+        //setIntermediatePlaces(new ArrayList<String>());
     }
 
     public TraverseOptions(TraverseModeSet modes) {
         this();
         this.setModes(modes);
-    }
-
-    public TraverseOptions(GtfsContext context) {
-        this();
-        setGtfsContext(context);
     }
 
     public TraverseOptions(TraverseMode mode) {
@@ -329,60 +263,16 @@ public class TraverseOptions implements Cloneable, Serializable {
     	this.setModes(modeSet);
     }    
 
-    /* ACCESSOR METHODS */
     
-    public void setGtfsContext(GtfsContext context) {
-        calendarService = context.getCalendarService();
-    }
-
-    public void setCalendarService(CalendarService calendarService) {
-        this.calendarService = calendarService;
-    }
-
-    public CalendarService getCalendarService() {
-        return calendarService;
-    }
-
-    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
-        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
-        if (dates == null) {
-            dates = calendarService.getServiceDatesForServiceId(serviceId);
-            serviceDatesByServiceId.put(serviceId, dates);
-        }
-        return dates.contains(serviceDate);
-    }
+    /* ACCESSOR METHODS */
 
     public boolean transitAllowed() {
         return getModes().isTransit();
     }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public TraverseOptions clone() {
-        try {
-            TraverseOptions clone = (TraverseOptions) super.clone();
-            clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
-            clone.bannedTrips = (HashSet<AgencyAndId>) bannedTrips.clone();
-            if (this.walkingOptions != this)
-            	clone.walkingOptions = this.walkingOptions.clone();
-            else
-            	clone.walkingOptions = clone;
-            return clone;
-        } catch (CloneNotSupportedException e) {
-            /* this will never happen since our super is the cloneable object */
-            throw new RuntimeException(e);
-        }
-    }
     
-    /** @param finalTime in seconds since the epoch */
-    public TraverseOptions reversedClone(long finalTime) {
-    	TraverseOptions ret = this.clone();
-    	ret.setArriveBy( ! ret.isArriveBy());
-    	ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
-    	ret.dateTime = finalTime;
-    	return ret;
+    public long getSecondsSinceEpoch() {
+        return dateTime;
     }
-    
 
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
@@ -462,21 +352,18 @@ public class TraverseOptions implements Cloneable, Serializable {
         return (T) extensions.get(key);
     }
 
-    public TransferTable getTransferTable() {
-        return transferTable;
-    }
-
-    public void setTransferTable(TransferTable transferTable) {
-        this.transferTable = transferTable;
-    }
-
     public boolean isReverseOptimizing() {
         return reverseOptimizing;
     }
 
     /** @return the (soft) maximum walk distance */
+    // If transit is not to be used, disable walk limit.
     public double getMaxWalkDistance() {
-        return maxWalkDistance;
+        if (getModes().isTransit()) {
+            return Double.MAX_VALUE;
+        } else {
+            return maxWalkDistance;
+        }
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
@@ -516,9 +403,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         return s;
     }
 
-
-    
-    /**** EX-REQUEST METHODS ****/
     public HashMap<String, String> getParameters() {
         return parameters;
     }
@@ -557,16 +441,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
     
-    /** return the vertex where this search will begin, accounting for arriveBy */
-    public Vertex getOriginVertex() {
-        return arriveBy ? toVertex : fromVertex;
-    }
-    
-    /** return the vertex where this search will end, accounting for arriveBy */
-    public Vertex getTargetVertex() {
-        return arriveBy ? fromVertex : toVertex;
-    }
-
     /** @param walk - the (soft) maximum walk distance to set */
     public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }
 
@@ -603,8 +477,13 @@ public class TraverseOptions implements Cloneable, Serializable {
         return arriveBy; 
     }
 
+    // If transit is not to be used, only search for one itinerary.
     public Integer getNumItineraries() { 
-        return numItineraries; 
+        if (getModes().isTransit()) {
+            return numItineraries;
+        } else {
+            return 1;
+        }
     }
 
     public void setNumItineraries(int numItineraries) {
@@ -709,7 +588,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public Integer getTransferPenalty() {
         return transferPenalty;
     }
-
+    
     public void setSpeed(double speed) {
         this.speed = speed;
     }
@@ -789,113 +668,38 @@ public class TraverseOptions implements Cloneable, Serializable {
 //        
 //    }
 
+    
     /* INSTANCE METHODS */
-    
-    /**
-     * Call when all search request parameters have been set to fill the service days cache,
-     * set some other values.
-     */
-    // could even be setGraph
-    public void prepareForSearch() {
-        if (initialized == true)
-            throw new IllegalStateException("A TraverseOptions should only be initialized once.");
-        if (graph == null)
-            throw new IllegalStateException("Graph must be set before preparing for search.");
-        
-        findEndpointVertices();
-        findIntermediateVertices();
-        
-        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
-        if (csData != null) {
-            CalendarServiceImpl calendarService = new CalendarServiceImpl();
-            calendarService.setData(csData);
-            setCalendarService(calendarService);
-        }
-        setTransferTable(graph.getTransferTable());
-        setServiceDays();
-        if (getModes().isTransit()
-            && ! graph.transitFeedCovers(dateTime)) {
-            // user wants a path through the transit network,
-            // but the date provided is outside those covered by the transit feed.
-            throw new TransitTimesException();
-        }
-        // If transit is not to be used, disable walk limit and only search for one itinerary.
-        if (! getModes().isTransit()) {
-            numItineraries = 1;
-            setMaxWalkDistance(Double.MAX_VALUE);
-        }
-        this.initialized = true;
-    }
-    
-    public long getSecondsSinceEpoch() {
-        return dateTime;
-    }
-    
-    // TODO: this should be done in SearchResource so we don't have to pass in a street index
-    private void findEndpointVertices() {
-        if (graph == null)
-            throw new RuntimeException("graph not yet set, cannot find endpoints");
-        if (streetIndex == null)
-            throw new RuntimeException("street index not yet set, cannot find endpoints");
-        ArrayList<String> notFound = new ArrayList<String>();
-        fromVertex = streetIndex.getVertexForPlace(getFromPlace(), this);
-        if (fromVertex == null) {
-            notFound.add("from");
-        }
-        toVertex = streetIndex.getVertexForPlace(getToPlace(), this, fromVertex);
-        if (toVertex == null) {
-            notFound.add("to");
-        }
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public TraverseOptions clone() {
+        try {
+            TraverseOptions clone = (TraverseOptions) super.clone();
+            clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
+            clone.bannedTrips = (HashSet<AgencyAndId>) bannedTrips.clone();
+            if (this.walkingOptions != this)
+                clone.walkingOptions = this.walkingOptions.clone();
+            else
+                clone.walkingOptions = clone;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            /* this will never happen since our super is the cloneable object */
+            throw new RuntimeException(e);
         }
     }
     
-    private void findIntermediateVertices() {
-        if (intermediatePlaces == null)
-            return;
-        ArrayList<String> notFound = new ArrayList<String>();
-        ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
-        int i = 0;
-        for (NamedPlace intermediate : intermediatePlaces) {
-            Vertex vertex = streetIndex.getVertexForPlace(intermediate, this);
-            if (vertex == null) {
-                notFound.add("intermediate." + i);
-            } else {
-                intermediateVertices.add(vertex);
-            }
-            i += 1;
-        }
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }        
+    /** @param finalTime in seconds since the epoch */
+    public TraverseOptions reversedClone(long finalTime) {
+        TraverseOptions ret = this.clone();
+        ret.setArriveBy( ! ret.isArriveBy());
+        ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
+        ret.dateTime = finalTime; // TODO: just force the new State's vertex and time.
+        return ret;
     }
 
-    /**
-     *  Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative
-     *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were
-     *  identified as a performance bottleneck. Must be called after the TraverseOptions already has a CalendarService set. 
-     */
-    public void setServiceDays() {
-        if( ! useServiceDays )
-            return;
-        final long SEC_IN_DAY = 60 * 60 * 24;
-
-        final long time = this.getSecondsSinceEpoch();
-        this.serviceDays = new ArrayList<ServiceDay>(3);
-        CalendarService cs = this.getCalendarService();
-        if (cs == null) {
-            LOG.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
-            return;
-        }
-        // This should be a valid way to find yesterday and tomorrow,
-        // since DST changes more than one hour after midnight in US/EU.
-        // But is this true everywhere?
-        for (String agency : graph.getAgencyIds()) {
-            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time, cs, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, cs, agency));
-        }
+    public RoutingContext getRoutingContext () {
+        return new RoutingContext(this);
     }
 
     /** Builds an initial State for a search based on this set of options. */
@@ -903,12 +707,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return new State(this);
     }
     
-    private static<T> void addIfNotExists(ArrayList<T> list, T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
-
+    @Override
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions other = (TraverseOptions) o;
@@ -933,6 +732,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return false;
     }
 
+    @Override
     public int hashCode() {
         return from.hashCode() * 524287 + to.hashCode() * 1327144003 
                 + new Double(speed).hashCode() + new Double(maxWeight).hashCode()
@@ -947,29 +747,7 @@ public class TraverseOptions implements Cloneable, Serializable {
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321
-                ;
-    }
-
-    /** check if the start and end locations are accessible */
-    public boolean isAccessible() {
-        if (getWheelchair()) {
-            return isWheelchairAccessible(fromVertex) &&
-                   isWheelchairAccessible(toVertex);
-        }
-        return true;
-    }
-
-    // this could be handled by method overloading on Vertex
-    public boolean isWheelchairAccessible(Vertex v) {
-        if (v instanceof TransitStop) {
-            TransitStop ts = (TransitStop) v;
-            return ts.hasWheelchairEntrance();
-        } else if (v instanceof StreetLocation) {
-            StreetLocation sl = (StreetLocation) v;
-            return sl.isWheelchairAccessible();
-        }
-        return true;
+                + new Double(stairsReluctance).hashCode() * 315595321;
     }
 
 }
