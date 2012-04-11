@@ -13,6 +13,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.spt;
 
+import org.opentripplanner.routing.core.RoutingContext;
+
 /**
  * Factory interface for providing swappable {@link ShortestPathTree} creation strategies.
  * 
@@ -20,5 +22,5 @@ package org.opentripplanner.routing.spt;
  * 
  */
 public interface ShortestPathTreeFactory {
-    public ShortestPathTree create();
+    public ShortestPathTree create(RoutingContext rctx);
 }

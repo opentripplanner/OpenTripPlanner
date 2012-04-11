@@ -20,6 +20,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -31,7 +33,8 @@ import org.opentripplanner.routing.graph.Vertex;
  * @author andrewbyrd
  */
 public class BasicShortestPathTree extends AbstractShortestPathTree {
-    private static final long serialVersionUID = 20110523L; // YYYYMMDD
+    
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private static final int DEFAULT_CAPACITY = 500;
 
@@ -41,8 +44,8 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
      * Parameterless constructor that uses a default capacity for internal vertex-keyed data
      * structures.
      */
-    public BasicShortestPathTree() {
-        this(DEFAULT_CAPACITY);
+    public BasicShortestPathTree(RoutingContext rctx) {
+        this(rctx, DEFAULT_CAPACITY);
     }
 
     /**
@@ -52,7 +55,8 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
      * @param n
      *            - the initial size of vertex-keyed maps
      */
-    public BasicShortestPathTree(int n) {
+    public BasicShortestPathTree(RoutingContext rctx, int n) {
+        super(rctx);
         states = new IdentityHashMap<Vertex, State>(n);
     }
 

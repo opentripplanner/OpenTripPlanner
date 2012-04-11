@@ -16,6 +16,7 @@ package org.opentripplanner.routing.spt;
 import java.util.Collection;
 import java.util.List;
 
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -103,6 +104,10 @@ public interface ShortestPathTree {
      */
     int getVertexCount();
 
+    /** @return the routing context for the search that produced this tree */
+    public RoutingContext getRoutingContext();
+
+    /** @return every state in this tree */
     public Collection<? extends State> getAllStates();
 
     /** Visit a vertex after it has been settled */
