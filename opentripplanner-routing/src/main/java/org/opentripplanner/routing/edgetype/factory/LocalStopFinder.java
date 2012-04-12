@@ -219,7 +219,6 @@ public class LocalStopFinder {
         // Iteration Variables
         HashSet<Vertex> closed = new HashSet<Vertex>();
         BinHeap<State> queue = new BinHeap<State>(50);
-        options.setRoutingContext(graph);
         BasicShortestPathTree spt = new BasicShortestPathTree(options);
         State initial = new State(origin, options);
         spt.add(initial);
