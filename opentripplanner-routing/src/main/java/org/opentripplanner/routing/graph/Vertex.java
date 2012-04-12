@@ -36,13 +36,11 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
     
     public abstract Collection<Edge> getOutgoing();
     public abstract void addOutgoing(Edge ee);
-    public abstract void addOutgoingConcurrent(Edge e);
     public abstract void removeOutgoing(Edge ee);
     public abstract int getDegreeOut();
 
     public abstract Collection<Edge> getIncoming();
     public abstract void addIncoming(Edge ee);
-    public abstract void addIncomingConcurrent(Edge e);
     public abstract void removeIncoming(Edge ee);
     public abstract int getDegreeIn();
 
@@ -67,7 +65,7 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
     /** Every vertex has a label which is globally unique. */
     public abstract String getLabel();
 
-    /** If this vertex is located on only one street, get that street's name. (RIGHT?) */
+    /** If this vertex is located on only one street, get that street's name. */
     public abstract String getName();
 
     public void setStreetName(String streetName);

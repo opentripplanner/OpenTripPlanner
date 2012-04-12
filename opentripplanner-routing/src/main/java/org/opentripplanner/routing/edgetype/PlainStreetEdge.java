@@ -403,18 +403,6 @@ public class PlainStreetEdge extends StreetEdge {
         return noThruTraffic;
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof PlainStreetEdge)) {
-            return false;
-        }
-        PlainStreetEdge pso = (PlainStreetEdge) o;
-        return pso.back == back && pso.fromv == fromv && pso.tov == tov && pso.length == length && pso.name.equals(name);
-    }
-
-    public int hashCode() {
-        return (back ? 2 : 1) * fromv.hashCode() * tov.hashCode() * (new Double(length)).hashCode() * name.hashCode();
-    }
-
     public boolean isStairs() {
         return stairs;
     }

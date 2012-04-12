@@ -135,14 +135,6 @@ public class OutEdge extends StreetEdge {
         return ((TurnVertex) fromv).setElevationProfile(elev, computed);
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof OutEdge) {
-            OutEdge other = (OutEdge) o;
-            return other.fromv.equals(fromv) && other.tov.equals(tov);
-        }
-        return false;
-    }
-
     @Override
     public boolean isNoThruTraffic() {
         return ((TurnVertex) fromv).isNoThruTraffic();
