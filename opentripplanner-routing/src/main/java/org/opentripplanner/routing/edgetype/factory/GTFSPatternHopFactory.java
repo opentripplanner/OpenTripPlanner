@@ -442,6 +442,16 @@ public class GTFSPatternHopFactory {
                 Stop s0 = st0.getStop();
                 Stop s1 = st1.getStop();
                 
+                if (st0.getPickupType() == 1) {
+                    // do not create an interline dwell when
+                    // the last stop on the arriving trip does not
+                    // allow pickups, since this probably means
+                    // that, while two trips share a block,
+                    // riders cannot stay on the vehicle during the
+                    // deadhead
+                    continue;
+                }
+
                 Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
                 Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
 

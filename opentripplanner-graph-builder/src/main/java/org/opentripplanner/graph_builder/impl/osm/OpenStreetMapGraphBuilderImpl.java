@@ -207,14 +207,65 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // Remove all simple islands
             _nodes.keySet().retainAll(_nodesWithNeighbors);
 
-            long wayIndex = 0;
-
             // figure out which nodes that are actually intersections
             initIntersectionNodes();
 
+            buildBasicGraph();
+
+            buildElevatorEdges(graph);
+
+            /* unify turn restrictions */
+            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
+            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
+                turnRestrictions.put(restriction.from, restriction);
+            }
+            if (customNamer != null) {
+                customNamer.postprocess(graph);
+            }
+            
+            //generate elevation profiles
+            generateElevationProfiles(graph);
+
+            applyBikeSafetyFactor(graph);
+            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+
+        } // END buildGraph()
+
+        private void generateElevationProfiles(Graph graph) {
+            Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
+            for (Map.Entry<EdgeWithElevation, List<ElevationPoint>> entry : data.entrySet()) {
+                EdgeWithElevation edge = entry.getKey();
+                List<ElevationPoint> points = entry.getValue();
+                Collections.sort(points);
+
+                if (points.size() == 1) {
+                    ElevationPoint firstPoint = points.get(0);
+                    ElevationPoint endPoint = new ElevationPoint(edge.getDistance(), firstPoint.ele);
+                    points.add(endPoint);
+                }
+                Coordinate[] coords = new Coordinate[points.size()];
+                int i = 0;
+                for (ElevationPoint p : points) {
+                    double d = p.distanceAlongShape;
+                    if (i == 0) {
+                        d = 0;
+                    } else if (i == points.size() - 1) {
+                        d = edge.getDistance();
+                    }
+                    coords[i++] = new Coordinate(d, p.ele);
+                }
+                // set elevation profile and warn if profile was flattened because it was too steep
+                if(edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true)) {
+                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                }
+            }
+        }
+
+        private void buildBasicGraph() {
             GeometryFactory geometryFactory = new GeometryFactory();
 
             /* build an ordinary graph, which we will convert to an edge-based graph */
+            long wayIndex = 0;
 
             for (OSMWay way : _ways.values()) {
 
@@ -367,51 +418,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     osmStartNode = _nodes.get(startNode);
                 }
             } // END loop over OSM ways
-
-            buildElevatorEdges(graph);
-
-            /* unify turn restrictions */
-            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
-            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
-                turnRestrictions.put(restriction.from, restriction);
-            }
-            if (customNamer != null) {
-                customNamer.postprocess(graph);
-            }
-            
-            //generate elevation profiles
-            Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
-            for (Map.Entry<EdgeWithElevation, List<ElevationPoint>> entry : data.entrySet()) {
-                EdgeWithElevation edge = entry.getKey();
-                List<ElevationPoint> points = entry.getValue();
-                Collections.sort(points);
-
-                if (points.size() == 1) {
-                    ElevationPoint firstPoint = points.get(0);
-                    ElevationPoint endPoint = new ElevationPoint(edge.getDistance(), firstPoint.ele);
-                    points.add(endPoint);
-                }
-                Coordinate[] coords = new Coordinate[points.size()];
-                int i = 0;
-                for (ElevationPoint p : points) {
-                    double d = p.distanceAlongShape;
-                    if (i == 0) {
-                        d = 0;
-                    } else if (i == points.size() - 1) {
-                        d = edge.getDistance();
-                    }
-                    coords[i++] = new Coordinate(d, p.ele);
-                }
-                // set elevation profile and warn if profile was flattened because it was too steep
-                if(edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true)) {
-                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
-                }
-            }
-
-            applyBikeSafetyFactor(graph);
-            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
-
-        } // END buildGraph()
+        }
 
         private void storeExtraElevationData(List<ElevationPoint> elevationPoints, PlainStreetEdge street, PlainStreetEdge backStreet, double length) {
             if (elevationPoints.isEmpty()) {
