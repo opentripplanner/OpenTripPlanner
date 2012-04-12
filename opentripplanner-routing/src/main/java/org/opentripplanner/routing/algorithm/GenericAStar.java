@@ -87,14 +87,15 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /** @return the shortest path, or null if none is found */
     public ShortestPathTree getShortestPathTree(TraverseOptions options, double relTimeout) {
 
-        RoutingContext rctx = options.getRoutingContext(graphService);
+        options.setRoutingContext(graphService.getGraph());
+        RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
         
         if (rctx.origin == null || rctx.target == null) {
             return null;
         }
 
-        ShortestPathTree spt = createShortestPathTree(rctx);
+        ShortestPathTree spt = createShortestPathTree(options);
 
         /**
          * Populate any extra edges
@@ -117,14 +118,15 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 rctx.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
 
         // heuristic calc could actually be done when states are constructed, inside state
-        double initialWeight = heuristic.computeInitialWeight(rctx.initialState, rctx.target);
-        spt.add(rctx.initialState);
+        State initialState = new State(options);
+        double initialWeight = heuristic.computeInitialWeight(initialState, rctx.target);
+        spt.add(initialState);
 
         // Priority Queue
         OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
         OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size() + extraEdges.size());
         // this would allow continuing a search from an existing state
-        pq.insert(rctx.initialState, initialWeight);
+        pq.insert(initialState, initialWeight);
 
 //        options = options.clone();
 //        /** max walk distance cannot be less than distances to nearest transit stops */
@@ -285,19 +287,19 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             return v.getTime() > rctx.worstTime;
     }
 
-    private ShortestPathTree createShortestPathTree(RoutingContext rctx) {
+    private ShortestPathTree createShortestPathTree(TraverseOptions opts) {
 
         // Return Tree
         ShortestPathTree spt = null;
 
         if (_shortestPathTreeFactory != null)
-            spt = _shortestPathTreeFactory.create(rctx);
+            spt = _shortestPathTreeFactory.create();
 
         if (spt == null) {
-            if (rctx.opt.getModes().isTransit()) {
-                spt = new MultiShortestPathTree(rctx);
+            if (opts.getModes().isTransit()) {
+                spt = new MultiShortestPathTree();
             } else {
-                spt = new BasicShortestPathTree(rctx);
+                spt = new BasicShortestPathTree();
             }
         }
 

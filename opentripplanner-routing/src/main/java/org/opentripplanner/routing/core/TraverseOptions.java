@@ -25,6 +25,7 @@ import java.util.TimeZone;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
@@ -203,7 +204,16 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
-    
+
+    /**
+     * The routing context used to actually carry out this search. It is important to build States 
+     * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
+     * in the TraverseOptions, rather than using RoutingContexts for everything because in some 
+     * testing and graph building situations we need to build a bunch of initial states with 
+     * different times and vertices from a single TraverseOptions, without setting all the transit 
+     * context or building temporary vertices (with all the exception-throwing checks that entails).
+     */
+    RoutingContext rctx;    
     
     /* CONSTRUCTORS */
     
@@ -666,8 +676,14 @@ public class TraverseOptions implements Cloneable, Serializable {
         return ret;
     }
 
-    public RoutingContext getRoutingContext (GraphService graphService) {
-        return new RoutingContext(this, graphService); // graphService.getGraph(routerId)
+    public void setRoutingContext (Graph graph) {
+        // TODO: this should probably convert the relative timeouts to absolute
+        // since it is called right before a search begins
+        this.rctx = new RoutingContext(this, graph); // graphService.getGraph(routerId)
+    }
+    
+    public RoutingContext getRoutingContext () {
+        return this.rctx;
     }
 
     @Override

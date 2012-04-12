@@ -55,40 +55,38 @@ public class State implements Cloneable {
     /* CONSTRUCTORS */
 
     /**
-     * Create an initial state representing the beginning of a search for the given routing context. Initial "parent-less" states can only be created
-     * at the beginning of a trip. elsewhere, all states must be created from a parent and associated with an edge.
+     * Create an initial state representing the beginning of a search for the given routing context. 
+     * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all 
+     * states must be created from a parent and associated with an edge.
      */
-    public State(RoutingContext rctx) {
-        TraverseOptions opt = rctx.opt;
-        this.time = opt.getSecondsSinceEpoch();
+    public State(TraverseOptions opt) {
+        this (opt.rctx.origin, opt.getSecondsSinceEpoch(), opt);
+    }
+
+    /**
+     * Create an initial state, forcing vertex to the specified value. Useful for reusing a 
+     * RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(Vertex vertex, TraverseOptions opt) {
+        this(vertex, opt.getSecondsSinceEpoch(), opt);
+    }
+
+    /**
+     * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
+     * a RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(Vertex vertex, long time, TraverseOptions opt) {
         this.weight = 0;
-        this.vertex = rctx.origin;
+        this.vertex = vertex;
         this.backState = null;
         this.backEdge = null;
         this.backEdgeNarrative = null;
         this.hops = 0;
         this.stateData = new StateData();
-        this.stateData.rctx = rctx;
+        this.stateData.opt = opt;
         this.stateData.startTime = time;
         this.stateData.tripSeqHash = 0;
-        // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
-    }
-
-    /**
-     * Create an initial state, forcing vertex and time to the specified values. Useful for reusing a RoutingContext in TransitIndex, tests, etc.
-     */
-    public State(Vertex vertex, long time, RoutingContext rctx) {
-        this(rctx);
         this.time = time;
-        this.vertex = vertex;
-    }
-    
-    /**
-     * Create an initial state, forcing vertex to the specified value. Useful for reusing a RoutingContext in TransitIndex, tests, etc.
-     */
-    public State(Vertex vertex, RoutingContext rctx) {
-        this(rctx);
-        this.vertex = vertex;
     }
 
     /**
@@ -324,17 +322,17 @@ public class State implements Cloneable {
     }
 
     public RoutingContext getContext() {
-        return stateData.rctx;
+        return stateData.opt.rctx;
     }
 
     public TraverseOptions getOptions () {
-        return stateData.rctx.opt;
+        return stateData.opt;
     }
     
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        return new State(this.vertex, this.time, stateData.rctx.reversedClone());
+        return new State(this.vertex, this.time, stateData.opt.reversedClone());
     }
 
     public void dumpPath() {

@@ -5,7 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
@@ -35,7 +37,7 @@ import org.springframework.context.ApplicationContextAware;
  * 
  * @author abyrd
  */
-public class RoutingContext implements Cloneable, ApplicationContextAware {
+public class RoutingContext implements Cloneable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
     
@@ -51,10 +53,9 @@ public class RoutingContext implements Cloneable, ApplicationContextAware {
     public final Vertex origin;
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
-    public final State initialState;
     public final boolean goalDirection = true;
     //public final Calendar calendar;
-    public final CalendarService calendarService;
+    public final CalendarServiceImpl calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public final GenericAStarFactory aStarSearchFactory = null;
     public final RemainingWeightHeuristic remainingWeightHeuristic;
@@ -73,6 +74,7 @@ public class RoutingContext implements Cloneable, ApplicationContextAware {
     /**
      * Initialized to, but distinct from TraverseOptions.maxWalkDistace. This value may be raised to retry searches or account for the minimum
      * possible walk distance to transit stops.
+     * TODO: this is a bad idea because then the resulting TraverseOptions object does not reflect the parameters used in the search.
      */
     public double maxWalkDistace; 
     
@@ -98,27 +100,27 @@ public class RoutingContext implements Cloneable, ApplicationContextAware {
     
     /* CONSTRUCTORS */
     
-    public RoutingContext(TraverseOptions traverseOptions, GraphService graphService) {
-        this(traverseOptions, graphService, true);
+    public RoutingContext(TraverseOptions traverseOptions, Graph graph) {
+        this(traverseOptions, graph, true);
     }
 
-    public RoutingContext(TraverseOptions traverseOptions, GraphService graphService, boolean useServiceDays) {
+    public RoutingContext(TraverseOptions traverseOptions, Graph graph, boolean useServiceDays) {
         opt = traverseOptions;
-        graph = graphService.getGraph(); // opt.routerId
+        this.graph = graph;
         fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
         toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
         // state.reversedClone() will have to set the vertex, not get it from opts
         origin = opt.arriveBy ? toVertex : fromVertex;
         target = opt.arriveBy ? fromVertex : toVertex;
-        initialState = new State(this);
         checkEndpointVertices();
         findIntermediateVertices();
-//        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
-//        if (csData != null) {
-//            calendarService = new CalendarServiceImpl();
-//            calendarService.setData(csData);
-//        }
-        calendarService = graphService.getCalendarService();
+        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
+        if (csData != null) {
+            calendarService = new CalendarServiceImpl();
+            calendarService.setData(csData);
+        } else {
+            calendarService = null;
+        }
         transferTable = graph.getTransferTable();
         if (useServiceDays)
             setServiceDays();
@@ -215,16 +217,6 @@ public class RoutingContext implements Cloneable, ApplicationContextAware {
         return true;
     }
 
-    public RoutingContext reversedClone() {
-        try {
-            RoutingContext ret = (RoutingContext) this.clone();
-            ret.opt = ret.opt.reversedClone();
-            return ret;
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("I <3 checked exceptions", e);
-        }
-    }
-
     public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
         Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
         if (dates == null) {
@@ -240,12 +232,6 @@ public class RoutingContext implements Cloneable, ApplicationContextAware {
      */
     @Override public void finalize() {
         LOG.debug("garbage routing context collected");
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-        //ctx.getBean(String.class);
-        LOG.debug("context is {}", ctx);
     }
 
 }

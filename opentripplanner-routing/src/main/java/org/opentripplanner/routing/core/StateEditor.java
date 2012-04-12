@@ -409,11 +409,11 @@ public class StateEditor {
         if (patches != null) {
             for (Patch patch : patches) {
                 active  = false;
-                display = patch.displayDuring(child.stateData.rctx.opt, child.getStartTime(),
+                display = patch.displayDuring(child.stateData.opt, child.getStartTime(),
                                               child.getTime());
 
                 if(!display) {
-                    active = patch.activeDuring(child.stateData.rctx.opt, child.getStartTime(),
+                    active = patch.activeDuring(child.stateData.opt, child.getStartTime(),
                                                 child.getTime());
                 }
 
