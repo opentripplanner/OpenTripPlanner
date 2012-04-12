@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
@@ -34,8 +34,8 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     private Map<Vertex, List<State>> stateSets;
 
-    public MultiShortestPathTree(RoutingContext rctx) {
-        super(rctx);
+    public MultiShortestPathTree(TraverseOptions options) {
+        super(options);
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
     
@@ -113,8 +113,8 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     private static final class FactoryImpl implements ShortestPathTreeFactory {
         @Override
-        public ShortestPathTree create(RoutingContext rctx) {
-            return new MultiShortestPathTree(rctx);
+        public ShortestPathTree create(TraverseOptions options) {
+            return new MultiShortestPathTree(options);
         }
     }
 

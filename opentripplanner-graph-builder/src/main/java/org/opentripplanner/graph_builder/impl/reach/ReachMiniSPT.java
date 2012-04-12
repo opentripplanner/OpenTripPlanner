@@ -48,7 +48,7 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
      * structures.
      */
     public ReachMiniSPT(RoutingContext rctx, double epsilon) {
-        this(rctx, DEFAULT_CAPACITY, epsilon);
+        this(DEFAULT_CAPACITY, epsilon);
     }
 
     /**
@@ -57,8 +57,7 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
      * 
      * @param n - the initial size of vertex-keyed maps
      */
-    public ReachMiniSPT(RoutingContext rctx, int n, double epsilon) {
-        super(rctx);
+    public ReachMiniSPT(int n, double epsilon) {
         states = new IdentityHashMap<Vertex, ReachState>(n);
         this.epsilon = epsilon;
     }

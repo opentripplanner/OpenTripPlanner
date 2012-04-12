@@ -25,7 +25,6 @@ import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.graph.Edge;
