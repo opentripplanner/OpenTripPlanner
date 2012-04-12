@@ -282,8 +282,7 @@ public class TransitIndex {
 //        }
         // TODO: verify correctness
         options.dateTime = startTime;
-        options.graph = this.graphService.getGraph();
-        options.prepareForSearch();
+        options.setRoutingContext(this.graphService.getGraph());
         return options;
     }
 
@@ -380,10 +379,10 @@ public class TransitIndex {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = endTime;
-        options = options.reversedClone(time);
+        options = options.reversedClone();
         do {
             // TODO: verify options/state correctness
-            State s0 = new State(e.getToVertex(), options);
+            State s0 = new State(e.getToVertex(), time, options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();

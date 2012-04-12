@@ -66,7 +66,7 @@ public class FindMaxWalkDistances {
         State u, v;
         HashSet<Vertex> closed = new HashSet<Vertex>();
         BinHeap<State> queue = new BinHeap<State>(50);
-        BasicShortestPathTree spt = new BasicShortestPathTree();
+        BasicShortestPathTree spt = new BasicShortestPathTree(options);
         State init = new State(origin, options);
         spt.add(init);
         queue.insert(init, init.getWeight());

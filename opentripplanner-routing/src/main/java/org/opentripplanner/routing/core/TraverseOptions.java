@@ -213,7 +213,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      * different times and vertices from a single TraverseOptions, without setting all the transit 
      * context or building temporary vertices (with all the exception-throwing checks that entails).
      */
-    RoutingContext rctx;    
+    public RoutingContext rctx;    
     
     /* CONSTRUCTORS */
     

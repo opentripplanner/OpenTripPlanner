@@ -61,6 +61,7 @@ import javax.swing.event.ListSelectionListener;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -82,6 +83,8 @@ import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryIm
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
+import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -254,9 +257,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private Graph graph;
 
-    private StreetVertexIndexServiceImpl indexService;
+    private StreetVertexIndexService indexService;
 
-    private ContractionRoutingServiceImpl routingService;
+    private SPTService sptService;
 
     private DefaultListModel metadataModel;
 
@@ -866,19 +869,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             modeSet.setTransit(true);
     	TraverseOptions options = new TraverseOptions(modeSet);
     	VisualTraverseVisitor visitor = new VisualTraverseVisitor(showGraph);
-    	options.aStarSearchFactory = visitor.getAStarSearchFactory();
     	options.boardCost = Integer.parseInt(boardingPenaltyField.getText()) * 60; // override low 2-4 minute values
     	// there should be a ui element for walk distance and optimize type
     	options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
-        options.remainingWeightHeuristic = new BidirectionalRemainingWeightHeuristic(graph);
+        //options.remainingWeightHeuristic = new BidirectionalRemainingWeightHeuristic(graph);
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
         // TODO: check options properly intialized (AMB)
-        options.prepareForSearch();
-    	List<GraphPath> paths = pathservice.getPaths(options);
+        List<GraphPath> paths = pathservice.getPaths(options);
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);
@@ -1009,14 +1010,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     }
     
     public void setGraph(GraphServiceImpl graphService) {
-        
         graph = graphService.getGraph();
-
         pathservice = new RetryingPathServiceImpl();
-        indexService = new StreetVertexIndexServiceImpl();
-        indexService.setGraphService(graphService);
-        indexService.setup();
-        routingService = new ContractionRoutingServiceImpl();
+        indexService = graph.streetIndex;
+        sptService = new GenericAStar();
     }
     
     public Graph getGraph() {

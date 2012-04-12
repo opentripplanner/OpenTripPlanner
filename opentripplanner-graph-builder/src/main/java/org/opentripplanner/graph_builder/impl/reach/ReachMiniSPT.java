@@ -47,7 +47,7 @@ public class ReachMiniSPT extends AbstractShortestPathTree {
      * Constructor that uses a default capacity for internal vertex-keyed data
      * structures.
      */
-    public ReachMiniSPT(RoutingContext rctx, double epsilon) {
+    public ReachMiniSPT(double epsilon) {
         this(DEFAULT_CAPACITY, epsilon);
     }
 

@@ -219,7 +219,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         GenericDijkstra dijkstra = new GenericDijkstra(options);
         dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
             @Override
-            public ShortestPathTree create() {
+            public ShortestPathTree create(TraverseOptions opts) {
                 ReachMiniSPT spt = new ReachMiniSPT(getEdgeTreesVertexLimit() * 2, Double.MAX_VALUE);
                 return spt;
             }
@@ -343,7 +343,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         }
         dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
             @Override
-            public ShortestPathTree create() {
+            public ShortestPathTree create(TraverseOptions opts) {
                 ReachMiniSPT spt = new ReachMiniSPT(epsilon);
                 return spt;
             }

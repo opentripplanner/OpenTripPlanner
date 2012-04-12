@@ -293,13 +293,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         ShortestPathTree spt = null;
 
         if (_shortestPathTreeFactory != null)
-            spt = _shortestPathTreeFactory.create();
+            spt = _shortestPathTreeFactory.create(opts);
 
         if (spt == null) {
             if (opts.getModes().isTransit()) {
-                spt = new MultiShortestPathTree();
+                spt = new MultiShortestPathTree(opts);
             } else {
-                spt = new BasicShortestPathTree();
+                spt = new BasicShortestPathTree(opts);
             }
         }
 

@@ -28,6 +28,7 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -218,10 +219,11 @@ public class LocalStopFinder {
         // Iteration Variables
         HashSet<Vertex> closed = new HashSet<Vertex>();
         BinHeap<State> queue = new BinHeap<State>(50);
-        BasicShortestPathTree spt = new BasicShortestPathTree();
-        State init = new State(origin, options);
-        spt.add(init);
-        queue.insert(init, init.getWeight());
+        options.setRoutingContext(graph);
+        BasicShortestPathTree spt = new BasicShortestPathTree(options);
+        State initial = new State(origin, options);
+        spt.add(initial);
+        queue.insert(initial, 0);
 
         HashMap<TripPattern, Double> patternCosts = new HashMap<TripPattern, Double>();
 

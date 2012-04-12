@@ -104,8 +104,8 @@ public class Components {
             cachedDateTime = dateTime;
             // TODO: verify correctness (AMB)
             Graph graph = graphService.getGraph();
-            options.graph = graph;
-            options.prepareForSearch();
+            //TODO: fix
+            options.setRoutingContext(graph);
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         
