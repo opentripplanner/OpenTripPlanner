@@ -409,11 +409,11 @@ public class StateEditor {
         if (patches != null) {
             for (Patch patch : patches) {
                 active  = false;
-                display = patch.displayDuring(child.stateData.options, child.getStartTime(),
+                display = patch.displayDuring(child.stateData.rctx.opt, child.getStartTime(),
                                               child.getTime());
 
                 if(!display) {
-                    active = patch.activeDuring(child.stateData.options, child.getStartTime(),
+                    active = patch.activeDuring(child.stateData.rctx.opt, child.getStartTime(),
                                                 child.getTime());
                 }
 
@@ -437,10 +437,10 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
-    public void setTraverseOptions(TraverseOptions options) {
-        child.stateData.options = options;
-        traversingBackward = options.isArriveBy();
-    }
+//    public void setTraverseOptions(TraverseOptions options) {
+//        child.stateData.options = options;
+//        traversingBackward = options.isArriveBy();
+//    }
 
     public void alightTransit() {
         child.setWalkAtLastTransit(child.getWalkDistance());

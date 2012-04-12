@@ -18,14 +18,15 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions,
@@ -34,11 +35,10 @@ import org.slf4j.LoggerFactory;
  * 
  * @author abyrd
  */
-public class RoutingContext {
+public class RoutingContext implements Cloneable, ApplicationContextAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingContext.class);
     
-    private static GraphService graphService = new GraphServiceImpl(); 
     private static RemainingWeightHeuristicFactory heuristicFactory = new DefaultRemainingWeightHeuristicFactoryImpl();
     
     /* FINAL FIELDS */
@@ -53,7 +53,6 @@ public class RoutingContext {
     public final Vertex target;
     public final State initialState;
     public final boolean goalDirection = true;
-    public final StreetVertexIndexService streetIndex;
     //public final Calendar calendar;
     public final CalendarService calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
@@ -87,13 +86,6 @@ public class RoutingContext {
     public double maxWeight = Double.MAX_VALUE;
 
     /**
-     * Set a hard limit on computation time. Any positive value will be treated as a limit on the
-     * computation time for one search instance, in milliseconds relative to search start time. 
-     * A zero or negative value implies no limit.
-     */
-    public long maxComputationTime = 0;
-
-    /**
      * The search will be aborted if it is still running after this time (in milliseconds since the 
      * epoch). A negative or zero value implies no limit. 
      * This provides an absolute timeout, whereas the maxComputationTime is relative to the 
@@ -106,36 +98,15 @@ public class RoutingContext {
     
     /* CONSTRUCTORS */
     
-    public RoutingContext(TraverseOptions traverseOptions) {
-        this(traverseOptions, true);
+    public RoutingContext(TraverseOptions traverseOptions, GraphService graphService) {
+        this(traverseOptions, graphService, true);
     }
 
-    /** return the vertex where this search will begin, accounting for arriveBy */
-    public Vertex getOriginVertex() {
-        return opt.arriveBy ? toVertex : fromVertex;
-    }
-    
-    /** return the vertex where this search will end, accounting for arriveBy */
-    public Vertex getTargetVertex() {
-        return opt.arriveBy ? fromVertex : toVertex;
-    }
-    
-    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
-        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
-        if (dates == null) {
-            dates = calendarService.getServiceDatesForServiceId(serviceId);
-            serviceDatesByServiceId.put(serviceId, dates);
-        }
-        return dates.contains(serviceDate);
-    }
-
-    public RoutingContext(TraverseOptions traverseOptions, boolean useServiceDays) {
+    public RoutingContext(TraverseOptions traverseOptions, GraphService graphService, boolean useServiceDays) {
         opt = traverseOptions;
         graph = graphService.getGraph(); // opt.routerId
-        opt.graph = graph; // TODO: add routingcontext to SPT
-        streetIndex = graph.getService(StreetVertexIndexService.class);
-        fromVertex = streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
-        toVertex = streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
+        fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
+        toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
         // state.reversedClone() will have to set the vertex, not get it from opts
         origin = opt.arriveBy ? toVertex : fromVertex;
         target = opt.arriveBy ? fromVertex : toVertex;
@@ -181,7 +152,7 @@ public class RoutingContext {
         ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
         int i = 0;
         for (NamedPlace intermediate : opt.intermediatePlaces) {
-            Vertex vertex = streetIndex.getVertexForPlace(intermediate, opt);
+            Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
             if (vertex == null) {
                 notFound.add("intermediate." + i);
             } else {
@@ -250,9 +221,17 @@ public class RoutingContext {
             ret.opt = ret.opt.reversedClone();
             return ret;
         } catch (CloneNotSupportedException e) {
-            // I <3 checked exceptions
-            return null;
+            throw new RuntimeException("I <3 checked exceptions", e);
         }
+    }
+
+    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
+        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
+        if (dates == null) {
+            dates = calendarService.getServiceDatesForServiceId(serviceId);
+            serviceDatesByServiceId.put(serviceId, dates);
+        }
+        return dates.contains(serviceDate);
     }
     
     /** 
@@ -261,6 +240,12 @@ public class RoutingContext {
      */
     @Override public void finalize() {
         LOG.debug("garbage routing context collected");
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        //ctx.getBean(String.class);
+        LOG.debug("context is {}", ctx);
     }
 
 }

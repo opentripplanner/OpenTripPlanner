@@ -38,6 +38,7 @@ import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,9 @@ public class RetryingPathServiceImpl implements PathService {
     private static final int MAX_TIME_FACTOR = 2;
     private static final int MAX_WEIGHT_FACTOR = 2;
 
-    @Autowired GraphService graphService;
-    @Autowired SPTService sptService;
-    @Autowired RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
+    @Autowired private GraphService graphService;
+    @Autowired private SPTService sptService;
+    @Autowired private RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
 
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
@@ -87,12 +88,7 @@ public class RetryingPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
-        // convert relative timeouts to absolute timeouts (maybe this should be in options)
         long searchBeginTime = System.currentTimeMillis();
-        long abortFirst = firstPathTimeout <= 0 ? 0 :
-                (long) (searchBeginTime + firstPathTimeout * 1000);
-        long abortMulti = multiPathTimeout <= 0 ? 0 :
-                (long) (searchBeginTime + multiPathTimeout * 1000);
         
         // The list of options specifying various modes, banned routes, etc to try for multiple
         // itineraries
@@ -120,15 +116,14 @@ public class RetryingPathServiceImpl implements PathService {
             options.setMaxWalkDistance(maxWalk);
             
             // apply appropriate timeout
-            options.searchAbortTime = paths.isEmpty() ? abortFirst : abortMulti;
-            options.maxComputationTime = 0;
-
+            double timeout = paths.isEmpty() ? firstPathTimeout : multiPathTimeout;
+            
             // options.worstTime = maxTime;
-            options.maxWeight = maxWeight;
+            //options.maxWeight = maxWeight;
             long subsearchBeginTime = System.currentTimeMillis();
             
             LOG.debug("BEGIN SUBSEARCH");
-            ShortestPathTree spt = sptService.getShortestPathTree(options);
+            ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
             List<GraphPath> somePaths = spt.getPaths();
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,

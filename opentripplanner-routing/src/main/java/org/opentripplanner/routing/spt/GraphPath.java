@@ -22,6 +22,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -47,7 +48,7 @@ public class GraphPath {
 
     private double walkDistance = 0;
 
-    private TraverseOptions options;
+    private RoutingContext rctx;
 
     /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
@@ -65,9 +66,9 @@ public class GraphPath {
      *            - the traverse options used to reach this state
      */
     public GraphPath(State s, boolean optimize) {
-        this.options = s.getOptions();
-        this.back = options.isArriveBy();
-
+        this.rctx = s.getContext();
+        this.back = rctx.opt.isArriveBy();
+        
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
         walkDistance = s.getWalkDistance();
@@ -271,6 +272,10 @@ public class GraphPath {
 
     public double getWalkDistance() {
         return walkDistance;
+    }
+    
+    public RoutingContext getRoutingContext() {
+        return rctx;
     }
 
 }

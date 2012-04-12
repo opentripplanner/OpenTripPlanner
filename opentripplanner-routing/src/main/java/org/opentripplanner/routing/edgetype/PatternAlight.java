@@ -19,6 +19,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -77,6 +78,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     @Override
     public State traverse(State state0) {
+        RoutingContext rctx = state0.getContext();
         TraverseOptions options = state0.getOptions();
         if (options.isArriveBy()) {
             /* backward traversal: find a transit trip on this pattern */
@@ -94,7 +96,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             int bestWait = -1;
             int bestPatternIndex = -1;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            SD: for (ServiceDay sd : options.serviceDays) {
+            SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining trips starting tomorrow
@@ -220,14 +222,14 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     }
 
     /* See comment at weightLowerBound. */
-    public double timeLowerBound(TraverseOptions options) {
-        if (options.isArriveBy())
+    public double timeLowerBound(RoutingContext rctx) {
+        if (rctx.opt.isArriveBy())
             return 0;
-        else if (!options.getModes().get(modeMask)) {
+        else if (! rctx.opt.getModes().get(modeMask)) {
             return Double.POSITIVE_INFINITY;
         }
         AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-        for (ServiceDay sd : options.serviceDays)
+        for (ServiceDay sd : rctx.serviceDays)
             if (sd.serviceIdRunning(serviceId))
                 return 0;
         return Double.POSITIVE_INFINITY;

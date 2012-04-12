@@ -85,7 +85,7 @@ public class PreBoardEdge extends FreeEdge {
             long transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
                 /* this is a transfer rather than an initial boarding */
-                TransferTable transferTable = options.getTransferTable();
+                TransferTable transferTable = s0.getContext().transferTable;
                 if (transferTable.hasPreferredTransfers()) {
                     // only penalize transfers if there are some that will be depenalized
                     transfer_penalty = options.nonpreferredTransferPenalty;

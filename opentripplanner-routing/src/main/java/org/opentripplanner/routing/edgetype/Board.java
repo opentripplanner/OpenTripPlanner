@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -85,6 +86,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
+        RoutingContext rctx = state0.getContext();
         TraverseOptions options = state0.getOptions();
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
@@ -117,7 +119,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             /* check if this trip is running or not */
             AgencyAndId serviceId = hop.getServiceId();
             int wait = -1;
-            for (ServiceDay sd : options.serviceDays) {
+            for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services

@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
@@ -43,6 +44,7 @@ public class PreAlightEdge extends FreeEdge {
 
     @Override
     public State traverse(State s0) {
+        RoutingContext rctx = s0.getContext();
         TraverseOptions options = s0.getOptions();
         // TODO: this could probably be fused with PreBoardEdge now (AMB)
         // they are currently only different because the StateEditor.incrementTime methods are not
@@ -77,7 +79,7 @@ public class PreAlightEdge extends FreeEdge {
             int transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
                 /* this is a transfer rather than an initial boarding */
-                TransferTable transferTable = options.getTransferTable();
+                TransferTable transferTable = rctx.transferTable;
                 if (transferTable.hasPreferredTransfers()) {
                     // only penalize transfers if there are some that will be depenalized
                     transfer_penalty = options.nonpreferredTransferPenalty;

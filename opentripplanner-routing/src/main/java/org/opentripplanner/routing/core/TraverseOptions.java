@@ -25,7 +25,7 @@ import java.util.TimeZone;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -666,8 +666,8 @@ public class TraverseOptions implements Cloneable, Serializable {
         return ret;
     }
 
-    public RoutingContext getRoutingContext () {
-        return new RoutingContext(this);
+    public RoutingContext getRoutingContext (GraphService graphService) {
+        return new RoutingContext(this, graphService); // graphService.getGraph(routerId)
     }
 
     @Override
@@ -712,7 +712,4 @@ public class TraverseOptions implements Cloneable, Serializable {
                 + new Double(stairsReluctance).hashCode() * 315595321;
     }
 
-    /* temp kludge until spts contain routingcontext */
-    public Graph graph;
-    
 }
