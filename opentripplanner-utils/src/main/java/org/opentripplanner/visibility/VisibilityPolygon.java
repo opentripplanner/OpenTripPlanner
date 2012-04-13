@@ -125,7 +125,7 @@ public class VisibilityPolygon extends Polygon {
         // preconditions have been excluded.
         //
         assert (environment_temp.is_valid(epsilon));
-        assert (environment_temp.is_in_standard_form());
+        //assert (environment_temp.is_in_standard_form());
         assert (observer.in(environment_temp, epsilon));
 
         // true => data printed to terminal
