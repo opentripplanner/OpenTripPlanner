@@ -124,6 +124,30 @@ otp.planner.StaticForms = {
         {}
     },
 
+    /** 
+     * This method called by submit() below, and returns an error string (or null if no error).  
+     * Here we check for errors in either the From & To input forms, and more importantly, whehter we have
+     * a coordinate to pass down to the API.  As of Spring 2012, the API requires a valid fromCoord and toCoord.
+     */
+    checkForSubmitErrorMessage : function()
+    {
+        var mess = null;
+
+        if(this.m_fromForm.getComboBox().activeError || this.m_toForm.getComboBox().activeError)
+            mess = this.locale.tripPlanner.geocoder.msg_content;
+
+        var f = this.m_fromForm.getNamedCoord() == null;
+        var t = this.m_toForm.getNamedCoord() == null; 
+        if(f && t)
+            mess = this.locale.tripPlanner.msgcodes['460'];
+        else if(f)
+            mess = this.locale.tripPlanner.msgcodes['440'];
+        else if(t)
+            mess = this.locale.tripPlanner.msgcodes['450'];
+
+        return mess;
+    },
+
     /**
      * called when submitting the form
      * 
@@ -135,23 +159,26 @@ otp.planner.StaticForms = {
     {
         this.blurForms();
 
+/*  COMMENTING THIS OUT - THIS code will get you into an endless loop when you type garbage into one of the geo forms which won't geocode. 
+    Good idea, but needs to be fixed...
+
         if(this.isBusyGeocoding())
         {
             // if we are currently waiting for a geocoder response,
-            // then let's wait until we get a response before we submit
-            // the form
+            // then let's wait until we get a response before we submit the form
             setTimeout(this.submit.createDelegate(this), 250);
             return;
         }
+*/
 
-        if (this.m_fromForm.getComboBox().activeError ||
-            this.m_toForm.getComboBox().activeError)
+        var mess = this.checkForSubmitErrorMessage();
+        if(mess)
         {
             Ext.Msg.show({
                 title: this.locale.tripPlanner.geocoder.msg_title,
-                msg:   this.locale.tripPlanner.geocoder.msg_content
+                msg:   mess
             });
-            setTimeout(function() { Ext.Msg.hide(); }, 3000);
+            setTimeout(function() { Ext.Msg.hide(); }, 4000);
             return;
         }
 
@@ -826,8 +853,8 @@ otp.planner.StaticForms = {
 
         // step 2: create the forms
         var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.planner.options.appendGeocodeName};
-        if(this.planner.geocoder && this.planner.geocoder.url)
-            comboBoxOptions.url = this.planner.geocoder.url; 
+        if(this.geocoder && this.geocoder.url)
+            comboBoxOptions.url = this.geocoder.url; 
         var fromFormOptions = Ext.apply({}, {id:otp.util.Constants.fromFormID, name:'from', emptyText:this.locale.tripPlanner.labels.from}, comboBoxOptions);
         var toFormOptions   = Ext.apply({}, {id:otp.util.Constants.toFormID,   name:'to',   emptyText:this.locale.tripPlanner.labels.to}, comboBoxOptions);
         if(this.isSolrGeocoderEnabled())
@@ -1240,7 +1267,7 @@ otp.planner.StaticForms = {
         var retVal = false;
         try
         {
-            if(this.geocode.m_fromGeocoding || this.geocode.m_toGeocoding)
+            if(this.geocoder.m_fromGeocoding || this.geocoder.m_toGeocoding)
                 retVal = true;
         }
         catch(e) {}

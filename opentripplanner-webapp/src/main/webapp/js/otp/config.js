@@ -69,10 +69,20 @@ otp.config_defaults = {
 
         /* debug geocoder */
         /*  *
+        ,fromToOverride:null,
         geocoder  :
         {
             enabled : true,
             isSolr  : true,
+            url     : "/js/otp/planner/test/solr-geo.json",
+            addressParamName : "address"
+        }
+        /*  *
+        ,fromToOverride:null,
+        geocoder  :
+        {
+            enabled : true,
+            isSolr  : false,
             url     : "/js/otp/planner/test/geo-multi.xml",
             addressParamName : "address"
         }
