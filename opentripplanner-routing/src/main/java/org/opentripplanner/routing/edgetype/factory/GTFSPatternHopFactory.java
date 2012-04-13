@@ -395,7 +395,7 @@ public class GTFSPatternHopFactory {
                                         trip);
                             } catch (TripOvertakingException e) {
                                 _log.warn(GraphBuilderAnnotation.register(graph, 
-                                		Variety.TRIP_DUPLICATE_DEPARTURE,
+                                		Variety.TRIP_OVERTAKING,
                                 		e.overtaker, e.overtaken, e.stopIndex));
                                 // back out trips and revert to the simple method
                                 for (i = i - 1; i >= 0; --i) {
