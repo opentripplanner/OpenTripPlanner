@@ -599,36 +599,6 @@ public class GTFSPatternHopFactory {
                 new PreBoardEdge(stopVertex, depart);
             }
         }
-
-        /* connect stops to their parent stations */
-        for (Stop stop : _dao.getAllStops()) {
-            String parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                Vertex stopVertex = stopNodes.get(stop);
-
-                String agencyId = stop.getId().getAgencyId();
-                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
-
-                Stop parentStop = _dao.getStopForId(parentStationId);
-                Vertex parentStopVertex = stopNodes.get(parentStop);
-
-                new FreeEdge(parentStopVertex, stopVertex);
-                new FreeEdge(stopVertex, parentStopVertex);
-
-                Vertex stopArriveVertex = stopArriveNodes.get(stop);
-                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
-
-                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
-
-                Vertex stopDepartVertex = stopDepartNodes.get(stop);
-                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
-
-                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
-
-            }
-        }
     }
     
     /**
@@ -1100,7 +1070,45 @@ public class GTFSPatternHopFactory {
         this.fareServiceFactory = fareServiceFactory;
     }
 
+    /**
+     * Create transfer edges between stops which are listed in transfers.txt.
+     * This is not usually useful, but it's nice for the NYC subway system, where
+     * it's important to provide in-station transfers for fare computation.
+     */
     public void createStationTransfers(Graph graph) {
+
+        /* connect stops to their parent stations
+         * TODO: provide a cost for these edges when stations and
+         * stops have different locations 
+         */
+        for (Stop stop : _dao.getAllStops()) {
+            String parentStation = stop.getParentStation();
+            if (parentStation != null) {
+                Vertex stopVertex = stopNodes.get(stop);
+
+                String agencyId = stop.getId().getAgencyId();
+                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+
+                Stop parentStop = _dao.getStopForId(parentStationId);
+                Vertex parentStopVertex = stopNodes.get(parentStop);
+
+                new FreeEdge(parentStopVertex, stopVertex);
+                new FreeEdge(stopVertex, parentStopVertex);
+
+                Vertex stopArriveVertex = stopArriveNodes.get(stop);
+                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
+
+                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+
+                Vertex stopDepartVertex = stopDepartNodes.get(stop);
+                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
+
+                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+
+            }
+        }
         for (Transfer transfer : _dao.getAllTransfers()) {
 
             int type = transfer.getTransferType();
