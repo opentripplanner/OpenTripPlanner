@@ -678,7 +678,8 @@ public class GTFSPatternHopFactory {
                 StopTime st = null;
                 for (j = i + 1; j < lastStop + 1; ++j) {
                     st = stopTimes.get(j);
-                    if (st.isDepartureTimeSet() || st.isArrivalTimeSet()) {
+                    if ((st.isDepartureTimeSet() && st.getDepartureTime() != departureTime)
+                            || (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)) {
                         break;
                     }
                 }
