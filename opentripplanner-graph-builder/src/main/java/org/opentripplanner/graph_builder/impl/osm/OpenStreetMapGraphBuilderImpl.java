@@ -286,7 +286,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
                     if (node == null) {
-                        throw new RuntimeException("node for area does not exist");
+                        throw new RuntimeException("node " + nodeRef + " for area " + areaWay.getId() + " does not exist");
                     }
                     Point point = new Point(node.getLon(), node.getLat());
                     nodes.add(node);
