@@ -69,24 +69,6 @@ public class RoutingContext implements Cloneable {
      */
     public ArrayList<ServiceDay> serviceDays;
 
-    /* VARIABLE FIELDS (may vary over the course of an SPTService search) */
-    
-    /**
-     * Initialized to, but distinct from TraverseOptions.maxWalkDistace. This value may be raised to retry searches or account for the minimum
-     * possible walk distance to transit stops.
-     * TODO: this is a bad idea because then the resulting TraverseOptions object does not reflect the parameters used in the search.
-     */
-    public double maxWalkDistace; 
-    
-    /**
-     * The worst possible time (latest for depart-by and earliest for arrive-by) that we will accept
-     * when planning a trip.
-     */
-    public long worstTime = Long.MAX_VALUE;
-
-    /** The worst possible weight that we will accept when planning a trip. */
-    public double maxWeight = Double.MAX_VALUE;
-
     /**
      * The search will be aborted if it is still running after this time (in milliseconds since the 
      * epoch). A negative or zero value implies no limit. 
@@ -125,7 +107,6 @@ public class RoutingContext implements Cloneable {
         if (useServiceDays)
             setServiceDays();
         remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
-        this.worstTime = opt.arriveBy ? 0 : Long.MAX_VALUE;
         if (opt.getModes().isTransit()
             && ! graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,

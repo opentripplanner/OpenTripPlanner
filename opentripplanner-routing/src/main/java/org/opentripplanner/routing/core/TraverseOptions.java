@@ -65,6 +65,10 @@ public class TraverseOptions implements Cloneable, Serializable {
     public boolean intermediatePlacesOrdered;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
     public double maxWalkDistance = Double.MAX_VALUE;
+    /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
+    public long worstTime = Long.MAX_VALUE;
+    /** The worst possible weight that we will accept when planning a trip. */
+    public double maxWeight = Double.MAX_VALUE;
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
@@ -261,6 +265,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
         walkingOptions.arriveBy = arriveBy;
+        if (worstTime == Long.MAX_VALUE || worstTime == 0)
+            worstTime = arriveBy ? 0 : Long.MAX_VALUE;
     }
 
     public TraverseOptions getWalkingOptions() {
