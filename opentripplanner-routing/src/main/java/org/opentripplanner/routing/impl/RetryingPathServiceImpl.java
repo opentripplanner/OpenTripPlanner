@@ -88,6 +88,10 @@ public class RetryingPathServiceImpl implements PathService {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
+        // make sure the options has a routing context *before* cloning it (otherwise you get
+        // orphan RoutingContexts leaving temporary edges in the graph until GC)
+        options.setRoutingContext(graphService.getGraph());
+
         long searchBeginTime = System.currentTimeMillis();
         
         // The list of options specifying various modes, banned routes, etc to try for multiple

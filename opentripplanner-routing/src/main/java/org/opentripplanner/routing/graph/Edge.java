@@ -52,7 +52,8 @@ public interface Edge extends Serializable, EdgeNarrative {
     /** @return the vertex this edge leads to, or null if this edge leads to more than one vertex */
     public Vertex getToVertex();
 
-    void detach();
+    /** @return the number of edge endpoints removed from edge lists (0, 1, or 2) */
+    int detach();
 
     void attach(Vertex fromv, Vertex tov);
 

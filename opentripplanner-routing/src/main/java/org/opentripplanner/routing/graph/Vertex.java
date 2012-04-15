@@ -36,12 +36,12 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
     
     public abstract Collection<Edge> getOutgoing();
     public abstract void addOutgoing(Edge ee);
-    public abstract void removeOutgoing(Edge ee);
+    public abstract boolean removeOutgoing(Edge ee);
     public abstract int getDegreeOut();
 
     public abstract Collection<Edge> getIncoming();
     public abstract void addIncoming(Edge ee);
-    public abstract void removeIncoming(Edge ee);
+    public abstract boolean removeIncoming(Edge ee);
     public abstract int getDegreeIn();
 
     /** Get an original, augmented, or replaced edgelist according to the supplied OverlayGraphs */
@@ -94,6 +94,14 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
      * they contained from this vertex's neighbors.
      */
     public abstract void removeAllEdges();
+    
+    /** 
+     * Clean up before garbage collection. Usually this method does nothing, but temporary vertices 
+     * must provide a method to remove their associated temporary edges from adjacent vertices' 
+     * edge lists, usually by simply calling detach() on them. 
+     * @return the number of edges affected by the cleanup.
+     */
+    public abstract int removeTemporaryEdges();
 
     /** Trim edge lists */
     public abstract void compact();
@@ -107,6 +115,5 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
 
     /** Check that all of this Vertex's incoming and outgoing edges are of the proper types */
     public abstract boolean edgeTypesValid();
-
 
 }

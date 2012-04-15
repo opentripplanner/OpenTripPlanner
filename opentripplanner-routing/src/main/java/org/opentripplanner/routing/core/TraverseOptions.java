@@ -685,7 +685,17 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setRoutingContext (Graph graph) {
         // TODO: this should probably convert the relative timeouts to absolute
         // since it is called right before a search begins
-        this.rctx = new RoutingContext(this, graph); // graphService.getGraph(routerId)
+        if (rctx == null) {
+            this.rctx = new RoutingContext(this, graph); // graphService.getGraph(routerId)
+        } else {
+            if (rctx.graph == graph) {
+                LOG.debug("keeping existing routing context");
+                return;
+            } else {
+                LOG.error("attempted to reset routing context using a different graph");
+                return;
+            }
+        }
     }
     
     public RoutingContext getRoutingContext () {

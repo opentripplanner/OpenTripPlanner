@@ -129,11 +129,12 @@ public abstract class AbstractVertex implements Vertex {
     }
     
     @Override
-    public void removeOutgoing(Edge ee) {
-        outgoing.remove(ee);
+    public boolean removeOutgoing(Edge ee) {
+        boolean removed = outgoing.remove(ee);
         if (outgoing.contains(ee)) {
             LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
+        return removed;
     }
 
     /** Get a collection containing all the edges leading from this vertex to other vertices. */
@@ -152,11 +153,12 @@ public abstract class AbstractVertex implements Vertex {
     }
     
     @Override
-    public void removeIncoming(Edge ee) {
-        incoming.remove(ee);
+    public boolean removeIncoming(Edge ee) {
+        boolean removed = incoming.remove(ee);
         if (incoming.contains(ee)) {
             LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
         }
+        return removed;
     }
 
     /** Get a collection containing all the edges leading from other vertices to this vertex. */
@@ -406,6 +408,11 @@ public abstract class AbstractVertex implements Vertex {
             }
             return false;
         }
+    }
+    
+    @Override public int removeTemporaryEdges() {
+        // do nothing, signal 0 other objects affected
+        return 0;
     }
 
 }

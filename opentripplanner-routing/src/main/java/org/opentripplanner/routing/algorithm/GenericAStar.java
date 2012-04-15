@@ -22,7 +22,6 @@ import java.util.Map;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
@@ -64,9 +63,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private TraverseVisitor traverseVisitor;
 
-    @Autowired private GraphService graphService;
-
-
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
     }
@@ -87,7 +83,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /** @return the shortest path, or null if none is found */
     public ShortestPathTree getShortestPathTree(TraverseOptions options, double relTimeout) {
 
-        options.setRoutingContext(graphService.getGraph());
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
         
@@ -96,23 +91,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         }
 
         ShortestPathTree spt = createShortestPathTree(options);
-
-        /**
-         * Populate any extra edges
-         */
-        final ExtraEdgesStrategy extraEdgesStrategy = rctx.extraEdgesStrategy;
-        Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
-        // conditional could be eliminated by placing this before the o/d swap above
-        if (options.isArriveBy()) {
-            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, rctx.origin);
-            extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, rctx.target);
-        } else {
-            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, rctx.origin);
-            extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, rctx.target);
-        }
-
-        if (extraEdges.isEmpty())
-            extraEdges = Collections.emptyMap();
 
         final RemainingWeightHeuristic heuristic = rctx.goalDirection ? 
                 rctx.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
@@ -124,7 +102,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         // Priority Queue
         OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
-        OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size() + extraEdges.size());
+        OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size());
         // this would allow continuing a search from an existing state
         pq.insert(initialState, initialWeight);
 
@@ -190,7 +168,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 return spt;
             }
 
-            Collection<Edge> edges = getEdgesForVertex(rctx.graph, extraEdges, u_vertex, options);
+            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
 
             nVisited += 1;
 
@@ -230,11 +208,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                                 + v.getVertex());
                     }
 
-                    if (estimate > rctx.maxWeight) {
+                    if (estimate > options.maxWeight) {
                         // too expensive to get here
                         if (_verbose)
                             System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                    } else if (isWorstTimeExceeded(v, rctx)) {
+                    } else if (isWorstTimeExceeded(v, options)) {
                         // too much time to get here
                     	if (_verbose)
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTime());
@@ -280,11 +258,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             return heuristic.computeForwardWeight(v, target);
     }
 
-    private boolean isWorstTimeExceeded(State v, RoutingContext rctx) {
-        if (rctx.opt.isArriveBy())
-            return v.getTime() < rctx.worstTime;
+    private boolean isWorstTimeExceeded(State v, TraverseOptions opt) {
+        if (opt.isArriveBy())
+            return v.getTime() < opt.worstTime;
         else
-            return v.getTime() > rctx.worstTime;
+            return v.getTime() > opt.worstTime;
     }
 
     private ShortestPathTree createShortestPathTree(TraverseOptions opts) {

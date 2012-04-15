@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -9,26 +10,20 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.algorithm.strategies.DefaultExtraEdgesStrategy;
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions,
@@ -53,16 +48,17 @@ public class RoutingContext implements Cloneable {
     public final Vertex origin;
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
+    ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
     public final boolean goalDirection = true;
     //public final Calendar calendar;
     public final CalendarServiceImpl calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public final GenericAStarFactory aStarSearchFactory = null;
     public final RemainingWeightHeuristic remainingWeightHeuristic;
-    public final ExtraEdgesStrategy extraEdgesStrategy = new DefaultExtraEdgesStrategy();
     public final TransferTable transferTable;
+            
     /**
-     * Cache lists of which transit services run on which midnight-to-midnight periods This ties a
+     * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a
      * TraverseOptions to a particular start time for the duration of a search so the same options
      * cannot be used for multiple searches concurrently. To do so this cache would need to be moved
      * into StateData, with all that entails.
@@ -132,7 +128,6 @@ public class RoutingContext implements Cloneable {
         if (opt.intermediatePlaces == null)
             return;
         ArrayList<String> notFound = new ArrayList<String>();
-        ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
         int i = 0;
         for (NamedPlace intermediate : opt.intermediatePlaces) {
             Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
@@ -212,7 +207,24 @@ public class RoutingContext implements Cloneable {
      * to the temporary vertices it created. We need to detach its edges from the permanent graph.
      */
     @Override public void finalize() {
-        LOG.debug("garbage routing context collected");
+        int nRemoved = this.destroy();
+        if (nRemoved > 0) {
+            LOG.warn("Temporary edges were removed during garbage collection. " +
+                     "This is probably because a routing context was not properly destroyed.");
+        }
+    }
+    
+    /** 
+     * Tear down this routing context, removing any temporary edges. 
+     * @returns the number of edges removed. 
+     */
+    public int destroy() {
+        int nRemoved = 0;
+        nRemoved += origin.removeTemporaryEdges();
+        nRemoved += target.removeTemporaryEdges();
+        for (Vertex v : intermediateVertices)
+            nRemoved += v.removeTemporaryEdges();
+        return nRemoved;
     }
 
 }

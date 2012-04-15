@@ -93,25 +93,33 @@ public abstract class AbstractEdge implements Edge {
     	attachTo(tov);
     }
     
-    private void detachFrom() {
+    private boolean detachFrom() {
+        boolean detached = false;
         if (fromv != null) {
-            fromv.removeOutgoing(this);
+            detached = fromv.removeOutgoing(this);
             fromv = null;
         }
+        return detached;
     }
 
-    private void detachTo() {
+    private boolean detachTo() {
+        boolean detached = false;
         if (tov != null) {
-            tov.removeIncoming(this);
+            detached = tov.removeIncoming(this);
             tov = null;
         }
+        return detached;
     }
 
     /** Disconnect this edge from its endpoint vertices, keeping edgelists coherent */
     @Override
-    public void detach() {
-    	detachFrom();
-    	detachTo();
+    public int detach() {
+        int nDetached = 0;
+    	if (detachFrom())
+    	    nDetached += 1;
+    	if (detachTo())
+    	    nDetached += 1;
+    	return nDetached;
     }
     
     public Trip getTrip() {

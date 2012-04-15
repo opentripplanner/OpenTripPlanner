@@ -114,6 +114,12 @@ public class Planner extends SearchResource {
             LOG.error("exception planning trip: ", e);
             PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
             response.setError(error);
+        } finally {
+            // tear down the routing context (remove temporary edges from edgelists)
+            if (request.rctx != null) {
+                int nRemoved = request.rctx.destroy();
+                LOG.debug("routing context destroyed ({} temporary edges removed)", nRemoved);
+            }
         }
         return response;
     }
