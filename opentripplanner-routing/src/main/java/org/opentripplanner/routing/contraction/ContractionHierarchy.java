@@ -571,6 +571,7 @@ public class ContractionHierarchy implements Serializable {
             TraverseOptions opt) {
 
     	TraverseOptions upOptions = opt.clone();
+        TraverseOptions downOptions = opt.clone();
 
         if (origin == null || target == null) {
             return null;
@@ -579,9 +580,8 @@ public class ContractionHierarchy implements Serializable {
         //TODO: verify set to/from are correct (AMB)
     	upOptions.setArriveBy(false);
     	upOptions.dateTime = time;
-    	upOptions.fromVertex = origin;
-    	upOptions.toVertex = target;
-    	TraverseOptions downOptions = upOptions.reversedClone(time);
+        downOptions.setArriveBy(true);
+        downOptions.dateTime = time;
 
     	/** max walk distance cannot be less than distances to nearest transit stops */
     	double minWalkDistance = 
@@ -601,8 +601,8 @@ public class ContractionHierarchy implements Serializable {
 
         Map<Vertex, ArrayList<Edge>> extraEdges = getExtraEdges(origin, target);
         
-        BasicShortestPathTree upspt = new BasicShortestPathTree();
-        BasicShortestPathTree downspt = new BasicShortestPathTree();
+        BasicShortestPathTree upspt = new BasicShortestPathTree(upOptions);
+        BasicShortestPathTree downspt = new BasicShortestPathTree(downOptions);
 
         BinHeap<State> upqueue = new BinHeap<State>(INITIAL_SIZE);
         BinHeap<State> downqueue = new BinHeap<State>(INITIAL_SIZE);
@@ -611,13 +611,13 @@ public class ContractionHierarchy implements Serializable {
         HashSet<Vertex> upclosed = new HashSet<Vertex>(INITIAL_SIZE);
         HashSet<Vertex> downclosed = new HashSet<Vertex>(INITIAL_SIZE);
 
-        State upInit = new State(upOptions);
+        State upInit = new State(origin, upOptions);
         upspt.add(upInit);
         upqueue.insert(upInit, upInit.getWeight());
 
         /* FIXME: insert extra bike walking targets */
 
-        State downInit = new State(downOptions);
+        State downInit = new State(target, downOptions);
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
         

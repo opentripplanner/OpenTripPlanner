@@ -100,8 +100,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
     public List<GraphPath> getPaths(TraverseOptions options) {
 
         // always use the bidirectional heuristic because the others are not precise enough
-        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.graph);
-        options.remainingWeightHeuristic = heuristic;
+        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
+        options.rctx.remainingWeightHeuristic = heuristic;
         
         // the states that will eventually be turned into paths and returned
         List<State> returnStates = new LinkedList<State>();
@@ -115,8 +115,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
         BinHeap<State> pq = new BinHeap<State>();
 //        List<State> boundingStates = new ArrayList<State>();
         
-        Vertex originVertex = options.getOriginVertex();
-        Vertex targetVertex = options.getTargetVertex();
+        Vertex originVertex = options.rctx.origin;
+        Vertex targetVertex = options.rctx.target;
         
         // increase maxWalk repeatedly in case hard limiting is in use 
         WALK: for (double maxWalk = options.getMaxWalkDistance();
@@ -136,7 +136,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
             cutoff += options.getMaxWalkDistance() * options.walkReluctance;
             options.maxWeight = cutoff;
             
-            State origin = options.getInitialState();
+            State origin = new State(options);
             // (used to) initialize heuristic outside loop so table can be reused
             heuristic.computeInitialWeight(origin, targetVertex);
             

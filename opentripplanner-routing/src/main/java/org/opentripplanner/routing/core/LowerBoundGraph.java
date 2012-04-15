@@ -267,9 +267,9 @@ public class LowerBoundGraph {
 	// testing search function that does an optimistic search in the original graph
 	private BasicShortestPathTree originalSSSP(Vertex o){
 		LOG.info("Initializing original SSSP");
-		BasicShortestPathTree spt = new BasicShortestPathTree();
 		BinHeap<State> q = new BinHeap<State>();
 		TraverseOptions opt = new TraverseOptions();
+		BasicShortestPathTree spt = new BasicShortestPathTree(opt);
 		opt.maxWalkDistance = Double.MAX_VALUE;
 		State initialState = new State(o, opt);
 		q.insert(initialState, 0);
