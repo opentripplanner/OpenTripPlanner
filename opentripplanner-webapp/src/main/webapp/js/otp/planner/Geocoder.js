@@ -31,7 +31,9 @@ otp.planner.GeocoderStatic = {
     enabled  : false,
     isSolr   : false,
     form     : null,
-    geocoder : {},    // geocoder reference from config.js
+    url      : null,
+    addressParamName : null,
+    geocoder_cfg : {},    // geocoder reference from config.js
 
     // hold state for whether geocoding is currently active
     m_fromGeocoding : false,
@@ -40,7 +42,7 @@ otp.planner.GeocoderStatic = {
     initialize : function(config)
     {
         otp.configure(this, config);
-        otp.configure(this, config.geocoder);
+        otp.configure(this, config.geocoder_cfg);
     },
 
     /** */
@@ -88,13 +90,13 @@ otp.planner.GeocoderStatic = {
         }
 
         var params = {};
-        params[this.geocoder.addressParamName] = address;
+        params[this.addressParamName] = address;
         if (this.routerId)
             params["routerId"] = this.form.routerId;
 
         var self = this;
         Ext.Ajax.request({
-            url: this.geocoder.url,
+            url: this.url,
             method: "GET",
             success: successFn,
             failure: failureFn,

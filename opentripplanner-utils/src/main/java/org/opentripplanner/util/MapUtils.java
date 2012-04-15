@@ -14,6 +14,7 @@
 package org.opentripplanner.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -95,4 +96,17 @@ public class MapUtils {
         }
     }
 
+    public static <T, U, V extends Collection<U>> void mergeIn(Map<T, V> mapList,
+            Map<T, V> from) {
+        for (Map.Entry<T, V> entry : from.entrySet()) {
+            T key = entry.getKey();
+            V value = entry.getValue();
+            V originalValue = mapList.get(key);
+            if (originalValue != null) {
+                originalValue.addAll(value);
+            } else {
+                mapList.put(key, value);
+            }
+        }
+    }
 }

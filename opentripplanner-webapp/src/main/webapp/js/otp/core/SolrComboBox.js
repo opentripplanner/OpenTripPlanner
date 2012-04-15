@@ -17,6 +17,8 @@ otp.namespace("otp.core");
 /**
  * Ext text form (SolrComboBox) for use with a SOLR geo searcher backend 
  * @class
+ * 
+ * IMPORTANT: we inherit from otp.core.ComboBoxStatic !!!
  */
 otp.core.SolrComboBoxStatic = {
 
@@ -29,12 +31,12 @@ otp.core.SolrComboBoxStatic = {
     initialize : function(config)
     {
         console.log("enter SolrComboBox constructor");
+        otp.inherit(this, otp.core.ComboBoxStatic);
 
         // test url if on local host
         if(otp.isLocalHost())
             this.url = '/js/otp/planner/test/solr-geo.json';
 
-        otp.inherit(this, otp.core.ComboBoxStatic);
         // CALLS THE BASE CONSTRUCTOR this.creator(config);
         otp.configure(this, config);
 

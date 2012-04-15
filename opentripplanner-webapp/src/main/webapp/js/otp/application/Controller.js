@@ -64,6 +64,7 @@ otp.application.Controller = {
         pconfig.ui  = this.ui;
         pconfig.locale = this.config.locale;
         pconfig.routerId = this.config.routerId;
+        pconfig.geocoder_cfg = pconfig.geocoder;
         this.planner = new otp.planner.Planner(pconfig);
         this.makeContextMenu();
         this.ui.accordion.add(this.planner.getPanel());
