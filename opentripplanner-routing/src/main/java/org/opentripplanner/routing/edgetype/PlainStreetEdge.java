@@ -203,7 +203,7 @@ public class PlainStreetEdge extends StreetEdge {
             weight = slopeSpeedEffectiveLength / options.speed;
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
             time = slopeSpeedEffectiveLength / options.speed;
-            switch (options.optimizeFor) {
+            switch (options.optimize) {
             case SAFE:
             	weight = bicycleSafetyEffectiveLength / options.speed;
             	break;

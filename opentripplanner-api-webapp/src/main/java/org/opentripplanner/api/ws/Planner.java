@@ -30,12 +30,9 @@ import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.PathServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
-
 import com.sun.jersey.api.spring.Autowire;
 
 @Path("/plan") // NOTE - /ws/plan is the full path -- see web.xml
@@ -76,7 +73,7 @@ public class Planner extends SearchResource {
         /* create request */
         TraverseOptions request;
         try {
-            request = buildRequestFromQueryParamFields();
+            request = buildRequest();
         } catch (ParameterException pe) {
             PlannerError error = new PlannerError(pe.message);
             response.setError(error);

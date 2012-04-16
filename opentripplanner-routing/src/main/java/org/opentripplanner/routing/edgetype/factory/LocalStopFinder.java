@@ -101,7 +101,7 @@ public class LocalStopFinder {
 
         walkingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         bikingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
-        bikingOptions.optimizeFor = OptimizeType.SAFE;
+        bikingOptions.optimize = OptimizeType.SAFE;
 
         int nonLocal = 0;
         for (TripPattern pattern : patterns) {

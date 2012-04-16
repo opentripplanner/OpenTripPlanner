@@ -52,7 +52,6 @@ public class RetryingPathServiceImpl implements PathService {
 
     @Autowired private GraphService graphService;
     @Autowired private SPTService sptService;
-    @Autowired private RemainingWeightHeuristicFactory remainingWeightHeuristicFactory;
 
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
@@ -111,13 +110,14 @@ public class RetryingPathServiceImpl implements PathService {
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
+        TraverseOptions currOptions;
         while (paths.size() < options.numItineraries) {
-            options = optionQueue.poll();
-            if (options == null) {
+            currOptions = optionQueue.poll();
+            if (currOptions == null) {
                 LOG.debug("Ran out of options to try.");
                 break;
             }
-            options.setMaxWalkDistance(maxWalk);
+            currOptions.setMaxWalkDistance(maxWalk);
             
             // apply appropriate timeout
             double timeout = paths.isEmpty() ? firstPathTimeout : multiPathTimeout;
@@ -127,7 +127,7 @@ public class RetryingPathServiceImpl implements PathService {
             long subsearchBeginTime = System.currentTimeMillis();
             
             LOG.debug("BEGIN SUBSEARCH");
-            ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
+            ShortestPathTree spt = sptService.getShortestPathTree(currOptions, timeout);
             List<GraphPath> somePaths = spt.getPaths();
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,
@@ -150,7 +150,7 @@ public class RetryingPathServiceImpl implements PathService {
                 LOG.debug("Setting max time and weight for subsequent searches.");
                 LOG.debug("First path start time:  {}", path.getStartTime());
                 maxTime = path.getStartTime() + 
-                		  MAX_TIME_FACTOR * (options.isArriveBy() ? -duration : duration);
+                		  MAX_TIME_FACTOR * (currOptions.isArriveBy() ? -duration : duration);
                 LOG.debug("First path duration:  {}", duration);
                 LOG.debug("Max time set to:  {}", maxTime);
                 maxWeight = path.getWeight() * MAX_WEIGHT_FACTOR;
@@ -172,7 +172,7 @@ public class RetryingPathServiceImpl implements PathService {
                     // now, create a list of options, one with each trip in this journey banned.
 
                     LOG.debug("New trips: {}", path.getTrips());
-                    TraverseOptions newOptions = options.clone();
+                    TraverseOptions newOptions = currOptions.clone();
                     for (AgencyAndId trip : path.getTrips()) {
                         newOptions.bannedTrips.add(trip);
                     }
@@ -181,7 +181,7 @@ public class RetryingPathServiceImpl implements PathService {
                     }
                 }
             }
-            LOG.debug("{} / {} itineraries", paths.size(), options.numItineraries);
+            LOG.debug("{} / {} itineraries", paths.size(), currOptions.numItineraries);
         }
         if (paths.size() == 0) {
             return null;

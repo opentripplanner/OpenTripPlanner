@@ -105,8 +105,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public boolean wheelchairAccessible = false;
 
-    public OptimizeType optimizeFor = OptimizeType.QUICK;
-
     /** How much worse walking is than waiting for an equivalent length of time, as a multiplier */
     public double walkReluctance = 2.0;
 
@@ -247,7 +245,7 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public TraverseOptions(TraverseModeSet modeSet, OptimizeType optimize) {
     	this();
-        this.optimizeFor = optimize;
+        this.optimize = optimize;
     	this.setModes(modeSet);
     }    
 
@@ -287,7 +285,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
             walkingOptions.speed *= 0.3; //assume walking bikes is slow
-            walkingOptions.optimizeFor = optimizeFor;
+            walkingOptions.optimize = optimize;
         } else if (modes.getCar()) {
             speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
@@ -301,8 +299,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public void setOptimize(OptimizeType optimize) {
-        optimizeFor = optimize;
-        walkingOptions.optimizeFor = optimize;
+        this.optimize = optimize;
+        walkingOptions.optimize = optimize;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -359,15 +357,18 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public void setPreferredRoutes(String s) {
-        preferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
+        if (s != null && !s.equals(""))
+            preferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
     
     public void setUnpreferredRoutes(String s) {
-        unpreferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
+        if (s != null && !s.equals(""))
+            unpreferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
 
     public void setBannedRoutes(String s) {
-        bannedRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
+        if (s != null && !s.equals(""))
+            bannedRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
     
     public final static int MIN_SIMILARITY = 1000;
@@ -378,7 +379,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         if(getModes().getNonTransitMode() == options.getModes().getNonTransitMode()) {
             s += 1000;
         }
-        if(optimizeFor == options.optimizeFor) {
+        if(optimize == options.optimize) {
             s += 700;
         }
         if(wheelchairAccessible == options.wheelchairAccessible) {
@@ -710,7 +711,7 @@ public class TraverseOptions implements Cloneable, Serializable {
                     && speed == other.speed 
                     && getModes().equals(other.getModes()) && isArriveBy() == other.isArriveBy()
                     && wheelchairAccessible == other.wheelchairAccessible
-                    && optimizeFor == other.optimizeFor && maxWalkDistance == other.maxWalkDistance
+                    && optimize == other.optimize && maxWalkDistance == other.maxWalkDistance
                     && transferPenalty == other.transferPenalty
                     && maxSlope == other.maxSlope && walkReluctance == other.walkReluctance
                     && waitReluctance == other.waitReluctance && boardCost == other.boardCost
@@ -732,7 +733,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return from.hashCode() * 524287 + to.hashCode() * 1327144003 
                 + new Double(speed).hashCode() + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
-                + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
+                + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373

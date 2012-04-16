@@ -186,7 +186,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         // test Dijkstra
         TraverseOptions options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
 
@@ -250,7 +250,7 @@ public class TestContractionHeirarchies extends TestCase {
 
 
         options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        options.optimize = OptimizeType.QUICK;
         options.speed = 1;
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
@@ -349,7 +349,7 @@ public class TestContractionHeirarchies extends TestCase {
         ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         TraverseOptions options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.speed = 1;
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
@@ -454,7 +454,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         TraverseOptions options = new TraverseOptions();
         options.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY));
-        options.optimizeFor = OptimizeType.QUICK;
+        options.optimize = OptimizeType.QUICK;
         
         CalendarServiceData data = graph.getService(CalendarServiceData.class);
         assertNotNull(data);

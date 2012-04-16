@@ -62,7 +62,7 @@ public class TestTriangle extends TestCase {
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         
         TraverseOptions options = new TraverseOptions(TraverseMode.BICYCLE);
-        options.optimizeFor = OptimizeType.TRIANGLE;
+        options.optimize = OptimizeType.TRIANGLE;
         options.speed = 6.0;
         options.walkReluctance = 1;
 

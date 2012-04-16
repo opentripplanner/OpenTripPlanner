@@ -213,7 +213,7 @@ public class TurnVertex extends StreetVertex {
             // evens out?
             weight = slopeSpeedEffectiveLength / options.speed;
         } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
-            switch (options.optimizeFor) {
+            switch (options.optimize) {
             case SAFE:
                 weight = bicycleSafetyEffectiveLength / options.speed;
                 break;

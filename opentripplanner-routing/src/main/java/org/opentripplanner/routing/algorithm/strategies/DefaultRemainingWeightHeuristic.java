@@ -156,7 +156,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             // true in Portland and NYC, but *not* true on highways
             return 10;
         } else {
-            if (options.optimizeFor == OptimizeType.QUICK) {
+            if (options.optimize == OptimizeType.QUICK) {
                 return options.speed;
             } else {
                 // assume that the best route is no more than 10 times better than

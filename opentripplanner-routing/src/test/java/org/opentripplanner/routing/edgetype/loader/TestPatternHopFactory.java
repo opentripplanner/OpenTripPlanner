@@ -514,7 +514,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_c = graph.getVertex("agency_C");
         Vertex stop_d = graph.getVertex("agency_D");
         TraverseOptions options = new TraverseOptions(context);
-        options.optimizeFor = OptimizeType.QUICK;
+        options.optimize = OptimizeType.QUICK;
         ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_c.getLabel(), stop_d.getLabel(),  
                 TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0), options);
 
