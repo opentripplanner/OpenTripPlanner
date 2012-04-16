@@ -54,7 +54,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -79,9 +78,9 @@ public class PlanGenerator {
 
     private TransitIndexService transitIndex;
     
-    public PlanGenerator(TraverseOptions options, PathServiceFactory pathServiceFactory) {
+    public PlanGenerator(TraverseOptions options, PathService pathService) {
         this.options = options;
-        pathService = pathServiceFactory.getPathService(options.getRouterId());
+        this.pathService = pathService;
     }
 
     /** Generates a TripPlan from a Request */

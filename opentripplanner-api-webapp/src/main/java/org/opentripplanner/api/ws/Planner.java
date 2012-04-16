@@ -29,6 +29,7 @@ import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,12 +45,7 @@ public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
-    private PathServiceFactory pathServiceFactory;
-
-    @Required
-    public void setPathServiceFactory(PathServiceFactory pathServiceFactory) {
-        this.pathServiceFactory = pathServiceFactory;
-    }
+    @Autowired private PathService pathService;
 
     /**
      * This is the primary entry point for the web service and is used for requesting trip plans.
@@ -89,7 +85,7 @@ public class Planner extends SearchResource {
 
         /* generate trip plan from request, and return it in a response */
         try {
-            PlanGenerator generator = new PlanGenerator(request, pathServiceFactory);
+            PlanGenerator generator = new PlanGenerator(request, pathService);
             TripPlan plan = generator.generate();
             response.setPlan(plan);
         } catch (VertexNotFoundException e) {

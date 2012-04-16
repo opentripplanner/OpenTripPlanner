@@ -34,9 +34,12 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
@@ -78,6 +81,8 @@ public class Graph implements Serializable {
     private transient Map<String, Vertex> vertices;
 
     private transient ContractionHierarchySet hierarchies;
+    
+    private transient CalendarService calendarService;
     
     private transient List<Vertex> vertexById;
 
@@ -429,6 +434,18 @@ public class Graph implements Serializable {
         return idForEdge.get(edge);
     }
 
+    public CalendarService getCalendarService() {
+        if (calendarService == null) {
+            CalendarServiceData data = this.getService(CalendarServiceData.class);
+            if (data != null) {
+              CalendarServiceImpl calendarService = new CalendarServiceImpl();
+              calendarService.setData(data);
+              this.calendarService = calendarService;
+            }
+        }
+        return this.calendarService;
+    }
+    
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }

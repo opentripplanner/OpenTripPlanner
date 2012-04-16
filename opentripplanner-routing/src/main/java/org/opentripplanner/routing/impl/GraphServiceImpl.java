@@ -14,166 +14,94 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
-import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
-import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphRefreshListener;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Implementation of {@link GraphService} that loads the graph from a file.
- * 
- * You can specify the location of the graph in a number of ways:
- * 
- * 1) Call {@link #setBundle(GraphBundle)} to set the graph bundle location
- * 
- * 2) Call {@link #setGraphPath(File)} to set the graph file path directly
- * 
- * 3) Call {@link #setContractionHierarchySet(ContractionHierarchySet)} to
- * specify the graph itself.
- * 
- * @author bdferris
- * @see GraphService
- */
 public class GraphServiceImpl implements GraphService {
 
-  private static final Logger _log = LoggerFactory.getLogger(GraphServiceImpl.class);
-	
-  private GraphBundle _bundle;
+    private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
-  private boolean _createEmptyGraphIfNotFound = false;
+    private String pathPattern;
 
-  private Graph _graph;
+    private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
-  private CalendarServiceImpl _calendarService;
+    private Map<String, Long> modTimes = new HashMap<String, Long>();
 
-  private List<GraphRefreshListener> _graphRefreshListeners;
+    private LoadLevel loadLevel;
 
-  private LoadLevel loadLevel;
+    private boolean synchronousReload = true;
 
-  public void setBundle(GraphBundle bundle) {
-    _bundle = bundle;
-  }
-
-  /**
-   * By default, we throw an exception if the graph path is not found. Set this
-   * to true to indicate that a default empty graph should be creaetd instead.
-   * 
-   * @param createEmptyGraphIfNotFound
-   */
-  public void setCreateEmptyGraphIfNotFound(boolean createEmptyGraphIfNotFound) {
-    _createEmptyGraphIfNotFound = createEmptyGraphIfNotFound;
-  }
-
-  public void setGraph(Graph graph) {
-    _graph = graph;
-
-    CalendarServiceData data = _graph.getService(CalendarServiceData.class);
-    if (data != null) {
-      CalendarServiceImpl calendarService = new CalendarServiceImpl();
-      calendarService.setData(data);
-      _calendarService = calendarService;
-    } else {
-      _calendarService = null;
+    public void setPath(String path) {
+        this.pathPattern = path;
     }
-  }
 
-  //@Autowired
-  public void setGraphRefreshListeners(
-      List<GraphRefreshListener> graphRefreshListeners) {
-    _graphRefreshListeners = graphRefreshListeners;
-  }
+    @Override
+    public void refreshGraphs() {
+        //////////////////
+    }
 
-  /****
-   * {@link GraphService} Interface
-   ****/
+    @Override
+    @PostConstruct // This means it will run on startup
+    public Graph getGraph() {
+        return getGraph("");
+    }
 
-  @Override
-  @PostConstruct
-  // This means it will run on startup
-  public void refreshGraph() {
-    readGraph();
-    notifyListeners();
-  }
-
-  @Override
-  public ContractionHierarchySet getContractionHierarchySet() {
-    return _graph.getHierarchies();
-  }
-
-  @Override
-  public Graph getGraph() {
-    return _graph;
-  }
-
-  @Override
-  public CalendarService getCalendarService() {
-    return _calendarService;
-  }
-
-  /****
-   * Private Methods
-   ****/
-
-  private void readGraph() {
-
-        File path = null;
-        if (_bundle == null) {
-            throw new RuntimeException("setBundle() mustbe called before readGraph()");
-        }
-        try {
-
-            File extraClassPath = _bundle.getExtraClassPath();
-            URL[] url;
-
-            url = new URL[] { new URL("file://" + extraClassPath + "/") };
-            ClassLoader oldLoader = getClass().getClassLoader();
-            URLClassLoader classLoader = new URLClassLoader(url, oldLoader);
-
-            path = _bundle.getGraphPath();
-
-            if (path == null || !path.exists()) {
-                if (!_createEmptyGraphIfNotFound) {
-                    _log.error("Graph not found. Verify path to stored graph: " + path);
-                    throw new IllegalStateException("graph path not found: " + path);
+    @Override
+    public synchronized Graph getGraph(String routerId) {
+        Graph graph;
+//        if (!useRouterId) { 
+//            // avoid having multiple copies of the same graph for different router IDs
+//            routerId = "";
+//        }
+        File graphFile = getFileForRouterId(routerId);
+        // key on filename, mapping all routerIds to the same graph when there is no {} in pattern
+        graph = graphs.get(graphFile.getAbsolutePath());
+        Long modTime = modTimes.get(graphFile.getAbsolutePath());
+        LOG.debug("graph for routerId '{}' is at {}", routerId, graphFile.getAbsolutePath());
+        if (graphFile != null && graphFile.exists()) {
+            if (modTime == null || graphFile.lastModified() > modTime) {
+                LOG.debug("this graph has changed or was not yet loaded");
+                modTime = graphFile.lastModified();
+                try {
+                    graph = Graph.load(graphFile, loadLevel);
+                    modTimes.put(graphFile.getAbsolutePath(), modTime);
+                    graphs.put(graphFile.getAbsolutePath(), graph);
+                } catch (Exception ex) {
+                    LOG.error("Exception while loading graph from {}.", graphFile);
+                    throw new RuntimeException("error loading graph from " + graphFile, ex);
                 }
-                /* Create an empty graph if not graph is found */
-                Graph graph = new Graph();
-                graph.setBundle(_bundle);
-                setGraph(graph);
-                return;
+            } else {
+                LOG.debug("returning cached graph {} for routerId '{}'", graph, routerId);
             }
-            setGraph(Graph.load(classLoader, path, loadLevel));
-        } catch (Exception ex) {
-            _log.error("Exception while loading graph from {}.", path);
-            throw new IllegalStateException("error loading graph from " + path, ex);
+        } else {
+            LOG.warn("graph file not found: {}", graphFile);
         }
-  }
+        return graph;
+    }
 
-  private void notifyListeners() {
-    if( _graphRefreshListeners == null)
-      return;
-    for( GraphRefreshListener listener : _graphRefreshListeners)
-      listener.handleGraphRefresh(this);
-  }
+    private File getFileForRouterId(String routerId) {
+        if (routerId.indexOf("../") != -1) {
+            LOG.warn("attempt to navigate up the directory hierarchy using a routerId");
+            return null;
+        } else {
+            String fileName = pathPattern.replace("{}", routerId);
+            return new File(fileName.concat("/Graph.obj"));
+        }
+    }
 
     @Override
     public void setLoadLevel(LoadLevel level) {
         if (level != loadLevel) {
             loadLevel = level;
-            refreshGraph();
+            refreshGraphs();
         }
     }
 

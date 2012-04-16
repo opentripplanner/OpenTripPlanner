@@ -35,13 +35,6 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Metadata {
 
-    private PathServiceFactory pathServiceFactory;
-
-    @Required
-    public void setPathServiceFactory(PathServiceFactory pathServiceFactory) {
-        this.pathServiceFactory = pathServiceFactory;
-    }
-
     @Autowired GraphService graphService;
     
     /**
@@ -61,6 +54,6 @@ public class Metadata {
             @DefaultValue("") @QueryParam(SearchResource.ROUTER_ID) String routerId)
             throws JSONException {
         //return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
-        return new GraphMetadata(graphService);
+        return new GraphMetadata(graphService.getGraph(routerId));
     }
 }
