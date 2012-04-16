@@ -285,6 +285,10 @@ public class Polygon {
         return true;
     }
 
+    public int hashCode() {
+        return vertices.hashCode() + 1;
+    }
+
     Point get(int i) {
         return vertices.get(i % vertices.size());
     }
