@@ -399,15 +399,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (options != null) {
             walkingOptions = options.getWalkingOptions();
         }
-        double envelopeGrowthAmount = 0.002; // ~= 200 meters
+        double envelopeGrowthAmount = 0.001; // ~= 100 meters
+        double radius = 0;
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
         while (candidateEdges.size() == 0) {
-            if (envelope.getWidth() > MAX_DISTANCE_FROM_STREET * 2)
-                return candidateEdges; // empty list
             // expand envelope -- assumes many close searches and occasional far ones
             envelope.expandBy(envelopeGrowthAmount);
-            envelopeGrowthAmount *= 2;
+            radius += envelopeGrowthAmount;
+            if (radius > MAX_DISTANCE_FROM_STREET)
+                return candidateEdges; // empty list
+            // envelopeGrowthAmount *= 2;
             List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
+            // TODO remove use of ExtraEdges
             if (extraEdges != null && nearbyEdges != null) {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
@@ -425,10 +428,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
-                if (ce.distance < MAX_DISTANCE_FROM_STREET)
+                if (ce.distance < radius)
                     candidateEdges.add(ce);
             }
         }
+
         Collection<CandidateEdgeBundle> bundles = candidateEdges.binByDistanceAndAngle();
         // initially set best bundle to the closest bundle
         CandidateEdgeBundle best = null; 
