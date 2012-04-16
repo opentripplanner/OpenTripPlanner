@@ -59,11 +59,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -78,11 +74,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
-import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -253,13 +244,13 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JLabel serviceIdLabel;
 
-    private RetryingPathServiceImpl pathservice;
+    private RetryingPathServiceImpl pathservice = new RetryingPathServiceImpl();
 
     private Graph graph;
 
     private StreetVertexIndexService indexService;
 
-    private SPTService sptService;
+    private SPTService sptService = new GenericAStar();
 
     private DefaultListModel metadataModel;
 
@@ -275,21 +266,17 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     public VizGui(String graphName) {
         super();
- 
-        GraphServiceImpl graphService = new GraphServiceImpl();
-        GraphBundle bundle = new GraphBundle();
         File path = new File(graphName);
         if (path.getName().equals("Graph.obj")) {
             path = path.getParentFile();
         }
-        bundle.setPath(path);
-        graphService.setBundle(bundle);
-        graphService.refreshGraph();
-            
-        setGraph(graphService);
-        
+        try {
+            graph = Graph.load(new File(graphName), Graph.LoadLevel.FULL);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        indexService = graph.streetIndex;
         setTitle("VizGui: " + graphName);
-
         init();
     }
     
@@ -1007,13 +994,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     public void verticesSelected(final List<Vertex> selected) {
         ListModel data = new VertexList(selected);
         nearbyVertices.setModel(data);
-    }
-    
-    public void setGraph(GraphServiceImpl graphService) {
-        graph = graphService.getGraph();
-        pathservice = new RetryingPathServiceImpl();
-        indexService = graph.streetIndex;
-        sptService = new GenericAStar();
     }
     
     public Graph getGraph() {
