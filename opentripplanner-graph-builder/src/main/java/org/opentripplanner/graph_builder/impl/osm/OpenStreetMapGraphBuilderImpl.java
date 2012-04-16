@@ -271,7 +271,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private void buildAreas() {
+            final int MAX_AREA_NODES = 50;
+            _log.debug("building visibility graphs for areas");
             for (OSMWay areaWay : _areas.values()) {
+                if (areaWay.getNodeRefs().size() > MAX_AREA_NODES) {
+                    _log.debug("skipping area with {} nodes", areaWay.getNodeRefs().size());
+                    continue;
+                }
                 setWayName(areaWay);
                 // TODO: nested areas
                 List<Point> vertices = new ArrayList<Point>();
