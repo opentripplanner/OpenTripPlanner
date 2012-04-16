@@ -18,8 +18,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.Pointlike;
-import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex.ValidEdgeTypes;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -43,10 +41,6 @@ public interface Vertex extends Serializable, Cloneable, Pointlike {
     public abstract void addIncoming(Edge ee);
     public abstract boolean removeIncoming(Edge ee);
     public abstract int getDegreeIn();
-
-    /** Get an original, augmented, or replaced edgelist according to the supplied OverlayGraphs */
-    public abstract Collection<Edge> getEdges(OverlayGraph extraEdges,
-            OverlayGraph replacementEdges, boolean incoming);
 
     
     /* ACCESSOR METHODS */
