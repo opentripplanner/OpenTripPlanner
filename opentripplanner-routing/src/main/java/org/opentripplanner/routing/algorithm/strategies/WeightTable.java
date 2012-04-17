@@ -211,7 +211,7 @@ public class WeightTable implements Serializable {
 				throw new RuntimeException(e);
 			}
 
-			BasicShortestPathTree spt = new BasicShortestPathTree(500000);
+			BasicShortestPathTree spt = new BasicShortestPathTree(options);
 			State s0 = new State(origin, options);
 			spt.add(s0);
 			heap.insert(s0, s0.getWeight());
@@ -240,7 +240,7 @@ public class WeightTable implements Serializable {
 
 			// then check what is accessible in one transit trip
 			heap.reset(); // recycle heap
-			spt = new BasicShortestPathTree(50000);
+			spt = new BasicShortestPathTree(options);
 			// first handle preboard edges
 			Queue<Vertex> q = new ArrayDeque<Vertex>(100);
 			q.add(origin);

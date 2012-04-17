@@ -85,12 +85,10 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
         this.target = target;
         targetStops = new ArrayList<NearbyStop>(50);
         Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
-        options.extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
-        options.extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
         // heap does not really need to be this big, verify initialization time
-        ShortestPathTree spt = new BasicShortestPathTree(5000);
+        ShortestPathTree spt = new BasicShortestPathTree(options);
         BinHeap<State> heap = new BinHeap<State>(100);
-        State targetState = new State(target, s0.getOptions().reversedClone(s0.getTime()));
+        State targetState = new State(target, s0.getTime(), s0.getOptions().reversedClone());
         spt.add(targetState);
         heap.insert(targetState, 0);
         while (!heap.empty()) {
