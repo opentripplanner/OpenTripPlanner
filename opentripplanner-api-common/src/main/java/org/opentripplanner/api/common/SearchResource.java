@@ -139,8 +139,8 @@ public abstract class SearchResource { // RoutingResource
      *  org.opentripplanner.api.ws.Planner. */
     @DefaultValue("2") @QueryParam(MAX_TRANSFERS) List<Integer> maxTransfers;
 
-    /** If true, goal direction is turned off and a full path tree is built */
-    @DefaultValue("false") @QueryParam("batch") List<Boolean> batch;
+    /** If true, goal direction is turned off and a full path tree is built (specify only once) */
+    @DefaultValue("false") @QueryParam("batch") Boolean batch;
     
     /* Inject the servlet request so we have access to the query parameter map */
     @Context protected HttpServletRequest httpServletRequest;
@@ -194,7 +194,6 @@ public abstract class SearchResource { // RoutingResource
                 if (tsafe == null || tslope == null || ttime == null) {
                     throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
                 }
-                // TODO fix
                 if (opt == null) {
                     opt = OptimizeType.TRIANGLE;
                 } else if (opt != OptimizeType.TRIANGLE) {
@@ -235,6 +234,8 @@ public abstract class SearchResource { // RoutingResource
         } else {
             request.setTransferPenalty(get(transferPenalty, n));
         }
+        if (batch != null)
+            request.batch = batch;
         request.setOptimize(opt);
         request.setModes(get(modes, n));
         request.setMinTransferTime(get(minTransferTime, n));

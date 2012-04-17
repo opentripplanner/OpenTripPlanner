@@ -207,6 +207,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
 
+    /** when true, do not use goal direction or stop at the target, build a full SPT */
+    public boolean batch = true;
+
     /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 

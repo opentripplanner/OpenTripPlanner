@@ -13,6 +13,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
@@ -49,7 +50,6 @@ public class RoutingContext implements Cloneable {
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
     ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
-    public final boolean goalDirection = true;
     //public final Calendar calendar;
     public final CalendarServiceImpl calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
@@ -102,7 +102,10 @@ public class RoutingContext implements Cloneable {
         transferTable = graph.getTransferTable();
         if (useServiceDays)
             setServiceDays();
-        remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
+        if (opt.batch)
+            remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        else
+            remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
         if (opt.getModes().isTransit()
             && ! graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,

@@ -92,8 +92,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         ShortestPathTree spt = createShortestPathTree(options);
 
-        final RemainingWeightHeuristic heuristic = rctx.goalDirection ? 
-                rctx.remainingWeightHeuristic : new TrivialRemainingWeightHeuristic();
+        final RemainingWeightHeuristic heuristic = options.batch ? 
+                new TrivialRemainingWeightHeuristic() : rctx.remainingWeightHeuristic; 
 
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
@@ -162,7 +162,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (!_searchTerminationStrategy.shouldSearchContinue(
                     rctx.origin, rctx.target, u, spt, options))
                     break;
-            } else if (rctx.goalDirection && u_vertex == rctx.target) {
+            } else if (!options.batch && u_vertex == rctx.target) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;
@@ -237,15 +237,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     Runtime.getRuntime().freeMemory();
             store.setLongMax("memoryUsed", memoryUsed);
         }
-    }
-
-    private Collection<Edge> getEdgesForVertex(Graph graph, Map<Vertex, List<Edge>> extraEdges,
-            Vertex vertex, TraverseOptions options) {
-
-        if (options.isArriveBy())
-            return GraphLibrary.getIncomingEdges(graph, vertex, extraEdges);
-        else
-            return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
     }
 
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
