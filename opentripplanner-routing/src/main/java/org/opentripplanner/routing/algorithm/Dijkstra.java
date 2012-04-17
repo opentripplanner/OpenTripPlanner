@@ -57,7 +57,7 @@ public class Dijkstra {
          * 
          * A good guess would be: ceiling(graph.averageDegree) ** hoplimit
          */
-        spt = new BasicShortestPathTree(50);
+        spt = new BasicShortestPathTree(options);
         queue = new BinHeap<State>(50);
         // Never init time to 0 since traverseBack will give times less than 0
         State init = new State(origin, options);

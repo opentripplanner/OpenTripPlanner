@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
@@ -48,8 +47,6 @@ public class GenericDijkstra {
 
     private SkipTraverseResultStrategy _skipTraverseResultStrategy;
 
-    private ExtraEdgesStrategy _extraEdgesStrategy;
-
     private boolean _verbose = false;
 
     public GenericDijkstra(TraverseOptions options) {
@@ -81,22 +78,12 @@ public class GenericDijkstra {
         _skipTraverseResultStrategy = skipTraverseResultStrategy;
     }
 
-    public void setExtraEdgesStrategy(ExtraEdgesStrategy extraEdgesStrategy) {
-        _extraEdgesStrategy = extraEdgesStrategy;
-    }
-
     public ShortestPathTree getShortestPathTree(State initialState) {
-        ShortestPathTree spt = createShortestPathTree();
+        ShortestPathTree spt = createShortestPathTree(options);
         OTPPriorityQueue<State> queue = createPriorityQueue();
 
         spt.add(initialState);
         queue.insert(initialState, initialState.getWeight());
-
-        OverlayGraph extraEdges = null;
-        if (_extraEdgesStrategy != null) {
-            extraEdges = new OverlayGraph();
-            _extraEdgesStrategy.addEdgesFor(extraEdges, initialState.getVertex());
-        }
 
         while (!queue.empty()) { // Until the priority queue is empty:
             State u = queue.extract_min();
@@ -112,7 +99,7 @@ public class GenericDijkstra {
                     null, u, spt, options))
                         break;
 
-            for (Edge edge : u_vertex.getEdges(extraEdges, replacementEdges, options.isArriveBy())) {
+            for (Edge edge : options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing()) {
 
                 if (_skipEdgeStrategy != null
                         && _skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
@@ -151,9 +138,9 @@ public class GenericDijkstra {
         return new BinHeap<State>();
     }
 
-    protected ShortestPathTree createShortestPathTree() {
+    protected ShortestPathTree createShortestPathTree(TraverseOptions options) {
         if (_shortestPathTreeFactory != null)
-            return _shortestPathTreeFactory.create();
-        return new BasicShortestPathTree();
+            return _shortestPathTreeFactory.create(options);
+        return new BasicShortestPathTree(options);
     }
 }
