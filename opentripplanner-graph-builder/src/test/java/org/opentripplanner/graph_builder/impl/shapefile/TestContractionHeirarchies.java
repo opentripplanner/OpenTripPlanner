@@ -254,7 +254,7 @@ public class TestContractionHeirarchies extends TestCase {
         options.speed = 1;
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
-        options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        //options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         for (int x1 = 0; x1 < N; ++x1) {
             for (int y1 = 0; y1 < N; ++y1) {
                 for (int x2 = 0; x2 < N; ++x2) {
@@ -456,13 +456,7 @@ public class TestContractionHeirarchies extends TestCase {
         options.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY));
         options.optimize = OptimizeType.QUICK;
         
-        CalendarServiceData data = graph.getService(CalendarServiceData.class);
-        assertNotNull(data);
-        CalendarServiceImpl calendarService = new CalendarServiceImpl();
-        calendarService.setData(data);
-        options.setCalendarService(calendarService);
-        options.setServiceDays(startTime, Arrays.asList("MTA NYCT"));
-        options.setTransferTable(graph.getTransferTable());
+        options.setRoutingContext(graph);
         
         Vertex start1 = graph.getVertex("0072480");
         Vertex end1 = graph.getVertex("0032341");

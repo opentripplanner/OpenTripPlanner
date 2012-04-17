@@ -24,7 +24,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.ws.RequestInf;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
@@ -75,7 +74,7 @@ public class TestRequest extends TestCase {
     private Planner planner;
     
     public void testRequest() {
-        RequestInf request = new Request();
+        TraverseOptions request = new TraverseOptions();
         
         request.addMode(TraverseMode.CAR);
         assertTrue(request.getModes().getCar());
