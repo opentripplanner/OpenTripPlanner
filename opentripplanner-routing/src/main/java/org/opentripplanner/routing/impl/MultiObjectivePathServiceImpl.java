@@ -13,23 +13,16 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -39,7 +32,6 @@ import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 /**
  * Implements a multi-objective goal-directed search algorithm like the one in Sec. 4.2 of: 
  * Perny and Spanjaard. Near Admissible Algorithms for Multiobjective Search.
@@ -101,17 +93,12 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
         // always use the bidirectional heuristic because the others are not precise enough
         RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
-        options.rctx.remainingWeightHeuristic = heuristic;
+        // TODO: some way to ensure that this is set to bidi heuristic
+        //options.rctx.remainingWeightHeuristic = heuristic;
         
         // the states that will eventually be turned into paths and returned
         List<State> returnStates = new LinkedList<State>();
 
-        // Populate any extra edges
-        final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
-        OverlayGraph extraEdges = new OverlayGraph();
-        extraEdgesStrategy.addEdgesFor(extraEdges, options.getOriginVertex());
-        extraEdgesStrategy.addEdgesFor(extraEdges, options.getTargetVertex());
-        
         BinHeap<State> pq = new BinHeap<State>();
 //        List<State> boundingStates = new ArrayList<State>();
         
@@ -197,7 +184,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                     continue QUEUE;
                 }
                 
-                for (Edge e : u.getEdges(extraEdges, null, options.isArriveBy())) {
+                for (Edge e : options.isArriveBy() ? u.getIncoming() : u.getOutgoing()) {
                     STATE: for (State new_sv = e.traverse(su); new_sv != null; new_sv = new_sv.getNextResult()) {
                         if (traverseVisitor != null) {
                             traverseVisitor.visitEdge(e, new_sv);
