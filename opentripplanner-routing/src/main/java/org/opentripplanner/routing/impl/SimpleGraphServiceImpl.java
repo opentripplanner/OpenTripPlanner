@@ -22,23 +22,18 @@ import org.opentripplanner.routing.services.GraphService;
 /**
  * This simple implementation of {@link GraphService} is mostly useful for testing
  * 
- * @author bdferris
  * @see GraphServiceImpl
  * @see GraphService
  */
-public class GraphServiceBeanImpl implements GraphService {
+public class SimpleGraphServiceImpl implements GraphService {
 
     private Graph graph;
 
-    private ContractionHierarchySet contractionHierarchySet;
-
     private CalendarService calendarService;
 
-    public GraphServiceBeanImpl() {
-
-    }
-
-    public GraphServiceBeanImpl(Graph graph) {
+    // TODO fix
+    
+    public SimpleGraphServiceImpl(Graph graph) {
         this.graph = graph;
     }
 
@@ -46,20 +41,12 @@ public class GraphServiceBeanImpl implements GraphService {
         this.graph = graph;
     }
 
-    public void setContractionHierarchySet(ContractionHierarchySet contractionHierarchySet) {
-        this.contractionHierarchySet = contractionHierarchySet;
-    }
-
-    public void setCalendarService(CalendarService calendarService) {
-        this.calendarService = calendarService;
-    }
-
     /****
      * {@link GraphService} Interface
      ****/
 
     @Override
-    public void refreshGraph() {
+    public void refreshGraphs() {
 
     }
 
@@ -69,17 +56,13 @@ public class GraphServiceBeanImpl implements GraphService {
     }
 
     @Override
-    public ContractionHierarchySet getContractionHierarchySet() {
-        return contractionHierarchySet;
-    }
-
-    @Override
-    public CalendarService getCalendarService() {
-        return calendarService;
-    }
-
-    @Override
     public void setLoadLevel(LoadLevel level) {
 
+    }
+
+    @Override
+    public Graph getGraph(String routerId) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
