@@ -24,6 +24,7 @@
 package org.opentripplanner.visibility;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 public class VisibilityGraph {
 
@@ -36,6 +37,10 @@ public class VisibilityGraph {
     int n;
 
     public VisibilityGraph(Environment environment, double epsilon) {
+        this(environment, epsilon, null);
+    }
+
+    public VisibilityGraph(Environment environment, double epsilon, Collection<Point> origins) {
         n = environment.n();
 
         // fill vertex_counts
@@ -49,13 +54,20 @@ public class VisibilityGraph {
         // fill adjacency matrix by checking for inclusion in the
         // visibility polygons
         for (int k1 = 0; k1 < n; k1++) {
-            Polygon polygon_temp = new VisibilityPolygon(environment.kth_point(k1), environment, epsilon);
+            Point point1 = environment.kth_point(k1);
+            if (origins != null && !origins.contains(point1)) 
+                    continue;
+            Polygon polygon_temp = new VisibilityPolygon(point1, environment, epsilon);
             for (int k2 = 0; k2 < n; k2++) {
                 if (k1 == k2)
                     adjacency_matrix[k1][k1] = true;
-                else
-                    adjacency_matrix[k1][k2] = adjacency_matrix[k2][k1] = environment.kth_point(k2).in(
-                            polygon_temp, epsilon);
+                else {
+                    Point point2 = environment.kth_point(k2);
+                    if (origins == null || origins.contains(point2)) {
+                        adjacency_matrix[k1][k2] = adjacency_matrix[k2][k1] = point2.in(
+                                polygon_temp, epsilon);
+                    }
+                }
             }
         }
     }
