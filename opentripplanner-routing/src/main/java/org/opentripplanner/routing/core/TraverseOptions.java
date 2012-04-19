@@ -50,7 +50,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** The complete list of incoming query parameters. */
     public final HashMap<String, String> parameters = new HashMap<String, String>();
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
-    public String routerId;
+    public String routerId = "";
     /** The start location -- either a Vertex name or latitude, longitude in degrees */
     // TODO change this to Doubles and a Vertex
     public String from;
@@ -217,6 +217,13 @@ public class TraverseOptions implements Cloneable, Serializable {
      * testing and graph building situations we need to build a bunch of initial states with 
      * different times and vertices from a single TraverseOptions, without setting all the transit 
      * context or building temporary vertices (with all the exception-throwing checks that entails).
+     * 
+     * While they are conceptually separate, TraverseOptions does maintain a reference to its 
+     * request scope's RoutingContext (and vice versa) so that both do not need to be 
+     * passed/injected separately into tight inner loops within routing algorithms. These references
+     * should be set to null when they leave the request scope -- the routing context becomes
+     * irrelevant at that point, since temporary graph elements have been removed and the graph may
+     * have been reloaded. 
      */
     public RoutingContext rctx;    
     
