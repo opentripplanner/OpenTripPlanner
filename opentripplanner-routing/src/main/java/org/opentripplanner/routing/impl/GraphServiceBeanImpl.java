@@ -25,15 +25,17 @@ import org.opentripplanner.routing.services.GraphService;
  * @see GraphServiceImpl
  * @see GraphService
  */
-public class SimpleGraphServiceImpl implements GraphService {
+public class GraphServiceBeanImpl implements GraphService {
 
     private Graph graph;
 
     private CalendarService calendarService;
 
-    // TODO fix
+    // 0-arg bean constructor
+    public GraphServiceBeanImpl() {
+    }
     
-    public SimpleGraphServiceImpl(Graph graph) {
+    public GraphServiceBeanImpl(Graph graph) {
         this.graph = graph;
     }
 
