@@ -230,7 +230,8 @@ otp.planner.ItineraryDataFactoryStatic = {
             tripDetailsDistanceVerb = this.locale.instructions.bike_verb;
         else if(containsCarMode) 
             tripDetailsDistanceVerb = this.locale.instructions.car_verb;
-        var tripDetailsData = Ext.apply({}, this.details.data, {distanceVerb: tripDetailsDistanceVerb});
+        var tripDetailsData = Ext.apply({}, this.planner.options, this.details.data, {distanceVerb: tripDetailsDistanceVerb});
+        if(tripDetailsData.showFareInfo == null) tripDetailsData.showFareInfo = true; 
 
         var tpId  = this.id + '-' + otp.planner.Utils.TRIP_ID;
         var tpTxt = this.templates.TP_TRIPDETAILS.applyTemplate(tripDetailsData);
