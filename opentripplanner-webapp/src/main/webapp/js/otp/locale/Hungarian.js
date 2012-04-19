@@ -46,13 +46,13 @@ otp.locale.Hungarian = {
     // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
-        safeSym  : "S",
+        safeName : "Bike friendly",
+        safeSym  : "B",
 
-        hillName : "Flattest",
+        hillName : "Flat",
         hillSym  : "F",
 
-        timeName : "Quickest",
+        timeName : "Quick",
         timeSym  : "Q"
     },
 
