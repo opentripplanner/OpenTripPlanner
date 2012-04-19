@@ -52,18 +52,24 @@ public class StreamedOpenStreetMapParser {
     private static final QName qType = new QName("type");
     private static final QName qRole = new QName("role");
 
-    public static void parseMap(final File path, OpenStreetMapContentHandler map) throws IOException,
-            XMLStreamException {
+    public static void parseMap(final File path, OpenStreetMapContentHandler map)
+            throws IOException, XMLStreamException {
+
         BufferedInputStream in = new BufferedInputStream(new FileInputStream(path));
-        parseMap(in, map, false);
+        parseMap(in, map, 1);
+
+        map.doneRelations();
+
+        in = new BufferedInputStream(new FileInputStream(path));
+        parseMap(in, map, 2);
 
         map.secondPhase();
 
         in = new BufferedInputStream(new FileInputStream(path));
-        parseMap(in, map, true);
+        parseMap(in, map, 3);
     }
 
-    public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, boolean onlyNodes) throws IOException,
+    public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, int phase) throws IOException,
             XMLStreamException {
 
         XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -77,17 +83,17 @@ public class StreamedOpenStreetMapParser {
             XMLEvent xmlEvent = xmlEventReader.nextEvent();
             if (xmlEvent.isStartElement()) {
                 StartElement element = xmlEvent.asStartElement();
-                if (onlyNodes && element.getName().equals(qNode)) {
+                if (phase == 3 && element.getName().equals(qNode)) {
                     osmNode = new OSMNode();
                     osmNode.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
                     osmNode.setLat(Double.parseDouble(element.getAttributeByName(qLat).getValue()));
                     osmNode.setLon(Double.parseDouble(element.getAttributeByName(qLon).getValue()));
 
-                } else if (!onlyNodes && element.getName().equals(qWay)) {
+                } else if (phase == 2 && element.getName().equals(qWay)) {
                     osmWay = new OSMWay();
                     osmWay.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
 
-                } else if (!onlyNodes && element.getName().equals(qRelation)) {
+                } else if (phase == 1 && element.getName().equals(qRelation)) {
                     osmRelation = new OSMRelation();
                     osmRelation.setId(Long.parseLong(element.getAttributeByName(qId).getValue()));
 

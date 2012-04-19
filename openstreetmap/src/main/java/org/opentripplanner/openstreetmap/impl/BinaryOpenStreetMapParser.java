@@ -28,38 +28,14 @@ import crosby.binary.Osmformat;
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
     private OpenStreetMapContentHandler _handler;
-    private boolean _nodesOnly = false;
-    private boolean _noNodes   = false;
+    private boolean _parseWays = true;
+    private boolean _parseRelations = true;
+    private boolean _parseNodes = true;
 
     public BinaryOpenStreetMapParser(OpenStreetMapContentHandler handler) {
         _handler = handler;
     }
 
-    /**
-     * Should only nodes be parsed?
-     *
-     * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#biPhase
-     */
-    public void nodesOnly(boolean nodesOnly) {
-        _nodesOnly = nodesOnly;
-
-        if(nodesOnly && _noNodes) {
-            _noNodes = false;
-        }
-    }
-
-    /**
-     * Should only non-nodes (ways and relations) be parsed?
-     *
-     * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#biPhase
-     */
-    public void noNodes(boolean noNodes) {
-        _noNodes = noNodes;
-
-        if(noNodes && _nodesOnly) {
-            _nodesOnly = false;
-        }
-    }
 
     public void complete() {
         // Jump in circles
@@ -67,7 +43,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseNodes(List<Osmformat.Node> nodes) {
-        if(_noNodes) {
+        if(!_parseNodes) {
             return;
         }
 
@@ -96,7 +72,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
         long lastId = 0, lastLat = 0, lastLon = 0;
         int j = 0; // Index into the keysvals array.
 
-        if(_noNodes) {
+        if(!_parseNodes) {
             return;
         }
 
@@ -137,7 +113,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseWays(List<Osmformat.Way> ways) {
-        if(_nodesOnly) {
+        if(!_parseWays) {
             return;
         }
 
@@ -169,7 +145,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseRelations(List<Osmformat.Relation> rels) {
-        if(_nodesOnly) {
+        if(!_parseRelations) {
             return;
         }
 
@@ -224,5 +200,32 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
             }
             throw new IllegalStateException("File requires unknown feature: " + s);
         }
+    }
+
+    /**
+     * Should relations be parsed
+     * 
+     * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
+     */
+    public void setParseWays(boolean parseWays) {
+        this._parseWays = parseWays;
+    }
+
+    /**
+     * Should relations be parsed
+     * 
+     * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
+     */
+    public void setParseRelations(boolean parseRelations) {
+        this._parseRelations = parseRelations;
+    }
+
+    /**
+     * Should nodes be parsed
+     * 
+     * @see org.opentripplanner.graph_builder.services/.sm.OpenStreetMapContentHandler#triPhase
+     */
+    public void setParseNodes(boolean parseNodes) {
+        _parseNodes = parseNodes;
     }
 }
