@@ -167,6 +167,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     
     private class Handler implements OpenStreetMapContentHandler {
 
+        private static final double VISIBILITY_EPSILON = 0.00000001;
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
         private List<Area> _areas = new ArrayList<Area>();
@@ -578,7 +579,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     //areas to prevent way explosion
                     if (visibilityPoints.size() > MAX_AREA_NODES)
                         continue;
-                    VisibilityGraph vg = new VisibilityGraph(areaEnv, 0.0000001, visibilityPoints);
+                    VisibilityGraph vg = new VisibilityGraph(areaEnv, VISIBILITY_EPSILON, visibilityPoints);
                     for (int i = 0; i < nodes.size(); ++i) {
                         OSMNode nodeI = nodes.get(i);
                         for (int j = 0; j < nodes.size(); ++j) {
