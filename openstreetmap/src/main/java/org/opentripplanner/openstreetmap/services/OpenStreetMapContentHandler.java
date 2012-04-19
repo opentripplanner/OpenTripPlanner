@@ -46,4 +46,14 @@ public interface OpenStreetMapContentHandler {
    * Stores a relation.
    */
   public void addRelation(OSMRelation relation);
+
+  /**
+   * Called when the relation-processing phase is complete 
+   */
+  public void doneRelations();
+
+  /**
+   * Called after the final phase, when all nodes are loaded
+   */
+  public void nodesLoaded();
 }

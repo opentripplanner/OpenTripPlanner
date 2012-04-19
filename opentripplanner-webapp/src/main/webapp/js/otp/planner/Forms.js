@@ -247,11 +247,13 @@ otp.planner.StaticForms = {
         var to   = this.m_toForm.getRawValue();
         var fromPlace = this.m_fromForm.getNamedCoord();
         var toPlace   = this.m_toForm.getNamedCoord();
+        var time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue());
         form.setValues({
             from      : from,
             to        : to,
-            fromPlace : fromPlace, 
-            toPlace   : toPlace
+            fromPlace : fromPlace,
+            toPlace   : toPlace,
+            time      : time
         });
     },
 
@@ -503,14 +505,14 @@ otp.planner.StaticForms = {
             if(params.after)
             {
                 time = params.after.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
                 forms.m_arriveByForm.setValue('false');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
                 forms.m_arriveByForm.setValue('true');
                 time = true;
             }
@@ -518,7 +520,7 @@ otp.planner.StaticForms = {
             if(params.time)
             {
                 time = params.time.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
                 time = true;
             }
 
@@ -533,13 +535,15 @@ otp.planner.StaticForms = {
 
             // optimize / minimize option : how to optimize the trip, safest, quickets, least tranfers, etc...
             if(params.min)
-                params.opt = params.min;
+                params.optimize = params.min;
             if(params.opt)
+                params.optimize = params.opt
+            if(params.optimize)
             {
-                forms.m_optimizeForm.setValue(params.opt);
+                forms.m_optimizeForm.setValue(params.optimize);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doOpt(params.opt);
+                    this.m_optionsManager.doOpt(params.optimize);
                 }
             }
 
@@ -557,7 +561,7 @@ otp.planner.StaticForms = {
             {
                 time = params.Hour + ":" +  params.Minute + " " + params.AmPm.toLowerCase();
                 time = time.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
                 time = true;
             }
 
@@ -621,7 +625,7 @@ otp.planner.StaticForms = {
         retVal.fromPlace = this.m_fromForm.getNamedCoord();
         retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
-        retVal.time      = this.m_time.getRawValue();
+        retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue());
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.m_routerIdForm.getValue();
@@ -1035,13 +1039,13 @@ otp.planner.StaticForms = {
     {
         this.m_date = new Ext.form.DateField({
             id:         'trip-date-form',
-            fieldLabel: this.locale.tripPlanner.labels.date,
             name:       'date',
+            fieldLabel: this.locale.tripPlanner.labels.date,
             format:     this.locale.time.date_format,
             allowBlank: false,
             msgTarget:  'qtip',
-            anchor:     "87%",
-            value:      new Date().format(this.locale.time.date_format)
+            value:      new Date().format(this.locale.time.date_format),
+            anchor:     "87%"
         });
 
         this.m_arriveByStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
@@ -1067,13 +1071,13 @@ otp.planner.StaticForms = {
 
         this.m_time = new Ext.ux.form.Spinner({
                 id         : 'trip-time-form',
+                name       : 'time',
                 fieldLabel : this.locale.tripPlanner.labels.when,
                 accelerate : true,
-                width      : 85,
                 msgTarget  : 'qtip',
                 value      : new Date().format(this.locale.time.time_format),
                 strategy   : new Ext.ux.form.Spinner.TimeStrategy({format:this.locale.time.time_format}),
-                name       : 'time'
+                width      : 85
         });
 
         var timePanel = {

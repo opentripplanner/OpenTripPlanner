@@ -46,13 +46,13 @@ otp.locale.Portuguese = {
     // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
-        safeSym  : "S",
+        safeName : "Bike friendly",
+        safeSym  : "B",
 
-        hillName : "Flattest",
+        hillName : "Flat",
         hillSym  : "F",
 
-        timeName : "Quickest",
+        timeName : "Quick",
         timeSym  : "Q"
     },
 
@@ -318,8 +318,8 @@ otp.locale.Portuguese = {
         options: 
         [
           ['TRANSFERS', 'Fewest transfers'],
-          ['QUICK',     'Quickest trip'],
-          ['SAFE',      'Safest trip'],
+          ['QUICK',     'Quick trip'],
+          ['SAFE',      'Bike friendly trip'],
           ['TRIANGLE',  'Custom trip...']
         ],
     
