@@ -53,13 +53,15 @@ public class Planner extends SearchResource {
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response getItineraries() throws JSONException {
 
-        // TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-        // TODO: test inputs, and prepare an error if we can't use said input.
-        // TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
-        // / vertext ids to planner (or error back to user)
-        // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
-        // out so it's used here too...
-
+        /*
+        TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
+        TODO: test inputs, and prepare an error if we can't use said input.
+        TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
+              or vertex ids to planner (or error back to user)
+        TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
+              out so it's used here too...
+        */
+        
         // create response object, containing a copy of all request parameters
         Response response = new Response(httpServletRequest);
         TraverseOptions request = null;
@@ -72,11 +74,8 @@ public class Planner extends SearchResource {
             PlannerError error = new PlannerError(e);
             response.setError(error);
         } finally {
-            // tear down the routing context (remove temporary edges from edge lists)
-            if (request != null && request.rctx != null) {
-                int nRemoved = request.rctx.destroy();
-                LOG.debug("routing context destroyed ({} temporary edges removed)", nRemoved);
-            }
+            if (request != null) 
+                request.cleanup();
         }
         return response;
     }

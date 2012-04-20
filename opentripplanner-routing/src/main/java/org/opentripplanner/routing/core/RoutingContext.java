@@ -41,7 +41,7 @@ public class RoutingContext implements Cloneable {
     
     /* FINAL FIELDS */
     
-    public TraverseOptions opt; // not final so we can reverse-optimize
+    public TraverseOptions opt; // not final so we can reverse-clone
     public final Graph graph;
     public final Vertex fromVertex;
     public final Vertex toVertex;
@@ -84,6 +84,7 @@ public class RoutingContext implements Cloneable {
 
     public RoutingContext(TraverseOptions traverseOptions, Graph graph, boolean useServiceDays) {
         opt = traverseOptions;
+        opt.rctx = this; // set reference immediately to allow temp edge cleanup on exception
         this.graph = graph;
         fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
         toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
@@ -123,8 +124,9 @@ public class RoutingContext implements Cloneable {
             notFound.add("from");
         if (toVertex == null)
             notFound.add("to");
-        if (notFound.size() > 0)
+        if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
+        }
     }
     
     private void findIntermediateVertices() {
