@@ -47,6 +47,7 @@ public class GraphPath {
 
     private double walkDistance = 0;
 
+    // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
 
     /**

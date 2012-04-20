@@ -60,31 +60,25 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+@Service @Scope("singleton")
 public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
-    TraverseOptions options;
-
-    private PathService pathService;
-
-    private FareService fareService;
-
     private GeometryFactory geometryFactory = new GeometryFactory();
 
-    private TransitIndexService transitIndex;
+    @Autowired private PathService pathService;
     
-    public PlanGenerator(TraverseOptions options, PathService pathService) {
-        this.options = options;
-        this.pathService = pathService;
-    }
-
     /** Generates a TripPlan from a Request */
-    public TripPlan generate() {
+    public TripPlan generate(TraverseOptions options) {
 
         // TODO: this seems to only check the endpoints, which are usually auto-generated
         //if ( ! options.isAccessible())
@@ -111,10 +105,6 @@ public class PlanGenerator {
             LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
             throw new PathNotFoundException();
         }
-
-        Graph graph = paths.get(0).getRoutingContext().graph;
-        transitIndex = graph.getService(TransitIndexService.class);
-        fareService = graph.getService(FareService.class);
 
         TripPlan plan = generatePlan(paths, options);
         if (plan != null) {
@@ -178,6 +168,9 @@ public class PlanGenerator {
      * @return itinerary
      */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+        Graph graph = path.getRoutingContext().graph;
+        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
+
         Itinerary itinerary = makeEmptyItinerary(path);
         EdgeNarrative postponedAlerts = null;
         Leg leg = null;
@@ -346,7 +339,7 @@ public class PlanGenerator {
                     }
                 } else if (backEdge instanceof Hop || backEdge instanceof PatternHop) {
                     pgstate = PlanGenState.TRANSIT;
-                    fixupTransitLeg(leg, state);
+                    fixupTransitLeg(leg, state, transitIndex);
                     leg.stop = new ArrayList<Place>();
                 } else {
                     LOG.error("Unexpected state (in PRETRANSIT): " + mode);
@@ -382,7 +375,7 @@ public class PlanGenerator {
                         // interline dwell
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
-                        fixupTransitLeg(leg, state);
+                        fixupTransitLeg(leg, state, transitIndex);
                         leg.startTime = new Date(state.getTimeInMillis());
                         leg.interlineWithPreviousLeg = true;
                     }
@@ -425,7 +418,7 @@ public class PlanGenerator {
         return itinerary;
     }
 
-    private void fixupTransitLeg(Leg leg, State state) {
+    private void fixupTransitLeg(Leg leg, State state, TransitIndexService transitIndex) {
         EdgeNarrative en = state.getBackEdgeNarrative();
         leg.route = en.getName();
         Trip trip = en.getTrip();
@@ -525,6 +518,9 @@ public class PlanGenerator {
         itinerary.startTime = new Date(startState.getTimeInMillis());
         itinerary.endTime = new Date(endState.getTimeInMillis());
         itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
+
+        Graph graph = path.getRoutingContext().graph;
+        FareService fareService = graph.getService(FareService.class);
         if (fareService != null) {
             itinerary.fare = fareService.getCost(path);
         }

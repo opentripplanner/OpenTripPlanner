@@ -42,7 +42,7 @@ public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
-    @Autowired private PathService pathService;
+    @Autowired private PlanGenerator planGenerator;
 
     /**
      * This is the primary entry point for the web service and is used for requesting trip plans.
@@ -82,8 +82,7 @@ public class Planner extends SearchResource {
 
         /* generate trip plan from request, and return it in a response */
         try {
-            PlanGenerator generator = new PlanGenerator(request, pathService);
-            TripPlan plan = generator.generate();
+            TripPlan plan = planGenerator.generate(request);
             response.setPlan(plan);
         } catch (VertexNotFoundException e) {
             PlannerError error = new PlannerError(Message.OUTSIDE_BOUNDS);
