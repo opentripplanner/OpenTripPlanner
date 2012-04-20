@@ -19,17 +19,10 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.common.Message;
-import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.SearchResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.TrivialPathException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.services.PathService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,48 +60,20 @@ public class Planner extends SearchResource {
         // TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
         // out so it's used here too...
 
-        /* create response object, containing a copy of all request parameters */
+        // create response object, containing a copy of all request parameters
         Response response = new Response(httpServletRequest);
-
-        /* create request */
-        TraverseOptions request;
+        TraverseOptions request = null;
         try {
-            request = buildRequest();
-        } catch (ParameterException pe) {
-            PlannerError error = new PlannerError(pe.message);
-            response.setError(error);
-            return response;
-        }
-
-        /* generate trip plan from request, and return it in a response */
-        try {
+            // fill in request from query parameters via shared superclass method
+            request = buildRequest(); 
             TripPlan plan = planGenerator.generate(request);
             response.setPlan(plan);
-        } catch (VertexNotFoundException e) {
-            PlannerError error = new PlannerError(Message.OUTSIDE_BOUNDS);
-            error.setMissing(e.getMissing());
-            response.setError(error);
-        } catch (PathNotFoundException e) {
-            PlannerError error = new PlannerError(Message.PATH_NOT_FOUND);
-            response.setError(error);
-        } catch (LocationNotAccessible e) {
-            PlannerError error = new PlannerError(Message.LOCATION_NOT_ACCESSIBLE);
-            response.setError(error);
-        } catch (TransitTimesException e) {
-            // TODO: improve this to distinguish between days/places with no service
-            // and dates outside those covered by the feed
-            PlannerError error = new PlannerError(Message.NO_TRANSIT_TIMES);
-            response.setError(error);
-        } catch (TrivialPathException e) {
-            PlannerError error = new PlannerError(Message.TOO_CLOSE);
-            response.setError(error);
         } catch (Exception e) {
-            LOG.error("exception planning trip: ", e);
-            PlannerError error = new PlannerError(Message.SYSTEM_ERROR);
+            PlannerError error = new PlannerError(e);
             response.setError(error);
         } finally {
-            // tear down the routing context (remove temporary edges from edgelists)
-            if (request.rctx != null) {
+            // tear down the routing context (remove temporary edges from edge lists)
+            if (request != null && request.rctx != null) {
                 int nRemoved = request.rctx.destroy();
                 LOG.debug("routing context destroyed ({} temporary edges removed)", nRemoved);
             }
