@@ -27,7 +27,7 @@ import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** This represents an error in trip planning. */
+/** This API response element represents an error in trip planning. */
 public class PlannerError {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
@@ -53,7 +53,7 @@ public class PlannerError {
 
     public PlannerError(Exception e) {
         this();
-        Message message = messages.get(e);
+        Message message = messages.get(e.getClass());
         if (message == null) {
             LOG.error("exception planning trip: ", e);
             message = Message.SYSTEM_ERROR;
