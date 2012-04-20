@@ -26,7 +26,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +44,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     private static final int CLAMP_ITINERARIES = 3;
     private static final int CLAMP_TRANSFERS = 4;
 
+    
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /** The complete list of incoming query parameters. */
@@ -219,13 +219,14 @@ public class TraverseOptions implements Cloneable, Serializable {
      * context or building temporary vertices (with all the exception-throwing checks that entails).
      * 
      * While they are conceptually separate, TraverseOptions does maintain a reference to its 
-     * request scope's RoutingContext (and vice versa) so that both do not need to be 
+     * accompanying RoutingContext (and vice versa) so that both do not need to be 
      * passed/injected separately into tight inner loops within routing algorithms. These references
-     * should be set to null when they leave the request scope -- the routing context becomes
+     * should be set to null when the request scope is torn down -- the routing context becomes
      * irrelevant at that point, since temporary graph elements have been removed and the graph may
      * have been reloaded. 
      */
     public RoutingContext rctx;    
+    
     
     /* CONSTRUCTORS */
     
@@ -473,11 +474,11 @@ public class TraverseOptions implements Cloneable, Serializable {
         return arriveBy; 
     }
 
-    // If transit is not to be used, only search for one itinerary.
     public Integer getNumItineraries() { 
         if (getModes().isTransit()) {
             return numItineraries;
         } else {
+            // If transit is not to be used, only search for one itinerary.
             return 1;
         }
     }
@@ -655,15 +656,6 @@ public class TraverseOptions implements Cloneable, Serializable {
         return new NamedPlace(toName, to);
     }
     
-    /* STATIC METHODS */
-    
-//    /**
-//     * Build a request from the parameters in a concrete subclass of SearchResource.
-//     */
-//    public Request(SearchResource) {
-//        
-//    }
-
     
     /* INSTANCE METHODS */
 
@@ -713,6 +705,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return this.rctx;
     }
 
+    /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
     @Override
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
@@ -738,6 +731,7 @@ public class TraverseOptions implements Cloneable, Serializable {
         return false;
     }
 
+    /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
     @Override
     public int hashCode() {
         return from.hashCode() * 524287 + to.hashCode() * 1327144003 
