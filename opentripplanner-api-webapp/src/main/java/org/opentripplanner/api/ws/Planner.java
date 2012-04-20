@@ -28,6 +28,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.spring.Autowire;
 
+/**
+ * This is the primary entry point for the trip planning web service.
+ * All parameters are passed in the query string. These parameters are defined in the abstract
+ * SearchResource superclass, which also has methods for building routing requests from query
+ * parameters. In order for inheritance to work, the REST resources are actually request-scoped 
+ * rather than singleton-scoped.
+ * 
+ * Some parameters may not be honored by the trip planner for some or all itineraries. For
+ * example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
+ * 
+ * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+ *         client making the request.
+ * 
+ * @throws JSONException
+ */
 @Path("/plan") // NOTE - /ws/plan is the full path -- see web.xml
 @XmlRootElement
 @Autowire
@@ -37,25 +52,12 @@ public class Planner extends SearchResource {
 
     @Autowired private PlanGenerator planGenerator;
 
-    /**
-     * This is the primary entry point for the web service and is used for requesting trip plans.
-     * All parameters are passed in the query string.
-     * 
-     * Some parameters may not be honored by the trip planner for some or all itineraries. For
-     * example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
-     * 
-     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
-     *         client making the request.
-     * 
-     * @throws JSONException
-     */
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response getItineraries() throws JSONException {
 
         /*
         TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-        TODO: test inputs, and prepare an error if we can't use said input.
         TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
               or vertex ids to planner (or error back to user)
         TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
