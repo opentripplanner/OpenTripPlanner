@@ -12,9 +12,11 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.api.ws;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -49,20 +51,20 @@ import com.sun.jersey.api.spring.Autowire;
 public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
-
     @Autowired private PlanGenerator planGenerator;
+    @Context protected HttpServletRequest httpServletRequest;
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response getItineraries() throws JSONException {
 
         /*
-        TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-        TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
-              or vertex ids to planner (or error back to user)
-        TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
-              out so it's used here too...
-        */
+         * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
+         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
+         *       or vertex ids to planner (or error back to user)
+         * TODO: org.opentripplanner.routing.impl.PathServiceImpl has COOORD parsing. Abstract that
+         *       out so it's used here too...
+         */
         
         // create response object, containing a copy of all request parameters
         Response response = new Response(httpServletRequest);

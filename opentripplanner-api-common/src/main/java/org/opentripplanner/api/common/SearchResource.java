@@ -114,9 +114,6 @@ public abstract class SearchResource { // RoutingResource
     /** If true, goal direction is turned off and a full path tree is built (specify only once) */
     @DefaultValue("false") @QueryParam("batch") Boolean batch;
     
-    /* Inject the servlet request so we have access to the query parameter map */
-    @Context protected HttpServletRequest httpServletRequest;
-
     /** 
      * Build the 0th Request object from the query parameter lists. 
      * @throws ParameterException when there is a problem interpreting a query parameter
