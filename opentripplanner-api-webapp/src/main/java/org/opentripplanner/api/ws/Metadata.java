@@ -22,7 +22,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.common.SearchResource;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +50,7 @@ public class Metadata {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public GraphMetadata getMetadata(
-            @DefaultValue("") @QueryParam(SearchResource.ROUTER_ID) String routerId)
+            @DefaultValue("") @QueryParam("routerId") String routerId)
             throws JSONException {
         //return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
         return new GraphMetadata(graphService.getGraph(routerId));
