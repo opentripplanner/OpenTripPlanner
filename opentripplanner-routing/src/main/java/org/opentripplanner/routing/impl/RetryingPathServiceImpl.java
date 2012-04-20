@@ -128,6 +128,8 @@ public class RetryingPathServiceImpl implements PathService {
             
             LOG.debug("BEGIN SUBSEARCH");
             ShortestPathTree spt = sptService.getShortestPathTree(currOptions, timeout);
+            if (spt == null) // timeout or other fail
+                break;
             List<GraphPath> somePaths = spt.getPaths();
             LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
                     System.currentTimeMillis() - subsearchBeginTime,
