@@ -15,10 +15,25 @@ package org.opentripplanner.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class MapUtils {
+
+    /**
+     * An extremely common pattern: add an item to a set in a hash value, creating that set if
+     * necessary
+     */
+    public static final <T, U> void addToMapSet(Map<T, Set<U>> mapList, T key, U value) {
+        Set<U> list = mapList.get(key);
+        if (list == null) {
+            list = new HashSet<U>();
+            mapList.put(key, list);
+        }
+        list.add(value);
+    }
 
     /**
      * An extremely common pattern: add an item to a list in a hash value, creating that list if
