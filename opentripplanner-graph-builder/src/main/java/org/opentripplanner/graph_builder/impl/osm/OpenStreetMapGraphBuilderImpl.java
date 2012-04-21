@@ -45,9 +45,13 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -60,6 +64,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.TranslatedString;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
@@ -173,10 +179,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private List<Area> _areas = new ArrayList<Area>();
         private Set<Long> _areaWayIds = new HashSet<Long>();
         private Map<Long, OSMWay> _areaWaysById = new HashMap<Long, OSMWay>();
+        private Map<Long, Set<OSMWay>> _areasForNode = new HashMap<Long, Set<OSMWay>>();
         private List<OSMWay> _singleWayAreas = new ArrayList<OSMWay>();
 
         private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
-        private Set<OSMRelation> _processedRelations = new HashSet<OSMRelation>();
+        private Set<OSMWithTags> _processedAreas = new HashSet<OSMWithTags>();
         private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
         private Set<Long> _areaNodes = new HashSet<Long>();
 
@@ -220,6 +227,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * done in a quick/dirty way.
          */
         class Area {
+
+            public class AreaConstructionException extends RuntimeException {
+                private static final long serialVersionUID = 1L;
+            }
             OSMWithTags parent; // this is the way or relation that has the relevant tags for the
                                 // area
 
@@ -230,6 +241,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // ring assignment
                 List<List<Long>> innerRingNodes = constructRings(innerRingWays);
                 List<List<Long>> outerRingNodes = constructRings(outerRingWays);
+                if (innerRingNodes == null || outerRingNodes == null) {
+                    throw new AreaConstructionException();
+                }
                 ArrayList<List<Long>> allRings = new ArrayList<List<Long>>(innerRingNodes);
                 allRings.addAll(outerRingNodes);
 
@@ -280,8 +294,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 endpoints.add(nextEndNode);
                 endpoints.add(nextStartNode);
                 if (!assignWayToRing(endpoints, way, remainingUnassigned, rings, 0)) {
-                    throw new RuntimeException("failed to construct rings for OSM area "
-                            + parent);
+                    _log.warn("Failed to construct rings for " + parent);
+                    return null;
                 }
                 return rings;
             }
@@ -1040,6 +1054,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (!_areaWayIds.contains(wayId)) {
                     _singleWayAreas.add(way);
                     _areaWaysById.put(wayId, way);
+                    _areaWayIds.add(wayId);
+                    for (Long node : way.getNodeRefs()) {
+                        MapUtils.addToMapSet(_areasForNode, node, way);
+                    }
                 }
                 return;
             }
@@ -1125,12 +1143,22 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         public void nodesLoaded() {
             processMultipolygons();
             AREA: for (OSMWay way : _singleWayAreas) {
+                if (_processedAreas.contains(way)) {
+                    continue;
+                }
                 for (Long nodeRef : way.getNodeRefs()) {
                     if (! _nodes.containsKey(nodeRef)) {
                         continue AREA;
                     }
                 }
-                _areas.add(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList()));                
+                try {
+                    _areas.add(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList()));
+                } catch (Area.AreaConstructionException e) {
+                    // this area cannot be constructed, but we already have all the
+                    //necessary nodes to construct it. So, something must be wrong with
+                    // the area; we'll mark it as processed so that we don't retry.
+                }
+                _processedAreas.add(way);
             }
             
         }
@@ -1155,7 +1183,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          */
         private void processMultipolygons() {
             RELATION: for (OSMRelation relation : _relations.values()) {
-                if (_processedRelations.contains(relation)) {
+                if (_processedAreas.contains(relation)) {
                     continue;
                 }
                 if (!(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
@@ -1177,6 +1205,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             // the edge of the region, so we will simply not route on it.
                             continue RELATION;
                         }
+                        MapUtils.addToMapSet(_areasForNode, nodeId, way);
                     }
                     if (role.equals("inner")) {
                         innerWays.add(way);
@@ -1186,8 +1215,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         _log.warn("Unexpected role " + role + " in multipolygon");
                     }
                 }
-                _processedRelations.add(relation);
-                _areas.add(new Area(relation, outerWays, innerWays));
+                _processedAreas.add(relation);
+                Area area;
+                try {
+                    area = new Area(relation, outerWays, innerWays);
+                } catch (Area.AreaConstructionException e) {
+                    continue;
+                }
+                _areas.add(area);
 
                 for (OSMRelationMember member : relation.getMembers()) {
                     //multipolygons for attribute mapping
