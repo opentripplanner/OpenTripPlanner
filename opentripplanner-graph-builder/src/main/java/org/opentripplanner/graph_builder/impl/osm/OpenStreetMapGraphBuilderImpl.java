@@ -167,7 +167,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     
     private class Handler implements OpenStreetMapContentHandler {
 
-        private static final double VISIBILITY_EPSILON = 0.00000001;
+        private static final double VISIBILITY_EPSILON = 0.000000001;
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
         private List<Area> _areas = new ArrayList<Area>();
