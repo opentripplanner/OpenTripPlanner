@@ -215,7 +215,7 @@ public class Environment {
         return outer_boundary.bbox();
     }
 
-    Polygon get(int i) {
+    public Polygon get(int i) {
         if (i == 0) {
             return outer_boundary;
         } else {
