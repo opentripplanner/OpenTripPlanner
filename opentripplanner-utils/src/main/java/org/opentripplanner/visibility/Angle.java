@@ -53,8 +53,6 @@ class Angle implements Comparable<Angle>, Cloneable {
     }
 
     public Angle(double rise_temp, double run_temp) {
-        if (rise_temp == 0 && run_temp == 0)
-            angle_radians = 0;
         // First calculate 4 quadrant inverse tangent into [-pi,+pi].
         angle_radians = Math.atan2(rise_temp, run_temp);
         // Correct so angles specified in [0, 2*PI).
