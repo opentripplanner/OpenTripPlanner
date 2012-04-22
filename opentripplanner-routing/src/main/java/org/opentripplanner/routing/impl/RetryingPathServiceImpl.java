@@ -50,8 +50,8 @@ public class RetryingPathServiceImpl implements PathService {
     private static final int MAX_TIME_FACTOR = 2;
     private static final int MAX_WEIGHT_FACTOR = 2;
 
-    @Autowired private GraphService graphService;
-    @Autowired private SPTService sptService;
+    @Autowired public GraphService graphService;
+    @Autowired public SPTService sptService;
 
     private double firstPathTimeout = 0; // seconds
     private double multiPathTimeout = 0; // seconds
