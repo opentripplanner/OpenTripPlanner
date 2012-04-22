@@ -38,20 +38,30 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
         try {
             if (_path.getName().endsWith(".gz")) {
                 InputStream in = new GZIPInputStream(new FileInputStream(_path));
-                StreamedOpenStreetMapParser.parseMap(in, handler, false);
+                StreamedOpenStreetMapParser.parseMap(in, handler, 1);
+
+                handler.doneRelations();
+
+                in = new GZIPInputStream(new FileInputStream(_path));
+                StreamedOpenStreetMapParser.parseMap(in, handler, 2);
 
                 handler.secondPhase();
 
                 in = new GZIPInputStream(new FileInputStream(_path));
-                StreamedOpenStreetMapParser.parseMap(in, handler, true);
+                StreamedOpenStreetMapParser.parseMap(in, handler, 3);
             } else if (_path.getName().endsWith(".bz2")) {
                 InputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
-                StreamedOpenStreetMapParser.parseMap(in, handler, false);
+                StreamedOpenStreetMapParser.parseMap(in, handler, 1);
+
+                handler.doneRelations();
+
+                in = new BZip2CompressorInputStream(new FileInputStream(_path));
+                StreamedOpenStreetMapParser.parseMap(in, handler, 2);
 
                 handler.secondPhase();
 
                 in = new BZip2CompressorInputStream(new FileInputStream(_path));
-                StreamedOpenStreetMapParser.parseMap(in, handler, true);
+                StreamedOpenStreetMapParser.parseMap(in, handler, 3);
             } else {
                 StreamedOpenStreetMapParser.parseMap(_path, handler);
             }

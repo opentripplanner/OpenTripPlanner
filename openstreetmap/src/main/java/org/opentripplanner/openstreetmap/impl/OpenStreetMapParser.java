@@ -50,15 +50,18 @@ public class OpenStreetMapParser {
         try {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(in);
-            processDocument(doc, map, false);
+            processDocument(doc, map, 1);
+            map.doneRelations();
+            processDocument(doc, map, 2);
             map.secondPhase();
-            processDocument(doc, map, true);
+            processDocument(doc, map, 3);
+            map.nodesLoaded();
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void processDocument(Document doc, OpenStreetMapContentHandler map, boolean nodesOnly) {
+    private void processDocument(Document doc, OpenStreetMapContentHandler map, int phase) {
         Node osm = doc.getFirstChild();
         Node node = osm.getFirstChild();
         while (node != null) {
@@ -67,7 +70,7 @@ public class OpenStreetMapParser {
                 continue;
             }
             Element element = (Element) node;
-            if (nodesOnly && element.getTagName().equals("node")) {
+            if (phase == 3 && element.getTagName().equals("node")) {
                 OSMNode osmNode = new OSMNode();
 
                 osmNode.setId(Long.parseLong(element.getAttribute("id")));
@@ -76,7 +79,7 @@ public class OpenStreetMapParser {
 
                 processTags(osmNode, element);
                 map.addNode(osmNode);
-            } else if (!nodesOnly && element.getTagName().equals("way")) {
+            } else if (phase == 2 && element.getTagName().equals("way")) {
                 OSMWay osmWay = new OSMWay();
                 osmWay.setId(Long.parseLong(element.getAttribute("id")));
                 processTags(osmWay, element);
@@ -97,7 +100,7 @@ public class OpenStreetMapParser {
                 }
 
                 map.addWay(osmWay);
-            } else if (!nodesOnly && element.getTagName().equals("relation")) {
+            } else if (phase == 1 && element.getTagName().equals("relation")) {
                 OSMRelation osmRelation = new OSMRelation();
                 osmRelation.setId(Long.parseLong(element.getAttribute("id")));
                 processTags(osmRelation, element);

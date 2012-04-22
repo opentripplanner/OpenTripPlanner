@@ -79,7 +79,7 @@ public class GraphBuilderAnnotation implements Serializable {
         TRIP_DEGENERATE("Trip %s has fewer than two stops.  We will not use it for routing. "
                 + "This is probably an error in your data"), 
         TRIP_OVERTAKING("Possible GTFS feed error: Trip %s overtakes trip %s (which has the same "
-                + "stops) at stop index %i. This will be handled correctly but inefficiently."), 
+                + "stops) at stop index %d. This will be handled correctly but inefficiently."), 
         TRIP_DUPLICATE("Possible GTFS feed error: Duplicate trip (skipping). New: %s Existing: %s"), 
         TRIP_DUPLICATE_DEPARTURE("Possible GTFS feed error: Duplicate first departure time. New "
                 + "trip: %s Existing trip: %s This will be handled correctly but inefficiently."), 

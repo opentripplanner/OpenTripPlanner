@@ -23,6 +23,8 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -100,7 +102,9 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
             try {
                 if( _visitedMapTiles.add(key))
                     _parser.parseMap(pathToMapTile, _contentHandler);
-            } catch (Exception ex) {
+            } catch (IOException ex) {
+                throw new IllegalStateException("error reading osm file " + pathToMapTile, ex);
+            } catch (SAXException ex) {
                 throw new IllegalStateException("error parsing osm file " + pathToMapTile, ex);
             }
         }

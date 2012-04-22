@@ -277,9 +277,9 @@ otp.core.ComboBoxStatic = {
     /** */
     clearGeocode : function()
     {
-        geocodeName  = null;
-        geocodeCoord = null;
-        geocodeRec   = null;
+        this.geocodeName  = null;
+        this.geocodeCoord = null;
+        this.geocodeRec   = null;
     },
 
 

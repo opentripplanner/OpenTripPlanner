@@ -60,7 +60,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
-            HashMap<AgencyAndId, PreBoardEdge> preBoardEdges, HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
+            HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
+            HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
         this.variantsByAgency = variantsByAgency;
         this.variantsByRoute = variantsByRoute;
@@ -69,6 +70,26 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.preAlightEdges = preAlightEdges;
         this.directionsForRoute = directionsByRoute;
         this.modes = modes;
+    }
+
+    public void merge(HashMap<String, List<RouteVariant>> variantsByAgency,
+            HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
+            HashMap<AgencyAndId, RouteVariant> variantsByTrip,
+            HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
+            HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
+            HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
+
+        MapUtils.mergeIn(this.variantsByAgency, variantsByAgency);
+        MapUtils.mergeIn(this.variantsByRoute, variantsByRoute);
+        this.variantsByTrip.putAll(variantsByTrip);
+        this.preBoardEdges.putAll(preBoardEdges);
+        this.preAlightEdges.putAll(preAlightEdges);
+        MapUtils.mergeIn(this.directionsForRoute, directionsByRoute);
+        for (TraverseMode mode : modes) {
+            if (!this.modes.contains(mode)) {
+                this.modes.add(mode);
+            }
+        }
     }
 
     @Override
