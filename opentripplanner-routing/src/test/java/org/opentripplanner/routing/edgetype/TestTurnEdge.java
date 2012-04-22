@@ -20,7 +20,7 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -64,7 +64,7 @@ public class TestTurnEdge extends TestCase {
         int expectedSecElapsed = (int) (streetLength / options.speed);
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
-        State s0 = new State(TestUtils.toSeconds(startTime), start, options);
+        State s0 = new State(start, TestUtils.toSeconds(startTime), options);
         State s1 = ee.traverse(s0);
 
         assertNotNull(s1);
@@ -73,7 +73,7 @@ public class TestTurnEdge extends TestCase {
         assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis() / 1000) < 10);
 
         options.setArriveBy(true);
-        s0 = new State(TestUtils.toSeconds(endTime), end, options);
+        s0 = new State(end, TestUtils.toSeconds(endTime), options);
         s1 = ee.traverse(s0);
 
         assertNotNull(s1);
@@ -152,8 +152,10 @@ public class TestTurnEdge extends TestCase {
         
         // with no maxWalkDistance, the transfer will not be taken
 
+        GenericAStar aStar = new GenericAStar();
         TraverseOptions options = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
+        options.setRoutingContext(graph, blOut, trIn);
+        ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(trIn, false);
         assertNotNull(path);
@@ -168,7 +170,8 @@ public class TestTurnEdge extends TestCase {
 
         // with a maxWalkDistance, the transfer will be taken.
         options.setMaxWalkDistance(10000);
-        spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
+        options.setRoutingContext(graph, blOut, trIn);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(trIn, false);
         assertNotNull(path);

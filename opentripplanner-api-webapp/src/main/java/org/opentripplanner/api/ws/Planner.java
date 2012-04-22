@@ -51,7 +51,7 @@ import com.sun.jersey.api.spring.Autowire;
 public class Planner extends SearchResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
-    @Autowired private PlanGenerator planGenerator;
+    @Autowired public PlanGenerator planGenerator;
     @Context protected HttpServletRequest httpServletRequest;
 
     @GET
@@ -71,7 +71,7 @@ public class Planner extends SearchResource {
         TraverseOptions request = null;
         try {
             // fill in request from query parameters via shared superclass method
-            request = buildRequest(); 
+            request = super.buildRequest(); 
             TripPlan plan = planGenerator.generate(request);
             response.setPlan(plan);
         } catch (Exception e) {

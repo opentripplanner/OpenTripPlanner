@@ -20,7 +20,7 @@ import java.util.HashMap;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
@@ -162,20 +162,23 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertEquals(3, start.getDegreeOut());
         assertEquals(3, start.getDegreeIn());
 
-        TraverseOptions wo = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(gg, start, end, 0, wo);
+        GenericAStar aStar = new GenericAStar();
+        TraverseOptions opt = new TraverseOptions();
+        opt.setRoutingContext(gg, start, end);
+        ShortestPathTree spt = aStar.getShortestPathTree(opt);
         assertNotNull(spt);
 
         //test that the option to walk bikes on the first or last segment works
         
-        wo = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        opt = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
         
         //Real live cyclists tell me that they would prefer to ride around the long way than to 
         //walk their bikes the short way.  If we slow down the default biking speed, that will 
         //force a change in preferences.
-        wo.speed = 2; 
+        opt.speed = 2; 
         
-        spt = AStar.getShortestPathTree(gg, start, carlton, 0, wo);
+        opt.setRoutingContext(gg, start, carlton);
+        spt = aStar.getShortestPathTree(opt);
         assertNotNull(spt);
         /* commented out as bike walking is not supported */
         /*

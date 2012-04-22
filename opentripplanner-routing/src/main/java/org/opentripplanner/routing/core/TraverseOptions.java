@@ -26,6 +26,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -686,10 +687,10 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public void setRoutingContext (Graph graph) {
-        // TODO: this should probably convert the relative timeouts to absolute
-        // since it is called right before a search begins
         if (rctx == null) {
             this.rctx = new RoutingContext(this, graph); // graphService.getGraph(routerId)
+            // check after reference established to allow temp edge cleanup on exception
+            this.rctx.check();
         } else {
             if (rctx.graph == graph) {
                 LOG.debug("keeping existing routing context");
@@ -701,6 +702,18 @@ public class TraverseOptions implements Cloneable, Serializable {
         }
     }
     
+    /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
+    public void setRoutingContext (Graph graph, Vertex from, Vertex to) {
+        if (rctx != null)
+            this.rctx.destroy();
+        this.rctx = new RoutingContext(this, graph, from, to);
+    }
+
+    /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
+    public void setRoutingContext (Graph graph, String from, String to) {
+        this.setRoutingContext(graph, graph.getVertex(from), graph.getVertex(to));
+    }
+
     public RoutingContext getRoutingContext () {
         return this.rctx;
     }

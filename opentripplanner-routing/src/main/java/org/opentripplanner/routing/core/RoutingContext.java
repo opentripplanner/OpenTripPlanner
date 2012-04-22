@@ -10,6 +10,7 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -49,9 +50,9 @@ public class RoutingContext implements Cloneable {
     public final Vertex origin;
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
-    ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
+    public final ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
     //public final Calendar calendar;
-    public final CalendarServiceImpl calendarService;
+    public final CalendarService calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public final GenericAStarFactory aStarSearchFactory = null;
     public final RemainingWeightHeuristic remainingWeightHeuristic;
@@ -79,75 +80,65 @@ public class RoutingContext implements Cloneable {
     /* CONSTRUCTORS */
     
     public RoutingContext(TraverseOptions traverseOptions, Graph graph) {
-        this(traverseOptions, graph, true);
+        this(traverseOptions, graph, null, null);
     }
 
-    public RoutingContext(TraverseOptions traverseOptions, Graph graph, boolean useServiceDays) {
-        opt = traverseOptions;
-        opt.rctx = this; // set reference immediately to allow temp edge cleanup on exception
+    public RoutingContext(TraverseOptions traverseOptions, Graph graph, Vertex from, Vertex to) {
+        this.opt = traverseOptions;
         this.graph = graph;
-        fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
-        toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
-        // state.reversedClone() will have to set the vertex, not get it from opts
+        if (from == null && to == null) {
+            // normal mode, search for vertices based on fromPlace and toPlace
+            fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
+            toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
+            if (opt.intermediatePlaces != null) {
+                for (NamedPlace intermediate : opt.intermediatePlaces) {
+                    Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
+                    intermediateVertices.add(vertex);
+                }
+            }
+        } else { 
+            // debug mode, force endpoint vertices to those specified rather than searching
+            fromVertex = from;
+            toVertex = to;
+        }
         origin = opt.arriveBy ? toVertex : fromVertex;
         target = opt.arriveBy ? fromVertex : toVertex;
-        checkEndpointVertices();
-        findIntermediateVertices();
-        CalendarServiceData csData = graph.getService(CalendarServiceData.class);
-        if (csData != null) {
-            calendarService = new CalendarServiceImpl();
-            calendarService.setData(csData);
-        } else {
-            calendarService = null;
-        }
+        calendarService = graph.getCalendarService();
         transferTable = graph.getTransferTable();
-        if (useServiceDays)
-            setServiceDays();
+        setServiceDays();
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
-        if (opt.getModes().isTransit()
-            && ! graph.transitFeedCovers(opt.dateTime)) {
+    }
+    
+    
+    /* INSTANCE METHODS */
+    
+    public void check() {
+        ArrayList<String> notFound = new ArrayList<String>();
+        if (fromVertex == null) {
+            notFound.add("from");
+        }
+        //if ( ! opt.batch)
+        if (toVertex == null) {
+            notFound.add("to");
+        }
+        for (int i = 0; i < intermediateVertices.size(); i++) {
+            if (intermediateVertices.get(i) == null) {
+                notFound.add("intermediate." + i);
+            }
+        }
+        if (notFound.size() > 0) {
+            throw new VertexNotFoundException(notFound);
+        }
+        if (opt.getModes().isTransit() && ! graph.transitFeedCovers(opt.dateTime)) {
             // user wants a path through the transit network,
             // but the date provided is outside those covered by the transit feed.
             throw new TransitTimesException();
         }
     }
     
-    
-    /* INSTANCE METHODS */
-    
-    private void checkEndpointVertices() {
-        ArrayList<String> notFound = new ArrayList<String>();
-        if (fromVertex == null)
-            notFound.add("from");
-        if (toVertex == null)
-            notFound.add("to");
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }
-    }
-    
-    private void findIntermediateVertices() {
-        if (opt.intermediatePlaces == null)
-            return;
-        ArrayList<String> notFound = new ArrayList<String>();
-        int i = 0;
-        for (NamedPlace intermediate : opt.intermediatePlaces) {
-            Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
-            if (vertex == null) {
-                notFound.add("intermediate." + i);
-            } else {
-                intermediateVertices.add(vertex);
-            }
-            i += 1;
-        }
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
-        }        
-    }
-
     /**
      *  Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative
      *  to the search time. This information is very heavily used (at every transit boarding) and Date operations were

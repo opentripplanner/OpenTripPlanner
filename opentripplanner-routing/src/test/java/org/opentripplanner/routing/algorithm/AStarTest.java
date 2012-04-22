@@ -96,10 +96,8 @@ public class AStarTest {
 
         TraverseOptions options = new TraverseOptions();
         options.speed = 1.0;
-
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		0, options);
-
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
         List<State> states = path.states;
@@ -121,9 +119,8 @@ public class AStarTest {
         TraverseOptions options = new TraverseOptions();
         options.speed = 1.0;
         options.setArriveBy(true);
-
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		1000, options);
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
 
@@ -165,8 +162,8 @@ public class AStarTest {
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		0, options);
+        options.setRoutingContext(_graph, fromLocation, toLocation);
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(toLocation, false);
 
@@ -201,8 +198,8 @@ public class AStarTest {
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		1000, options);
+        options.setRoutingContext(_graph, fromLocation, toLocation);
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(fromLocation, false);
 
