@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.bike_rental;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,7 +13,6 @@ import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,13 +59,16 @@ public class BikeRentalUpdater implements Runnable {
                 vertex.setSpacesAvailable(station.spacesAvailable);
             }
         }
+        List<BikeRentalStationVertex> toRemove = new ArrayList<BikeRentalStationVertex>();
         for (Entry<String, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
             if (stationIds.contains(entry.getKey()))
                 continue;
-            Vertex vertex = entry.getValue();
+            BikeRentalStationVertex vertex = entry.getValue();
             graph.removeVertexAndEdges(vertex);
+            toRemove.add(vertex);
             //TODO: need to unsplit any streets that were split
         }
+        verticesByStation.keySet().removeAll(toRemove);
 
     }
 
