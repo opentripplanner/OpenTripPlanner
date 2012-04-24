@@ -48,6 +48,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
+    /* TODO no defaults should be set here, they should all be handled in one place (searchresource) */ 
     /** The complete list of incoming query parameters. */
     public final HashMap<String, String> parameters = new HashMap<String, String>();
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
@@ -209,7 +210,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public boolean reverseOptimizing = false;
 
     /** when true, do not use goal direction or stop at the target, build a full SPT */
-    public boolean batch = true;
+    public boolean batch = false;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States 
@@ -573,6 +574,10 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setMinTransferTime(Integer minTransferTime) {
         this.minTransferTime = minTransferTime;
+    }
+
+    public void setBatch(boolean batch) {
+        this.batch = batch;
     }
     
     public Integer getMinTransferTime() {
