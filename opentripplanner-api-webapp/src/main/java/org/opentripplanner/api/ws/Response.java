@@ -37,6 +37,10 @@ public class Response {
 
     public Response(ServletRequest sr) {
         this.requestParameters = new HashMap<String, String>();
+        if (sr == null) { 
+            // for tests where there is no http request
+            return;
+        }
         // include only the first instance of each query parameter
         @SuppressWarnings("unchecked")
         Map<String, String[]> params = sr.getParameterMap();
