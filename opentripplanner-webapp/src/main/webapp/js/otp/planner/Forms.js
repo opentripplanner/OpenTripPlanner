@@ -247,7 +247,7 @@ otp.planner.StaticForms = {
         var to   = this.m_toForm.getRawValue();
         var fromPlace = this.m_fromForm.getNamedCoord();
         var toPlace   = this.m_toForm.getNamedCoord();
-        var time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue());
+        var time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
         form.setValues({
             from      : from,
             to        : to,
@@ -505,14 +505,14 @@ otp.planner.StaticForms = {
             if(params.after)
             {
                 time = params.after.replace(/\./g, "");
-                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 forms.m_arriveByForm.setValue('false');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
-                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 forms.m_arriveByForm.setValue('true');
                 time = true;
             }
@@ -520,7 +520,7 @@ otp.planner.StaticForms = {
             if(params.time)
             {
                 time = params.time.replace(/\./g, "");
-                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 time = true;
             }
 
@@ -561,7 +561,7 @@ otp.planner.StaticForms = {
             {
                 time = params.Hour + ":" +  params.Minute + " " + params.AmPm.toLowerCase();
                 time = time.replace(/\./g, "");
-                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time));
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 time = true;
             }
 
@@ -625,7 +625,7 @@ otp.planner.StaticForms = {
         retVal.fromPlace = this.m_fromForm.getNamedCoord();
         retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
-        retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue());
+        retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.m_routerIdForm.getValue();

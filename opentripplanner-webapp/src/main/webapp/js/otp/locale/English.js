@@ -224,7 +224,7 @@ otp.locale.English = {
         seconds_abbrev : "secs",
         format         : "F jS, Y @ g:ia",
         date_format    : "m-d-Y",
-        time_format    : "g:ia",
+        time_format    : "g:i a",
         months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 
