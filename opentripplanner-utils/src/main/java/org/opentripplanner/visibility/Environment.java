@@ -87,7 +87,7 @@ public class Environment {
         return true;
     }
 
-    boolean is_valid(double epsilon) {
+    public boolean is_valid(double epsilon) {
         if (n() <= 2)
             return false;
 

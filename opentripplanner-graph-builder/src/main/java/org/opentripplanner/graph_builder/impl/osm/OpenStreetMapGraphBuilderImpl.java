@@ -611,9 +611,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     //FIXME: temporary hard limit on size of 
                     //areas to prevent way explosion
-                    if (visibilityPoints.size() > MAX_AREA_NODES)
+                    if (visibilityPoints.size() > MAX_AREA_NODES) {
+                        _log.warn("Area " + area.parent + " is too complicated (" + visibilityPoints.size() + " > " + MAX_AREA_NODES);
                         continue;
+                    }
 
+                    if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
+                        _log.warn("Area " + area.parent + " is not epsilon-valid (epsilon = " + VISIBILITY_EPSILON + ")");
+                        continue;
+                    }
                     VisibilityGraph vg = new VisibilityGraph(areaEnv, VISIBILITY_EPSILON, visibilityPoints);
                     for (int i = 0; i < nodes.size(); ++i) {
                         OSMNode nodeI = nodes.get(i);
