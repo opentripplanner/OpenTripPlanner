@@ -123,15 +123,31 @@ otp.util.DateUtils = {
     /** Make a Date object from an ISO 8601 date string (ignoring time zone) */
     isoDateStringToDate : function(str)
     {
-        if (!str)
-            return null;
-        if (str.lastIndexOf("Z") != -1) {
-        	str = str.substring(0, str.length - 1);
+        var date = null;
+        if(str)
+        {
+            if (str.lastIndexOf("Z") != -1) {
+                str = str.substring(0, str.length - 1);
+            }
+            var tokens = str.split(/[\-\+T:]/);
+            date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3], tokens[4], tokens[5], 0);
         }
-        var tokens = str.split(/[\-\+T:]/);
-        var date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3],
-                tokens[4], tokens[5], 0);
         return date;
+    },
+
+    /** make an iso [YYYY]-[MM]-[DD] (2012-04-22) date for the api */
+    dateToIsoDateString : function(date, defVal)
+    {
+        var retVal = defVal;
+        try
+        {
+            retVal = date.toISOString().substring(0,10);
+        }
+        catch(e)
+        {
+            console.log("WARN EXCEPTION in dateToIsoString(): " + e);
+        }
+        return retVal;
     },
 
     /** */

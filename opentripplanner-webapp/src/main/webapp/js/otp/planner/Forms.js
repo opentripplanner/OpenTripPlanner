@@ -243,16 +243,14 @@ otp.planner.StaticForms = {
         this.hideErrorDialogs();
 
         // step 3: fix up some of the form values before sending onto the trip planner web service
-        var from = this.m_fromForm.getRawValue();
-        var to   = this.m_toForm.getRawValue();
         var fromPlace = this.m_fromForm.getNamedCoord();
         var toPlace   = this.m_toForm.getNamedCoord();
         var time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
+        var date      = otp.util.DateUtils.dateToIsoDateString(this.m_date.getValue(), this.m_date.getRawValue());
         form.setValues({
-            from      : from,
-            to        : to,
             fromPlace : fromPlace,
             toPlace   : toPlace,
+            date      : date,
             time      : time
         });
     },
@@ -790,6 +788,7 @@ otp.planner.StaticForms = {
 
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
+        var dateParam    = new Ext.form.Hidden({name: 'date',      value: ''});
         //this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
 
         var conf = {
@@ -800,6 +799,7 @@ otp.planner.StaticForms = {
             keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
+                            dateParam,
                             this.m_routerIdForm,
                             this.m_toPlace,
                             this.m_fromPlace,
@@ -994,7 +994,8 @@ otp.planner.StaticForms = {
 
 
     /** */
-    addIntermediatePlace : function(ll) {
+    addIntermediatePlace : function(ll)
+    {
         var intPlaceField = new Ext.form.TextField({
             text: "hello",
             columnWidth: 0.75
@@ -1039,7 +1040,7 @@ otp.planner.StaticForms = {
     {
         this.m_date = new Ext.form.DateField({
             id:         'trip-date-form',
-            name:       'date',
+            name:       'ui_date',
             fieldLabel: this.locale.tripPlanner.labels.date,
             format:     this.locale.time.date_format,
             allowBlank: false,
