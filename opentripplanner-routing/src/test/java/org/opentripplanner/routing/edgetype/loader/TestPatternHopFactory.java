@@ -376,6 +376,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
 
         TraverseOptions options = new TraverseOptions(context);
+        options.getModes().setWalk(false);
         options.getModes().setBicycle(true);
         options.getModes().setTransit(true);
 

@@ -23,10 +23,11 @@ import org.opentripplanner.routing.graph.Vertex;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * An edge that costs nothing to traverse.  Used for connecting intersection vertices to the main
+ * An edge that costs nothing to traverse. Used for connecting intersection vertices to the main
  * edge-based graph.
+ * 
  * @author novalis
- *
+ * 
  */
 public class FreeEdge extends AbstractEdge {
 
@@ -35,12 +36,12 @@ public class FreeEdge extends AbstractEdge {
     public FreeEdge(Vertex from, Vertex to) {
         super(from, to);
     }
-    
+
     @Override
     public State traverse(State s0) {
-    	EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
-    	StateEditor s1 = s0.edit(this, en);
-    	s1.incrementWeight(1);
+        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions()));
+        StateEditor s1 = s0.edit(this, en);
+        s1.incrementWeight(1);
         return s1.makeState();
     }
 
@@ -63,7 +64,7 @@ public class FreeEdge extends AbstractEdge {
     public String getName() {
         return null;
     }
-    
+
     public String toString() {
         return "FreeEdge(" + fromv + " -> " + tov + ")";
     }

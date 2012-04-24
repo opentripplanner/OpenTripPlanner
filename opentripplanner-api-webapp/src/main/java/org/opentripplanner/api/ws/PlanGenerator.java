@@ -609,7 +609,7 @@ public class PlanGenerator {
             options.setMaxWalkDistance(request.getMaxWalkDistance());
         }
         if (request.getWalkSpeed() > 0) {
-            options.speed = request.getWalkSpeed();
+            options.setWalkSpeed(request.getWalkSpeed());
         }
         options.setTriangleSafetyFactor(request.getTriangleSafetyFactor());
         options.setTriangleSlopeFactor(request.getTriangleSlopeFactor());

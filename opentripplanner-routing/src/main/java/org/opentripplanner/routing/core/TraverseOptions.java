@@ -40,7 +40,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     private static final Logger _log = LoggerFactory.getLogger(TraverseOptions.class);
 
     /** max speed along streets, in meters per second */
-    public double speed;
+    private double walkSpeed;
+    private double bikeSpeed;
+    private double carSpeed;
 
     private TraverseModeSet modes;
 
@@ -109,6 +111,27 @@ public class TraverseOptions implements Cloneable, Serializable {
     // it is assumed that getting off an elevator is completely free
 
     /**
+     * Time to rent a bike
+     */
+    public int bikeRentalPickupTime = 60;
+
+    /**
+     * Cost of renting a bike. The cost is a bit more than actual time
+     * to model the associated cost and trouble.
+     */
+    public int bikeRentalPickupCost = 120;
+
+    /**
+     * Time to drop-off a rented bike
+     */
+    public int bikeRentalDropoffTime = 30;
+
+    /**
+     * Cost of dropping-off a rented bike
+     */
+    public int bikeRentalDropoffCost = 30;
+
+    /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a
      * multiplier. The default value treats wait and on-vehicle time as the same.
      * 
@@ -124,7 +147,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     public double waitAtBeginningFactor = 0.2;
 
     /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
-    public int boardCost = 60 * 5;
+    protected int walkBoardCost = 60 * 5;
+    protected int bikeBoardCost = 60 * 10; // cyclists hate loading their bike a second time
 
     /**
      * Do not use certain named routes
@@ -251,7 +275,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
-        speed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
+        walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
+        bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
+        carSpeed = 15; // 15 m/s, ~35 mph, a random driving speed
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
         calendar = Calendar.getInstance();
         walkingOptions = this;
@@ -335,13 +361,15 @@ public class TraverseOptions implements Cloneable, Serializable {
     public boolean equals(Object o) {
         if (o instanceof TraverseOptions) {
             TraverseOptions to = (TraverseOptions) o;
-            return speed == to.speed && maxWeight == to.maxWeight && worstTime == to.worstTime
+            return walkSpeed == to.walkSpeed && bikeSpeed == to.bikeSpeed && carSpeed == to.carSpeed
+                    && maxWeight == to.maxWeight && worstTime == to.worstTime
                     && getModes().equals(to.getModes()) && isArriveBy() == to.isArriveBy()
                     && wheelchairAccessible == to.wheelchairAccessible
                     && optimizeFor == to.optimizeFor && maxWalkDistance == to.maxWalkDistance
                     && transferPenalty == to.transferPenalty
                     && maxSlope == to.maxSlope && walkReluctance == to.walkReluctance
-                    && waitReluctance == to.waitReluctance && boardCost == to.boardCost
+                    && waitReluctance == to.waitReluctance
+                    && walkBoardCost == to.walkBoardCost && bikeBoardCost == to.bikeBoardCost
                     && bannedRoutes.equals(to.bannedRoutes)
                     && bannedTrips.equals(to.bannedTrips)
                     && minTransferTime == to.minTransferTime
@@ -356,20 +384,20 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
 
     public int hashCode() {
-        return new Double(speed).hashCode() + new Double(maxWeight).hashCode()
+        return new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
+                + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimizeFor.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + boardCost + bannedRoutes.hashCode() + bannedTrips.hashCode() * 1373
-                + minTransferTime * 20996011 + (int) nonpreferredTransferPenalty
-                + (int) transferPenalty * 163013803 
+                + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
+                + bannedTrips.hashCode() * 1373 + minTransferTime * 20996011
+                + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321
-                ;
+                + new Double(stairsReluctance).hashCode() * 315595321;
     }
 
     public void setArriveBy(boolean back) {
@@ -397,15 +425,12 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
-            speed = 5; // 5 m/s, ~11 mph, a random bicycling speed.
-            boardCost = 10 * 60; // cyclists hate loading their bike a second time
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
-            walkingOptions.speed *= 0.3; //assume walking bikes is slow
+            walkingOptions.walkSpeed *= 0.3; //assume walking bikes is slow
             walkingOptions.optimizeFor = optimizeFor;
         } else if (modes.getCar()) {
-            speed = 15; // 15 m/s, ~35 mph, a random driving speed
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
@@ -523,7 +548,9 @@ public class TraverseOptions implements Cloneable, Serializable {
     public int similarity(TraverseOptions options) {
         int s = 0;
 
-        if(getModes().getNonTransitMode() == options.getModes().getNonTransitMode()) {
+        // TODO Check this: perfect equality between non-transit modes.
+        // For partial equality, should we return a smaller similarity score?
+        if (getModes().getNonTransitSet().equals(options.getModes().getNonTransitSet())) {
             s += 1000;
         }
         if(optimizeFor == options.optimizeFor) {
@@ -561,5 +588,72 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setTriangleTimeFactor(double triangleTimeFactor) {
         this.triangleTimeFactor = triangleTimeFactor;
         walkingOptions.triangleTimeFactor = triangleTimeFactor;
+    }
+
+    /**
+     * @param mode
+     * @return The road speed for a specific traverse mode.
+     */
+    public double getSpeed(TraverseMode mode) {
+        if (mode == TraverseMode.WALK)
+            return walkSpeed;
+        if (mode == TraverseMode.BICYCLE)
+            return bikeSpeed;
+        if (mode == TraverseMode.CAR)
+            return carSpeed;
+        throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
+    }
+
+    /**
+     * @return The highest speed for all possible road-modes.
+     */
+    public double getSpeedUpperBound() {
+        // Assume carSpeed > bikeSpeed > walkSpeed
+        if (modes.getCar())
+            return carSpeed;
+        if (modes.getBicycle())
+            return bikeSpeed;
+        return walkSpeed;
+    }
+
+    public void setWalkSpeed(double walkSpeed) {
+        this.walkSpeed = walkSpeed;
+    }
+
+    public void setBikeSpeed(double bikeSpeed) {
+        this.bikeSpeed = bikeSpeed;
+    }
+
+    public void setCarSpeed(double carSpeed) {
+        this.carSpeed = carSpeed;
+    }
+
+    /**
+     * @param mode
+     * @return The board cost for a specific traverse mode.
+     */
+    public int getBoardCost(TraverseMode mode) {
+        if (mode == TraverseMode.BICYCLE)
+            return bikeBoardCost;
+        // I assume you can't bring your car in the bus
+        return walkBoardCost;
+    }
+
+    /**
+     * @return The lower boarding cost for all possible road-modes.
+     */
+    public int getBoardCostLowerBound() {
+        // Assume walkBoardCost < bikeBoardCost
+        if (modes.getWalk())
+            return walkBoardCost;
+        return bikeBoardCost;
+    }
+
+    public void setWalkBoardCost(int walkBoardCost) {
+        this.walkBoardCost = walkBoardCost;
+    }
+
+    public void setBikeBoardCost(int bikeBoardCost) {
+        this.bikeBoardCost = bikeBoardCost;
     }
 }

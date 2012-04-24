@@ -188,7 +188,7 @@ public class TestContractionHeirarchies extends TestCase {
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
 
         // test hop limit
         Dijkstra dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
@@ -251,7 +251,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
-        options.speed = 1;
+        options.setWalkSpeed(1);
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
         options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
@@ -351,7 +351,7 @@ public class TestContractionHeirarchies extends TestCase {
         TraverseOptions options = new TraverseOptions();
         options.optimizeFor = OptimizeType.QUICK;
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
         assertNotNull(path);
         assertTrue(path.states.size() > 1);

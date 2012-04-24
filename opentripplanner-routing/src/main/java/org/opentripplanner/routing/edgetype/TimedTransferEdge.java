@@ -47,7 +47,7 @@ public class TimedTransferEdge extends AbstractEdge {
 
     @Override
     public State traverse(State s0) {
-        EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions()));
         StateEditor s1 = s0.edit(this, en);
         s1.incrementWeight(1);
         return s1.makeState();

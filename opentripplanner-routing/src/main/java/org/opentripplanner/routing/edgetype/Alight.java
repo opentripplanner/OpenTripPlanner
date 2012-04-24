@@ -91,7 +91,8 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             // backward traversal: find an appropriate transit trip
             if (!options.getModes().contains(hop.getMode()))
                 return null;
-            if (options.getModes().getBicycle() && !hop.getBikesAllowed())
+            TraverseMode mode = s0.getNonTransitMode(options);
+            if (mode.equals(TraverseMode.BICYCLE) && !hop.getBikesAllowed())
                 return null;
             long current_time = s0.getTime();
 
@@ -118,7 +119,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             StateEditor s1 = s0.edit(this);
             TransitUtils.handleBoardAlightType(s1, dropoffType);
             s1.incrementTimeInSeconds(wait);
-            s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
+            s1.incrementWeight(wait * options.waitReluctance + options.getBoardCost(mode));
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
             s1.setZone(zone);
@@ -147,7 +148,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
      */
     public double weightLowerBound(TraverseOptions options) {
         if (options.isArriveBy())
-            return options.boardCost;
+            return options.getBoardCostLowerBound();
         else
             return 0;
     }

@@ -54,21 +54,21 @@ public class TestTurnEdge extends TestCase {
         TurnVertex end = new TurnVertex(gg, "end", GeometryUtils.makeLineString(-74.004, 40.5, -74.006, 41.0), "end", streetLength, false, null);
         
         TraverseOptions options = new TraverseOptions();
-        options.speed = ConstantsForTests.WALKING_SPEED;
+        options.setWalkSpeed(ConstantsForTests.WALKING_SPEED);
         
         TurnEdge ee = new TurnEdge(start, end);
 
         // Start at October 21, 2009 at 1:00:00pm
         GregorianCalendar startTime = new GregorianCalendar(2009, 9, 21, 13, 0, 0);
         GregorianCalendar endTime = (GregorianCalendar) startTime.clone();
-        int expectedSecElapsed = (int) (streetLength / options.speed);
+        int expectedSecElapsed = (int) (streetLength / options.getSpeed(TraverseMode.WALK));
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
         State s0 = new State(TestUtils.toSeconds(startTime), start, options);
         State s1 = ee.traverse(s0);
 
         assertNotNull(s1);
-        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10); //they're not identical because of the turn cost
+        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.getSpeed(TraverseMode.WALK)) < 10); //they're not identical because of the turn cost
         // Has the time elapsed as expected?
         assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis() / 1000) < 10);
 
@@ -77,7 +77,7 @@ public class TestTurnEdge extends TestCase {
         s1 = ee.traverse(s0);
 
         assertNotNull(s1);
-        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.speed) < 10);
+        assertTrue(Math.abs(s1.getWeight() -  options.walkReluctance * streetLength / options.getSpeed(TraverseMode.WALK)) < 10);
         assertTrue(Math.abs(s1.getTime() - startTime.getTimeInMillis() / 1000) < 10);
     }
 

@@ -72,7 +72,14 @@ public class StateEditor {
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
             // created vertices
-            if (parent.vertex.equals(en.getFromVertex())) {
+            if (en.getFromVertex().equals(en.getToVertex())
+                    && parent.vertex.equals(en.getFromVertex())) {
+                // TODO LG: We disable this test: the assumption that
+                // the from and to vertex of an edge are not the same
+                // is not true anymore: bike rental on/off edges.
+                traversingBackward = parent.getOptions().isArriveBy();
+                child.vertex = en.getToVertex();
+			} else if (parent.vertex.equals(en.getFromVertex())) {
                 traversingBackward = false;
                 child.vertex = en.getToVertex();
             } else if (parent.vertex.equals(en.getToVertex())) {
@@ -287,6 +294,11 @@ public class StateEditor {
         child.stateData.everBoarded = everBoarded;
     }
 
+    public void setBikeRenting(boolean bikeRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = bikeRenting;
+    }
+
     public void setPreviousStop(Vertex previousStop) {
         cloneStateDataAsNeeded();
         child.stateData.previousStop = previousStop;
@@ -324,6 +336,7 @@ public class StateEditor {
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
+        child.stateData.usingRentedBike = state.stateData.usingRentedBike;
     }
 
     /* PUBLIC GETTER METHODS */
@@ -371,6 +384,10 @@ public class StateEditor {
 
     public boolean isEverBoarded() {
         return child.isEverBoarded();
+    }
+
+    public boolean isRentingBike() {
+        return child.isBikeRenting();
     }
 
     public Vertex getPreviousStop() {

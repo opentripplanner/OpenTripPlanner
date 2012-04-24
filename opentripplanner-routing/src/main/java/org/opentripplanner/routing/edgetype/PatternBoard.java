@@ -110,6 +110,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             long current_time = state0.getTime();
             int bestWait = -1;
             int bestPatternIndex = -1;
+            TraverseMode mode = state0.getNonTransitMode(options);
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
             SD: for (ServiceDay sd : options.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -119,7 +120,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight,
-                            options.wheelchairAccessible, options.getModes().getBicycle(), true);
+                            options.wheelchairAccessible, mode == TraverseMode.BICYCLE, true);
                     if (patternIndex >= 0) {
                         Trip trip = pattern.getTrip(patternIndex);
                         while (options.bannedTrips.contains(trip.getId())) {
@@ -202,7 +203,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost + options.boardCost);
+            s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             return s1.makeState();
         }
     }
@@ -240,7 +241,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         if (options.isArriveBy())
             return timeLowerBound(options);
         else
-            return options.boardCost;
+            return options.getBoardCostLowerBound();
     }
 
     

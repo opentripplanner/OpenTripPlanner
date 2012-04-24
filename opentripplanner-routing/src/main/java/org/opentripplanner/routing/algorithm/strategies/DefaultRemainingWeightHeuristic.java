@@ -59,17 +59,18 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
          *	    again considering any mandatory walking.
          */
         if (useTransit) {
+            double speed = options.getSpeedUpperBound();
             if (s.isAlightedLocal()) {
                 if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
                 }
-                return options.walkReluctance * euclidianDistance / options.speed;
+                return options.walkReluctance * euclidianDistance / speed;
             } else {
                 int boardCost;
                 if (s.isOnboard()) {
                     boardCost = 0;
                 } else {
-                    boardCost = options.boardCost;
+                    boardCost = options.getBoardCostLowerBound();
                 }
                 if (s.isEverBoarded()) {
                     boardCost += options.transferPenalty;
@@ -78,7 +79,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                         return -1;
                     }
-                    return options.walkReluctance * euclidianDistance / options.speed;
+                    return options.walkReluctance * euclidianDistance / speed;
                 } else {
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
@@ -86,10 +87,10 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                         return -1;
                     }
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
-                            + mandatoryWalkDistance * options.walkReluctance / options.speed
+                            + mandatoryWalkDistance * options.walkReluctance / speed
                             + boardCost;
                     return Math.min(distance, options.walkReluctance * euclidianDistance
-                            / options.speed);
+                            / speed);
                 }
             }
         }
@@ -107,19 +108,20 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     	Vertex sv = s.getVertex();
         
         double euclidianDistance = sv.fastDistance(target);
-        
+
         if (useTransit) {
+            double speed = options.getSpeedUpperBound();
             if (s.isAlightedLocal()) {
                 if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
                 }
-                return options.walkReluctance * euclidianDistance / options.speed;
+                return options.walkReluctance * euclidianDistance / speed;
             } else {
                 int boardCost;
                 if (s.isOnboard()) {
                     boardCost = 0;
                 } else {
-                    boardCost = options.boardCost;
+                    boardCost = options.getBoardCostLowerBound();
                 }
                 if (s.isEverBoarded()) {
                     boardCost += options.transferPenalty;
@@ -129,7 +131,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                         return -1;
                     }
                     return options.walkReluctance * euclidianDistance
-                            / options.speed;
+                            / speed;
                 } else {
                     double mandatoryWalkDistance = target
                             .getDistanceToNearestTransitStop()
@@ -139,9 +141,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     }
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance
-                            / options.speed + boardCost;
+                            / speed + boardCost;
                     return Math.min(distance, options.walkReluctance
-                            * euclidianDistance / options.speed);
+                            * euclidianDistance / speed);
                 }
             }
         } else {
@@ -157,11 +159,11 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             return 10;
         } else {
             if (options.optimizeFor == OptimizeType.QUICK) {
-                return options.speed;
+                return options.getSpeedUpperBound();
             } else {
                 // assume that the best route is no more than 10 times better than
                 // the as-the-crow-flies flat base route.
-                return options.speed * 10;
+                return options.getSpeedUpperBound() * 10;
             }
         }
     }

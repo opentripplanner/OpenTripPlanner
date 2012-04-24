@@ -101,11 +101,12 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             if (options.bannedTrips.contains(getTrip().getId())) {
                 return null;
             }
+            TraverseMode mode = state0.getNonTransitMode(options);
             // forward traversal: find a relevant transit trip
             if (!options.getModes().contains(hop.getMode())) {
                 return null;
             }
-            if (options.getModes().getBicycle() && !hop.getBikesAllowed()) {
+            if (mode.equals(TraverseMode.BICYCLE) && !hop.getBikesAllowed()) {
                 return null;
             }
             if (options.wheelchairAccessible && !wheelchairAccessible) {
@@ -137,7 +138,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             StateEditor s1 = state0.edit(this);
             TransitUtils.handleBoardAlightType(s1, pickupType);
             s1.incrementTimeInSeconds(wait);
-            s1.incrementWeight(wait * options.waitReluctance + options.boardCost);
+            s1.incrementWeight(wait * options.waitReluctance + options.getBoardCost(mode));
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
             s1.setZone(zone);
@@ -155,7 +156,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         if (options.isArriveBy())
             return 0;
         else
-            return options.boardCost;
+            return options.getBoardCostLowerBound();
     }
 
     /* use default (constant 0) timelowerbound */
