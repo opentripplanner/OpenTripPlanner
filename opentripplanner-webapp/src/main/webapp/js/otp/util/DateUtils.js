@@ -121,7 +121,8 @@ otp.util.DateUtils = {
     },
     
     /** Make a Date object from an ISO 8601 date string (ignoring time zone) */
-    isoDateStringToDate : function(str) {
+    isoDateStringToDate : function(str)
+    {
         if (!str)
             return null;
         if (str.lastIndexOf("Z") != -1) {
@@ -133,18 +134,69 @@ otp.util.DateUtils = {
         return date;
     },
 
-    prettyDateTime : function(date) {
+    /** */
+    prettyDateTime : function(date)
+    {
         if (typeof date == "string") {
             date = this.isoDateStringToDate(date);
         }
         return date.format(this.DATE_TIME_FORMAT_STRING);
     },
-    
-    prettyTime : function(date) {
+
+    /** */
+    prettyTime : function(date)
+    {
         if (typeof date == "string") {
             date = this.isoDateStringToDate(date);
         }
         return date.format(this.TIME_FORMAT_STRING);
+    },
+
+    /** arbitrary time string parser / correction */
+    parseTime : function(t)
+    {
+        var time = t.trim();
+        time = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
+    
+        var h = time[1];
+        var m = parseInt(time[2]) || null;
+        var am = time[3];
+    
+        if(h && h.length > 2)
+        {
+            if(m == null)
+                m = h.substring(h.length-2);
+            h = h.substring(0, h.length-2);
+        }
+        h = parseInt(h) || 12;
+        if(h > 12)
+        {
+            h = h % 12;
+            if(h == 0)
+                h = 12;
+            if(am == null || am == '')
+                am = 'p';
+        }
+        if(m == null || m > 59 || m < 0)
+            m = "00"
+
+        if(am && am == 'p')
+            am = "pm"
+        else  
+            am = "am"
+    
+        return  h + ":" + m + "" + am;
+    },
+
+    /** */
+    parseTimeTest : function(t)
+    {
+        var times = ['1:00 pm','1:00 p.m.','100 p','1:00p.m.','1:00p','1 pm','1 p.m.','1 p','1pm','1p.m.','1p','1:pm','13:00','13','944am', '1354','12335','1232p'];
+    
+        for ( var i = 0; i < times.length; i++ )
+        {
+          console.log(parseTime(times[i]));
+        }
     },
 
     CLASS_NAME : "otp.util.DateUtils"

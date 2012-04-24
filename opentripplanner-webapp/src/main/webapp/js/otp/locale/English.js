@@ -46,13 +46,13 @@ otp.locale.English = {
     // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
-        safeSym  : "S",
+        safeName : "Bike friendly",
+        safeSym  : "B",
 
-        hillName : "Flattest",
+        hillName : "Flat",
         hillSym  : "F",
 
-        timeName : "Quickest",
+        timeName : "Quick",
         timeSym  : "Q"
     },
 
@@ -298,7 +298,7 @@ otp.locale.English = {
             geoToMsg     : "Please select the 'To' location for your trip: "
         },
         
-        // default messages from server if a message was not returned
+        // default messages from server if a message was not returned ... 'Place' error messages also used when trying to submit without From & To coords.
         msgcodes:
         {
             200: "Plan OK",
@@ -308,21 +308,21 @@ otp.locale.English = {
             406: "No transit times",
             408: "Request timed out",
             413: "Invalid parameter",
-            440: "From geocode not found",
-            450: "To geocode not found",
-            460: "Geocode from and to not found",
-            470: "From or to not wheelchair accessible",
+            440: "The 'From' place is not found ... please re-enter it.",
+            450: "The 'To' place is not found ... please re-enter it.",
+            460: "Places 'From' and 'To' are not found ... please re-enter them.",
+            470: "Places 'From' or 'To' are not wheelchair accessible",
             409: "Too close",
-            340: "Geocode from ambiguous",
-            350: "Geocode to ambiguous",
-            360: "Geocode from and to ambiguous"
+            340: "Geocode 'From' ambiguous",
+            350: "Geocode 'To' ambiguous",
+            360: "Geocodes 'From' and 'To' are ambiguous"
         },
 
         options: 
         [
           ['TRANSFERS', 'Fewest transfers'],
-          ['QUICK',     'Quickest trip'],
-          ['SAFE',      'Safest trip'],
+          ['QUICK',     'Quick trip'],
+          ['SAFE',      'Bike friendly trip'],
           ['TRIANGLE',  'Custom trip...']
         ],
     

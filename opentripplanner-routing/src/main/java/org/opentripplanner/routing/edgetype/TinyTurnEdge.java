@@ -87,7 +87,7 @@ public class TinyTurnEdge extends FreeEdge {
         double angleLength = turnCost / 20.0;
         double time = angleLength / options.speed;
         double weight = time * options.walkReluctance + turnCost / 20;
-        EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+        EdgeNarrative en = new FixedModeEdge(this, options.getModes().getNonTransitMode());
         StateEditor s1 = s0.edit(this, en);
         s1.incrementWeight(weight);
         s1.incrementTimeInSeconds((int) Math.ceil(time));

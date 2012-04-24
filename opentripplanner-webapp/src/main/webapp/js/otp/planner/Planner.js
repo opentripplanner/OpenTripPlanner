@@ -38,7 +38,7 @@ otp.planner.Planner = {
     poi                     : null,
     fromToOverride          : null,
     linkTemplates           : null,
-    geocoder                : null,
+    geocoder_cfg            : null,
     templates               : null,
     routerId                : null,
     maxTransfers            : null,

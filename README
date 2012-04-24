@@ -17,3 +17,13 @@ opentripplanner-graph-builder - Command line tool for configuring and building t
 opentripplanner-gui           - Graph visualizer primarily useful for development and troubleshooting
 opentripplanner-integration   - Integration tests
 
+--== DEVELOPMENT ==--
+
+OpenTripPlanner has been primarily developed by OpenPlans with funding
+from TriMet, and many code, translation, and documentation
+contributions from around the world.  
+
+We welcome new contributions!  We prefer to format our code according to the
+GeoTools formatting guidelines; an Eclipse autoformatter can be found here:
+http://svn.osgeo.org/geotools/trunk/build/eclipse/formatter.xml
+

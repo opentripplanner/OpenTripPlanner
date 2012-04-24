@@ -395,7 +395,7 @@ public class GTFSPatternHopFactory {
                                         trip);
                             } catch (TripOvertakingException e) {
                                 _log.warn(GraphBuilderAnnotation.register(graph, 
-                                		Variety.TRIP_DUPLICATE_DEPARTURE,
+                                		Variety.TRIP_OVERTAKING,
                                 		e.overtaker, e.overtaken, e.stopIndex));
                                 // back out trips and revert to the simple method
                                 for (i = i - 1; i >= 0; --i) {
@@ -599,36 +599,6 @@ public class GTFSPatternHopFactory {
                 new PreBoardEdge(stopVertex, depart);
             }
         }
-
-        /* connect stops to their parent stations */
-        for (Stop stop : _dao.getAllStops()) {
-            String parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                Vertex stopVertex = stopNodes.get(stop);
-
-                String agencyId = stop.getId().getAgencyId();
-                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
-
-                Stop parentStop = _dao.getStopForId(parentStationId);
-                Vertex parentStopVertex = stopNodes.get(parentStop);
-
-                new FreeEdge(parentStopVertex, stopVertex);
-                new FreeEdge(stopVertex, parentStopVertex);
-
-                Vertex stopArriveVertex = stopArriveNodes.get(stop);
-                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
-
-                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
-
-                Vertex stopDepartVertex = stopDepartNodes.get(stop);
-                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
-
-                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
-
-            }
-        }
     }
     
     /**
@@ -708,7 +678,8 @@ public class GTFSPatternHopFactory {
                 StopTime st = null;
                 for (j = i + 1; j < lastStop + 1; ++j) {
                     st = stopTimes.get(j);
-                    if (st.isDepartureTimeSet() || st.isArrivalTimeSet()) {
+                    if ((st.isDepartureTimeSet() && st.getDepartureTime() != departureTime)
+                            || (st.isArrivalTimeSet() && st.getArrivalTime() != departureTime)) {
                         break;
                     }
                 }
@@ -1100,7 +1071,45 @@ public class GTFSPatternHopFactory {
         this.fareServiceFactory = fareServiceFactory;
     }
 
+    /**
+     * Create transfer edges between stops which are listed in transfers.txt.
+     * This is not usually useful, but it's nice for the NYC subway system, where
+     * it's important to provide in-station transfers for fare computation.
+     */
     public void createStationTransfers(Graph graph) {
+
+        /* connect stops to their parent stations
+         * TODO: provide a cost for these edges when stations and
+         * stops have different locations 
+         */
+        for (Stop stop : _dao.getAllStops()) {
+            String parentStation = stop.getParentStation();
+            if (parentStation != null) {
+                Vertex stopVertex = stopNodes.get(stop);
+
+                String agencyId = stop.getId().getAgencyId();
+                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+
+                Stop parentStop = _dao.getStopForId(parentStationId);
+                Vertex parentStopVertex = stopNodes.get(parentStop);
+
+                new FreeEdge(parentStopVertex, stopVertex);
+                new FreeEdge(stopVertex, parentStopVertex);
+
+                Vertex stopArriveVertex = stopArriveNodes.get(stop);
+                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
+
+                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+
+                Vertex stopDepartVertex = stopDepartNodes.get(stop);
+                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
+
+                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+
+            }
+        }
         for (Transfer transfer : _dao.getAllTransfers()) {
 
             int type = transfer.getTransferType();

@@ -45,13 +45,13 @@ otp.locale.Marathi = {
     // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Safest",
+        safeName : "Bike friendly",
         safeSym  : "S",
 
-        hillName : "Flattest",
+        hillName : "Flat",
         hillSym  : "F",
 
-        timeName : "Quickest",
+        timeName : "Quick",
         timeSym  : "Q"
     },
 
