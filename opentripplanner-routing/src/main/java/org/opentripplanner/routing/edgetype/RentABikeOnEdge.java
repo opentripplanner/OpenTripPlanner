@@ -48,10 +48,6 @@ public class RentABikeOnEdge extends AbstractEdge {
              */
             if (!s0.isBikeRenting())
                 return null;
-            BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-            if (dropoff.getSpacesAvailable() == 0) {
-                return null;
-            }
             BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
             if (pickup.getSpacesAvailable() == 0) {
                 return null;
