@@ -709,8 +709,11 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
     public void setRoutingContext (Graph graph, Vertex from, Vertex to) {
-        if (rctx != null)
-            this.rctx.destroy();
+        // normally you would want to tear down the routing context...
+        // but this method is mostly used in tests, and teardown interferes with testHalfEdges
+        // FIXME here, or in test, and/or in other places like TSP that use this method
+        // if (rctx != null)
+        //    this.rctx.destroy();
         this.rctx = new RoutingContext(this, graph, from, to);
     }
 
