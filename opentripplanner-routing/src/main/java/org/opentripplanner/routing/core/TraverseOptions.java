@@ -272,6 +272,11 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     private double triangleSafetyFactor;
 
+    /** Whether or not bike rental availability information will be used
+     * to plan bike rental trips
+     */
+    private boolean useBikeRentalAvailabilityInformation = false;
+    
     /** Constructor for options; modes defaults to walk and transit */
     public TraverseOptions() {
         // http://en.wikipedia.org/wiki/Walking
@@ -655,5 +660,13 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setBikeBoardCost(int bikeBoardCost) {
         this.bikeBoardCost = bikeBoardCost;
+    }
+
+    public boolean useBikeRentalAvailabilityInformation() {
+        return useBikeRentalAvailabilityInformation;
+    }
+
+    public void setUseBikeRentalAvailabilityInformation(boolean useBikeRentalAvailabilityInformation) {
+        this.useBikeRentalAvailabilityInformation = useBikeRentalAvailabilityInformation;
     }
 }

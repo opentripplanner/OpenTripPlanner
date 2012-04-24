@@ -73,6 +73,8 @@ public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
+    private static final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
+
     Request request;
 
     private PathService pathService;
@@ -653,6 +655,9 @@ public class PlanGenerator {
         if (request.getTransferPenalty() != null) {
             options.transferPenalty = request.getTransferPenalty();
         }
+
+        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
+        options.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
         return options;
     }
 

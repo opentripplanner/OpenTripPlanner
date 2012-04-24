@@ -49,7 +49,7 @@ public class RentABikeOnEdge extends AbstractEdge {
             if (!s0.isBikeRenting())
                 return null;
             BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
-            if (pickup.getSpacesAvailable() == 0) {
+            if (options.useBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
                 return null;
             }
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
@@ -72,7 +72,7 @@ public class RentABikeOnEdge extends AbstractEdge {
             if (!options.getModes().contains(TraverseMode.BICYCLE))
                 return null;
             BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-            if (dropoff.getBikesAvailable() == 0) {
+            if (options.useBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
                 return null;
             }
 
