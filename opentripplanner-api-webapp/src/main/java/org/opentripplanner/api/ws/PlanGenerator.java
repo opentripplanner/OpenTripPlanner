@@ -75,7 +75,7 @@ public class PlanGenerator {
 
     private GeometryFactory geometryFactory = new GeometryFactory();
 
-    @Autowired private PathService pathService;
+    @Autowired public PathService pathService;
     
     /** Generates a TripPlan from a Request */
     public TripPlan generate(TraverseOptions options) {

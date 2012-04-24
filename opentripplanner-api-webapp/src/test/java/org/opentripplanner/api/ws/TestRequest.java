@@ -11,19 +11,25 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
+/* this is in api.common so it can set package-private fields */
 package org.opentripplanner.api.ws;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import junit.framework.TestCase;
+
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.ws.PlanGenerator;
+import org.opentripplanner.api.ws.Planner;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
@@ -31,6 +37,7 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFa
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -39,67 +46,27 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.impl.ContractionRoutingServiceImpl;
-import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
-import org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.util.DateUtils;
 
-import junit.framework.TestCase;
-
-/**
- * This is a hack to hold graph data between test runs, since loading it takes a long time.
- * 
- */
-class DataHolder {
-    public Graph graph = null;
-    public Planner planner = null;
-    public RetryingPathServiceImpl pathService = null;
-    
-    private static DataHolder instance = null;
-    public static DataHolder getInstance() {
+/* This is a hack to hold context and graph data between test runs, since loading it is slow. */
+class TestContext {
+    public Graph graph = new Graph();
+    public GraphService graphService = new GraphServiceBeanImpl(graph); 
+    public PlanGenerator planGenerator = new PlanGenerator();
+    public RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
+    private static TestContext instance = null;
+    public static TestContext getInstance() {
         if (instance == null) {
-            instance = new DataHolder();
+            instance = new TestContext();
         }
         return instance;
     }
-}
-
-public class TestRequest extends TestCase {
-
-    private RetryingPathServiceImpl pathService;
-    private Graph graph;
-    private Planner planner;
-    
-    public void testRequest() {
-        TraverseOptions request = new TraverseOptions();
-        
-        request.addMode(TraverseMode.CAR);
-        assertTrue(request.getModes().getCar());
-        request.removeMode(TraverseMode.CAR);
-        assertFalse(request.getModes().getCar());
-     
-        request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.getModes().getCar());
-        assertTrue(request.getModes().getBicycle());
-        assertTrue(request.getModes().getWalk());
-    }
-
-    public void setUp() {
-        DataHolder holder = DataHolder.getInstance();
-        graph = holder.graph;
-        planner = holder.planner;
-        pathService = holder.pathService;
-        if (graph != null) {
-            return;
-        }
-        planner = new Planner();
-        pathService = new RetryingPathServiceImpl();
-        graph = new Graph();
-        pathService.setRemainingWeightHeuristicFactory(
-                new DefaultRemainingWeightHeuristicFactoryImpl());
+    public TestContext() {
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
@@ -121,52 +88,38 @@ public class TestRequest extends TestCase {
         //as a test, use prefixes ("NE", SE", etc) as an alert
         schema.setNoteConverter(new AttributeFeatureConverter<String> ("PREFIX"));
 
-        builder.setSchema(schema );
+        builder.setSchema(schema);
         builder.buildGraph(graph, new HashMap<Class<?>, Object>());
-        GraphServiceImpl graphService = new GraphServiceImpl();
-        graphService.setGraph(graph);
+        graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
         
-        pathService.setGraphService(graphService);
-        ContractionRoutingServiceImpl routingService = new ContractionRoutingServiceImpl();
-        routingService.setGraphService(graphService);
-        pathService.setRoutingService(routingService);
-        SingletonPathServiceFactoryImpl pathServiceFactory = new SingletonPathServiceFactoryImpl();
-        pathServiceFactory.setPathService(pathService);
-        planner.setPathServiceFactory(pathServiceFactory);
+        pathService.sptService = new GenericAStar();
+        pathService.graphService = graphService;
+        planGenerator.pathService = pathService;
+    }
+}
 
-        holder.graph = graph;
-        holder.planner = planner;
-        holder.pathService = pathService;
+
+public class TestRequest extends TestCase {
+
+    public void testRequest() {
+        TraverseOptions request = new TraverseOptions();
+        
+        request.addMode(TraverseMode.CAR);
+        assertTrue(request.getModes().getCar());
+        request.removeMode(TraverseMode.CAR);
+        assertFalse(request.getModes().getCar());
+     
+        request.setModes(new TraverseModeSet("BICYCLE,WALK"));
+        assertFalse(request.getModes().getCar());
+        assertTrue(request.getModes().getBicycle());
+        assertTrue(request.getModes().getWalk());
     }
 
     public void testPlanner() throws Exception {
         
-        Vertex v1 = graph.getVertex("113410");//getVertexByCrossStreets("NE 43RD AVE", "NE FLANDERS ST", false);
-        Vertex v2 = graph.getVertex("137427");//getVertexByCrossStreets("NE 43RD AVE", "NE ROYAL CT", true);
-        assertNotNull(v1);
-        assertNotNull(v2);
+        Planner planner = new TestPlanner("113410", "137427");
         
-        Response response = planner.getItineraries(
-                v1.getLabel(),
-                v2.getLabel(),
-                null,
-                null,
-                "2009-01-01", 
-                "11:11:11",
-                null,
-                false,
-                false,
-                840.0,
-                1.33,
-                null,
-                null,
-                null,
-                OptimizeType.QUICK,
-                new TraverseModeSet("WALK"),
-                1,
-                null, false,
-                "", "", "", 0, 2);
-        
+        Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
         List<WalkStep> steps = leg.walkSteps;
@@ -175,23 +128,17 @@ public class TestRequest extends TestCase {
         WalkStep step2 = steps.get(2);
         assertEquals(AbsoluteDirection.NORTH, step0.absoluteDirection);
         assertEquals("NE 43RD AVE", step0.streetName);
-        
         assertEquals("NE 43RD AVE", step2.streetName);
         assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
         assertTrue(step2.stayOn);
 
     }
 
-	public void testAlerts() throws Exception {
-		Vertex v1 = graph.getVertex("114789 back");//SE 47th and Ash
-		Vertex v2 = graph.getVertex("114237");// NE 47th and Davis note that we cross Burnside this go from SE to NE
-		assertNotNull(v1);
-		assertNotNull(v2);
+    public void testAlerts() throws Exception {
 
-		Response response = planner.getItineraries(v1.getLabel(),
-				v2.getLabel(), null, null, "2009-01-01", "11:11:11", null, false,
-				false, 840.0, 1.33, null, null, null, OptimizeType.QUICK,
-				new TraverseModeSet("WALK"), 1, null, false, "", "", "", 0, 2);
+	//SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
+	Planner planner = new TestPlanner("114789 back", "114237");
+	Response response = planner.getItineraries();
 
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
@@ -212,6 +159,7 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
+        Graph graph = TestContext.getInstance().graph;
         Vertex v1 = graph.getVertex("114080 back");//getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
         Vertex v2 = graph.getVertex("115250");//graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
         Vertex v3 = graph.getVertex("108406");//graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST", false)).iterator().next().getToVertex();
@@ -222,13 +170,8 @@ public class TestRequest extends TestCase {
         assertNotNull(v3);
         assertNotNull(v4);
         
-        ArrayList<NamedPlace> intermediates = new ArrayList<NamedPlace>();
-        intermediates.add(new NamedPlace(v3.getLabel()));
-        intermediates.add(new NamedPlace(v2.getLabel()));
-        Date dateTime = DateUtils.toDate("2009-01-01", "10:00:00");
-        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-        List<GraphPath> paths = pathService.plan(new NamedPlace(v1.getLabel()), new NamedPlace(v4.getLabel()),
-                intermediates, false, dateTime, options);
+        TestPlanner planner = new TestPlanner(v1.getLabel(), v4.getLabel(), Arrays.asList(v3.getLabel(), v2.getLabel()));
+        List<GraphPath> paths = planner.getPaths();
         
         assertTrue(paths.size() > 0);
         GraphPath path = paths.get(0);
@@ -238,6 +181,49 @@ public class TestRequest extends TestCase {
                 curVertex += 1;
             }
         }
-        assertEquals(4, curVertex); //found all four, in the correct order
+        assertEquals(4, curVertex); //found all four, in the correct order (1, 3, 2, 4)
     }
+    
+    /**
+     * Subclass of Planner for testing. Constructor sets fields that would usually be set by 
+     * Jersey from HTTP Query string.
+     */
+    private static class TestPlanner extends Planner {
+        public TestPlanner(String v1, String v2) {
+            super();
+            this.fromPlace = Arrays.asList(v1);
+            this.toPlace = Arrays.asList(v2);
+            this.date = Arrays.asList("2009-01-01");
+            this.time = Arrays.asList("11:11:11");
+            this.maxWalkDistance = Arrays.asList(840.0);
+            this.walkSpeed = Arrays.asList(1.33);
+            this.optimize = Arrays.asList(OptimizeType.QUICK);
+            this.modes = Arrays.asList(new TraverseModeSet("WALK"));
+            this.numItineraries = Arrays.asList(1);
+            this.transferPenalty = Arrays.asList(0);
+            this.maxTransfers = Arrays.asList(2);
+            
+            this.planGenerator = TestContext.getInstance().planGenerator;
+        }
+
+        public TestPlanner(String v1, String v2, List<String> intermediates) {
+            this(v1, v2);
+            this.intermediatePlaces = intermediates;
+            TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
+            tsp.chainedPathService = TestContext.getInstance().pathService;
+            tsp.graphService = TestContext.getInstance().graphService;
+            this.planGenerator.pathService = tsp;
+        }
+        
+        public List<GraphPath> getPaths() {
+            try {
+                return this.planGenerator.pathService.getPaths(this.buildRequest());
+            } catch (ParameterException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+        
+    }
+    
 }
