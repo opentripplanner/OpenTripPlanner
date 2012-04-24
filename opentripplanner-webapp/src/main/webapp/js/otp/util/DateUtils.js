@@ -169,23 +169,14 @@ otp.util.DateUtils = {
             h = h.substring(0, h.length-2);
         }
         h = parseInt(h) || 12;
-        if(h > 12)
-        {
-            h = h % 12;
-            if(h == 0)
-                h = 12;
-            if(am == null || am == '')
-                am = 'p';
-        }
+
         if(m == null || m > 59 || m < 0)
             m = "00"
 
         if(am && am == 'p')
-            am = "pm"
-        else  
-            am = "am"
+            h += 12;
     
-        return  h + ":" + m + "" + am;
+        return  h + ":" + m;
     },
 
     /** */
