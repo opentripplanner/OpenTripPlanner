@@ -55,6 +55,11 @@ public class RentABikeOffEdge extends AbstractEdge {
              */
             if (!options.getModes().contains(TraverseMode.BICYCLE))
                 return null;
+            
+            BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
+            if (dropoff.getBikesAvailable() == 0) {
+                return null;
+            }
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1 = s0.edit(this, en);
