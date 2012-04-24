@@ -15,7 +15,6 @@ package org.opentripplanner.api.servlet;
 
 import java.util.List;
 
-import org.opentripplanner.updater.Updater;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -26,7 +25,7 @@ public class PeriodicGraphUpdater {
 
     private Thread thread;
 
-    private List<Updater> updaters;
+    private List<Runnable> updaters;
 
     public void start() {
         updater = new UpdateTask();
@@ -48,11 +47,11 @@ public class PeriodicGraphUpdater {
         return updateFrequency;
     }
 
-    public List<Updater> getUpdaters() {
+    public List<Runnable> getUpdaters() {
         return updaters;
     }
 
-    public void setUpdaters(List<Updater> updaters) {
+    public void setUpdaters(List<Runnable> updaters) {
         this.updaters = updaters;
     }
 
@@ -80,8 +79,8 @@ public class PeriodicGraphUpdater {
 
                     now = System.currentTimeMillis();
                 }
-                for (Updater updater : getUpdaters()) {
-                    System.out.println("running updater " + updater.getUrl());
+                for (Runnable updater : getUpdaters()) {
+                    System.out.println("running updater " + updater);
                     updater.run();
                 }
 

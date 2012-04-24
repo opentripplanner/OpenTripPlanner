@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -83,7 +84,7 @@ public class NetworkLinkerLibrary {
 
     private TransitIndexService transitIndex;
 
-    public NetworkLinkerLibrary(Graph graph, HashMap<Class<?>, Object> extra) {
+    public NetworkLinkerLibrary(Graph graph, Map<Class<?>, Object> extra) {
         this.graph = graph;
         this.transitIndex = graph.getService(TransitIndexService.class);
         EdgesForRoute edgesForRoute = (EdgesForRoute) extra.get(EdgesForRoute.class);
@@ -483,7 +484,9 @@ public class NetworkLinkerLibrary {
             Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
             if (starting == null) {
                 starting = new HashSet<Edge>();
-                edgesStartingAt.put((TurnVertex) edge.getFromVertex(), starting);
+                if (edge.getFromVertex() instanceof TurnVertex) {
+                    edgesStartingAt.put((TurnVertex) edge.getFromVertex(), starting);
+                }
             }
             starting.add(edge);
         }

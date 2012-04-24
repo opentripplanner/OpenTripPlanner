@@ -20,6 +20,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -68,6 +69,10 @@ public class RentABikeOffEdge extends AbstractEdge {
              */
             if (!s0.isBikeRenting())
                 return null;
+            BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
+            if (pickup.getSpacesAvailable() == 0) {
+                return null;
+            }
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1e = s0.edit(this, en);

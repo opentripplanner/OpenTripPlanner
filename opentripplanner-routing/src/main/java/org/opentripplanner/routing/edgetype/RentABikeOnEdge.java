@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -35,7 +35,7 @@ public class RentABikeOnEdge extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RentABikeOnEdge(Vertex from, Vertex to) {
+    public RentABikeOnEdge(BikeRentalStationVertex from, BikeRentalStationVertex to) {
         super(from, to);
     }
 
@@ -48,6 +48,14 @@ public class RentABikeOnEdge extends AbstractEdge {
              */
             if (!s0.isBikeRenting())
                 return null;
+            BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
+            if (dropoff.getSpacesAvailable() == 0) {
+                return null;
+            }
+            BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
+            if (pickup.getSpacesAvailable() == 0) {
+                return null;
+            }
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1 = s0.edit(this, en);
@@ -67,6 +75,11 @@ public class RentABikeOnEdge extends AbstractEdge {
              */
             if (!options.getModes().contains(TraverseMode.BICYCLE))
                 return null;
+            BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
+            if (dropoff.getBikesAvailable() == 0) {
+                return null;
+            }
+
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1 = s0.edit(this, en);

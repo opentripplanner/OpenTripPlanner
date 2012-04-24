@@ -16,12 +16,6 @@ package org.opentripplanner.updater;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.opentripplanner.routing.services.PatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-public class Updater implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(Updater.class);
+public class GtfsRealtimeUpdater implements Runnable {
+    private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
 
     private String url;
 
@@ -55,21 +49,9 @@ public class Updater implements Runnable {
         this.defaultAgencyId = defaultAgencyId;
     }
 
-    private InputStream getData() throws ClientProtocolException, IOException {
-        HttpGet httpget = new HttpGet(url);
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpResponse response = httpclient.execute(httpget);
-        HttpEntity entity = response.getEntity();
-        if (entity == null) {
-            return null;
-        }
-        InputStream instream = entity.getContent();
-        return instream;
-    }
-
     public void run() {
         try {
-            InputStream data = getData();
+            InputStream data = HttpUtils.getData(url);
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
@@ -103,6 +85,8 @@ public class Updater implements Runnable {
     public void setEarlyStart(long earlyStart) {
         this.earlyStart = earlyStart;
     }
-
+    public String toString() {
+        return "GtfsRealtimeUpdater(" + url + ")";
+    }
 
 }
