@@ -49,18 +49,21 @@ public class ElevatorHopEdge extends AbstractEdge {
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+        
+        TraverseMode mode = s0.getNonTransitMode(options);
 
-        if (options.getModes().getWalk() && 
+        if (mode == TraverseMode.WALK && 
             !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return null;
         }
 
-        if (options.getModes().getBicycle() && 
+        if (mode == TraverseMode.BICYCLE && 
             !permission.allows(StreetTraversalPermission.BICYCLE)) {
             return null;
         }
         // there are elevators which allow cars
-        if (options.getModes().getCar() && !permission.allows(StreetTraversalPermission.CAR)) {
+        if (mode == TraverseMode.CAR
+            && !permission.allows(StreetTraversalPermission.CAR)) {
             return null;
         }
 
