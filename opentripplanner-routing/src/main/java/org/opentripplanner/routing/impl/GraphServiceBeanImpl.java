@@ -64,7 +64,6 @@ public class GraphServiceBeanImpl implements GraphService {
 
     @Override
     public Graph getGraph(String routerId) {
-        // TODO Auto-generated method stub
-        return null;
+        return graph;
     }
 }
