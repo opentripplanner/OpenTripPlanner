@@ -599,10 +599,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if (hole.area() > 0) {
                             reversePolygonOfOSMNodes(holeNodes);
                             hole.reverse();
-
-                            if (!hole.is_in_standard_form()) {
-                                standardize(hole.vertices, nodes);
-                            }
+                        }
+                        if (!hole.is_in_standard_form()) {
+                            standardize(hole.vertices, holeNodes);
                         }
                         nodes.addAll(holeNodes);
                         polygons.add(hole);
