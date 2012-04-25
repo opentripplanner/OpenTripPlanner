@@ -50,7 +50,8 @@ public class State implements Cloneable {
     /* StateData contains data which is unlikely to change as often */
     protected StateData stateData;
 
-    private double lastTransitWalk = 0;
+    // how far have we walked
+    protected double walkDistance;
 
     /* CONSTRUCTORS */
 
@@ -209,7 +210,7 @@ public class State implements Cloneable {
     }
 
     public double getWalkDistance() {
-        return stateData.walkDistance;
+        return walkDistance;
     }
 
     public Vertex getVertex() {
@@ -379,17 +380,13 @@ public class State implements Cloneable {
     }
 
     public double getWalkSinceLastTransit() {
-        return stateData.walkDistance - lastTransitWalk;
+        return walkDistance - stateData.lastTransitWalk;
     }
 
     public double getWalkAtLastTransit() {
-        return lastTransitWalk;
+        return stateData.lastTransitWalk;
     }
 
-    public void setWalkAtLastTransit(double lastTransitWalk) {
-        this.lastTransitWalk = lastTransitWalk;
-    }
-    
     public boolean multipleOptionsBefore() {
         boolean foundAlternatePaths = false;
         TraverseMode requestedMode = getNonTransitMode(getOptions());

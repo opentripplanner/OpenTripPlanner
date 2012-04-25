@@ -151,7 +151,7 @@ public class StateEditor {
         if (!options.getModes().getTransit())
             return false;
 
-        return child.stateData.walkDistance >= options.maxWalkDistance;
+        return child.walkDistance >= options.maxWalkDistance;
     }
 
     public String toString() {
@@ -230,13 +230,12 @@ public class StateEditor {
     }
 
     public void incrementWalkDistance(double length) {
-        cloneStateDataAsNeeded();
         if (length < 0) {
             _log.warn("A state's walk distance is being incremented by a negative amount.");
             defectiveTraversal = true;
             return;
         }
-        child.stateData.walkDistance += length;
+        child.walkDistance += length;
     }
 
     public void incrementNumBoardings() {
@@ -265,8 +264,7 @@ public class StateEditor {
     }
 
     public void setWalkDistance(double walkDistance) {
-        cloneStateDataAsNeeded();
-        child.stateData.walkDistance = walkDistance;
+        child.walkDistance = walkDistance;
     }
 
     public void setZone(String zone) {
@@ -460,6 +458,7 @@ public class StateEditor {
     }
 
     public void alightTransit() {
-        child.setWalkAtLastTransit(child.getWalkDistance());
+        cloneStateDataAsNeeded();
+        child.stateData.lastTransitWalk = child.getWalkDistance();
     }
 }
