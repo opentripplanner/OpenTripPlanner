@@ -134,6 +134,15 @@ otp.util.DateUtils = {
         }
         return date;
     },
+    
+    pad : function (n, digits) {
+	    var string = n.toString();
+	    var missingDigits = digits - string.length;
+	    if (missingDigits > 0) {
+	    	string = ('0' * missingDigits) + string;
+	    }
+	    return string;
+	},
 
     /** make an iso [YYYY]-[MM]-[DD] (2012-04-22) date for the api */
     dateToIsoDateString : function(date, defVal)
@@ -141,7 +150,11 @@ otp.util.DateUtils = {
         var retVal = defVal;
         try
         {
-            retVal = date.toISOString().substring(0,10);
+        	// there is a Date.toISOString() method, but it will account for the browser time zone
+        	// we want to assume the date is expressed in the _server_ time zone
+        	retVal = [date.getFullYear(), this.pad(date.getMonth() + 1, 2), 
+        	          this.pad(date.getDate(), 2)].join('-'); 
+        	console.log(retVal);
         }
         catch(e)
         {
