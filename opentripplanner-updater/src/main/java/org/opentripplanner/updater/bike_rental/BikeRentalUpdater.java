@@ -52,6 +52,7 @@ public class BikeRentalUpdater implements Runnable {
                 vertex = new BikeRentalStationVertex(graph, "bike rental station " + id, station.x,
                         station.y, station.name, station.bikesAvailable, station.spacesAvailable);
                 networkLinkerLibrary.connectVertexToStreets(vertex);
+                verticesByStation.put(id, vertex);
                 new RentABikeOnEdge(vertex, vertex);
                 new RentABikeOffEdge(vertex, vertex);
             } else {
