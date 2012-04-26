@@ -171,8 +171,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
  
-        /* string interning turned off pending a faster custom string table */
-        reader.setInternStrings(false);
+        reader.setInternStrings(true);
 
         if (gtfsBundle.getDefaultAgencyId() != null)
             reader.setDefaultAgencyId(gtfsBundle.getDefaultAgencyId());
@@ -294,7 +293,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         @Override
         public void handleEntity(Object bean) {
             int count = incrementCount(bean.getClass());
-            if (count % 100000 == 0)
+            if (count % 1000000 == 0)
                 if (_log.isDebugEnabled()) {
                     String name = bean.getClass().getName();
                     int index = name.lastIndexOf('.');

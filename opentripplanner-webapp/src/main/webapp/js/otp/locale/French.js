@@ -125,7 +125,10 @@ otp.locale.French = {
         to : "vers",
         via : "via",
         circle_counterclockwise : "prendre le rond-point",
-        circle_clockwise : "prendre le rond-point dans le sens horaire"
+        circle_clockwise : "prendre le rond-point dans le sens horaire",
+        // rather than just being a direction, this should be
+        // full-fledged to take just the exit name at the end
+        elevator: "prendre l'ascenseur niveau"
     },
 
     // see otp.planner.Templates for use ... these are used on the trip

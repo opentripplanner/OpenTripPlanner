@@ -57,8 +57,8 @@ public class OSMDownloader {
         _cacheDirectory = cacheDirectory;
     }
 
-    public void setUpdateIfOlderThanDuration(int durationIndDays) {
-        _updateIfOlderThanDuration = durationIndDays;
+    public void setUpdateIfOlderThanDuration(int durationInMilliseconds) {
+        _updateIfOlderThanDuration = durationInMilliseconds;
     }
 
     public void visitRegion(Envelope rectangle, OSMDownloaderListener listener) throws IOException {
@@ -109,10 +109,11 @@ public class OSMDownloader {
             Envelope r = new Envelope(lon - _overlap, lon + _lonXStep + _overlap, lat - _overlap,
                     lat + _latYStep + _overlap);
 
-            _log.debug("downloading osm tile: " + key);
+            _log.debug("downloading osm tile: " + key + " from path " + path + " e " + path.exists());
+            
 
             URL url = constructUrl(r);
-            _log.debug(url.toString());
+            _log.warn("downloading from " + url.toString());
 
             InputStream in = url.openStream();
             FileOutputStream out = new FileOutputStream(path);

@@ -55,7 +55,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
     
     @Override
     public State traverse(State s0) {
-        EdgeNarrative en = new FixedModeEdge(this, s0.getOptions().getModes().getNonTransitMode());
+        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions())); 
         TraverseOptions options = s0.getOptions();
 
         StateEditor s1 = s0.edit(this, en);

@@ -28,7 +28,8 @@ otp.config_defaults = {
             showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
             showIntermediateForms : true,   // turn on/off the ability to plan routes with intermediate points 
             showStopCodes         : true,   // show stop codes as part of the itinerary
-            showAgencyInfo        : true,   // show the 'service run by Yolobus' on each itinerary leg...
+            showAgencyInfo        : true,   // show the 'service run by Yolobus' on each itinerary leg
+            showFareInfo          : true,   // show the fare information in the itinerary
             showPrintButton       : true,   // turn on/off itinerary print button
             showLinksButton       : true,   // turn on/off itinerary links button
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
@@ -69,10 +70,20 @@ otp.config_defaults = {
 
         /* debug geocoder */
         /*  *
+        ,fromToOverride:null,
         geocoder  :
         {
             enabled : true,
             isSolr  : true,
+            url     : "/js/otp/planner/test/solr-geo.json",
+            addressParamName : "address"
+        }
+        /*  *
+        ,fromToOverride:null,
+        geocoder  :
+        {
+            enabled : true,
+            isSolr  : false,
             url     : "/js/otp/planner/test/geo-multi.xml",
             addressParamName : "address"
         }

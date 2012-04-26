@@ -188,47 +188,65 @@ public class TurnVertex extends StreetVertex {
                 return false;
             }
         }
-
         if (wo.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
         }
-
         if (wo.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         }
-
         if (wo.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
         }
+        return false;
+    }
 
+    public boolean canTraverse(TraverseOptions wo, TraverseMode mode) {
+        if (wo.wheelchairAccessible) {
+            if (!wheelchairAccessible) {
+                return false;
+            }
+            if (maxSlope > wo.maxSlope) {
+                return false;
+            }
+        }
+        if (mode == TraverseMode.WALK && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return true;
+        }
+        if (mode == TraverseMode.BICYCLE && permission.allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        }
+        if (mode == TraverseMode.CAR && permission.allows(StreetTraversalPermission.CAR)) {
+            return true;
+        }
         return false;
     }
 
     public double computeWeight(State s0, TraverseOptions options, double time) {
         double weight;
+        double speed = options.getSpeed(s0.getNonTransitMode(options));
         if (options.wheelchairAccessible) {
             // in fact, a wheelchair user will probably be going slower
             // than a cyclist, having less wind resistance, but will have
             // a stronger preference for less work. Maybe it
             // evens out?
-            weight = slopeSpeedEffectiveLength / options.speed;
-        } else if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            weight = slopeSpeedEffectiveLength / speed;
+        } else if (s0.getNonTransitMode(options).equals(TraverseMode.BICYCLE)) {
             switch (options.optimizeFor) {
             case SAFE:
-                weight = bicycleSafetyEffectiveLength / options.speed;
+                weight = bicycleSafetyEffectiveLength / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyEffectiveLength / options.speed;
+                weight = bicycleSafetyEffectiveLength / speed;
                 if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
                 break;
             case FLAT:
-                weight = length / options.speed + slopeWorkCost;
+                weight = length / speed + slopeWorkCost;
                 break;
             case QUICK:
-                weight = slopeSpeedEffectiveLength / options.speed;
+                weight = slopeSpeedEffectiveLength / speed;
                 break;
             case TRIANGLE:
                 double quick = slopeSpeedEffectiveLength;
@@ -237,10 +255,10 @@ public class TurnVertex extends StreetVertex {
                 weight = quick * options.getTriangleTimeFactor() + slope
                         * options.getTriangleSlopeFactor() + safety
                         * options.getTriangleSafetyFactor();
-                weight /= options.speed;
+                weight /= speed;
                 break;
             default:
-                weight = length / options.speed;
+                weight = length / speed;
             }
         } else {
             weight = time;

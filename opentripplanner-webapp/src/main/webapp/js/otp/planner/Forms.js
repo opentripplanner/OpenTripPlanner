@@ -124,6 +124,30 @@ otp.planner.StaticForms = {
         {}
     },
 
+    /** 
+     * This method called by submit() below, and returns an error string (or null if no error).  
+     * Here we check for errors in either the From & To input forms, and more importantly, whehter we have
+     * a coordinate to pass down to the API.  As of Spring 2012, the API requires a valid fromCoord and toCoord.
+     */
+    checkForSubmitErrorMessage : function()
+    {
+        var mess = null;
+
+        if(this.m_fromForm.getComboBox().activeError || this.m_toForm.getComboBox().activeError)
+            mess = this.locale.tripPlanner.geocoder.msg_content;
+
+        var f = this.m_fromForm.getNamedCoord() == null;
+        var t = this.m_toForm.getNamedCoord() == null; 
+        if(f && t)
+            mess = this.locale.tripPlanner.msgcodes['460'];
+        else if(f)
+            mess = this.locale.tripPlanner.msgcodes['440'];
+        else if(t)
+            mess = this.locale.tripPlanner.msgcodes['450'];
+
+        return mess;
+    },
+
     /**
      * called when submitting the form
      * 
@@ -135,23 +159,26 @@ otp.planner.StaticForms = {
     {
         this.blurForms();
 
+/*  COMMENTING THIS OUT - THIS code will get you into an endless loop when you type garbage into one of the geo forms which won't geocode. 
+    Good idea, but needs to be fixed...
+
         if(this.isBusyGeocoding())
         {
             // if we are currently waiting for a geocoder response,
-            // then let's wait until we get a response before we submit
-            // the form
+            // then let's wait until we get a response before we submit the form
             setTimeout(this.submit.createDelegate(this), 250);
             return;
         }
+*/
 
-        if (this.m_fromForm.getComboBox().activeError ||
-            this.m_toForm.getComboBox().activeError)
+        var mess = this.checkForSubmitErrorMessage();
+        if(mess)
         {
             Ext.Msg.show({
                 title: this.locale.tripPlanner.geocoder.msg_title,
-                msg:   this.locale.tripPlanner.geocoder.msg_content
+                msg:   mess
             });
-            setTimeout(function() { Ext.Msg.hide(); }, 3000);
+            setTimeout(function() { Ext.Msg.hide(); }, 4000);
             return;
         }
 
@@ -216,15 +243,15 @@ otp.planner.StaticForms = {
         this.hideErrorDialogs();
 
         // step 3: fix up some of the form values before sending onto the trip planner web service
-        var from = this.m_fromForm.getRawValue();
-        var to   = this.m_toForm.getRawValue();
         var fromPlace = this.m_fromForm.getNamedCoord();
         var toPlace   = this.m_toForm.getNamedCoord();
+        var time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
+        var date      = otp.util.DateUtils.dateToIsoDateString(this.m_date.getValue(), this.m_date.getRawValue());
         form.setValues({
-            from      : from,
-            to        : to,
-            fromPlace : fromPlace, 
-            toPlace   : toPlace
+            fromPlace : fromPlace,
+            toPlace   : toPlace,
+            date      : date,
+            time      : time
         });
     },
 
@@ -476,14 +503,14 @@ otp.planner.StaticForms = {
             if(params.after)
             {
                 time = params.after.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 forms.m_arriveByForm.setValue('false');
                 time = true;
             }
             else if(params.by)
             {
                 time = params.by.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 forms.m_arriveByForm.setValue('true');
                 time = true;
             }
@@ -491,7 +518,7 @@ otp.planner.StaticForms = {
             if(params.time)
             {
                 time = params.time.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 time = true;
             }
 
@@ -506,13 +533,15 @@ otp.planner.StaticForms = {
 
             // optimize / minimize option : how to optimize the trip, safest, quickets, least tranfers, etc...
             if(params.min)
-                params.opt = params.min;
+                params.optimize = params.min;
             if(params.opt)
+                params.optimize = params.opt
+            if(params.optimize)
             {
-                forms.m_optimizeForm.setValue(params.opt);
+                forms.m_optimizeForm.setValue(params.optimize);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doOpt(params.opt);
+                    this.m_optionsManager.doOpt(params.optimize);
                 }
             }
 
@@ -530,7 +559,7 @@ otp.planner.StaticForms = {
             {
                 time = params.Hour + ":" +  params.Minute + " " + params.AmPm.toLowerCase();
                 time = time.replace(/\./g, "");
-                forms.m_time.setRawValue(time);
+                forms.m_time.setRawValue(otp.util.DateUtils.parseTime(time, this.locale.time.time_format));
                 time = true;
             }
 
@@ -594,7 +623,7 @@ otp.planner.StaticForms = {
         retVal.fromPlace = this.m_fromForm.getNamedCoord();
         retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
-        retVal.time      = this.m_time.getRawValue();
+        retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
         retVal.arriveBy  = this.m_arriveByForm.getRawValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.m_routerIdForm.getValue();
@@ -759,6 +788,7 @@ otp.planner.StaticForms = {
 
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
+        var dateParam    = new Ext.form.Hidden({name: 'date',      value: ''});
         //this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
 
         var conf = {
@@ -769,6 +799,7 @@ otp.planner.StaticForms = {
             keys:        {key: [10, 13], scope: this, handler: this.submit},
             items:       [  fromToFP,
                             optFP,
+                            dateParam,
                             this.m_routerIdForm,
                             this.m_toPlace,
                             this.m_fromPlace,
@@ -826,8 +857,8 @@ otp.planner.StaticForms = {
 
         // step 2: create the forms
         var comboBoxOptions = {layout:'anchor', label:'', cls:'nudgeRight', msgTarget:'under', locale:this.locale, poi:this.poi, appendGeocodeName:this.planner.options.appendGeocodeName};
-        if(this.planner.geocoder && this.planner.geocoder.url)
-            comboBoxOptions.url = this.planner.geocoder.url; 
+        if(this.geocoder && this.geocoder.url)
+            comboBoxOptions.url = this.geocoder.url; 
         var fromFormOptions = Ext.apply({}, {id:otp.util.Constants.fromFormID, name:'from', emptyText:this.locale.tripPlanner.labels.from}, comboBoxOptions);
         var toFormOptions   = Ext.apply({}, {id:otp.util.Constants.toFormID,   name:'to',   emptyText:this.locale.tripPlanner.labels.to}, comboBoxOptions);
         if(this.isSolrGeocoderEnabled())
@@ -963,7 +994,8 @@ otp.planner.StaticForms = {
 
 
     /** */
-    addIntermediatePlace : function(ll) {
+    addIntermediatePlace : function(ll)
+    {
         var intPlaceField = new Ext.form.TextField({
             text: "hello",
             columnWidth: 0.75
@@ -1008,13 +1040,13 @@ otp.planner.StaticForms = {
     {
         this.m_date = new Ext.form.DateField({
             id:         'trip-date-form',
+            name:       'ui_date',
             fieldLabel: this.locale.tripPlanner.labels.date,
-            name:       'date',
             format:     this.locale.time.date_format,
             allowBlank: false,
             msgTarget:  'qtip',
-            anchor:     "87%",
-            value:      new Date().format(this.locale.time.date_format)
+            value:      new Date().format(this.locale.time.date_format),
+            anchor:     "87%"
         });
 
         this.m_arriveByStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.arriveDepart);
@@ -1040,13 +1072,13 @@ otp.planner.StaticForms = {
 
         this.m_time = new Ext.ux.form.Spinner({
                 id         : 'trip-time-form',
+                name       : 'time',
                 fieldLabel : this.locale.tripPlanner.labels.when,
                 accelerate : true,
-                width      : 85,
                 msgTarget  : 'qtip',
                 value      : new Date().format(this.locale.time.time_format),
                 strategy   : new Ext.ux.form.Spinner.TimeStrategy({format:this.locale.time.time_format}),
-                name       : 'time'
+                width      : 85
         });
 
         var timePanel = {
@@ -1240,7 +1272,7 @@ otp.planner.StaticForms = {
         var retVal = false;
         try
         {
-            if(this.geocode.m_fromGeocoding || this.geocode.m_toGeocoding)
+            if(this.geocoder.m_fromGeocoding || this.geocoder.m_toGeocoding)
                 retVal = true;
         }
         catch(e) {}

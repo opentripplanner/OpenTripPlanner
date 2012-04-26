@@ -15,6 +15,7 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
@@ -32,6 +34,8 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ExtraElevationData;
+import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -40,30 +44,42 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.TranslatedString;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.MapUtils;
+import org.opentripplanner.visibility.Environment;
+import org.opentripplanner.visibility.Point;
+import org.opentripplanner.visibility.Polygon;
+import org.opentripplanner.visibility.VisibilityGraph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,6 +106,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     private ExtraElevationData extraElevationData = new ExtraElevationData();
 
     private boolean noZeroLevels = true;
+
+    private boolean staticBikeRental;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -159,12 +177,33 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         return wayPropertySet;
     }
 
+    /**
+     * Whether bike rental stations should be loaded from OSM, rather
+     * than periodically dynamically pulled from APIs.
+     */
+    public void setStaticBikeRental(boolean b) {
+        this.staticBikeRental = b;
+    }
+    
+    public boolean getStaticBikeRental() {
+        return staticBikeRental;
+    }
+
     private class Handler implements OpenStreetMapContentHandler {
 
+        private static final double VISIBILITY_EPSILON = 0.000000001;
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
+        private List<Area> _areas = new ArrayList<Area>();
+        private Set<Long> _areaWayIds = new HashSet<Long>();
+        private Map<Long, OSMWay> _areaWaysById = new HashMap<Long, OSMWay>();
+        private Map<Long, Set<OSMWay>> _areasForNode = new HashMap<Long, Set<OSMWay>>();
+        private List<OSMWay> _singleWayAreas = new ArrayList<OSMWay>();
+
         private Map<Long, OSMRelation> _relations = new HashMap<Long, OSMRelation>();
+        private Set<OSMWithTags> _processedAreas = new HashSet<OSMWithTags>();
         private Set<Long> _nodesWithNeighbors = new HashSet<Long>();
+        private Set<Long> _areaNodes = new HashSet<Long>();
 
         private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByFromWay =
                 new HashMap<Long, List<TurnRestrictionTag>>();
@@ -175,7 +214,223 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag =
                 new HashMap<TurnRestrictionTag, TurnRestriction>();
 
+        class Ring {
+            public List<OSMNode> nodes;
+
+            public Polygon geometry;
+
+            public List<Ring> holes = new ArrayList<Ring>();
+
+            public Ring(List<Long> osmNodes) {
+                ArrayList<Point> vertices = new ArrayList<Point>();
+                nodes = new ArrayList<OSMNode>(osmNodes.size());
+                for (long nodeId : osmNodes) {
+                    OSMNode node = _nodes.get(nodeId);
+                    if (nodes.contains(node)) {
+                        // hopefully, this only happens in order to
+                        // close polygons
+                        continue;
+                    }
+                    Point point = new Point(node.getLon(), node.getLat());
+                    nodes.add(node);
+                    vertices.add(point);
+                }
+                geometry = new Polygon(vertices);
+            }
+        }
+
+        /**
+         * Stores information about an OSM area needed for visibility graph construction. Algorithm
+         * based on http://wiki.openstreetmap.org/wiki/Relation:multipolygon/Algorithm but generally
+         * done in a quick/dirty way.
+         */
+        class Area {
+
+            public class AreaConstructionException extends RuntimeException {
+                private static final long serialVersionUID = 1L;
+            }
+            OSMWithTags parent; // this is the way or relation that has the relevant tags for the
+                                // area
+
+            List<Ring> outermostRings = new ArrayList<Ring>();
+
+            Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays) {
+                this.parent = parent;
+                // ring assignment
+                List<List<Long>> innerRingNodes = constructRings(innerRingWays);
+                List<List<Long>> outerRingNodes = constructRings(outerRingWays);
+                if (innerRingNodes == null || outerRingNodes == null) {
+                    throw new AreaConstructionException();
+                }
+                ArrayList<List<Long>> allRings = new ArrayList<List<Long>>(innerRingNodes);
+                allRings.addAll(outerRingNodes);
+
+                List<Ring> innerRings = new ArrayList<Ring>();
+                List<Ring> outerRings = new ArrayList<Ring>();
+                for (List<Long> ring : innerRingNodes) {
+                    innerRings.add(new Ring(ring));
+                }
+                for (List<Long> ring : outerRingNodes) {
+                    outerRings.add(new Ring(ring));
+                }
+
+                // now, ring grouping
+                // first, find outermost rings
+                OUTER: for (Ring outer : outerRings) {
+                    for (Ring possibleContainer : outerRings) {
+                        if (outer != possibleContainer && 
+                                outer.geometry.hasPointInside(possibleContainer.geometry)) {
+                            continue OUTER;
+                        }
+                    }
+                    outermostRings.add(outer);
+
+                    // find holes in this ring
+                    for (Ring possibleHole : innerRings) {
+                        if (possibleHole.geometry.hasPointInside(outer.geometry)) {
+                            outer.holes.add(possibleHole);
+                        }
+                    }
+                }
+            }
+
+            public List<List<Long>> constructRings(List<OSMWay> ways) {
+                if (ways.size() == 0) {
+                    //no rings is no rings
+                    return Collections.emptyList();
+                }
+                OSMWay way = ways.get(ways.size() - 1);
+                List<OSMWay> remainingUnassigned = new ArrayList<OSMWay>(ways);
+                remainingUnassigned.remove(ways.size() - 1);
+
+                List<Long> wayNodes = way.getNodeRefs();
+                Long nextStartNode = wayNodes.get(wayNodes.size() - 1);
+                Long nextEndNode = wayNodes.get(0);
+                ArrayList<List<Long>> rings = new ArrayList<List<Long>>();
+                rings.add(new ArrayList<Long>());
+                HashSet<Long> endpoints = new HashSet<Long>();
+                endpoints.add(nextEndNode);
+                endpoints.add(nextStartNode);
+                if (!assignWayToRing(endpoints, way, remainingUnassigned, rings, 0)) {
+                    _log.warn("Failed to construct rings for " + parent);
+                    return null;
+                }
+                return rings;
+            }
+
+            private boolean assignWayToRing(Set<Long> endpoints, OSMWay way,
+                    List<OSMWay> unassigned, List<List<Long>> rings, int ring) {
+                List<Long> curRing = rings.get(ring);
+                ArrayList<Long> savedRing = new ArrayList<Long>(curRing);
+
+                long removedEndpoint;
+
+                if (curRing.size() == 0) {
+                    curRing.addAll(way.getNodeRefs());
+                    removedEndpoint = -1;
+                } else {
+
+                    long ringFirstNode = curRing.get(0);
+                    long ringLastNode = curRing.get(curRing.size() - 1);
+
+                    if (ringFirstNode == ringLastNode) {
+                        return false; // this ring is full
+                    }
+
+                    List<Long> wayNodes = way.getNodeRefs();
+                    long wayFirstNode = wayNodes.get(0);
+                    long wayLastNode = wayNodes.get(wayNodes.size() - 1);
+
+                    if (ringFirstNode == wayLastNode) {
+                        curRing.addAll(0, wayNodes.subList(1, wayNodes.size()));
+                        removedEndpoint = ringFirstNode;
+                    } else if (ringFirstNode == wayFirstNode) {
+                        ArrayList<Long> wayNodesCopy = new ArrayList<Long>(wayNodes);
+                        Collections.reverse(wayNodesCopy);
+                        curRing.addAll(0, wayNodesCopy.subList(1, wayNodes.size()));
+                        removedEndpoint = ringFirstNode;
+                    } else if (ringLastNode == wayFirstNode) {
+                        curRing.addAll(wayNodes.subList(1, wayNodes.size()));
+                        removedEndpoint = ringLastNode;
+                    } else if (ringLastNode == wayLastNode) {
+                        ArrayList<Long> wayNodesCopy = new ArrayList<Long>(wayNodes);
+                        Collections.reverse(wayNodesCopy);
+                        curRing.addAll(wayNodesCopy.subList(1, wayNodes.size()));
+                        removedEndpoint = ringLastNode;
+                    } else {
+                        // this way cannot be connected to either end of this way
+                        return false;
+                    }
+                    endpoints.remove(removedEndpoint);
+
+                    long newRingFirstNode = curRing.get(0);
+                    long newRingLastNode = curRing.get(curRing.size() - 1);
+
+                    if (newRingFirstNode == newRingLastNode) {
+                        // check that ring is valid i.e. has no self-intersections;
+                        // assumes that self-intersections only occur at nodes,
+                        // since the alternative is a hassle to code;
+                        // the OSM multipolygon spec says it will never happen, but
+                        // I have not proven that it is impossible to construct an invalid
+                        // interpretation of a valid multipolygon which has this property
+                        if (new HashSet<Long>(curRing).size() != curRing.size() - 1) {
+                            return false;
+                        }
+                    }
+
+                }
+                if (unassigned.size() == 0) {
+                    // check that all rings are valid, closed rings
+                    for (List<Long> checkRing : rings) {
+                        if (!checkRing.get(0).equals(checkRing.get(checkRing.size() - 1))) {
+                            return false;
+                        }
+                    }
+                    endpoints.remove(curRing.get(0));
+                    return true;
+                }
+
+                for (OSMWay nextWay : unassigned) {
+                    List<OSMWay> remainingUnassigned = new ArrayList<OSMWay>(unassigned);
+                    remainingUnassigned.remove(nextWay);
+
+                    List<Long> nextWayNodes = nextWay.getNodeRefs();
+                    Long nextStartNode = nextWayNodes.get(nextWayNodes.size() - 1);
+                    Long nextEndNode = nextWayNodes.get(0);
+                    if (endpoints.contains(nextStartNode) || endpoints.contains(nextEndNode)) {
+
+                        // this is inefficient; we should actually keep track of which rings
+                        // each endpoint is associated with
+                        for (int i = 0; i < rings.size(); ++i) {
+                            if (assignWayToRing(endpoints, nextWay, remainingUnassigned, rings, i)) {
+                                return true;
+                            }
+                        }
+                    }
+                    rings.add(new ArrayList<Long>());
+                    endpoints.add(nextEndNode);
+                    endpoints.add(nextStartNode);
+                    if (assignWayToRing(endpoints, nextWay, remainingUnassigned, rings,
+                            rings.size() - 1)) {
+                        return true;
+                    }
+                    endpoints.remove(nextEndNode);
+                    endpoints.remove(nextStartNode);
+                    rings.remove(rings.size() - 1);
+                }
+                // no way to assign this way to this ring (and still consistently assign the other
+                // rings)
+
+                // restore rings to previous state before failing
+                rings.set(ring, savedRing);
+                endpoints.add(removedEndpoint);
+                return false;
+            }
+        }
+
         private Graph graph;
+
+        GeometryFactory geometryFactory = new GeometryFactory();
 
         /** The bike safety factor of the safest street */
         private double bestBikeSafety = 1;
@@ -197,6 +452,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         // track which vertical level each OSM way belongs to, for building elevators etc.
         private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel>();
+        private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
 
         public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
             this.graph = graph;
@@ -204,13 +460,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // handle turn restrictions, road names, and level maps in relations
             processRelations();
 
+            if (staticBikeRental) {
+                processBikeRentalNodes();
+            }
+
             // Remove all simple islands
-            _nodes.keySet().retainAll(_nodesWithNeighbors);
+            HashSet<Long> _keep = new HashSet<Long>(_nodesWithNeighbors);
+            _keep.addAll(_areaNodes);
+            _nodes.keySet().retainAll(_keep);
 
             // figure out which nodes that are actually intersections
             initIntersectionNodes();
 
             buildBasicGraph();
+            buildAreas();
 
             buildElevatorEdges(graph);
 
@@ -229,7 +492,48 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             applyBikeSafetyFactor(graph);
             StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
 
+            if (staticBikeRental) {
+                linkBikeRentalStations();
+            }
         } // END buildGraph()
+
+        private void processBikeRentalNodes() {
+            _log.debug("Processing bike rental nodes...");
+            int n = 0;
+            for (OSMNode node : _bikeRentalNodes) {
+                n++;
+                String name = node.getTag("name");
+                if (name == null)
+                    name = "Bike rental " + node.getId();
+                int capacity = Integer.MAX_VALUE;
+                if (node.hasTag("capacity")) {
+                    capacity = Integer.parseInt(node.getTag("capacity"));
+                }
+                BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "bike rental "
+                        + node.getId(), node.getLon(), node.getLat(),
+                        "Bike rental station " + name, capacity);
+                new RentABikeOnEdge(station, station);
+                new RentABikeOffEdge(station, station);
+            }
+            _log.debug("Created " + n + " bike rental stations.");
+        }
+
+        private void linkBikeRentalStations() {
+            _log.debug("Linking bike rental stations...");
+            NetworkLinkerLibrary networkLinkerLibrary = new NetworkLinkerLibrary(graph,
+                    new HashMap<Class<?>, Object>());
+            // Iterate over a copy of vertex list because it will be modified
+            ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+            vertices.addAll(graph.getVertices());
+
+            for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
+                    BikeRentalStationVertex.class)) {
+                if (!networkLinkerLibrary.connectVertexToStreets(brsv)) {
+                    _log.warn(GraphBuilderAnnotation.register(graph,
+                            Variety.BIKE_RENTAL_STATION_UNLINKED, brsv));
+                }
+            }
+        }
 
         private void generateElevationProfiles(Graph graph) {
             Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
@@ -261,8 +565,256 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
+        private void buildAreas() {
+            final int MAX_AREA_NODES = 500;
+            _log.debug("building visibility graphs for areas");
+            for (Area area : _areas) {
+                Set<OSMNode> startingNodes = new HashSet<OSMNode>();
+                List<Vertex> startingVertices = new ArrayList<Vertex>();
+                Set<Edge> edges = new HashSet<Edge>();
+
+                OSMWithTags areaEntity = area.parent;
+
+                StreetTraversalPermission areaPermissions = getPermissionsForEntity(areaEntity,
+                        StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+                if (areaPermissions == StreetTraversalPermission.NONE) 
+                        continue;
+                setWayName(areaEntity);
+
+                List<Point> vertices = new ArrayList<Point>();
+
+                // the points corresponding to concave or hole vertices
+                // or those linked to ways
+                Set<Point> visibilityPoints = new HashSet<Point>();
+
+                // create polygon and accumulate nodes for area
+
+                for (Ring ring : area.outermostRings) {
+                    List<OSMNode> nodes = new ArrayList<OSMNode>();
+                    for (OSMNode node : ring.nodes) {
+                        if (nodes.contains(node)) {
+                            // hopefully, this only happens in order to
+                            // close polygons
+                            continue;
+                        }
+                        if (node == null) {
+                            throw new RuntimeException("node for area "
+                                    + areaEntity.getId() + " does not exist");
+                        }
+                        Point point = new Point(node.getLon(), node.getLat());
+                        nodes.add(node);
+                        vertices.add(point);
+                    }
+                    Polygon polygon = new Polygon(vertices);
+
+                    if (polygon.area() < 0) {
+                        polygon.reverse();
+                        // need to reverse nodes as well
+                        reversePolygonOfOSMNodes(nodes);
+                    }
+
+                    if (!polygon.is_in_standard_form()) {
+                        standardize(polygon.vertices, nodes);
+                    }
+
+                    int n = polygon.vertices.size();
+                    for (int i = 0; i < n; ++i) {
+                        Point cur = polygon.vertices.get(i);
+                        Point prev = polygon.vertices.get((i + n - 1) % n);
+                        Point next = polygon.vertices.get((i + 1) % n);
+                        OSMNode curNode = nodes.get(i);
+                        if (_nodesWithNeighbors.contains(curNode.getId()) || multipleAreasContain(curNode.getId())) {
+                            visibilityPoints.add(cur);
+                            startingNodes.add(curNode);
+                        } else if ((cur.x - prev.x) * (next.y - cur.y) - (cur.y - prev.y)
+                                * (next.x - cur.x) < 0) {
+                            //that math up there is a couple of cross products to check
+                            //if the point is concave.
+                            visibilityPoints.add(cur);
+                        }
+
+                    }
+
+                    ArrayList<Polygon> polygons = new ArrayList<Polygon>();
+                    polygons.add(polygon);
+                    // holes
+                    for (Ring innerRing : ring.holes) {
+                        ArrayList<OSMNode> holeNodes = new ArrayList<OSMNode>();
+                        vertices = new ArrayList<Point>();
+                        for (OSMNode node : innerRing.nodes) {
+                            if (holeNodes.contains(node)) {
+                                // hopefully, this only happens in order to
+                                // close polygons
+                                continue;
+                            }
+                            if (node == null) {
+                                throw new RuntimeException("node for area does not exist");
+                            }
+                            Point point = new Point(node.getLon(), node.getLat());
+                            holeNodes.add(node);
+                            vertices.add(point);
+                            visibilityPoints.add(point);
+                            if (_nodesWithNeighbors.contains(node.getId()) || multipleAreasContain(node.getId())) {                    
+                                startingNodes.add(node);
+                            }
+                        }
+                        Polygon hole = new Polygon(vertices);
+
+                        if (hole.area() > 0) {
+                            reversePolygonOfOSMNodes(holeNodes);
+                            hole.reverse();
+                        }
+                        if (!hole.is_in_standard_form()) {
+                            standardize(hole.vertices, holeNodes);
+                        }
+                        nodes.addAll(holeNodes);
+                        polygons.add(hole);
+                    }
+
+                    Environment areaEnv = new Environment(polygons);
+
+                    //FIXME: temporary hard limit on size of 
+                    //areas to prevent way explosion
+                    if (visibilityPoints.size() > MAX_AREA_NODES) {
+                        _log.warn("Area " + area.parent + " is too complicated (" + visibilityPoints.size() + " > " + MAX_AREA_NODES);
+                        continue;
+                    }
+
+                    if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
+                        _log.warn("Area " + area.parent + " is not epsilon-valid (epsilon = " + VISIBILITY_EPSILON + ")");
+                        continue;
+                    }
+                    VisibilityGraph vg = new VisibilityGraph(areaEnv, VISIBILITY_EPSILON, visibilityPoints);
+                    for (int i = 0; i < nodes.size(); ++i) {
+                        OSMNode nodeI = nodes.get(i);
+                        for (int j = 0; j < nodes.size(); ++j) {
+                            if (i == j)
+                                continue;
+
+                            if (vg.get(0, i, 0, j)) {
+                                // vertex i is connected to vertex j
+                                IntersectionVertex startEndpoint = getVertexForOsmNode(nodeI,
+                                        areaEntity);
+                                OSMNode nodeJ = nodes.get(j);
+                                IntersectionVertex endEndpoint = getVertexForOsmNode(nodeJ, areaEntity);
+
+                                Coordinate[] coordinates = new Coordinate[] {
+                                        startEndpoint.getCoordinate(), endEndpoint.getCoordinate() };
+                                LineString geometry = geometryFactory.createLineString(coordinates);
+
+                                String id = "way (area) " + areaEntity.getId() + " from "
+                                        + nodeI.getId() + " to " + nodeJ.getId();
+                                id = unique(id);
+                                String name = getNameForWay(areaEntity, id);
+
+                                double length = DistanceLibrary.distance(
+                                        startEndpoint.getCoordinate(), endEndpoint.getCoordinate());
+                                PlainStreetEdge street = new PlainStreetEdge(startEndpoint,
+                                        endEndpoint, geometry, name, length,
+                                        areaPermissions,
+                                        i > j);
+                                street.setId(id);
+
+                                edges.add(street);
+                                if (startingNodes.contains(nodeI)) {
+                                    startingVertices.add(startEndpoint);
+                                }
+                            }
+                        }
+                    }
+                }
+                pruneAreaEdges(startingVertices, edges);
+            }
+        }
+
+        private void standardize(ArrayList<Point> vertices, List<OSMNode> nodes) {
+            //based on code from VisiLibity
+            int point_count = vertices.size();
+            if (point_count > 1) { // if more than one point in the polygon.
+                ArrayList<Point> vertices_temp = new ArrayList<Point>(point_count);
+                ArrayList<OSMNode> nodes_temp = new ArrayList<OSMNode>(point_count);
+                // Find index of lexicographically smallest point.
+                int index_of_smallest = 0;
+                for (int i = 1; i < point_count; i++)
+                    if (vertices.get(i).compareTo(vertices.get(index_of_smallest)) < 0)
+                        index_of_smallest = i;
+                //minor optimization for already-standardized polygons
+                if (index_of_smallest == 0) return;
+                // Fill vertices_temp starting with lex. smallest.
+                for (int i = index_of_smallest; i < point_count; i++) {
+                    vertices_temp.add(vertices.get(i));
+                    nodes_temp.add(nodes.get(i));
+                }
+                for (int i = 0; i < index_of_smallest; i++) {
+                    vertices_temp.add(vertices.get(i));
+                    nodes_temp.add(nodes.get(i));
+                }
+                for (int i = 0; i < point_count; ++i) {
+                    vertices.set(i, vertices_temp.get(i));
+                    nodes.set(i, nodes_temp.get(i));
+                }
+            }
+        }
+
+        private boolean multipleAreasContain(long id) {
+            Set<OSMWay> areas = _areasForNode.get(id);
+            if (areas == null) {
+                return false;
+            }
+            return areas.size() > 1;
+        }
+
+        class ListedEdgesOnly implements SkipEdgeStrategy {
+            private Set<Edge> edges;
+            public ListedEdgesOnly(Set<Edge> edges) {
+                this.edges = edges;
+            }
+            @Override
+            public boolean shouldSkipEdge(Vertex origin, Vertex target, State current, Edge edge,
+                    ShortestPathTree spt, TraverseOptions traverseOptions) {
+                return !edges.contains(edge);
+            }
+
+        }
+        /** 
+         * Do an all-pairs shortest path search from a list of vertices over a specified
+         * set of edges, and retain only those edges which are actually used in some
+         * shortest path.
+         * @param startingVertices
+         * @param edges
+         */
+        private void pruneAreaEdges(List<Vertex> startingVertices, Set<Edge> edges) {
+            TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
+            GenericDijkstra search = new GenericDijkstra(options);
+            search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
+            Set<Edge> usedEdges = new HashSet<Edge>();
+            for (Vertex vertex : startingVertices) {
+                State state = new State(vertex, options);
+                ShortestPathTree spt = search.getShortestPathTree(state);
+                for (Vertex endVertex : startingVertices) {
+                    GraphPath path = spt.getPath(endVertex, false);
+                    for (Edge edge : path.edges) {
+                        usedEdges.add(edge);
+                    }
+                }
+            }
+            for (Edge edge : edges) {
+                if (!usedEdges.contains(edge)) {
+                    edge.detach();
+                }
+            }
+        }
+
+        private void reversePolygonOfOSMNodes(List<OSMNode> nodes) {
+            for (int i = 1; i < (nodes.size()+1) / 2; ++i) {
+                OSMNode tmp = nodes.get(i);
+                int opposite = nodes.size() - i;
+                nodes.set(i, nodes.get(opposite));
+                nodes.set(opposite, tmp);
+            }
+        }
+
         private void buildBasicGraph() {
-            GeometryFactory geometryFactory = new GeometryFactory();
 
             /* build an ordinary graph, which we will convert to an edge-based graph */
             long wayIndex = 0;
@@ -275,12 +827,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 WayProperties wayData = wayPropertySet.getDataForWay(way);
 
-                if (!way.hasTag("name")) {
-                    String creativeName = wayPropertySet.getCreativeNameForWay(way);
-                    if (creativeName != null) {
-                        way.addTag("otp:gen_name", creativeName);
-                    }
-                }
+                setWayName(way);
                 Set<Alert> note = wayPropertySet.getNoteForWay(way);
                 Set<Alert> wheelchairNote = getWheelchairNotes(way);
 
@@ -418,6 +965,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     osmStartNode = _nodes.get(startNode);
                 }
             } // END loop over OSM ways
+        }
+
+        private void setWayName(OSMWithTags way) {
+            if (!way.hasTag("name")) {
+                String creativeName = wayPropertySet.getCreativeNameForWay(way);
+                if (creativeName != null) {
+                    way.addTag("otp:gen_name", creativeName);
+                }
+            }
         }
 
         private void storeExtraElevationData(List<ElevationPoint> elevationPoints, PlainStreetEdge street, PlainStreetEdge backStreet, double length) {
@@ -653,7 +1209,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addNode(OSMNode node) {
-            if (!_nodesWithNeighbors.contains(node.getId()))
+            if(node.isTag("amenity", "bicycle_rental")) {
+                _bikeRentalNodes.add(node);
+                return;
+            }
+            if (!(_nodesWithNeighbors.contains(node.getId()) || _areaNodes.contains(node.getId())))
                 return;
 
             if (_nodes.containsKey(node.getId()))
@@ -667,29 +1227,82 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         public void addWay(OSMWay way) {
             /* only add ways once */
-            if (_ways.containsKey(way.getId()))
-                return;
-            /* filter out ways that are not relevant for routing */
-            if (!(way.hasTag("highway") || way.isTag("railway", "platform")))
-                return;
-            if (way.isTag("highway", "conveyer") || way.isTag("highway", "proposed"))
-                return;
-            if (way.isTag("area", "yes"))
-                // routing on areas is not yet supported. areas can cause problems with stop linking.
-                // (24th & Mission BART plaza is both highway=pedestrian and area=yes)
+            long wayId = way.getId();
+            if (_ways.containsKey(wayId) || _areaWaysById.containsKey(wayId))
                 return;
 
-            _ways.put(way.getId(), way);
+            if (_areaWayIds.contains(wayId)) {
+                _areaWaysById.put(wayId, way);
+            }
+            
+            /* filter out ways that are not relevant for routing */
+            if (!isWayRouteable(way)) {
+                return;
+            }
+            if (way.isTag("area", "yes") && way.getNodeRefs().size() > 2) {
+                //this is an area that's a simple polygon.  So we can just add it straight
+                //to the areas, if it's not part of a relation.
+                if (!_areaWayIds.contains(wayId)) {
+                    _singleWayAreas.add(way);
+                    _areaWaysById.put(wayId, way);
+                    _areaWayIds.add(wayId);
+                    for (Long node : way.getNodeRefs()) {
+                        MapUtils.addToMapSet(_areasForNode, node, way);
+                    }
+                }
+                return;
+            }
+
+            _ways.put(wayId, way);
 
             if (_ways.size() % 10000 == 0)
                 _log.debug("ways=" + _ways.size());
+        }
+
+        private boolean isWayRouteable(OSMWithTags way) {
+            if (!(way.hasTag("highway") || way.isTag("railway", "platform")))
+                return false;
+            String highway = way.getTag("highway");
+            if (highway != null
+                    && (highway.equals("conveyer") || highway.equals("proposed") || highway
+                            .equals("raceway")))
+                return false;
+
+            String access = way.getTag("access");
+
+            if (access != null) {
+                if ("no".equals(access) || "license".equals(access)) {
+                    if (way.doesTagAllowAccess("motorcar")) {
+                        return true;
+                    }
+                    if (way.doesTagAllowAccess("bicycle")) {
+                        return true;
+                    }
+                    if (way.doesTagAllowAccess("foot")) {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            return true;
         }
 
         public void addRelation(OSMRelation relation) {
             if (_relations.containsKey(relation.getId()))
                 return;
 
-            if (!(relation.isTag("type", "restriction"))
+            if (relation.isTag("type", "multipolygon") && relation.hasTag("highway")) {
+                // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
+                // without reference to the ways that compose them.  Accordingly, we will merely
+                // mark the ways for preservation here, and deal with the details once we have
+                // the ways loaded.
+                if (!isWayRouteable(relation)) {
+                    return;
+                }
+                for (OSMRelationMember member : relation.getMembers()) {
+                    _areaWayIds.add(member.getRef());
+                }
+            } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
                     && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))
                     && !(relation.isTag("type", "level_map"))) {
@@ -704,8 +1317,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void secondPhase() {
-            int count = _ways.values().size();
-
             // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
             // the way purging keeps the needed way around.
             // Multipolygons may be processed more than once, which may be needed since
@@ -716,33 +1327,96 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // only 2 steps -- ways+relations, followed by used nodes.
             // Ways can be tag-filtered in phase 1. 
             
-            processMultipolygons();
+            markNodesForKeeping(_ways.values(), _nodesWithNeighbors);
+            markNodesForKeeping(_areaWaysById.values(), _areaNodes);
+        }
 
-            for (Iterator<OSMWay> it = _ways.values().iterator(); it.hasNext();) {
+        public void nodesLoaded() {
+            processMultipolygons();
+            AREA: for (OSMWay way : _singleWayAreas) {
+                if (_processedAreas.contains(way)) {
+                    continue;
+                }
+                for (Long nodeRef : way.getNodeRefs()) {
+                    if (! _nodes.containsKey(nodeRef)) {
+                        continue AREA;
+                    }
+                }
+                try {
+                    _areas.add(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList()));
+                } catch (Area.AreaConstructionException e) {
+                    // this area cannot be constructed, but we already have all the
+                    //necessary nodes to construct it. So, something must be wrong with
+                    // the area; we'll mark it as processed so that we don't retry.
+                }
+                _processedAreas.add(way);
+            }
+            
+        }
+
+        private void markNodesForKeeping(Collection<OSMWay> osmWays, Set<Long> nodeSet) {
+            for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
                 OSMWay way = it.next();
                 // Since the way is kept, update nodes-with-neighbors
                 List<Long> nodes = way.getNodeRefs();
                 if (nodes.size() > 1) {
-                    _nodesWithNeighbors.addAll(nodes);
+                    nodeSet.addAll(nodes);
                 }
             }
-
-            _log.trace("purged " + (count - _ways.values().size()) + " ways out of " + count);
         }
 
         /**
-         * Copies useful metadata from multipolygon relations to the relevant ways.
+         * Copies useful metadata from multipolygon relations to the relevant ways, or to the area
+         * map
          * 
          * This is done at a different time than processRelations(), so that way purging doesn't
          * remove the used ways.
          */
         private void processMultipolygons() {
-            for (OSMRelation relation : _relations.values()) {
+            RELATION: for (OSMRelation relation : _relations.values()) {
+                if (_processedAreas.contains(relation)) {
+                    continue;
+                }
                 if (!(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))) {
                     continue;
                 }
+                // Area multipolygons -- pedestrian plazas
+                ArrayList<OSMWay> innerWays = new ArrayList<OSMWay>();
+                ArrayList<OSMWay> outerWays = new ArrayList<OSMWay>();
+                for (OSMRelationMember member : relation.getMembers()) {
+                    String role = member.getRole();
+                    OSMWay way = _areaWaysById.get(member.getRef());
+                    if (way == null) {
+                        // relation includes way which does not exist in the data. Skip.
+                        continue RELATION;
+                    }
+                    for (Long nodeId : way.getNodeRefs()) {
+                        if (!_nodes.containsKey(nodeId)) {
+                            // this area is missing some nodes, perhaps because it is on
+                            // the edge of the region, so we will simply not route on it.
+                            continue RELATION;
+                        }
+                        MapUtils.addToMapSet(_areasForNode, nodeId, way);
+                    }
+                    if (role.equals("inner")) {
+                        innerWays.add(way);
+                    } else if (role.equals("outer")) {
+                        outerWays.add(way);
+                    } else {
+                        _log.warn("Unexpected role " + role + " in multipolygon");
+                    }
+                }
+                _processedAreas.add(relation);
+                Area area;
+                try {
+                    area = new Area(relation, outerWays, innerWays);
+                } catch (Area.AreaConstructionException e) {
+                    continue;
+                }
+                _areas.add(area);
 
                 for (OSMRelationMember member : relation.getMembers()) {
+                    //multipolygons for attribute mapping
                     if (!("way".equals(member.getType()) && _ways.containsKey(member.getRef()))) {
                         continue;
                     }
@@ -779,7 +1453,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 } else if (relation.isTag("type", "route")) {
                     processRoad(relation);
                 }
-                // multipolygons were already processed in secondPhase()
+
+                // multipolygons will be further processed in secondPhase()
             }
         }
 
@@ -1006,11 +1681,43 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             way.getId()));
                 }
             }
+            P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
+            StreetTraversalPermission permissionsFront = permissionPair.getFirst();
+            StreetTraversalPermission permissionsBack = permissionPair.getSecond();
+
+            String access = way.getTag("access");
+            boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
+                    || "customers".equals(access) || "delivery".equals(access)
+                    || "forestry".equals(access) || "agricultural".equals(access);
+
+            if (permissionsFront != StreetTraversalPermission.NONE) {
+                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
+                        geometry, false);
+                street.setNoThruTraffic(noThruTraffic);
+            }
+            if (permissionsBack != StreetTraversalPermission.NONE) {
+                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack,
+                        backGeometry, true);
+                backStreet.setNoThruTraffic(noThruTraffic);
+            }
+
+            /* mark edges that are on roundabouts */
+            if ("roundabout".equals(tags.get("junction"))) {
+                if (street != null)
+                    street.setRoundabout(true);
+                if (backStreet != null)
+                    backStreet.setRoundabout(true);
+            }
+
+            return new P2<PlainStreetEdge>(street, backStreet);
+        }
+
+        private P2<StreetTraversalPermission> getPermissions(StreetTraversalPermission permissions, OSMWithTags way) {
 
             StreetTraversalPermission permissionsFront = permissions;
             StreetTraversalPermission permissionsBack = permissions;
 
-            if (way.isTagTrue("oneway") || "roundabout".equals(tags.get("junction"))) {
+            if (way.isTagTrue("oneway") || "roundabout".equals(way.getTag("junction"))) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
             }
             if (way.isTag("oneway", "-1")) {
@@ -1041,32 +1748,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
-
-            String access = way.getTag("access");
-            boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
-                    || "customers".equals(access) || "delivery".equals(access)
-                    || "forestry".equals(access) || "agricultural".equals(access);
-
-            if (permissionsFront != StreetTraversalPermission.NONE) {
-                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
-                        geometry, false);
-                street.setNoThruTraffic(noThruTraffic);
-            }
-            if (permissionsBack != StreetTraversalPermission.NONE) {
-                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack,
-                        backGeometry, true);
-                backStreet.setNoThruTraffic(noThruTraffic);
-            }
-
-            /* mark edges that are on roundabouts */
-            if ("roundabout".equals(tags.get("junction"))) {
-                if (street != null)
-                    street.setRoundabout(true);
-                if (backStreet != null)
-                    backStreet.setRoundabout(true);
-            }
-
-            return new P2<PlainStreetEdge>(street, backStreet);
+            return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
         }
 
         private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
@@ -1076,15 +1758,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             String id = "way " + way.getId() + " from " + startNode;
             id = unique(id);
 
-            String name = way.getAssumedName();
-
-            if (customNamer != null) {
-                name = customNamer.name(way, name);
-            }
-
-            if (name == null) {
-                name = id;
-            }
+            String name = getNameForWay(way, id);
 
             boolean steps = "steps".equals(way.getTag("highway"));
             if (steps) {
@@ -1113,6 +1787,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             return street;
+        }
+
+        private String getNameForWay(OSMWithTags way, String id) {
+            String name = way.getAssumedName();
+
+            if (customNamer != null) {
+                name = customNamer.name(way, name);
+            }
+
+            if (name == null) {
+                name = id;
+            }
+            return name;
         }
 
         private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity,
@@ -1267,6 +1954,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 endpoints.add(iv);
             }
             return iv;
+        }
+
+        @Override
+        public void doneRelations() {
+            //nothing to do here
         }
     }
 

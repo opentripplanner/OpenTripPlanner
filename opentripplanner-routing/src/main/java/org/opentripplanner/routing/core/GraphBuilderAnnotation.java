@@ -79,7 +79,7 @@ public class GraphBuilderAnnotation implements Serializable {
         TRIP_DEGENERATE("Trip %s has fewer than two stops.  We will not use it for routing. "
                 + "This is probably an error in your data"), 
         TRIP_OVERTAKING("Possible GTFS feed error: Trip %s overtakes trip %s (which has the same "
-                + "stops) at stop index %i. This will be handled correctly but inefficiently."), 
+                + "stops) at stop index %d. This will be handled correctly but inefficiently."), 
         TRIP_DUPLICATE("Possible GTFS feed error: Duplicate trip (skipping). New: %s Existing: %s"), 
         TRIP_DUPLICATE_DEPARTURE("Possible GTFS feed error: Duplicate first departure time. New "
                 + "trip: %s Existing trip: %s This will be handled correctly but inefficiently."), 
@@ -89,6 +89,7 @@ public class GraphBuilderAnnotation implements Serializable {
         TURN_RESTRICTION_BAD("Invalid turn restriction at %s"), 
         TURN_RESTRICTION_EXCEPTION("Turn restriction with bicycle exception at node %s from %s"), 
         STOP_UNLINKED("Stop %s not near any streets; it will not be usable"), 
+        BIKE_RENTAL_STATION_UNLINKED("Bike rental station %s not near any streets; it will not be usable"),
         VERTEX_SHAPE_ERROR("Transit edge %s has shape geometry which is far from its "
                 + "start/end vertices.  This could be caused by bad shape geometry, or "
                 + "by incorrect use of defaultAgencyId"), 
@@ -108,8 +109,11 @@ public class GraphBuilderAnnotation implements Serializable {
                 "same agency. Is this intentional?"),
         HOP_SPEED("Excessive speed of %f m/sec over %fm on route %s trip %s stop sequence %d."),
         HOP_ZERO_DISTANCE("Zero-distance hop in %d seconds on trip %s stop sequence %d."),
-        HOP_ZERO_TIME("Zero-time hop over %fm on route %s trip %s stop sequence %d.");
-
+        HOP_ZERO_TIME("Zero-time hop over %fm on route %s trip %s stop sequence %d."), 
+        NEGATIVE_DWELL_TIME("Negative time dwell at %s; we will assume it is zero."),
+        NEGATIVE_HOP_TIME("Negative time hop between %s and %s; skipping the entire trip.  This might" +
+        		"be caused by the use of 00:xx instead of 24:xx for stoptimes after midnight.");
+        
         private final String formatString;
 
         Variety(String formatString) {

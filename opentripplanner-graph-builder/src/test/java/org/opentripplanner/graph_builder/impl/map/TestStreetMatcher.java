@@ -174,7 +174,8 @@ public class TestStreetMatcher {
         @Override
         public State traverse(State s0) {
             double d = getDistance();
-            int t = (int) (d / s0.getOptions().speed);
+            TraverseMode mode = s0.getNonTransitMode(s0.getOptions());
+            int t = (int) (d / s0.getOptions().getSpeed(mode));
             StateEditor s1 = s0.edit(this);
             s1.incrementTimeInSeconds(t);
             s1.incrementWeight(d);

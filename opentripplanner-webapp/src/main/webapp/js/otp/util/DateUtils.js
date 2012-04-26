@@ -121,30 +121,127 @@ otp.util.DateUtils = {
     },
     
     /** Make a Date object from an ISO 8601 date string (ignoring time zone) */
-    isoDateStringToDate : function(str) {
-        if (!str)
-            return null;
-        if (str.lastIndexOf("Z") != -1) {
-        	str = str.substring(0, str.length - 1);
+    isoDateStringToDate : function(str)
+    {
+        var date = null;
+        if(str)
+        {
+            if (str.lastIndexOf("Z") != -1) {
+                str = str.substring(0, str.length - 1);
+            }
+            var tokens = str.split(/[\-\+T:]/);
+            date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3], tokens[4], tokens[5], 0);
         }
-        var tokens = str.split(/[\-\+T:]/);
-        var date = new Date(tokens[0], tokens[1] - 1, tokens[2], tokens[3],
-                tokens[4], tokens[5], 0);
         return date;
     },
+    
+    pad : function (n, digits) {
+	    var string = n.toString();
+	    var missingDigits = digits - string.length;
+	    if (missingDigits > 0) {
+	    	string = ('0' * missingDigits) + string;
+	    }
+	    return string;
+	},
 
-    prettyDateTime : function(date) {
+    /** make an iso [YYYY]-[MM]-[DD] (2012-04-22) date for the api */
+    dateToIsoDateString : function(date, defVal)
+    {
+        var retVal = defVal;
+        try
+        {
+        	// there is a Date.toISOString() method, but it will account for the browser time zone
+        	// we want to assume the date is expressed in the _server_ time zone
+        	retVal = [date.getFullYear(), this.pad(date.getMonth() + 1, 2), 
+        	          this.pad(date.getDate(), 2)].join('-'); 
+        	console.log(retVal);
+        }
+        catch(e)
+        {
+            console.log("WARN EXCEPTION in dateToIsoString(): " + e);
+        }
+        return retVal;
+    },
+
+    /** */
+    prettyDateTime : function(date)
+    {
         if (typeof date == "string") {
             date = this.isoDateStringToDate(date);
         }
         return date.format(this.DATE_TIME_FORMAT_STRING);
     },
-    
-    prettyTime : function(date) {
+
+    /** */
+    prettyTime : function(date)
+    {
         if (typeof date == "string") {
             date = this.isoDateStringToDate(date);
         }
         return date.format(this.TIME_FORMAT_STRING);
+    },
+
+    /** arbitrary am/pm time string correction ... e.g., 1233pm gets formatted into 12:33pm, etc... */
+    correctAmPmTimeString : function(time, format)
+    {
+        time = time.trim();
+        time = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
+
+        var h = time[1];
+        var m = parseInt(time[2]) || null;
+        var am = time[3];
+    
+        if(h && h.length > 2)
+        {
+            if(m == null)
+                m = h.substring(h.length-2);
+            h = h.substring(0, h.length-2);
+        }
+        h = parseInt(h) || 12;
+        if(h > 12)
+        {
+            h = h % 12;
+            if(h == 0)
+                h = 12;
+            if(am == null || am == '')
+                am = 'p';
+        }
+        if(m == null || m > 59 || m < 0)
+            m = "00"
+
+        if(am && am == 'p')
+            am = "pm"
+        else  
+            am = "am"
+
+        var space = "";
+        if(format.toLowerCase().charAt(format.length-2) == " ")
+            space = " ";
+
+        return  h + ":" + m + space + am;
+    },
+
+    /** time string parser / correction */
+    parseTime : function(time, format)
+    {
+        var retVal = time;
+        if(format && format.toLowerCase().charAt(format.length-1) == "a")
+        {
+            retVal = this.correctAmPmTimeString(time, format);
+        }
+        return retVal;
+    },
+
+    /** */
+    parseTimeTest : function(t)
+    {
+        var times = ['1:00 pm','1:00 p.m.','100 p','1:00p.m.','1:00p','1 pm','1 p.m.','1 p','1pm','1p.m.','1p','1:pm','13:00','13','944am', '1354','12335','1232p'];
+
+        for ( var i = 0; i < times.length; i++ )
+        {
+          console.log(this.parseTime(times[i], 'g:i a'));
+          console.log(this.parseTime(times[i], 'H:i'));
+        }
     },
 
     CLASS_NAME : "otp.util.DateUtils"

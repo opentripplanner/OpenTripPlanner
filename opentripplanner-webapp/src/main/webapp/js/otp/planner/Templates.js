@@ -99,12 +99,13 @@ otp.planner.Templates = {
                 '<div id="trip-details">',
                 '<h3>' + this.locale.labels.trip_details + '</h3>',
                 '<table cellpadding="3" cellspacing="0" border="0">',
-                    '<tpl if="regularFare != null">',
-                      '<tr><td><strong>' + this.locale.labels.fare        + '</strong></td><td>{regularFare}</td></tr></tpl>',
-                      '<tr><td><strong>' + this.locale.labels.travel      + '</strong></td><td>{startTimeDisplay}</td></tr>',
-                      '<tr><td><strong>' + this.locale.labels.valid       + '</strong></td><td>{[new Date().format("' + this.locale.time.format + '")]}</td></tr>',
-                      '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
-                      '<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
+                    '<tpl if="regularFare != null && showFareInfo == true">',
+                      '<tr><td><strong>' + this.locale.labels.fare      + '</strong></td><td>{regularFare}</td></tr>',
+                    '</tpl>',
+                    '<tr><td><strong>' + this.locale.labels.travel      + '</strong></td><td>{startTimeDisplay}</td></tr>',
+                    '<tr><td><strong>' + this.locale.labels.valid       + '</strong></td><td>{[new Date().format("' + this.locale.time.format + '")]}</td></tr>',
+                    '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
+                    '<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
                 '</table></div>'
             ).compile();
 

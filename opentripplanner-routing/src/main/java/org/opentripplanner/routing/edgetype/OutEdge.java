@@ -75,24 +75,24 @@ public class OutEdge extends StreetEdge {
 
     private State doTraverse(State s0, TraverseOptions options) {
         TurnVertex fromv = ((TurnVertex) this.fromv);
-
-        if (!fromv.canTraverse(options)) {
+        TraverseMode traverseMode = s0.getNonTransitMode(options);
+        if (!fromv.canTraverse(options, traverseMode)) {
             // try walking bike since you can't ride it here
-            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+            if (traverseMode == TraverseMode.BICYCLE) {
                 return doTraverse(s0, options.getWalkingOptions());
             } else {
                 return null;
             }
         }
 
-        TraverseMode traverseMode = options.getModes().getNonTransitMode();
         FixedModeEdge en = new FixedModeEdge(this, traverseMode);
         if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
             en.addNotes(fromv.getWheelchairNotes());
         }
         StateEditor s1 = s0.edit(this, en);
 
-        double time = fromv.getEffectiveLength(traverseMode) / options.speed;
+        double speed = options.getSpeed(traverseMode);
+        double time = fromv.getEffectiveLength(traverseMode) / speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) time);
@@ -111,6 +111,7 @@ public class OutEdge extends StreetEdge {
         return ((TurnVertex) fromv).getElevationProfile();
     }
 
+    @Override
     public boolean canTraverse(TraverseOptions options) {
         return ((TurnVertex) fromv).canTraverse(options);
     }

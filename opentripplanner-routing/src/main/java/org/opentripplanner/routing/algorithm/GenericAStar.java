@@ -138,7 +138,6 @@ public class GenericAStar {
 
         /* the core of the A* algorithm */
         while (!pq.empty()) { // Until the priority queue is empty:
-
             if (_verbose) {
                 double w = pq.peek_min_key();
                 System.out.println("pq min key = " + w);
@@ -184,7 +183,8 @@ public class GenericAStar {
                 if (!_searchTerminationStrategy.shouldSearchContinue(origin.getVertex(), target, u,
                         spt, options))
                     break;
-            } else if (u_vertex == target) {
+            // TODO LG: Provide a generic end of search condition
+            } else if (u_vertex == target && u.isFinal()) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;
@@ -296,7 +296,9 @@ public class GenericAStar {
             spt = _shortestPathTreeFactory.create();
 
         if (spt == null) {
-            if (options.getModes().getTransit()) {
+            // Use MultiShortestPathTree if transit OR bike rental.
+            if (options.getModes().getTransit() || options.getModes().getWalk()
+                            && options.getModes().getBicycle()) {
                 spt = new MultiShortestPathTree();
                 // if (options.useServiceDays)
                 options.setServiceDays(init.getTime(), graph.getAgencyIds());

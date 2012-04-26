@@ -17,23 +17,27 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.io.File;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -47,8 +51,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -82,6 +86,22 @@ public class TestPatternHopFactory extends TestCase {
         nl.createLinkage();
     }
 
+    public void testAnnotation() {
+        boolean found = false;
+        for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
+            if (annotation.getVariety().equals(Variety.NEGATIVE_HOP_TIME)) {
+                Collection<Object> objects = annotation.getReferencedObjects();
+                assertTrue(objects.size() == 2);
+                Iterator<Object> iter = objects.iterator();
+                StopTime st0 = (StopTime) iter.next();
+                StopTime st1 = (StopTime) iter.next();
+                assertTrue(st0.getDepartureTime() > st1.getArrivalTime());
+                found = true;
+            }
+        }
+        assertTrue(found);
+    }
+    
     public void testBoardAlight() throws Exception {
         Vertex stop_a_depart = graph.getVertex("agency_A_depart");
         Vertex stop_b_depart = graph.getVertex("agency_B_depart");
@@ -376,6 +396,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
 
         TraverseOptions options = new TraverseOptions(context);
+        options.getModes().setWalk(false);
         options.getModes().setBicycle(true);
         options.getModes().setTransit(true);
 

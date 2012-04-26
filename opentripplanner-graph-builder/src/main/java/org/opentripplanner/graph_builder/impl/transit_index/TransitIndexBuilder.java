@@ -81,6 +81,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     List<TraverseMode> modes = new ArrayList<TraverseMode>();
 
+    private HashSet<Edge> handledEdges = new HashSet<Edge>();
+
     @Override
     public void setDao(GtfsRelationalDao dao) {
         this.dao = dao;
@@ -106,9 +108,16 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
                 + " variants ");
 
-        TransitIndexServiceImpl service = new TransitIndexServiceImpl(variantsByAgency,
-                variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
-                modes);
+        TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph.getService(TransitIndexService.class);
+        if (service == null) {
+            service = new TransitIndexServiceImpl(variantsByAgency,
+                    variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+                    modes);
+        } else {
+            service.merge(variantsByAgency,
+                    variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+                    modes);
+        }
 
         insertCalendarData(service);
 
@@ -130,6 +139,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             TripPattern pattern = null;
             Trip trip = null;
             for (Edge e : gv.getIncoming()) {
+                if (handledEdges.contains(e)) {
+                    continue;
+                }
+                handledEdges.add(e);
                 if (!(e instanceof AbstractEdge)) {
                     continue;
                 }

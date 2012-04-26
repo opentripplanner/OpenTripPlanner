@@ -78,4 +78,10 @@ public class OSMMap implements OpenStreetMapContentHandler {
 
   public void secondPhase() {
   }
+
+  public void doneRelations() {
+  }
+
+  public void nodesLoaded() {
+  }
 }
