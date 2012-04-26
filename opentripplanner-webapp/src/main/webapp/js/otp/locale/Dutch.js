@@ -169,7 +169,7 @@ otp.locale.Dutch = {
     labels : 
     {
         agency_msg   : "Uitgevoerd door",
-        agency_msg_tt: "Open website van vervoerder in aparte window...",
+        agency_msg_tt: "Open website van vervoerder in nieuw venster...",
         about        : "Over",
         stop_id      : "Haltenummer",
         trip_details : "Reisdetails",
