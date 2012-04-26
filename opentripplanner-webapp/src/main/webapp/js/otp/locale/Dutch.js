@@ -350,8 +350,6 @@ otp.locale.Dutch = {
         mode : 
         [
             ['TRANSIT,WALK', 'OV'],
-// DO WE REALLY NEED THIS?  ISN'T BUS & TRAIN the same as TRANSIT, WALK
-//          ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
             ['BUSISH,WALK', 'Alleen bus'],
             ['TRAINISH,WALK', 'Alleen trein'],
             ['WALK', 'Alleen lopen'],
