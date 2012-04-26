@@ -356,7 +356,9 @@ otp.locale.Dutch = {
             ['TRAINISH,WALK', 'Alleen trein'],
             ['WALK', 'Alleen lopen'],
             ['BICYCLE', 'Fiets'],
-            ['TRANSIT,BICYCLE', 'OV & fiets']
+            ['WALK,BICYCLE', 'Huurfiets'],
+            ['TRANSIT,BICYCLE', 'OV & Fiets'],
+            ['TRANSIT,WALK,BICYCLE', 'OV & OV-fiets']
         ],
 
         wheelchair :
