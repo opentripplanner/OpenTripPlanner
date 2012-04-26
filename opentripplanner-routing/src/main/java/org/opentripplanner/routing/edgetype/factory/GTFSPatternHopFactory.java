@@ -58,6 +58,7 @@ import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
@@ -353,7 +354,9 @@ public class GTFSPatternHopFactory {
 
                 if (tripPattern == null) {
                     tripPattern = makeTripPattern(graph, trip, stopTimes);
-
+                    if (tripPattern == null) {
+                        continue;
+                    }
                     patterns.put(stopPattern, tripPattern);
                     if (blockId != null && !blockId.equals("")) {
                         addTripToInterliningMap(trip, stopTimes, tripPattern);
@@ -386,9 +389,25 @@ public class GTFSPatternHopFactory {
                         for (i = 0; i < stopTimes.size() - 1; i++) {
                             StopTime st0 = stopTimes.get(i);
                             st1 = stopTimes.get(i + 1);
+                            
                             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
                             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-                            
+
+                            if (runningTime < 0) {
+                                _log.warn(GraphBuilderAnnotation.register(graph,
+                                        Variety.NEGATIVE_HOP_TIME, st0, st1));
+                                //back out hops and give up
+                                for (i = i - 1; i >= 0; --i) {
+                                    tripPattern.removeHop(i, insertionPoint);
+                                }
+                                simple = true;
+                                break;
+                            }
+                            if (dwellTime < 0) {
+                                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
+                                dwellTime = 0;
+                            }
+
                             try {
                                 tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
                                         runningTime, st1.getArrivalTime(), dwellTime, st0.getStopHeadsign(),
@@ -662,10 +681,8 @@ public class GTFSPatternHopFactory {
         int interpStep = 0;
 
         int i;
-        StopTime st1 = null;
         for (i = 0; i < lastStop; i++) {
             StopTime st0 = stopTimes.get(i);
-            st1 = stopTimes.get(i + 1);
 
             prevDepartureTime = departureTime;
             departureTime = st0.getDepartureTime();
@@ -728,39 +745,58 @@ public class GTFSPatternHopFactory {
         StopTime st1 = null;
         PatternArriveVertex psv0arrive, psv1arrive = null;
         PatternDepartVertex psv0depart;
-        for (i = 0; i < lastStop; i++) {
+        ArrayList<Edge> createdEdges = new ArrayList<Edge>();
+        ArrayList<Vertex> createdVertices = new ArrayList<Vertex>();
+        for (i = 0; i < lastStop; i++) {           
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
             st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
+
+            int arrivalTime = st1.getArrivalTime();
+            int departureTime = st0.getDepartureTime();
+
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
+            int runningTime = arrivalTime - departureTime ;
+
+            if (runningTime < 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph,
+                        Variety.NEGATIVE_HOP_TIME, st0, st1));
+                //back out hops and give up
+                for (Edge e: createdEdges) {
+                    e.getFromVertex().removeOutgoing(e);
+                    e.getToVertex().removeIncoming(e);
+                }
+                for (Vertex v : createdVertices) {
+                    graph.removeVertexAndEdges(v);
+                }
+                return null;
+            }
 
             // create journey vertices
 
-            psv0depart = new PatternDepartVertex(graph, tripPattern, st0); 
+            psv0depart = new PatternDepartVertex(graph, tripPattern, st0);
+            createdVertices.add(psv0depart);
             patternDepartNodes.put(new T2<Stop, Trip>(s0, trip), psv0depart);
             
             if (i != 0) {
                 psv0arrive = psv1arrive;
                 PatternDwell dwell = new PatternDwell(psv0arrive, psv0depart, i, tripPattern);
+                createdEdges.add(dwell);
                 if (dwellTime == 0) {
                     potentiallyUselessDwells.add(dwell);
                 }
             }
 
             psv1arrive = new PatternArriveVertex(graph, tripPattern, st1);
+            createdVertices.add(psv1arrive);
             patternArriveNodes.put(new T2<Stop, Trip>(s1, trip), psv1arrive);
 
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, i,
                     tripPattern);
+            createdEdges.add(hop);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
-            
-            int arrivalTime = st1.getArrivalTime();
-
-            int departureTime = st0.getDepartureTime();
-
-            int runningTime = arrivalTime - departureTime ;
 
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
                     st0.getStopHeadsign(), trip);
@@ -768,8 +804,10 @@ public class GTFSPatternHopFactory {
             TransitStopDepart stopDepart = stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = stopArriveNodes.get(s1);
 
-            new PatternBoard(stopDepart, psv0depart, tripPattern, i, mode);
-            new PatternAlight(psv1arrive, stopArrive, tripPattern, i, mode);
+            Edge board = new PatternBoard(stopDepart, psv0depart, tripPattern, i, mode);
+            Edge alight = new PatternAlight(psv1arrive, stopArrive, tripPattern, i, mode);
+            createdEdges.add(board);
+            createdEdges.add(alight);
         }
 
         tripPattern.setTripFlags(0, 
@@ -827,11 +865,31 @@ public class GTFSPatternHopFactory {
         boolean tripWheelchairAccessible = trip.getWheelchairAccessible() == 1;
 
         PatternStopVertex psv0arrive, psv0depart, psv1arrive = null;
+        ArrayList<Edge> created = new ArrayList<Edge>();
+        
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
             StopTime st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
+
+            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
+            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+            if (runningTime < 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph,
+                        Variety.NEGATIVE_HOP_TIME, st0, st1));
+                //back out trip and give up
+                for (Edge e: created) {
+                    e.getFromVertex().removeOutgoing(e);
+                    e.getToVertex().removeIncoming(e);
+                }
+                return;
+            }
+            if (dwellTime < 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
+                dwellTime = 0;
+            }
+
             Vertex startStation = stopDepartNodes.get(s0);
             Vertex endStation = stopArriveNodes.get(s1);
 
@@ -848,19 +906,22 @@ public class GTFSPatternHopFactory {
 
             new Dwell(psv0arrive, psv0depart, st0);
             Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip);
+            created.add(hop);
             hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
             hops.add(hop);
 
             if (st0.getPickupType() != 1) {
-                new Board(startStation, psv0depart, hop,
+                Edge board = new Board(startStation, psv0depart, hop,
                     tripWheelchairAccessible && s0.getWheelchairBoarding() == 1,
                     st0.getStop().getZoneId(), trip, st0.getPickupType());
+                created.add(board);
             }
             if (st0.getDropOffType() != 1) {
-                new Alight(psv1arrive, endStation, hop, 
+                Edge alight = new Alight(psv1arrive, endStation, hop, 
                     tripWheelchairAccessible && s1.getWheelchairBoarding() == 1,
                     st0.getStop().getZoneId(), trip, st0.getDropOffType());
+                created.add(alight);
             }
         }
     }
