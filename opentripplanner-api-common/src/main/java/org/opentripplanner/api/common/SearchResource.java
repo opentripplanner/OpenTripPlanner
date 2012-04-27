@@ -152,7 +152,7 @@ public abstract class SearchResource { // RoutingResource
         request.setWheelchair(get(wheelchair, n, false));
         request.setNumItineraries(get(numItineraries, n, 3));
         request.setMaxWalkDistance(get(maxWalkDistance, n, 840.0));
-        request.setSpeed(get(walkSpeed, n, 1.33));
+        request.setWalkSpeed(get(walkSpeed, n, 1.33));
         OptimizeType opt = get(optimize, n, OptimizeType.QUICK);
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);

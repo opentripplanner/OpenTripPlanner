@@ -37,6 +37,7 @@ import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchy.PotentialShortcut;
@@ -186,7 +187,7 @@ public class TestContractionHeirarchies extends TestCase {
         TraverseOptions options = new TraverseOptions();
         options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
 
         // test hop limit
         Dijkstra dijkstra = new Dijkstra(verticesOut[0][0], options, graph.getVertex("a(0, 0)"), 3);
@@ -249,7 +250,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         options = new TraverseOptions();
         options.optimize = OptimizeType.QUICK;
-        options.speed = 1;
+        options.setWalkSpeed(1);
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
         //options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
@@ -349,7 +350,7 @@ public class TestContractionHeirarchies extends TestCase {
         TraverseOptions options = new TraverseOptions();
         options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
         assertNotNull(path);
         assertTrue(path.states.size() > 1);
@@ -454,15 +455,17 @@ public class TestContractionHeirarchies extends TestCase {
         options.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY));
         options.optimize = OptimizeType.QUICK;
         
-        options.setRoutingContext(graph);
-        
         Vertex start1 = graph.getVertex("0072480");
         Vertex end1 = graph.getVertex("0032341");
 
         assertNotNull(end1);
         assertNotNull(start1);
+
+        options.dateTime = startTime;
+        options.setRoutingContext(graph, start1, end1);
         
-        ShortestPathTree shortestPathTree = AStar.getShortestPathTree(graph, start1, end1, startTime, options);
+        ShortestPathTree shortestPathTree = new GenericAStar()
+            .getShortestPathTree(options);
         path = shortestPathTree.getPath(end1, true);
         assertNotNull(path);
 

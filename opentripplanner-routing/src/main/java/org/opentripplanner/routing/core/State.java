@@ -75,7 +75,7 @@ public class State implements Cloneable {
      * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, long time, TraverseOptions opt) {
+    public State(Vertex vertex, long time, TraverseOptions options) {
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -83,9 +83,10 @@ public class State implements Cloneable {
         this.backEdgeNarrative = null;
         this.hops = 0;
         this.stateData = new StateData();
-        this.stateData.opt = opt;
+        this.stateData.opt = options;
         this.stateData.startTime = time;
         this.stateData.tripSeqHash = 0;
+        this.stateData.usingRentedBike = false;
         this.time = time;
     }
 
@@ -133,7 +134,7 @@ public class State implements Cloneable {
     }
 
     public String toString() {
-        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " + vertex + ">";
+        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " + (isBikeRenting() ? "BIKE_RENT " : "") + vertex + ">";
     }
     
     public String toStringVerbose() {
@@ -182,6 +183,17 @@ public class State implements Cloneable {
         return stateData.everBoarded;
     }
 
+    public boolean isBikeRenting() {
+        return stateData.usingRentedBike;
+    }
+
+    /**
+     * @return True if the state at vertex can be the end of path.
+     */
+    public boolean isFinal() {
+        return !isBikeRenting();
+    }
+
     public Vertex getPreviousStop() {
         return stateData.previousStop;
     }
@@ -210,6 +222,9 @@ public class State implements Cloneable {
         if (other.weight == 0) {
             return false;
         }
+        // Multi-state (bike rental) - no domination for different states
+        if (isBikeRenting() != other.isBikeRenting())
+            return false;
 
         if (this.similarTripSeq(other)) {
             return this.weight <= other.weight;
@@ -329,6 +344,18 @@ public class State implements Cloneable {
         return stateData.opt;
     }
     
+    public TraverseMode getNonTransitMode(TraverseOptions options) {
+        TraverseModeSet modes = options.getModes();
+        if (modes.getCar())
+            return TraverseMode.CAR;
+        if (modes.getWalk() && !isBikeRenting())
+            return TraverseMode.WALK;
+        if (modes.getBicycle())
+            return TraverseMode.BICYCLE;
+
+        return null;
+    }
+
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
@@ -367,7 +394,7 @@ public class State implements Cloneable {
     
     public boolean multipleOptionsBefore() {
         boolean foundAlternatePaths = false;
-        TraverseMode requestedMode = getOptions().getModes().getNonTransitMode();
+        TraverseMode requestedMode = getNonTransitMode(getOptions());
         for (Edge out : backState.vertex.getOutgoing()) {
             if (out == backEdge) {
                 continue;

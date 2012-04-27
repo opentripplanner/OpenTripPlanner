@@ -95,9 +95,10 @@ public class AStarTest {
     public void testForward() {
 
         TraverseOptions options = new TraverseOptions();
-        options.speed = 1.0;
+        options.setWalkSpeed(1.0);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
+
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
         List<State> states = path.states;
@@ -117,7 +118,7 @@ public class AStarTest {
     public void testBack() {
 
         TraverseOptions options = new TraverseOptions();
-        options.speed = 1.0;
+        options.setWalkSpeed(1.0);
         options.setArriveBy(true);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -151,7 +152,7 @@ public class AStarTest {
     public void testForwardExtraEdges() {
 
         TraverseOptions options = new TraverseOptions();
-        options.speed = 1.0;
+        options.setWalkSpeed(1.0);
 
         StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
                 -122.385050, 47.666620), "near_shilshole_22nd");
@@ -186,7 +187,7 @@ public class AStarTest {
     public void testBackExtraEdges() {
 
         TraverseOptions options = new TraverseOptions();
-        options.speed = 1.0;
+        options.setWalkSpeed(1.0);
         options.setArriveBy(true);
 
         StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
@@ -256,7 +257,8 @@ public class AStarTest {
         @Override
         public State traverse(State s0) {
             double d = getDistance();
-            int t = (int) (d / s0.getOptions().speed);
+            TraverseMode mode = s0.getNonTransitMode(s0.getOptions());
+            int t = (int) (d / s0.getOptions().getSpeed(mode));
             StateEditor s1 = s0.edit(this);
             s1.incrementTimeInSeconds(t);
             s1.incrementWeight(d);

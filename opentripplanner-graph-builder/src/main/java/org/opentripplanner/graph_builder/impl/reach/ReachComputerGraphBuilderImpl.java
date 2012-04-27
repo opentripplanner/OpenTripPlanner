@@ -97,7 +97,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
 
         addReachToGraph(graph);
 

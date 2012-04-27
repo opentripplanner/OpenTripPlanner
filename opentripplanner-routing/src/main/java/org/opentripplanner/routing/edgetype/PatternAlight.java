@@ -181,6 +181,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setZone(pattern.getZone(stopIndex + 1));
             s1.setRoute(trip.getRoute().getId());
 
+            TraverseMode mode = state0.getNonTransitMode(options);
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
@@ -188,7 +189,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost + options.boardCost);
+            s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             return s1.makeState();
 
         } else {
@@ -244,7 +245,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
      */
     public double weightLowerBound(TraverseOptions options) {
         if (options.isArriveBy())
-            return options.boardCost;
+            return options.getBoardCostLowerBound();
         else
             return timeLowerBound(options);
     }

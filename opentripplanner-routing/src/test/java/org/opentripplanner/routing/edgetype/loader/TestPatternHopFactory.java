@@ -380,6 +380,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
 
         TraverseOptions options = new TraverseOptions();
+        options.getModes().setWalk(false);
         options.getModes().setBicycle(true);
         options.getModes().setTransit(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);

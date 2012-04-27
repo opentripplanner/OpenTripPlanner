@@ -30,6 +30,7 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -315,7 +316,10 @@ public class ContractionHierarchy implements Serializable {
         backOptions.setArriveBy(true);
         this.contractionFactor = contractionFactor;
 
-        this.mode = this.fwdOptions.getModes().getNonTransitMode();
+        // TODO LG Check this
+        TraverseModeSet modes = this.fwdOptions.getModes(); 
+        this.mode = modes.getCar() ? TraverseMode.CAR
+                : modes.getBicycle() ? TraverseMode.BICYCLE : TraverseMode.WALK;
         build();
     }
 

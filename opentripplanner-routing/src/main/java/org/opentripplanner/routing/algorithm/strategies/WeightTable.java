@@ -29,6 +29,7 @@ import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.GenericObjectPool;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -61,7 +62,7 @@ public class WeightTable implements Serializable {
 		this.g = g;
 		// default max walk speed is biking speed
 		//maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed;
-		maxWalkSpeed = new TraverseOptions().speed;
+		maxWalkSpeed = new TraverseOptions().getSpeed(TraverseMode.WALK);
 	}
 
 	public double getWeight(Vertex from, Vertex to) {
@@ -152,9 +153,10 @@ public class WeightTable implements Serializable {
 
 		// make one heap and recycle it
 		TraverseOptions options = new TraverseOptions();
-		options.speed = maxWalkSpeed;
+		// TODO LG Check this change:
+		options.setWalkSpeed(maxWalkSpeed);
 		final double MAX_WEIGHT = 60 * 60 * options.walkReluctance;
-		final double OPTIMISTIC_BOARD_COST = options.boardCost;
+		final double OPTIMISTIC_BOARD_COST = options.getBoardCostLowerBound();
 
 		// create a task for each transit stop in the graph
 		ArrayList<Callable<Void>> tasks = new ArrayList<Callable<Void>>();

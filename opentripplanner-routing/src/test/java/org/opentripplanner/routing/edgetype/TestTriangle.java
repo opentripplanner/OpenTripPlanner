@@ -63,7 +63,7 @@ public class TestTriangle extends TestCase {
         
         TraverseOptions options = new TraverseOptions(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;
-        options.speed = 6.0;
+        options.setBikeSpeed(6.0);
         options.walkReluctance = 1;
 
         options.setTriangleSafetyFactor(0);
@@ -73,7 +73,7 @@ public class TestTriangle extends TestCase {
 
         State result = testStreet.traverse(startState);
         double timeWeight = result.getWeight();
-        double expectedSpeedWeight = trueLength / options.speed;
+        double expectedSpeedWeight = trueLength / options.getSpeed(TraverseMode.BICYCLE);
 		assertEquals(expectedSpeedWeight, timeWeight);
 
         options.setTriangleSafetyFactor(0);
@@ -82,8 +82,8 @@ public class TestTriangle extends TestCase {
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double slopeWeight = result.getWeight();
-        assertTrue(length * 1.5 / options.speed < slopeWeight);
-        assertTrue(length * 1.5 * 10 / options.speed > slopeWeight);
+        assertTrue(length * 1.5 / options.getSpeed(TraverseMode.BICYCLE) < slopeWeight);
+        assertTrue(length * 1.5 * 10 / options.getSpeed(TraverseMode.BICYCLE) > slopeWeight);
 
         options.setTriangleSafetyFactor(1);
         options.setTriangleSlopeFactor(0);
@@ -92,7 +92,7 @@ public class TestTriangle extends TestCase {
         result = testStreet.traverse(startState);
         double safetyWeight = result.getWeight();
         double slopeSafety = costs.slopeSafetyCost;
-        double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / options.speed;
+        double expectedSafetyWeight = (trueLength * 0.74 + slopeSafety) / options.getSpeed(TraverseMode.BICYCLE);
         assertTrue(expectedSafetyWeight - safetyWeight < 0.00001);
 
         final double ONE_THIRD = 1/3.0;
