@@ -1,6 +1,7 @@
 package org.opentripplanner.api.common;
 
 import java.util.List;
+import java.util.Date;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
