@@ -54,7 +54,6 @@ public class TestBikeRental extends TestCase {
         
         // it is impossible to get from v1 to v3 by walking
         TraverseOptions options = new TraverseOptions(new TraverseModeSet("WALK,TRANSIT"));
-        options.dateTime = 1000;
         options.setRoutingContext(graph, v1, v3);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
 
@@ -63,7 +62,6 @@ public class TestBikeRental extends TestCase {
 
         // or biking
         options = new TraverseOptions(new TraverseModeSet("BICYCLE,TRANSIT"));
-        options.dateTime = 1000;
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -73,7 +71,6 @@ public class TestBikeRental extends TestCase {
 
         // or even both (assuming walking bikes is disallowed)
         options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
-        options.dateTime = 1000;
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -91,7 +88,6 @@ public class TestBikeRental extends TestCase {
         
         // but we can't get off the bike at v3, so we still fail
         options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
-        options.dateTime = 1000;
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -109,7 +105,6 @@ public class TestBikeRental extends TestCase {
         
         // now we succeed!
         options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
-        options.dateTime = 1000;
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 
