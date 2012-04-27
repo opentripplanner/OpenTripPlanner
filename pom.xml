@@ -29,7 +29,6 @@
     <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
     <module>opentripplanner-web-utils</module>
-    <module>opentripplanner-api-common</module>
   </modules>
 
   <build>
