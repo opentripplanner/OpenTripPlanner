@@ -29,7 +29,11 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class VisibilityPolygon extends Polygon {
+    private static Logger log = LoggerFactory.getLogger(VisibilityPolygon.class);
     Point observer;
 
     public boolean is_spike(Point observer, Point point1, Point point2, Point point3, double epsilon) {
@@ -85,7 +89,7 @@ public class VisibilityPolygon extends Polygon {
         for (int i = 0; i < vertices.size(); i++)
             if (!spike_tips.contains(vertices.get(i)))
                 vertices_temp.add(vertices.get(i));
-        vertices = vertices_temp; // fixme check this - used to be swap - DMT
+        vertices = vertices_temp;
     }
 
     public VisibilityPolygon(Point observer, Environment environment_temp, double epsilon) {
@@ -125,7 +129,7 @@ public class VisibilityPolygon extends Polygon {
         // preconditions have been excluded.
         //
         assert (environment_temp.is_valid(epsilon));
-        //assert (environment_temp.is_in_standard_form());
+        assert (environment_temp.is_in_standard_form());
         assert (observer.in(environment_temp, epsilon));
 
         // true => data printed to terminal
@@ -139,13 +143,16 @@ public class VisibilityPolygon extends Polygon {
         //
 
         // construct a POLAR EDGE LIST from environment_temp's outer
-        // boundary && holes. During this construction, those edges are
+        // boundary and holes. During this construction, those edges are
         // split which either (1) cross the ray emanating from the observer
         // parallel to the x-axis (of world coords), or (2) contain the
         // observer in their relative interior (w/in epsilon). Also, edges
         // having first vertex bearing >= second vertex bearing are
         // eliminated because they cannot possibly contribute to the
         // visibility polygon.
+
+        final Angle ANGLE_PI = new Angle(Math.PI);
+        final Angle ANGLE_ZERO = new Angle(0.0);
         ArrayList<PolarEdge> elp = new ArrayList<PolarEdge>();
         PolarPoint ppoint1, ppoint2;
         PolarPoint split_bottom, split_top;
@@ -161,14 +168,18 @@ public class VisibilityPolygon extends Polygon {
             for (int j = 0; j < polygon.n(); j++) {
                 ppoint1 = new PolarPoint(observer, polygon.get(j));
                 ppoint2 = new PolarPoint(observer, polygon.get(j + 1));
+                log.debug("contemplating " +  ppoint1 + " and " +  ppoint1);
+
                 // If the observer is in the relative interior of the edge.
                 if (observer.in_relative_interior_of(new LineSegment(ppoint1, ppoint2), epsilon)) {
+                    log.debug("in relative interior");
+
                     // Split the edge at the observer && add the resulting two
                     // edges to elp (the polar edge list).
                     split_bottom = new PolarPoint(observer, observer);
                     split_top = new PolarPoint(observer, observer);
 
-                    if (ppoint2.bearing.equals(new Angle(0.0)))
+                    if (ppoint2.bearing.equals(ANGLE_ZERO))
                         ppoint2.set_bearing_to_2pi();
 
                     left_wall_bearing = ppoint1.bearing.clone();
@@ -181,7 +192,9 @@ public class VisibilityPolygon extends Polygon {
 
                 // Else if the observer is on first vertex of edge.
                 else if (observer.distance(ppoint1) <= epsilon) {
-                    if (ppoint2.bearing.equals(new Angle(0.0))) {
+                    log.debug("on first vertex");
+
+                    if (ppoint2.bearing.equals(ANGLE_ZERO)) {
                         ppoint2.set_bearing_to_2pi();
                     }
                     // Get right wall bearing.
@@ -191,6 +204,8 @@ public class VisibilityPolygon extends Polygon {
                 }
                 // Else if the observer is on second vertex of edge.
                 else if (observer.distance(ppoint2) <= epsilon) {
+                    log.debug("on second vertex");
+
                     // Get left wall bearing.
                     left_wall_bearing = ppoint1.bearing.clone();
                     elp.add(new PolarEdge(ppoint1, new PolarPoint(observer, observer)));
@@ -201,11 +216,15 @@ public class VisibilityPolygon extends Polygon {
 
                 // If edge not horizontal (w/in epsilon).
                 else if (Math.abs(ppoint1.y - ppoint2.y) > epsilon) {
+                    log.debug("off edge");
+
                     // Possible source of numerical instability?
                     t = (observer.y - ppoint2.y) / (ppoint1.y - ppoint2.y);
                     // If edge crosses the ray emanating horizontal && right of
                     // the observer.
                     if (0 < t && t < 1 && observer.x < t * ppoint1.x + (1 - t) * ppoint2.x) {
+                        log.debug("crosses ray");
+
                         // If first point is above, omit edge because it runs
                         // 'against the grain'.
                         if (ppoint1.y > observer.y)
@@ -216,29 +235,29 @@ public class VisibilityPolygon extends Polygon {
                                 * ppoint2.x, observer.y));
                         split_top = new PolarPoint(observer, new Point(t * ppoint1.x + (1 - t)
                                 * ppoint2.x, observer.y));
-                        split_top.set_bearing(new Angle(0.0));
+                        split_top.set_bearing(ANGLE_ZERO);
                         split_bottom.set_bearing_to_2pi();
                         elp.add(new PolarEdge(ppoint1, split_bottom));
                         elp.add(new PolarEdge(split_top, ppoint2));
                         continue;
-                    }
-                    // If the edge is not horizontal && doesn't cross the ray
-                    // emanating horizontal && right of the observer.
-                    else if (ppoint1.bearing.compareTo(ppoint2.bearing) >= 0
-                            && ppoint2.bearing.equals(new Angle(0.0))
-                            && ppoint1.bearing.compareTo(new Angle(Math.PI)) > 0)
-                        ppoint2.set_bearing_to_2pi();
-                    // Filter out edges which run 'against the grain'.
-                    else if ((ppoint1.bearing.equals(new Angle(0, 0)) && ppoint2.bearing
-                            .compareTo(new Angle(Math.PI)) > 0)
-                            || ppoint1.bearing.compareTo(ppoint2.bearing) >= 0) {
-                        continue;
+                    } else {
+                        if (ppoint1.bearing.compareTo(ppoint2.bearing) >= 0
+                                && ppoint2.bearing.equals(ANGLE_ZERO)
+                                && ppoint1.bearing.compareTo(ANGLE_PI) > 0) {
+                            ppoint2.set_bearing_to_2pi();
+                        // Filter out edges which run 'against the grain'.
+                        } else if ((ppoint1.bearing.equals(ANGLE_ZERO) && 
+                                ppoint2.bearing.compareTo(ANGLE_PI) > 0)
+                                || ppoint1.bearing.compareTo(ppoint2.bearing) >= 0) {
+                            continue;
+                        }
                     }
                     elp.add(new PolarEdge(ppoint1, ppoint2));
                     continue;
                 }
                 // If edge is horizontal (w/in epsilon).
                 else {
+                    log.debug("epsilon horizontal");
                     // Filter out edges which run 'against the grain'.
                     if (ppoint1.bearing.compareTo(ppoint2.bearing) >= 0)
                         continue;
@@ -278,8 +297,8 @@ public class VisibilityPolygon extends Polygon {
                     ppoint_wei1.set_bearing(right_wall_bearing);
                     edge.first.set_bearing(right_wall_bearing);
                 } else {
-                    ppoint_wei1.set_bearing(new Angle(0.0));
-                    edge.first.set_bearing(new Angle(0.0));
+                    ppoint_wei1.set_bearing(ANGLE_ZERO);
+                    edge.first.set_bearing(ANGLE_ZERO);
                 }
             } else if (observer.distance(ppoint_wei2) <= epsilon) {
                 if (right_wall_bearing.compareTo(left_wall_bearing) > 0) {
@@ -297,7 +316,9 @@ public class VisibilityPolygon extends Polygon {
         // Put event point in correct order.
         // Collections.sort is a stable sort.
         Collections.sort(q1);
-
+        for (PolarPointWithEdgeInfo q : q1) {
+            log.debug("q: " + q);
+        }
         //
         // -------PREPARE FOR MAIN LOOP-------
         //
@@ -307,7 +328,7 @@ public class VisibilityPolygon extends Polygon {
 
         //
         PolarPointWithEdgeInfo current_vertex = new PolarPointWithEdgeInfo();
-        // Note active_edge && e are not actually edges themselves, but
+        // Note active_edge and e are not actually edges themselves, but
         // iterators pointing to edges. active_edge keeps track of the
         // current edge visible during the sweep. e is an auxiliary
         // variable used in calculation of k-points
@@ -317,7 +338,7 @@ public class VisibilityPolygon extends Polygon {
         double k_range;
         LineSegment xing;
 
-        // Priority queue of edges, where higher priority indicates closer
+        // Priority queue of edges, where lower (first) priority indicates closer
         // range to observer along current ray (of ray sweep).
         IncidentEdgeCompare my_iec = new IncidentEdgeCompare(observer, current_vertex, epsilon);
         PriorityQueue<PolarEdge> q2 = new PriorityQueue<PolarEdge>(elp.size(), my_iec);
@@ -334,7 +355,8 @@ public class VisibilityPolygon extends Polygon {
             q2.add(active_edge);
         }
 
-        vertices.add(current_vertex.clone());
+        vertices.add(new Point(current_vertex));
+        log.debug("adding: " + current_vertex + "\n--");
 
         // -------BEGIN MAIN LOOP-------//
         //
@@ -345,26 +367,30 @@ public class VisibilityPolygon extends Polygon {
 
             // Pop current_vertex from q1.
             current_vertex.set(q1.remove(0));
+            log.debug("cv: " + current_vertex);
 
             // ---Handle Event Point---
 
             // TYPE 1: current_vertex is the _second_vertex_ of active_edge.
             if (current_vertex.incident_edge.equals(active_edge) && !current_vertex.is_first) {
+                log.debug( "type 1");
+
                 if (!q1.isEmpty()) {
                     // If the next vertex in q1 is contiguous.
                     if (current_vertex.distance(q1.get(0)) <= epsilon) {
-
                         continue;
                     }
                 }
 
                 // Push current_vertex onto visibility polygon
-                vertices.add(current_vertex.clone());
+                vertices.add(new Point(current_vertex));
+                log.debug("adding: " + current_vertex);
+
                 chop_spikes_at_back(observer, epsilon);
 
                 while (!q2.isEmpty()) {
                     e = q2.peek();
-
+                    log.debug("q2: " + e);
                     // If the current_vertex bearing has not passed, in the
                     // lex. order sense, the bearing of the second point of the
                     // edge at the front of q2.
@@ -391,7 +417,8 @@ public class VisibilityPolygon extends Polygon {
                         }
 
                         // Push k onto the visibility polygon.
-                        vertices.add(k.clone());
+                        vertices.add(new Point(k));
+                        log.debug("adding k1: " + k);
                         chop_spikes_at_back(observer, epsilon);
                         active_edge = e;
                         break;
@@ -403,6 +430,7 @@ public class VisibilityPolygon extends Polygon {
 
             // If current_vertex is the _first_vertex_ of its edge.
             if (current_vertex.is_first) {
+                log.debug("is first");
                 // Find intersection point k of ray (through current_vertex)
                 // with active_edge.
 
@@ -435,6 +463,7 @@ public class VisibilityPolygon extends Polygon {
                 // (rangewise) in back along the current bearing.
                 if (k_range < current_vertex.range) {
                     // this is empty, in the original too -DMT
+                    log.debug("type 2");
                 } // Close Type 2.
 
                 // TYPE 3: current_vertex is (1) the first vertex of some edge
@@ -444,18 +473,20 @@ public class VisibilityPolygon extends Polygon {
                 if (k_range >= current_vertex.range) {
                     // Push k onto the visibility polygon unless effectively
                     // contiguous with current_vertex.
-
+                    log.debug("type 3");
                     if (xing.size() > 0 && k_range != Double.POSITIVE_INFINITY
                             && k.distance(current_vertex) > epsilon
                             && active_edge.first.distance(observer) > epsilon) {
 
                         // Push k-point onto the visibility polygon.
-                        vertices.add(k.clone());
+                        vertices.add(new Point(k));
+                        log.debug("adding k2: " + k);
                         chop_spikes_at_back(observer, epsilon);
                     }
 
                     // Push current_vertex onto the visibility polygon.
-                    vertices.add(current_vertex.clone());
+                    vertices.add(new Point(current_vertex));
+                    log.debug("adding: " + current_vertex);
                     chop_spikes_at_back(observer, epsilon);
                     // Set active_edge to edge of current_vertex.
                     active_edge = e;

@@ -105,18 +105,10 @@ class PolarPoint extends Point implements Comparable<Point> {
         }
         PolarPoint polar_point2 = (PolarPoint) point2;
         int bearingComp = bearing.compareTo(polar_point2.bearing);
-        if (bearingComp < 0)
-            return -1;
-        else if (bearingComp == 0) {
-            if (range < polar_point2.range) {
-                return -1;
-            } else if (range > polar_point2.range) {
-                return 1;
-            } else {
-                return 0;
-            }
+        if (bearingComp == 0) {
+            return (int) Math.signum(range - polar_point2.range);
         }
-        return 1;
+        return bearingComp;
 
     }
 

@@ -289,7 +289,7 @@ public class Polygon {
         return vertices.hashCode() + 1;
     }
 
-    Point get(int i) {
+    public Point get(int i) {
         return vertices.get(i % vertices.size());
     }
 

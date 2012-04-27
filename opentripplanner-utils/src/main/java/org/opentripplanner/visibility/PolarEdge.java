@@ -21,7 +21,6 @@
  License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 package org.opentripplanner.visibility;
 
 class PolarEdge {
@@ -39,5 +38,17 @@ class PolarEdge {
 
     public String toString() {
         return "PolarEdge(" + first + ", " + second + ")";
+    }
+
+    public boolean equals(Object o) {
+        if (!(o instanceof PolarEdge)) {
+            return false;
+        }
+        PolarEdge other = (PolarEdge) o;
+        return first.equals(other.first) && second.equals(other.second);
+    }
+
+    public int hashCode() {
+        return 31 * first.hashCode() + second.hashCode();
     }
 }

@@ -25,6 +25,10 @@ package org.opentripplanner.visibility;
 
 import java.util.Comparator;
 
+/**
+ * This is *reversed* from the original since Java PQs are min-heaps while STL PQs are max-heaps
+ * 
+ */
 class IncidentEdgeCompare implements Comparator<PolarEdge> {
     Point observer_pointer;
 
@@ -52,13 +56,13 @@ class IncidentEdgeCompare implements Comparator<PolarEdge> {
             k2 = new PolarPoint(observer_pointer, xing2.first());
             return (int) Math.signum(k1.range - k2.range);
         }
-        // Otherwise infeasible edges are given higher priority, so they
+        // Otherwise infeasible edges are given lower priority, so they
         // get pushed out the top of the priority_queue's (q2's)
         // heap.
         else if (xing1.size() == 0 && xing2.size() > 0)
-            return 1;
-        else if (xing1.size() > 0 && xing2.size() == 0)
             return -1;
+        else if (xing1.size() > 0 && xing2.size() == 0)
+            return 1;
         else
             return 0;
     }
