@@ -44,7 +44,7 @@ public class BikeRentalStationVertex extends AbstractVertex {
         this.bikesAvailable = bikes;
     }
 
-    public void setSpacesAvilable(int spaces) {
+    public void setSpacesAvailable(int spaces) {
         this.spacesAvailable = spaces;
     }
 }

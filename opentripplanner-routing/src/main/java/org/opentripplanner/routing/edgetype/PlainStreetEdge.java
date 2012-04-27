@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
@@ -443,5 +444,26 @@ public class PlainStreetEdge extends StreetEdge {
 
     public Set<Alert> getWheelchairNotes() {
         return wheelchairNotes;
+    }
+
+    public TurnVertex createTurnVertex(Graph graph) {
+        String id = getId();
+        TurnVertex tv = new TurnVertex(graph, id, getGeometry(), getName(), getLength(), back,
+                getNotes());
+        tv.setWheelchairNotes(getWheelchairNotes());
+        tv.setWheelchairAccessible(isWheelchairAccessible());
+        tv.setBicycleSafetyEffectiveLength(getBicycleSafetyEffectiveLength());
+        tv.setCrossable(isCrossable());
+        tv.setPermission(getPermission());
+        tv.setSlopeOverride(getSlopeOverride());
+        // the only cases where there will already be an elevation profile are those where it came
+        // from
+        // the street network (osm ele tags, for instance), so it's OK to force it here.
+        tv.setElevationProfile(getElevationProfile(), true);
+        tv.setRoundabout(isRoundabout());
+        tv.setBogusName(hasBogusName());
+        tv.setNoThruTraffic(isNoThruTraffic());
+        tv.setStairs(isStairs());
+        return tv;
     }
 }

@@ -75,7 +75,7 @@ public class DateUtils implements DateConstants {
         Date retVal = null;
 
         try {
-            String newString = input.replace('_', '.').replace('-', '.').replace(':', '.').replace(
+            String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
                     '/', '.');
             if (newString != null) {
                 List<String> dl = DF_LIST;
@@ -311,7 +311,7 @@ public class DateUtils implements DateConstants {
     }
 
     public synchronized static Date parseDate(SimpleDateFormat sdf, String string) {
-        sdf.setLenient(true);
+        sdf.setLenient(false);
         try {
             return sdf.parse(string);
         } catch (Exception e) {

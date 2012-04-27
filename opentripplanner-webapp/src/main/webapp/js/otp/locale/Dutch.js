@@ -217,7 +217,7 @@ otp.locale.Dutch = {
         minute         : "minuut",
         minutes        : "minuten",
         minute_abbrev  : "min",
-        minutes_abbrev : "mins",
+        minutes_abbrev : "min",
         second_abbrev  : "s",
         seconds_abbrev : "s",
         format         : "j F Y @ H:i",
@@ -230,7 +230,7 @@ otp.locale.Dutch = {
     {
         labels :
         {
-            panelTitle : "System Map"
+            panelTitle : "Lijnenkaart"
         }
     },
 
@@ -301,8 +301,8 @@ otp.locale.Dutch = {
         {
             200: "Plan OK",
             500: "Server fout",
-            400: "Trip buiten bekend gebied",
-            404: "Pad niet gevonden",
+            400: "Reis buiten bekend gebied",
+            404: "Geen route gevonden",
             406: "Geen OV tijden gevonden",
             408: "Resultaat niet op tijd gevonden",
             413: "Ongeldige parameter",
@@ -326,7 +326,7 @@ otp.locale.Dutch = {
     
         arriveDepart: 
         [
-          ['false', 'Vertrek'],
+          ['false', 'Vertrek'], 
           ['true',  'Aankomst']
         ],
     
@@ -350,13 +350,13 @@ otp.locale.Dutch = {
         mode : 
         [
             ['TRANSIT,WALK', 'OV'],
-// DO WE REALLY NEED THIS?  ISN'T BUS & TRAIN the same as TRANSIT, WALK
-//          ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
             ['BUSISH,WALK', 'Alleen bus'],
             ['TRAINISH,WALK', 'Alleen trein'],
             ['WALK', 'Alleen lopen'],
             ['BICYCLE', 'Fiets'],
-            ['TRANSIT,BICYCLE', 'OV & fiets']
+            ['WALK,BICYCLE', 'Huurfiets'],
+            ['TRANSIT,BICYCLE', 'OV & Fiets'],
+            ['TRANSIT,WALK,BICYCLE', 'OV & OV-fiets']
         ],
 
         wheelchair :
@@ -368,4 +368,3 @@ otp.locale.Dutch = {
 
     CLASS_NAME : "otp.locale.Dutch"
 };
-

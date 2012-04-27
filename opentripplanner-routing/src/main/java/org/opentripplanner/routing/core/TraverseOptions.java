@@ -227,6 +227,12 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** when true, do not use goal direction or stop at the target, build a full SPT */
     public boolean batch = false;
 
+    /** 
+     * Whether or not bike rental availability information will be used
+     * to plan bike rental trips
+     */
+    private boolean useBikeRentalAvailabilityInformation = false;
+
     /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
@@ -853,5 +859,13 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setBikeBoardCost(int bikeBoardCost) {
         this.bikeBoardCost = bikeBoardCost;
     }
-    
+
+    public boolean useBikeRentalAvailabilityInformation() {
+        return useBikeRentalAvailabilityInformation;
+    }
+
+    public void setUseBikeRentalAvailabilityInformation(boolean useBikeRentalAvailabilityInformation) {
+        this.useBikeRentalAvailabilityInformation = useBikeRentalAvailabilityInformation;
+    }
+
 }

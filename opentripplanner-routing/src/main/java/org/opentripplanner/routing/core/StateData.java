@@ -33,8 +33,7 @@ public class StateData implements Cloneable {
 
     protected AgencyAndId tripId;
 
-    // how far have we walked
-    protected double walkDistance;
+    protected double lastTransitWalk = 0;
 
     protected String zone;
 

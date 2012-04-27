@@ -123,24 +123,7 @@ public class StreetUtils {
             return tv;
         }
 
-        boolean back = pse.back;
-        String id = pse.getId();
-        tv = new TurnVertex(graph, id, pse.getGeometry(), pse.getName(), pse.getLength(), back,
-                pse.getNotes());
-        tv.setWheelchairNotes(pse.getWheelchairNotes());
-        tv.setWheelchairAccessible(pse.isWheelchairAccessible());
-        tv.setBicycleSafetyEffectiveLength(pse.getBicycleSafetyEffectiveLength());
-        tv.setCrossable(pse.isCrossable());
-        tv.setPermission(pse.getPermission());
-        tv.setSlopeOverride(pse.getSlopeOverride());
-        // the only cases where there will already be an elevation profile are those where it came
-        // from
-        // the street network (osm ele tags, for instance), so it's OK to force it here.
-        tv.setElevationProfile(pse.getElevationProfile(), true);
-        tv.setRoundabout(pse.isRoundabout());
-        tv.setBogusName(pse.hasBogusName());
-        tv.setNoThruTraffic(pse.isNoThruTraffic());
-        tv.setStairs(pse.isStairs());
+        tv = pse.createTurnVertex(graph);
         turnVertices.put(pse, tv);
         return tv;
     }

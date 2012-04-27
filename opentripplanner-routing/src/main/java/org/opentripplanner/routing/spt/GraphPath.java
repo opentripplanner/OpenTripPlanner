@@ -206,6 +206,8 @@ public class GraphPath {
             editor.setFromState(orig);
             editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
             editor.incrementWeight(orig.getWeightDelta());
+            if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
+            	editor.setBikeRenting(!orig.isBikeRenting());
             ret  = editor.makeState();
             orig = orig.getBackState();
         }

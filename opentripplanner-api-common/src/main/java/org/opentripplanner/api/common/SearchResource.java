@@ -203,6 +203,10 @@ public abstract class SearchResource { // RoutingResource
         request.setModes(get(modes, n, new TraverseModeSet("WALK,TRANSIT")));
         request.setMinTransferTime(get(minTransferTime, n, 0));
         request.setMaxTransfers(get(maxTransfers, n, 2));
+        final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
+        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
+                < NOW_THRESHOLD_MILLIS;
+        request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
         if (intermediatePlaces != null && intermediatePlacesOrdered && request.getModes().isTransit())
             throw new UnsupportedOperationException("TSP is not supported for transit trips");
         return request;

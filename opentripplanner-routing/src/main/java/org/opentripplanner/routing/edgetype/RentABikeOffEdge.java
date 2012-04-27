@@ -13,15 +13,10 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
-
-import com.vividsolutions.jts.geom.Geometry;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 /**
  * Dropping off a rented bike edge.
@@ -31,91 +26,33 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author laurent
  * 
  */
-public class RentABikeOffEdge extends AbstractEdge {
+public class RentABikeOffEdge extends RentABikeAbstractEdge {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public RentABikeOffEdge(Vertex from, Vertex to) {
-		super(from, to);
-	}
+    public RentABikeOffEdge(Vertex from, Vertex to) {
+        super(from, to);
+    }
 
-	@Override
-	public State traverse(State s0) {
-		TraverseOptions options = s0.getOptions();
-		if (options.isArriveBy()) {
-			/*
-			 * If we already have a bike (rented or own) we won't go any faster
-			 * by having a second one.
-			 */
-			if (!s0.getNonTransitMode(options).equals(TraverseMode.WALK))
-				return null;
-			/*
-			 * To rent a bike, we need to have BICYCLE in allowed modes.
-			 */
-			if (!options.getModes().contains(TraverseMode.BICYCLE))
-				return null;
-			EdgeNarrative en = new FixedModeEdge(this,
-					s0.getNonTransitMode(options));
+    @Override
+    public State traverse(State s0) {
+        TraverseOptions options = s0.getOptions();
+        if (options.isArriveBy()) {
+            return super.traverseRent(s0);
+        } else {
+            return super.traverseDropoff(s0);
+        }
+    }
 
-			StateEditor s1 = s0.edit(this, en);
-			s1.incrementWeight(options.bikeRentalPickupCost);
-			s1.incrementTimeInSeconds(options.bikeRentalPickupTime);
-			s1.setBikeRenting(true);
-			State s1b = s1.makeState();
-			return s1b;
-		} else {
-			/*
-			 * To dropoff a bike, we need to have rented one.
-			 */
-			if (!s0.isBikeRenting())
-				return null;
-			EdgeNarrative en = new FixedModeEdge(this,
-					s0.getNonTransitMode(options));
+    public boolean equals(Object o) {
+        if (o instanceof RentABikeOffEdge) {
+            RentABikeOffEdge other = (RentABikeOffEdge) o;
+            return other.getFromVertex().equals(fromv) && other.getToVertex().equals(tov);
+        }
+        return false;
+    }
 
-			StateEditor s1e = s0.edit(this, en);
-			s1e.incrementWeight(options.bikeRentalDropoffCost);
-			s1e.incrementTimeInSeconds(options.bikeRentalDropoffTime);
-			s1e.setBikeRenting(false);
-			State s1 = s1e.makeState();
-			return s1;
-		}
-	}
-
-	@Override
-	public double getDistance() {
-		return 0;
-	}
-
-	@Override
-	public Geometry getGeometry() {
-		return null;
-	}
-
-	@Override
-	public TraverseMode getMode() {
-		return TraverseMode.WALK;
-	}
-
-	@Override
-	public String getName() {
-		return getToVertex().getName();
-	}
-
-	@Override
-	public boolean hasBogusName() {
-		return false;
-	}
-
-	public boolean equals(Object o) {
-		if (o instanceof RentABikeOffEdge) {
-			RentABikeOffEdge other = (RentABikeOffEdge) o;
-			return other.getFromVertex().equals(fromv)
-					&& other.getToVertex().equals(tov);
-		}
-		return false;
-	}
-
-	public String toString() {
-		return "RentABikeOffEdge(" + fromv + " -> " + tov + ")";
-	}
+    public String toString() {
+        return "RentABikeOffEdge(" + fromv + " -> " + tov + ")";
+    }
 }
