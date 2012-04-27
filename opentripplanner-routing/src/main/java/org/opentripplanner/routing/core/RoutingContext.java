@@ -149,7 +149,7 @@ public class RoutingContext implements Cloneable {
         final long time = opt.getSecondsSinceEpoch();
         this.serviceDays = new ArrayList<ServiceDay>(3);
         if (calendarService == null) {
-            LOG.warn("TraverseOptions has no CalendarService or GTFSContext. Transit will never be boarded.");
+            LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }
         // This should be a valid way to find yesterday and tomorrow,
