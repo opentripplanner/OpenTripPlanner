@@ -917,7 +917,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     endEndpoint = getVertexForOsmNode(osmEndNode, way);
 
                     P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, osmEndNode.getId(), permissions, geometry);
+                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
                     PlainStreetEdge street = streets.getFirst();
 
@@ -1614,7 +1614,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start,
-                IntersectionVertex end, OSMWithTags way, long startNode, long endNode,
+                IntersectionVertex end, OSMWithTags way, int index, long startNode, long endNode,
                 StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length in meters, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
@@ -1683,12 +1683,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     || "forestry".equals(access) || "agricultural".equals(access);
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
-                street = getEdgeForStreet(start, end, way, startNode, endNode, d, permissionsFront,
+                street = getEdgeForStreet(start, end, way, index, startNode, endNode, d, permissionsFront,
                         geometry, false);
                 street.setNoThruTraffic(noThruTraffic);
             }
             if (permissionsBack != StreetTraversalPermission.NONE) {
-                backStreet = getEdgeForStreet(end, start, way, startNode, endNode, d, permissionsBack,
+                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, d, permissionsBack,
                         backGeometry, true);
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -1744,10 +1744,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
-                OSMWithTags way, long startNode, long endNode, double length,
+                OSMWithTags way, int index, long startNode, long endNode, double length,
                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
-            String id = "way " + way.getId() + " from " + startNode;
+            String id = "way " + way.getId() + " from " + index;
             id = unique(id);
 
             String name = getNameForWay(way, id);
