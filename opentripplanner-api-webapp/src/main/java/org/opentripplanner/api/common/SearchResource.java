@@ -5,7 +5,6 @@ import java.util.Date;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.opentripplanner.routing.core.OptimizeType;
