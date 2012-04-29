@@ -49,6 +49,8 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
 
                 in = new GZIPInputStream(new FileInputStream(_path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 3);
+
+                handler.nodesLoaded();
             } else if (_path.getName().endsWith(".bz2")) {
                 InputStream in = new BZip2CompressorInputStream(new FileInputStream(_path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 1);
