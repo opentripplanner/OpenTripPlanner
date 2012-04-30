@@ -29,6 +29,8 @@
     <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
     <module>opentripplanner-web-utils</module>
+    <module>opentripplanner-analyst-core</module>
+    <module>opentripplanner-analyst-webapp</module>
   </modules>
 
   <build>
