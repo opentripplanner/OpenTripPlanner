@@ -2,16 +2,16 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
-	<artifactId>opentripplanner-analyst-core</artifactId>
-	<packaging>war</packaging>
-	<name>OpenTripPlanner Analytics Core</name>
+	<artifactId>opentripplanner-analyst</artifactId>
+	<packaging>jar</packaging>
+	<name>OpenTripPlanner Analyst Core</name>
 	<url>http://opentripplanner.org/wiki/Analytics</url>
 
-	<parent>
-		<groupId>org.opentripplanner</groupId>
-		<artifactId>opentripplanner-analyst</artifactId>
-		<version>0.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <artifactId>opentripplanner</artifactId>
+        <groupId>org.opentripplanner</groupId>
+        <version>0.8.0-SNAPSHOT</version>
+    </parent>
 
 	<repositories>
 		<repository>
@@ -24,12 +24,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.opentripplanner</groupId>
+            <groupId>${project.groupId}</groupId>
 			<artifactId>opentripplanner-routing</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.opentripplanner</groupId>
-			<artifactId>opentripplanner-api-common</artifactId>
+            <version>${project.version}</version>
 		</dependency>
 		<dependency>
             <groupId>com.sun.jersey</groupId>

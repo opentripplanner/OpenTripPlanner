@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.rest;
+package org.opentripplanner.api.ws.analyst;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -9,22 +9,19 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.geotools.geometry.Envelope2D;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.analyst.rest.parameter.Layer;
-import org.opentripplanner.analyst.rest.parameter.LayerList;
-import org.opentripplanner.analyst.rest.parameter.Style;
-import org.opentripplanner.analyst.rest.parameter.MIMEImageFormat;
-import org.opentripplanner.analyst.rest.parameter.StyleList;
 import org.opentripplanner.api.common.SearchResource;
+import org.opentripplanner.analyst.parameter.Layer;
+import org.opentripplanner.analyst.parameter.LayerList;
+import org.opentripplanner.analyst.parameter.MIMEImageFormat;
+import org.opentripplanner.analyst.parameter.Style;
+import org.opentripplanner.analyst.parameter.StyleList;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
-
 import com.sun.jersey.api.core.InjectParam;
 
 // removed component, mixing spring and jersey annotations is bad?

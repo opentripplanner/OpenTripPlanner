@@ -1,8 +1,8 @@
 package org.opentripplanner.analyst.request;
 
-import org.opentripplanner.analyst.rest.parameter.Layer;
-import org.opentripplanner.analyst.rest.parameter.MIMEImageFormat;
-import org.opentripplanner.analyst.rest.parameter.Style;
+import org.opentripplanner.analyst.parameter.Layer;
+import org.opentripplanner.analyst.parameter.MIMEImageFormat;
+import org.opentripplanner.analyst.parameter.Style;
 
 public class RenderRequest {
 

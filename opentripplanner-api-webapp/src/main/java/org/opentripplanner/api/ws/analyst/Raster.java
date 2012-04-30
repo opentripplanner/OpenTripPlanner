@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.rest;
+package org.opentripplanner.api.ws.analyst;
 
 import java.util.GregorianCalendar;
 
@@ -16,9 +16,9 @@ import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTRequest;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.analyst.rest.parameter.Layer;
-import org.opentripplanner.analyst.rest.parameter.MIMEImageFormat;
-import org.opentripplanner.analyst.rest.parameter.Style;
+import org.opentripplanner.analyst.parameter.Layer;
+import org.opentripplanner.analyst.parameter.MIMEImageFormat;
+import org.opentripplanner.analyst.parameter.Style;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;

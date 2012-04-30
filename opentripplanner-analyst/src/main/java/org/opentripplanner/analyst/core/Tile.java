@@ -11,7 +11,7 @@ import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.analyst.rest.parameter.Style;
+import org.opentripplanner.analyst.parameter.Style;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

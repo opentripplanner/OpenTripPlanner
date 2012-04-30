@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.rest.parameter;
+package org.opentripplanner.analyst.parameter;
 
 import java.util.Arrays;
 import java.util.Collection;

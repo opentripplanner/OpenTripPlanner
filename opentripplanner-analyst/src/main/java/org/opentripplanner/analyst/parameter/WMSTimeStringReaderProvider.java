@@ -1,4 +1,4 @@
-package org.opentripplanner.analyst.rest.parameter;
+package org.opentripplanner.analyst.parameter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
