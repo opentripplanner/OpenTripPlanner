@@ -14,8 +14,10 @@
 package org.opentripplanner.api.model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.patch.Alert;
@@ -36,12 +38,12 @@ public class Leg {
     /**
      * The date and time this leg begins.
      */
-    public Date startTime = null;
+    public Calendar startTime = null;
     
     /**
      * The date and time this leg ends.
      */
-    public Date endTime = null;
+    public Calendar endTime = null;
     
     /**
      * The distance traveled while traversing the leg in meters.
@@ -186,7 +188,7 @@ public class Leg {
      */
     @XmlElement
     public long getDuration() {
-        return endTime.getTime() - startTime.getTime();
+        return endTime.getTimeInMillis() - startTime.getTimeInMillis();
     }
 
     public void addAlert(Alert alert) {
@@ -210,5 +212,14 @@ public class Leg {
         if (!alerts.contains(alert)) {
             alerts.add(alert);
         }
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(startTime.getTime());
+        startTime = calendar;
+        calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(endTime.getTime());
+        endTime = calendar; 
     }
 }

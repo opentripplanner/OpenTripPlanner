@@ -13,13 +13,16 @@
 package org.opentripplanner.api.model;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Fare;
 
 /**
@@ -35,11 +38,11 @@ public class Itinerary {
     /**
      * Time that the trip departs.
      */
-    public Date startTime = null;
+    public Calendar startTime = null;
     /**
      * Time that the trip arrives.
      */
-    public Date endTime = null;
+    public Calendar endTime = null;
 
     /**
      * How much time is spent walking, in seconds.
@@ -122,6 +125,43 @@ public class Itinerary {
             if (leg.isBogusNonTransitLeg()) {
                 it.remove();
             }
+        }
+    }
+
+    public void fixupDates(CalendarServiceData service) {
+        TimeZone startTimeZone = null;
+        TimeZone timeZone = null;
+        Iterator<Leg> it = legs.iterator();
+        while (it.hasNext()) {
+            Leg leg = it.next();
+            if (leg.agencyId == null) {
+                if (timeZone != null) {
+                    leg.setTimeZone(timeZone);
+                }
+            } else {
+                timeZone = service.getTimeZoneForAgencyId(leg.agencyId);
+                if (startTimeZone == null) {
+                    startTimeZone = timeZone; 
+                 }
+            }
+        }
+        if (timeZone != null) {
+            Calendar calendar = Calendar.getInstance(startTimeZone);
+            calendar.setTime(startTime.getTime());
+            startTime = calendar;
+            // go back and set timezone for legs prior to first transit
+            it = legs.iterator();
+            while (it.hasNext()) {
+                Leg leg = it.next();
+                if (leg.agencyId == null) {
+                    leg.setTimeZone(startTimeZone);
+                } else {
+                    break;
+                }
+            }
+            calendar = Calendar.getInstance(timeZone);
+            calendar.setTime(endTime.getTime());
+            endTime = calendar;
         }
     }
 }
