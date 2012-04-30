@@ -1,0 +1,73 @@
+<html>
+
+<head>
+	<title>OTP Analytics Client</title>
+    <link rel="stylesheet" type="text/css" href="js/lib/leaflet/leaflet.css" />
+    <script src="js/lib/leaflet/leaflet.js"></script>
+    <script src="js/lib/proj4js-1.0.3/lib/proj4js-compressed.js"></script>
+</head>
+
+<body>
+	<center>
+		<div id="map" style="width:1000px; height: 750px"></div>
+	      <form>
+	           <input type="button" value="Add Purple Line" onclick="purpleOn()" />
+	           <input type="button" value="Remove Purple Line" onclick="purpleOff()" />
+	           <input type="button" value="Color30" onclick="color30()" />
+	           <input type="button" value="Gray" onclick="gray()" />
+	           <input type="button" value="Difference" onclick="difference()" />
+               <input type="button" value="Hägerstrand" onclick="hagerstrand()" />
+          </form>
+	</center>
+    <span>
+      <span id="toolbox">
+        <div class="tool">
+
+          <h4>Map Setup</h4>
+          <p>Times must be expressed in ISO8601 combined date/time format (YYYY-MM-DDTHH:MM:SS)</p>
+          <form action="#" onsubmit="return mapSetupTool()">
+            <label for="setupOrigTime">Origin time:</label>
+            <input type="text" size="24" id="setupOrigTime" />
+            
+            <label for="setupDestTime">Destination time:</label>
+            <input type="text" size="24" id="setupDestTime" />
+
+            <label for="setupLayer">Layer:</label>
+            <select id="setupLayer">
+              <option value="hagerstrand">H&auml;gerstrand</option>
+              <option value="traveltime">Travel Time</option>
+            </select>
+
+            <input type="submit" value="Set Up Map" />
+          </form>
+
+          <h4>Download Image Tool</h4>
+          <form onsubmit="downloadTool(); return false;">
+            <label for="downloadFormat">Image Format:</label>
+            <select id="downloadFormat">
+              <option value="image/geotiff">GeoTIFF</option>
+              <option value="image/png">PNG</option>
+              <option value="image/jpeg">JPEG</option>
+            </select>
+            
+            <label for="downloadProj">Projection:</label>
+            <input type="text" id="downloadProj" value="EPSG:4326" />
+            
+            <label for="downloadLayer">Layer:</label>
+            <select id="downloadLayer">
+              <option value="traveltime">Travel Time</option>
+              <option value="hagerstrand">H&auml;gerstrand</option>
+            </select>
+
+            <label for="downloadResolution">Resolution (SRS units):</label>
+            <input type="text" id="downloadResolution" />
+
+            <input type="submit" />
+          </form>
+        </div>
+      </span>
+    </span>            
+    <script type="text/javascript"  src="js/otp/client.js"></script>
+</body>
+
+</html>

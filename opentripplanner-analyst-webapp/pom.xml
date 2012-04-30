@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>opentripplanner-analyst-webapp</artifactId>
+    <packaging>war</packaging>
+    <name>OpenTripPlanner Analytics Webapp</name>
+
+    <parent>
+        <artifactId>opentripplanner-analyst</artifactId>
+        <groupId>org.opentripplanner</groupId>
+        <version>0.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+	<!-- all dependencies are inherited -->
+    </dependencies>
+
+    <build>
+        <finalName>opentripplanner-analyst-webapp</finalName>
+        <!-- 
+        <plugins>
+            <plugin>
+                <groupId>ro.isdc.wro4j</groupId>
+                <artifactId>wro4j-maven-plugin</artifactId>
+                <version>1.4.2</version>
+                <executions>
+                    <execution>
+                            <phase>prepare-package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                  <targetGroups>otp-min,lib-min</targetGroups>
+                  <destinationFolder>${basedir}/src/main/webapp/js/</destinationFolder>
+                  <contextFolder>${basedir}/src/main/webapp/</contextFolder>
+                </configuration>
+            </plugin>
+        </plugins>
+         -->
+    </build>
+</project>

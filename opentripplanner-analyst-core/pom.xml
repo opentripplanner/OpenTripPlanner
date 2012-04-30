@@ -1,0 +1,86 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<artifactId>opentripplanner-analyst-core</artifactId>
+	<packaging>war</packaging>
+	<name>OpenTripPlanner Analytics Core</name>
+	<url>http://opentripplanner.org/wiki/Analytics</url>
+
+	<parent>
+		<groupId>org.opentripplanner</groupId>
+		<artifactId>opentripplanner-analyst</artifactId>
+		<version>0.1-SNAPSHOT</version>
+	</parent>
+
+	<repositories>
+		<repository>
+	      <id>maven2-repository.dev.java.net</id>
+	      <name>Java.net Repository for Maven</name>
+	      <url>http://download.java.net/maven/2/</url>
+	      <layout>default</layout>
+	    </repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.opentripplanner</groupId>
+			<artifactId>opentripplanner-routing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.opentripplanner</groupId>
+			<artifactId>opentripplanner-api-common</artifactId>
+		</dependency>
+		<dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+            <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+    		<groupId>com.sun.jersey</groupId>
+    		<artifactId>jersey-servlet</artifactId>
+    		<version>${jersey.version}</version>
+		</dependency>
+        <dependency>
+    		<groupId>com.sun.jersey</groupId>
+    		<artifactId>jersey-grizzly2</artifactId>
+    		<version>${jersey.version}</version>
+		</dependency>
+		<dependency>
+    	<groupId>com.google.guava</groupId>
+    		<artifactId>guava</artifactId>
+    		<version>11.0.1</version>
+		</dependency>
+		<dependency>
+    		<groupId>com.sun.jersey.contribs</groupId>
+    		<artifactId>jersey-spring</artifactId>
+    		<version>${jersey.version}</version>
+
+            <!-- exclude these spring 2.5.6 jars -->
+            <exclusions>
+              <exclusion>  <!-- declare the exclusion here -->
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+              </exclusion>
+              <exclusion>  <!-- declare the exclusion here -->
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-web</artifactId>
+              </exclusion>
+            </exclusions> 
+		</dependency>
+
+        <!-- prevent NotFoundErrors by including the correct versions
+        of these modules -->
+        <dependency>  
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+          <version>${spring.version}</version>
+        </dependency>
+        <dependency>  
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+          <version>${spring.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
