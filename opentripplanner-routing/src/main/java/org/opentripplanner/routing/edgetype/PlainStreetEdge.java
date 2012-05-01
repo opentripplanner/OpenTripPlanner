@@ -25,8 +25,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -43,7 +42,7 @@ public class PlainStreetEdge extends StreetEdge {
 
     private static final long serialVersionUID = 1L;
 
-    private PackedCoordinateSequence elevationProfile;
+    private ElevationProfileSegment elevationProfileSegment;
 
     private double length;
 
@@ -51,23 +50,13 @@ public class PlainStreetEdge extends StreetEdge {
 
     private String name;
 
-    private double slopeSpeedEffectiveLength;
-
-    private double bicycleSafetyEffectiveLength;
-
-    private double slopeWorkCost;
-
     private boolean wheelchairAccessible = true;
-
-    private double maxSlope;
 
     private StreetTraversalPermission permission;
 
     private String id;
 
     private boolean crossable = true;
-
-    private boolean slopeOverride = false;
 
     public boolean back;
     
@@ -102,9 +91,7 @@ public class PlainStreetEdge extends StreetEdge {
         super(v1, v2);
         this.geometry = geometry;
         this.length = length;
-        slopeSpeedEffectiveLength = length;
-        bicycleSafetyEffectiveLength = length;
-        slopeWorkCost = length;
+        this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.name = name;
         this.permission = permission;
         this.back = back;
@@ -116,7 +103,7 @@ public class PlainStreetEdge extends StreetEdge {
             if (!wheelchairAccessible) {
                 return false;
             }
-            if (maxSlope > options.maxSlope) {
+            if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -137,7 +124,7 @@ public class PlainStreetEdge extends StreetEdge {
             if (!wheelchairAccessible) {
                 return false;
             }
-            if (maxSlope > options.maxSlope) {
+            if (elevationProfileSegment.getMaxSlope() > options.maxSlope) {
                 return false;
             }
         }
@@ -155,32 +142,12 @@ public class PlainStreetEdge extends StreetEdge {
 
     @Override
     public PackedCoordinateSequence getElevationProfile() {
-        return elevationProfile;
+        return elevationProfileSegment.getElevationProfile();
     }
 
     @Override
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        if (elev == null || elev.size() < 2) {
-            return false;
-        }
-        if (slopeOverride && !computed) {
-            return false;
-        }
-
-        elevationProfile = elev;
-
-        // compute the various costs of the elevation changes
-        double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
-        length *= lengthMultiplier;
-        bicycleSafetyEffectiveLength *= lengthMultiplier;
-
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev,
-                permission.allows(StreetTraversalPermission.CAR));
-        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
-        maxSlope = costs.maxSlope;
-        slopeWorkCost = costs.slopeWorkCost;
-        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
-        return costs.flattened;
+        return elevationProfileSegment.setElevationProfile(elev, computed, permission.allows(StreetTraversalPermission.CAR));
     }
 
     @Override
@@ -221,31 +188,31 @@ public class PlainStreetEdge extends StreetEdge {
         double time = length / speed;
         double weight;
         if (options.wheelchairAccessible) {
-            weight = slopeSpeedEffectiveLength / speed;
+            weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
         } else if (s0.getNonTransitMode(options).equals(TraverseMode.BICYCLE)) {
-            time = slopeSpeedEffectiveLength / speed;
+            time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimizeFor) {
             case SAFE:
-                weight = bicycleSafetyEffectiveLength / speed;
+                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyEffectiveLength / speed;
-                if (bicycleSafetyEffectiveLength / length <= TurnVertex.GREENWAY_SAFETY_FACTOR) {
+                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
+                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= TurnVertex.GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = length / speed + slopeWorkCost;
+                weight = length / speed + elevationProfileSegment.getSlopeWorkCost();
                 break;
             case QUICK:
-                weight = slopeSpeedEffectiveLength / speed;
+                weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
                 break;
             case TRIANGLE:
-                double quick = slopeSpeedEffectiveLength;
-                double safety = bicycleSafetyEffectiveLength;
-                double slope = slopeWorkCost;
+                double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
+                double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
+                double slope = elevationProfileSegment.getSlopeWorkCost();
                 weight = quick * options.getTriangleTimeFactor() + slope
                         * options.getTriangleSlopeFactor() + safety
                         * options.getTriangleSafetyFactor();
@@ -316,27 +283,27 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {
-        this.slopeSpeedEffectiveLength = slopeSpeedEffectiveLength;
+        elevationProfileSegment.setSlopeSpeedEffectiveLength(slopeSpeedEffectiveLength);
     }
 
     public double getSlopeSpeedEffectiveLength() {
-        return slopeSpeedEffectiveLength;
+        return elevationProfileSegment.getSlopeSpeedEffectiveLength();
     }
 
     public void setSlopeWorkCost(double slopeWorkCost) {
-        this.slopeWorkCost = slopeWorkCost;
+        elevationProfileSegment.setSlopeWorkCost(slopeWorkCost);
     }
 
     public double getWorkCost() {
-        return slopeWorkCost;
+        return elevationProfileSegment.getSlopeWorkCost();
     }
 
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+        elevationProfileSegment.setBicycleSafetyEffectiveLength(bicycleSafetyEffectiveLength);
     }
 
     public double getBicycleSafetyEffectiveLength() {
-        return bicycleSafetyEffectiveLength;
+        return elevationProfileSegment.getBicycleSafetyEffectiveLength();
     }
 
     public double getLength() {
@@ -373,7 +340,7 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     public boolean getSlopeOverride() {
-        return slopeOverride ;
+        return elevationProfileSegment.getSlopeOverride();
     }
 
     public void setId(String id) {
@@ -382,11 +349,11 @@ public class PlainStreetEdge extends StreetEdge {
 
     @Override
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        return ElevationUtils.getPartialElevationProfile(elevationProfile, start, end);
+        return elevationProfileSegment.getElevationProfile(start, end);
     }
 
     public void setSlopeOverride(boolean slopeOverride) {
-        this.slopeOverride = slopeOverride;
+        elevationProfileSegment.setSlopeOverride(slopeOverride);
     }
 
     public void setRoundabout(boolean roundabout) {
