@@ -60,7 +60,7 @@ public class FindMaxWalkDistances {
         TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.walkReluctance = 1.0;
-        options.speed = 1.0;
+        options.setWalkSpeed(1.0);
         
         // Iteration Variables
         State u, v;

@@ -72,7 +72,14 @@ public class StateEditor {
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
             // created vertices
-            if (parent.vertex.equals(en.getFromVertex())) {
+            if (en.getFromVertex().equals(en.getToVertex())
+                    && parent.vertex.equals(en.getFromVertex())) {
+                // TODO LG: We disable this test: the assumption that
+                // the from and to vertex of an edge are not the same
+                // is not true anymore: bike rental on/off edges.
+                traversingBackward = parent.getOptions().isArriveBy();
+                child.vertex = en.getToVertex();
+			} else if (parent.vertex.equals(en.getFromVertex())) {
                 traversingBackward = false;
                 child.vertex = en.getToVertex();
             } else if (parent.vertex.equals(en.getToVertex())) {
@@ -144,7 +151,7 @@ public class StateEditor {
         if (!options.getModes().getTransit())
             return false;
 
-        return child.stateData.walkDistance >= options.maxWalkDistance;
+        return child.walkDistance >= options.maxWalkDistance;
     }
 
     public String toString() {
@@ -223,13 +230,12 @@ public class StateEditor {
     }
 
     public void incrementWalkDistance(double length) {
-        cloneStateDataAsNeeded();
         if (length < 0) {
             _log.warn("A state's walk distance is being incremented by a negative amount.");
             defectiveTraversal = true;
             return;
         }
-        child.stateData.walkDistance += length;
+        child.walkDistance += length;
     }
 
     public void incrementNumBoardings() {
@@ -258,8 +264,7 @@ public class StateEditor {
     }
 
     public void setWalkDistance(double walkDistance) {
-        cloneStateDataAsNeeded();
-        child.stateData.walkDistance = walkDistance;
+        child.walkDistance = walkDistance;
     }
 
     public void setZone(String zone) {
@@ -285,6 +290,11 @@ public class StateEditor {
     public void setEverBoarded(boolean everBoarded) {
         cloneStateDataAsNeeded();
         child.stateData.everBoarded = everBoarded;
+    }
+
+    public void setBikeRenting(boolean bikeRenting) {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = bikeRenting;
     }
 
     public void setPreviousStop(Vertex previousStop) {
@@ -324,6 +334,7 @@ public class StateEditor {
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
+        child.stateData.usingRentedBike = state.stateData.usingRentedBike;
     }
 
     /* PUBLIC GETTER METHODS */
@@ -371,6 +382,10 @@ public class StateEditor {
 
     public boolean isEverBoarded() {
         return child.isEverBoarded();
+    }
+
+    public boolean isRentingBike() {
+        return child.isBikeRenting();
     }
 
     public Vertex getPreviousStop() {
@@ -443,6 +458,7 @@ public class StateEditor {
     }
 
     public void alightTransit() {
-        child.setWalkAtLastTransit(child.getWalkDistance());
+        cloneStateDataAsNeeded();
+        child.stateData.lastTransitWalk = child.getWalkDistance();
     }
 }

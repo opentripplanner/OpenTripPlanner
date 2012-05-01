@@ -223,8 +223,8 @@ otp.locale.English = {
         second_abbrev  : "sec",
         seconds_abbrev : "secs",
         format         : "F jS, Y @ g:ia",
-        date_format    : "m-d-Y",
-        time_format    : "g:ia",
+        date_format    : "n/j/Y",
+        time_format    : "g:i a",
         months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 
@@ -361,7 +361,9 @@ otp.locale.English = {
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
             ['BICYCLE', 'Bicycle'],
-            ['TRANSIT,BICYCLE', 'Transit & Bicycle']
+            ['WALK,BICYCLE', 'Rented Bicycle'],
+            ['TRANSIT,BICYCLE', 'Transit & Bicycle'],
+            ['TRANSIT,WALK,BICYCLE', 'Transit & Rented Bicycle']
         ],
 
         wheelchair :

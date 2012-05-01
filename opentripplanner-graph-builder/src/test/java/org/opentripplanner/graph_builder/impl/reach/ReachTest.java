@@ -51,7 +51,7 @@ public class ReachTest extends TestCase {
         makeGraph(graph);
         TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
         options.walkReluctance = 1;
-        options.speed = 1;
+        options.setWalkSpeed(1);
         
         ReachComputerGraphBuilderImpl computer = new ReachComputerGraphBuilderImpl();
         computer.epsilon = 500;

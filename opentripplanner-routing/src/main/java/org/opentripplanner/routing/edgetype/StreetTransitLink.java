@@ -19,10 +19,10 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -83,7 +83,18 @@ public class StreetTransitLink extends AbstractEdge {
         }
         // disallow traversing two StreetTransitLinks in a row.
         // prevents router using transit stops as shortcuts to get around turn restrictions.
-        if (s0.getBackEdge() instanceof StreetTransitLink)
+        // also disallow going through stop -> station -> stop as a shortcut.
+        Edge backEdge = s0.getBackEdge();
+        Edge bbackEdge = s0.getBackState() != null ? s0.getBackState()
+                .getBackEdge() : null;
+        Edge bbbackEdge = s0.getBackState() != null
+                && s0.getBackState().getBackState() != null ? s0.getBackState()
+                .getBackState().getBackEdge() : null;
+        if (backEdge instanceof StreetTransitLink)
+            return null;
+        if (backEdge instanceof FreeEdge && bbackEdge instanceof StreetTransitLink)
+            return null;
+        if (backEdge instanceof FreeEdge && bbackEdge instanceof FreeEdge && bbbackEdge instanceof StreetTransitLink)
             return null;
         // Do not check here whether transit modes are selected. A check for the presence of 
         // transit modes will instead be done in the following PreBoard edge.

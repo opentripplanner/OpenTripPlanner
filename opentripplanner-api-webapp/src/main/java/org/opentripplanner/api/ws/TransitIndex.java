@@ -150,7 +150,7 @@ public class TransitIndex {
                 TransitRoute transitRoute = new TransitRoute();
                 transitRoute.id = route.getId();
                 transitRoute.routeLongName = route.getLongName();
-                transitRoute.routeShortName = route.getLongName();
+                transitRoute.routeShortName = route.getShortName();
                 transitRoute.url = route.getUrl();
                 response.routes.add(transitRoute);
                 break;

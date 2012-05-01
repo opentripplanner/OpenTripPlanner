@@ -30,7 +30,7 @@ public class DirectionUtils {
         geodeticCalculator = new GeodeticCalculator();
     }
 
-    private static DirectionUtils getInstance() {
+    private static synchronized DirectionUtils getInstance() {
         if (instance == null) {
             instance = new DirectionUtils();
         }
@@ -44,7 +44,7 @@ public class DirectionUtils {
      *            a LineString or a MultiLineString
      * @return
      */
-    public static double getLastAngle(Geometry geometry) {
+    public static synchronized double getLastAngle(Geometry geometry) {
         LineString line;
         if (geometry instanceof MultiLineString) {
             line = (LineString) geometry.getGeometryN(geometry.getNumGeometries() - 1);
@@ -69,7 +69,7 @@ public class DirectionUtils {
      *            a LineString or a MultiLineString
      * @return
      */
-    public static double getFirstAngle(Geometry geometry) {
+    public static synchronized double getFirstAngle(Geometry geometry) {
         LineString line;
         if (geometry instanceof MultiLineString) {
             line = (LineString) geometry.getGeometryN(0);

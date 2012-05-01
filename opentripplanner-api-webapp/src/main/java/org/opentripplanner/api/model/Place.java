@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.model; 
 
+import java.util.Calendar;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
@@ -54,12 +55,12 @@ public class Place {
     /**
      * The time the rider will arrive at the place.
      */
-    public Date arrival = null;
+    public Calendar arrival = null;
 
     /**
      * The time the rider will depart the place.
      */
-    public Date departure = null;
+    public Calendar departure = null;
 
     @XmlAttribute
     public String orig;
@@ -86,8 +87,8 @@ public class Place {
         this.name = name;
     }
 
-    public Place(Double lon, Double lat, String name, Date time) {
+    public Place(Double lon, Double lat, String name, Calendar timeAtState) {
         this(lon, lat, name);
-        this.arrival = departure = time;
+        this.arrival = departure = timeAtState;
     }
 }

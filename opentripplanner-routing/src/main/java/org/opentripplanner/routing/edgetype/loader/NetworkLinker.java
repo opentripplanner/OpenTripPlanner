@@ -22,6 +22,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,5 +74,14 @@ public class NetworkLinker {
         // Do we really need this? Commenting out does seem to cause some slowdown. (AMB)
         networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
+        
+        _log.debug("Linking bike rental stations...");
+        for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
+                BikeRentalStationVertex.class)) {
+            if (!networkLinkerLibrary.connectVertexToStreets(brsv)) {
+                _log.warn(GraphBuilderAnnotation.register(graph,
+                        Variety.BIKE_RENTAL_STATION_UNLINKED, brsv));
+            }
+        }
     }
 }

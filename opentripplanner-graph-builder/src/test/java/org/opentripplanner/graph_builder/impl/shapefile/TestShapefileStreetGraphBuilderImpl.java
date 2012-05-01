@@ -173,7 +173,7 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         //Real live cyclists tell me that they would prefer to ride around the long way than to 
         //walk their bikes the short way.  If we slow down the default biking speed, that will 
         //force a change in preferences.
-        wo.speed = 2; 
+        wo.setBikeSpeed(2);
         
         spt = AStar.getShortestPathTree(gg, start, carlton, 0, wo);
         assertNotNull(spt);

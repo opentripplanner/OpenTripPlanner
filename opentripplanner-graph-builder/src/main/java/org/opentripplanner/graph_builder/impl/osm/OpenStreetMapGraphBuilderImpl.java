@@ -31,6 +31,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.impl.osm.OSMPlainStreetEdgeFactory;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ExtraElevationData;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -58,6 +59,8 @@ import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -67,6 +70,7 @@ import org.opentripplanner.routing.patch.TranslatedString;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -102,6 +106,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private boolean noZeroLevels = true;
 
+    private boolean staticBikeRental;
+
+    private OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
+
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -122,6 +130,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      */
     public void setProviders(List<OpenStreetMapProvider> providers) {
         _providers.addAll(providers);
+    }
+
+    /**
+     * Allows for alternate PlainStreetEdge implementations; this is intended
+     * for users who want to provide more info in PSE than OTP normally keeps
+     * around.
+     */
+    public void setEdgeFactory(OSMPlainStreetEdgeFactory edgeFactory) {
+        this.edgeFactory = edgeFactory;
     }
 
     /**
@@ -170,7 +187,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         return wayPropertySet;
     }
 
+    /**
+     * Whether bike rental stations should be loaded from OSM, rather
+     * than periodically dynamically pulled from APIs.
+     */
+    public void setStaticBikeRental(boolean b) {
+        this.staticBikeRental = b;
+    }
     
+    public boolean getStaticBikeRental() {
+        return staticBikeRental;
+    }
+
     private class Handler implements OpenStreetMapContentHandler {
 
         private static final double VISIBILITY_EPSILON = 0.000000001;
@@ -434,12 +462,17 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         // track which vertical level each OSM way belongs to, for building elevators etc.
         private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel>();
+        private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
 
         public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
             this.graph = graph;
 
             // handle turn restrictions, road names, and level maps in relations
             processRelations();
+
+            if (staticBikeRental) {
+                processBikeRentalNodes();
+            }
 
             // Remove all simple islands
             HashSet<Long> _keep = new HashSet<Long>(_nodesWithNeighbors);
@@ -470,6 +503,29 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
 
         } // END buildGraph()
+
+        private void processBikeRentalNodes() {
+            _log.debug("Processing bike rental nodes...");
+            int n = 0;
+            for (OSMNode node : _bikeRentalNodes) {
+                n++;
+                int capacity = Integer.MAX_VALUE;
+                if (node.hasTag("capacity")) {
+                    try {
+                        capacity = Integer.parseInt(node.getTag("capacity"));
+                    } catch (NumberFormatException e) {
+                        _log.warn("Capacity is not a number: " + node.getTag("capacity"));
+                    }
+                }
+                String creativeName = wayPropertySet.getCreativeNameForWay(node);
+                BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "bike rental "
+                        + node.getId(), node.getLon(), node.getLat(),
+                        creativeName, capacity);
+                new RentABikeOnEdge(station, station);
+                new RentABikeOffEdge(station, station);
+            }
+            _log.debug("Created " + n + " bike rental stations.");
+        }
 
         private void generateElevationProfiles(Graph graph) {
             Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
@@ -599,10 +655,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         if (hole.area() > 0) {
                             reversePolygonOfOSMNodes(holeNodes);
                             hole.reverse();
-
-                            if (!hole.is_in_standard_form()) {
-                                standardize(hole.vertices, nodes);
-                            }
+                        }
+                        if (!hole.is_in_standard_form()) {
+                            standardize(hole.vertices, holeNodes);
                         }
                         nodes.addAll(holeNodes);
                         polygons.add(hole);
@@ -612,9 +667,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                     //FIXME: temporary hard limit on size of 
                     //areas to prevent way explosion
-                    if (visibilityPoints.size() > MAX_AREA_NODES)
+                    if (visibilityPoints.size() > MAX_AREA_NODES) {
+                        _log.warn("Area " + area.parent + " is too complicated (" + visibilityPoints.size() + " > " + MAX_AREA_NODES);
                         continue;
+                    }
 
+                    if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
+                        _log.warn("Area " + area.parent + " is not epsilon-valid (epsilon = " + VISIBILITY_EPSILON + ")");
+                        continue;
+                    }
                     VisibilityGraph vg = new VisibilityGraph(areaEnv, VISIBILITY_EPSILON, visibilityPoints);
                     for (int i = 0; i < nodes.size(); ++i) {
                         OSMNode nodeI = nodes.get(i);
@@ -640,7 +701,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                                 double length = DistanceLibrary.distance(
                                         startEndpoint.getCoordinate(), endEndpoint.getCoordinate());
-                                PlainStreetEdge street = new PlainStreetEdge(startEndpoint,
+                                PlainStreetEdge street = edgeFactory.createEdge(nodeI, nodeJ, areaEntity, startEndpoint,
                                         endEndpoint, geometry, name, length,
                                         areaPermissions,
                                         i > j);
@@ -856,7 +917,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     endEndpoint = getVertexForOsmNode(osmEndNode, way);
 
                     P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
-                            way, i, permissions, geometry);
+                            way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
                     PlainStreetEdge street = streets.getFirst();
 
@@ -1140,6 +1201,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         public void addNode(OSMNode node) {
+            if(node.isTag("amenity", "bicycle_rental")) {
+                _bikeRentalNodes.add(node);
+                return;
+            }
             if (!(_nodesWithNeighbors.contains(node.getId()) || _areaNodes.contains(node.getId())))
                 return;
 
@@ -1549,7 +1614,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start,
-                IntersectionVertex end, OSMWithTags way, long startNode,
+                IntersectionVertex end, OSMWithTags way, int index, long startNode, long endNode,
                 StreetTraversalPermission permissions, LineString geometry) {
             // get geometry length in meters, irritatingly.
             Coordinate[] coordinates = geometry.getCoordinates();
@@ -1618,12 +1683,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     || "forestry".equals(access) || "agricultural".equals(access);
 
             if (permissionsFront != StreetTraversalPermission.NONE) {
-                street = getEdgeForStreet(start, end, way, startNode, d, permissionsFront,
+                street = getEdgeForStreet(start, end, way, index, startNode, endNode, d, permissionsFront,
                         geometry, false);
                 street.setNoThruTraffic(noThruTraffic);
             }
             if (permissionsBack != StreetTraversalPermission.NONE) {
-                backStreet = getEdgeForStreet(end, start, way, startNode, d, permissionsBack,
+                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, d, permissionsBack,
                         backGeometry, true);
                 backStreet.setNoThruTraffic(noThruTraffic);
             }
@@ -1679,10 +1744,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
-                OSMWithTags way, long startNode, double length,
+                OSMWithTags way, int index, long startNode, long endNode, double length,
                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
-            String id = "way " + way.getId() + " from " + startNode;
+            String id = "way " + way.getId() + " from " + index;
             id = unique(id);
 
             String name = getNameForWay(way, id);
@@ -1693,8 +1758,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 length *= 2;
             }
 
-            PlainStreetEdge street = new PlainStreetEdge(start, end, geometry, name, length,
-                    permissions, back);
+            PlainStreetEdge street = edgeFactory
+                    .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
+                            geometry, name, length, permissions, back);
             street.setId(id);
 
             if (!way.hasTag("name")) {

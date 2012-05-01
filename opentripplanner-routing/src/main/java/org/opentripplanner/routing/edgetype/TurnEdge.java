@@ -131,23 +131,30 @@ public class TurnEdge extends StreetEdge {
         if (restrictedModes == null)
             return false;
         else {
-            return restrictedModes.contains(options.getModes().getNonTransitMode());
+            return options.getModes().isRestricted(restrictedModes);
+        }
+    }
+
+    private boolean turnRestricted(State s0, TraverseOptions options) {
+        if (restrictedModes == null)
+            return false;
+        else {
+            return restrictedModes.contains(s0.getNonTransitMode(options));
         }
     }
 
     private State doTraverse(State s0, TraverseOptions options) {
-        if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
+        if (turnRestricted(s0, options) && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
-        if (!((TurnVertex) fromv).canTraverse(options)) {
-            if (options.getModes().contains(TraverseMode.BICYCLE)) {
+        TraverseMode traverseMode = s0.getNonTransitMode(options);
+        if (!((TurnVertex) fromv).canTraverse(options, traverseMode)) {
+            if (traverseMode == TraverseMode.BICYCLE) {
                 // try walking bicycle, since you can't ride it here
                 return doTraverse(s0, options.getWalkingOptions());
             }
             return null;
         }
-
-        TraverseMode traverseMode = options.getModes().getNonTransitMode();
 
         FixedModeEdge en = new FixedModeEdge(this, traverseMode);
         Set<Alert> wheelchairNotes = ((TurnVertex) fromv).getWheelchairNotes();
@@ -184,7 +191,8 @@ public class TurnEdge extends StreetEdge {
             break;
         }
 
-        double time = (((TurnVertex) fromv).getEffectiveLength(traverseMode) + turnCost / 20.0) / options.speed;
+        double speed = options.getSpeed(s0.getNonTransitMode(options));
+        double time = (((TurnVertex) fromv).getEffectiveLength(traverseMode) + turnCost / 20.0) / speed;
         double weight = ((TurnVertex) fromv).computeWeight(s0, options, time);
         s1.incrementWalkDistance(((TurnVertex) fromv).getLength());
         s1.incrementTimeInSeconds((int) Math.ceil(time));
@@ -298,7 +306,7 @@ public class TurnEdge extends StreetEdge {
     
     @Override
     public double timeLowerBound(TraverseOptions options) {
-        return (((TurnVertex) fromv).getLength() + turnCost/20) / options.speed;
+        return (((TurnVertex) fromv).getLength() + turnCost/20) / options.getSpeedUpperBound();
     }
     
 	    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {

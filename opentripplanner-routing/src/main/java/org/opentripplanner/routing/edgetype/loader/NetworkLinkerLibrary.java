@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -31,6 +32,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TurnEdge;
@@ -42,6 +44,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.TransitIndexService;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -81,7 +84,7 @@ public class NetworkLinkerLibrary {
 
     private TransitIndexService transitIndex;
 
-    public NetworkLinkerLibrary(Graph graph, HashMap<Class<?>, Object> extra) {
+    public NetworkLinkerLibrary(Graph graph, Map<Class<?>, Object> extra) {
         this.graph = graph;
         this.transitIndex = graph.getService(TransitIndexService.class);
         EdgesForRoute edgesForRoute = (EdgesForRoute) extra.get(EdgesForRoute.class);
@@ -116,6 +119,25 @@ public class NetworkLinkerLibrary {
             for (StreetVertex sv : nearbyStreetVertices) {
                 new StreetTransitLink(sv, v, wheelchairAccessible);
                 new StreetTransitLink(v, sv, wheelchairAccessible);
+            }
+            return true;
+        }
+    }
+
+    /**
+     * The entry point for networklinker to link each bike rental station.
+     * 
+     * @param v
+     * @return true if the links were successfully added, otherwise false
+     */
+    public boolean connectVertexToStreets(BikeRentalStationVertex v) {
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null);
+        if (nearbyStreetVertices == null) {
+            return false;
+        } else {
+            for (StreetVertex sv : nearbyStreetVertices) {
+                new StreetBikeRentalLink(sv, v);
+                new StreetBikeRentalLink(v, sv);
             }
             return true;
         }
@@ -462,7 +484,9 @@ public class NetworkLinkerLibrary {
             Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
             if (starting == null) {
                 starting = new HashSet<Edge>();
-                edgesStartingAt.put((TurnVertex) edge.getFromVertex(), starting);
+                if (edge.getFromVertex() instanceof TurnVertex) {
+                    edgesStartingAt.put((TurnVertex) edge.getFromVertex(), starting);
+                }
             }
             starting.add(edge);
         }

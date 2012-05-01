@@ -14,12 +14,16 @@
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -73,6 +77,8 @@ public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
+    private static final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
+
     Request request;
 
     private PathService pathService;
@@ -83,10 +89,12 @@ public class PlanGenerator {
 
     private TransitIndexService transitIndex;
 
+    private Graph graph;
+
     public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
         this.request = request;
         pathService = pathServiceFactory.getPathService(request.getRouterId());
-        Graph graph = pathService.getGraphService().getGraph();
+        graph = pathService.getGraphService().getGraph();
         transitIndex = graph.getService(TransitIndexService.class);
         fareService = graph.getService(FareService.class);
     }
@@ -390,7 +398,7 @@ public class PlanGenerator {
                             Place stop = makePlace(state.getBackState(), true);
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
-                            leg.stop.get(leg.stop.size() - 1).departure = new Date(
+                            leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(
                                     state.getTimeInMillis());
                         }
                     }
@@ -399,7 +407,7 @@ public class PlanGenerator {
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
                         fixupTransitLeg(leg, state);
-                        leg.startTime = new Date(state.getTimeInMillis());
+                        leg.startTime = makeCalendar(state.getTimeInMillis());
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
@@ -436,9 +444,24 @@ public class PlanGenerator {
             finalizeLeg(leg, path.states.getLast(), path.states, startWalk, i, coordinates);
         }
         itinerary.removeBogusLegs();
+        itinerary.fixupDates(graph.getService(CalendarServiceData.class));
         if (itinerary.legs.size() == 0)
             throw new TrivialPathException();
         return itinerary;
+    }
+
+    private Calendar makeCalendar(long millis) {
+        CalendarServiceData service = graph.getService(CalendarServiceData.class);
+        Collection<String> agencyIds = graph.getAgencyIds();
+        TimeZone timeZone; 
+        if (agencyIds.size() == 0) {
+            timeZone = TimeZone.getTimeZone("GMT");
+        } else {
+            timeZone = service.getTimeZoneForAgencyId(agencyIds.iterator().next());
+        }
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTimeInMillis(millis);
+        return calendar;
     }
 
     private void fixupTransitLeg(Leg leg, State state) {
@@ -461,7 +484,7 @@ public class PlanGenerator {
             }
         }
         leg.mode = en.getMode().toString();
-        leg.startTime = new Date(state.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(state.getBackState().getTimeInMillis());
     }
 
     private void finalizeLeg(Leg leg, State state, List<State> states, int start, int end,
@@ -469,7 +492,7 @@ public class PlanGenerator {
         if (start != -1) {
             leg.walkSteps = getWalkSteps(states.subList(start, end + 1));
         }
-        leg.endTime = new Date(state.getBackState().getTimeInMillis());
+        leg.endTime = makeCalendar(state.getBackState().getTimeInMillis());
         Geometry geometry = geometryFactory.createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
         leg.to = makePlace(state, true);
@@ -519,7 +542,7 @@ public class PlanGenerator {
     private Leg makeLeg(Itinerary itinerary, State s) {
         Leg leg = new Leg();
         itinerary.addLeg(leg);
-        leg.startTime = new Date(s.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(s.getBackState().getTimeInMillis());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
@@ -538,8 +561,8 @@ public class PlanGenerator {
         State startState = path.states.getFirst();
         State endState = path.states.getLast();
 
-        itinerary.startTime = new Date(startState.getTimeInMillis());
-        itinerary.endTime = new Date(endState.getTimeInMillis());
+        itinerary.startTime = makeCalendar(startState.getTimeInMillis());
+        itinerary.endTime = makeCalendar(endState.getTimeInMillis());
         itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
         if (fareService != null) {
             itinerary.fare = fareService.getCost(path);
@@ -559,7 +582,7 @@ public class PlanGenerator {
         String name = v.getName();
         Place place;
         if (time) {
-            Date timeAtState = new Date(state.getTimeInMillis());
+            Calendar timeAtState = makeCalendar(state.getTimeInMillis());
             place = new Place(endCoord.x, endCoord.y, name, timeAtState);
         } else {
             place = new Place(endCoord.x, endCoord.y, name);
@@ -609,7 +632,7 @@ public class PlanGenerator {
             options.setMaxWalkDistance(request.getMaxWalkDistance());
         }
         if (request.getWalkSpeed() > 0) {
-            options.speed = request.getWalkSpeed();
+            options.setWalkSpeed(request.getWalkSpeed());
         }
         options.setTriangleSafetyFactor(request.getTriangleSafetyFactor());
         options.setTriangleSlopeFactor(request.getTriangleSlopeFactor());
@@ -653,6 +676,9 @@ public class PlanGenerator {
         if (request.getTransferPenalty() != null) {
             options.transferPenalty = request.getTransferPenalty();
         }
+
+        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
+        options.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
         return options;
     }
 
