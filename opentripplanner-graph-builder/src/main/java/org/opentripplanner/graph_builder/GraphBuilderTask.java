@@ -87,7 +87,7 @@ public class GraphBuilderTask implements Runnable {
     }
 
     public void run() {
-        
+
         Graph graph;
         
         if (_baseGraph != null) {
@@ -111,7 +111,11 @@ public class GraphBuilderTask implements Runnable {
             _log.info("graph already exists and alwaysRebuild=false => skipping graph build");
             return;
         }
-        
+
+        if(!graphPath.canWrite()) {
+            throw new RuntimeException("Cannot write to graph path " + graphPath);
+        }
+
         //check prerequisites
         ArrayList<String> provided = new ArrayList<String>();
         boolean bad = false;
