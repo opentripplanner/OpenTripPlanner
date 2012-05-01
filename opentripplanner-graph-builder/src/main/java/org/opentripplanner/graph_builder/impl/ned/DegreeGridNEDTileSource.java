@@ -19,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.jets3t.service.S3Service;
@@ -27,12 +28,18 @@ import org.jets3t.service.ServiceException;
 import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.operation.buffer.BufferBuilder;
+import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 /**
  * Download one-degree-wide, 1/3 arcsecond NED tiles from S3 (or get them from a directory of files
@@ -65,12 +72,18 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     @Override
     public List<File> getNEDTiles() {
 
-        Envelope extent = graph.getExtent();
+        HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
+
+        for (Vertex v : graph.getVertices()) {
+            Coordinate coord = v.getCoordinate();
+            tiles.add(new P2<Integer>((int) coord.x, (int) coord.y));
+        }
+
         List<File> paths = new ArrayList<File>();
-        for (int y = (int) extent.getMinY() + 1; y <= (int) extent.getMaxY() + 1; ++y) {
-            for (int x = (int) extent.getMinX() - 1; x <= (int) extent.getMaxX() - 1; ++x) {
-                paths.add(getPathToTile(x, y));
-            }
+        for (P2<Integer> tile : tiles) {
+            int x = tile.getFirst() - 1;
+            int y = tile.getSecond() + 1;
+            paths.add(getPathToTile(x, y));
         }
         return paths;
     }

@@ -32,7 +32,7 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
     }
 
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit");
+        return Arrays.asList("streets");
     }
 
     @Override
