@@ -14,7 +14,6 @@
 package org.opentripplanner.graph_builder;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -133,7 +132,12 @@ public class GraphBuilderTask implements Runnable {
             _log.warn("base graph loaded, not enforcing prerequisites");
         else if (bad)
             throw new RuntimeException("Prerequisites unsatisfied");
-        
+
+        //check inputs
+        for (GraphBuilder builder : _graphBuilders) {
+            builder.checkInputs();
+        }
+
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);

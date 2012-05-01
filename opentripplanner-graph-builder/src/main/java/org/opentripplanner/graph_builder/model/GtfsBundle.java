@@ -20,11 +20,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipFile;
 
+import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
 import org.opentripplanner.graph_builder.impl.DownloadableGtfsInputSource;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GtfsBundle {
+
+    private static final Logger _log = LoggerFactory.getLogger(GtfsBundle.class);
 
     private File path;
 
@@ -148,5 +154,29 @@ public class GtfsBundle {
 
     public void setDefaultStreetToStopTime(int time) {
         defaultStreetToStopTime = time;
+    }
+    
+    public void checkInputs() {
+        if (csvInputSource != null) {
+            _log.warn("unknown CSV source type; cannot check inputs");
+            return;
+        }
+        if (path != null) {
+            if (!path.exists()) {
+                throw new RuntimeException("GTFS Path " + path + " does not exist.");
+            }
+            if (!path.canRead()) {
+                throw new RuntimeException("GTFS Path " + path + " cannot be read.");
+            }
+        } else if (url != null) {
+            try {
+                HttpUtils.testUrl(url.toExternalForm());
+            } catch (ClientProtocolException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }

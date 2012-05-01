@@ -81,4 +81,11 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
     public String toString() {
         return "StreamedFileBasedOpenStreetMapProviderImpl(" + _path + ")";
     }
+
+    @Override
+    public void checkInputs() {
+        if (!_path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + _path);
+        }
+    }
 }

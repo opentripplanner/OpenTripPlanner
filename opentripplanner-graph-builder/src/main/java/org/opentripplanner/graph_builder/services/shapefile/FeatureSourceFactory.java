@@ -19,4 +19,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 
 public interface FeatureSourceFactory {
     public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource();
+
+    /** @see GraphBuilder.checkInputs() */
+    public void checkInputs();
 }

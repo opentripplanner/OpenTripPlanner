@@ -423,4 +423,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         return values[0];
     }
 
+    @Override
+    public void checkInputs() {
+        gridCoverageFactory.checkInputs();
+    }
+
 }
