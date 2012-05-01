@@ -69,6 +69,9 @@ public class Leg {
     @XmlAttribute
     public String agencyUrl;
 
+    @XmlAttribute
+    public int agencyTimeZoneOffset;
+
     /**
      * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
      */
@@ -220,6 +223,7 @@ public class Leg {
         startTime = calendar;
         calendar = Calendar.getInstance(timeZone);
         calendar.setTime(endTime.getTime());
-        endTime = calendar; 
+        endTime = calendar;
+        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
 }
