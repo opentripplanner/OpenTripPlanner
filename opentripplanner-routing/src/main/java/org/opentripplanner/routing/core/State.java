@@ -84,6 +84,8 @@ public class State implements Cloneable {
         this.backEdgeNarrative = null;
         this.hops = 0;
         this.stateData = new StateData();
+        // note that here we are breaking the circular reference between rctx and options
+        // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = time;
         this.stateData.tripSeqHash = 0;

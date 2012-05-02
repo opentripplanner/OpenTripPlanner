@@ -67,7 +67,7 @@ public class GraphPath {
      */
     public GraphPath(State s, boolean optimize) {
         this.rctx = s.getContext();
-        this.back = rctx.opt.isArriveBy();
+        this.back = s.getOptions().isArriveBy();
         
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
