@@ -262,6 +262,9 @@ public class TestContractionHeirarchies extends TestCase {
                             continue;
                         }
                         options.setArriveBy(false);
+                        
+                        // TODO: rewrite CH getShortestPath to use rctx origin/dest vertices (AMB)
+                        options.setRoutingContext(graph, verticesOut[y1][x1], verticesIn[y2][x2]);
                         path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], 1000000000,
                                 options);
 

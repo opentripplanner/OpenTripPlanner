@@ -574,18 +574,20 @@ public class ContractionHierarchy implements Serializable {
     public GraphPath getShortestPath(Vertex origin, Vertex target, long time,
             TraverseOptions opt) {
 
-    	TraverseOptions upOptions = opt.clone();
-        TraverseOptions downOptions = opt.clone();
-
         if (origin == null || target == null) {
             return null;
         }
 
+        TraverseOptions upOptions = opt.clone();
+        TraverseOptions downOptions = opt.clone();
+
         //TODO: verify set to/from are correct (AMB)
     	upOptions.setArriveBy(false);
     	upOptions.dateTime = time;
+    	upOptions.setRoutingContext(graph, origin, target);
         downOptions.setArriveBy(true);
         downOptions.dateTime = time;
+        upOptions.setRoutingContext(graph, target, origin);
 
     	/** max walk distance cannot be less than distances to nearest transit stops */
     	double minWalkDistance = 
