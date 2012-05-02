@@ -24,4 +24,9 @@ public class PruneFloatingIslands implements GraphBuilder {
         StreetUtils.pruneFloatingIslands(graph);
     }
 
+    @Override
+    public void checkInputs() {
+        //no inputs
+    }
+
 }

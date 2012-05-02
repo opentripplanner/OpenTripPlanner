@@ -14,12 +14,17 @@
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -367,8 +372,7 @@ public class PlanGenerator {
                             Place stop = makePlace(state.getBackState(), true);
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
-                            leg.stop.get(leg.stop.size() - 1).departure = new Date(
-                                    state.getTimeInMillis());
+                            leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
                         }
                     }
                     if (!route.equals(leg.route)) {
@@ -376,7 +380,7 @@ public class PlanGenerator {
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
                         fixupTransitLeg(leg, state, transitIndex);
-                        leg.startTime = new Date(state.getTimeInMillis());
+                        leg.startTime = makeCalendar(state);
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
@@ -413,9 +417,24 @@ public class PlanGenerator {
             finalizeLeg(leg, path.states.getLast(), path.states, startWalk, i, coordinates);
         }
         itinerary.removeBogusLegs();
+        itinerary.fixupDates(graph.getService(CalendarServiceData.class));
         if (itinerary.legs.size() == 0)
             throw new TrivialPathException();
         return itinerary;
+    }
+
+    private Calendar makeCalendar(State state) {
+        CalendarService service = state.getContext().calendarService;
+        Collection<String> agencyIds = state.getContext().graph.getAgencyIds();
+        TimeZone timeZone; 
+        if (agencyIds.size() == 0) {
+            timeZone = TimeZone.getTimeZone("GMT");
+        } else {
+            timeZone = service.getTimeZoneForAgencyId(agencyIds.iterator().next());
+        }
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTimeInMillis(state.getTimeInMillis());
+        return calendar;
     }
 
     private void fixupTransitLeg(Leg leg, State state, TransitIndexService transitIndex) {
@@ -438,7 +457,7 @@ public class PlanGenerator {
             }
         }
         leg.mode = en.getMode().toString();
-        leg.startTime = new Date(state.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(state.getBackState());
     }
 
     private void finalizeLeg(Leg leg, State state, List<State> states, int start, int end,
@@ -446,7 +465,7 @@ public class PlanGenerator {
         if (start != -1) {
             leg.walkSteps = getWalkSteps(states.subList(start, end + 1));
         }
-        leg.endTime = new Date(state.getBackState().getTimeInMillis());
+        leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = geometryFactory.createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
         leg.to = makePlace(state, true);
@@ -496,7 +515,7 @@ public class PlanGenerator {
     private Leg makeLeg(Itinerary itinerary, State s) {
         Leg leg = new Leg();
         itinerary.addLeg(leg);
-        leg.startTime = new Date(s.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(s.getBackState());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
@@ -515,8 +534,8 @@ public class PlanGenerator {
         State startState = path.states.getFirst();
         State endState = path.states.getLast();
 
-        itinerary.startTime = new Date(startState.getTimeInMillis());
-        itinerary.endTime = new Date(endState.getTimeInMillis());
+        itinerary.startTime = makeCalendar(startState);
+        itinerary.endTime = makeCalendar(endState);
         itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
 
         Graph graph = path.getRoutingContext().graph;
@@ -539,7 +558,7 @@ public class PlanGenerator {
         String name = v.getName();
         Place place;
         if (time) {
-            Date timeAtState = new Date(state.getTimeInMillis());
+            Calendar timeAtState = makeCalendar(state);
             place = new Place(endCoord.x, endCoord.y, name, timeAtState);
         } else {
             place = new Place(endCoord.x, endCoord.y, name);

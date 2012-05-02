@@ -80,4 +80,9 @@ public class WeightTableGraphBuilderImpl implements GraphBuilder {
         public double getMaxWalkDistance() {
             return maxWalkDistance;
         }
+
+        @Override
+        public void checkInputs() {
+            //no inputs
+        }
 }

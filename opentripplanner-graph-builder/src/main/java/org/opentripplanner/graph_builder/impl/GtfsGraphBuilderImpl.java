@@ -335,4 +335,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             }
         }
     }
+
+    @Override
+    public void checkInputs() {
+        for (GtfsBundle bundle : _gtfsBundles.getBundles()) {
+            bundle.checkInputs();
+        }
+    }
 }

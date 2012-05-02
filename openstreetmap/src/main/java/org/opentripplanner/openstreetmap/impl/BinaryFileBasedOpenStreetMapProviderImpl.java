@@ -66,4 +66,11 @@ public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapPr
     public String toString() {
         return "BinaryFileBasedOpenStreetMapProviderImpl(" + _path + ")";
     }
+
+    @Override
+    public void checkInputs() {
+        if (!_path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + _path);
+        }
+    }
 }

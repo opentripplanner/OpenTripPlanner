@@ -1962,4 +1962,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     public void setCustomNamer(CustomNamer customNamer) {
         this.customNamer = customNamer;
     }
+
+    @Override
+    public void checkInputs() {
+        for (OpenStreetMapProvider provider : _providers) {
+            provider.checkInputs();
+        }
+    }
 }

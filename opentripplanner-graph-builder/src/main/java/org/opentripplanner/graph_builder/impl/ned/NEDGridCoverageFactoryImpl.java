@@ -82,4 +82,11 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         }
         return coverage;
     }
+
+    @Override
+    public void checkInputs() {
+        if (!cacheDirectory.canWrite()) {
+            throw new RuntimeException("Can't write to NED cache: " + cacheDirectory);
+        }
+    }
 }

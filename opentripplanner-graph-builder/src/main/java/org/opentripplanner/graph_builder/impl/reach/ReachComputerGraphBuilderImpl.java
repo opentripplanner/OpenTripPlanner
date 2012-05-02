@@ -474,4 +474,9 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         this.edgeTreesVertexLimit = edgeTreesVertexLimit;
     }
 
+    @Override
+    public void checkInputs() {
+        //no inputs
+    }
+
 }

@@ -96,7 +96,11 @@ public class GraphBuilderTask implements Runnable {
             LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
             return;
         }
-        
+
+        if(!graphFile.canWrite()) {
+            throw new RuntimeException("Cannot write to graph path " + graphFile);
+        }
+
         //check prerequisites
         ArrayList<String> provided = new ArrayList<String>();
         boolean bad = false;
@@ -114,7 +118,12 @@ public class GraphBuilderTask implements Runnable {
             LOG.warn("base graph loaded, not enforcing prerequisites");
         else if (bad)
             throw new RuntimeException("Prerequisites unsatisfied");
-        
+
+        //check inputs
+        for (GraphBuilder builder : _graphBuilders) {
+            builder.checkInputs();
+        }
+
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);

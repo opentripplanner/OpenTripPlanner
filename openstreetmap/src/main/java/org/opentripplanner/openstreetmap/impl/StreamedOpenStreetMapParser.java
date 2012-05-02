@@ -67,6 +67,8 @@ public class StreamedOpenStreetMapParser {
 
         in = new BufferedInputStream(new FileInputStream(path));
         parseMap(in, map, 3);
+
+        map.nodesLoaded();
     }
 
     public static void parseMap(final InputStream in, OpenStreetMapContentHandler map, int phase) throws IOException,
