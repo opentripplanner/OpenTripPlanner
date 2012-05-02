@@ -311,7 +311,6 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
-        assert (modes.isValid());
         if (modes.getBicycle()) {
             walkingOptions = new TraverseOptions();
             walkingOptions.setArriveBy(this.isArriveBy());
