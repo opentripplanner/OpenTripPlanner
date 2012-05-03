@@ -16,7 +16,8 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.List;
 
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
@@ -27,15 +28,21 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public interface StreetVertexIndexService {
 
-    public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options);
+    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest options);
 
-    public Vertex getClosestVertex(final Coordinate location, String name, TraverseOptions options,
+    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest options,
             List<Edge> extraEdges);
 
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options,
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
             List<Edge> extraEdges, Collection<Edge> preferredEdges);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
+
+    Vertex getVertexForPlace(NamedPlace place, RoutingRequest options);
+
+    Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other);
+
+    boolean isAccessible(NamedPlace place, RoutingRequest options);
 }

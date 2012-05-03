@@ -14,19 +14,35 @@
 
 package org.opentripplanner.api.model.error;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.opentripplanner.api.ws.Message;
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.ws.LocationNotAccessible;
+import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.TransitTimesException;
+import org.opentripplanner.routing.error.TrivialPathException;
+import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- * This represents an error in trip planning.
- *
- */
+/** This API response element represents an error in trip planning. */
 public class PlannerError {
 
+    private static final Logger LOG = LoggerFactory.getLogger(PlannerError.class);
+    private static Map<Class<? extends Exception>, Message> messages;
+    static {
+        messages = new HashMap<Class<? extends Exception>, Message> ();
+        messages.put(VertexNotFoundException.class, Message.OUTSIDE_BOUNDS);
+        messages.put(PathNotFoundException.class,   Message.PATH_NOT_FOUND);
+        messages.put(LocationNotAccessible.class,   Message.LOCATION_NOT_ACCESSIBLE);
+        messages.put(TransitTimesException.class,   Message.NO_TRANSIT_TIMES);
+        messages.put(TrivialPathException.class,    Message.TOO_CLOSE);
+    }
+    
     private int    id;
     private String msg;
-
     private List<String> missing = null;
     private boolean noPath = false;
 
@@ -35,6 +51,19 @@ public class PlannerError {
         noPath = true;
     }
 
+    public PlannerError(Exception e) {
+        this();
+        Message message = messages.get(e.getClass());
+        if (message == null) {
+            LOG.error("exception planning trip: ", e);
+            message = Message.SYSTEM_ERROR;
+        }
+        this.setMsg(message);
+        if (e instanceof VertexNotFoundException)
+            this.setMissing(((VertexNotFoundException)e).getMissing());
+    }
+
+    
     public PlannerError(boolean np) {
         noPath = np;
     }

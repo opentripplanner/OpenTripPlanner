@@ -2,11 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<!-- Single graph -->
+	<!-- import api-webapp application context -->
 	<import resource="classpath:org/opentripplanner/api/application-context.xml" />
 
-	<bean id="graphBundle" class="org.opentripplanner.model.GraphBundle">
-		<property name="path" value="/var/otp/graphs/" />
+    <!-- specify a GraphService, configuring the path to the serialized Graphs -->
+	<bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
+		<property name="path" value="/var/otp/graphs/dc/" />
 	</bean>
 	
 </beans>

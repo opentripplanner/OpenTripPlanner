@@ -22,28 +22,33 @@ import java.util.Map;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
-import org.opentripplanner.routing.algorithm.strategies.ExtraEdgesStrategy;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.util.DateUtils;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Find the shortest path between graph vertices using A*.
  */
-public class GenericAStar {
+public class GenericAStar implements SPTService { // maybe this should be wrapped in a component SPT service 
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
@@ -69,70 +74,43 @@ public class GenericAStar {
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
         _searchTerminationStrategy = searchTerminationStrategy;
     }
+    
+    @Override
+    public ShortestPathTree getShortestPathTree(RoutingRequest req) {
+        return getShortestPathTree(req, -1); // negative timeout means no timeout
+    }
 
-    /**
-     * Plots a path on graph from origin to target. In the case of "arrive-by" routing, the origin
-     * state is actually the user's end location and the target vertex is the user's start location.
-     * 
-     * @param graph
-     * @param origin
-     * @param target
-     * @return the shortest path, or null if none is found
-     */
-    public ShortestPathTree getShortestPathTree(Graph graph, State origin, Vertex target) {
+    /** @return the shortest path, or null if none is found */
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout) {
 
-        if (origin == null || target == null) {
+        RoutingContext rctx = options.getRoutingContext();
+        long abortTime = DateUtils.absoluteTimeout(relTimeout);
+        
+        if (rctx.origin == null || rctx.target == null) {
             return null;
         }
 
-        TraverseOptions options = origin.getOptions();
+        ShortestPathTree spt = createShortestPathTree(options);
 
-        // from now on, target means "where this search will terminate"
-        // not "the end of the trip from the user's perspective".
+        final RemainingWeightHeuristic heuristic = options.batch ? 
+                new TrivialRemainingWeightHeuristic() : rctx.remainingWeightHeuristic; 
 
-        ShortestPathTree spt = createShortestPathTree(origin, options, graph);
-
-        options.setTransferTable(graph.getTransferTable());
-
-        /**
-         * Populate any extra edges
-         */
-        final ExtraEdgesStrategy extraEdgesStrategy = options.extraEdgesStrategy;
-        Map<Vertex, List<Edge>> extraEdges = new HashMap<Vertex, List<Edge>>();
-        // conditional could be eliminated by placing this before the o/d swap above
-        if (options.isArriveBy()) {
-            extraEdgesStrategy.addIncomingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addIncomingEdgesForTarget(extraEdges, target);
-        } else {
-            extraEdgesStrategy.addOutgoingEdgesForOrigin(extraEdges, origin.getVertex());
-            extraEdgesStrategy.addOutgoingEdgesForTarget(extraEdges, target);
-        }
-
-        if (extraEdges.isEmpty())
-            extraEdges = Collections.emptyMap();
-
-        final RemainingWeightHeuristic heuristic = options.remainingWeightHeuristic;
-
-        double initialWeight = heuristic.computeInitialWeight(origin, target);
-        spt.add(origin);
+        // heuristic calc could actually be done when states are constructed, inside state
+        State initialState = new State(options);
+        double initialWeight = heuristic.computeInitialWeight(initialState, rctx.target);
+        spt.add(initialState);
 
         // Priority Queue
-        OTPPriorityQueueFactory factory = BinHeap.FACTORY;
-        OTPPriorityQueue<State> pq = factory.create(graph.getVertices().size() + extraEdges.size());
+        OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
+        OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size());
         // this would allow continuing a search from an existing state
-        pq.insert(origin, origin.getWeight() + initialWeight);
+        pq.insert(initialState, initialWeight);
 
-        options = options.clone();
-        /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
-                + target.getDistanceToNearestTransitStop();
-        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), minWalkDistance));
-
-        long abortTime = Long.MAX_VALUE;
-        if (options.searchAbortTime > 0)
-            abortTime = Math.min(abortTime, options.searchAbortTime);
-        if (options.maxComputationTime > 0)
-            abortTime = Math.min(abortTime, System.currentTimeMillis() + options.maxComputationTime);
+//        options = options.clone();
+//        /** max walk distance cannot be less than distances to nearest transit stops */
+//        double minWalkDistance = origin.getVertex().getDistanceToNearestTransitStop()
+//                + target.getDistanceToNearestTransitStop();
+//        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
 
         int nVisited = 0;
 
@@ -147,12 +125,12 @@ public class GenericAStar {
              * Terminate the search prematurely if we've hit our computation wall.
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", origin, target);
+                LOG.warn("Search timeout. origin={} target={}", rctx.origin, rctx.target);
                 // Returning null indicates something went wrong and search should be aborted.
                 // This is distinct from the empty list of paths which implies that a result may still
                 // be found by retrying with altered options (e.g. max walk distance)
                 storeMemory();
-                return null;
+                return null; // throw timeout exception
             }
 
             // get the lowest-weight state in the queue
@@ -180,17 +158,17 @@ public class GenericAStar {
              * Should we terminate the search?
              */
             if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(origin.getVertex(), target, u,
-                        spt, options))
+                if (!_searchTerminationStrategy.shouldSearchContinue(
+                    rctx.origin, rctx.target, u, spt, options))
                     break;
             // TODO LG: Provide a generic end of search condition
-            } else if (u_vertex == target && u.isFinal()) {
+            } else if (!options.batch && u_vertex == rctx.target && u.isFinal()) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;
             }
 
-            Collection<Edge> edges = getEdgesForVertex(graph, extraEdges, u_vertex, options);
+            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
 
             nVisited += 1;
 
@@ -214,10 +192,10 @@ public class GenericAStar {
 
                     if (_skipTraversalResultStrategy != null
                             && _skipTraversalResultStrategy.shouldSkipTraversalResult(
-                                    origin.getVertex(), target, u, v, spt, options))
+                                    rctx.origin, rctx.target, u, v, spt, options))
                         continue;
 
-                    double remaining_w = computeRemainingWeight(heuristic, v, target, options);
+                    double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                         continue;
                     }
@@ -261,17 +239,8 @@ public class GenericAStar {
         }
     }
 
-    private Collection<Edge> getEdgesForVertex(Graph graph, Map<Vertex, List<Edge>> extraEdges,
-            Vertex vertex, TraverseOptions options) {
-
-        if (options.isArriveBy())
-            return GraphLibrary.getIncomingEdges(graph, vertex, extraEdges);
-        else
-            return GraphLibrary.getOutgoingEdges(graph, vertex, extraEdges);
-    }
-
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
-            Vertex target, TraverseOptions options) {
+            Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
         if (options.isArriveBy())
@@ -280,30 +249,28 @@ public class GenericAStar {
             return heuristic.computeForwardWeight(v, target);
     }
 
-    private boolean isWorstTimeExceeded(State v, TraverseOptions options) {
-        if (options.isArriveBy())
-            return v.getTime() < options.worstTime;
+    private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
+        if (opt.isArriveBy())
+            return v.getTime() < opt.worstTime;
         else
-            return v.getTime() > options.worstTime;
+            return v.getTime() > opt.worstTime;
     }
 
-    private ShortestPathTree createShortestPathTree(State init, TraverseOptions options, Graph graph) {
+    private ShortestPathTree createShortestPathTree(RoutingRequest opts) {
 
         // Return Tree
         ShortestPathTree spt = null;
 
         if (_shortestPathTreeFactory != null)
-            spt = _shortestPathTreeFactory.create();
+            spt = _shortestPathTreeFactory.create(opts);
 
         if (spt == null) {
             // Use MultiShortestPathTree if transit OR bike rental.
-            if (options.getModes().getTransit() || options.getModes().getWalk()
-                            && options.getModes().getBicycle()) {
-                spt = new MultiShortestPathTree();
-                // if (options.useServiceDays)
-                options.setServiceDays(init.getTime(), graph.getAgencyIds());
+            if (opts.getModes().isTransit() || 
+                opts.getModes().getWalk() && opts.getModes().getBicycle()) {
+                spt = new MultiShortestPathTree(opts);
             } else {
-                spt = new BasicShortestPathTree();
+                spt = new BasicShortestPathTree(opts);
             }
         }
 
@@ -313,4 +280,5 @@ public class GenericAStar {
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
+
 }

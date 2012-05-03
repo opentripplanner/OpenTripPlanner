@@ -64,6 +64,8 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
 
                 in = new BZip2CompressorInputStream(new FileInputStream(_path));
                 StreamedOpenStreetMapParser.parseMap(in, handler, 3);
+                
+                handler.nodesLoaded();
             } else {
                 StreamedOpenStreetMapParser.parseMap(_path, handler);
             }
@@ -78,5 +80,12 @@ public class StreamedFileBasedOpenStreetMapProviderImpl implements OpenStreetMap
 
     public String toString() {
         return "StreamedFileBasedOpenStreetMapProviderImpl(" + _path + ")";
+    }
+
+    @Override
+    public void checkInputs() {
+        if (!_path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + _path);
+        }
     }
 }

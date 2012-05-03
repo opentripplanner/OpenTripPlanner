@@ -41,4 +41,8 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
         linker.createLinkage();
     }
 
+    @Override
+    public void checkInputs() {
+        //no inputs
+    }
 }

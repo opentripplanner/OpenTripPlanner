@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Proj4js</title>
+  
+  <style type="text/css">
+    @import url(test/base.css);
+
+    #descSource, #descDest {
+        font-style: italic;
+        color: #999;
+    }
+    
+    #xySource, #xyDest {
+        width: 100%;
+    }
+    
+  </style>
+  
+  <script src="lib/proj4js.js"></script>
+ 
+  <script src="lib/defs/EPSG27200.js"></script>
+  <script src="lib/defs/EPSG4272.js"></script>
+  <script src="lib/defs/EPSG54009.js"></script>
+  <script src="lib/defs/EPSG42304.js"></script>
+  <script src="lib/defs/EPSG25833.js"></script>
+  <script src="lib/defs/EPSG27563.js"></script>
+  <script src="lib/defs/EPSG4139.js"></script>
+  <script src="lib/defs/EPSG4302.js"></script>
+  <script src="lib/defs/EPSG31285.js"></script>
+  <script src="lib/defs/EPSG900913.js"></script>
+                      
+  <script type="text/javascript">
+  
+  var projHash = {};
+  function initProj4js() {
+    var crsSource = document.getElementById('crsSource');
+    var crsDest = document.getElementById('crsDest');
+    var optIndex = 0;
+    for (var def in Proj4js.defs) {
+       projHash[def] = new Proj4js.Proj(def);    //create a Proj for each definition
+       var label = def+" - "+ (projHash[def].title ? projHash[def].title : '');
+       var opt = new Option(label, def);
+       crsSource.options[optIndex]= opt;
+       var opt = new Option(label, def);
+       crsDest.options[optIndex]= opt;
+       ++optIndex;
+    }  // for
+    updateCrs('Source');
+    updateCrs('Dest');
+  }
+  
+  function updateCrs(id) {
+    var crs = document.getElementById('crs'+id);
+    if (crs.value) {
+      var proj = projHash[crs.value];
+      var str = 'projection: ' + proj.projName + ' - datum: ' + proj.datumName;
+      var desc = document.getElementById('desc'+id);
+      desc.innerHTML = str;
+      var units = document.getElementById('units'+id);
+      units.innerHTML = proj.units;
+    }
+  }
+  
+  function transform() {
+    var crsSource = document.getElementById('crsSource');
+    var projSource = null;
+    if (crsSource.value) {
+      projSource = projHash[crsSource.value];
+    } else {
+      alert("Select a source coordinate system");
+      return;
+    }
+    var crsDest = document.getElementById('crsDest');
+    var projDest = null;
+    if (crsDest.value) {
+      projDest = projHash[crsDest.value];
+    } else {
+      alert("Select a destination coordinate system");
+      return;
+    }
+    var pointInput = document.getElementById('xySource');
+    if (pointInput.value) {
+      var pointSource = new Proj4js.Point(pointInput.value);
+      var pointDest = Proj4js.transform(projSource, projDest, pointSource);
+      document.getElementById('xyDest').value = pointDest.toShortString();
+    } else {
+      alert("Enter source coordinates");
+      return;
+    }
+  }
+  
+  </script>
+</head>
+
+<body onload="initProj4js()">
+  <div id="header">
+    <h1>Proj4js Home Page</h1>
+  </div>
+  <div id="navbar">
+    <a href="http://trac.osgeo.org/proj4js">Proj4js Wiki/Trac</a> | 
+    <a href="http://wiki.osgeo.org/wiki/MetaCRS">OSGeo MetaCRS</a> |
+    <a href="http://spatialreference.org/">spatialreference.org</a> |
+    <a href="http://communitymapbuilder.org/">MapBuilder</a> | 
+    <a href="http://openlayers.org/">OpenLayers</a> | 
+  </div>
+  <h1>Welcome to Proj4js</h1>
+  <p>
+This is a JavaScript library that provides methods for coordinate 
+transformations between map projections and longitude/latitude, 
+including datum transformations, in a web client.
+  </p>
+
+  <p>
+To use the Proj4js, you first create a source and destination Proj4js.Proj
+objects, passing in a projection code (e.g. EPSG:4326).
+You can then use the Proj4js.transform() method, passing in map XY as a point
+object and the source and destination projection objects,
+and it returns the point coordinate in the destination projection.
+  </p>
+  <form>
+  <table>
+    <tbody>
+      <tr>
+        <th colspan="3">source</th>
+        <th></th>
+        <th colspan="3">dest</th>
+      </tr>
+      <tr>
+        <td>CRS:</td>
+        <td colspan="2">
+          <select name="crsSource" id="crsSource" onchange="updateCrs('Source')">
+            <option value selected="selected">Select a CRS</option>
+          </select>
+        </td>
+        <td></td>
+        <td>CRS:</td>
+        <td colspan="2">
+          <select name="crsDest" id="crsDest" onchange="updateCrs('Dest')">
+            <option value selected="selected">Select a CRS</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td></td>
+        <td colspan="2" id="descSource">Projection - datum</td>
+        <td></td>
+        <td></td>
+        <td colspan="2" id="descDest">Projection - datum</td>
+      </tr>
+      <tr>
+        <td>x,y</td>
+        <td><input name="xySource" id="xySource" type="text"/></td>
+        <td id="unitsSource">units</td>
+        <td><input type="button" value="--> transform -->" onclick="transform();"/></td>
+        <td>x,y</td>
+        <td><input name="xyDest" id="xyDest" type="text"></td>
+        <td id="unitsDest">units</td>
+      </tr>
+      <tr>
+        <td colspan="7" align="center"><input type="reset" value="reset"/></td>
+      </tr>
+    </tbody>
+  </table>
+  </form>
+  <p>
+For more information on Proj4js and to report bugs, please visit the 
+<a href="http://trac.osgeo.org/proj4js">Proj4js Trac and Wiki</a> at OSGeo.
+  </p>
+
+</body>
+</html>

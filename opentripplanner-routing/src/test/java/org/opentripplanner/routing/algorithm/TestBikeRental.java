@@ -15,7 +15,7 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
@@ -50,25 +50,30 @@ public class TestBikeRental extends TestCase {
         Edge mustBike = new PlainStreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
                 -77.0492, 38.858), "S. Crystal Dr", 87, StreetTraversalPermission.BICYCLE, false);
 
+        GenericAStar aStar = new GenericAStar();
+        
         // it is impossible to get from v1 to v3 by walking
-        TraverseOptions options = new TraverseOptions(new TraverseModeSet("WALK,TRANSIT"));
-        ShortestPathTree tree = AStar.getShortestPathTree(graph, v1, v3, 1000, options);
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));
+        options.setRoutingContext(graph, v1, v3);
+        ShortestPathTree tree = aStar.getShortestPathTree(options);
 
         GraphPath path = tree.getPath(v3, false);
         assertNull(path);
 
         // or biking
-        options = new TraverseOptions(new TraverseModeSet("BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
-        tree = AStar.getShortestPathTree(graph, v1, v3, 1000, options);
+        options.setRoutingContext(graph, v1, v3);
+        tree = aStar.getShortestPathTree(options);
 
         path = tree.getPath(v3, false);
         assertNull(path);
 
         // or even both (assuming walking bikes is disallowed)
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
-        tree = AStar.getShortestPathTree(graph, v1, v3, 1000, options);
+        options.setRoutingContext(graph, v1, v3);
+        tree = aStar.getShortestPathTree(options);
 
         path = tree.getPath(v3, false);
         assertNull(path);
@@ -82,9 +87,10 @@ public class TestBikeRental extends TestCase {
         new RentABikeOffEdge(station, station);
         
         // but we can't get off the bike at v3, so we still fail
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
-        tree = AStar.getShortestPathTree(graph, v1, v3, 1000, options);
+        options.setRoutingContext(graph, v1, v3);
+        tree = aStar.getShortestPathTree(options);
 
         path = tree.getPath(v3, false);
         assertNotNull(path);
@@ -98,8 +104,9 @@ public class TestBikeRental extends TestCase {
         new RentABikeOffEdge(station2, station2);
         
         // now we succeed!
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
-        tree = AStar.getShortestPathTree(graph, v1, v3, 1000, options);
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options.setRoutingContext(graph, v1, v3);
+        tree = aStar.getShortestPathTree(options);
 
         path = tree.getPath(v3, false);
         assertNotNull(path);

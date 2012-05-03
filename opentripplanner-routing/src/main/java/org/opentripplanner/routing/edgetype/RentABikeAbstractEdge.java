@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -39,7 +39,7 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
 	}
 
 	protected State traverseRent(State s0) {
-            TraverseOptions options = s0.getOptions();
+            RoutingRequest options = s0.getOptions();
             /*
              * If we already have a bike (rented or own) we won't go any faster by having a second
              * one.
@@ -67,7 +67,7 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
 	}
 
 	protected State traverseDropoff(State s0) {
-            TraverseOptions options = s0.getOptions();
+            RoutingRequest options = s0.getOptions();
             /*
              * To dropoff a bike, we need to have rented one.
              */

@@ -13,20 +13,17 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.util.SlopeCosts;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +38,7 @@ public class TurnVertex extends StreetVertex {
 
     private static final long serialVersionUID = -385126804908021091L;
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TurnVertex.class);
 
     /**
@@ -52,15 +50,7 @@ public class TurnVertex extends StreetVertex {
 
     protected boolean wheelchairAccessible = true;
 
-    protected double maxSlope;
-
-    protected PackedCoordinateSequence elevationProfile;
-
-    protected boolean slopeOverride;
-
-    protected double slopeSpeedEffectiveLength;
-
-    protected double slopeWorkCost;
+    protected ElevationProfileSegment elevationProfileSegment;
 
     protected StreetTraversalPermission permission;
 
@@ -74,8 +64,6 @@ public class TurnVertex extends StreetVertex {
     private boolean stairs = false;
 
     protected boolean crossable = true; // can this street be safely crossed? (unused)
-
-    protected double bicycleSafetyEffectiveLength;
 
     protected String edgeId;
 
@@ -99,9 +87,7 @@ public class TurnVertex extends StreetVertex {
         this.edgeId = id;
         this.geometry = geometry;
         this.length = length;
-        this.bicycleSafetyEffectiveLength = length;
-        this.slopeWorkCost = length;
-        this.slopeSpeedEffectiveLength = length;
+        this.elevationProfileSegment = new ElevationProfileSegment(length);
         this.permission = StreetTraversalPermission.ALL;
         this.notes = notes;
 
@@ -118,7 +104,7 @@ public class TurnVertex extends StreetVertex {
     }
 
     public PackedCoordinateSequence getElevationProfile() {
-        return elevationProfile;
+        return elevationProfileSegment.getElevationProfile();
     }
 
     /**
@@ -130,60 +116,20 @@ public class TurnVertex extends StreetVertex {
      * @return a PackedCoordinateSequence
      */
     public PackedCoordinateSequence getElevationProfile(double start, double end) {
-        if (elevationProfile == null)
-            return null;
-        List<Coordinate> coordList = new LinkedList<Coordinate>();
-
-        if (start < 0)
-            start = 0;
-        if (end > length)
-            end = length;
-
-        for (Coordinate coord : elevationProfile.toCoordinateArray()) {
-            if (coord.x >= start && coord.x <= end) {
-                coordList.add(new Coordinate(coord.x - start, coord.y));
-            }
-        }
-
-        Coordinate coordArr[] = new Coordinate[coordList.size()];
-        return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
+        return elevationProfileSegment.getElevationProfile(start, end);
     }
 
-    // TODO: there is duplicate code in TurnVertex and PlainStreetEdge. 
-    // We may want a separate StreetSegment class/interface.
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
-        if (elev == null || elev.size() < 2) {
-            return false;
-        }
-        if (slopeOverride && !computed) {
-            return false;
-        }
-
-        elevationProfile = elev;
-
-        // compute the various costs of the elevation changes
-        double lengthMultiplier = ElevationUtils.getLengthMultiplierFromElevation(elev);
-        if (Double.isNaN(lengthMultiplier)) {
-            LOG.error("lengthMultiplier from elevation profile is NaN, setting to 1");
-            lengthMultiplier = 1;
-        }
-        length *= lengthMultiplier;
-        bicycleSafetyEffectiveLength *= lengthMultiplier;
-
-        SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, permission.allows(StreetTraversalPermission.CAR));
-        slopeSpeedEffectiveLength = costs.slopeSpeedEffectiveLength;
-        maxSlope = costs.maxSlope;
-        slopeWorkCost = costs.slopeWorkCost;
-        bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
-        return costs.flattened;
+        return elevationProfileSegment.setElevationProfile(elev, computed,
+                permission.allows(StreetTraversalPermission.CAR));
     }
 
-    public boolean canTraverse(TraverseOptions wo) {
+    public boolean canTraverse(RoutingRequest wo) {
         if (wo.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
             }
-            if (maxSlope > wo.maxSlope) {
+            if (elevationProfileSegment.getMaxSlope() > wo.maxSlope) {
                 return false;
             }
         }
@@ -199,12 +145,12 @@ public class TurnVertex extends StreetVertex {
         return false;
     }
 
-    public boolean canTraverse(TraverseOptions wo, TraverseMode mode) {
+    public boolean canTraverse(RoutingRequest wo, TraverseMode mode) {
         if (wo.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
             }
-            if (maxSlope > wo.maxSlope) {
+            if (elevationProfileSegment.getMaxSlope() > wo.maxSlope) {
                 return false;
             }
         }
@@ -220,7 +166,7 @@ public class TurnVertex extends StreetVertex {
         return false;
     }
 
-    public double computeWeight(State s0, TraverseOptions options, double time) {
+    public double computeWeight(State s0, RoutingRequest options, double time) {
         double weight;
         double speed = options.getSpeed(s0.getNonTransitMode(options));
         if (options.wheelchairAccessible) {
@@ -228,29 +174,29 @@ public class TurnVertex extends StreetVertex {
             // than a cyclist, having less wind resistance, but will have
             // a stronger preference for less work. Maybe it
             // evens out?
-            weight = slopeSpeedEffectiveLength / speed;
+            weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
         } else if (s0.getNonTransitMode(options).equals(TraverseMode.BICYCLE)) {
-            switch (options.optimizeFor) {
+            switch (options.optimize) {
             case SAFE:
-                weight = bicycleSafetyEffectiveLength / speed;
+                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyEffectiveLength / speed;
-                if (bicycleSafetyEffectiveLength / length <= GREENWAY_SAFETY_FACTOR) {
+                weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
+                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
                 break;
             case FLAT:
-                weight = length / speed + slopeWorkCost;
+                weight = length / speed + elevationProfileSegment.getSlopeWorkCost();
                 break;
             case QUICK:
-                weight = slopeSpeedEffectiveLength / speed;
+                weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
                 break;
             case TRIANGLE:
-                double quick = slopeSpeedEffectiveLength;
-                double safety = bicycleSafetyEffectiveLength;
-                double slope = slopeWorkCost;
+                double quick = elevationProfileSegment.getSlopeSpeedEffectiveLength();
+                double safety = elevationProfileSegment.getBicycleSafetyEffectiveLength();
+                double slope = elevationProfileSegment.getSlopeWorkCost();
                 weight = quick * options.getTriangleTimeFactor() + slope
                         * options.getTriangleSlopeFactor() + safety
                         * options.getTriangleSafetyFactor();
@@ -271,11 +217,11 @@ public class TurnVertex extends StreetVertex {
     }
 
     public void setSlopeOverride(boolean slopeOverride) {
-        this.slopeOverride = slopeOverride;
+        elevationProfileSegment.setSlopeOverride(slopeOverride);
     }
 
     public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        this.bicycleSafetyEffectiveLength = bicycleSafetyEffectiveLength;
+        elevationProfileSegment.setBicycleSafetyEffectiveLength(bicycleSafetyEffectiveLength);
     }
 
     public String toString() {
@@ -299,7 +245,7 @@ public class TurnVertex extends StreetVertex {
     }
 
     public double getBicycleSafetyEffectiveLength() {
-        return bicycleSafetyEffectiveLength;
+        return elevationProfileSegment.getBicycleSafetyEffectiveLength();
     }
 
     public void setPermission(StreetTraversalPermission permission) {
@@ -360,7 +306,7 @@ public class TurnVertex extends StreetVertex {
 
     public double getEffectiveLength(TraverseMode traverseMode) {
         if (traverseMode == TraverseMode.BICYCLE) {
-            return slopeSpeedEffectiveLength;
+            return elevationProfileSegment.getSlopeSpeedEffectiveLength();
         } else {
             return length;
         }

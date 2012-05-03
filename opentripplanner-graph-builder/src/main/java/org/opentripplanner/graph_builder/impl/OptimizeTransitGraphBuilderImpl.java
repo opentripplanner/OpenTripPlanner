@@ -53,4 +53,9 @@ public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
             }
         }
     }
+
+    @Override
+    public void checkInputs() {
+        //no inputs
+    }
 }

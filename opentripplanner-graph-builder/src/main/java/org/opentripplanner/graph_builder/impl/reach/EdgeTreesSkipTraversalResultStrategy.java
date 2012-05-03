@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl.reach;
 
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -31,7 +31,7 @@ public class EdgeTreesSkipTraversalResultStrategy implements SkipTraverseResultS
 
     @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
-            State current, ShortestPathTree spt, TraverseOptions traverseOptions) {
+            State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
 
         return current.getVertex().getCoordinate().equals(skipCoordinate);
     }

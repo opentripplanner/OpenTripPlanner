@@ -282,7 +282,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
     }
 
     /** Returns true if any the trip may use some transit mode */
-    public boolean getTransit() {
+    public boolean isTransit() {
         return (modes & (MODE_TRANSIT)) != 0;
     }
 
@@ -342,6 +342,18 @@ public class TraverseModeSet implements Cloneable, Serializable {
         return "TraverseMode (" + out + ")";
     }
 
+    public String getAsStr() {
+        String retVal = null;
+        for (TraverseMode m : getModes()) {
+            if (retVal == null)
+                retVal = "";
+            else
+                retVal += ", ";
+            retVal += m;
+        }
+        return retVal;
+    }
+
     @Override
     public TraverseModeSet clone() {
         try {
@@ -368,12 +380,15 @@ public class TraverseModeSet implements Cloneable, Serializable {
         return true;
     }
 
-    @Override
-    public boolean equals(Object another) {
-        if (!(another instanceof TraverseModeSet))
-            return false;
-        TraverseModeSet otherset = (TraverseModeSet) another;
-        return modes == otherset.modes;
+    public int hashCode() {
+        return modes;
+    }
+
+    public boolean equals(Object other) {
+        if (other instanceof TraverseModeSet) {
+            return modes == ((TraverseModeSet)other).modes;
+        }
+        return false;
     }
 
 }

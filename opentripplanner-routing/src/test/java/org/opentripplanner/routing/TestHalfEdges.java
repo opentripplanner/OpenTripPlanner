@@ -25,11 +25,11 @@ import junit.framework.TestCase;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -37,7 +37,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -57,6 +56,8 @@ import com.vividsolutions.jts.linearref.LinearLocation;
 public class TestHalfEdges extends TestCase {
 
     Graph graph;
+
+    private GenericAStar aStar = new GenericAStar();
 
     private TurnVertex top;
 
@@ -165,7 +166,7 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
     	
-    	TraverseOptions options = new TraverseOptions();
+    	RoutingRequest options = new RoutingRequest();
 
         HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
         turns.addAll(leftBack.getOutgoing());
@@ -184,23 +185,23 @@ public class TestHalfEdges extends TestCase {
         
         assertEquals(12, extra.size());
         
-        GregorianCalendar startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
-
-        ShortestPathTree spt1 = AStar.getShortestPathTree(graph, brOut, end, TestUtils.toSeconds(startTime),
-                options);
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+        options.dateTime = startTime;
+        options.setRoutingContext(graph, brOut, end);
+        ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
         GraphPath pathBr = spt1.getPath(end, false);
         assertNotNull("There must be a path from br to end", pathBr);
         
-        ShortestPathTree spt2 = AStar.getShortestPathTree(graph, trOut, end, TestUtils.toSeconds(startTime),
-                options);
+        options.setRoutingContext(graph, trOut, end);
+        ShortestPathTree spt2 = aStar.getShortestPathTree(options);
 
         GraphPath pathTr = spt2.getPath(end, false);
         assertNotNull("There must be a path from tr to end", pathTr);
         assertTrue("path from bottom to end must be longer than path from top to end", pathBr.getWeight() > pathTr.getWeight());
         
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
-                options);
+        options.setRoutingContext(graph, start, end);
+        ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(end, false);
         assertNotNull("There must be a path from start to end", path);
@@ -211,11 +212,9 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
         }
 
-        startTime = new GregorianCalendar(2009, 11, 1, 12, 34, 25);
-
         options.setArriveBy(true);
-        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime), 
-                options);
+        options.setRoutingContext(graph, start, end);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from start to end (looking back)", path);
@@ -230,11 +229,11 @@ public class TestHalfEdges extends TestCase {
          * that prove (a) that walking bikes works, but that (b) it is not preferred to riding a tiny bit longer.
          */
         
-        options = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
-                options);
+        options.setRoutingContext(graph, start, end);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom along the right", path);
@@ -247,8 +246,8 @@ public class TestHalfEdges extends TestCase {
         
         start = StreetLocation.createStreetLocation("start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
-        spt = AStar.getShortestPathTree(graph, start, end, TestUtils.toSeconds(startTime),
-                options);
+        options.setRoutingContext(graph, start, end);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(start, false);
         assertNotNull("There must be a path from top to bottom", path);
@@ -280,7 +279,7 @@ public class TestHalfEdges extends TestCase {
         List<Edge> extras = start.getExtra();
         assertEquals(10, extras.size());
         
-        TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, biking);
         assertNotNull(end);
         
@@ -290,7 +289,7 @@ public class TestHalfEdges extends TestCase {
         // test that the closest vertex finder also adds an edge to transit
         // stops (if you are really close to the transit stop relative to the
         // street)
-        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), null, new TraverseOptions());
+        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), null, new RoutingRequest());
         assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
@@ -301,12 +300,13 @@ public class TestHalfEdges extends TestCase {
         assertTrue(found);
 
         // test that it is possible to travel between two splits on the same street
-        TraverseOptions walking = new TraverseOptions(TraverseMode.WALK);
+        RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
         start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.004), null, walking);
         end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, walking,
                 start.getExtra());
         assertNotNull(end);
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, start, end, 0, walking);
+        walking.setRoutingContext(graph, start, end);
+        ShortestPathTree spt = aStar.getShortestPathTree(walking);
         GraphPath path = spt.getPath(end, false);
         for (State s : path.states) {
             assertFalse(s.getVertex() == top);

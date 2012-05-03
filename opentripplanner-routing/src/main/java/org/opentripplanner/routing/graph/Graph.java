@@ -34,15 +34,20 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparator;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,11 +82,15 @@ public class Graph implements Serializable {
 
     private transient ContractionHierarchySet hierarchies;
     
+    private transient CalendarService calendarService;
+    
     private transient List<Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
     
     private transient Map<Edge, Integer> idForEdge;
+    
+    public transient StreetVertexIndexService streetIndex;
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
@@ -182,7 +191,7 @@ public class Graph implements Serializable {
         for (AgencyAndId sid : data.getServiceIds()) {
             agencies.add(sid.getAgencyId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
-                long t = sd.getAsDate().getTime();
+                long t = sd.getAsDate().getTime() / 1000;
                 if (t > now) {
                     agenciesWithFutureDates.add(sid.getAgencyId());
                 }
@@ -202,8 +211,7 @@ public class Graph implements Serializable {
     }
 
     // Check to see if we have transit information for a given date
-    public boolean transitFeedCovers(Date d) {
-        long t = d.getTime();
+    public boolean transitFeedCovers(long t) {
         return t >= this.transitServiceStarts && t < this.transitServiceEnds;
     }
 
@@ -314,6 +322,8 @@ public class Graph implements Serializable {
             for (Vertex v : graph.getVertices())
                 v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+            LOG.debug("street index built.");
             if (level == LoadLevel.NO_HIERARCHIES)
                 return graph;
             graph.hierarchies = (ContractionHierarchySet) in.readObject();
@@ -366,9 +376,6 @@ public class Graph implements Serializable {
     }
 
     public void save(File file) throws IOException {
-        if (!file.getParentFile().exists())
-            if (!file.getParentFile().mkdirs())
-                LOG.error("Failed to create directories for graph bundle at " + file);
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(
@@ -424,6 +431,18 @@ public class Graph implements Serializable {
         return idForEdge.get(edge);
     }
 
+    public CalendarService getCalendarService() {
+        if (calendarService == null) {
+            CalendarServiceData data = this.getService(CalendarServiceData.class);
+            if (data != null) {
+              CalendarServiceImpl calendarService = new CalendarServiceImpl();
+              calendarService.setData(data);
+              this.calendarService = calendarService;
+            }
+        }
+        return this.calendarService;
+    }
+    
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }

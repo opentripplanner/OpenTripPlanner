@@ -36,8 +36,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
-import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.algorithm.Dijkstra;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchy.PotentialShortcut;
@@ -48,14 +48,13 @@ import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -185,8 +184,8 @@ public class TestContractionHeirarchies extends TestCase {
         
         
         // test Dijkstra
-        TraverseOptions options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        RoutingRequest options = new RoutingRequest();
+        options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.setWalkSpeed(1);
 
@@ -214,7 +213,7 @@ public class TestContractionHeirarchies extends TestCase {
         
         // test getShortcuts
         
-        ContractionHierarchy testch = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
+        ContractionHierarchy testch = new ContractionHierarchy(graph, new RoutingRequest(TraverseMode.WALK, OptimizeType.QUICK), 0.0);
         Vertex v = graph.getVertex("a(2, 2)");
         List<PotentialShortcut> shortcuts = testch.getShortcuts(v, true).shortcuts;
         
@@ -225,7 +224,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertEquals(0, shortcuts.size());
 
         // test hierarchy construction
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new RoutingRequest(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
         assertTrue("remaining vertices = " + hierarchy.corev.size(), hierarchy.corev.size() == 0);
 
@@ -249,12 +248,12 @@ public class TestContractionHeirarchies extends TestCase {
         }
 
 
-        options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        options = new RoutingRequest();
+        options.optimize = OptimizeType.QUICK;
         options.setWalkSpeed(1);
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
-        options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        //options.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         for (int x1 = 0; x1 < N; ++x1) {
             for (int y1 = 0; y1 < N; ++y1) {
                 for (int x2 = 0; x2 < N; ++x2) {
@@ -263,6 +262,9 @@ public class TestContractionHeirarchies extends TestCase {
                             continue;
                         }
                         options.setArriveBy(false);
+                        
+                        // TODO: rewrite CH getShortestPath to use rctx origin/dest vertices (AMB)
+                        options.setRoutingContext(graph, verticesOut[y1][x1], verticesIn[y2][x2]);
                         path = hierarchy.getShortestPath(verticesOut[y1][x1], verticesIn[y2][x2], 1000000000,
                                 options);
 
@@ -346,10 +348,10 @@ public class TestContractionHeirarchies extends TestCase {
             }
         }
 
-        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
+        ContractionHierarchy hierarchy = new ContractionHierarchy(graph, new RoutingRequest(TraverseMode.WALK, OptimizeType.QUICK), 1.0);
 
-        TraverseOptions options = new TraverseOptions();
-        options.optimizeFor = OptimizeType.QUICK;
+        RoutingRequest options = new RoutingRequest();
+        options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
         options.setWalkSpeed(1);
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
@@ -452,25 +454,21 @@ public class TestContractionHeirarchies extends TestCase {
         NetworkLinker nl = new NetworkLinker(graph);
         nl.createLinkage();
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.SUBWAY));
-        options.optimizeFor = OptimizeType.QUICK;
-        
-        CalendarServiceData data = graph.getService(CalendarServiceData.class);
-        assertNotNull(data);
-        CalendarServiceImpl calendarService = new CalendarServiceImpl();
-        calendarService.setData(data);
-        options.setCalendarService(calendarService);
-        options.setServiceDays(startTime, Arrays.asList("MTA NYCT"));
-        options.setTransferTable(graph.getTransferTable());
+        options.optimize = OptimizeType.QUICK;
         
         Vertex start1 = graph.getVertex("0072480");
         Vertex end1 = graph.getVertex("0032341");
 
         assertNotNull(end1);
         assertNotNull(start1);
+
+        options.dateTime = startTime;
+        options.setRoutingContext(graph, start1, end1);
         
-        ShortestPathTree shortestPathTree = AStar.getShortestPathTree(graph, start1, end1, startTime, options);
+        ShortestPathTree shortestPathTree = new GenericAStar()
+            .getShortestPathTree(options);
         path = shortestPathTree.getPath(end1, true);
         assertNotNull(path);
 
@@ -487,7 +485,7 @@ public class TestContractionHeirarchies extends TestCase {
         assertTrue("Path must take subway", subway1);
 
         ContractionHierarchySet chs = new ContractionHierarchySet();
-        chs.addTraverseOptions(new TraverseOptions(TraverseMode.WALK, OptimizeType.QUICK));
+        chs.addTraverseOptions(new RoutingRequest(TraverseMode.WALK, OptimizeType.QUICK));
         chs.setContractionFactor(0.50);
         chs.setGraph(graph);
         chs.build();

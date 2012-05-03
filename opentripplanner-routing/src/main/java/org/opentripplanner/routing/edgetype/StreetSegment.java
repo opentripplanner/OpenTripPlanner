@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 /*
  * StreetSegment will hold the information for a single piece of street covered by around six 
@@ -23,6 +23,6 @@ import org.opentripplanner.routing.core.TraverseOptions;
  */
 public interface StreetSegment {
 
-    public double getWeight(TraverseOptions options);
+    public double getWeight(RoutingRequest options);
 
 }

@@ -14,6 +14,7 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -40,7 +41,7 @@ import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.model.transit.TransitRoute;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -245,7 +246,7 @@ public class TransitIndex {
         Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
         Vertex boarding = preBoardEdge.getToVertex();
 
-        TraverseOptions options = makeTraverseOptions(startTime, transitIndexService.getAllAgencies());
+        RoutingRequest options = makeTraverseOptions(startTime);
 
         //add all departures
         HashSet<AgencyAndId> trips = new HashSet<AgencyAndId>();
@@ -273,12 +274,15 @@ public class TransitIndex {
         return result;
     }
 
-    private TraverseOptions makeTraverseOptions(long startTime, Collection<String> agencies) {
-        TraverseOptions options = new TraverseOptions();
-        if (graphService.getCalendarService() != null) {
-            options.setCalendarService(graphService.getCalendarService());
-            options.setServiceDays(startTime, agencies);
-        }
+    private RoutingRequest makeTraverseOptions(long startTime) {
+        RoutingRequest options = new RoutingRequest();
+//        if (graphService.getCalendarService() != null) {
+//            options.setCalendarService(graphService.getCalendarService());
+//            options.setServiceDays(startTime, agencies);
+//        }
+        // TODO: verify correctness
+        options.dateTime = startTime;
+        options.setRoutingContext(this.graphService.getGraph());
         return options;
     }
 
@@ -307,7 +311,7 @@ public class TransitIndex {
         }
 
         RouteVariant variant = transitIndexService.getVariantForTrip(trip);
-        TraverseOptions options = makeTraverseOptions(time, transitIndexService.getAllAgencies());
+        RoutingRequest options = makeTraverseOptions(time);
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();
@@ -317,7 +321,8 @@ public class TransitIndex {
             //this is all segments across all patterns that match this variant
             if (segment.stop.equals(firstStop)) {
                 //this might be the correct start segment, but we need to try traversing and see if we get this trip
-                State s0 = new State(time, segment.board.getFromVertex(), options);
+                // TODO: verify options and state creation correctness (AMB)
+                State s0 = new State(segment.board.getFromVertex(), options);
                 state = segment.board.traverse(s0);
                 if (state == null) continue;
                 if (state.getBackEdgeNarrative().getTrip().getId().equals(trip)) {
@@ -335,7 +340,8 @@ public class TransitIndex {
         }
 
         for (RouteSegment segment :  variant.segmentsAfter(start)) {
-            State s0 = new State(state.getTime(), segment.hopIn.getFromVertex(), options);
+            // TODO: verify options/state init correctness
+            State s0 = new State(segment.hopIn.getFromVertex(), state.getTime(), options);
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
             st.time = state.getTime();
@@ -346,12 +352,13 @@ public class TransitIndex {
     }
 
     private List<StopTime> getStopTimesForBoardEdge(long startTime, long endTime,
-            TraverseOptions options, Edge e) {
+            RoutingRequest options, Edge e) {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = startTime;
         do {
-            State s0 = new State(time, e.getFromVertex(), options);
+            // TODO verify options/state correctness
+            State s0 = new State(e.getFromVertex(), time, options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
@@ -368,13 +375,14 @@ public class TransitIndex {
     }
 
     private List<StopTime> getStopTimesForAlightEdge(long startTime, long endTime,
-            TraverseOptions options, Edge e) {
+            RoutingRequest options, Edge e) {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = endTime;
         options = options.reversedClone();
         do {
-            State s0 = new State(time, e.getToVertex(), options);
+            // TODO: verify options/state correctness
+            State s0 = new State(e.getToVertex(), time, options);
             result = e.traverse(s0);
             if (result == null) break;
             time = result.getTime();
@@ -388,6 +396,7 @@ public class TransitIndex {
         } while (true);
         return out;
     }
+    
     /**
      * Return a list of all available transit modes supported, if any.
      * 

@@ -29,12 +29,13 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -55,18 +56,19 @@ import org.opentripplanner.util.TestUtils;
 public class TestPatch extends TestCase {
     private Graph graph;
 
-    private TraverseOptions options;
+    private RoutingRequest options;
 
+    private GenericAStar aStar = new GenericAStar();
+    
     public void setUp() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
-
-        options = new TraverseOptions();
-        options.setGtfsContext(context);
-
+        options = new RoutingRequest();
         graph = new Graph();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
+        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        
         TransitIndexService index = new TransitIndexService() {
             /*
              * mock TransitIndexService always returns preboard/prealight edges for stop A and a
@@ -185,8 +187,9 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, true);
         assertNotNull(path);
@@ -214,8 +217,9 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, true);
         assertNotNull(path);
@@ -223,8 +227,9 @@ public class TestPatch extends TestCase {
         assertNull(path.states.get(1).getBackEdgeNarrative().getNotes());
 
         // now a trip during the second period
-        startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, false); // do not optimize because we want the first trip
         assertNotNull(path);
@@ -249,8 +254,10 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
-        spt = AStar.getShortestPathTree(graph, stop_a, stop_e, startTime, options);
+        long startTime = 
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, false);
         assertNotNull(path);

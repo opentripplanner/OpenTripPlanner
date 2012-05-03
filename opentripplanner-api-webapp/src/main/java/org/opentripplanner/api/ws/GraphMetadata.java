@@ -23,35 +23,22 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.GraphService;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 @XmlRootElement
 public class GraphMetadata {
 
-
-    /**
-     * The bounding box of the graph, in decimal degrees.
-     */
+    /** The bounding box of the graph, in decimal degrees. */
     private double lowerLeftLatitude, lowerLeftLongitude, upperRightLatitude, upperRightLongitude;
 
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
-    public GraphMetadata() {
-    }
+//    public GraphMetadata() {
+//
+//    }
 
-    public GraphMetadata(GraphService graphService) {
-        setGraphService(graphService);
-    }
-
-    @Autowired    
-    public void setGraphService(GraphService graphService) {
-
-        Graph graph = graphService.getGraph();
-        
+    public GraphMetadata(Graph graph) {
         /* generate extents */
         Envelope leftEnv = new Envelope();
         Envelope rightEnv = new Envelope();

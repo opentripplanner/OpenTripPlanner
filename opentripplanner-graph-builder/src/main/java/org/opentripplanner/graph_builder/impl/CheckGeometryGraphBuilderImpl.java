@@ -94,4 +94,9 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
         }
 
     }
+
+    @Override
+    public void checkInputs() {
+        //no inputs to check
+    }
 }

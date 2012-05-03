@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge.ValidVertexTypes;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -36,7 +36,7 @@ import org.opentripplanner.routing.spt.GraphPath;
  * behavior, care must be taken when implementing.
  * 
  * Specifically, we currently forbid an edge from returning multiple results in both
- * {@link #traverse(State, TraverseOptions)} and {@link #traverseBack(State, TraverseOptions)}. If
+ * {@link #traverse(State, RoutingRequest)} and {@link #traverseBack(State, RoutingRequest)}. If
  * one traverse operations returns multiple results, the inverse operation must always return a
  * single result. We've set this rule primarily to support the reverse path optimization in
  * {@link GraphPath#optimize()}.
@@ -52,7 +52,8 @@ public interface Edge extends Serializable, EdgeNarrative {
     /** @return the vertex this edge leads to, or null if this edge leads to more than one vertex */
     public Vertex getToVertex();
 
-    void detach();
+    /** @return the number of edge endpoints removed from edge lists (0, 1, or 2) */
+    int detach();
 
     void attach(Vertex fromv, Vertex tov);
 
@@ -69,20 +70,20 @@ public interface Edge extends Serializable, EdgeNarrative {
      * Intended to replace optimisticTraverse, on the grounds that the lower bound on an edge's weight 
      * should not be path-dependent, so the state is not needed.
      * 
-     * @return a lower bound on this edge's weight, given these {@link TraverseOptions}.
-     * Double.POSITIVE_INFINITY if the edge cannot be traversed with the given {@link TraverseOptions}.
+     * @return a lower bound on this edge's weight, given these {@link RoutingRequest}.
+     * Double.POSITIVE_INFINITY if the edge cannot be traversed with the given {@link RoutingRequest}.
      */
-    public double weightLowerBound(TraverseOptions options);
+    public double weightLowerBound(RoutingRequest options);
 
     /**
      * Another replacement for optimisticTraverse, intended for use in resource-limited shortest
      * path searches.
      * 
      * @return a lower bound on the time it takes to traverse this edge, given these 
-     * {@link TraverseOptions}. Double.POSITIVE_INFINITY if the edge cannot be traversed 
-     * with the given {@link TraverseOptions}.
+     * {@link RoutingRequest}. Double.POSITIVE_INFINITY if the edge cannot be traversed 
+     * with the given {@link RoutingRequest}.
      */
-    public double timeLowerBound(TraverseOptions options);
+    public double timeLowerBound(RoutingRequest options);
 
     public void addPatch(Patch patch);
 

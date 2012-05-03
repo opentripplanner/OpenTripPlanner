@@ -4,10 +4,6 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
            
-    <bean id="graphBundle" class="org.opentripplanner.model.GraphBundle">
-        <property name="path" value="target/graph-bundle" />
-    </bean>
-
     <bean id="gtfsBuilder" class="org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl">
         <property name="gtfsBundles">
             <bean id="gtfsBundles" class="org.opentripplanner.graph_builder.model.GtfsBundles">
@@ -61,7 +57,7 @@
 
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
         <property name="alwaysRebuild" value="false" />
-        <property name="graphBundle" ref="graphBundle" />
+        <property name="path" value="target/graph-bundle" />
         <property name="graphBuilders">
             <list>
                 <ref bean="gtfsBuilder" />

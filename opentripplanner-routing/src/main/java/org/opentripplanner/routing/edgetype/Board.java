@@ -15,11 +15,12 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -85,7 +86,8 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
-        TraverseOptions options = state0.getOptions();
+        RoutingContext rctx = state0.getContext();
+        RoutingRequest options = state0.getOptions();
         if (options.wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
@@ -118,7 +120,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             /* check if this trip is running or not */
             AgencyAndId serviceId = hop.getServiceId();
             int wait = -1;
-            for (ServiceDay sd : options.serviceDays) {
+            for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
@@ -152,7 +154,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
      * added at alight edges.
      */
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         if (options.isArriveBy())
             return 0;
         else

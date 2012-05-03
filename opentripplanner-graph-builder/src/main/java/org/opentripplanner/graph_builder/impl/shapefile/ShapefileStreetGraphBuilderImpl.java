@@ -328,4 +328,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
         }
     }
 
+    @Override
+    public void checkInputs() {
+        _featureSourceFactory.checkInputs();
+    }
 }

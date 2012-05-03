@@ -146,9 +146,9 @@ public class StateEditor {
         return child;
     }
 
-    public boolean weHaveWalkedTooFar(TraverseOptions options) {
+    public boolean weHaveWalkedTooFar(RoutingRequest options) {
         // Only apply limit in transit-only case
-        if (!options.getModes().getTransit())
+        if (!options.getModes().isTransit())
             return false;
 
         return child.walkDistance >= options.maxWalkDistance;
@@ -424,11 +424,11 @@ public class StateEditor {
         if (patches != null) {
             for (Patch patch : patches) {
                 active  = false;
-                display = patch.displayDuring(child.stateData.options, child.getStartTime(),
+                display = patch.displayDuring(child.stateData.opt, child.getStartTime(),
                                               child.getTime());
 
                 if(!display) {
-                    active = patch.activeDuring(child.stateData.options, child.getStartTime(),
+                    active = patch.activeDuring(child.stateData.opt, child.getStartTime(),
                                                 child.getTime());
                 }
 
@@ -452,10 +452,10 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
-    public void setTraverseOptions(TraverseOptions options) {
-        child.stateData.options = options;
-        traversingBackward = options.isArriveBy();
-    }
+//    public void setTraverseOptions(TraverseOptions options) {
+//        child.stateData.options = options;
+//        traversingBackward = options.isArriveBy();
+//    }
 
     public void alightTransit() {
         cloneStateDataAsNeeded();

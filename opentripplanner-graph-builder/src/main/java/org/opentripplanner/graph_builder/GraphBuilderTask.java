@@ -20,39 +20,31 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class GraphBuilderTask implements Runnable {
     
-    private static Logger _log = LoggerFactory.getLogger(GraphBuilderTask.class); 
-
-    private GraphService _graphService;
+    private static Logger LOG = LoggerFactory.getLogger(GraphBuilderTask.class); 
 
     private List<GraphBuilder> _graphBuilders = new ArrayList<GraphBuilder>();
 
-    private GraphBundle _graphBundle;
+    private File graphFile;
     
     private boolean _alwaysRebuild = true;
 
-    private List<TraverseOptions> _modeList;
+    private List<RoutingRequest> _modeList;
 
     private double _contractionFactor = 1.0;
     
     private String _baseGraph = null;
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        _graphService = graphService;
-    }
+    
+    private Graph graph = new Graph();
     
     public void addGraphBuilder(GraphBuilder loader) {
         _graphBuilders.add(loader);
@@ -62,56 +54,59 @@ public class GraphBuilderTask implements Runnable {
         _graphBuilders = graphLoaders;
     }
 
-    public void setGraphBundle(GraphBundle graphBundle) {
-        _graphBundle = graphBundle;
-    }
-    
     public void setAlwaysRebuild(boolean alwaysRebuild) {
         _alwaysRebuild = alwaysRebuild;
     }
     
     public void setBaseGraph(String baseGraph) {
-        _baseGraph = baseGraph;
+        this._baseGraph = baseGraph;
+        try {
+            graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
+        } catch (Exception e) {
+            throw new RuntimeException("error loading base graph");
+        }
     }
 
-    public void addMode(TraverseOptions mo) {
+    public void addMode(RoutingRequest mo) {
         _modeList.add(mo);
     }
 
-    public void setModes(List<TraverseOptions> modeList) {
+    public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
     }
 
     public void setContractionFactor(double contractionFactor) {
         _contractionFactor = contractionFactor;
     }
+    
+    public void setPath (String path) {
+        graphFile = new File(path.concat("/Graph.obj"));
+    }
+    
+    public Graph getGraph() {
+        return this.graph;
+    }
 
     public void run() {
         
-        Graph graph;
-        
-        if (_baseGraph != null) {
-            try {
-                graph = Graph.load(new File(_baseGraph), LoadLevel.FULL);
-            } catch (Exception e) {
-                throw new RuntimeException("error loading base graph");
-            }
-        } else {
-            graph = _graphService.getGraph();
+        if (graphFile == null) {
+            throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
         }
 
-        if (_graphBundle == null) {
-            throw new RuntimeException("graphBuilderTask has no attribute graphBundle.");
-        }
-        graph.setBundle(_graphBundle);
-
-        File graphPath = _graphBundle.getGraphPath();
-        
-        if( graphPath.exists() && ! _alwaysRebuild) {
-            _log.info("graph already exists and alwaysRebuild=false => skipping graph build");
+        if( graphFile.exists() && ! _alwaysRebuild) {
+            LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
             return;
         }
-        
+
+        try {
+            if (!graphFile.getParentFile().exists())
+                if (!graphFile.getParentFile().mkdirs())
+                    LOG.error("Failed to create directories for graph bundle at " + graphFile);
+            graphFile.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
+        }
+
         //check prerequisites
         ArrayList<String> provided = new ArrayList<String>();
         boolean bad = false;
@@ -119,17 +114,22 @@ public class GraphBuilderTask implements Runnable {
             List<String> prerequisites = builder.getPrerequisites();
             for (String prereq : prerequisites) {
                 if (!provided.contains(prereq)) {
-                    _log.error("Graph builder " + builder + " requires " + prereq + " but no previous stages provide it");
+                    LOG.error("Graph builder " + builder + " requires " + prereq + " but no previous stages provide it");
                     bad = true;
                 }
             }
             provided.addAll(builder.provides());
         }
         if (_baseGraph != null)
-            _log.warn("base graph loaded, not enforcing prerequisites");
+            LOG.warn("base graph loaded, not enforcing prerequisites");
         else if (bad)
             throw new RuntimeException("Prerequisites unsatisfied");
-        
+
+        //check inputs
+        for (GraphBuilder builder : _graphBuilders) {
+            builder.checkInputs();
+        }
+
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);
@@ -141,10 +141,9 @@ public class GraphBuilderTask implements Runnable {
         }
         GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
         try {
-            graph.save(graphPath);
+            graph.save(graphFile);
         } catch (Exception ex) {
             throw new IllegalStateException(ex);
         }
-        _graphService.refreshGraph();
     }
 }

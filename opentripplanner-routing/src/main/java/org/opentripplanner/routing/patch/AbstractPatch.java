@@ -20,7 +20,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 public abstract class AbstractPatch implements Patch {
     private static final long serialVersionUID = 1371103825857750564L;
@@ -33,7 +33,7 @@ public abstract class AbstractPatch implements Patch {
     protected List<TimePeriod> displayTimePeriods = new ArrayList<TimePeriod>();
 
     @Override
-    public boolean activeDuring(TraverseOptions options, long start, long end) {
+    public boolean activeDuring(RoutingRequest options, long start, long end) {
         for (TimePeriod period : timePeriods) {
             if (!(end <= period.startTime || start >= period.endTime)) {
                 return true;
@@ -43,7 +43,7 @@ public abstract class AbstractPatch implements Patch {
     }
     
     @Override
-    public boolean displayDuring(TraverseOptions options, long start, long end) {
+    public boolean displayDuring(RoutingRequest options, long start, long end) {
         for (TimePeriod period : displayTimePeriods) {
             if (!(end <= period.startTime || start >= period.endTime)) {
                 return true;

@@ -16,7 +16,6 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -24,6 +23,7 @@ import java.util.TimeZone;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -32,13 +32,10 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
@@ -61,86 +58,59 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.PathServiceFactory;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
+@Service @Scope("singleton")
 public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
-    private static final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
-
-    Request request;
-
-    private PathService pathService;
-
-    private FareService fareService;
-
     private GeometryFactory geometryFactory = new GeometryFactory();
 
-    private TransitIndexService transitIndex;
+    @Autowired public PathService pathService;
+    
+    /** Generates a TripPlan from a Request */
+    public TripPlan generate(RoutingRequest options) {
 
-    private Graph graph;
-
-    public PlanGenerator(Request request, PathServiceFactory pathServiceFactory) {
-        this.request = request;
-        pathService = pathServiceFactory.getPathService(request.getRouterId());
-        graph = pathService.getGraphService().getGraph();
-        transitIndex = graph.getService(TransitIndexService.class);
-        fareService = graph.getService(FareService.class);
-    }
-
-    /**
-     * Generates a TripPlan from a Request;
-     * 
-     */
-    public TripPlan generate() {
-
-        TraverseOptions options = getOptions(request);
-
-        checkLocationsAccessible(request, options);
+        // TODO: this seems to only check the endpoints, which are usually auto-generated
+        //if ( ! options.isAccessible())
+        //    throw new LocationNotAccessible();
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
         boolean tooSloped = false;
         try {
-            List<NamedPlace> intermediates = request.getIntermediatePlaces();
-            if (intermediates.size() == 0) {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                        request.getDateTime(), options, request.getNumItineraries());
-                if (paths == null && request.getWheelchair()) {
-                    // There are no paths that meet the user's slope restrictions.
-                    // Try again without slope restrictions (and warn user).
-                    options.maxSlope = Double.MAX_VALUE;
-                    paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                            request.getDateTime(), options, request.getNumItineraries());
-                    tooSloped = true;
-                }
-            } else {
-                paths = pathService.plan(request.getFromPlace(), request.getToPlace(),
-                        intermediates, request.isIntermediatePlacesOrdered(),
-                        request.getDateTime(), options);
+            paths = pathService.getPaths(options);
+            if (paths == null && options.getWheelchair()) {
+                // There are no paths that meet the user's slope restrictions.
+                // Try again without slope restrictions (and warn user).
+                options.maxSlope = Double.MAX_VALUE;
+                paths = pathService.getPaths(options);
+                tooSloped = true;
             }
         } catch (VertexNotFoundException e) {
-            LOG.info("Vertex not found: " + request.getFrom() + " : " + request.getTo(), e);
+            LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
             throw e;
         }
 
         if (paths == null || paths.size() == 0) {
-            LOG.info("Path not found: " + request.getFrom() + " : " + request.getTo());
+            LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
             throw new PathNotFoundException();
         }
 
-        TripPlan plan = generatePlan(paths, request);
+        TripPlan plan = generatePlan(paths, options);
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
@@ -150,9 +120,9 @@ public class PlanGenerator {
                     continue;
                 }
                 Leg firstLeg = i.legs.get(0);
-                firstLeg.from.orig = request.getFromName();
+                firstLeg.from.orig = options.getFromName();
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
-                lastLeg.to.orig = request.getToName();
+                lastLeg.to.orig = options.getToName();
             }
         }
 
@@ -162,7 +132,7 @@ public class PlanGenerator {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public TripPlan generatePlan(List<GraphPath> paths, Request request) {
+    public TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
 
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();
@@ -202,6 +172,9 @@ public class PlanGenerator {
      * @return itinerary
      */
     private Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+        Graph graph = path.getRoutingContext().graph;
+        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
+
         Itinerary itinerary = makeEmptyItinerary(path);
         EdgeNarrative postponedAlerts = null;
         Leg leg = null;
@@ -370,7 +343,7 @@ public class PlanGenerator {
                     }
                 } else if (backEdge instanceof Hop || backEdge instanceof PatternHop) {
                     pgstate = PlanGenState.TRANSIT;
-                    fixupTransitLeg(leg, state);
+                    fixupTransitLeg(leg, state, transitIndex);
                     leg.stop = new ArrayList<Place>();
                 } else {
                     LOG.error("Unexpected state (in PRETRANSIT): " + mode);
@@ -398,16 +371,15 @@ public class PlanGenerator {
                             Place stop = makePlace(state.getBackState(), true);
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
-                            leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(
-                                    state.getTimeInMillis());
+                            leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
                         }
                     }
                     if (!route.equals(leg.route)) {
                         // interline dwell
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
-                        fixupTransitLeg(leg, state);
-                        leg.startTime = makeCalendar(state.getTimeInMillis());
+                        fixupTransitLeg(leg, state, transitIndex);
+                        leg.startTime = makeCalendar(state);
                         leg.interlineWithPreviousLeg = true;
                     }
                 } else {
@@ -450,9 +422,9 @@ public class PlanGenerator {
         return itinerary;
     }
 
-    private Calendar makeCalendar(long millis) {
-        CalendarServiceData service = graph.getService(CalendarServiceData.class);
-        Collection<String> agencyIds = graph.getAgencyIds();
+    private Calendar makeCalendar(State state) {
+        CalendarService service = state.getContext().calendarService;
+        Collection<String> agencyIds = state.getContext().graph.getAgencyIds();
         TimeZone timeZone; 
         if (agencyIds.size() == 0) {
             timeZone = TimeZone.getTimeZone("GMT");
@@ -460,11 +432,11 @@ public class PlanGenerator {
             timeZone = service.getTimeZoneForAgencyId(agencyIds.iterator().next());
         }
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(millis);
+        calendar.setTimeInMillis(state.getTimeInMillis());
         return calendar;
     }
 
-    private void fixupTransitLeg(Leg leg, State state) {
+    private void fixupTransitLeg(Leg leg, State state, TransitIndexService transitIndex) {
         EdgeNarrative en = state.getBackEdgeNarrative();
         leg.route = en.getName();
         Trip trip = en.getTrip();
@@ -484,7 +456,7 @@ public class PlanGenerator {
             }
         }
         leg.mode = en.getMode().toString();
-        leg.startTime = makeCalendar(state.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(state.getBackState());
     }
 
     private void finalizeLeg(Leg leg, State state, List<State> states, int start, int end,
@@ -492,7 +464,7 @@ public class PlanGenerator {
         if (start != -1) {
             leg.walkSteps = getWalkSteps(states.subList(start, end + 1));
         }
-        leg.endTime = makeCalendar(state.getBackState().getTimeInMillis());
+        leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = geometryFactory.createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
         leg.to = makePlace(state, true);
@@ -542,7 +514,7 @@ public class PlanGenerator {
     private Leg makeLeg(Itinerary itinerary, State s) {
         Leg leg = new Leg();
         itinerary.addLeg(leg);
-        leg.startTime = makeCalendar(s.getBackState().getTimeInMillis());
+        leg.startTime = makeCalendar(s.getBackState());
         EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
@@ -561,9 +533,12 @@ public class PlanGenerator {
         State startState = path.states.getFirst();
         State endState = path.states.getLast();
 
-        itinerary.startTime = makeCalendar(startState.getTimeInMillis());
-        itinerary.endTime = makeCalendar(endState.getTimeInMillis());
+        itinerary.startTime = makeCalendar(startState);
+        itinerary.endTime = makeCalendar(endState);
         itinerary.duration = endState.getTimeInMillis() - startState.getTimeInMillis();
+
+        Graph graph = path.getRoutingContext().graph;
+        FareService fareService = graph.getService(FareService.class);
         if (fareService != null) {
             itinerary.fare = fareService.getCost(path);
         }
@@ -582,7 +557,7 @@ public class PlanGenerator {
         String name = v.getName();
         Place place;
         if (time) {
-            Calendar timeAtState = makeCalendar(state.getTimeInMillis());
+            Calendar timeAtState = makeCalendar(state);
             place = new Place(endCoord.x, endCoord.y, name, timeAtState);
         } else {
             place = new Place(endCoord.x, endCoord.y, name);
@@ -595,91 +570,6 @@ public class PlanGenerator {
             place.zoneId = state.getZone();
         }
         return place;
-    }
-
-    /**
-     * Throw an exception if the start and end locations are not wheelchair accessible given the
-     * user's specified maximum slope.
-     */
-    private void checkLocationsAccessible(Request request, TraverseOptions options) {
-        if (request.getWheelchair()) {
-            // check if the start and end locations are accessible
-            if (!pathService.isAccessible(request.getFromPlace(), options)
-                    || !pathService.isAccessible(request.getToPlace(), options)) {
-                throw new LocationNotAccessible();
-            }
-
-        }
-    }
-
-    /**
-     * Get the traverse options for a request
-     * 
-     * @param request
-     * @return
-     */
-    private TraverseOptions getOptions(Request request) {
-
-        TraverseModeSet modeSet = request.getModeSet();
-        assert (modeSet.isValid());
-        TraverseOptions options = new TraverseOptions(modeSet, request.getOptimize());
-        options.setArriveBy(request.isArriveBy());
-        options.wheelchairAccessible = request.getWheelchair();
-        if (request.getMaxSlope() > 0) {
-            options.maxSlope = request.getMaxSlope();
-        }
-        if (request.getMaxWalkDistance() > 0) {
-            options.setMaxWalkDistance(request.getMaxWalkDistance());
-        }
-        if (request.getWalkSpeed() > 0) {
-            options.setWalkSpeed(request.getWalkSpeed());
-        }
-        options.setTriangleSafetyFactor(request.getTriangleSafetyFactor());
-        options.setTriangleSlopeFactor(request.getTriangleSlopeFactor());
-        options.setTriangleTimeFactor(request.getTriangleTimeFactor());
-        if (request.getMinTransferTime() != null) {
-            options.minTransferTime = request.getMinTransferTime();
-        }
-        if (request.getMaxTransfers() != null) {
-            options.maxTransfers = request.getMaxTransfers();
-        }
-        if (request.getPreferredRoutes() != null) {
-            for (String element : request.getPreferredRoutes()) {
-                String[] routeSpec = element.split("_", 2);
-                if (routeSpec.length != 2) {
-                    throw new IllegalArgumentException(
-                            "AgencyId or routeId not set in preferredRoutes list");
-                }
-                options.preferredRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
-            }
-        }
-        if (request.getUnpreferredRoutes() != null) {
-            for (String element : request.getUnpreferredRoutes()) {
-                String[] routeSpec = element.split("_", 2);
-                if (routeSpec.length != 2) {
-                    throw new IllegalArgumentException(
-                            "AgencyId or routeId not set in unpreferredRoutes list");
-                }
-                options.unpreferredRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
-            }
-        }
-        if (request.getBannedRoutes() != null) {
-            for (String element : request.getBannedRoutes()) {
-                String[] routeSpec = element.split("_", 2);
-                if (routeSpec.length != 2) {
-                    throw new IllegalArgumentException(
-                            "AgencyId or routeId not set in bannedRoutes list");
-                }
-                options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
-            }
-        }
-        if (request.getTransferPenalty() != null) {
-            options.transferPenalty = request.getTransferPenalty();
-        }
-
-        boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        options.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        return options;
     }
 
     /**

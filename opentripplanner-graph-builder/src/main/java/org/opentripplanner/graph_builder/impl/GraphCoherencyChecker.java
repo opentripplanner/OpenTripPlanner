@@ -86,5 +86,10 @@ public class GraphCoherencyChecker implements GraphBuilder {
         }
         _log.info("edge lists and from/to members are {}coherent.", coherent ? "": "not ");
     }
+
+    @Override
+    public void checkInputs() {
+        //No inputs other than the graph itself
+    }
     
 }

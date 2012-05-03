@@ -52,4 +52,11 @@ public class ShapefileFeatureSourceFactoryImpl implements FeatureSourceFactory {
                     + _path, ex);
         }
     }
+
+    @Override
+    public void checkInputs() {
+        if (!_path.canRead()) {
+            throw new RuntimeException("Can't read Shapefile path: " + _path);
+        }
+    }
 }

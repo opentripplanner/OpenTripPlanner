@@ -9,14 +9,9 @@
            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
     <import resource="classpath:org/opentripplanner/application-context.xml" />
+    <context:component-scan base-package="org.opentripplanner.api"/>
 
-	<bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
-		<property name="bundle" ref="graphBundle" />
-	</bean>
-	
-	<bean id="pathService" class="org.opentripplanner.routing.impl.ContractionPathServiceImpl">
-		<property name="remainingWeightHeuristicFactory" ref="heuristicFactory" />
-		<!-- adjust these timeouts if you are getting too few itineraries per result, or some searches are very slow -->
+	<bean id="pathService" class="org.opentripplanner.routing.impl.RetryingPathServiceImpl">
         <property name="firstPathTimeout" value="10.0" />
         <property name="multiPathTimeout" value="1.0" />
 	</bean>
@@ -37,15 +32,8 @@
 	</bean>
 	-->
  
-	<bean id="heuristicFactory" 
-	      class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl">
-		<!-- <constructor-arg ref="graphService" />  -->
-	</bean>
-
-	<bean id="pathServiceFactory" class="org.opentripplanner.routing.impl.SingletonPathServiceFactoryImpl">
-		<property name="pathService" ref="pathService" />
-	</bean>
-	
-	<bean class="org.opentripplanner.jsonp.JsonpCallbackFilter" id="jsonpCallbackFilter" />
+  <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+  <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+  <bean class="org.opentripplanner.jsonp.JsonpCallbackFilter" id="jsonpCallbackFilter" />
 
 </beans>

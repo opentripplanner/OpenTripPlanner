@@ -26,4 +26,7 @@ import org.opengis.coverage.Coverage;
 
 public interface NEDGridCoverageFactory {
     public Coverage getGridCoverage();
+
+    /** @see GraphBuilder.checkInputs() */
+    public void checkInputs();
 }

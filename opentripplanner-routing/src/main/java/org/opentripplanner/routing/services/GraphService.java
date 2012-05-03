@@ -38,30 +38,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public interface GraphService {
 
+    /** specify whether additional debug information is loaded from the serialized graphs */
     public void setLoadLevel(LoadLevel level);
     
-	/**
-	 * Refresh the graph. Depending on the underlying implementation, this may
-	 * involve reloading the graph from a file.
-	 */
-	public void refreshGraph();
+    /** Refresh all known graphs. This will usually involve reloading the graph from a file. */
+    public void refreshGraphs();
 
-	/**
-	 * 
-	 * @return the current graph object
-	 */
-	public Graph getGraph();
+    /** @return the current default graph object */
+    public Graph getGraph();
 
-	/**
-	 * 
-	 * @return the current contraction hiearachy set object
-	 */
-	public ContractionHierarchySet getContractionHierarchySet();
+    /** @return the default graph object for the given router ID */
+    public Graph getGraph(String routerId);
 
-	/**
-	 * 
-	 * @return the current calendar service instance, or null if no calendar
-	 *         data is loaded
-	 */
-	public CalendarService getCalendarService();
 }
