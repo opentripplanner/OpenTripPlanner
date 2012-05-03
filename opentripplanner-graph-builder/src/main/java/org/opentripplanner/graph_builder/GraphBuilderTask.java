@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,8 +112,13 @@ public class GraphBuilderTask implements Runnable {
             return;
         }
 
-        if(!graphPath.canWrite()) {
-            throw new RuntimeException("Cannot write to graph path " + graphPath);
+        try {
+            if (!graphPath.getParentFile().exists())
+                if (!graphPath.getParentFile().mkdirs())
+                    _log.error("Failed to create directories for graph bundle at " + graphPath);
+            graphPath.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot create or overwrite graph at path " + graphPath);
         }
 
         //check prerequisites

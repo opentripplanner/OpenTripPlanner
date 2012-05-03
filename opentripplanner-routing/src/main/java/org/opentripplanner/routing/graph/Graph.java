@@ -366,9 +366,6 @@ public class Graph implements Serializable {
     }
 
     public void save(File file) throws IOException {
-        if (!file.getParentFile().exists())
-            if (!file.getParentFile().mkdirs())
-                LOG.error("Failed to create directories for graph bundle at " + file);
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
         ObjectOutputStream out = new ObjectOutputStream(
