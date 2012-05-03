@@ -15,7 +15,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.api.common.SearchResource;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.analyst.parameter.Layer;
 import org.opentripplanner.analyst.parameter.LayerList;
 import org.opentripplanner.analyst.parameter.MIMEImageFormat;
@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
 
 @Path("wms")
-public class WebMapService extends SearchResource {
+public class WebMapService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(WebMapService.class);
 

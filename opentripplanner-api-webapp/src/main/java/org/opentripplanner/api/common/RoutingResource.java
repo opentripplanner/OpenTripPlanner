@@ -21,9 +21,9 @@ import org.slf4j.LoggerFactory;
  * 
  * @author abyrd
  */
-public abstract class SearchResource { // RoutingResource
+public abstract class RoutingResource { 
 
-    private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
     /* TODO do not specify @DefaultValues here, so all defaults are handled in one place */
     

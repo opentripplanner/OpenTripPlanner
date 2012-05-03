@@ -13,7 +13,7 @@ import org.opentripplanner.analyst.core.SlippyTile;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.api.common.SearchResource;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.analyst.parameter.Layer;
 import org.opentripplanner.analyst.parameter.LayerList;
 import org.opentripplanner.analyst.parameter.MIMEImageFormat;
@@ -26,7 +26,7 @@ import com.sun.jersey.api.core.InjectParam;
 
 // removed component, mixing spring and jersey annotations is bad?
 @Path("/tile/{z}/{x}/{y}.png") 
-public class TileService extends SearchResource {
+public class TileService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(TileService.class);
 

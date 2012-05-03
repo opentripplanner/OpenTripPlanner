@@ -21,7 +21,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.common.SearchResource;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -48,7 +48,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Path("/plan") // NOTE - /ws/plan is the full path -- see web.xml
 @XmlRootElement
 @Autowire
-public class Planner extends SearchResource {
+public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
     @Autowired public PlanGenerator planGenerator;
