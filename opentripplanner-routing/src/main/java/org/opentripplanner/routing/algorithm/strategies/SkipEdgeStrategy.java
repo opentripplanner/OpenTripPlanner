@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -39,5 +39,5 @@ public interface SkipEdgeStrategy {
      * @return true if the given edge should not be considered for traversal
      */
     public boolean shouldSkipEdge(Vertex origin, Vertex target, State current, Edge edge,
-            ShortestPathTree spt, TraverseOptions traverseOptions);
+            ShortestPathTree spt, RoutingRequest traverseOptions);
 }

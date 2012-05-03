@@ -56,25 +56,27 @@ public class State implements Cloneable {
     /* CONSTRUCTORS */
 
     /**
-     * Create a state representing the beginning of a trip at the given vertex, at the current
-     * system time.
+     * Create an initial state representing the beginning of a search for the given routing context. 
+     * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all 
+     * states must be created from a parent and associated with an edge.
      */
-    public State(Vertex v, TraverseOptions opt) {
-        this((int) (System.currentTimeMillis() / 1000), v, opt);
+    public State(RoutingRequest opt) {
+        this (opt.rctx.origin, opt.getSecondsSinceEpoch(), opt);
     }
 
     /**
-     * Create a state representing the beginning of a search at the given vertex, at the given time.
-     * 
-     * @param time - The time at which the search will start
-     * @param v - The origin vertex of the search
+     * Create an initial state, forcing vertex to the specified value. Useful for reusing a 
+     * RoutingContext in TransitIndex, tests, etc.
      */
-    public State(long time, Vertex vertex, TraverseOptions opt) {
-        // parent-less states can only be created at the beginning of a trip.
-        // elsewhere, all states must be created from a parent
-        // and associated with an edge.
+    public State(Vertex vertex, RoutingRequest opt) {
+        this(vertex, opt.getSecondsSinceEpoch(), opt);
+    }
 
-        this.time = time;
+    /**
+     * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
+     * a RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(Vertex vertex, long time, RoutingRequest options) {
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -82,15 +84,13 @@ public class State implements Cloneable {
         this.backEdgeNarrative = null;
         this.hops = 0;
         this.stateData = new StateData();
-        stateData.options = opt;
-        stateData.startTime = time;
-        stateData.tripSeqHash = 0;
-        stateData.usingRentedBike = false;
-        // System.out.printf("new state %d %s %s \n", this.time, this.vertex, stateData.options);
-    }
-
-    public State createState(long time, Vertex vertex, TraverseOptions options) {
-        return new State(time, vertex, options);
+        // note that here we are breaking the circular reference between rctx and options
+        // this should be harmless since reversed clones are only used when routing has finished
+        this.stateData.opt = options;
+        this.stateData.startTime = time;
+        this.stateData.tripSeqHash = 0;
+        this.stateData.usingRentedBike = false;
+        this.time = time;
     }
 
     /**
@@ -298,8 +298,8 @@ public class State implements Cloneable {
 
     /**
      * Optional next result that allows {@link Edge} to return multiple results from
-     * {@link Edge#traverse(State, TraverseOptions)} or
-     * {@link Edge#traverseBack(State, TraverseOptions)}
+     * {@link Edge#traverse(State, RoutingRequest)} or
+     * {@link Edge#traverseBack(State, RoutingRequest)}
      * 
      * @return the next additional result from an edge traversal, or null if no more results
      */
@@ -339,11 +339,15 @@ public class State implements Cloneable {
         return ret;
     }
 
-    public TraverseOptions getOptions() {
-        return stateData.options;
+    public RoutingContext getContext() {
+        return stateData.opt.rctx;
     }
 
-    public TraverseMode getNonTransitMode(TraverseOptions options) {
+    public RoutingRequest getOptions () {
+        return stateData.opt;
+    }
+    
+    public TraverseMode getNonTransitMode(RoutingRequest options) {
         TraverseModeSet modes = options.getModes();
         if (modes.getCar())
             return TraverseMode.CAR;
@@ -358,7 +362,7 @@ public class State implements Cloneable {
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        return createState(this.time, this.vertex, stateData.options.reversedClone());
+        return new State(this.vertex, this.time, stateData.opt.reversedClone());
     }
 
     public void dumpPath() {

@@ -31,7 +31,7 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -72,7 +72,7 @@ public class ContractionHierarchy implements Serializable {
 
     private double contractionFactor;
 
-    private transient TraverseOptions fwdOptions, backOptions;
+    private transient RoutingRequest fwdOptions, backOptions;
 
     private transient TraverseMode mode;
 
@@ -306,7 +306,7 @@ public class ContractionHierarchy implements Serializable {
      * @param contractionFactor
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
-    public ContractionHierarchy(Graph graph, TraverseOptions options, double contractionFactor) {
+    public ContractionHierarchy(Graph graph, RoutingRequest options, double contractionFactor) {
         
         this.graph = graph;
         fwdOptions = options;
@@ -572,24 +572,29 @@ public class ContractionHierarchy implements Serializable {
      * 
      */
     public GraphPath getShortestPath(Vertex origin, Vertex target, long time,
-            TraverseOptions opt) {
-
-    	TraverseOptions upOptions = opt.clone();
-    	TraverseOptions downOptions = opt.clone();
+            RoutingRequest opt) {
 
         if (origin == null || target == null) {
             return null;
         }
 
-        /** max walk distance cannot be less than distances to nearest transit stops */
-        double minWalkDistance = 
-                origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
-        upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
-        downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
+        RoutingRequest upOptions = opt.clone();
+        RoutingRequest downOptions = opt.clone();
 
+        //TODO: verify set to/from are correct (AMB)
     	upOptions.setArriveBy(false);
-    	downOptions.setArriveBy(true);
-    	
+    	upOptions.dateTime = time;
+    	upOptions.setRoutingContext(graph, origin, target);
+        downOptions.setArriveBy(true);
+        downOptions.dateTime = time;
+        upOptions.setRoutingContext(graph, target, origin);
+
+    	/** max walk distance cannot be less than distances to nearest transit stops */
+    	double minWalkDistance = 
+    	        origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();
+    	upOptions.setMaxWalkDistance(Math.max(upOptions.getMaxWalkDistance(), minWalkDistance));
+    	downOptions.setMaxWalkDistance(Math.max(downOptions.getMaxWalkDistance(), minWalkDistance));
+        
     	final boolean VERBOSE = false;
     	
     	// DEBUG no walk limit
@@ -602,8 +607,8 @@ public class ContractionHierarchy implements Serializable {
 
         Map<Vertex, ArrayList<Edge>> extraEdges = getExtraEdges(origin, target);
         
-        BasicShortestPathTree upspt = new BasicShortestPathTree();
-        BasicShortestPathTree downspt = new BasicShortestPathTree();
+        BasicShortestPathTree upspt = new BasicShortestPathTree(upOptions);
+        BasicShortestPathTree downspt = new BasicShortestPathTree(downOptions);
 
         BinHeap<State> upqueue = new BinHeap<State>(INITIAL_SIZE);
         BinHeap<State> downqueue = new BinHeap<State>(INITIAL_SIZE);
@@ -612,13 +617,13 @@ public class ContractionHierarchy implements Serializable {
         HashSet<Vertex> upclosed = new HashSet<Vertex>(INITIAL_SIZE);
         HashSet<Vertex> downclosed = new HashSet<Vertex>(INITIAL_SIZE);
 
-        State upInit = new State(time, origin, upOptions);
+        State upInit = new State(origin, upOptions);
         upspt.add(upInit);
         upqueue.insert(upInit, upInit.getWeight());
 
         /* FIXME: insert extra bike walking targets */
 
-        State downInit = new State(time, target, downOptions);
+        State downInit = new State(target, downOptions);
         downspt.add(downInit);
         downqueue.insert(downInit, downInit.getWeight());
         

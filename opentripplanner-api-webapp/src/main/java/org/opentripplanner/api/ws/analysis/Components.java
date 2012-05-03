@@ -28,11 +28,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.opentripplanner.analysis.AnalysisUtils;
 import org.opentripplanner.api.model.analysis.GraphComponent;
 import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
-import org.opentripplanner.api.ws.RequestInf;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.springframework.beans.factory.annotation.Required;
@@ -60,7 +59,7 @@ public class Components {
      * cache for component geometry (for a specific query)
      */
     private List<Geometry> cachedPolygons;
-    private TraverseOptions cachedOptions;
+    private RoutingRequest cachedOptions;
     private long cachedDateTime;
 
     @Required
@@ -82,10 +81,10 @@ public class Components {
     @Produces({ MediaType.APPLICATION_JSON })
     public GraphComponentPolygons getComponentPolygons(
             @DefaultValue("TRANSIT,WALK") @QueryParam("modes") TraverseModeSet modes,
-            @QueryParam(RequestInf.DATE) String date, @QueryParam(RequestInf.TIME) String time,
-            @DefaultValue("") @QueryParam(RequestInf.BANNED_ROUTES) String bannedRoutes) {
+            @QueryParam("date") String date, @QueryParam("time") String time,
+            @DefaultValue("") @QueryParam("bannedRoutes") String bannedRoutes) {
 
-        TraverseOptions options = new TraverseOptions(modes);
+        RoutingRequest options = new RoutingRequest(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();
         if (bannedRoutes.length() > 0) {
             for (String element : bannedRoutes.split(",")) {
@@ -102,11 +101,10 @@ public class Components {
         if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {
             cachedOptions = options;
             cachedDateTime = dateTime;
+            // TODO: verify correctness (AMB)
             Graph graph = graphService.getGraph();
-            if (graphService.getCalendarService() != null) {
-                options.setCalendarService(graphService.getCalendarService());
-            }
-            options.setServiceDays(dateTime, graph.getAgencyIds());
+            //TODO: fix
+            options.setRoutingContext(graph);
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         

@@ -64,14 +64,17 @@ public class GtfsLibrary {
     }
 
     public static CalendarService createCalendarService(GtfsRelationalDao dao) {
-
-        CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
-        factory.setGtfsDao(dao);
-        CalendarServiceData data = factory.createData();
-
+        CalendarServiceData data = createCalendarServiceData(dao);
         CalendarServiceImpl service = new CalendarServiceImpl();
         service.setData(data);
         return service;
+    }
+
+    public static CalendarServiceData createCalendarServiceData(GtfsRelationalDao dao) {
+        CalendarServiceDataFactoryImpl factory = new CalendarServiceDataFactoryImpl();
+        factory.setGtfsDao(dao);
+        CalendarServiceData data = factory.createData();
+        return data;
     }
 
     public static AgencyAndId convertIdFromString(String value) {

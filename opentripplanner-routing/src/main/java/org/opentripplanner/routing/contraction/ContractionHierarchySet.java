@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -30,26 +30,26 @@ public class ContractionHierarchySet implements Serializable {
     private static final long serialVersionUID = -8621085480392710082L;
     
     private Graph graph;
-    private HashMap<TraverseOptions, ContractionHierarchy> hierarchiesByMode = new HashMap<TraverseOptions, ContractionHierarchy>();
-    private List<TraverseOptions> modeList;
+    private HashMap<RoutingRequest, ContractionHierarchy> hierarchiesByMode = new HashMap<RoutingRequest, ContractionHierarchy>();
+    private List<RoutingRequest> modeList;
 
     private double contractionFactor = 1.0;
 
     public ContractionHierarchySet() {
-        modeList = new ArrayList<TraverseOptions>();
+        modeList = new ArrayList<RoutingRequest>();
     }
     
-    public ContractionHierarchySet(Graph graph, List<TraverseOptions> modeList, double contractionFactor) {
+    public ContractionHierarchySet(Graph graph, List<RoutingRequest> modeList, double contractionFactor) {
         this.modeList = modeList;
         this.graph = graph;
         this.contractionFactor = contractionFactor;
     }
 
-    public ContractionHierarchySet(Graph graph, List<TraverseOptions> modeList) {
+    public ContractionHierarchySet(Graph graph, List<RoutingRequest> modeList) {
         this(graph, modeList, 1.0);
     }
 
-    public void addTraverseOptions(TraverseOptions mando) {
+    public void addTraverseOptions(RoutingRequest mando) {
         modeList.add(mando);
     }
     
@@ -57,14 +57,14 @@ public class ContractionHierarchySet implements Serializable {
         graph = g;
     }
 
-    public ContractionHierarchy getHierarchy(TraverseOptions options) {
-        TraverseOptions bestOptions = null;
-        int bestSimilarity = TraverseOptions.MIN_SIMILARITY; // A minimum score of 1000 is required
+    public ContractionHierarchy getHierarchy(RoutingRequest options) {
+        RoutingRequest bestOptions = null;
+        int bestSimilarity = RoutingRequest.MIN_SIMILARITY; // A minimum score of 1000 is required
 
         if(modeList == null)
             return null;
 
-        for(TraverseOptions optionsH : modeList) {
+        for(RoutingRequest optionsH : modeList) {
             int similarity = optionsH.similarity(options);
             if(similarity > bestSimilarity) {
                 bestSimilarity = similarity;
@@ -80,7 +80,7 @@ public class ContractionHierarchySet implements Serializable {
             return;
         }
         _log.debug("Building contraction hierarchies for " + modeList.size() + " modes");
-        for (TraverseOptions mo : modeList) {
+        for (RoutingRequest mo : modeList) {
             _log.debug("Building contraction hierarchy for " + mo);
             ContractionHierarchy ch = new ContractionHierarchy(getGraph(), mo, contractionFactor);
             hierarchiesByMode.put(mo, ch);

@@ -18,7 +18,7 @@ import java.util.HashMap;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.LowerBoundGraph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -50,7 +50,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     double[] weights;
 
-    public LBGRemainingWeightHeuristic(Graph g, TraverseOptions opt) {
+    public LBGRemainingWeightHeuristic(Graph g, RoutingRequest opt) {
         GraphAndDirection key = new GraphAndDirection(g, opt.isArriveBy());
         this.lbg = lbgCache.get(key);
         if (this.lbg == null) {

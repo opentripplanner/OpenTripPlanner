@@ -20,7 +20,7 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -57,7 +57,7 @@ public class FindMaxWalkDistances {
      */
     private static void assignStopDistances(Graph graph, TransitStop origin) {
         
-        TraverseOptions options = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.walkReluctance = 1.0;
         options.setWalkSpeed(1.0);
@@ -66,7 +66,7 @@ public class FindMaxWalkDistances {
         State u, v;
         HashSet<Vertex> closed = new HashSet<Vertex>();
         BinHeap<State> queue = new BinHeap<State>(50);
-        BasicShortestPathTree spt = new BasicShortestPathTree();
+        BasicShortestPathTree spt = new BasicShortestPathTree(options);
         State init = new State(origin, options);
         spt.add(init);
         queue.insert(init, init.getWeight());

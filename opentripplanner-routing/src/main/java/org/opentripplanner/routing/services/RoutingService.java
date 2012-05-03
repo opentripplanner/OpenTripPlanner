@@ -16,7 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -47,5 +47,5 @@ public interface RoutingService {
      * @return
      */
     public GraphPath route(Vertex fromVertex, Vertex toVertex, List<Vertex> intermediateVertices,
-            boolean ordered, int dateTime, TraverseOptions options);
+            boolean ordered, int dateTime, RoutingRequest options);
 }

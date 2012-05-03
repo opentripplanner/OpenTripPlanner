@@ -18,17 +18,17 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -40,16 +40,14 @@ public class TestHopFactory extends TestCase {
 
     private Graph graph;
 
-    private GtfsContext context;
+    private GenericAStar aStar = new GenericAStar();
 
     public void setUp() throws Exception {
-
-        context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = new Graph();
-
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
-
+        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
     }
 
     public void testBoardAlight() throws Exception {
@@ -82,18 +80,16 @@ public class TestHopFactory extends TestCase {
         Vertex stop_a = graph.getVertex("agency_A_depart");
         Vertex stop_c = graph.getVertex("agency_C_arrive");
 
-        TraverseOptions options = new TraverseOptions(context);
-
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c
-                .getLabel(),
-                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0), options);
+        RoutingRequest options = new RoutingRequest();
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
+        options.setRoutingContext(graph, stop_a, stop_c);
+        ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(stop_c, false);
         assertNotNull(path);
         assertEquals(6, path.states.size());
         long endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 30, 0);
         assertEquals(endTime, path.getEndTime());
-
     }
 
     public void testRouting() throws Exception {
@@ -104,31 +100,31 @@ public class TestHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D_arrive");
         Vertex stop_e = graph.getVertex("agency_E_arrive");
 
-        TraverseOptions options = new TraverseOptions();
-        options.setGtfsContext(context);
+        RoutingRequest options = new RoutingRequest();
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
 
         ShortestPathTree spt;
         GraphPath path;
 
         // A to B
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_b.getLabel(), 
-                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
+        options.setRoutingContext(graph, stop_a, stop_b);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_b, false);
         assertNotNull(path);
         assertEquals(4, path.states.size());
 
         // A to C
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_c.getLabel(), 
-                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
+        options.setRoutingContext(graph, stop_a, stop_c);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_c, false);
         assertNotNull(path);
         assertEquals(6, path.states.size());
 
         // A to D
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_d.getLabel(), 
-                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
+        options.setRoutingContext(graph, stop_a, stop_d);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_d, false);
         assertNotNull(path);
@@ -137,8 +133,8 @@ public class TestHopFactory extends TestCase {
         assertEquals(endTime, path.getEndTime());
 
         // A to E
-        spt = AStar.getShortestPathTree(graph, stop_a.getLabel(), stop_e.getLabel(),
-                TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0), options);
+        options.setRoutingContext(graph, stop_a, stop_e);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, false);
         assertNotNull(path);

@@ -33,7 +33,7 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.impl.SerializedGraphFactoryBean;
 import org.opentripplanner.routing.services.PathService;
@@ -103,8 +103,12 @@ public class RunBenchmarkPlanMain {
         String to = plan.latTo + " " + plan.lonTo;
 
         try {
+          RoutingRequest opt = new RoutingRequest();
+          opt.setDateTime(plan.time);
+          opt.setFrom(from);
+          opt.setTo(to);
           long t0 = System.currentTimeMillis();
-          service.plan(new NamedPlace(from), new NamedPlace(to), plan.time, new TraverseOptions(), 1);
+          service.getPaths(opt);
           long t1 = System.currentTimeMillis();
 
           System.out.println("t=" + (t1 - t0));

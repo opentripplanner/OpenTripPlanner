@@ -15,7 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.slf4j.Logger;
@@ -27,17 +27,16 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public class DefaultRemainingWeightHeuristicFactoryImpl implements
-		RemainingWeightHeuristicFactory {
+public class DefaultRemainingWeightHeuristicFactoryImpl 
+    implements RemainingWeightHeuristicFactory {
 
     private static final Logger LOG = 
     	LoggerFactory.getLogger(DefaultRemainingWeightHeuristicFactoryImpl.class);
 
-	@Override
-	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt,
-			Vertex target) {
+    @Override
+    public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
         LOG.debug("Using Euclidean heuristic independent of search type.");
         return new DefaultRemainingWeightHeuristic();
- 	}
+    }
 
 }

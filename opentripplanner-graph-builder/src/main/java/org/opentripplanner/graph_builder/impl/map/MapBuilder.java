@@ -80,4 +80,9 @@ public class MapBuilder implements GraphBuilder {
             }
         }
     }
+
+    @Override
+    public void checkInputs() {
+        //no file inputs
+    }
 }

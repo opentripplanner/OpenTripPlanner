@@ -17,7 +17,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 
@@ -74,12 +74,12 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     }
     
     @Override
-    public double timeLowerBound(TraverseOptions options) {
+    public double timeLowerBound(RoutingRequest options) {
         return pattern.getBestDwellTime(stopIndex);
     }
 
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options);
     }
 

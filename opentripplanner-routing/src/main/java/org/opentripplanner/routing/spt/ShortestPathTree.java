@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -85,7 +86,7 @@ public interface ShortestPathTree {
     public State getState(Vertex dest);
 
     /**
-     * This should probably be somewhere else, but leaving it here for now for backward compat.
+     * This should probably be somewhere else (static method on GraphPath?), but leaving it here for now for backward compat.
      * 
      * @param dest
      * @param optimize
@@ -93,6 +94,9 @@ public interface ShortestPathTree {
      * @return
      */
     public List<GraphPath> getPaths(Vertex dest, boolean optimize);
+
+    /** Return a default set of back-optimized paths to the target vertex */
+    public List<GraphPath> getPaths();
 
     public GraphPath getPath(Vertex dest, boolean optimize);
 
@@ -103,6 +107,10 @@ public interface ShortestPathTree {
      */
     int getVertexCount();
 
+    /** @return the routing context for the search that produced this tree */
+    public RoutingRequest getOptions();
+
+    /** @return every state in this tree */
     public Collection<? extends State> getAllStates();
 
     /** Visit a vertex after it has been settled */

@@ -16,15 +16,15 @@ package org.opentripplanner.routing.patch;
 import java.io.Serializable;
 
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 
 public interface Patch extends Serializable {
     public Alert getAlert();
 
-    public boolean activeDuring(TraverseOptions options, long start, long end);
+    public boolean activeDuring(RoutingRequest options, long start, long end);
 
-    public boolean displayDuring(TraverseOptions options, long start, long end);
+    public boolean displayDuring(RoutingRequest options, long start, long end);
 
     public String getId();
 

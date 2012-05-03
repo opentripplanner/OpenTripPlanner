@@ -17,13 +17,14 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -35,20 +36,22 @@ import org.opentripplanner.util.TestUtils;
 
 public class TestFares extends TestCase {
 
+    private GenericAStar aStar = new GenericAStar();
+    
     public void testBasic() throws Exception {
 
-        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
-        TraverseOptions options = new TraverseOptions();
-        options.setGtfsContext(context);
-
         Graph gg = new Graph();
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.CALTRAIN_GTFS));
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
+        gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        RoutingRequest options = new RoutingRequest();
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
+        options.dateTime = startTime;
+        options.setRoutingContext(gg, "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain");
         ShortestPathTree spt;
         GraphPath path = null;
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
-        spt = AStar.getShortestPathTree(gg, "Caltrain_Millbrae Caltrain",
-                "Caltrain_Mountain View Caltrain", startTime, options);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(gg.getVertex("Caltrain_Mountain View Caltrain"), true);
 
@@ -61,17 +64,16 @@ public class TestFares extends TestCase {
     public void testPortland() throws Exception {
 
         Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
-        TraverseOptions options = new TraverseOptions();
-        options.setGtfsContext(ConstantsForTests.getInstance().getPortlandContext());
+        RoutingRequest options = new RoutingRequest();
         StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(gg);
         index.setup();
         ShortestPathTree spt;
         GraphPath path = null;
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 0, 0);
-
+        options.dateTime = startTime;
+        options.setRoutingContext(gg, "TriMet_10579", "TriMet_8371");
         // from zone 3 to zone 2
-        spt = AStar.getShortestPathTree(gg, "TriMet_10579", "TriMet_8371", startTime,
-                options);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(gg.getVertex("TriMet_8371"), true);
         assertNotNull(path);
@@ -83,8 +85,9 @@ public class TestFares extends TestCase {
         // long trip
 
         startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        spt = AStar.getShortestPathTree(gg, "TriMet_8389", "TriMet_1252", startTime,
-                options);
+        options.dateTime = startTime;
+        options.setRoutingContext(gg, "TriMet_8389", "TriMet_1252");
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(gg.getVertex("TriMet_1252"), true);
         assertNotNull(path);
@@ -95,8 +98,9 @@ public class TestFares extends TestCase {
         // complex trip
         options.maxTransfers = 5;
         startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
-        spt = AStar.getShortestPathTree(gg, "TriMet_10428", "TriMet_4231", startTime,
-                options);
+        options.dateTime = startTime;
+        options.setRoutingContext(gg, "TriMet_10428", "TriMet_4231");
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(gg.getVertex("TriMet_4231"), true);
         assertNotNull(path);

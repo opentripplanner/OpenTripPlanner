@@ -20,11 +20,11 @@ import junit.framework.TestCase;
 
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.AStar;
+import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -53,7 +53,7 @@ public class TestTurnEdge extends TestCase {
         TurnVertex start = new TurnVertex(gg, "start", GeometryUtils.makeLineString(-74.002, 40.5, -74.004, 40.5, -74.004, 40.5, -74.006, 41.0), "start", streetLength, false, null);
         TurnVertex end = new TurnVertex(gg, "end", GeometryUtils.makeLineString(-74.004, 40.5, -74.006, 41.0), "end", streetLength, false, null);
         
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(ConstantsForTests.WALKING_SPEED);
         
         TurnEdge ee = new TurnEdge(start, end);
@@ -64,7 +64,7 @@ public class TestTurnEdge extends TestCase {
         int expectedSecElapsed = (int) (streetLength / options.getSpeed(TraverseMode.WALK));
         endTime.add(GregorianCalendar.SECOND, expectedSecElapsed);
 
-        State s0 = new State(TestUtils.toSeconds(startTime), start, options);
+        State s0 = new State(start, TestUtils.toSeconds(startTime), options);
         State s1 = ee.traverse(s0);
 
         assertNotNull(s1);
@@ -73,7 +73,7 @@ public class TestTurnEdge extends TestCase {
         assertTrue(Math.abs(s1.getTime() - endTime.getTimeInMillis() / 1000) < 10);
 
         options.setArriveBy(true);
-        s0 = new State(TestUtils.toSeconds(endTime), end, options);
+        s0 = new State(end, TestUtils.toSeconds(endTime), options);
         s1 = ee.traverse(s0);
 
         assertNotNull(s1);
@@ -152,8 +152,10 @@ public class TestTurnEdge extends TestCase {
         
         // with no maxWalkDistance, the transfer will not be taken
 
-        TraverseOptions options = new TraverseOptions();
-        ShortestPathTree spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
+        GenericAStar aStar = new GenericAStar();
+        RoutingRequest options = new RoutingRequest();
+        options.setRoutingContext(graph, blOut, trIn);
+        ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(trIn, false);
         assertNotNull(path);
@@ -168,7 +170,8 @@ public class TestTurnEdge extends TestCase {
 
         // with a maxWalkDistance, the transfer will be taken.
         options.setMaxWalkDistance(10000);
-        spt = AStar.getShortestPathTree(graph, blOut, trIn, 0, options);
+        options.setRoutingContext(graph, blOut, trIn);
+        spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(trIn, false);
         assertNotNull(path);

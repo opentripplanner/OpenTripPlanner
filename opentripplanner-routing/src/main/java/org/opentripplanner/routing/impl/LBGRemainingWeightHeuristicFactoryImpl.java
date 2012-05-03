@@ -16,7 +16,7 @@ package org.opentripplanner.routing.impl;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -45,9 +45,9 @@ public class LBGRemainingWeightHeuristicFactoryImpl implements
 	}
 
 	@Override
-	public RemainingWeightHeuristic getInstanceForSearch(TraverseOptions opt,
-			Vertex target) {
-		if (opt.getModes().getTransit()) {
+	public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
+	        Vertex target = opt.rctx.target;
+		if (opt.getModes().isTransit()) {
 			LOG.debug("Transit itinerary requested.");
 			return new LBGRemainingWeightHeuristic(_graphService.getGraph(), opt);
 		} else {

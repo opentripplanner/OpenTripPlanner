@@ -23,7 +23,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -80,11 +80,11 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
         return s1.makeState();
     }
 
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
     	return timeLowerBound(options);
     }
 
-    public double timeLowerBound(TraverseOptions options) {
+    public double timeLowerBound(RoutingRequest options) {
         return elapsed;
     }
 

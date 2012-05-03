@@ -19,12 +19,13 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
@@ -77,7 +78,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
-        TraverseOptions options = state0.getOptions();
+        RoutingContext rctx = state0.getContext();
+        RoutingRequest options = state0.getOptions();
         if (options.isArriveBy()) {
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
@@ -112,7 +114,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestPatternIndex = -1;
             TraverseMode mode = state0.getNonTransitMode(options);
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            SD: for (ServiceDay sd : options.serviceDays) {
+            SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
@@ -215,13 +217,13 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     /* See weightLowerBound comment. */
-    public double timeLowerBound(TraverseOptions options) {
-        if (options.isArriveBy()) {
-            if (!options.getModes().get(modeMask)) {
+    public double timeLowerBound(RoutingContext rctx) {
+        if (rctx.opt.isArriveBy()) {
+            if (! rctx.opt.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            for (ServiceDay sd : options.serviceDays)
+            for (ServiceDay sd : rctx.serviceDays)
                 if (sd.serviceIdRunning(serviceId))
                     return 0;
             return Double.POSITIVE_INFINITY;
@@ -237,7 +239,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
      * edges. The lower bound search is proceeding backward, and if it has reached a board edge the
      * pattern was already deemed useful.
      */
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         if (options.isArriveBy())
             return timeLowerBound(options);
         else

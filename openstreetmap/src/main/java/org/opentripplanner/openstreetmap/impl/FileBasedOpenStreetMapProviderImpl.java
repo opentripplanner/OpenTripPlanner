@@ -51,4 +51,11 @@ public class FileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider
     public String toString() {
         return "FileBasedOpenStreetMapProviderImpl(" + _path + ")";
     }
+
+    @Override
+    public void checkInputs() {
+        if (!_path.canRead()) {
+            throw new RuntimeException("Can't read OSM path: " + _path);
+        }
+    }
 }

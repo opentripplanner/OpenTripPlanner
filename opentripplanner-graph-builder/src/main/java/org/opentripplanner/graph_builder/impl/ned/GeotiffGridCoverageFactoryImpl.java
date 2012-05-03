@@ -63,4 +63,11 @@ public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         return coverage;
     }
 
+    @Override
+    public void checkInputs() {
+        if (!path.canRead()) {
+            throw new RuntimeException("Can't read NED path: " + path);
+        }
+    }
+
 }

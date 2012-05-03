@@ -27,6 +27,7 @@ import java.util.Stack;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.AbstractShortestPathTree;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public class ReachMiniSPT extends AbstractShortestPathTree {

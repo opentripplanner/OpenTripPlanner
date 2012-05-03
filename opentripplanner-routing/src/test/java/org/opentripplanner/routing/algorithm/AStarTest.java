@@ -24,7 +24,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
@@ -94,11 +94,10 @@ public class AStarTest {
     @Test
     public void testForward() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
-
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		0, options);
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
 
@@ -118,12 +117,11 @@ public class AStarTest {
     @Test
     public void testBack() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
-
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, "56th_24th", "leary_20th",
-        		1000, options);
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
 
@@ -153,7 +151,7 @@ public class AStarTest {
     @Test
     public void testForwardExtraEdges() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
 
         StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
@@ -165,8 +163,8 @@ public class AStarTest {
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		0, options);
+        options.setRoutingContext(_graph, fromLocation, toLocation);
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(toLocation, false);
 
@@ -188,7 +186,7 @@ public class AStarTest {
     @Test
     public void testBackExtraEdges() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
 
@@ -201,8 +199,8 @@ public class AStarTest {
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
-        ShortestPathTree tree = AStar.getShortestPathTree(_graph, fromLocation, toLocation,
-        		1000, options);
+        options.setRoutingContext(_graph, fromLocation, toLocation);
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(fromLocation, false);
 

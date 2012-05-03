@@ -117,4 +117,11 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
     public String getApiBaseUrl() {
         return _apiBaseUrl;
     }
+
+    @Override
+    public void checkInputs() {
+        if (!_cacheDirectory.canWrite()) {
+            throw new RuntimeException("Can't write to OSM cache: " + _cacheDirectory);
+        }
+    }
 }

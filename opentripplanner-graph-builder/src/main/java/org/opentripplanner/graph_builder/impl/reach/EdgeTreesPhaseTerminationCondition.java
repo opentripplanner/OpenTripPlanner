@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl.reach;
 
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -32,7 +32,7 @@ public class EdgeTreesPhaseTerminationCondition implements SearchTerminationStra
 
     @Override
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
-            ShortestPathTree spt, TraverseOptions traverseOptions) {
+            ShortestPathTree spt, RoutingRequest traverseOptions) {
         if (current.getVertex() instanceof TransitStop) {
             unsafe = true;
             return false;

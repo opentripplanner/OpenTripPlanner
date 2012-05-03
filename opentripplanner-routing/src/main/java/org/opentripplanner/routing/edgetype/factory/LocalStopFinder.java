@@ -28,10 +28,11 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -61,9 +62,9 @@ public class LocalStopFinder {
 
     private StreetVertexIndexServiceImpl indexService;
 
-    private TraverseOptions walkingOptions;
+    private RoutingRequest walkingOptions;
 
-    private TraverseOptions bikingOptions;
+    private RoutingRequest bikingOptions;
 
     private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
 
@@ -98,9 +99,9 @@ public class LocalStopFinder {
 
         neighborhoods = new HashMap<Stop, HashMap<TripPattern, P2<Double>>>();
 
-        walkingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-        bikingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
-        bikingOptions.optimizeFor = OptimizeType.SAFE;
+        walkingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
+        bikingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
+        bikingOptions.optimize = OptimizeType.SAFE;
 
         int nonLocal = 0;
         for (TripPattern pattern : patterns) {
@@ -213,15 +214,15 @@ public class LocalStopFinder {
      * @return
      */
     private HashMap<TripPattern, Double> getBestDistanceForPatterns(Graph graph, Vertex origin,
-            TraverseOptions options, Set<TripPattern> nearbyPatterns) {
+            RoutingRequest options, Set<TripPattern> nearbyPatterns) {
 
         // Iteration Variables
         HashSet<Vertex> closed = new HashSet<Vertex>();
         BinHeap<State> queue = new BinHeap<State>(50);
-        BasicShortestPathTree spt = new BasicShortestPathTree();
-        State init = new State(origin, options);
-        spt.add(init);
-        queue.insert(init, init.getWeight());
+        BasicShortestPathTree spt = new BasicShortestPathTree(options);
+        State initial = new State(origin, options);
+        spt.add(initial);
+        queue.insert(initial, 0);
 
         HashMap<TripPattern, Double> patternCosts = new HashMap<TripPattern, Double>();
 

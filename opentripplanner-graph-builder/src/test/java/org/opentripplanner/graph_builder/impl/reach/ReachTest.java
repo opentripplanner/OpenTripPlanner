@@ -25,7 +25,7 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -49,7 +49,7 @@ public class ReachTest extends TestCase {
         graph = new Graph();
 
         makeGraph(graph);
-        TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
+        RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
         options.walkReluctance = 1;
         options.setWalkSpeed(1);
         
@@ -66,7 +66,7 @@ public class ReachTest extends TestCase {
             assertTrue(e.getReach() < 400);
         }
         
-        List<TraverseOptions> optionlist = Arrays.asList(options);
+        List<RoutingRequest> optionlist = Arrays.asList(options);
 //        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, optionlist);
 //        graph.setHierarchies(hierarchies);
         graph.save(new File("/tmp/ReachTestGraph.obj"));

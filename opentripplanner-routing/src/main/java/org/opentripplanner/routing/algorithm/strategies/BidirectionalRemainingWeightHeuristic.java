@@ -17,7 +17,7 @@ import java.util.Arrays;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
@@ -87,7 +87,7 @@ public class BidirectionalRemainingWeightHeuristic implements
             return 0;
     }
 
-    private void recalculate(Vertex origin, Vertex target, TraverseOptions options, boolean timeNotWeight) {
+    private void recalculate(Vertex origin, Vertex target, RoutingRequest options, boolean timeNotWeight) {
         if (target != this.target || options.maxWeight > this.cutoff) {
             LOG.debug("recalc");
             this.target = target;

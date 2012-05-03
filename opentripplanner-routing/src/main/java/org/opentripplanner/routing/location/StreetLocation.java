@@ -235,9 +235,20 @@ public class StreetLocation extends AbstractVertex {
     public int hashCode() {
         return getCoordinate().hashCode();
     }
+
+    public void addExtraEdgeTo(Vertex target) {
+        extra.add(new FreeEdge(this, target));
+        extra.add(new FreeEdge(target, this));
+    }	
+
+    @Override public int removeTemporaryEdges() {
+        int nRemoved = 0;
+        for (Edge e : getExtra()) {
+            // edges might already be detached
+            if (e.detach() != 0)
+                nRemoved += 1;
+        }
+        return nRemoved;
+    }
     
-	public void addExtraEdgeTo(Vertex target) {
-		extra.add(new FreeEdge(this, target));
-		extra.add(new FreeEdge(target, this));
-	}
 }

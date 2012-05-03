@@ -15,6 +15,8 @@ package org.opentripplanner.api.ws;
 
 import java.util.Locale;
 
+import org.opentripplanner.api.common.Message;
+
 import junit.framework.TestCase;
 
 public class TestMessages extends TestCase {

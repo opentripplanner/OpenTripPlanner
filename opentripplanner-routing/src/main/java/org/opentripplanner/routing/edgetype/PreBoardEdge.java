@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
@@ -42,7 +42,7 @@ public class PreBoardEdge extends FreeEdge {
 
     @Override
     public State traverse(State s0) {
-        TraverseOptions options = s0.getOptions();
+        RoutingRequest options = s0.getOptions();
         if (options.isArriveBy()) {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);
@@ -60,7 +60,7 @@ public class PreBoardEdge extends FreeEdge {
             // Do not pre-board if transit modes are not selected.
             // Return null here rather than in StreetTransitLink so that walk-only
             // options can be used to find transit stops without boarding vehicles.
-            if (!options.getModes().getTransit())
+            if (!options.getModes().isTransit())
                 return null;
 
             // Do not board if the passenger has alighted from a local stop
@@ -85,7 +85,7 @@ public class PreBoardEdge extends FreeEdge {
             long transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
                 /* this is a transfer rather than an initial boarding */
-                TransferTable transferTable = options.getTransferTable();
+                TransferTable transferTable = s0.getContext().transferTable;
                 if (transferTable.hasPreferredTransfers()) {
                     // only penalize transfers if there are some that will be depenalized
                     transfer_penalty = options.nonpreferredTransferPenalty;
