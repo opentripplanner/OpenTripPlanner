@@ -54,19 +54,19 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
-class TestContext {
+class Context {
     public Graph graph = new Graph();
     public GraphService graphService = new GraphServiceBeanImpl(graph); 
     public PlanGenerator planGenerator = new PlanGenerator();
     public RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
-    private static TestContext instance = null;
-    public static TestContext getInstance() {
+    private static Context instance = null;
+    public static Context getInstance() {
         if (instance == null) {
-            instance = new TestContext();
+            instance = new Context();
         }
         return instance;
     }
-    public TestContext() {
+    public Context() {
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
@@ -159,7 +159,7 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
         
-        Graph graph = TestContext.getInstance().graph;
+        Graph graph = Context.getInstance().graph;
         Vertex v1 = graph.getVertex("114080 back");//getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
         Vertex v2 = graph.getVertex("115250");//graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
         Vertex v3 = graph.getVertex("108406");//graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST", false)).iterator().next().getToVertex();
@@ -203,15 +203,15 @@ public class TestRequest extends TestCase {
             this.transferPenalty = Arrays.asList(0);
             this.maxTransfers = Arrays.asList(2);
             
-            this.planGenerator = TestContext.getInstance().planGenerator;
+            this.planGenerator = Context.getInstance().planGenerator;
         }
 
         public TestPlanner(String v1, String v2, List<String> intermediates) {
             this(v1, v2);
             this.intermediatePlaces = intermediates;
             TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
-            tsp.chainedPathService = TestContext.getInstance().pathService;
-            tsp.graphService = TestContext.getInstance().graphService;
+            tsp.chainedPathService = Context.getInstance().pathService;
+            tsp.graphService = Context.getInstance().graphService;
             this.planGenerator.pathService = tsp;
         }
         
