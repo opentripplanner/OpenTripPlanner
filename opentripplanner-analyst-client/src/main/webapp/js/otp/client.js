@@ -75,7 +75,7 @@ var buildQuery = function(params) {
 	return "?" + ret.join('&');
 };
 
-var analystUrl = "/opentripplanner-analyst-core/tile/{z}/{x}/{y}.png"; 
+var analystUrl = "/opentripplanner-api-webapp/ws/tile/{z}/{x}/{y}.png"; 
 var analystLayer = new L.TileLayer(analystUrl + buildQuery(params), {attribution: osmAttrib});
 
 var refresh = function () {
@@ -239,7 +239,7 @@ var downloadTool = function () {
         // left, bot, right, top
         bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
 
-        var url = '/opentripplanner-analyst-core/wms?layers=' + params.layers +
+        var url = '/opentripplanner-api-webapp/ws/wms?layers=' + params.layers +
             '&format=' + params.format + 
             '&srs=' + params.srs +
             '&resolution=' + params.resolution +

@@ -785,8 +785,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 ShortestPathTree spt = search.getShortestPathTree(state);
                 for (Vertex endVertex : startingVertices) {
                     GraphPath path = spt.getPath(endVertex, false);
-                    for (Edge edge : path.edges) {
-                        usedEdges.add(edge);
+                    if (path != null){
+                        for (Edge edge : path.edges) {
+                            usedEdges.add(edge);
+                        }
                     }
                 }
             }
