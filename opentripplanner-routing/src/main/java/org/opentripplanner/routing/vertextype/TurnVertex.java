@@ -19,7 +19,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
@@ -124,7 +124,7 @@ public class TurnVertex extends StreetVertex {
                 permission.allows(StreetTraversalPermission.CAR));
     }
 
-    public boolean canTraverse(TraverseOptions wo) {
+    public boolean canTraverse(RoutingRequest wo) {
         if (wo.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
@@ -145,7 +145,7 @@ public class TurnVertex extends StreetVertex {
         return false;
     }
 
-    public boolean canTraverse(TraverseOptions wo, TraverseMode mode) {
+    public boolean canTraverse(RoutingRequest wo, TraverseMode mode) {
         if (wo.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
@@ -166,7 +166,7 @@ public class TurnVertex extends StreetVertex {
         return false;
     }
 
-    public double computeWeight(State s0, TraverseOptions options, double time) {
+    public double computeWeight(State s0, RoutingRequest options, double time) {
         double weight;
         double speed = options.getSpeed(s0.getNonTransitMode(options));
         if (options.wheelchairAccessible) {

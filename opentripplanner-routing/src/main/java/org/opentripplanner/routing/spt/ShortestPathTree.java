@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -108,7 +108,7 @@ public interface ShortestPathTree {
     int getVertexCount();
 
     /** @return the routing context for the search that produced this tree */
-    public TraverseOptions getOptions();
+    public RoutingRequest getOptions();
 
     /** @return every state in this tree */
     public Collection<? extends State> getAllStates();

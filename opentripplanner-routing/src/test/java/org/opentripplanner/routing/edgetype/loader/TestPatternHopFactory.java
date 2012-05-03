@@ -36,7 +36,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.PatternAlight;
@@ -137,7 +137,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_e = graph.getVertex("agency_E");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         // test feed is designed for instantaneous transfers
         options.minTransferTime = 0;
 
@@ -192,7 +192,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_f = graph.getVertex("agency_F_depart");
         Vertex stop_h = graph.getVertex("agency_H_arrive");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 5, 0, 0);
         options.setRoutingContext(graph, stop_f, stop_h);
 
@@ -209,7 +209,7 @@ public class TestPatternHopFactory extends TestCase {
 
         ShortestPathTree spt;
         GraphPath path;
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
 
         // Friday evening
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 23, 20, 0); 
@@ -274,7 +274,7 @@ public class TestPatternHopFactory extends TestCase {
         assertTrue(i == 3);
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = startTime;
         options.setRoutingContext(graph, stop_o, stop_p);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -306,7 +306,7 @@ public class TestPatternHopFactory extends TestCase {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex("agency_B_depart");
         Vertex stop_g = graph.getVertex("agency_G_arrive");
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = startTime;
         options.setRoutingContext(graph, stop_b, stop_g);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -326,7 +326,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_k = graph.getVertex("agency_K_arrive");
 
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 19, 12, 0, 0);
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = startTime;
         options.setRoutingContext(graph, stop_i, stop_k);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -366,7 +366,7 @@ public class TestPatternHopFactory extends TestCase {
 
         ShortestPathTree spt;
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setModes(new TraverseModeSet("TRAINISH"));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
@@ -384,7 +384,7 @@ public class TestPatternHopFactory extends TestCase {
     public void testTimelessStops() throws Exception {
         Vertex stop_d = graph.getVertex("agency_D");
         Vertex stop_c = graph.getVertex("agency_C");
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 10, 0, 0);
         options.setRoutingContext(graph, stop_d, stop_c);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -400,7 +400,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_c = graph.getVertex("agency_C");
         Vertex stop_d = graph.getVertex("agency_D");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.getModes().setWalk(false);
         options.getModes().setBicycle(true);
         options.getModes().setTransit(true);
@@ -442,7 +442,7 @@ public class TestPatternHopFactory extends TestCase {
             split_d = e.getToVertex();
         }
         
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.wheelchairAccessible = true;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
 
@@ -486,7 +486,7 @@ public class TestPatternHopFactory extends TestCase {
          *  the 8:50 and have to catch the 9:50.
          */
         Vertex destination = graph.getVertex("agency_T");
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         // test is designed such that transfers must be instantaneous
         options.minTransferTime = 0; 
         GregorianCalendar startTime = new GregorianCalendar(2009, 11, 2, 8, 30, 0);
@@ -510,7 +510,7 @@ public class TestPatternHopFactory extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setModes(new TraverseModeSet("TRANSIT"));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.setRoutingContext(graph, stop_u, stop_v);
@@ -547,7 +547,7 @@ public class TestPatternHopFactory extends TestCase {
     public void testFewestTransfers() {
         Vertex stop_c = graph.getVertex("agency_C");
         Vertex stop_d = graph.getVertex("agency_D");
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
         options.setRoutingContext(graph, stop_c, stop_d);  
@@ -576,7 +576,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop = graph.getVertex("agency_A");
         assertNotNull(stop);
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0); 
         options.setRoutingContext(graph, entrance, stop);
         ShortestPathTree spt = aStar.getShortestPathTree(options);

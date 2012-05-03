@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -90,7 +90,7 @@ public class TSPPathFinder {
     }
     
     public static GraphPath findShortestPath(Vertex toVertex, Vertex fromVertex,
-            Map<Vertex, HashMap<Vertex, GraphPath>> paths, HashSet<Vertex> vertices, long time, TraverseOptions options) {
+            Map<Vertex, HashMap<Vertex, GraphPath>> paths, HashSet<Vertex> vertices, long time, RoutingRequest options) {
    
         TSPPath shortestPath = findShortestPathInternal(toVertex, fromVertex, paths, vertices, 0);
         

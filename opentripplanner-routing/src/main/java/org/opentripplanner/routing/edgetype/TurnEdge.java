@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
@@ -127,7 +127,7 @@ public class TurnEdge extends StreetEdge {
         return doTraverse(s0, s0.getOptions());
     }
 
-    private boolean turnRestricted(TraverseOptions options) {
+    private boolean turnRestricted(RoutingRequest options) {
         if (restrictedModes == null)
             return false;
         else {
@@ -135,7 +135,7 @@ public class TurnEdge extends StreetEdge {
         }
     }
 
-    private boolean turnRestricted(State s0, TraverseOptions options) {
+    private boolean turnRestricted(State s0, RoutingRequest options) {
         if (restrictedModes == null)
             return false;
         else {
@@ -143,7 +143,7 @@ public class TurnEdge extends StreetEdge {
         }
     }
 
-    private State doTraverse(State s0, TraverseOptions options) {
+    private State doTraverse(State s0, RoutingRequest options) {
         if (turnRestricted(s0, options) && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
@@ -222,7 +222,7 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public boolean canTraverse(TraverseOptions options) {
+    public boolean canTraverse(RoutingRequest options) {
     	if (turnRestricted(options) && !options.getModes().contains(TraverseMode.WALK)) {
     		return false;
     	}
@@ -300,12 +300,12 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options) * options.walkReluctance;
     }
     
     @Override
-    public double timeLowerBound(TraverseOptions options) {
+    public double timeLowerBound(RoutingRequest options) {
         return (((TurnVertex) fromv).getLength() + turnCost/20) / options.getSpeedUpperBound();
     }
     

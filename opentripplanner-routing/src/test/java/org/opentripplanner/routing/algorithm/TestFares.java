@@ -24,7 +24,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,7 +45,7 @@ public class TestFares extends TestCase {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
         gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 8, 7, 12, 0, 0);
         options.dateTime = startTime;
         options.setRoutingContext(gg, "Caltrain_Millbrae Caltrain", "Caltrain_Mountain View Caltrain");
@@ -64,7 +64,7 @@ public class TestFares extends TestCase {
     public void testPortland() throws Exception {
 
         Graph gg = ConstantsForTests.getInstance().getPortlandGraph();
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         StreetVertexIndexServiceImpl index = new StreetVertexIndexServiceImpl(gg);
         index.setup();
         ShortestPathTree spt;

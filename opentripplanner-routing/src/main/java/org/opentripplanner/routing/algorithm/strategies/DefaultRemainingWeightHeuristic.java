@@ -16,7 +16,7 @@ package org.opentripplanner.routing.algorithm.strategies;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -28,7 +28,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
     private static final long serialVersionUID = -5172878150967231550L;
 
-    private TraverseOptions options;
+    private RoutingRequest options;
 
     private boolean useTransit = false;
 
@@ -152,7 +152,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     }
     
 
-    public static double getMaxSpeed(TraverseOptions options) {
+    public static double getMaxSpeed(RoutingRequest options) {
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 10 m/s, which is roughly
             // true in Portland and NYC, but *not* true on highways

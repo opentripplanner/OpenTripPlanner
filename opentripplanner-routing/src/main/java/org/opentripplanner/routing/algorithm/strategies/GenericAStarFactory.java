@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
  * This strategy allows you to override the creation of a {@link GenericAStar} instance, providing a
@@ -22,7 +22,7 @@ import org.opentripplanner.routing.core.TraverseOptions;
  * 
  * @author bdferris
  * @see GenericAStar
- * @see TraverseOptions
+ * @see RoutingRequest
  */
 public interface GenericAStarFactory {
 

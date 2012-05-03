@@ -19,7 +19,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
@@ -61,7 +61,7 @@ public class TestTriangle extends TestCase {
         
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         
-        TraverseOptions options = new TraverseOptions(TraverseMode.BICYCLE);
+        RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;
         options.setBikeSpeed(6.0);
         options.walkReluctance = 1;

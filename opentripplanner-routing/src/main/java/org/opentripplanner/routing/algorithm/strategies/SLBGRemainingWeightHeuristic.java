@@ -18,7 +18,7 @@ import java.util.HashMap;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.SimplifiedLowerBoundGraph;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -50,7 +50,7 @@ public class SLBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     double[] weights;
 
-    public SLBGRemainingWeightHeuristic(Graph g, TraverseOptions opt) {
+    public SLBGRemainingWeightHeuristic(Graph g, RoutingRequest opt) {
         GraphAndDirection key = new GraphAndDirection(g, opt.isArriveBy());
         this.lbg = lbgCache.get(key);
         if (this.lbg == null) {
@@ -89,7 +89,7 @@ public class SLBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
             return 0;
     }
 
-    private void recalculate(Vertex target, TraverseOptions options) {
+    private void recalculate(Vertex target, RoutingRequest options) {
         if (target != this.target) {
             this.target = target;
             if (target instanceof StreetLocation)

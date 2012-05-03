@@ -31,7 +31,7 @@ import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.util.DateUtils;
 import org.springframework.beans.factory.annotation.Required;
@@ -59,7 +59,7 @@ public class Components {
      * cache for component geometry (for a specific query)
      */
     private List<Geometry> cachedPolygons;
-    private TraverseOptions cachedOptions;
+    private RoutingRequest cachedOptions;
     private long cachedDateTime;
 
     @Required
@@ -84,7 +84,7 @@ public class Components {
             @QueryParam("date") String date, @QueryParam("time") String time,
             @DefaultValue("") @QueryParam("bannedRoutes") String bannedRoutes) {
 
-        TraverseOptions options = new TraverseOptions(modes);
+        RoutingRequest options = new RoutingRequest(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();
         if (bannedRoutes.length() > 0) {
             for (String element : bannedRoutes.split(",")) {

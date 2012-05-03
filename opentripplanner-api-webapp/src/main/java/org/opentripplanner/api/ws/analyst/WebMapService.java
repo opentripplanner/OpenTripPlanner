@@ -22,7 +22,7 @@ import org.opentripplanner.analyst.parameter.MIMEImageFormat;
 import org.opentripplanner.analyst.parameter.Style;
 import org.opentripplanner.analyst.parameter.StyleList;
 import org.opentripplanner.analyst.parameter.WMSVersion;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
@@ -69,8 +69,8 @@ public class WebMapService extends SearchResource {
         if (version == new WMSVersion("1.3.0") && crs != null)
             srs = crs;
 
-        TraverseOptions reqA = this.buildRequest(0);
-        TraverseOptions reqB = this.buildRequest(1);
+        RoutingRequest reqA = this.buildRequest(0);
+        RoutingRequest reqB = this.buildRequest(1);
         
         LOG.debug("params {}", uriInfo.getQueryParameters());
         LOG.debug("layers = {}", layers);

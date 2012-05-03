@@ -41,7 +41,7 @@ import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.model.transit.TransitRoute;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -246,7 +246,7 @@ public class TransitIndex {
         Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
         Vertex boarding = preBoardEdge.getToVertex();
 
-        TraverseOptions options = makeTraverseOptions(startTime);
+        RoutingRequest options = makeTraverseOptions(startTime);
 
         //add all departures
         HashSet<AgencyAndId> trips = new HashSet<AgencyAndId>();
@@ -274,8 +274,8 @@ public class TransitIndex {
         return result;
     }
 
-    private TraverseOptions makeTraverseOptions(long startTime) {
-        TraverseOptions options = new TraverseOptions();
+    private RoutingRequest makeTraverseOptions(long startTime) {
+        RoutingRequest options = new RoutingRequest();
 //        if (graphService.getCalendarService() != null) {
 //            options.setCalendarService(graphService.getCalendarService());
 //            options.setServiceDays(startTime, agencies);
@@ -311,7 +311,7 @@ public class TransitIndex {
         }
 
         RouteVariant variant = transitIndexService.getVariantForTrip(trip);
-        TraverseOptions options = makeTraverseOptions(time);
+        RoutingRequest options = makeTraverseOptions(time);
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();
@@ -352,7 +352,7 @@ public class TransitIndex {
     }
 
     private List<StopTime> getStopTimesForBoardEdge(long startTime, long endTime,
-            TraverseOptions options, Edge e) {
+            RoutingRequest options, Edge e) {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = startTime;
@@ -375,7 +375,7 @@ public class TransitIndex {
     }
 
     private List<StopTime> getStopTimesForAlightEdge(long startTime, long endTime,
-            TraverseOptions options, Edge e) {
+            RoutingRequest options, Edge e) {
         List<StopTime> out = new ArrayList<StopTime>();
         State result;
         long time = endTime;

@@ -36,7 +36,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
@@ -83,7 +83,7 @@ public class PlanGenerator {
     @Autowired public PathService pathService;
     
     /** Generates a TripPlan from a Request */
-    public TripPlan generate(TraverseOptions options) {
+    public TripPlan generate(RoutingRequest options) {
 
         // TODO: this seems to only check the endpoints, which are usually auto-generated
         //if ( ! options.isAccessible())
@@ -133,7 +133,7 @@ public class PlanGenerator {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public TripPlan generatePlan(List<GraphPath> paths, TraverseOptions request) {
+    public TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
 
         GraphPath exemplar = paths.get(0);
         Vertex tripStartVertex = exemplar.getStartVertex();

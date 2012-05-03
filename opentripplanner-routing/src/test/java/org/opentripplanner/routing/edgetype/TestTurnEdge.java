@@ -24,7 +24,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -53,7 +53,7 @@ public class TestTurnEdge extends TestCase {
         TurnVertex start = new TurnVertex(gg, "start", GeometryUtils.makeLineString(-74.002, 40.5, -74.004, 40.5, -74.004, 40.5, -74.006, 41.0), "start", streetLength, false, null);
         TurnVertex end = new TurnVertex(gg, "end", GeometryUtils.makeLineString(-74.004, 40.5, -74.006, 41.0), "end", streetLength, false, null);
         
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(ConstantsForTests.WALKING_SPEED);
         
         TurnEdge ee = new TurnEdge(start, end);
@@ -153,7 +153,7 @@ public class TestTurnEdge extends TestCase {
         // with no maxWalkDistance, the transfer will not be taken
 
         GenericAStar aStar = new GenericAStar();
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setRoutingContext(graph, blOut, trIn);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 

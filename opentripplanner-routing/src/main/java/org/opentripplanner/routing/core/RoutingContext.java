@@ -42,7 +42,7 @@ public class RoutingContext implements Cloneable {
     
     /* FINAL FIELDS */
     
-    public TraverseOptions opt; // not final so we can reverse-clone
+    public RoutingRequest opt; // not final so we can reverse-clone
     public final Graph graph;
     public final Vertex fromVertex;
     public final Vertex toVertex;
@@ -79,11 +79,11 @@ public class RoutingContext implements Cloneable {
     
     /* CONSTRUCTORS */
     
-    public RoutingContext(TraverseOptions traverseOptions, Graph graph) {
+    public RoutingContext(RoutingRequest traverseOptions, Graph graph) {
         this(traverseOptions, graph, null, null);
     }
 
-    public RoutingContext(TraverseOptions traverseOptions, Graph graph, Vertex from, Vertex to) {
+    public RoutingContext(RoutingRequest traverseOptions, Graph graph, Vertex from, Vertex to) {
         this.opt = traverseOptions;
         this.graph = graph;
         if (from == null && to == null) {

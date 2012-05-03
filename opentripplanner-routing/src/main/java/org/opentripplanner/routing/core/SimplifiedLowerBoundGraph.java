@@ -94,7 +94,7 @@ public class SimplifiedLowerBoundGraph {
             distEdges[group] = new HashMap<Integer, Double>();
         }
         LOG.info("finding border edges...");
-        TraverseOptions dummyOptions = new TraverseOptions();
+        RoutingRequest dummyOptions = new RoutingRequest();
         for (int from_gindex = 0; from_gindex < max_gindex; from_gindex++) {
             if (from_gindex % 10000 == 0)
                 LOG.info("    group {}", from_gindex);
@@ -148,7 +148,7 @@ public class SimplifiedLowerBoundGraph {
     }
     
     // single-source shortest path (weight to all reachable destinations)
-    public double[] sssp(StreetLocation origin, TraverseOptions options) {
+    public double[] sssp(StreetLocation origin, RoutingRequest options) {
         double[] result = new double[max_gindex];
         Arrays.fill(result, Double.POSITIVE_INFINITY);
         IntBinHeap q = new IntBinHeap(max_gindex / 2);

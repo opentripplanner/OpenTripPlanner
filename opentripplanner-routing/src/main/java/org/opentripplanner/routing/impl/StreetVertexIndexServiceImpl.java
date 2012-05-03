@@ -30,7 +30,7 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -175,11 +175,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by
      * splitting nearby edges (non-permanently).
      */
-    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options) {
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, RoutingRequest options) {
         return getClosestVertex(coordinate, name, options, null);
     }
 
-    public Vertex getClosestVertex(final Coordinate coordinate, String name, TraverseOptions options, List<Edge> extraEdges) {
+    public Vertex getClosestVertex(final Coordinate coordinate, String name, RoutingRequest options, List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
@@ -386,7 +386,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, TraverseOptions options, List<Edge> extraEdges, Collection<Edge> routeEdges) {
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options, List<Edge> extraEdges, Collection<Edge> routeEdges) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge> ();
         if (extraEdges != null)
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
@@ -395,7 +395,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Envelope envelope = new Envelope(coordinate);
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
-        TraverseOptions walkingOptions = null;
+        RoutingRequest walkingOptions = null;
         if (options != null) {
             walkingOptions = options.getWalkingOptions();
         }
@@ -489,12 +489,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
 
     @Override
-    public Vertex getVertexForPlace(NamedPlace place, TraverseOptions options) {
+    public Vertex getVertexForPlace(NamedPlace place, RoutingRequest options) {
         return getVertexForPlace(place, options, null);
     }
 
     @Override
-    public Vertex getVertexForPlace(NamedPlace place, TraverseOptions options, Vertex other) {
+    public Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other) {
         Matcher matcher = _latLonPattern.matcher(place.place);
         if (matcher.matches()) {
             double lat = Double.parseDouble(matcher.group(1));
@@ -512,7 +512,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @Override
-    public boolean isAccessible(NamedPlace place, TraverseOptions options) {
+    public boolean isAccessible(NamedPlace place, RoutingRequest options) {
         /* fixme: take into account slope for wheelchair accessibility */
         Vertex vertex = getVertexForPlace(place, options);
         if (vertex instanceof TransitStop) {

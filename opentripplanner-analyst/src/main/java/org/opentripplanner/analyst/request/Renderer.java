@@ -18,7 +18,7 @@ import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.analyst.core.Tile;
 import org.opentripplanner.analyst.parameter.MIMEImageFormat;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class Renderer {
     private SPTCache sptCache;
 
     public Response getResponse (TileRequest tileRequest, 
-            TraverseOptions sptRequestA, TraverseOptions sptRequestB, 
+            RoutingRequest sptRequestA, RoutingRequest sptRequestB, 
             RenderRequest renderRequest) throws Exception {
 
         Tile tile = tileCache.get(tileRequest);

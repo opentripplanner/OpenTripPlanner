@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl.reach;
 
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -23,7 +23,7 @@ public class PartialTreesPhaseTerminationCondition implements SearchTerminationS
 
     @Override
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
-            ShortestPathTree spt, TraverseOptions traverseOptions) {
+            ShortestPathTree spt, RoutingRequest traverseOptions) {
         ReachMiniSPT rmspt = (ReachMiniSPT) spt;
         return rmspt.shouldSearchContinue();
     }

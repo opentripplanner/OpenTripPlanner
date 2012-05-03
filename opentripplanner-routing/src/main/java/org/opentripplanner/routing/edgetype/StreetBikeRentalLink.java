@@ -17,7 +17,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
@@ -91,7 +91,7 @@ public class StreetBikeRentalLink extends AbstractEdge implements EdgeWithElevat
     }
 
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         return options.getModes().contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
     }
 

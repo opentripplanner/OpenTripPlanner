@@ -24,7 +24,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -220,7 +220,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public boolean canTraverse(TraverseOptions options) {
+        public boolean canTraverse(RoutingRequest options) {
             return true;
         }
 

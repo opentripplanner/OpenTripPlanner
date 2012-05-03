@@ -15,7 +15,7 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
@@ -53,7 +53,7 @@ public class TestBikeRental extends TestCase {
         GenericAStar aStar = new GenericAStar();
         
         // it is impossible to get from v1 to v3 by walking
-        TraverseOptions options = new TraverseOptions(new TraverseModeSet("WALK,TRANSIT"));
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));
         options.setRoutingContext(graph, v1, v3);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
 
@@ -61,7 +61,7 @@ public class TestBikeRental extends TestCase {
         assertNull(path);
 
         // or biking
-        options = new TraverseOptions(new TraverseModeSet("BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -70,7 +70,7 @@ public class TestBikeRental extends TestCase {
         assertNull(path);
 
         // or even both (assuming walking bikes is disallowed)
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -87,7 +87,7 @@ public class TestBikeRental extends TestCase {
         new RentABikeOffEdge(station, station);
         
         // but we can't get off the bike at v3, so we still fail
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -104,7 +104,7 @@ public class TestBikeRental extends TestCase {
         new RentABikeOffEdge(station2, station2);
         
         // now we succeed!
-        options = new TraverseOptions(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 

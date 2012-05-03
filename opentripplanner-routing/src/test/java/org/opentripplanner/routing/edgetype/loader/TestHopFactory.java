@@ -23,7 +23,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -80,7 +80,7 @@ public class TestHopFactory extends TestCase {
         Vertex stop_a = graph.getVertex("agency_A_depart");
         Vertex stop_c = graph.getVertex("agency_C_arrive");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_c);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
@@ -100,7 +100,7 @@ public class TestHopFactory extends TestCase {
         Vertex stop_d = graph.getVertex("agency_D_arrive");
         Vertex stop_e = graph.getVertex("agency_E_arrive");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
 
         ShortestPathTree spt;

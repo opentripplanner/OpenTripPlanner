@@ -57,7 +57,7 @@ public class StateData implements Cloneable {
 
     protected HashMap<Object, Object> extensions;
 
-    protected TraverseOptions opt;
+    protected RoutingRequest opt;
 
     protected StateData clone() {
         try {

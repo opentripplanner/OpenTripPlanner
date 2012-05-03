@@ -24,7 +24,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
@@ -94,7 +94,7 @@ public class AStarTest {
     @Test
     public void testForward() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -117,7 +117,7 @@ public class AStarTest {
     @Test
     public void testBack() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
         options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
@@ -151,7 +151,7 @@ public class AStarTest {
     @Test
     public void testForwardExtraEdges() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
 
         StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
@@ -186,7 +186,7 @@ public class AStarTest {
     @Test
     public void testBackExtraEdges() {
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
 

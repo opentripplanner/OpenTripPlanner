@@ -28,7 +28,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.extra_graph.EdgesForRoute;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -74,7 +74,7 @@ public class NetworkLinkerLibrary {
     private GeometryFactory geometryFactory = new GeometryFactory();
 
     /* by default traverse options allow walking only, which is what we want */
-    private TraverseOptions options = new TraverseOptions();
+    private RoutingRequest options = new RoutingRequest();
 
     private Graph graph;
 

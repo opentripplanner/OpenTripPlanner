@@ -13,7 +13,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.spt;
 
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
  * Factory interface for providing swappable {@link ShortestPathTree} creation strategies.
@@ -22,5 +22,5 @@ import org.opentripplanner.routing.core.TraverseOptions;
  * 
  */
 public interface ShortestPathTreeFactory {
-    public ShortestPathTree create(TraverseOptions options);
+    public ShortestPathTree create(RoutingRequest options);
 }

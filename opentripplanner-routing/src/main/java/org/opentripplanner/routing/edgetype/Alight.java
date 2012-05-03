@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -83,7 +83,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
 
     public State traverse(State s0) {
         RoutingContext rctx = s0.getContext();
-        TraverseOptions options = s0.getOptions();
+        RoutingRequest options = s0.getOptions();
         if (options.wheelchairAccessible && !wheelchairAccessible)
             return null;
         if (options.isArriveBy()) {
@@ -148,7 +148,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
      * If the search is proceeding backward, board cost is added at alight edges. Otherwise it is
      * added at board edges.
      */
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         if (options.isArriveBy())
             return options.getBoardCostLowerBound();
         else

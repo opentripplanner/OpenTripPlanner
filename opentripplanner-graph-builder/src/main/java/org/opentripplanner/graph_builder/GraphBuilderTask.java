@@ -21,7 +21,7 @@ import java.util.List;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class GraphBuilderTask implements Runnable {
     
     private boolean _alwaysRebuild = true;
 
-    private List<TraverseOptions> _modeList;
+    private List<RoutingRequest> _modeList;
 
     private double _contractionFactor = 1.0;
     
@@ -66,11 +66,11 @@ public class GraphBuilderTask implements Runnable {
         }
     }
 
-    public void addMode(TraverseOptions mo) {
+    public void addMode(RoutingRequest mo) {
         _modeList.add(mo);
     }
 
-    public void setModes(List<TraverseOptions> modeList) {
+    public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
     }
 

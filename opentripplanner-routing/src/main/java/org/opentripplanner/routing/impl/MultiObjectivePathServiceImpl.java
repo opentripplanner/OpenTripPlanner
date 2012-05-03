@@ -22,7 +22,7 @@ import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.pqueue.BinHeap;
@@ -89,7 +89,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> getPaths(TraverseOptions options) {
+    public List<GraphPath> getPaths(RoutingRequest options) {
 
         // always use the bidirectional heuristic because the others are not precise enough
         RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);

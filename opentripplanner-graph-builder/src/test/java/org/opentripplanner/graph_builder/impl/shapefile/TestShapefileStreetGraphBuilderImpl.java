@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -163,14 +163,14 @@ public class TestShapefileStreetGraphBuilderImpl extends TestCase {
         assertEquals(3, start.getDegreeIn());
 
         GenericAStar aStar = new GenericAStar();
-        TraverseOptions opt = new TraverseOptions();
+        RoutingRequest opt = new RoutingRequest();
         opt.setRoutingContext(gg, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(opt);
         assertNotNull(spt);
 
         //test that the option to walk bikes on the first or last segment works
         
-        opt = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        opt = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         
         //Real live cyclists tell me that they would prefer to ride around the long way than to 
         //walk their bikes the short way.  If we slow down the default biking speed, that will 

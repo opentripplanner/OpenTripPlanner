@@ -23,7 +23,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
@@ -34,7 +34,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     private Map<Vertex, List<State>> stateSets;
 
-    public MultiShortestPathTree(TraverseOptions options) {
+    public MultiShortestPathTree(RoutingRequest options) {
         super(options);
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
@@ -113,7 +113,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     private static final class FactoryImpl implements ShortestPathTreeFactory {
         @Override
-        public ShortestPathTree create(TraverseOptions options) {
+        public ShortestPathTree create(RoutingRequest options) {
             return new MultiShortestPathTree(options);
         }
     }

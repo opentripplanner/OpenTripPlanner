@@ -25,7 +25,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     public State traverse(State state0) {
         RoutingContext rctx = state0.getContext();
-        TraverseOptions options = state0.getOptions();
+        RoutingRequest options = state0.getOptions();
         if (options.isArriveBy()) {
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
@@ -239,7 +239,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
      * edges. The lower bound search is proceeding backward, and if it has reached a board edge the
      * pattern was already deemed useful.
      */
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         if (options.isArriveBy())
             return timeLowerBound(options);
         else

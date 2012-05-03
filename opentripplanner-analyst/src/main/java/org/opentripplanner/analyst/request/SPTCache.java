@@ -1,6 +1,6 @@
 package org.opentripplanner.analyst.request;
 
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -14,7 +14,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
 @Component
-public class SPTCache extends CacheLoader<TraverseOptions, ShortestPathTree> {
+public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SPTCache.class);
 
@@ -22,14 +22,14 @@ public class SPTCache extends CacheLoader<TraverseOptions, ShortestPathTree> {
     
     @Autowired private GraphService graphService; 
 
-    private LoadingCache<TraverseOptions, ShortestPathTree> sptCache = CacheBuilder
+    private LoadingCache<RoutingRequest, ShortestPathTree> sptCache = CacheBuilder
             .newBuilder()
             .concurrencyLevel(16)
             .maximumSize(16)
             .build(this);
 
     @Override /** completes the abstract CacheLoader superclass */
-    public ShortestPathTree load(TraverseOptions req) throws Exception {
+    public ShortestPathTree load(RoutingRequest req) throws Exception {
         LOG.debug("spt cache miss : {}", req);
         req.setRoutingContext(graphService.getGraph());
         long t0 = System.currentTimeMillis();
@@ -39,7 +39,7 @@ public class SPTCache extends CacheLoader<TraverseOptions, ShortestPathTree> {
         return spt;
     }
 
-    public ShortestPathTree get(TraverseOptions req) throws Exception {
+    public ShortestPathTree get(RoutingRequest req) throws Exception {
         return req == null ? null : sptCache.get(req);
     }
     

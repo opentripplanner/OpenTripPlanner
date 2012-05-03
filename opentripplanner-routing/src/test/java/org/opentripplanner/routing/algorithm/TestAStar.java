@@ -25,7 +25,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -46,7 +46,7 @@ public class TestAStar extends TestCase {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(gg);
         gg.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         
         ShortestPathTree spt;
         GraphPath path = null;
@@ -77,7 +77,7 @@ public class TestAStar extends TestCase {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         Vertex start = graph.getVertex("TriMet_8371");
         Vertex end = graph.getVertex("TriMet_8374");
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
@@ -122,7 +122,7 @@ public class TestAStar extends TestCase {
         Vertex start = graph.getVertex("TriMet_8371");
         Vertex end = graph.getVertex("TriMet_8374");
 
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         // one hour is more than enough time
@@ -144,7 +144,7 @@ public class TestAStar extends TestCase {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 12, 34, 25);
-        TraverseOptions options = new TraverseOptions();
+        RoutingRequest options = new RoutingRequest();
         options.dateTime = startTime;
         
         Vertex airport = graph.getVertex("TriMet_10579");

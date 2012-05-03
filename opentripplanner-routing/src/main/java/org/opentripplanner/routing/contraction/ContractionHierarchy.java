@@ -31,7 +31,7 @@ import org.opentripplanner.routing.algorithm.Dijkstra;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -72,7 +72,7 @@ public class ContractionHierarchy implements Serializable {
 
     private double contractionFactor;
 
-    private transient TraverseOptions fwdOptions, backOptions;
+    private transient RoutingRequest fwdOptions, backOptions;
 
     private transient TraverseMode mode;
 
@@ -306,7 +306,7 @@ public class ContractionHierarchy implements Serializable {
      * @param contractionFactor
      *            A fraction from 0 to 1 of (the contractable portion of) the graph to contract
      */
-    public ContractionHierarchy(Graph graph, TraverseOptions options, double contractionFactor) {
+    public ContractionHierarchy(Graph graph, RoutingRequest options, double contractionFactor) {
         
         this.graph = graph;
         fwdOptions = options;
@@ -572,14 +572,14 @@ public class ContractionHierarchy implements Serializable {
      * 
      */
     public GraphPath getShortestPath(Vertex origin, Vertex target, long time,
-            TraverseOptions opt) {
+            RoutingRequest opt) {
 
         if (origin == null || target == null) {
             return null;
         }
 
-        TraverseOptions upOptions = opt.clone();
-        TraverseOptions downOptions = opt.clone();
+        RoutingRequest upOptions = opt.clone();
+        RoutingRequest downOptions = opt.clone();
 
         //TODO: verify set to/from are correct (AMB)
     	upOptions.setArriveBy(false);

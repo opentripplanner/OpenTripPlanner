@@ -32,7 +32,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -62,9 +62,9 @@ public class LocalStopFinder {
 
     private StreetVertexIndexServiceImpl indexService;
 
-    private TraverseOptions walkingOptions;
+    private RoutingRequest walkingOptions;
 
-    private TraverseOptions bikingOptions;
+    private RoutingRequest bikingOptions;
 
     private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
 
@@ -99,8 +99,8 @@ public class LocalStopFinder {
 
         neighborhoods = new HashMap<Stop, HashMap<TripPattern, P2<Double>>>();
 
-        walkingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.WALK));
-        bikingOptions = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        walkingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
+        bikingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         bikingOptions.optimize = OptimizeType.SAFE;
 
         int nonLocal = 0;
@@ -214,7 +214,7 @@ public class LocalStopFinder {
      * @return
      */
     private HashMap<TripPattern, Double> getBestDistanceForPatterns(Graph graph, Vertex origin,
-            TraverseOptions options, Set<TripPattern> nearbyPatterns) {
+            RoutingRequest options, Set<TripPattern> nearbyPatterns) {
 
         // Iteration Variables
         HashSet<Vertex> closed = new HashSet<Vertex>();

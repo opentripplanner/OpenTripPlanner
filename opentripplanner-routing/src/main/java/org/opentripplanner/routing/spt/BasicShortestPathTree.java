@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -44,7 +44,7 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
      * Parameterless constructor that uses a default capacity for internal vertex-keyed data
      * structures.
      */
-    public BasicShortestPathTree(TraverseOptions options) {
+    public BasicShortestPathTree(RoutingRequest options) {
         this(options, DEFAULT_CAPACITY);
     }
 
@@ -55,7 +55,7 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
      * @param n
      *            - the initial size of vertex-keyed maps
      */
-    public BasicShortestPathTree(TraverseOptions options, int n) {
+    public BasicShortestPathTree(RoutingRequest options, int n) {
         super(options);
         states = new IdentityHashMap<Vertex, State>(n);
     }

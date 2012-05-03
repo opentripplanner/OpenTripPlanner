@@ -22,7 +22,7 @@ import java.util.Map;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.GraphLibrary;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -54,7 +54,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
     // private HashSet<Vertex> targetStopSet; // was used when there were transfer links, which were too slow.
     private IdentityHashMap<Vertex, Double> weightCache;
 
-    private TraverseOptions options;
+    private RoutingRequest options;
 
     public TableRemainingWeightHeuristic(Graph g) {
         this.g = g;

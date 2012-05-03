@@ -18,7 +18,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -73,7 +73,7 @@ public class OutEdge extends StreetEdge {
         return doTraverse(s0, s0.getOptions());
     }
 
-    private State doTraverse(State s0, TraverseOptions options) {
+    private State doTraverse(State s0, RoutingRequest options) {
         TurnVertex fromv = ((TurnVertex) this.fromv);
         TraverseMode traverseMode = s0.getNonTransitMode(options);
         if (!fromv.canTraverse(options, traverseMode)) {
@@ -112,7 +112,7 @@ public class OutEdge extends StreetEdge {
     }
 
     @Override
-    public boolean canTraverse(TraverseOptions options) {
+    public boolean canTraverse(RoutingRequest options) {
         return ((TurnVertex) fromv).canTraverse(options);
     }
 

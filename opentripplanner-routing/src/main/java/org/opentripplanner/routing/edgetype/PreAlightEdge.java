@@ -18,7 +18,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
@@ -45,7 +45,7 @@ public class PreAlightEdge extends FreeEdge {
     @Override
     public State traverse(State s0) {
         RoutingContext rctx = s0.getContext();
-        TraverseOptions options = s0.getOptions();
+        RoutingRequest options = s0.getOptions();
         // TODO: this could probably be fused with PreBoardEdge now (AMB)
         // they are currently only different because the StateEditor.incrementTime methods are not
         // used.

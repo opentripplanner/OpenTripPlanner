@@ -18,7 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -28,13 +28,13 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public abstract class AbstractShortestPathTree implements ShortestPathTree {
 
-    public final TraverseOptions options;
+    public final RoutingRequest options;
     
     protected AbstractShortestPathTree () {
         this.options = null;
     }
 
-    protected AbstractShortestPathTree (TraverseOptions options) {
+    protected AbstractShortestPathTree (RoutingRequest options) {
         this.options = options;
     }
     
@@ -70,7 +70,7 @@ public abstract class AbstractShortestPathTree implements ShortestPathTree {
     }
     
     @Override
-    public TraverseOptions getOptions() {
+    public RoutingRequest getOptions() {
         return options;
     }
 

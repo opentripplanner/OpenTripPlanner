@@ -53,7 +53,7 @@ public class LowerBoundGraph {
 		vertex = new int   [nVertices][];
 		weight = new double[nVertices][];
 		vertexByIndex = new Vertex[nVertices];
-		TraverseOptions opt = new TraverseOptions();
+		RoutingRequest opt = new RoutingRequest();
 		if (kind == INCOMING)
 			opt.setArriveBy(true);
 		LOG.info("Loading origial graph into compact representation...");
@@ -268,7 +268,7 @@ public class LowerBoundGraph {
 	private BasicShortestPathTree originalSSSP(Vertex o){
 		LOG.info("Initializing original SSSP");
 		BinHeap<State> q = new BinHeap<State>();
-		TraverseOptions opt = new TraverseOptions();
+		RoutingRequest opt = new RoutingRequest();
 		BasicShortestPathTree spt = new BasicShortestPathTree(opt);
 		opt.maxWalkDistance = Double.MAX_VALUE;
 		State initialState = new State(o, opt);

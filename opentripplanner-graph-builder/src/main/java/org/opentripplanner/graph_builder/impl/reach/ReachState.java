@@ -18,11 +18,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class ReachState extends State {
-    public ReachState(Vertex v, TraverseOptions opt) {
+    public ReachState(Vertex v, RoutingRequest opt) {
         super(v, opt);
     }
 

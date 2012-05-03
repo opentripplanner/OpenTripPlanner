@@ -25,7 +25,7 @@ import java.util.Map;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -52,7 +52,7 @@ public class TravelingSalesmanPathService implements PathService {
     @Autowired public PathService chainedPathService;
     
     @Override
-    public List<GraphPath> getPaths(TraverseOptions options) {
+    public List<GraphPath> getPaths(RoutingRequest options) {
         if (options.getIntermediatePlaces() == null || options.getIntermediatePlaces().size() == 0) {
             // no intermediate places specified, chain to main path service
             return chainedPathService.getPaths(options);

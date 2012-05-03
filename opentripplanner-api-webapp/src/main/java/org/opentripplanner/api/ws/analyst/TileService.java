@@ -19,7 +19,7 @@ import org.opentripplanner.analyst.parameter.LayerList;
 import org.opentripplanner.analyst.parameter.MIMEImageFormat;
 import org.opentripplanner.analyst.parameter.Style;
 import org.opentripplanner.analyst.parameter.StyleList;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
@@ -46,8 +46,8 @@ public class TileService extends SearchResource {
         
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
         TileRequest tileRequest = new TileRequest(env, 255, 255);
-        TraverseOptions sptRequestA = buildRequest(0);
-        TraverseOptions sptRequestB = buildRequest(1);
+        RoutingRequest sptRequestA = buildRequest(0);
+        RoutingRequest sptRequestB = buildRequest(1);
 
         Layer layer = layers.get(0);
         Style style = styles.get(0);

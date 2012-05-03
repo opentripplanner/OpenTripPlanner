@@ -29,7 +29,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -166,7 +166,7 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
     	
-    	TraverseOptions options = new TraverseOptions();
+    	RoutingRequest options = new RoutingRequest();
 
         HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
         turns.addAll(leftBack.getOutgoing());
@@ -229,7 +229,7 @@ public class TestHalfEdges extends TestCase {
          * that prove (a) that walking bikes works, but that (b) it is not preferred to riding a tiny bit longer.
          */
         
-        options = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
         end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
         options.setRoutingContext(graph, start, end);
@@ -279,7 +279,7 @@ public class TestHalfEdges extends TestCase {
         List<Edge> extras = start.getExtra();
         assertEquals(10, extras.size());
         
-        TraverseOptions biking = new TraverseOptions(new TraverseModeSet(TraverseMode.BICYCLE));
+        RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         StreetLocation end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, biking);
         assertNotNull(end);
         
@@ -289,7 +289,7 @@ public class TestHalfEdges extends TestCase {
         // test that the closest vertex finder also adds an edge to transit
         // stops (if you are really close to the transit stop relative to the
         // street)
-        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), null, new TraverseOptions());
+        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.004999, 40.00999), null, new RoutingRequest());
         assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
@@ -300,7 +300,7 @@ public class TestHalfEdges extends TestCase {
         assertTrue(found);
 
         // test that it is possible to travel between two splits on the same street
-        TraverseOptions walking = new TraverseOptions(TraverseMode.WALK);
+        RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
         start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.004), null, walking);
         end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null, walking,
                 start.getExtra());

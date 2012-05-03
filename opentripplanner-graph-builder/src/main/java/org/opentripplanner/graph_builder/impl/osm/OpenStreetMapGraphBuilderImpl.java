@@ -52,7 +52,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -763,7 +763,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             @Override
             public boolean shouldSkipEdge(Vertex origin, Vertex target, State current, Edge edge,
-                    ShortestPathTree spt, TraverseOptions traverseOptions) {
+                    ShortestPathTree spt, RoutingRequest traverseOptions) {
                 return !edges.contains(edge);
             }
 
@@ -776,7 +776,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param edges
          */
         private void pruneAreaEdges(List<Vertex> startingVertices, Set<Edge> edges) {
-            TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
+            RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
             GenericDijkstra search = new GenericDijkstra(options);
             search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
             Set<Edge> usedEdges = new HashSet<Edge>();

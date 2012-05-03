@@ -28,7 +28,7 @@ import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrate
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -76,12 +76,12 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
     
     @Override
-    public ShortestPathTree getShortestPathTree(TraverseOptions req) {
+    public ShortestPathTree getShortestPathTree(RoutingRequest req) {
         return getShortestPathTree(req, -1); // negative timeout means no timeout
     }
 
     /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(TraverseOptions options, double relTimeout) {
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout) {
 
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
@@ -240,7 +240,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private double computeRemainingWeight(final RemainingWeightHeuristic heuristic, State v,
-            Vertex target, TraverseOptions options) {
+            Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
         if (options.isArriveBy())
@@ -249,14 +249,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             return heuristic.computeForwardWeight(v, target);
     }
 
-    private boolean isWorstTimeExceeded(State v, TraverseOptions opt) {
+    private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
         if (opt.isArriveBy())
             return v.getTime() < opt.worstTime;
         else
             return v.getTime() > opt.worstTime;
     }
 
-    private ShortestPathTree createShortestPathTree(TraverseOptions opts) {
+    private ShortestPathTree createShortestPathTree(RoutingRequest opts) {
 
         // Return Tree
         ShortestPathTree spt = null;

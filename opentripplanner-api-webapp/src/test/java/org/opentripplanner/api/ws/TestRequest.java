@@ -42,7 +42,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -102,7 +102,7 @@ class TestContext {
 public class TestRequest extends TestCase {
 
     public void testRequest() {
-        TraverseOptions request = new TraverseOptions();
+        RoutingRequest request = new RoutingRequest();
         
         request.addMode(TraverseMode.CAR);
         assertTrue(request.getModes().getCar());

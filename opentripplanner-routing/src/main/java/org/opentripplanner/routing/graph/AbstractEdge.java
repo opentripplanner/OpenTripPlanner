@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
@@ -145,12 +145,12 @@ public abstract class AbstractEdge implements Edge {
     	return this.traverse(s0);
     }
     
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         // Edge weights are non-negative. Zero is an admissible default lower bound.
     	return 0;
     }
         
-    public double timeLowerBound(TraverseOptions options) {
+    public double timeLowerBound(RoutingRequest options) {
         // No edge should take less than zero time to traverse.
         return 0;
     }

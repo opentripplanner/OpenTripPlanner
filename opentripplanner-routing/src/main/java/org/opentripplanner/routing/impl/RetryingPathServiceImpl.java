@@ -27,7 +27,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Vertex;
@@ -83,7 +83,7 @@ public class RetryingPathServiceImpl implements PathService {
     }
 
     @Override
-    public List<GraphPath> getPaths(TraverseOptions options) {
+    public List<GraphPath> getPaths(RoutingRequest options) {
 
         ArrayList<GraphPath> paths = new ArrayList<GraphPath>();
 
@@ -95,12 +95,12 @@ public class RetryingPathServiceImpl implements PathService {
         
         // The list of options specifying various modes, banned routes, etc to try for multiple
         // itineraries
-        Queue<TraverseOptions> optionQueue = new LinkedList<TraverseOptions>();
+        Queue<RoutingRequest> optionQueue = new LinkedList<RoutingRequest>();
         optionQueue.add(options);
 
         /* if the user wants to travel by transit, create a bus-only set of options */
         if (options.getModes().getTrainish() && options.getModes().contains(TraverseMode.BUS)) {
-            TraverseOptions busOnly = options.clone();
+            RoutingRequest busOnly = options.clone();
             busOnly.setModes(options.getModes().clone());
             busOnly.getModes().setTrainish(false);
             // Moved inside block to avoid double insertion in list ? (AMB)
@@ -110,7 +110,7 @@ public class RetryingPathServiceImpl implements PathService {
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
-        TraverseOptions currOptions;
+        RoutingRequest currOptions;
         while (paths.size() < options.numItineraries) {
             currOptions = optionQueue.poll();
             if (currOptions == null) {
@@ -174,7 +174,7 @@ public class RetryingPathServiceImpl implements PathService {
                     // now, create a list of options, one with each trip in this journey banned.
 
                     LOG.debug("New trips: {}", path.getTrips());
-                    TraverseOptions newOptions = currOptions.clone();
+                    RoutingRequest newOptions = currOptions.clone();
                     for (AgencyAndId trip : path.getTrips()) {
                         newOptions.bannedTrips.add(trip);
                     }

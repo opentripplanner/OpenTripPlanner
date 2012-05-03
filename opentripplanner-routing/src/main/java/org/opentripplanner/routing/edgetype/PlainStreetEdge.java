@@ -22,7 +22,7 @@ import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
@@ -98,7 +98,7 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     @Override
-    public boolean canTraverse(TraverseOptions options) {
+    public boolean canTraverse(RoutingRequest options) {
         if (options.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
@@ -119,7 +119,7 @@ public class PlainStreetEdge extends StreetEdge {
         return false;
     }
 
-    private boolean canTraverse(TraverseOptions options, TraverseMode mode) {
+    private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
             if (!wheelchairAccessible) {
                 return false;
@@ -175,7 +175,7 @@ public class PlainStreetEdge extends StreetEdge {
         return doTraverse(s0, s0.getOptions());
     }
 
-    private State doTraverse(State s0, TraverseOptions options) {
+    private State doTraverse(State s0, RoutingRequest options) {
         TraverseMode traverseMode = s0.getNonTransitMode(options);
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
@@ -273,12 +273,12 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options) * options.walkReluctance;
     }
 
     @Override
-    public double timeLowerBound(TraverseOptions options) {
+    public double timeLowerBound(RoutingRequest options) {
         return this.length / options.getSpeedUpperBound();
     }
 

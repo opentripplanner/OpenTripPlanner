@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
  * 
  * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS
  */
-public class TraverseOptions implements Cloneable, Serializable {
+public class RoutingRequest implements Cloneable, Serializable {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-    private static final Logger LOG = LoggerFactory.getLogger(TraverseOptions.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
     private static final int CLAMP_ITINERARIES = 3;
     private static final int CLAMP_TRANSFERS = 4;
 
@@ -219,7 +219,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     public double triangleSafetyFactor;
 
     /** A sub-traverse options for another mode */
-    public TraverseOptions walkingOptions;
+    public RoutingRequest walkingOptions;
     
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
@@ -254,7 +254,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     /* CONSTRUCTORS */
     
     /** Constructor for options; modes defaults to walk and transit */
-    public TraverseOptions() {
+    public RoutingRequest() {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
@@ -263,21 +263,21 @@ public class TraverseOptions implements Cloneable, Serializable {
         walkingOptions = this;
     }
 
-    public TraverseOptions(TraverseModeSet modes) {
+    public RoutingRequest(TraverseModeSet modes) {
         this();
         this.setModes(modes);
     }
 
-    public TraverseOptions(TraverseMode mode) {
+    public RoutingRequest(TraverseMode mode) {
     	this();
     	this.setModes(new TraverseModeSet(mode));
     }
 
-    public TraverseOptions(TraverseMode mode, OptimizeType optimize) {
+    public RoutingRequest(TraverseMode mode, OptimizeType optimize) {
     	this(new TraverseModeSet(mode), optimize);
     }
 
-    public TraverseOptions(TraverseModeSet modeSet, OptimizeType optimize) {
+    public RoutingRequest(TraverseModeSet modeSet, OptimizeType optimize) {
     	this();
         this.optimize = optimize;
     	this.setModes(modeSet);
@@ -301,7 +301,7 @@ public class TraverseOptions implements Cloneable, Serializable {
             worstTime = arriveBy ? 0 : Long.MAX_VALUE;
     }
 
-    public TraverseOptions getWalkingOptions() {
+    public RoutingRequest getWalkingOptions() {
         return walkingOptions;
     }
 
@@ -312,13 +312,13 @@ public class TraverseOptions implements Cloneable, Serializable {
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
-            walkingOptions = new TraverseOptions();
+            walkingOptions = new RoutingRequest();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
             walkingOptions.walkSpeed *= 0.3; //assume walking bikes is slow
             walkingOptions.optimize = optimize;
         } else if (modes.getCar()) {
-            walkingOptions = new TraverseOptions();
+            walkingOptions = new RoutingRequest();
             walkingOptions.setArriveBy(this.isArriveBy());
             walkingOptions.maxWalkDistance = maxWalkDistance;
         }
@@ -343,7 +343,7 @@ public class TraverseOptions implements Cloneable, Serializable {
      */
     public void freezeTraverseMode() {
         walkingOptions = clone();
-        walkingOptions.walkingOptions = new TraverseOptions(new TraverseModeSet());
+        walkingOptions.walkingOptions = new RoutingRequest(new TraverseModeSet());
     }
 
     /**
@@ -403,7 +403,7 @@ public class TraverseOptions implements Cloneable, Serializable {
     
     public final static int MIN_SIMILARITY = 1000;
 
-    public int similarity(TraverseOptions options) {
+    public int similarity(RoutingRequest options) {
         int s = 0;
 
         // TODO Check this: perfect equality between non-transit modes.
@@ -678,9 +678,9 @@ public class TraverseOptions implements Cloneable, Serializable {
 
     @SuppressWarnings("unchecked")
     @Override
-    public TraverseOptions clone() {
+    public RoutingRequest clone() {
         try {
-            TraverseOptions clone = (TraverseOptions) super.clone();
+            RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
             clone.bannedTrips = (HashSet<AgencyAndId>) bannedTrips.clone();
             if (this.walkingOptions != this)
@@ -695,8 +695,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     }
     
     /** @param finalTime in seconds since the epoch */
-    public TraverseOptions reversedClone() {
-        TraverseOptions ret = this.clone();
+    public RoutingRequest reversedClone() {
+        RoutingRequest ret = this.clone();
         ret.setArriveBy( ! ret.isArriveBy());
         ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
         return ret;
@@ -740,8 +740,8 @@ public class TraverseOptions implements Cloneable, Serializable {
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof TraverseOptions) {
-            TraverseOptions other = (TraverseOptions) o;
+        if (o instanceof RoutingRequest) {
+            RoutingRequest other = (RoutingRequest) o;
             return from.equals(other.from) && to.equals(other.to)
                     && walkSpeed == other.walkSpeed && bikeSpeed == other.bikeSpeed 
                     && carSpeed == other.carSpeed

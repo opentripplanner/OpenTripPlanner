@@ -30,7 +30,7 @@ import org.apache.commons.pool.impl.GenericObjectPool;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -62,7 +62,7 @@ public class WeightTable implements Serializable {
 		this.g = g;
 		// default max walk speed is biking speed
 		//maxWalkSpeed = new TraverseOptions(TraverseMode.BICYCLE).speed;
-		maxWalkSpeed = new TraverseOptions().getSpeed(TraverseMode.WALK);
+		maxWalkSpeed = new RoutingRequest().getSpeed(TraverseMode.WALK);
 	}
 
 	public double getWeight(Vertex from, Vertex to) {
@@ -152,7 +152,7 @@ public class WeightTable implements Serializable {
 				nThreads);
 
 		// make one heap and recycle it
-		TraverseOptions options = new TraverseOptions();
+		RoutingRequest options = new RoutingRequest();
 		// TODO LG Check this change:
 		options.setWalkSpeed(maxWalkSpeed);
 		final double MAX_WEIGHT = 60 * 60 * options.walkReluctance;
@@ -184,12 +184,12 @@ public class WeightTable implements Serializable {
 	class SPTComputer implements Callable<Void> {
 
 		private GenericObjectPool heapPool;
-		private TraverseOptions options;
+		private RoutingRequest options;
 		private double OPTIMISTIC_BOARD_COST;
 		private double MAX_WEIGHT;		
 		private TransitStop origin;
 
-		SPTComputer(GenericObjectPool heapPool, TraverseOptions options,
+		SPTComputer(GenericObjectPool heapPool, RoutingRequest options,
 				final double MAX_WEIGHT, final double OPTIMISTIC_BOARD_COST,
 				TransitStop origin) {
 			this.heapPool = heapPool;

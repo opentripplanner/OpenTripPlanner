@@ -20,7 +20,7 @@ import java.util.Set;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
@@ -37,14 +37,14 @@ public class Dijkstra {
     private int hopLimit;
     Set<Vertex> routeOn;
     
-    public Dijkstra(Vertex origin, TraverseOptions options, Vertex taboo) {
+    public Dijkstra(Vertex origin, RoutingRequest options, Vertex taboo) {
         this(origin, options, taboo, Integer.MAX_VALUE);
     }
     /**
      * 
      * @param taboo Do not consider any paths passing through this vertex
      */
-    public Dijkstra(Vertex origin, TraverseOptions options, Vertex taboo, int hopLimit) {
+    public Dijkstra(Vertex origin, RoutingRequest options, Vertex taboo, int hopLimit) {
         this.taboo = taboo;
         this.hopLimit = hopLimit;
 

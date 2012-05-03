@@ -146,7 +146,7 @@ public class StateEditor {
         return child;
     }
 
-    public boolean weHaveWalkedTooFar(TraverseOptions options) {
+    public boolean weHaveWalkedTooFar(RoutingRequest options) {
         // Only apply limit in transit-only case
         if (!options.getModes().isTransit())
             return false;

@@ -35,7 +35,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -56,14 +56,14 @@ import org.opentripplanner.util.TestUtils;
 public class TestPatch extends TestCase {
     private Graph graph;
 
-    private TraverseOptions options;
+    private RoutingRequest options;
 
     private GenericAStar aStar = new GenericAStar();
     
     public void setUp() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
-        options = new TraverseOptions();
+        options = new RoutingRequest();
         graph = new Graph();
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);

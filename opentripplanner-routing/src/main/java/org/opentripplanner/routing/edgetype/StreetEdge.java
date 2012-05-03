@@ -12,7 +12,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.edgetype;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -31,7 +31,7 @@ public abstract class StreetEdge extends AbstractEdge implements EdgeWithElevati
         super(v1, v2);
     }
     
-    public abstract boolean canTraverse(TraverseOptions options);
+    public abstract boolean canTraverse(RoutingRequest options);
     
     public abstract double getLength();
     

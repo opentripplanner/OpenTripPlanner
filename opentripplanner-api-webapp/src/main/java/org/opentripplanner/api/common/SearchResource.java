@@ -9,7 +9,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +119,7 @@ public abstract class SearchResource { // RoutingResource
      * Build the 0th Request object from the query parameter lists. 
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
-    protected TraverseOptions buildRequest() throws ParameterException {
+    protected RoutingRequest buildRequest() throws ParameterException {
         return buildRequest(0);
     }
     
@@ -129,8 +129,8 @@ public abstract class SearchResource { // RoutingResource
      *         re-specifying only those parameters that change from one request to the next. 
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
-    protected TraverseOptions buildRequest(int n) throws ParameterException {
-        TraverseOptions request = new TraverseOptions();
+    protected RoutingRequest buildRequest(int n) throws ParameterException {
+        RoutingRequest request = new RoutingRequest();
         request.setRouterId(get(routerId, n, ""));
         request.setFrom(get(fromPlace, n, null));
         request.setTo(get(toPlace, n, null));

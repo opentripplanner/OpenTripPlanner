@@ -24,7 +24,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.common.SearchResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class Planner extends SearchResource {
         
         // create response object, containing a copy of all request parameters
         Response response = new Response(httpServletRequest);
-        TraverseOptions request = null;
+        RoutingRequest request = null;
         try {
             // fill in request from query parameters via shared superclass method
             request = super.buildRequest(); 

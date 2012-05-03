@@ -63,7 +63,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -854,7 +854,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         // otherwise 'false' will clear trainish and busish 
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
-    	TraverseOptions options = new TraverseOptions(modeSet);
+    	RoutingRequest options = new RoutingRequest(modeSet);
     	VisualTraverseVisitor visitor = new VisualTraverseVisitor(showGraph);
     	options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
     	// TODO LG Add ui element for bike board cost (for now bike = 2 * walk)

@@ -27,7 +27,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.util.MapUtils;
 
 import com.vividsolutions.jts.algorithm.ConvexHull;
@@ -48,7 +48,7 @@ public class AnalysisUtils {
      * 
      * @param dateTime
      */
-    public static List<Geometry> getComponentPolygons(Graph graph, TraverseOptions options,
+    public static List<Geometry> getComponentPolygons(Graph graph, RoutingRequest options,
             long time) {
         DisjointSet<Vertex> components = getConnectedComponents(graph);
 

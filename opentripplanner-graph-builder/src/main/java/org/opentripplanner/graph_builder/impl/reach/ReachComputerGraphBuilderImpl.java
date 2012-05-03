@@ -30,7 +30,7 @@ import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -95,7 +95,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        TraverseOptions options = new TraverseOptions(TraverseMode.WALK);
+        RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
         options.walkReluctance = 1;
         options.setWalkSpeed(1);
 
@@ -179,7 +179,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
      * @param options a set of TraverseOptions with modes containing TraverseMode.WALK or BICYCLE or CAR 
      * @return
      */
-    private OverlayGraph makeWalkingGraph(Graph graph, TraverseOptions options) {
+    private OverlayGraph makeWalkingGraph(Graph graph, RoutingRequest options) {
         OverlayGraph newGraph = new OverlayGraph(graph);
         for (Vertex vertex : graph.getVertices()) {
             options.setArriveBy(false);
@@ -215,11 +215,11 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
      * @param streetVertices
      * @param options
      */
-    private void removeEdgeTrees(OverlayGraph ograph, Set<Vertex> streetVertices, TraverseOptions options) {
+    private void removeEdgeTrees(OverlayGraph ograph, Set<Vertex> streetVertices, RoutingRequest options) {
         GenericDijkstra dijkstra = new GenericDijkstra(options);
         dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
             @Override
-            public ShortestPathTree create(TraverseOptions opts) {
+            public ShortestPathTree create(RoutingRequest opts) {
                 ReachMiniSPT spt = new ReachMiniSPT(getEdgeTreesVertexLimit() * 2, Double.MAX_VALUE);
                 return spt;
             }
@@ -270,7 +270,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     }
 
     void partialTreesForStreets(OverlayGraph ograph, Collection<Vertex> streetVertices,
-            TraverseOptions options) {
+            RoutingRequest options) {
 
         /* compute the walking graph */
 
@@ -305,7 +305,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         }
     }
 
-    private Set<Vertex> getWalkingVertices(OverlayGraph ograph, TraverseOptions options) {
+    private Set<Vertex> getWalkingVertices(OverlayGraph ograph, RoutingRequest options) {
         Set<Vertex> streetVertices = new HashSet<Vertex>();
         for (Vertex vertex : ograph.getVertices()) {
             if (vertex instanceof TurnVertex) {
@@ -333,7 +333,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
     }
 
     OverlayGraph partialTreesPhase(final OverlayGraph oGraph, Collection<Vertex> streetVertices,
-        final TraverseOptions options, boolean transitStops) {
+        final RoutingRequest options, boolean transitStops) {
         
         log.info("Partial trees phase at epsilon = " + epsilon);
 
@@ -343,7 +343,7 @@ public class ReachComputerGraphBuilderImpl implements GraphBuilder {
         }
         dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
             @Override
-            public ShortestPathTree create(TraverseOptions opts) {
+            public ShortestPathTree create(RoutingRequest opts) {
                 ReachMiniSPT spt = new ReachMiniSPT(epsilon);
                 return spt;
             }

@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -42,7 +42,7 @@ public class TinyTurnEdge extends FreeEdge {
         this.permission = permission;
     }
     
-    public boolean canTraverse(TraverseOptions options, TraverseMode mode) {
+    public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (mode == TraverseMode.WALK && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;
         }
@@ -60,7 +60,7 @@ public class TinyTurnEdge extends FreeEdge {
 
     @Override
     public State traverse(State s0) {
-        TraverseOptions options = s0.getOptions();
+        RoutingRequest options = s0.getOptions();
         TraverseMode traverseMode = s0.getNonTransitMode(options);
 
         if (!canTraverse(options, traverseMode)) {
@@ -73,7 +73,7 @@ public class TinyTurnEdge extends FreeEdge {
         return doTraverse(s0, options);
     }
     
-    private boolean turnRestricted(State s0, TraverseOptions options) {
+    private boolean turnRestricted(State s0, RoutingRequest options) {
         if (restrictedModes == null)
             return false;
         else {
@@ -81,7 +81,7 @@ public class TinyTurnEdge extends FreeEdge {
         }
     }
 
-    public State doTraverse(State s0, TraverseOptions options) {
+    public State doTraverse(State s0, RoutingRequest options) {
         if (turnRestricted(s0, options) && !options.getModes().getWalk()) {
             return null;
         }

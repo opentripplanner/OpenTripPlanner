@@ -60,7 +60,7 @@ public class State implements Cloneable {
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all 
      * states must be created from a parent and associated with an edge.
      */
-    public State(TraverseOptions opt) {
+    public State(RoutingRequest opt) {
         this (opt.rctx.origin, opt.getSecondsSinceEpoch(), opt);
     }
 
@@ -68,7 +68,7 @@ public class State implements Cloneable {
      * Create an initial state, forcing vertex to the specified value. Useful for reusing a 
      * RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, TraverseOptions opt) {
+    public State(Vertex vertex, RoutingRequest opt) {
         this(vertex, opt.getSecondsSinceEpoch(), opt);
     }
 
@@ -76,7 +76,7 @@ public class State implements Cloneable {
      * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, long time, TraverseOptions options) {
+    public State(Vertex vertex, long time, RoutingRequest options) {
         this.weight = 0;
         this.vertex = vertex;
         this.backState = null;
@@ -298,8 +298,8 @@ public class State implements Cloneable {
 
     /**
      * Optional next result that allows {@link Edge} to return multiple results from
-     * {@link Edge#traverse(State, TraverseOptions)} or
-     * {@link Edge#traverseBack(State, TraverseOptions)}
+     * {@link Edge#traverse(State, RoutingRequest)} or
+     * {@link Edge#traverseBack(State, RoutingRequest)}
      * 
      * @return the next additional result from an edge traversal, or null if no more results
      */
@@ -343,11 +343,11 @@ public class State implements Cloneable {
         return stateData.opt.rctx;
     }
 
-    public TraverseOptions getOptions () {
+    public RoutingRequest getOptions () {
         return stateData.opt;
     }
     
-    public TraverseMode getNonTransitMode(TraverseOptions options) {
+    public TraverseMode getNonTransitMode(RoutingRequest options) {
         TraverseModeSet modes = options.getModes();
         if (modes.getCar())
             return TraverseMode.CAR;

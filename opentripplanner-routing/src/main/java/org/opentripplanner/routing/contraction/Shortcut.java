@@ -21,7 +21,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseOptions;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -177,12 +177,12 @@ public class Shortcut extends AbstractEdge {
 	}
 
 	@Override
-	public double timeLowerBound(TraverseOptions options) {
+	public double timeLowerBound(RoutingRequest options) {
 		return weight == -1 ? 0 : weight;
 	}
 
     @Override
-    public double weightLowerBound(TraverseOptions options) {
+    public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options);
     }
 }
