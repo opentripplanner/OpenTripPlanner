@@ -78,9 +78,13 @@ public class ElevationUtils {
             }
             double slope = rise / run;
             // Baldwin St in Dunedin, NZ, is the steepest street
-            // on earth, and has a grade of 35%. So, this must be a data error.
-            // Then again, footpaths are often very steep...
-            if (slopeLimit && (slope > 0.35 || slope < -0.35)) {
+            // on earth, and has a grade of 35%.  So for streets
+            // which allow cars, we set the limit to 35%.  Footpaths
+            // are sometimes steeper, so we turn slopeLimit off for them.
+            // But we still need some sort of limit, because the energy
+            // usage approximation breaks down at extreme slopes, and
+            // gives negative weights
+            if ((slopeLimit && (slope > 0.35 || slope < -0.35)) || slope > 1.0 || slope < -1.0) {
                 slope = 0; 
                 flattened = true;
             }
