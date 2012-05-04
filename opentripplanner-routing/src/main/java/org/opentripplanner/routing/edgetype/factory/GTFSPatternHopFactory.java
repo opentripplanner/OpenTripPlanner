@@ -500,7 +500,7 @@ public class GTFSPatternHopFactory {
 
     /**
      * scan through the given list, looking for clearly incorrect series of stoptimes 
-     * and unsettng / annotatng them. unsetting the arrival/departure time of clearly incorrect
+     * and unsetting / annotating them. unsetting the arrival/departure time of clearly incorrect
      * stoptimes will cause them to be interpolated in the next step. 
      *  
      * @param stopTimes the stoptimes to be filtered (from a single trip)
@@ -795,7 +795,7 @@ public class GTFSPatternHopFactory {
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, i,
                     tripPattern);
             createdEdges.add(hop);
-            hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, psv0depart,
+            hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
 
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
@@ -907,7 +907,7 @@ public class GTFSPatternHopFactory {
             new Dwell(psv0arrive, psv0depart, st0);
             Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip);
             created.add(hop);
-            hop.setGeometry(getHopGeometry(trip.getShapeId(), st0, st1, psv0depart,
+            hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
             hops.add(hop);
 
@@ -926,7 +926,7 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private Geometry getHopGeometry(AgencyAndId shapeId, StopTime st0, StopTime st1,
+    private Geometry getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
@@ -946,8 +946,11 @@ public class GTFSPatternHopFactory {
 
             double[] distances = getDistanceForShapeId(shapeId);
 
-            if (distances != null) {
-
+            if (distances == null) {
+                _log.warn(GraphBuilderAnnotation.register(graph, 
+                        Variety.BOGUS_SHAPE_GEOMETRY, shapeId));
+                return null;
+            } else {
                 LinearLocation startIndex = getSegmentFraction(distances, startDistance);
                 LinearLocation endIndex = getSegmentFraction(distances, endDistance);
 
@@ -960,6 +963,11 @@ public class GTFSPatternHopFactory {
         }
 
         LineString line = getLineStringForShapeId(shapeId);
+        if (line == null) {
+            _log.warn(GraphBuilderAnnotation.register(graph, 
+                    Variety.BOGUS_SHAPE_GEOMETRY, shapeId));
+            return null;
+        }
         LocationIndexedLine lol = new LocationIndexedLine(line);
 
         LinearLocation startCoord = lol.indexOf(startJourney.getCoordinate());
@@ -1032,6 +1040,9 @@ public class GTFSPatternHopFactory {
             return geometry;
 
         List<ShapePoint> points = getUniqueShapePointsForShapeId(shapeId);
+        if (points.size() < 2) {
+            return null;
+        }
         Coordinate[] coordinates = new Coordinate[points.size()];
         double[] distances = new double[points.size()];
 
