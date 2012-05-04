@@ -415,18 +415,12 @@ public class PlainStreetEdge extends StreetEdge {
 
     public TurnVertex createTurnVertex(Graph graph) {
         String id = getId();
-        TurnVertex tv = new TurnVertex(graph, id, getGeometry(), getName(), getLength(), back,
-                getNotes());
+        TurnVertex tv = new TurnVertex(graph, id, getGeometry(), getName(),
+                elevationProfileSegment, back, getNotes());
         tv.setWheelchairNotes(getWheelchairNotes());
         tv.setWheelchairAccessible(isWheelchairAccessible());
-        tv.setBicycleSafetyEffectiveLength(getBicycleSafetyEffectiveLength());
         tv.setCrossable(isCrossable());
         tv.setPermission(getPermission());
-        tv.setSlopeOverride(getSlopeOverride());
-        // the only cases where there will already be an elevation profile are those where it came
-        // from
-        // the street network (osm ele tags, for instance), so it's OK to force it here.
-        tv.setElevationProfile(getElevationProfile(), true);
         tv.setRoundabout(isRoundabout());
         tv.setBogusName(hasBogusName());
         tv.setNoThruTraffic(isNoThruTraffic());
