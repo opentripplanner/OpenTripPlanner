@@ -776,7 +776,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param edges
          */
         private void pruneAreaEdges(List<Vertex> startingVertices, Set<Edge> edges) {
-            RoutingRequest options = new RoutingRequest(TraverseMode.WALK);
+            if (edges.size() == 0)
+                    return;
+            TraverseMode mode;
+            PlainStreetEdge firstEdge = (PlainStreetEdge) edges.iterator().next();
+
+            if (firstEdge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
+                mode = TraverseMode.WALK;
+            } else if (firstEdge.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+                mode = TraverseMode.BICYCLE;
+            } else {
+                mode = TraverseMode.CAR;
+            }
+            RoutingRequest options = new RoutingRequest(mode);
             GenericDijkstra search = new GenericDijkstra(options);
             search.setSkipEdgeStrategy(new ListedEdgesOnly(edges));
             Set<Edge> usedEdges = new HashSet<Edge>();
