@@ -306,134 +306,135 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             public List<List<Long>> constructRings(List<OSMWay> ways) {
                 if (ways.size() == 0) {
-                    //no rings is no rings
+                    // no rings is no rings
                     return Collections.emptyList();
                 }
-                OSMWay way = ways.get(ways.size() - 1);
-                List<OSMWay> remainingUnassigned = new ArrayList<OSMWay>(ways);
-                remainingUnassigned.remove(ways.size() - 1);
 
-                List<Long> wayNodes = way.getNodeRefs();
-                Long nextStartNode = wayNodes.get(wayNodes.size() - 1);
-                Long nextEndNode = wayNodes.get(0);
-                ArrayList<List<Long>> rings = new ArrayList<List<Long>>();
-                rings.add(new ArrayList<Long>());
-                HashSet<Long> endpoints = new HashSet<Long>();
-                endpoints.add(nextEndNode);
-                endpoints.add(nextStartNode);
-                if (!assignWayToRing(endpoints, way, remainingUnassigned, rings, 0)) {
-                    _log.warn("Failed to construct rings for " + parent);
+                HashMap<Long, List<OSMWay>> waysByEndpoint = new HashMap<Long, List<OSMWay>>();
+                for (OSMWay way : ways) {
+                    List<Long> refs = way.getNodeRefs();
+                    MapUtils.addToMapList(waysByEndpoint, refs.get(0), way);
+                    MapUtils.addToMapList(waysByEndpoint, refs.get(refs.size() - 1), way);
+                }
+
+                List<List<Long>> closedRings = new ArrayList<List<Long>>();
+                // precheck for impossible situations and precompute one-way rings
+
+                List<Long> toRemove = new ArrayList<Long>();
+                for (Map.Entry<Long, List<OSMWay>> entry : waysByEndpoint.entrySet()) {
+                    Long key = entry.getKey();
+                    List<OSMWay> list = entry.getValue();
+                    if (list.size() % 2 == 1) {
+                        return null;
+                    }
+                    OSMWay way1 = list.get(0);
+                    OSMWay way2 = list.get(1);
+                    if (list.size() == 2 && way1 == way2) {
+                        ArrayList<Long> ring = new ArrayList<Long>(way1.getNodeRefs());
+                        closedRings.add(ring);
+                        toRemove.add(key);
+                    }
+                }
+                for (Long key : toRemove) {
+                    waysByEndpoint.remove(key);
+                }
+
+                List<Long> partialRing = new ArrayList<Long>();
+                if (waysByEndpoint.size() == 0) {
+                    return closedRings;
+                }
+
+                long firstEndpoint = 0, otherEndpoint = 0;
+                OSMWay firstWay = null;
+                for (Map.Entry<Long, List<OSMWay>> entry : waysByEndpoint.entrySet()) {
+                    firstEndpoint = entry.getKey();
+                    List<OSMWay> list = entry.getValue();
+                    firstWay = list.get(0);
+                    List<Long> nodeRefs = firstWay.getNodeRefs();
+                    partialRing.addAll(nodeRefs);
+                    firstEndpoint = nodeRefs.get(0);
+                    otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
+                    break;
+                }
+                waysByEndpoint.get(firstEndpoint).remove(firstWay);
+                waysByEndpoint.get(otherEndpoint).remove(firstWay);
+                if (constructRingsRecursive(waysByEndpoint, partialRing, closedRings, firstEndpoint)) {
+                    return closedRings;
+                } else {
                     return null;
                 }
-                return rings;
             }
 
-            private boolean assignWayToRing(Set<Long> endpoints, OSMWay way,
-                    List<OSMWay> unassigned, List<List<Long>> rings, int ring) {
-                List<Long> curRing = rings.get(ring);
-                ArrayList<Long> savedRing = new ArrayList<Long>(curRing);
+            private boolean constructRingsRecursive(HashMap<Long, List<OSMWay>> waysByEndpoint,
+                    List<Long> ring, List<List<Long>> closedRings, long endpoint) {
 
-                long removedEndpoint;
+                List<OSMWay> ways = new ArrayList<OSMWay>(waysByEndpoint.get(endpoint));
 
-                if (curRing.size() == 0) {
-                    curRing.addAll(way.getNodeRefs());
-                    removedEndpoint = -1;
-                } else {
+                for (OSMWay way : ways) {
+                    // remove this way from the map
+                    List<Long> nodeRefs = way.getNodeRefs();
+                    long firstEndpoint = nodeRefs.get(0);
+                    long otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
+                    MapUtils.removeFromMapList(waysByEndpoint, firstEndpoint, way);
+                    MapUtils.removeFromMapList(waysByEndpoint, otherEndpoint, way);
 
-                    long ringFirstNode = curRing.get(0);
-                    long ringLastNode = curRing.get(curRing.size() - 1);
-
-                    if (ringFirstNode == ringLastNode) {
-                        return false; // this ring is full
-                    }
-
-                    List<Long> wayNodes = way.getNodeRefs();
-                    long wayFirstNode = wayNodes.get(0);
-                    long wayLastNode = wayNodes.get(wayNodes.size() - 1);
-
-                    if (ringFirstNode == wayLastNode) {
-                        curRing.addAll(0, wayNodes.subList(1, wayNodes.size()));
-                        removedEndpoint = ringFirstNode;
-                    } else if (ringFirstNode == wayFirstNode) {
-                        ArrayList<Long> wayNodesCopy = new ArrayList<Long>(wayNodes);
-                        Collections.reverse(wayNodesCopy);
-                        curRing.addAll(0, wayNodesCopy.subList(1, wayNodes.size()));
-                        removedEndpoint = ringFirstNode;
-                    } else if (ringLastNode == wayFirstNode) {
-                        curRing.addAll(wayNodes.subList(1, wayNodes.size()));
-                        removedEndpoint = ringLastNode;
-                    } else if (ringLastNode == wayLastNode) {
-                        ArrayList<Long> wayNodesCopy = new ArrayList<Long>(wayNodes);
-                        Collections.reverse(wayNodesCopy);
-                        curRing.addAll(wayNodesCopy.subList(1, wayNodes.size()));
-                        removedEndpoint = ringLastNode;
+                    ArrayList<Long> newRing = new ArrayList<Long>(ring.size() + nodeRefs.size());
+                    long newFirstEndpoint;
+                    if (firstEndpoint == endpoint) {
+                        for (int j = nodeRefs.size() - 1; j >= 1; --j) {
+                            newRing.add(nodeRefs.get(j));
+                        }
+                        newRing.addAll(ring);
+                        newFirstEndpoint = otherEndpoint;
                     } else {
-                        // this way cannot be connected to either end of this way
-                        return false;
+                        newRing.addAll(nodeRefs.subList(0, nodeRefs.size() - 1));
+                        newRing.addAll(ring);
+                        newFirstEndpoint = firstEndpoint;
                     }
-                    endpoints.remove(removedEndpoint);
-
-                    long newRingFirstNode = curRing.get(0);
-                    long newRingLastNode = curRing.get(curRing.size() - 1);
-
-                    if (newRingFirstNode == newRingLastNode) {
-                        // check that ring is valid i.e. has no self-intersections;
-                        // assumes that self-intersections only occur at nodes,
-                        // since the alternative is a hassle to code;
-                        // the OSM multipolygon spec says it will never happen, but
-                        // I have not proven that it is impossible to construct an invalid
-                        // interpretation of a valid multipolygon which has this property
-                        if (new HashSet<Long>(curRing).size() != curRing.size() - 1) {
-                            return false;
+                    if (newRing.get(newRing.size() - 1).equals(newRing.get(0))) {
+                        // ring closure
+                        closedRings.add(newRing);
+                        // if we're out of endpoints, then we have succeeded
+                        if (waysByEndpoint.size() == 0) {
+                            return true; // success
                         }
-                    }
 
-                }
-                if (unassigned.size() == 0) {
-                    // check that all rings are valid, closed rings
-                    for (List<Long> checkRing : rings) {
-                        if (!checkRing.get(0).equals(checkRing.get(checkRing.size() - 1))) {
-                            return false;
+                        // otherwise, we need to start a new partial ring
+                        newRing = new ArrayList<Long>();
+                        OSMWay firstWay = null;
+                        for (Map.Entry<Long, List<OSMWay>> entry : waysByEndpoint.entrySet()) {
+                            firstEndpoint = entry.getKey();
+                            List<OSMWay> list = entry.getValue();
+                            firstWay = list.get(0);
+                            nodeRefs = firstWay.getNodeRefs();
+                            newRing.addAll(nodeRefs);
+                            firstEndpoint = nodeRefs.get(0);
+                            otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
+                            break;
                         }
-                    }
-                    endpoints.remove(curRing.get(0));
-                    return true;
-                }
-
-                for (OSMWay nextWay : unassigned) {
-                    List<OSMWay> remainingUnassigned = new ArrayList<OSMWay>(unassigned);
-                    remainingUnassigned.remove(nextWay);
-
-                    List<Long> nextWayNodes = nextWay.getNodeRefs();
-                    Long nextStartNode = nextWayNodes.get(nextWayNodes.size() - 1);
-                    Long nextEndNode = nextWayNodes.get(0);
-                    if (endpoints.contains(nextStartNode) || endpoints.contains(nextEndNode)) {
-
-                        // this is inefficient; we should actually keep track of which rings
-                        // each endpoint is associated with
-                        for (int i = 0; i < rings.size(); ++i) {
-                            if (assignWayToRing(endpoints, nextWay, remainingUnassigned, rings, i)) {
+                        MapUtils.removeFromMapList(waysByEndpoint, firstEndpoint, firstWay);
+                        MapUtils.removeFromMapList(waysByEndpoint, otherEndpoint, firstWay);
+                        if (constructRingsRecursive(waysByEndpoint, newRing, closedRings,
+                                firstEndpoint)) {
+                            return true;
+                        }
+                        MapUtils.addToMapList(waysByEndpoint, firstEndpoint, firstWay);
+                        MapUtils.addToMapList(waysByEndpoint, otherEndpoint, firstWay);
+                    } else {
+                        // continue with this ring
+                        if (waysByEndpoint.get(newFirstEndpoint) != null) {
+                            if (constructRingsRecursive(waysByEndpoint, newRing, closedRings,
+                                    newFirstEndpoint)) {
                                 return true;
                             }
                         }
                     }
-                    rings.add(new ArrayList<Long>());
-                    endpoints.add(nextEndNode);
-                    endpoints.add(nextStartNode);
-                    if (assignWayToRing(endpoints, nextWay, remainingUnassigned, rings,
-                            rings.size() - 1)) {
-                        return true;
+                    if (firstEndpoint == endpoint) {
+                        MapUtils.addToMapList(waysByEndpoint, otherEndpoint, way);
+                    } else {
+                        MapUtils.addToMapList(waysByEndpoint, firstEndpoint, way);
                     }
-                    endpoints.remove(nextEndNode);
-                    endpoints.remove(nextStartNode);
-                    rings.remove(rings.size() - 1);
                 }
-                // no way to assign this way to this ring (and still consistently assign the other
-                // rings)
-
-                // restore rings to previous state before failing
-                rings.set(ring, savedRing);
-                endpoints.add(removedEndpoint);
                 return false;
             }
         }
