@@ -178,20 +178,19 @@ var hagerstrand = function () {
 var mapSetupTool = function () {
     var o = document.getElementById('setupOrigTime').value;
     if (o != '')
-        flags.origTime = o;
+        flags.startTime = o;
 
     var d = document.getElementById('setupDestTime').value;
     if (d != '')
-        flags.destTime = d;
+        flags.endTime = d;
 
     var l = document.getElementById('setupLayer').value;
     // if we switch from Hägerstrand to Travel Time, remove dest marker
-    if (flags.layer != l && l == 'traveltime') {
-            map.removeLayer(destMarker);
-    }
-    // and vice-versa
-    else if (flags.layer != l && l == 'hagerstrand') {
-        map.addLayer(destMarker);
+    if (l == 'hagerstrand')
+        hagerstrand();
+
+    else if (l == 'traveltime') {
+        gray();
     }
 
     flags.layer = l;
