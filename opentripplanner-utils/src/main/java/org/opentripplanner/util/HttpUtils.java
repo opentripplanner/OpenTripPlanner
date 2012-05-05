@@ -31,10 +31,7 @@ public class HttpUtils {
         HttpHead head = new HttpHead(url);
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = httpclient.execute(head);
-        HttpEntity entity = response.getEntity();
-        if (entity == null) {
-            throw new FileNotFoundException();
-        }
+
         StatusLine status = response.getStatusLine();
         if (status.getStatusCode() == 404) {
             throw new FileNotFoundException();
