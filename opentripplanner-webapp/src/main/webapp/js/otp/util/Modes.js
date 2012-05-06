@@ -145,7 +145,7 @@ otp.util.ItineraryModes = {
      */
     initialize : function(config, itinerary)
     {
-        otp.configure(this, config);
+        otp.configure(this, config.planner);
         this.itinerary = itinerary;
         this._findModes();
         this._findMessage();
@@ -193,6 +193,10 @@ otp.util.ItineraryModes = {
                 this.m_message = this.itineraryMessages.bicycle_transit;
             else if(this.m_hasBike && this.itineraryMessages.bicycle)
                 this.m_message = this.itineraryMessages.bicycle;
+            else if(this.m_hasBike && this.m_hasWalk)
+                this.m_message = this.itineraryMessages.bicycle_rental;
+            else if(this.m_hasBike && this.m_hasWalk && this.m_hasTransit)
+                this.m_message = this.itineraryMessages.bicycle_rental_t;
             else if(this.m_hasTransit && this.itineraryMessages.transit)
             {
                 this.m_message = this.itineraryMessages.transit;
