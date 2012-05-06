@@ -192,6 +192,12 @@ var mapSetupTool = function () {
     if (maxD != '')
         params.maxWalkDistance = maxD;
 
+    // set time
+    if (flags.twoEndpoint)
+        params.time = [flags.startTime, flags.endTime];
+    else
+        params.time = flags.startTime;
+
     refresh();
     return false;
 };     
@@ -200,7 +206,6 @@ var downloadTool = function () {
     var dlParams = {
         format: document.getElementById('downloadFormat').value,
         srs: document.getElementById('downloadProj').value,
-        layers: document.getElementById('downloadLayer').value,
         resolution: document.getElementById('downloadResolution').value
     };
 
@@ -211,7 +216,7 @@ var downloadTool = function () {
     // reproject
     var src = new Proj4js.Proj('EPSG:4326');
     // TODO: undefined srs?
-    var dest = new Proj4js.Proj(params.srs);
+    var dest = new Proj4js.Proj(dlParams.srs);
 
     // wait until ready then execute
     var interval;
@@ -235,10 +240,6 @@ var downloadTool = function () {
         // left, bot, right, top
         bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
 
-        // origin, destination
-        var origLoc = origMarker.getLatLng();
-        var destLoc = destMarker.getLatLng();
-
         var url = '/opentripplanner-api-webapp/ws/wms' +
             buildQuery(params) +
             '&format=' + dlParams.format + 
@@ -249,4 +250,7 @@ var downloadTool = function () {
         
         window.open(url);
     }, 1000); // this is the end of setInterval, run every 1s
+
+    // prevent form submission
+    return false;
 };
