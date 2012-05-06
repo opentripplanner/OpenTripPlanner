@@ -16,7 +16,7 @@
 	           <input type="button" value="Color30" onclick="color30()" />
 	           <input type="button" value="Gray" onclick="gray()" />
 	           <input type="button" value="Difference" onclick="difference()" />
-               <input type="button" value="Hägerstrand" onclick="hagerstrand()" />
+               <input type="button" value="H&auml;gerstrand" onclick="hagerstrand()" />
           </form>
 	</center>
     <span>
@@ -32,17 +32,26 @@
             <label for="setupDestTime">Destination time:</label>
             <input type="text" size="24" id="setupDestTime" />
 
-            <label for="setupLayer">Layer:</label>
-            <select id="setupLayer">
-              <option value="hagerstrand">H&auml;gerstrand</option>
-              <option value="traveltime">Travel Time</option>
+            <label for="setupMode">Mode:</label>
+            <select id="setupMode">
+              <option value="TRANSIT,WALK">Transit</option>
+              <option value="BUSISH,WALK">Bus only</option>
+              <option value="TRAINISH,WALK">Train only</option>
+              <option value="WALK">Walk only</option>
+              <option value="BICYCLE">Bicycle</option>
+              <option value="WALK,BICYCLE">Rented Bicycle</option>
+              <option value="TRANSIT,BICYCLE">Transit & Bicycle</option>
+              <option value="TRANSIT,WALK,BICYCLE">Transit & Rented Bicycle</option>
             </select>
+
+            <label for="setupMaxDistance">Maximum Walking Distance:</label>
+            <input type="text" id="setupMaxDistance" />
 
             <input type="submit" value="Set Up Map" />
           </form>
 
           <h4>Download Image Tool</h4>
-          <form onsubmit="downloadTool(); return false;">
+          <form action="#" onsubmit="return downloadTool();">
             <label for="downloadFormat">Image Format:</label>
             <select id="downloadFormat">
               <option value="image/geotiff">GeoTIFF</option>
@@ -53,12 +62,6 @@
             <label for="downloadProj">Projection:</label>
             <input type="text" id="downloadProj" value="EPSG:4326" />
             
-            <label for="downloadLayer">Layer:</label>
-            <select id="downloadLayer">
-              <option value="traveltime">Travel Time</option>
-              <option value="hagerstrand">H&auml;gerstrand</option>
-            </select>
-
             <label for="downloadResolution">Resolution (SRS units):</label>
             <input type="text" id="downloadResolution" />
 
