@@ -200,7 +200,7 @@ var mapSetupTool = function () {
 };     
 
 var downloadTool = function () { 
-    var params = {
+    var dlParams = {
         format: document.getElementById('downloadFormat').value,
         srs: document.getElementById('downloadProj').value,
         layers: document.getElementById('downloadLayer').value,
@@ -238,18 +238,18 @@ var downloadTool = function () {
         // left, bot, right, top
         bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
 
-        var url = '/opentripplanner-api-webapp/ws/wms?layers=' + params.layers +
-            '&format=' + params.format + 
-            '&srs=' + params.srs +
-            '&resolution=' + params.resolution +
-            '&bbox=' + bbox +
-            '&DIM_ORIGINLAT=' + analyst.wmsParams.DIM_ORIGINLAT +
-            '&DIM_ORIGINLON=' + analyst.wmsParams.DIM_ORIGINLON +
-            '&time=' + analyst.wmsParams.time +
-            '&DIM_ORIGINLATB=' + analyst.wmsParams.DIM_ORIGINLATB + 
-            '&DIM_ORIGINLONB=' + analyst.wmsParams.DIM_ORIGINLONB +
-            '&DIM_TIMEB=' + analyst.wmsParams.DIM_TIMEB;
+        // origin, destination
+        var origLoc = origMarker.getLatLng();
+        var destLoc = destMarker.getLatLng();
 
+        var url = '/opentripplanner-api-webapp/ws/wms' +
+            buildQuery(params) +
+            '&format=' + dlParams.format + 
+            '&srs=' + dlParams.srs +
+            '&resolution=' + dlParams.resolution +
+            '&bbox=' + bbox 
+            // all of the from, to, time, &c. is taken care of by buildQuery.
+        
         window.open(url);
     }, 1000); // this is the end of setInterval, run every 1s
 };
