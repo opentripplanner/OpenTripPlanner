@@ -184,16 +184,13 @@ var mapSetupTool = function () {
     if (d != '')
         flags.endTime = d;
 
-    var l = document.getElementById('setupLayer').value;
-    // if we switch from Hägerstrand to Travel Time, remove dest marker
-    if (l == 'hagerstrand')
-        hagerstrand();
+    var m = document.getElementById('setupMode').value;
+    if (m != '')
+        params.mode = m;
 
-    else if (l == 'traveltime') {
-        gray();
-    }
-
-    flags.layer = l;
+    var maxD = document.getElementById('setupMaxDistance').value;
+    if (maxD != '')
+        params.maxWalkDistance = maxD;
 
     refresh();
     return false;
