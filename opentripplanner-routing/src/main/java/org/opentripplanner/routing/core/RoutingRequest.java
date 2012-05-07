@@ -80,7 +80,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
     public boolean arriveBy = false;
     /** Whether the trip must be wheelchair accessible. */
-    public boolean wheelchair = false;
+    public boolean wheelchairAccessible = false;
     /** The maximum number of possible itineraries to return. */
     public int numItineraries = 3;
     /** The maximum slope of streets for wheelchair trips. */
@@ -103,8 +103,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      * optimize_transfer_penalty seconds, then that's what we'll return.
      */
     public int transferPenalty = 0;
-
-    public boolean wheelchairAccessible = false;
 
     /** How much worse walking is than waiting for an equivalent length of time, as a multiplier */
     public double walkReluctance = 2.0;
@@ -536,10 +534,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /** Set whether the trip must be wheelchair accessible */
-    public void setWheelchair(boolean wheelchair) { this.wheelchair = wheelchair; }
+    public void setWheelchair(boolean wheelchair) { 
+        this.wheelchairAccessible = wheelchair; 
+    }
 
     /** return whether the trip must be wheelchair accessible */
-    public boolean getWheelchair() { return wheelchair; }
+    public boolean getWheelchairAccessible() { 
+        return wheelchairAccessible; 
+    }
 
     public void setIntermediatePlaces(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<NamedPlace>(intermediates.size());
