@@ -1,10 +1,11 @@
 <html>
 
 <head>
-<title>OTP Analytics Client</title>
-<link rel="stylesheet" type="text/css" href="js/lib/leaflet/leaflet.css" />
-<script src="js/lib/leaflet/leaflet.js"></script>
-<script src="js/lib/proj4js-1.0.3/lib/proj4js-compressed.js"></script>
+	<title>OTP Analytics Client</title>
+	<link rel="stylesheet" type="text/css" href="js/lib/leaflet/leaflet.css" />
+	<link rel="stylesheet" type="text/css" href="client.css" />
+	<script src="js/lib/leaflet/leaflet.js"></script>
+	<script src="js/lib/proj4js-1.0.3/lib/proj4js-compressed.js"></script>
 </head>
 
 <body>
@@ -16,7 +17,7 @@
 					<input type="button" value="Add Purple Line" onclick="purpleOn()" />
 					<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
 				</div>
-				<br>
+				<h1>Layer Style</h1>
 				<div>
 					<input type="button" value="Color30" onclick="color30()" />
 					<input type="button" value="Gray" onclick="gray()" />
@@ -26,7 +27,7 @@
 			</form>
 		</div>
 		<div class="tool" style="font-family: sans-serif;">
-			<h4>Map Setup</h4>
+			<h1>Map Setup</h1>
 			<form action="#" onsubmit="return mapSetupTool()">
 				<label for="setupOrigTime">Origin time*:</label> <input type="text" id="setupOrigTime" /> <br> 
 				<label for="setupDestTime">Destination time*:</label> <input type="text" id="setupDestTime" /> <br>
@@ -47,20 +48,22 @@
 			</form>
 			<h4>Download Image Tool</h4>
 			<form action="#" onsubmit="return downloadTool();">
-				<label for="downloadFormat">Image Format:</label> <select
-					id="downloadFormat">
+				<label for="downloadFormat">Image Format:</label> 
+				<select id="downloadFormat">
 					<option value="image/geotiff">GeoTIFF</option>
 					<option value="image/png">PNG</option>
 					<option value="image/jpeg">JPEG</option>
-				</select> <label for="downloadProj">Projection:</label> <input type="text"
-					id="downloadProj" value="EPSG:4326" /> <label
-					for="downloadResolution">Resolution (SRS units):</label> <input
-					type="text" id="downloadResolution" /> <input type="submit" />
+				</select> <br>
+				<label for="downloadProj">Projection:</label> 
+				<input type="text" id="downloadProj" value="EPSG:4326" /> <br> 
+				<label for="downloadResolution">Resolution (SRS units):</label> 
+				<input type="text" id="downloadResolution" /> <br>
+				<input type="submit" />
 			</form>
 		</div>
-		<div style="bottom:0px; font-size: 60%">
+		<p class="footnote">
 			*Times must be expressed in ISO8601 combined date/time format (YYYY-MM-DDTHH:MM:SS)
-		</div>
+		</p>
 	</div>
 	<script type="text/javascript" src="js/otp/client.js"></script>
 </body>
