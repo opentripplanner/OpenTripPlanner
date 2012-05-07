@@ -178,33 +178,34 @@ var hagerstrand = function () {
 var mapSetupTool = function () {
     var o = document.getElementById('setupOrigTime').value;
     if (o != '')
-        flags.origTime = o;
+        flags.startTime = o;
 
     var d = document.getElementById('setupDestTime').value;
     if (d != '')
-        flags.destTime = d;
+        flags.endTime = d;
 
-    var l = document.getElementById('setupLayer').value;
-    // if we switch from Hägerstrand to Travel Time, remove dest marker
-    if (flags.layer != l && l == 'traveltime') {
-            map.removeLayer(destMarker);
-    }
-    // and vice-versa
-    else if (flags.layer != l && l == 'hagerstrand') {
-        map.addLayer(destMarker);
-    }
+    var m = document.getElementById('setupMode').value;
+    if (m != '')
+        params.mode = m;
 
-    flags.layer = l;
+    var maxD = document.getElementById('setupMaxDistance').value;
+    if (maxD != '')
+        params.maxWalkDistance = maxD;
+
+    // set time
+    if (flags.twoEndpoint)
+        params.time = [flags.startTime, flags.endTime];
+    else
+        params.time = flags.startTime;
 
     refresh();
     return false;
 };     
 
 var downloadTool = function () { 
-    var params = {
+    var dlParams = {
         format: document.getElementById('downloadFormat').value,
         srs: document.getElementById('downloadProj').value,
-        layers: document.getElementById('downloadLayer').value,
         resolution: document.getElementById('downloadResolution').value
     };
 
@@ -215,7 +216,7 @@ var downloadTool = function () {
     // reproject
     var src = new Proj4js.Proj('EPSG:4326');
     // TODO: undefined srs?
-    var dest = new Proj4js.Proj(params.srs);
+    var dest = new Proj4js.Proj(dlParams.srs);
 
     // wait until ready then execute
     var interval;
@@ -239,18 +240,17 @@ var downloadTool = function () {
         // left, bot, right, top
         bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
 
-        var url = '/opentripplanner-api-webapp/ws/wms?layers=' + params.layers +
-            '&format=' + params.format + 
-            '&srs=' + params.srs +
-            '&resolution=' + params.resolution +
-            '&bbox=' + bbox +
-            '&DIM_ORIGINLAT=' + analyst.wmsParams.DIM_ORIGINLAT +
-            '&DIM_ORIGINLON=' + analyst.wmsParams.DIM_ORIGINLON +
-            '&time=' + analyst.wmsParams.time +
-            '&DIM_ORIGINLATB=' + analyst.wmsParams.DIM_ORIGINLATB + 
-            '&DIM_ORIGINLONB=' + analyst.wmsParams.DIM_ORIGINLONB +
-            '&DIM_TIMEB=' + analyst.wmsParams.DIM_TIMEB;
-
+        var url = '/opentripplanner-api-webapp/ws/wms' +
+            buildQuery(params) +
+            '&format=' + dlParams.format + 
+            '&srs=' + dlParams.srs +
+            '&resolution=' + dlParams.resolution +
+            '&bbox=' + bbox 
+            // all of the from, to, time, &c. is taken care of by buildQuery.
+        
         window.open(url);
     }, 1000); // this is the end of setInterval, run every 1s
+
+    // prevent form submission
+    return false;
 };
