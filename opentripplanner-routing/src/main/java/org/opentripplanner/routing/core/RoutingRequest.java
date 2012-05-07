@@ -759,7 +759,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                     && bannedTrips.equals(other.bannedTrips)
                     && minTransferTime == other.minTransferTime
                     && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                    && transferPenalty == other.transferPenalty
                     && triangleSafetyFactor == other.triangleSafetyFactor
                     && triangleSlopeFactor == other.triangleSlopeFactor
                     && triangleTimeFactor == other.triangleTimeFactor
