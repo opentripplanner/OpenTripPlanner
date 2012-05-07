@@ -112,7 +112,8 @@ public class GraphBuilderAnnotation implements Serializable {
         HOP_ZERO_TIME("Zero-time hop over %fm on route %s trip %s stop sequence %d."), 
         NEGATIVE_DWELL_TIME("Negative time dwell at %s; we will assume it is zero."),
         NEGATIVE_HOP_TIME("Negative time hop between %s and %s; skipping the entire trip.  This might" +
-        		"be caused by the use of 00:xx instead of 24:xx for stoptimes after midnight.");
+        		"be caused by the use of 00:xx instead of 24:xx for stoptimes after midnight."), 
+        BOGUS_SHAPE_GEOMETRY("Shape geometry for shape_id %s does not have two distinct points.");
         
         private final String formatString;
 

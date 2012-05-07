@@ -93,7 +93,7 @@ public class PlanGenerator {
         boolean tooSloped = false;
         try {
             paths = pathService.getPaths(options);
-            if (paths == null && options.getWheelchair()) {
+            if (paths == null && options.getWheelchairAccessible()) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions (and warn user).
                 options.maxSlope = Double.MAX_VALUE;

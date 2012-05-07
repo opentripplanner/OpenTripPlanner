@@ -83,11 +83,26 @@ public class TurnVertex extends StreetVertex {
 
     public TurnVertex(Graph g, String id, LineString geometry, String name, double length,
             boolean back, Set<Alert> notes) {
+        this(g, id, geometry, name, length, back, notes, null);
+    }
+
+    public TurnVertex(Graph g, String id, LineString geometry, String name,
+            ElevationProfileSegment elevationProfileSegment, boolean back, Set<Alert> notes) {
+        this(g, id, geometry, name, elevationProfileSegment.getLength(), back, notes,
+                elevationProfileSegment);
+    }
+
+    private TurnVertex(Graph g, String id, LineString geometry, String name, double length,
+            boolean back, Set<Alert> notes, ElevationProfileSegment elevationProfileSegment) {
         super(g, id + (back ? " back" : ""), getCoord(geometry), name);
         this.edgeId = id;
         this.geometry = geometry;
         this.length = length;
-        this.elevationProfileSegment = new ElevationProfileSegment(length);
+        if (elevationProfileSegment != null) {
+            this.elevationProfileSegment = elevationProfileSegment;
+        } else {
+            this.elevationProfileSegment = new ElevationProfileSegment(length);
+        }
         this.permission = StreetTraversalPermission.ALL;
         this.notes = notes;
 
@@ -218,10 +233,6 @@ public class TurnVertex extends StreetVertex {
 
     public void setSlopeOverride(boolean slopeOverride) {
         elevationProfileSegment.setSlopeOverride(slopeOverride);
-    }
-
-    public void setBicycleSafetyEffectiveLength(double bicycleSafetyEffectiveLength) {
-        elevationProfileSegment.setBicycleSafetyEffectiveLength(bicycleSafetyEffectiveLength);
     }
 
     public String toString() {
