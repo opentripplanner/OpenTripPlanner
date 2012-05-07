@@ -739,75 +739,71 @@ public class RoutingRequest implements Cloneable, Serializable {
         return this.rctx;
     }
 
-    /* MISSING TERMS in equals
-    public List<NamedPlace> intermediatePlaces;
-    public boolean intermediatePlacesOrdered;
-    public long dateTime = new Date().getTime() / 1000;
-    public int numItineraries = 3;
-    public boolean showIntermediateStops = false;
-    public int elevatorBoardTime = 90;
-    public int elevatorBoardCost = 90;
-    public int elevatorHopTime = 20;
-    public int elevatorHopCost = 20;
-    public int bikeRentalPickupTime = 60;
-    public int bikeRentalPickupCost = 120;
-    public int bikeRentalDropoffTime = 30;
-    public int bikeRentalDropoffCost = 30;
-    public double waitAtBeginningFactor = 0.2;
-    public int useAnotherThanPreferredRoutesPenalty = 300;
-    public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
-    public HashSet<RouteSpec> unpreferredRoutes = new HashSet<RouteSpec>();
-    public int useUnpreferredRoutesPenalty = 300;
-    public int maxTransfers = 2;
-    public Map<Object, Object> extensions = new HashMap<Object, Object>();
-    public RoutingRequest walkingOptions;
-    public boolean reverseOptimizing = false;
-    public boolean batch = false;
-    private boolean useBikeRentalAvailabilityInformation = false;
-     */
-
     /** 
      * Equality does not mean that the fields of the two RoutingRequests are identical, but
      * that they will produce the same SPT. This is particularly important when the batch
      * field is set to 'true'. Does not consider the RoutingContext, to allow SPT caching. 
+     * Intermediate places are also not included because the TSP solver will factor a single
+     * intermediate places routing request into several routing requests without intermediates
+     * before searching.
      */
     @Override
     public boolean equals(Object o) {
-        if (o instanceof RoutingRequest) {
-            RoutingRequest other = (RoutingRequest) o;
-            if ( ! this.batch) {
-                if (other.batch) 
-                    return false; // this is a batch request, and the other is not
-                if ( ! to.equals(other.to))
-                    return false; // destination only affects SPT in non-batch requests
+        if ( ! (o instanceof RoutingRequest))
+            return false;
+        RoutingRequest other = (RoutingRequest) o;
+        boolean endpointsMatch;
+        if (this.batch) {
+            if (this.arriveBy) {
+                endpointsMatch = to.equals(other.to);
+            } else {
+                endpointsMatch = from.equals(other.from);
             }
-            return from.equals(other.from) && walkSpeed == other.walkSpeed 
-                    && bikeSpeed == other.bikeSpeed && carSpeed == other.carSpeed
-                    && maxWeight == other.maxWeight && worstTime == other.worstTime
-                    && getModes().equals(other.getModes()) && isArriveBy() == other.isArriveBy()
-                    && wheelchairAccessible == other.wheelchairAccessible
-                    && optimize == other.optimize && maxWalkDistance == other.maxWalkDistance
-                    && transferPenalty == other.transferPenalty
-                    && maxSlope == other.maxSlope && walkReluctance == other.walkReluctance
-                    && waitReluctance == other.waitReluctance 
-                    && walkBoardCost == other.walkBoardCost && bikeBoardCost == other.bikeBoardCost
-                    && bannedRoutes.equals(other.bannedRoutes)
-                    && bannedTrips.equals(other.bannedTrips)
-                    && minTransferTime == other.minTransferTime
-                    && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                    && triangleSafetyFactor == other.triangleSafetyFactor
-                    && triangleSlopeFactor == other.triangleSlopeFactor
-                    && triangleTimeFactor == other.triangleTimeFactor
-                    && stairsReluctance == other.stairsReluctance;
+        } else {
+            endpointsMatch = from.equals(other.from) && to.equals(other.to);
         }
-        // objects are of different types, they are not equal
-        return false;
+        return endpointsMatch && dateTime == other.dateTime 
+                && isArriveBy() == other.isArriveBy() 
+                && numItineraries == other.numItineraries // should only apply in non-batch?
+                && walkSpeed == other.walkSpeed && bikeSpeed == other.bikeSpeed 
+                && carSpeed == other.carSpeed
+                && maxWeight == other.maxWeight && worstTime == other.worstTime
+                && maxTransfers == other.maxTransfers
+                && getModes().equals(other.getModes()) 
+                && wheelchairAccessible == other.wheelchairAccessible
+                && optimize.equals(other.optimize) && maxWalkDistance == other.maxWalkDistance
+                && transferPenalty == other.transferPenalty
+                && maxSlope == other.maxSlope && walkReluctance == other.walkReluctance
+                && waitReluctance == other.waitReluctance 
+                && walkBoardCost == other.walkBoardCost && bikeBoardCost == other.bikeBoardCost
+                && bannedRoutes.equals(other.bannedRoutes)
+                && bannedTrips.equals(other.bannedTrips)
+                && preferredRoutes.equals(other.preferredRoutes)
+                && unpreferredRoutes.equals(other.unpreferredRoutes)
+                && minTransferTime == other.minTransferTime
+                && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
+                && useAnotherThanPreferredRoutesPenalty == other.useAnotherThanPreferredRoutesPenalty
+                && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
+                && triangleSafetyFactor == other.triangleSafetyFactor
+                && triangleSlopeFactor == other.triangleSlopeFactor
+                && triangleTimeFactor == other.triangleTimeFactor
+                && stairsReluctance == other.stairsReluctance
+                && elevatorBoardTime == other.elevatorBoardTime
+                && elevatorBoardCost == other.elevatorBoardCost
+                && elevatorHopTime == other.elevatorHopTime
+                && elevatorHopCost == other.elevatorHopCost
+                && bikeRentalPickupTime == other.bikeRentalPickupTime
+                && bikeRentalPickupCost == other.bikeRentalPickupCost
+                && bikeRentalDropoffTime == other.bikeRentalDropoffTime
+                && bikeRentalDropoffCost == other.bikeRentalDropoffCost
+                && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
+                && extensions.equals(other.extensions);
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
     @Override
     public int hashCode() {
-        return from.hashCode() * 524287 + to.hashCode() * 1327144003 
+        int hashCode = from.hashCode() * 524287  
                 + new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode() 
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
@@ -822,6 +818,12 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321;
+        if (batch) {
+            hashCode *= -1;
+            hashCode += to.hashCode() * 1327144003;
+            hashCode += numItineraries;
+        }
+        return hashCode;
     }
 
     /** Tear down any routing context (remove temporary edges from edge lists) */
