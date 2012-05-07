@@ -739,14 +739,50 @@ public class RoutingRequest implements Cloneable, Serializable {
         return this.rctx;
     }
 
-    /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
+    /* MISSING TERMS in equals
+    public List<NamedPlace> intermediatePlaces;
+    public boolean intermediatePlacesOrdered;
+    public long dateTime = new Date().getTime() / 1000;
+    public int numItineraries = 3;
+    public boolean showIntermediateStops = false;
+    public int elevatorBoardTime = 90;
+    public int elevatorBoardCost = 90;
+    public int elevatorHopTime = 20;
+    public int elevatorHopCost = 20;
+    public int bikeRentalPickupTime = 60;
+    public int bikeRentalPickupCost = 120;
+    public int bikeRentalDropoffTime = 30;
+    public int bikeRentalDropoffCost = 30;
+    public double waitAtBeginningFactor = 0.2;
+    public int useAnotherThanPreferredRoutesPenalty = 300;
+    public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
+    public HashSet<RouteSpec> unpreferredRoutes = new HashSet<RouteSpec>();
+    public int useUnpreferredRoutesPenalty = 300;
+    public int maxTransfers = 2;
+    public Map<Object, Object> extensions = new HashMap<Object, Object>();
+    public RoutingRequest walkingOptions;
+    public boolean reverseOptimizing = false;
+    public boolean batch = false;
+    private boolean useBikeRentalAvailabilityInformation = false;
+     */
+
+    /** 
+     * Equality does not mean that the fields of the two RoutingRequests are identical, but
+     * that they will produce the same SPT. This is particularly important when the batch
+     * field is set to 'true'. Does not consider the RoutingContext, to allow SPT caching. 
+     */
     @Override
     public boolean equals(Object o) {
         if (o instanceof RoutingRequest) {
             RoutingRequest other = (RoutingRequest) o;
-            return from.equals(other.from) && to.equals(other.to)
-                    && walkSpeed == other.walkSpeed && bikeSpeed == other.bikeSpeed 
-                    && carSpeed == other.carSpeed
+            if ( ! this.batch) {
+                if (other.batch) 
+                    return false; // this is a batch request, and the other is not
+                if ( ! to.equals(other.to))
+                    return false; // destination only affects SPT in non-batch requests
+            }
+            return from.equals(other.from) && walkSpeed == other.walkSpeed 
+                    && bikeSpeed == other.bikeSpeed && carSpeed == other.carSpeed
                     && maxWeight == other.maxWeight && worstTime == other.worstTime
                     && getModes().equals(other.getModes()) && isArriveBy() == other.isArriveBy()
                     && wheelchairAccessible == other.wheelchairAccessible
@@ -764,6 +800,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                     && triangleTimeFactor == other.triangleTimeFactor
                     && stairsReluctance == other.stairsReluctance;
         }
+        // objects are of different types, they are not equal
         return false;
     }
 
