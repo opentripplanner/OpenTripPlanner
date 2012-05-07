@@ -1,0 +1,18 @@
+body {
+	font-family: sans-serif;	
+	line-height: 17px;
+	font-size: 14px;
+	color: #06185c;
+}
+
+h1 {
+	font-size: 110%;
+}
+
+p {
+    font-size: 100%
+}
+
+p.footnote {
+    font-size: 75%
+}
