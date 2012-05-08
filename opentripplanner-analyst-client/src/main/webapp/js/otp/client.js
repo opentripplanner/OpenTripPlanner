@@ -42,18 +42,14 @@ var aerialLayer = new L.TileLayer(aerialURL,
 
 var flags = {
 	twoEndpoint: false,
-	// note times are in UTC
-    startTime: '2012-06-06T14:00:00Z',
-    endTime: '2012-06-06T16:00:00Z'
+    startTime: 'none',
+    endTime: 'none'
 };
 
 var params = {
     layers: 'traveltime',
     styles: 'mask',
-    time: flags.startTime,
     batch: true,
-    maxWalkDistance: '2500',
-	mode: 'WALK,TRANSIT' // SUBWAY for metrorail, TRAM for purple line
 };
 
 // convert a map of query parameters into a query string, 
@@ -107,7 +103,7 @@ var baseMaps = {
 };
 	        
 var overlayMaps = {
-    "Analyst WMS": analystLayer,
+    "Analyst Tiles": analystLayer,
     //"Analyst Tiles": analystTile
 };
 
@@ -124,8 +120,6 @@ map.setView(initLocation, 12);
 
 var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
 map.addControl(layersControl);
-
-refresh();
 
 // tools
 
@@ -243,7 +237,7 @@ var downloadTool = function () {
             '&format=' + dlParams.format + 
             '&srs=' + dlParams.srs +
             '&resolution=' + dlParams.resolution +
-            '&bbox=' + bbox 
+            '&bbox=' + bbox;
             // all of the from, to, time, &c. is taken care of by buildQuery.
         
         window.open(url);
@@ -252,3 +246,6 @@ var downloadTool = function () {
     // prevent form submission
     return false;
 };
+
+// read setup values from map setup tool on page load
+mapSetupTool();

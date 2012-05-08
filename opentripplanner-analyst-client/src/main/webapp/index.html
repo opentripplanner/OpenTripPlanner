@@ -26,13 +26,14 @@
 		<div class="tool">
 			<h2>Map Setup</h2>
 			<form action="#" onsubmit="return mapSetupTool()">
+				<!-- times are in agency timezone unless suffixed by Z  -->
 				<span>
 					<label for="setupOrigTime">Origin time*:</label>
-					<input type="text" class="isoDateField" id="setupOrigTime" />
+					<input type="text" class="isoDateField" id="setupOrigTime" value="2012-06-06T08:00:00" />
 				</span> 
 				<span>
 					<label for="setupDestTime">Destination time*:</label> 	
-					<input type="text" class="isoDateField" id="setupDestTime" />
+					<input type="text" class="isoDateField" id="setupDestTime" value="2012-06-06T10:00:00" />
 				</span>
 				<span>
 					<label for="setupMode">Mode:</label> 
@@ -49,7 +50,7 @@
 				</span>
 				<span>
 					<label for="setupMaxDistance">Maximum Walking Distance (m):</label> 
-					<input type="text" id="setupMaxDistance" class="numberField" /> 
+					<input type="text" id="setupMaxDistance" class="numberField" value="2000" /> 
 				</span>
 				<input type="submit" value="Set Up Map" class="toolSubmit" />
 				<p class="footnote">
