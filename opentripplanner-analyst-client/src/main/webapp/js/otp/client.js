@@ -29,9 +29,7 @@ var mapboxURL = "http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y
 var OSMURL    = "http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png";
 var aerialURL = "http://{s}.mqcdn.com/naip/{z}/{x}/{y}.png";
 
-var mapboxAttrib = "Data <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'>CC-BY-SA</a>" +
-    " by <a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a>, " +
-    "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
+var mapboxAttrib = "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
 var mapboxLayer = new L.TileLayer(mapboxURL, 
 		{subdomains: ["a","b","c","d"], maxZoom: 16, attribution: mapboxAttrib});
 
