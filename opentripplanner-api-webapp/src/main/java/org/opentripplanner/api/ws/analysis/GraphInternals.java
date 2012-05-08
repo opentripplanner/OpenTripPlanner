@@ -288,7 +288,7 @@ public class GraphInternals {
         return out;
     }
 
-    private Envelope getEnvelope(String lowerLeft, String upperRight) {
+    public static Envelope getEnvelope(String lowerLeft, String upperRight) {
         String[] lowerLeftParts = lowerLeft.split(",");
         String[] upperRightParts = upperRight.split(",");
 
