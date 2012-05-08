@@ -1,70 +1,86 @@
 <html>
 
 <head>
-	<title>OTP Analytics Client</title>
+	<meta charset="utf-8" />
+	<title>OTP Analyst Client</title>
 	<link rel="stylesheet" type="text/css" href="js/lib/leaflet/leaflet.css" />
-	<link rel="stylesheet" type="text/css" href="client.css" />
 	<script src="js/lib/leaflet/leaflet.js"></script>
 	<script src="js/lib/proj4js-1.0.3/lib/proj4js-compressed.js"></script>
+	<link rel="stylesheet" type="text/css" href="client.css" />
 </head>
 
 <body>
-	<div id="map" style="width: 75%; float: right; height: 100%; background: #eee;"> </div>
-	<div style="width: 25%; float: left; height: 100%; background: #ccc;">
-		<div class="tool" style="font-family: sans-serif;">
-			<form>
-				<div style="background: #888">
-					<input type="button" value="Add Purple Line" onclick="purpleOn()" />
-					<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
-				</div>
-				<h1>Layer Style</h1>
-				<div>
-					<input type="button" value="Color30" onclick="color30()" />
-					<input type="button" value="Gray" onclick="gray()" />
-					<input type="button" value="Difference" onclick="difference()" /> 
-					<input type="button" value="H&auml;gerstrand" onclick="hagerstrand()" />
-				</div>
-			</form>
+	<div id="toolbox">
+		<h1>OpenTripPlanner Analyst</h1>
+		<input type="button" value="Add Purple Line" onclick="purpleOn()" />
+		<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
+		<div class="tool">
+			<h2>Layer Style</h2>
+			<span>
+				<input type="button" value="Color30" onclick="color30()" />
+				<input type="button" value="Gray" onclick="gray()" />
+				<input type="button" value="Difference" onclick="difference()" /> 
+				<input type="button" value="H&auml;gerstrand" onclick="hagerstrand()" />
+			</span>
 		</div>
-		<div class="tool" style="font-family: sans-serif;">
-			<h1>Map Setup</h1>
+		<div class="tool">
+			<h2>Map Setup</h2>
 			<form action="#" onsubmit="return mapSetupTool()">
-				<label for="setupOrigTime">Origin time*:</label> <input type="text" id="setupOrigTime" /> <br> 
-				<label for="setupDestTime">Destination time*:</label> <input type="text" id="setupDestTime" /> <br>
-				<label for="setupMode">Mode:</label> 
-				<select id="setupMode">
-					<option value="TRANSIT,WALK">Transit</option>
-					<option value="BUSISH,WALK">Bus only</option>
-					<option value="TRAINISH,WALK">Train only</option>
-					<option value="WALK">Walk only</option>
-					<option value="BICYCLE">Bicycle</option>
-					<option value="WALK,BICYCLE">Rented Bicycle</option>
-					<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
-					<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
-				</select> <br>
-				<label for="setupMaxDistance">Maximum Walking Distance (m):</label> 
-				<input type="text" id="setupMaxDistance" style="width: 4em;"/> 
-				<input type="submit" value="Set Up Map" />
-			</form>
-			<h4>Download Image Tool</h4>
-			<form action="#" onsubmit="return downloadTool();">
-				<label for="downloadFormat">Image Format:</label> 
-				<select id="downloadFormat">
-					<option value="image/geotiff">GeoTIFF</option>
-					<option value="image/png">PNG</option>
-					<option value="image/jpeg">JPEG</option>
-				</select> <br>
-				<label for="downloadProj">Projection:</label> 
-				<input type="text" id="downloadProj" value="EPSG:4326" /> <br> 
-				<label for="downloadResolution">Resolution (SRS units):</label> 
-				<input type="text" id="downloadResolution" /> <br>
-				<input type="submit" />
+				<span>
+					<label for="setupOrigTime">Origin time*:</label>
+					<input type="text" class="isoDateField" id="setupOrigTime" />
+				</span> 
+				<span>
+					<label for="setupDestTime">Destination time*:</label> 	
+					<input type="text" class="isoDateField" id="setupDestTime" />
+				</span>
+				<span>
+					<label for="setupMode">Mode:</label> 
+					<select id="setupMode">
+						<option value="TRANSIT,WALK">Transit</option>
+						<option value="BUSISH,WALK">Bus only</option>
+						<option value="TRAINISH,WALK">Train only</option>
+						<option value="WALK">Walk only</option>
+						<option value="BICYCLE">Bicycle</option>
+						<option value="WALK,BICYCLE">Rented Bicycle</option>
+						<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
+						<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
+					</select>
+				</span>
+				<span>
+					<label for="setupMaxDistance">Maximum Walking Distance (m):</label> 
+					<input type="text" id="setupMaxDistance" class="numberField" /> 
+				</span>
+				<input type="submit" value="Set Up Map" class="toolSubmit" />
+				<p class="footnote">
+					* Times must be expressed in ISO8601 combined date/time format: YYYY-MM-DDTHH:MM:SS
+				</p>
 			</form>
 		</div>
-		<p class="footnote">
-			*Times must be expressed in ISO8601 combined date/time format (YYYY-MM-DDTHH:MM:SS)
-		</p>
+		<div class="tool">
+			<h2>Download Image Tool</h2>
+			<form action="#" onsubmit="return downloadTool();">
+				<span>
+					<label for="downloadFormat">Image Format:</label> 
+					<select id="downloadFormat">
+						<option value="image/geotiff">GeoTIFF</option>
+						<option value="image/png">PNG</option>
+						<option value="image/jpeg">JPEG</option>
+					</select>
+				</span>
+				<span>
+					<label for="downloadProj">Projection:</label> 
+					<input type="text" id="downloadProj" value="EPSG:4326" /> 
+				</span>
+				<span>
+					<label for="downloadResolution">Resolution (SRS units):</label> 
+					<input type="text" id="downloadResolution" class="numberField" />
+				</span>
+				<input type="submit" value="Download Image" class="toolSubmit" />
+			</form>
+		</div>
 	</div>
+	<div id="map"> </div>
 	<script type="text/javascript" src="js/otp/client.js"></script>
 </body>
 
