@@ -217,12 +217,13 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long   startTime = firstRide.startTime;
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
-        String agencyId  = firstRide.route.getAgencyId();                
+        // stops don't really have an agency id, they have the per-feed default id
+        String feedId = firstRide.firstStop.getId().getAgencyId();  
         long lastRideStartTime = firstRide.startTime;
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
-            if ( ! ride.route.getAgencyId().equals(agencyId)) {
-                _log.debug("skipped multi-agency ride sequence {}", rides);
+            if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
+                _log.debug("skipped multi-feed ride sequence {}", rides);
                 return Float.POSITIVE_INFINITY;
             }
             lastRideStartTime = ride.startTime;
@@ -239,7 +240,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long journeyTime = lastRideEndTime - startTime;
         // find the best fare that matches this set of rides
         for (AgencyAndId fareId : fareAttributes.keySet()) {
-            if ( ! fareId.getAgencyId().equals(agencyId))
+        	// fares also don't really have an agency id, they will have the per-feed default id
+            if ( ! fareId.getAgencyId().equals(feedId))
                 continue;
             FareRuleSet ruleSet = fareRules.get(fareId);
             if (ruleSet == null || ruleSet.matches(startZone, endZone, zones, routes)) {
