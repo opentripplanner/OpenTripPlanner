@@ -4,10 +4,8 @@ body {
 	font-size: 15px;
 	color: #06185c;
 	margin: 0px;
-	/* prevent margins from causing line wrap */
-	box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
+	/* do not add scroll bars unless overridden on sub-elements */
+	overflow: hidden;
 }
 
 div#map {
@@ -15,7 +13,6 @@ div#map {
 	background: #eee;
 	margin: 0px;
 	padding: 0px;
-	overflow: hidden;
 }
 
 div#toolbox {
@@ -24,14 +21,14 @@ div#toolbox {
 	background: #ccc;
 	margin: 0px;
 	padding: 0px;
+	/* add vertical scroll bar if content does not fit */
 	overflow-x: hidden;
 	overflow-y: auto;
 }
 
 h1 {
 	font-size: 125%;
-	font-weight: bolder;
-	font-style: italic;
+	font-weight: bold;
 	background: #888;
 	padding: 0.4em;
 	margin: 0px;
@@ -65,6 +62,7 @@ div.tool {
 }
 
 div.tool span {
+	/* keep rows of buttons from wrapping when vertical scroll bar appears */
 	white-space: nowrap;
 }
 
@@ -74,6 +72,7 @@ div.tool form {
 }
 
 div.tool form span {
+	/* group labels and their buttons together on a single line */
 	width: 100%;
 	display: block;
 	overflow: hidden;
