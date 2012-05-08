@@ -34,9 +34,9 @@ public class GraphMetadata {
 
     private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
 
-//    public GraphMetadata() {
-//
-//    }
+    public GraphMetadata() {
+    	// 0-arg constructor avoids com.sun.xml.bind.v2.runtime.IllegalAnnotationsException
+    }
 
     public GraphMetadata(Graph graph) {
         /* generate extents */

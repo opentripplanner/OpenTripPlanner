@@ -52,7 +52,6 @@ public class Metadata {
     public GraphMetadata getMetadata(
             @DefaultValue("") @QueryParam("routerId") String routerId)
             throws JSONException {
-        //return new GraphMetadata(pathServiceFactory.getPathService(routerId).getGraphService());
         return new GraphMetadata(graphService.getGraph(routerId));
     }
 }
