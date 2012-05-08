@@ -88,6 +88,73 @@ var refresh = function () {
     map.addLayer(analystLayer);
 };
 
+// create geoJSON layers for DC Purple Line
+
+var purpleLineCoords = [
+ [-77.094111, 38.984299],
+ [-77.077117, 38.994373],
+ [-77.053857, 39.000076],
+ [-77.039909, 38.999709],
+ [-77.031970, 38.994172],
+ [-77.024503, 38.995340],
+ [-77.017379, 38.999209],
+ [-77.009525, 38.999776],
+ [-77.003560, 38.998141],
+ [-76.995492, 38.999509],
+ [-76.987596, 38.989036],
+ [-76.978927, 38.983665],
+ [-76.955194, 38.985466], 
+ [-76.944122, 38.987535],
+ [-76.936870, 38.985567],
+ [-76.927128, 38.978094],
+ [-76.925197, 38.968785],
+ [-76.920004, 38.960543],
+ [-76.900392, 38.963246],
+ [-76.885371, 38.951733],
+ [-76.871681, 38.947928]];
+
+var purpleLineStopsFeature = { 
+	"type": "Feature",
+	"geometry": {
+	    "type": "MultiPoint",
+	    "coordinates": purpleLineCoords,
+	    "properties": {
+	        "name": "Purple Line stops"
+	    }	
+	}
+};
+var geojsonMarkerOptions = {
+		radius: 4,
+		fillColor: "#000",
+		color: "#000",
+		weight: 0,
+		opacity: 0,
+		fillOpacity: 0.8
+};
+var purpleLineStopsLayer = new L.GeoJSON(purpleLineStopsFeature, {
+	pointToLayer: function (latlng) { 
+		return new L.CircleMarker(latlng, geojsonMarkerOptions);
+	}});
+map.addLayer(purpleLineStopsLayer);
+
+var purpleLineAlignmentFeature = { 
+	"type": "Feature",
+	"geometry": {
+	    "type": "LineString",
+	    "coordinates": purpleLineCoords,
+	    "properties": {
+	        "name": "Purple Line alignment",
+	        "style": {
+	            "color": "#004070",
+	            "weight": 4,
+	            "opacity": 0.8
+	        }
+	    }	
+	}
+};
+var purpleLineAlignmentLayer = new L.GeoJSON(purpleLineAlignmentFeature);
+map.addLayer(purpleLineAlignmentLayer);
+
 var baseMaps = {
 	"MapBox": mapboxLayer,
     "OSM": osmLayer,
@@ -96,6 +163,8 @@ var baseMaps = {
 	        
 var overlayMaps = {
     "Analyst Tiles": analystLayer,
+    "Stops": purpleLineStopsLayer,
+	"Alignment": purpleLineAlignmentLayer
 };
 
 // attempt to get map metadata (bounds) from server
