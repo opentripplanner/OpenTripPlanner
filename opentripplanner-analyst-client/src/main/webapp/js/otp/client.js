@@ -96,7 +96,6 @@ var baseMaps = {
 	        
 var overlayMaps = {
     "Analyst Tiles": analystLayer,
-    //"Analyst Tiles": analystTile
 };
 
 // attempt to get map metadata (bounds) from server
@@ -133,8 +132,8 @@ origMarker.on('dragend', refresh);
 destMarker.on('dragend', refresh);
 
 map.addLayer(mapboxLayer);
-map.addLayer(analystLayer);
 map.addLayer(origMarker);
+// do not add analyst layer yet -- it will be added in refresh() once params are pulled in
 
 var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
 map.addControl(layersControl);
