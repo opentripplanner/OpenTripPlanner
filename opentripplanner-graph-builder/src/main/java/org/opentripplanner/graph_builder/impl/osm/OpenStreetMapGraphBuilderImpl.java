@@ -584,6 +584,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 for (Ring ring : area.outermostRings) {
                     List<OSMNode> nodes = new ArrayList<OSMNode>();
+                    vertices.clear();
                     for (OSMNode node : ring.nodes) {
                         if (nodes.contains(node)) {
                             // hopefully, this only happens in order to

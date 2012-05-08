@@ -12,14 +12,6 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-var portland      = new L.LatLng(45.5191, -122.6745);
-var ottawa        = new L.LatLng(45.4131, -75.63806);
-var sanfrancisco  = new L.LatLng(37.7805, -122.419);
-var dc            = new L.LatLng(38.8951, -77.03666);
-var new_carrolton = new L.LatLng(38.9538, -76.8851);
-
-var initLocation = new_carrolton;
-
 var map = new L.Map('map', {
 	minZoom : 10,
 	maxZoom : 16
@@ -29,9 +21,7 @@ var mapboxURL = "http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y
 var OSMURL    = "http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png";
 var aerialURL = "http://{s}.mqcdn.com/naip/{z}/{x}/{y}.png";
 
-var mapboxAttrib = "Data <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'>CC-BY-SA</a>" +
-    " by <a href='http://openstreetmap.org/' target='_blank'>OpenStreetMap</a>, " +
-    "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
+var mapboxAttrib = "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
 var mapboxLayer = new L.TileLayer(mapboxURL, 
 		{subdomains: ["a","b","c","d"], maxZoom: 16, attribution: mapboxAttrib});
 
@@ -44,18 +34,14 @@ var aerialLayer = new L.TileLayer(aerialURL,
 
 var flags = {
 	twoEndpoint: false,
-	// note times are in UTC
-    startTime: '2012-06-06T14:00:00Z',
-    endTime: '2012-06-06T16:00:00Z'
+    startTime: 'none',
+    endTime: 'none'
 };
 
 var params = {
     layers: 'traveltime',
     styles: 'mask',
-    time: flags.startTime,
     batch: true,
-    maxWalkDistance: '2500',
-	mode: 'WALK,TRANSIT' // SUBWAY for metrorail, TRAM for purple line
 };
 
 // convert a map of query parameters into a query string, 
@@ -109,10 +95,36 @@ var baseMaps = {
 };
 	        
 var overlayMaps = {
-    "Analyst WMS": analystLayer,
-    //"Analyst Tiles": analystTile
+    "Analyst Tiles": analystLayer,
 };
 
+// attempt to get map metadata (bounds) from server
+var request = new XMLHttpRequest();
+request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
+request.setRequestHeader("Accept", "application/xml");
+request.send(null);
+console.log(request.responseText);
+console.log(request.status);
+console.log(request.responseXML);
+
+var initLocation;
+if (request.status == 200 && request.responseXML != null) {
+	var x = request.responseXML;
+	var minLat = parseFloat(x.getElementsByTagName('minLatitude')[0].textContent);
+	var maxLat = parseFloat(x.getElementsByTagName('maxLatitude')[0].textContent);
+	var minLon = parseFloat(x.getElementsByTagName('minLongitude')[0].textContent);
+	var maxLon = parseFloat(x.getElementsByTagName('maxLongitude')[0].textContent);
+	var lon = (minLon + maxLon) / 2;
+	var lat = (minLat + maxLat) / 2;
+	initLocation = new L.LatLng(lat, lon);
+} else {
+	initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
+}
+map.setView(initLocation, 12);
+
+// uncomment to override initial location for DC Purple Line demo
+//var new_carrolton = new L.LatLng(38.9538, -76.8851);
+//var origMarker = new L.Marker(new_carrolton, {draggable: true});
 var origMarker = new L.Marker(initLocation, {draggable: true});
 var destMarker = new L.Marker(initLocation, {draggable: true});
 //marker.bindPopup("I am marker.");
@@ -120,14 +132,11 @@ origMarker.on('dragend', refresh);
 destMarker.on('dragend', refresh);
 
 map.addLayer(mapboxLayer);
-map.addLayer(analystLayer);
 map.addLayer(origMarker);
-map.setView(initLocation, 12);
+// do not add analyst layer yet -- it will be added in refresh() once params are pulled in
 
 var layersControl = new L.Control.Layers(baseMaps, overlayMaps);
 map.addControl(layersControl);
-
-refresh();
 
 // tools
 
@@ -245,7 +254,7 @@ var downloadTool = function () {
             '&format=' + dlParams.format + 
             '&srs=' + dlParams.srs +
             '&resolution=' + dlParams.resolution +
-            '&bbox=' + bbox 
+            '&bbox=' + bbox;
             // all of the from, to, time, &c. is taken care of by buildQuery.
         
         window.open(url);
@@ -254,3 +263,6 @@ var downloadTool = function () {
     // prevent form submission
     return false;
 };
+
+// read setup values from map setup tool on page load
+mapSetupTool();

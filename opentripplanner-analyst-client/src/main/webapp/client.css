@@ -1,12 +1,42 @@
 body {
 	font-family: sans-serif;	
-	line-height: 17px;
-	font-size: 14px;
+	line-height: 16px;
+	font-size: 15px;
 	color: #06185c;
+	margin: 0px;
+	/* do not add scroll bars unless overridden on sub-elements */
+	overflow: hidden;
+}
+
+div#map {
+	height: 100%; 
+	background: #eee;
+	margin: 0px;
+	padding: 0px;
+}
+
+div#toolbox {
+	height: 100%; width: 320px;
+	float: left;
+	background: #ccc;
+	margin: 0px;
+	padding: 0px;
+	/* add vertical scroll bar if content does not fit */
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 h1 {
-	font-size: 110%;
+	font-size: 125%;
+	font-weight: bold;
+	background: #888;
+	padding: 0.4em;
+	margin: 0px;
+	margin-bottom: 0.5em;
+}
+
+h2 {
+	font-size: 100%;
 }
 
 p {
@@ -14,5 +44,65 @@ p {
 }
 
 p.footnote {
-    font-size: 75%
+    font-size: 75%;    
+}
+
+input {
+	margin: 2px;
+}
+
+div#toolbox {
+	margin: 0px;
+	padding: 0em;
+}
+
+div.tool {
+	margin: 0px;
+	padding: 0.4em 0.4em 1em 0.4em;
+}
+
+div.tool span {
+	/* keep rows of buttons from wrapping when vertical scroll bar appears */
+	white-space: nowrap;
+}
+
+div.tool form {
+	margin: 0px;
+	padding: 0px;
+}
+
+div.tool form span {
+	/* group labels and their buttons together on a single line */
+	width: 100%;
+	display: block;
+	overflow: hidden;
+	margin: 0px;
+	padding: 0px;
+}
+
+div.tool form span label {
+	display: inline-block;
+	float: left;
+}
+
+div.tool form span input {
+	display: inline-block;
+	float: right;
+}
+
+div.tool form span select {
+	display: inline-block;
+	float: right;
+}
+
+.isoDateField {
+	width:auto;
+}
+
+.numberField {
+	width: 4em;
+}
+
+.toolSubmit {
+	width: 100%;
 }
