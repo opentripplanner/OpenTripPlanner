@@ -10,7 +10,6 @@
 
     <import resource="classpath:org/opentripplanner/application-context.xml" />
 
-    <!-- warning: changing the order of these context-scan elements will cause cryptic failures -->
     <context:component-scan base-package="org.opentripplanner.analyst"/>
     <context:component-scan base-package="org.opentripplanner.api"/>
 
@@ -37,6 +36,6 @@
  
   <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
   <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-  <bean class="org.opentripplanner.jsonp.JsonpCallbackFilter" id="jsonpCallbackFilter" />
+  <bean id="jsonpCallbackFilter" class="org.opentripplanner.jsonp.JsonpCallbackFilter" />
 
 </beans>

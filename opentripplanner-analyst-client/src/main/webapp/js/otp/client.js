@@ -12,9 +12,15 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+var INIT_LOCATION = new L.LatLng(38.9538, -76.8851); // new carrolton
+var AUTO_CENTER_MAP = false;
+var ROUTER_ID = "";
+
 var map = new L.Map('map', {
 	minZoom : 10,
-	maxZoom : 16
+	maxZoom : 16,
+	// what we really need is a fade transition between old and new tiles without removing the old ones
+	//fadeAnimation: false
 });
 
 var mapboxURL = "http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y}.png";
@@ -54,6 +60,9 @@ var buildQuery = function(params) {
 		if ( ! (vals instanceof Array)) vals = new Array(vals);
 		for (i in vals) { 
 			val = vals[i]; // js iterates over indices not values!
+			// skip params that are empty or stated to be the same as previous
+			if (val == '' || val == 'same')
+				continue;
 			param = [encodeURIComponent(key), encodeURIComponent(val)].join('=');
 			ret.push(param);
 		}
@@ -67,6 +76,7 @@ var analystLayer = new L.TileLayer(analystUrl + buildQuery(params), {attribution
 var refresh = function () {
 	var o = origMarker.getLatLng();
 	var d = destMarker.getLatLng();
+	console.log(flags);
     if (flags.twoEndpoint) {
     	params.fromPlace = [o.lat + "," + o.lng, d.lat + "," + d.lng];
     	// toPlace is not currently used, but must be provided to avoid missing vertex error
@@ -79,14 +89,81 @@ var refresh = function () {
     	params.toPlace = d.lat + "," + d.lng;
     	map.removeLayer(destMarker);
     }
-    console.log(flags);
     console.log(params);
     console.log(analystUrl + buildQuery(params));
+    // can we trigger refresh instead of removing?
 	if (analystLayer != null)
 		map.removeLayer(analystLayer);
 	analystLayer._url = analystUrl + buildQuery(params);
     map.addLayer(analystLayer);
 };
+
+// create geoJSON layers for DC Purple Line
+
+var purpleLineCoords = [
+ [-77.094111, 38.984299],
+ [-77.077117, 38.994373],
+ [-77.053857, 39.000076],
+ [-77.039909, 38.999709],
+ [-77.031970, 38.994172],
+ [-77.024503, 38.995340],
+ [-77.017379, 38.999209],
+ [-77.009525, 38.999776],
+ [-77.003560, 38.998141],
+ [-76.995492, 38.999509],
+ [-76.987596, 38.989036],
+ [-76.978927, 38.983665],
+ [-76.955194, 38.985466], 
+ [-76.944122, 38.987535],
+ [-76.936870, 38.985567],
+ [-76.927128, 38.978094],
+ [-76.925197, 38.968785],
+ [-76.920004, 38.960543],
+ [-76.900392, 38.963246],
+ [-76.885371, 38.951733],
+ [-76.871681, 38.947928]];
+
+var purpleLineStopsFeature = { 
+	"type": "Feature",
+	"geometry": {
+	    "type": "MultiPoint",
+	    "coordinates": purpleLineCoords,
+	    "properties": {
+	        "name": "Purple Line stops"
+	    }	
+	}
+};
+var geojsonMarkerOptions = {
+		radius: 4,
+		fillColor: "#000",
+		color: "#000",
+		weight: 0,
+		opacity: 0,
+		fillOpacity: 0.8
+};
+var purpleLineStopsLayer = new L.GeoJSON(purpleLineStopsFeature, {
+	pointToLayer: function (latlng) { 
+		return new L.CircleMarker(latlng, geojsonMarkerOptions);
+	}});
+map.addLayer(purpleLineStopsLayer);
+
+var purpleLineAlignmentFeature = { 
+	"type": "Feature",
+	"geometry": {
+	    "type": "LineString",
+	    "coordinates": purpleLineCoords,
+	    "properties": {
+	        "name": "Purple Line alignment",
+	        "style": {
+	            "color": "#004070",
+	            "weight": 4,
+	            "opacity": 0.8
+	        }
+	    }	
+	}
+};
+var purpleLineAlignmentLayer = new L.GeoJSON(purpleLineAlignmentFeature);
+map.addLayer(purpleLineAlignmentLayer);
 
 var baseMaps = {
 	"MapBox": mapboxLayer,
@@ -96,40 +173,45 @@ var baseMaps = {
 	        
 var overlayMaps = {
     "Analyst Tiles": analystLayer,
+    "Stops": purpleLineStopsLayer,
+	"Alignment": purpleLineAlignmentLayer
 };
 
-// attempt to get map metadata (bounds) from server
-var request = new XMLHttpRequest();
-request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
-request.setRequestHeader("Accept", "application/xml");
-request.send(null);
-console.log(request.responseText);
-console.log(request.status);
-console.log(request.responseXML);
-
-var initLocation;
-if (request.status == 200 && request.responseXML != null) {
-	var x = request.responseXML;
-	var minLat = parseFloat(x.getElementsByTagName('minLatitude')[0].textContent);
-	var maxLat = parseFloat(x.getElementsByTagName('maxLatitude')[0].textContent);
-	var minLon = parseFloat(x.getElementsByTagName('minLongitude')[0].textContent);
-	var maxLon = parseFloat(x.getElementsByTagName('maxLongitude')[0].textContent);
-	var lon = (minLon + maxLon) / 2;
-	var lat = (minLat + maxLat) / 2;
-	initLocation = new L.LatLng(lat, lon);
-} else {
-	initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
+var initLocation = INIT_LOCATION;
+if (AUTO_CENTER_MAP) {
+	// attempt to get map metadata (bounds) from server
+	var request = new XMLHttpRequest();
+	request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
+	request.setRequestHeader("Accept", "application/xml");
+	request.send(null);
+	if (request.status == 200 && request.responseXML != null) {
+		var x = request.responseXML;
+		var minLat = parseFloat(x.getElementsByTagName('minLatitude')[0].textContent);
+		var maxLat = parseFloat(x.getElementsByTagName('maxLatitude')[0].textContent);
+		var minLon = parseFloat(x.getElementsByTagName('minLongitude')[0].textContent);
+		var maxLon = parseFloat(x.getElementsByTagName('maxLongitude')[0].textContent);
+		var lon = (minLon + maxLon) / 2;
+		var lat = (minLat + maxLat) / 2;
+		initLocation = new L.LatLng(lat, lon);
+	} else {
+		initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
+	}
 }
 map.setView(initLocation, 12);
-
-// uncomment to override initial location for DC Purple Line demo
-//var new_carrolton = new L.LatLng(38.9538, -76.8851);
-//var origMarker = new L.Marker(new_carrolton, {draggable: true});
-var origMarker = new L.Marker(initLocation, {draggable: true});
-var destMarker = new L.Marker(initLocation, {draggable: true});
-//marker.bindPopup("I am marker.");
+var initLocation2 = new L.LatLng(initLocation.lat + 0.05, initLocation.lng + 0.05);
+console.log(initLocation, initLocation2);
+var greenMarkerIcon = new L.Icon({
+    iconUrl: 'js/lib/leaflet/images/marker-green.png',
+});
+var redMarkerIcon = new L.Icon({
+    iconUrl: 'js/lib/leaflet/images/marker-red.png',
+});
+var origMarker = new L.Marker(initLocation,  {draggable: true, icon: greenMarkerIcon });
+var destMarker = new L.Marker(initLocation2, {draggable: true, icon: redMarkerIcon });
 origMarker.on('dragend', refresh);
+origMarker.bindPopup("I am the origin.");
 destMarker.on('dragend', refresh);
+destMarker.bindPopup("I am the destination.");
 
 map.addLayer(mapboxLayer);
 map.addLayer(origMarker);
@@ -185,11 +267,11 @@ var hagerstrand = function () {
 };
 
 var mapSetupTool = function () {
-    var o = document.getElementById('setupOrigTime').value;
+    var o = document.getElementById('setupTime').value;
     if (o != '')
         flags.startTime = o;
 
-    var d = document.getElementById('setupDestTime').value;
+    var d = document.getElementById('setupTime2').value;
     if (d != '')
         flags.endTime = d;
 

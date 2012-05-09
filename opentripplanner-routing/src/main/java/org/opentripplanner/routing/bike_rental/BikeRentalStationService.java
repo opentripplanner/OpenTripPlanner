@@ -10,18 +10,25 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-package org.opentripplanner.api.model.transit;
 
-import java.util.ArrayList;
-import java.util.List;
+package org.opentripplanner.routing.bike_rental;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
-@XmlRootElement(name="StopList")
-public class StopList {
-    @XmlElements(value = { @XmlElement(name="stop") })
-    public List<Stop> stops = new ArrayList<Stop>();
+public class BikeRentalStationService {
+    private Set<BikeRentalStation> stations = new HashSet<BikeRentalStation>();
 
+    public Collection<BikeRentalStation> getStations() {
+        return stations;
+    }
+    
+    public void addStation(BikeRentalStation station) {
+        stations.add(station);
+    }
+    
+    public void removeStation(BikeRentalStation station) {
+        stations.remove(station);
+    }
 }

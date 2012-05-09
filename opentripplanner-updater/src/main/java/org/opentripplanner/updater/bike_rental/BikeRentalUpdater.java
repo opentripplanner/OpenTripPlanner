@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
@@ -9,6 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
@@ -19,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class BikeRentalUpdater implements Runnable {
 
-    Map<String, BikeRentalStationVertex> verticesByStation = new HashMap<String, BikeRentalStationVertex>();
+    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
     private BikeRentalDataSource source;
 
@@ -27,6 +42,8 @@ public class BikeRentalUpdater implements Runnable {
 
     private NetworkLinkerLibrary networkLinkerLibrary;
 
+    private BikeRentalStationService service;
+    
     @Autowired
     public void setBikeRentalDataSource(BikeRentalDataSource source) {
         this.source = source;
@@ -36,23 +53,34 @@ public class BikeRentalUpdater implements Runnable {
     public void setGraphService(GraphService graphService) {
         graph = graphService.getGraph();
         networkLinkerLibrary = new NetworkLinkerLibrary(graph, Collections.<Class<?>, Object> emptyMap());
+        service = graph.getService(BikeRentalStationService.class);
+        if (service == null) {
+            service = new BikeRentalStationService();
+            graph.putService(BikeRentalStationService.class, service);
+        }
     }
 
+    public List<BikeRentalStation> getStations() {
+        return source.getStations();
+    }
+    
     @Override
     public void run() {
         if (!source.update())
             return;
+        
         List<BikeRentalStation> stations = source.getStations();
-        Set<String> stationIds = new HashSet<String>();
+        Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
+            service.addStation(station);
             String id = station.id;
-            stationIds.add(id);
+            stationSet.add(station);
             BikeRentalStationVertex vertex = verticesByStation.get(id);
             if (vertex == null) {
                 vertex = new BikeRentalStationVertex(graph, "bike rental station " + id, station.x,
                         station.y, station.name, station.bikesAvailable, station.spacesAvailable);
                 networkLinkerLibrary.connectVertexToStreets(vertex);
-                verticesByStation.put(id, vertex);
+                verticesByStation.put(station, vertex);
                 new RentABikeOnEdge(vertex, vertex);
                 new RentABikeOffEdge(vertex, vertex);
             } else {
@@ -61,12 +89,14 @@ public class BikeRentalUpdater implements Runnable {
             }
         }
         List<BikeRentalStationVertex> toRemove = new ArrayList<BikeRentalStationVertex>();
-        for (Entry<String, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
-            if (stationIds.contains(entry.getKey()))
+        for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
+            BikeRentalStation station = entry.getKey();
+            if (stationSet.contains(station))
                 continue;
             BikeRentalStationVertex vertex = entry.getValue();
             graph.removeVertexAndEdges(vertex);
             toRemove.add(vertex);
+            service.removeStation(station);
             //TODO: need to unsplit any streets that were split
         }
         verticesByStation.keySet().removeAll(toRemove);

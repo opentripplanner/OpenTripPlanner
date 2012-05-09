@@ -80,6 +80,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle>();
 
+    private boolean generateFeedIds = false;
+
     public List<String> provides() {
         return Arrays.asList("transit");
     }
@@ -115,12 +117,17 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         MultiCalendarServiceImpl service = new MultiCalendarServiceImpl();
 
         try {
+            int bundleIndex = 0;
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
-
+                bundleIndex += 1;
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
                 hf.setFareServiceFactory(_fareServiceFactory);
+
+                if (generateFeedIds && gtfsBundle.getDefaultAgencyId() == null) {
+                    gtfsBundle.setDefaultAgencyId("FEED#" + bundleIndex);
+                }
 
                 loadBundle(gtfsBundle, graph, dao);
 
@@ -155,13 +162,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     }
 
-
     /****
      * Private Methods
      ****/
 
-
-    private void loadBundle(GtfsBundle gtfsBundle, Graph graph, GtfsMutableRelationalDao dao) throws IOException {
+    private void loadBundle(GtfsBundle gtfsBundle, Graph graph, GtfsMutableRelationalDao dao)
+            throws IOException {
 
         StoreImpl store = new StoreImpl(dao);
         store.open();
@@ -170,7 +176,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         GtfsReader reader = new GtfsReader();
         reader.setInputSource(gtfsBundle.getCsvInputSource());
         reader.setEntityStore(store);
- 
+
         reader.setInternStrings(true);
 
         if (gtfsBundle.getDefaultAgencyId() != null)
@@ -341,5 +347,9 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         for (GtfsBundle bundle : _gtfsBundles.getBundles()) {
             bundle.checkInputs();
         }
+    }
+
+    public void setGenerateFeedIds(boolean generateFeedIds) {
+        this.generateFeedIds = generateFeedIds;
     }
 }

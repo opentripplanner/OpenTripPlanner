@@ -78,7 +78,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 			return null;
 		State ret = null;
 		for (State s : states) {
-			if (ret == null || s.betterThan(ret)) {
+			if ((ret == null || s.betterThan(ret)) && s.isFinal()) {
 				ret = s;
 			}
 		}

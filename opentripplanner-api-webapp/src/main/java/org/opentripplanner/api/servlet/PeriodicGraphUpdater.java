@@ -13,7 +13,7 @@
 
 package org.opentripplanner.api.servlet;
 
-import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -26,7 +26,7 @@ public class PeriodicGraphUpdater {
 
     private Thread thread;
 
-    private List<Runnable> updaters = Collections.emptyList();
+    private List<Runnable> updaters = new LinkedList<Runnable>();
 
     public void start() {
         updater = new UpdateTask();
