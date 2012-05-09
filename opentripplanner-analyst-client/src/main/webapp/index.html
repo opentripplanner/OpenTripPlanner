@@ -27,7 +27,7 @@
 				<input type="button" value="H&auml;gerstrand" onclick="hagerstrand()" />
 			</span>
 		</form>
-		<form action="#" onsubmit="return mapSetupTool()">
+		<form>
 			<h2>Origin Setup</h2>
 			<span>
 				<!-- times are in agency timezone unless suffixed by Z  -->
@@ -93,34 +93,32 @@
 			</span>
 		</form>
 		<form>
-			<input type="submit" value="Set Up Map" class="fullWidth" />
+			<input type="button" value="Refresh Map" onclick="mapSetupTool()" class="fullWidth" />
 			<p class="footnote">
 				* Times must be expressed in ISO8601 combined date/time format: YYYY-MM-DDTHH:MM:SS
 			</p>
 		</form>	
 		<!-- download tool is commented out to avoid over-filling the cache in public use
-		<div class="tool">
+		<form>
 			<h2>Download Image Tool</h2>
-			<form action="#" onsubmit="return downloadTool();">
-				<span>
-					<label for="downloadFormat">Image Format:</label> 
-					<select id="downloadFormat">
-						<option value="image/geotiff">GeoTIFF</option>
-						<option value="image/png">PNG</option>
-						<option value="image/jpeg">JPEG</option>
-					</select>
-				</span>
-				<span>
-					<label for="downloadProj">Projection:</label> 
-					<input type="text" id="downloadProj" value="EPSG:4326" /> 
-				</span>
-				<span>
-					<label for="downloadResolution">Resolution (SRS units):</label> 
-					<input type="text" id="downloadResolution" class="numberField" />
-				</span>
-				<input type="submit" value="Download Image" class="toolSubmit" />
-			</form>
-		</div>
+			<span>
+				<label for="downloadFormat">Image Format:</label> 
+				<select id="downloadFormat">
+					<option value="image/geotiff">GeoTIFF</option>
+					<option value="image/png">PNG</option>
+					<option value="image/jpeg">JPEG</option>
+				</select>
+			</span>
+			<span>
+				<label for="downloadProj">Projection:</label> 
+				<input type="text" id="downloadProj" value="EPSG:4326" /> 
+			</span>
+			<span>
+				<label for="downloadResolution">Resolution (SRS units):</label> 
+				<input type="text" id="downloadResolution" class="numberField" />
+			</span>
+			<input type="button" value="Download Image" onclick="downloadTool()" class="fullWidth" />
+		</form>
 		 -->
 	</div>
 	<div id="map"> </div>
