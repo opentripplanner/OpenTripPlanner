@@ -20,6 +20,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.jets3t.service.io.TempFile;
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -69,7 +70,7 @@ public class ReachTest extends TestCase {
         List<RoutingRequest> optionlist = Arrays.asList(options);
 //        ContractionHierarchySet hierarchies = new ContractionHierarchySet(graph, optionlist);
 //        graph.setHierarchies(hierarchies);
-        graph.save(new File("/tmp/ReachTestGraph.obj"));
+        graph.save(File.createTempFile("ReachTestGraph", ".obj"));
     }
     
     void makeGraph(Graph graph) {
