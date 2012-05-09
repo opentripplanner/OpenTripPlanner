@@ -12,6 +12,10 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
+var INIT_LOCATION = new L.LatLng(38.9538, -76.8851); // new carrolton
+var AUTO_CENTER_MAP = false;
+var ROUTER_ID = "";
+
 var map = new L.Map('map', {
 	minZoom : 10,
 	maxZoom : 16
@@ -167,33 +171,29 @@ var overlayMaps = {
 	"Alignment": purpleLineAlignmentLayer
 };
 
-// attempt to get map metadata (bounds) from server
-var request = new XMLHttpRequest();
-request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
-request.setRequestHeader("Accept", "application/xml");
-request.send(null);
-console.log(request.responseText);
-console.log(request.status);
-console.log(request.responseXML);
-
-var initLocation;
-if (request.status == 200 && request.responseXML != null) {
-	var x = request.responseXML;
-	var minLat = parseFloat(x.getElementsByTagName('minLatitude')[0].textContent);
-	var maxLat = parseFloat(x.getElementsByTagName('maxLatitude')[0].textContent);
-	var minLon = parseFloat(x.getElementsByTagName('minLongitude')[0].textContent);
-	var maxLon = parseFloat(x.getElementsByTagName('maxLongitude')[0].textContent);
-	var lon = (minLon + maxLon) / 2;
-	var lat = (minLat + maxLat) / 2;
-	initLocation = new L.LatLng(lat, lon);
-} else {
-	initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
+var initLocation = INIT_LOCATION;
+if (AUTO_CENTER_MAP) {
+	// attempt to get map metadata (bounds) from server
+	var request = new XMLHttpRequest();
+	request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
+	request.setRequestHeader("Accept", "application/xml");
+	request.send(null);
+	if (request.status == 200 && request.responseXML != null) {
+		var x = request.responseXML;
+		var minLat = parseFloat(x.getElementsByTagName('minLatitude')[0].textContent);
+		var maxLat = parseFloat(x.getElementsByTagName('maxLatitude')[0].textContent);
+		var minLon = parseFloat(x.getElementsByTagName('minLongitude')[0].textContent);
+		var maxLon = parseFloat(x.getElementsByTagName('maxLongitude')[0].textContent);
+		var lon = (minLon + maxLon) / 2;
+		var lat = (minLat + maxLat) / 2;
+		initLocation = new L.LatLng(lat, lon);
+	} else {
+		initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
+	}
 }
+
 map.setView(initLocation, 12);
 
-// uncomment to override initial location for DC Purple Line demo
-//var new_carrolton = new L.LatLng(38.9538, -76.8851);
-//var origMarker = new L.Marker(new_carrolton, {draggable: true});
 var origMarker = new L.Marker(initLocation, {draggable: true});
 var destMarker = new L.Marker(initLocation, {draggable: true});
 //marker.bindPopup("I am marker.");
