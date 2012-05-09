@@ -93,8 +93,8 @@ public class TestBikeRental extends TestCase {
         tree = aStar.getShortestPathTree(options);
 
         path = tree.getPath(v3, false);
-        assertNotNull(path);
-        assertFalse(path.states.getLast().isFinal());
+        // null is returned because the only state at the target is not final
+        assertNull(path); 
 
         BikeRentalStationVertex station2 = new BikeRentalStationVertex(graph, "station2", -77.049,
                 36.857, "station", 10);
