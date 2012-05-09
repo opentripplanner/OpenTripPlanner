@@ -32,7 +32,6 @@ h1 {
 	background: #888;
 	padding: 0.4em;
 	margin: 0px;
-	margin-bottom: 0.5em;
 }
 
 h2 {
@@ -47,62 +46,54 @@ p.footnote {
     font-size: 75%;    
 }
 
-input {
-	margin: 2px;
-}
-
 div#toolbox {
 	margin: 0px;
 	padding: 0em;
 }
 
-div.tool {
+form {
 	margin: 0px;
-	padding: 0.4em 0.4em 1em 0.4em;
+	padding: 0.4em 0.4em 0.6em 0.4em;
 }
 
-div.tool span {
-	/* keep rows of buttons from wrapping when vertical scroll bar appears */
-	white-space: nowrap;
-}
-
-div.tool form {
-	margin: 0px;
-	padding: 0px;
-}
-
-div.tool form span {
+form span {
 	/* group labels and their buttons together on a single line */
 	width: 100%;
 	display: block;
 	overflow: hidden;
 	margin: 0px;
 	padding: 0px;
+	/* can we keep rows of buttons from wrapping when vertical scroll bar appears ? */
+ 	/* white-space: */  
 }
 
-div.tool form span label {
-	display: inline-block;
+input {
+	margin: 2px;
+}
+
+form span label {
 	float: left;
+	width: 150px;
 }
 
-div.tool form span input {
-	display: inline-block;
+form span input {
 	float: right;
+	width: 150px;
 }
 
-div.tool form span select {
-	display: inline-block;
+form span select {
 	float: right;
+	width: 150px;
 }
 
-.isoDateField {
-	width:auto;
+.autoWidth {
+	width: auto;
 }
 
-.numberField {
+.narrowInput {
 	width: 4em;
 }
 
-.toolSubmit {
+.fullWidth {
 	width: 100%;
 }
