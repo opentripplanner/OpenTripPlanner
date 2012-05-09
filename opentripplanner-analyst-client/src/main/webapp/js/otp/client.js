@@ -193,8 +193,6 @@ if (AUTO_CENTER_MAP) {
 		var lon = (minLon + maxLon) / 2;
 		var lat = (minLat + maxLat) / 2;
 		initLocation = new L.LatLng(lat, lon);
-	} else {
-		initLocation = new L.LatLng(45.5191, -122.6745); // Portland, Oregon
 	}
 }
 map.setView(initLocation, 12);
