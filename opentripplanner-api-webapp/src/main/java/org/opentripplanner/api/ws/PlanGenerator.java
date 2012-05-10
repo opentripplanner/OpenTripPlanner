@@ -49,6 +49,7 @@ import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -193,6 +194,7 @@ public class PlanGenerator {
             }
 
             TraverseMode mode = backEdgeNarrative.getMode();
+            System.out.println("Mode = " + mode + " and edge is " + backEdge + " and pgstate is " + pgstate);
             if (mode != null) {
                 long dt = state.getAbsTimeDeltaSec();
                 if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING
@@ -270,6 +272,9 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     startWalk = i;
                     leg = makeLeg(itinerary, state);
+                    if (backEdge instanceof RentABikeOnEdge) {
+                        leg.rentedBike = true; 
+                    }
                     pgstate = PlanGenState.BICYCLE;
                 } else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
