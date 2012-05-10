@@ -231,4 +231,13 @@ public abstract class Tile {
 
     public abstract Sample[] getSamples();
 
+    public static BufferedImage getLegend(IndexColorModel model, int width, int height) {
+        BufferedImage legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, model);
+        byte[] pixels = ((DataBufferByte)legend.getRaster().getDataBuffer()).getData();
+        for (int row = 0; row < height; row++)
+        for (int col = 0; col < width; col++)
+        pixels[row * width + col] = (byte)col;
+		return legend;
+    }
+
 }
