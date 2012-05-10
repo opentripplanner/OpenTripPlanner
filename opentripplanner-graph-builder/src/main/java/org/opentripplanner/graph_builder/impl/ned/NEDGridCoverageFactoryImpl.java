@@ -23,6 +23,7 @@ import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,23 +32,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
-    private GraphService graphService;
+    private Graph graph;
 
     UnifiedGridCoverage coverage = null;
 
     private File cacheDirectory;
 
     private NEDTileSource tileSource = new NEDDownloader();
-
-    /**
-     * Set the graph that will be used to determine the extent of the NED.
-     *
-     * @param graphService
-     */
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
 
     /**
      * Set the directory where NED will be cached.
@@ -65,7 +56,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     public Coverage getGridCoverage() {
         if (coverage == null) {
-            tileSource.setGraph(graphService.getGraph());
+            tileSource.setGraph(graph);
             tileSource.setCacheDirectory(cacheDirectory);
             List<File> paths = tileSource.getNEDTiles();
             for (File path : paths) {
@@ -88,5 +79,17 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         if (!cacheDirectory.canWrite()) {
             throw new RuntimeException("Can't write to NED cache: " + cacheDirectory);
         }
+    }
+
+
+    /**
+     * Set the graph that will be used to determine the extent of the NED.
+     *
+     * @param graph
+     */
+
+    @Override
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 }

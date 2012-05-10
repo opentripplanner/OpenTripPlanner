@@ -84,7 +84,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-
+        gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
 
         // If gridCov is a GridCoverage2D, apply a bilinear interpolator. Otherwise, just use the

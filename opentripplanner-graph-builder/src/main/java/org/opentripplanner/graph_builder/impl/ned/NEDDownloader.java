@@ -55,7 +55,6 @@ import org.opentripplanner.openstreetmap.impl.OSMDownloader;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -85,7 +84,6 @@ public class NEDDownloader implements NEDTileSource {
     private double _lonXStep = 0.16;
 
     @Override
-    @Autowired
     public void setGraph(Graph graph) {
         this.graph = graph;
     }
