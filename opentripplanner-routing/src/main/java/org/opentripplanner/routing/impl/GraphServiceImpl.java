@@ -39,6 +39,8 @@ public class GraphServiceImpl implements GraphService {
     private Map<String, Long> modTimes = new HashMap<String, Long>();
 
     private LoadLevel loadLevel;
+    
+    private String defaultRouterId = "";
 
     private boolean synchronousReload = true;
 
@@ -54,16 +56,16 @@ public class GraphServiceImpl implements GraphService {
     @Override
     @PostConstruct // This means it will run on startup
     public Graph getGraph() {
-        return getGraph("");
+        return getGraph(null);
     }
 
     @Override
     public synchronized Graph getGraph(String routerId) {
+    	if (routerId == null || routerId.isEmpty()) {
+    		routerId = defaultRouterId;    		
+    		LOG.debug("routerId not specified, set to default of '{}'", routerId);
+    	}
         Graph graph;
-//        if (!useRouterId) { 
-//            // avoid having multiple copies of the same graph for different router IDs
-//            routerId = "";
-//        }
         File graphFile = getFileForRouterId(routerId);
         // key on filename, mapping all routerIds to the same graph when there is no {} in pattern
         graph = graphs.get(graphFile.getAbsolutePath());
@@ -108,4 +110,7 @@ public class GraphServiceImpl implements GraphService {
         }
     }
 
+    public void setDefaultRouterId(String routerId) {
+    	this.defaultRouterId = routerId;
+    }
 }
