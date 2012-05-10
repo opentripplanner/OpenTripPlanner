@@ -30,6 +30,10 @@
 		<form>
 			<h2>Origin Setup</h2>
 			<span>
+				<label for="setupTimeSlider">Time of day:</label>
+				<input type="range" name="setupTimeSlider" min="0" max="24" step="0.25" value="8.0" onchange="setOriginTime(setupTimeSlider.value)" />
+			</span> 
+			<span>
 				<!-- times are in agency timezone unless suffixed by Z  -->
 				<label for="setupTime">Date and time: *</label>
 				<input type="text" class="wideInput" id="setupTime" value="2012-06-06T08:00:00" />
@@ -56,8 +60,8 @@
 			<h2>Destination Setup</h2>
 			<span>
 				<label for="setupRelativeTime2">Time relative to origin:</label> 	
-				<select id="setupRelativeTime2" default="+2.0" >
-					<option value="same">Same as Origin</option>
+				<select id="setupRelativeTime2" default="+2.0" onchange="setDestinationTime(setupRelativeTime2.value)" >
+					<option value="+0">Same as Origin</option>
 					<option value="+0.25"> +15 minutes</option>
 					<option value="+0.5" > +30 minutes</option>
 					<option value="+0.75"> +45 minutes</option>
@@ -70,7 +74,6 @@
 			</span>
 			<span>
 				<label for="setupTime2">Date and time: *</label> 	
-				<!-- maybe add +/- half hours selector -->
 				<input type="text" id="setupTime2" value="2012-06-06T10:00:00" />
 			</span>
 			<span>

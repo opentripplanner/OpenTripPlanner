@@ -346,3 +346,17 @@ var downloadTool = function () {
 
 // read setup values from map setup tool on page load
 mapSetupTool();
+
+var baseDate = Date.parse("2012-06-06"); 
+var msecPerHour = 60 * 60 * 1000;
+var setOriginTime = function(fractionalHours) {
+	var seconds = baseDate + fractionalHours * msecPerHour; 
+	setupTime.value = new Date(seconds).toISOString().substring(0,19);
+	setDestinationTime(setupRelativeTime2.value);
+};
+var setDestinationTime = function(fractionalHours) {
+	var seconds = Date.parse(setupTime.value) + fractionalHours * msecPerHour; 
+	setupTime2.value = new Date(seconds).toISOString().substring(0,19);
+};
+
+
