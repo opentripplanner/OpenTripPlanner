@@ -49,20 +49,21 @@ public abstract class Tile {
     
     private static IndexColorModel buildDefaultColorMap() {
     	Color[] palette = new Color[256];
+    	final int ALPHA = 0x60FFFFFF; // ARGB
     	for (int i = 0; i < 28; i++) {
     		// Note: HSB = Hue / Saturation / Brightness
-        	palette[i + 00] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.333f, i * 0.037f, 0.8f), true); // Green
-        	palette[i + 30] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.666f, i * 0.037f, 0.8f), true); // Blue
-        	palette[i + 60] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.144f, i * 0.037f, 0.8f), true); // Yellow
-        	palette[i + 90] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.000f, i * 0.037f, 0.8f), true); // Red
-        	palette[i + 120] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.000f, 0.000f, (29 - i) * 0.0172f), true); // Black
+        	palette[i + 00] =  new Color(ALPHA & Color.HSBtoRGB(0.333f, i * 0.037f, 0.8f), true); // Green
+        	palette[i + 30] =  new Color(ALPHA & Color.HSBtoRGB(0.666f, i * 0.037f, 0.8f), true); // Blue
+        	palette[i + 60] =  new Color(ALPHA & Color.HSBtoRGB(0.144f, i * 0.037f, 0.8f), true); // Yellow
+        	palette[i + 90] =  new Color(ALPHA & Color.HSBtoRGB(0.000f, i * 0.037f, 0.8f), true); // Red
+        	palette[i + 120] = new Color(ALPHA & Color.HSBtoRGB(0.000f, 0.000f, (29 - i) * 0.0172f), true); // Black
         }
     	for (int i = 28; i < 30; i++) {
-        	palette[i + 00] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.333f, (30 - i) * 0.333f, 0.8f), true); // Green
-        	palette[i + 30] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.666f, (30 - i) * 0.333f, 0.8f), true); // Blue
-        	palette[i + 60] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.144f, (30 - i) * 0.333f, 0.8f), true); // Yellow
-        	palette[i + 90] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.000f, (30 - i) * 0.333f, 0.8f), true); // Red
-        	palette[i + 120] = new Color(0xA0FFFFFF & Color.HSBtoRGB(0.000f, 0.000f, (29 - i) * 0.0172f), true); // Black
+        	palette[i + 00] =  new Color(ALPHA & Color.HSBtoRGB(0.333f, (30 - i) * 0.333f, 0.8f), true); // Green
+        	palette[i + 30] =  new Color(ALPHA & Color.HSBtoRGB(0.666f, (30 - i) * 0.333f, 0.8f), true); // Blue
+        	palette[i + 60] =  new Color(ALPHA & Color.HSBtoRGB(0.144f, (30 - i) * 0.333f, 0.8f), true); // Yellow
+        	palette[i + 90] =  new Color(ALPHA & Color.HSBtoRGB(0.000f, (30 - i) * 0.333f, 0.8f), true); // Red
+        	palette[i + 120] = new Color(ALPHA & Color.HSBtoRGB(0.000f, 0.000f, (29 - i) * 0.0172f), true); // Black
     	}
         for (int i = 150; i < palette.length; i++) {
         	palette[i] = new Color(0x00000000, true);
