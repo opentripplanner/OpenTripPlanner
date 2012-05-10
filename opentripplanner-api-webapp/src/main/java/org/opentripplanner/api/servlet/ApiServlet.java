@@ -48,6 +48,15 @@ public class ApiServlet extends SpringServlet {
         autowireCapableBeanFactory.autowireBean(this);
     }
     
+    @Override
+    public void destroy() {
+    	if (updater != null) {
+    		// updater is a user (not daemon) thread
+    		// shut it down properly so container shutdown does not stall
+    		updater.stop();
+    	}
+    }
+    
     public ApiServlet() {
         super();
     }
