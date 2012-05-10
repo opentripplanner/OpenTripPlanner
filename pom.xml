@@ -90,7 +90,9 @@
             Javadoc generation in release:perform requires the new release
             versions of our artifacts to already be installed in the local 
             repository. -->
-            <preparationGoals>clean install</preparationGoals>
+            <!-- The site generation step can fail. Run it in :prepare to make sure it
+            works before tagging the release. -->
+            <preparationGoals>clean install site</preparationGoals>
           </configuration>
         </plugin>
         <plugin>
