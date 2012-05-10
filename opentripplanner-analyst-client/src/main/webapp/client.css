@@ -26,6 +26,12 @@ div#toolbox {
 	overflow-y: auto;
 }
 
+img#legend {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
 h1 {
 	font-size: 125%;
 	font-weight: bold;

@@ -13,7 +13,7 @@
 */
 
 var INIT_LOCATION = new L.LatLng(38.9538, -76.8851); // new carrolton
-var AUTO_CENTER_MAP = false;
+var AUTO_CENTER_MAP = true;
 var ROUTER_ID = "";
 
 var map = new L.Map('map', {
@@ -96,6 +96,8 @@ var refresh = function () {
 		map.removeLayer(analystLayer);
 	analystLayer._url = analystUrl + buildQuery(params);
     map.addLayer(analystLayer);
+	legend.src = "/opentripplanner-api-webapp/ws/legend.png?width=300&height=40&styles=" 
+		+ params.styles;
 };
 
 // create geoJSON layers for DC Purple Line
@@ -358,5 +360,4 @@ var setDestinationTime = function(fractionalHours) {
 	var seconds = Date.parse(setupTime.value) + fractionalHours * msecPerHour; 
 	setupTime2.value = new Date(seconds).toISOString().substring(0,19);
 };
-
 
