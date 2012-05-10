@@ -154,25 +154,27 @@ public abstract class Tile {
     }
 
     protected BufferedImage getEmptyImage(Style style) {
-        BufferedImage image;
-        switch (style) {
+        IndexColorModel colorMap = getMapForStyle(style);
+        if (colorMap == null)
+        	return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        else
+        	return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, colorMap);
+    }
+    
+    protected static IndexColorModel getMapForStyle(Style style) {
+    	switch (style) {
         case GRAY :
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-            break;
+        	return null;
         case DIFFERENCE :
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, DIFFERENCE_COLOR_MAP);
-            break;
+            return DIFFERENCE_COLOR_MAP;
         case TRANSPARENT :
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, TRANSPARENT_COLOR_MAP);
-            break;
+            return TRANSPARENT_COLOR_MAP;
         case MASK :
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, MASK_COLOR_MAP);
-            break;
+            return MASK_COLOR_MAP;
         case COLOR30 :
         default :
-            image = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, DEFAULT_COLOR_MAP);
+            return DEFAULT_COLOR_MAP;
         }
-        return image;
     }
     
     public BufferedImage generateImage(ShortestPathTree spt, RenderRequest renderRequest) {
@@ -231,8 +233,16 @@ public abstract class Tile {
 
     public abstract Sample[] getSamples();
 
+    public static BufferedImage getLegend(Style style, int width, int height) {
+    	return getLegend(getMapForStyle(style), width, height);
+    }
+
     public static BufferedImage getLegend(IndexColorModel model, int width, int height) {
-        BufferedImage legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, model);
+        BufferedImage legend;
+        if (model == null)
+        	legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+    	else
+        	legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, model);
         byte[] pixels = ((DataBufferByte)legend.getRaster().getDataBuffer()).getData();
         for (int row = 0; row < height; row++)
         for (int col = 0; col < width; col++)
