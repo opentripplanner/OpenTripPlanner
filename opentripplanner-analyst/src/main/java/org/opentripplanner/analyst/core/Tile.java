@@ -2,16 +2,13 @@ package org.opentripplanner.analyst.core;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Transparency;
-import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.ComponentColorModel;
-import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.Map;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridCoverageFactory;
@@ -28,10 +25,14 @@ public abstract class Tile {
 
     /* STATIC */
     private static final Logger LOG = LoggerFactory.getLogger(Tile.class);
-    public static final IndexColorModel DEFAULT_COLOR_MAP = buildDefaultColorMap();
-    public static final IndexColorModel DIFFERENCE_COLOR_MAP = buildDifferenceColorMap();
-    public static final IndexColorModel TRANSPARENT_COLOR_MAP = buildTransparentColorMap();
-    public static final IndexColorModel MASK_COLOR_MAP = buildMaskColorMap(90);
+    public static final Map<Style, IndexColorModel> modelsByStyle; 
+    static {
+        modelsByStyle = new EnumMap<Style, IndexColorModel>(Style.class);
+        modelsByStyle.put(Style.COLOR30, buildDefaultColorMap());
+        modelsByStyle.put(Style.DIFFERENCE, buildDifferenceColorMap());
+        modelsByStyle.put(Style.TRANSPARENT, buildTransparentColorMap());
+        modelsByStyle.put(Style.MASK, buildMaskColorMap(90));
+    }
     
     /* INSTANCE */
     final GridGeometry2D gg;
@@ -162,27 +163,11 @@ public abstract class Tile {
     }
 
     protected BufferedImage getEmptyImage(Style style) {
-        IndexColorModel colorMap = getMapForStyle(style);
-        if (colorMap == null)
-        	return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+        IndexColorModel colorModel = modelsByStyle.get(style);
+        if (colorModel == null)
+            return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
         else
-        	return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, colorMap);
-    }
-    
-    protected static IndexColorModel getMapForStyle(Style style) {
-    	switch (style) {
-        case GRAY :
-        	return null;
-        case DIFFERENCE :
-            return DIFFERENCE_COLOR_MAP;
-        case TRANSPARENT :
-            return TRANSPARENT_COLOR_MAP;
-        case MASK :
-            return MASK_COLOR_MAP;
-        case COLOR30 :
-        default :
-            return DEFAULT_COLOR_MAP;
-        }
+            return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
     }
     
     public BufferedImage generateImage(ShortestPathTree spt, RenderRequest renderRequest) {
@@ -242,12 +227,9 @@ public abstract class Tile {
     public abstract Sample[] getSamples();
 
     public static BufferedImage getLegend(Style style, int width, int height) {
-    	return getLegend(getMapForStyle(style), width, height);
-    }
-
-    public static BufferedImage getLegend(IndexColorModel model, int width, int height) {
         final int NBANDS = 150;
         final int LABEL_SPACING = 30; 
+        IndexColorModel model = modelsByStyle.get(style);
         if (width < 140 || width > 2000)
             width = 140;
         if (height < 25 || height > 2000)
