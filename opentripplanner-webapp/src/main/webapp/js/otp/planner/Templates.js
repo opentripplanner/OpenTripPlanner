@@ -57,7 +57,7 @@ otp.planner.Templates = {
 
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
-                  '<div id={id} class="dir-alt-route-inner"><a href="#">{id}</a>: ',
+                  '<div id={id} class="dir-alt-route-inner"><a href="javascript:void;">{id}</a>: ',
                   ' {startTimeDisplay} - {endTimeDisplay} ',
                   '<tpl if="numTransfers">',
                     '<br/><span class="transfers">',
@@ -91,7 +91,7 @@ otp.planner.Templates = {
 
         if(this.streetviewTemplate == null)
             this.streetviewTemplate =  new Ext.XTemplate(
-                '<a href="#" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
+                '<a href="javascript:void;" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
             ).compile();
 
         if(this.TP_TRIPDETAILS == null)
@@ -115,7 +115,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_MODE == null)
             this.TP_LEG_MODE = ''
                 + '<h4>' 
-                + '<a href="#">{[otp.util.Modes.translate(values["mode"])]}</a>'
+                + '<a href="javascript:void;">{[otp.util.Modes.translate(values["mode"])]}</a>'
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '</h4>';
@@ -123,7 +123,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_CONTINUES == null)
             this.TP_LEG_CONTINUES = ''
                 + '<h4>'
-                + '<a href="#">' + this.locale.instructions.continue_as + '</a> '
+                + '<a href="javascript:void;">' + this.locale.instructions.continue_as + '</a> '
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '<span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span>'
@@ -176,19 +176,19 @@ otp.planner.Templates = {
 
         if(this.TP_START == null)
             this.TP_START = new Ext.XTemplate(
-                  '<h4><a href="#">' + this.locale.instructions.start_at + '</a> {name}</h4>'
+                  '<h4><a href="javascript:void;">' + this.locale.instructions.start_at + '</a> {name}</h4>'
             ).compile();
 
         if(this.TP_END == null)
             this.TP_END = new Ext.XTemplate(
-                  '<h4><a href="#">' + this.locale.instructions.end_at + '</a> {name}</h4>'
+                  '<h4><a href="javascript: void;">' + this.locale.instructions.end_at + '</a> {name}</h4>'
             ).compile(); 
     },
 
     makeLegTemplate : function(mode)
     {
         return new Ext.XTemplate(
-                  '<h4><a href="#">' + mode + ' </a>',
+                  '<h4><a href="javascript:void;">' + mode + ' </a>',
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
                     this.locale.directions.to + ' {toName}',
                   '</h4>',
