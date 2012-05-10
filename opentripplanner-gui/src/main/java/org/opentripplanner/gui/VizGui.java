@@ -74,6 +74,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
+import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
