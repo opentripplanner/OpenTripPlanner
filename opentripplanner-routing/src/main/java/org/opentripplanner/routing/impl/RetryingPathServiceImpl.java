@@ -89,7 +89,7 @@ public class RetryingPathServiceImpl implements PathService {
 
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
-        options.setRoutingContext(graphService.getGraph());
+        options.setRoutingContext(graphService.getGraph(options.getRouterId()));
 
         long searchBeginTime = System.currentTimeMillis();
         
