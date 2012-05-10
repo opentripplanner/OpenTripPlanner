@@ -67,7 +67,7 @@ public class Renderer {
         }
     }
         
-    private static Response generateStreamingImageResponse(
+    public static Response generateStreamingImageResponse(
             final BufferedImage image, final MIMEImageFormat format) {
         
         if (image == null) {

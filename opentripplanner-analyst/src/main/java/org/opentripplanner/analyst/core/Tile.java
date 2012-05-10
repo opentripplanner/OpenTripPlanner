@@ -1,9 +1,16 @@
 package org.opentripplanner.analyst.core;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.ComponentColorModel;
+import java.awt.image.DataBuffer;
 import java.awt.image.DataBufferByte;
 import java.awt.image.IndexColorModel;
+import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
 import org.geotools.coverage.grid.GridCoverage2D;
@@ -238,16 +245,27 @@ public abstract class Tile {
     }
 
     public static BufferedImage getLegend(IndexColorModel model, int width, int height) {
-        BufferedImage legend;
+        final int NBANDS = 150;
+        final int LABEL_SPACING = 30; 
+        if (width < 140 || width > 2000)
+            width = 140;
+        if (height < 25 || height > 2000)
+            height = 25;
         if (model == null)
-        	legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-    	else
-        	legend = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, model);
-        byte[] pixels = ((DataBufferByte)legend.getRaster().getDataBuffer()).getData();
+            return null;
+        WritableRaster raster = model.createCompatibleWritableRaster(width, height);
+        byte[] pixels = ((DataBufferByte) raster.getDataBuffer()).getData();
         for (int row = 0; row < height; row++)
-        for (int col = 0; col < width; col++)
-        pixels[row * width + col] = (byte)col;
-		return legend;
+            for (int col = 0; col < width; col++)
+                pixels[row * width + col] = (byte) (col * NBANDS / width);
+        BufferedImage legend = model.convertToIntDiscrete(raster, false);
+        Graphics2D gr = legend.createGraphics();
+        gr.setColor(new Color(0));
+        gr.drawString("travel time (minutes)", 0, 10);
+        float scale = width / (float) NBANDS;
+        for (int i = 0; i < NBANDS; i += LABEL_SPACING)
+            gr.drawString(Integer.toString(i), i * scale, height);
+        return legend;
     }
 
 }
