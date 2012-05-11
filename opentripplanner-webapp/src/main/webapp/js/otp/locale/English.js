@@ -351,12 +351,20 @@ otp.locale.English = {
             ['80467',  '50 miles'],
             ['160934',  '100 miles']
         ],
-    
+
         mode : 
         [
             ['TRANSIT,WALK', 'Transit'],
-// DO WE REALLY NEED THIS?  ISN'T BUS & TRAIN the same as TRANSIT, WALK
-//          ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
+            ['BUSISH,WALK', 'Bus only'],
+            ['TRAINISH,WALK', 'Train only'],
+            ['WALK', 'Walk only'],
+            ['BICYCLE', 'Bicycle'],
+            ['TRANSIT,BICYCLE', 'Transit & Bicycle']
+        ],
+
+        with_bike_mode : 
+        [
+            ['TRANSIT,WALK', 'Transit'],
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
