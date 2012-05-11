@@ -34,6 +34,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -96,13 +98,16 @@ public class Graph implements Serializable {
 
     private Collection<String> agencies = new HashSet<String>();
 
+    private transient Set<Edge> temporaryEdges;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
     }
 
     public Graph() {
-        this.vertices = new HashMap<String, Vertex>();
+        this.vertices = new ConcurrentHashMap<String, Vertex>();
+        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
     }
 
     /**
@@ -165,6 +170,12 @@ public class Graph implements Serializable {
     public void removeVertexAndEdges(Vertex vertex) {
         if (! containsVertex(vertex)) {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
+        }
+        for (Edge e : vertex.getIncoming()) {
+            temporaryEdges.remove(e);
+        }
+        for (Edge e : vertex.getOutgoing()) {
+            temporaryEdges.remove(e);
         }
         vertex.removeAllEdges();
         this.remove(vertex);
@@ -260,7 +271,14 @@ public class Graph implements Serializable {
             ++i;
         }
     }
-    
+
+    private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException,
+            IOException {
+        inputStream.defaultReadObject();
+
+        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>()); 
+    }
+
     public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
     	this.graphBuilderAnnotations.add(gba);
     }
@@ -468,6 +486,21 @@ public class Graph implements Serializable {
 
     public void addAgencyId(String agency) {
         agencies.add(agency);
+    }
+
+    public void addTemporaryEdge(Edge edge) {
+        temporaryEdges.add(edge);
+    }
+
+    public void removeTemporaryEdge(Edge edge) {
+        if (edge.getFromVertex() == null || edge.getToVertex() == null) {
+            return;
+        }
+        temporaryEdges.remove(edge);
+    }
+
+    public Collection<Edge> getTemporaryEdges() {
+        return temporaryEdges;
     }
 
 }

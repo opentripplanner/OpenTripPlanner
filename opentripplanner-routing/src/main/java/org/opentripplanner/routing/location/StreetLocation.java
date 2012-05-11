@@ -25,6 +25,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
@@ -48,10 +49,13 @@ public class StreetLocation extends AbstractVertex {
 
     private ArrayList<StreetEdge> edges;
 
+    private Graph graph;
+
     // maybe name should just be pulled from street being split
-    public StreetLocation(String id, Coordinate nearestPoint, String name) {
+    public StreetLocation(Graph graph, String id, Coordinate nearestPoint, String name) {
         // calling constructor with null graph means this vertex is temporary
         super(null, id, nearestPoint.x, nearestPoint.y, name);
+        this.graph = graph;
     }
 
     private static final long serialVersionUID = 1L;
@@ -64,6 +68,7 @@ public class StreetLocation extends AbstractVertex {
      * This is a little bit complicated, because TurnEdges get most of their data from
      * their fromVertex. So we have to create a separate fromVertex located at the start of the set
      * of turns, with a free edge into it from the from vertex.
+     * @param graph 
      * 
      * @param label
      * @param name
@@ -75,13 +80,13 @@ public class StreetLocation extends AbstractVertex {
      * 
      * @return the new StreetLocation
      */
-    public static StreetLocation createStreetLocation(String label, String name,
+    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
         boolean wheelchairAccessible = false;
 
         /* linking vertex with epsilon transitions */
-        StreetLocation location = new StreetLocation(label, nearestPoint, name);
+        StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
         HashMap<Geometry, P2<TurnVertex>> cache = new HashMap<Geometry, P2<TurnVertex>>();
         for (StreetEdge street : edges) {
@@ -96,7 +101,7 @@ public class StreetLocation extends AbstractVertex {
             }
             boolean seen = cache.containsKey(street.getGeometry());
             /* forward edges and vertices */
-            TurnVertex edgeLocation = createHalfLocation(location, label + " to "
+            TurnVertex edgeLocation = createHalfLocation(graph, location, label + " to "
                     + street.getToVertex().getLabel(), name, nearestPoint, street, cache);
 
             if (!seen) {
@@ -105,6 +110,8 @@ public class StreetLocation extends AbstractVertex {
 
                 location.extra.add(l1in);
                 location.extra.add(l1out);
+                graph.addTemporaryEdge(l1in);
+                graph.addTemporaryEdge(l1out);
             }
             
             double distance = fromv.getDistanceToNearestTransitStop();
@@ -130,7 +137,7 @@ public class StreetLocation extends AbstractVertex {
         return edges;
     }
 
-    private static TurnVertex createHalfLocation(StreetLocation base, String label,
+    private static TurnVertex createHalfLocation(Graph graph, StreetLocation base, String label,
             String name, Coordinate nearestPoint, Edge edge, HashMap<Geometry, P2<TurnVertex>> cache) {
 
         StreetEdge street = (StreetEdge) edge;
@@ -166,6 +173,9 @@ public class StreetLocation extends AbstractVertex {
             FreeEdge free = new FreeEdge(fromv, newFrom);
             TurnEdge incoming = new TurnEdge(newFrom, location);
 
+            graph.addTemporaryEdge(free);
+            graph.addTemporaryEdge(incoming);
+            
             base.extra.add(free);
             base.extra.add(incoming);
         }
@@ -181,6 +191,7 @@ public class StreetLocation extends AbstractVertex {
             e = outEdge;
         }
         base.extra.add(e);
+        graph.addTemporaryEdge(e);
         
         return location;
     }
@@ -244,6 +255,7 @@ public class StreetLocation extends AbstractVertex {
     @Override public int removeTemporaryEdges() {
         int nRemoved = 0;
         for (Edge e : getExtra()) {
+            graph.removeTemporaryEdge(e);
             // edges might already be detached
             if (e.detach() != 0)
                 nRemoved += 1;

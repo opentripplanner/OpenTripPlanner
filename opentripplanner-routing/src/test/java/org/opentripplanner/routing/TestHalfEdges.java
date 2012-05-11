@@ -171,12 +171,12 @@ public class TestHalfEdges extends TestCase {
         HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
         turns.addAll(leftBack.getOutgoing());
         
-        StreetLocation start = StreetLocation.createStreetLocation("start", "start", cast(turns,StreetEdge.class), new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start", cast(turns,StreetEdge.class), new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
 
         HashSet<Edge> endTurns = new HashSet<Edge>(right.getOutgoing());
         endTurns.addAll(rightBack.getOutgoing());
         
-        StreetLocation end = StreetLocation.createStreetLocation("end", "end", cast(endTurns,StreetEdge.class), new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
+        StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end", cast(endTurns,StreetEdge.class), new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()));
         
         assertTrue(start.getX() < end.getX());
         assertTrue(start.getY() < end.getY());
@@ -230,8 +230,8 @@ public class TestHalfEdges extends TestCase {
          */
         
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
-        start = StreetLocation.createStreetLocation("start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
-        end = StreetLocation.createStreetLocation("end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
+        start = StreetLocation.createStreetLocation(graph, "start1", "start1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()));
+        end = StreetLocation.createStreetLocation(graph, "end1", "end1", cast(turns,StreetEdge.class), new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()));
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 
@@ -244,8 +244,8 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("leftBack"));
         }
         
-        start = StreetLocation.createStreetLocation("start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
-        end = StreetLocation.createStreetLocation("end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
+        start = StreetLocation.createStreetLocation(graph, "start2", "start2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
+        end = StreetLocation.createStreetLocation(graph, "end2", "end2", cast(turns,StreetEdge.class), new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()));
         options.setRoutingContext(graph, start, end);
         spt = aStar.getShortestPathTree(options);
 

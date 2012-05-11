@@ -63,7 +63,7 @@ public class NetworkLinker {
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible)) {
+                if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
                     _log.warn(GraphBuilderAnnotation.register(graph, Variety.STOP_UNLINKED, ts));
                 }
             }
@@ -78,7 +78,7 @@ public class NetworkLinker {
         _log.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
                 BikeRentalStationVertex.class)) {
-            if (!networkLinkerLibrary.connectVertexToStreets(brsv)) {
+            if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 _log.warn(GraphBuilderAnnotation.register(graph,
                         Variety.BIKE_RENTAL_STATION_UNLINKED, brsv));
             }

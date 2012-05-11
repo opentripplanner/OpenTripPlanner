@@ -26,7 +26,9 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.loader.LinkRequest;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -77,9 +79,13 @@ public class BikeRentalUpdater implements Runnable {
             stationSet.add(station);
             BikeRentalStationVertex vertex = verticesByStation.get(station);
             if (vertex == null) {
-                vertex = new BikeRentalStationVertex(graph, "bike rental station " + id, station.x,
+                String name = "bike rental station " + id;
+                vertex = new BikeRentalStationVertex(graph, name, station.x,
                         station.y, station.name, station.bikesAvailable, station.spacesAvailable);
-                networkLinkerLibrary.connectVertexToStreets(vertex);
+                LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
+                for (Edge e : request.getEdgesAdded()) {
+                    graph.addTemporaryEdge(e);
+                }
                 verticesByStation.put(station, vertex);
                 new RentABikeOnEdge(vertex, vertex);
                 new RentABikeOffEdge(vertex, vertex);

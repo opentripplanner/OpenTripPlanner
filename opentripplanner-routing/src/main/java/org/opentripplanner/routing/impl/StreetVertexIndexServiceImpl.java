@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Set;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -39,8 +39,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.services.GraphRefreshListener;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -49,8 +47,6 @@ import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -201,7 +197,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 else 
                     name = "unnamed street";
             }
-            StreetLocation closest = new StreetLocation("corner " + Math.random(), coordinate, name);
+            StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coordinate, name);
             for (Vertex v : vertices) {
                 FreeEdge e = new FreeEdge(closest, v);
                 closest.getExtra().add(e);
@@ -244,7 +240,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if (name == null) {
                 name = bestStreet.getName();
             }
-            closest_street = StreetLocation.createStreetLocation(bestStreet.getName() + "_"
+            closest_street = StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
                     + coordinate.toString(), name, bundle.toEdgeList(), nearestPoint);
         }
 
@@ -317,6 +313,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 //this is kind of a hack, but there's not really a better way to do it
                 score /= SIDEWALK_PREFERENCE;
             }
+            //break ties by choosing shorter edges; this should cause split streets to be preferred
+            score += edge.getLength() / 1000000; 
             double xd = nearestPointOnEdge.x - p.getX();
             double yd = nearestPointOnEdge.y - p.getY();
             directionToEdge = Math.atan2(yd, xd);
@@ -392,6 +390,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
                 extraStreets.add(se);
 
+        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class))
+            extraStreets.add(se);
+        
         Envelope envelope = new Envelope(coordinate);
         GeometryFactory factory = new GeometryFactory();
         Point p = factory.createPoint(coordinate);
@@ -410,8 +411,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 return candidateEdges; // empty list
             // envelopeGrowthAmount *= 2;
             List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
-            // TODO remove use of ExtraEdges
-            if (extraEdges != null && nearbyEdges != null) {
+
+            if (nearbyEdges != null) {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
             for (StreetEdge e : nearbyEdges) {

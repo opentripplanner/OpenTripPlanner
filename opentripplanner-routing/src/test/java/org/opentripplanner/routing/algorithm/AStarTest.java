@@ -154,12 +154,12 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
 
-        StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
+        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
                 -122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
                 new SimpleEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
-        StreetLocation toLocation = new StreetLocation("near_56th_20th", new Coordinate(
+        StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
@@ -190,12 +190,12 @@ public class AStarTest {
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
 
-        StreetLocation fromLocation = new StreetLocation("near_shilshole_22nd", new Coordinate(
+        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
                 -122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
                 new SimpleEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
-        StreetLocation toLocation = new StreetLocation("near_56th_20th", new Coordinate(
+        StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
         toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
 
