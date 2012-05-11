@@ -23,13 +23,12 @@ otp.core.MapSingleton = null;
  */
 otp.core.MapStatic = {
 
-//http://maps.opengeo.org/geowebcache/service/wms?LAYERS=openstreetmap&FORMAT=image%2Fpng&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&EXCEPTIONS=application%2Fvnd.ogc.se_inimage&SRS=EPSG:4326&BBOX=-8240523.1442212,4972687.3114282,-8238077.1593164,4975133.296333&WIDTH=256&HEIGHT=256
-
     routerId          : null,
     locale            : null,
     map               : null,
     baseLayer         : null,
     mapDiv            : "map",
+    metadataUrl       : '/opentripplanner-api-webapp/ws/metadata',
 
     // list of functions that will be called before/after all features on the map are removed
     beforeAllFeaturesRemoved: [],
@@ -43,7 +42,7 @@ otp.core.MapStatic = {
     tooltipLinks     : true,
     tooltipCleared   : true,
 
-    /**
+    /*
      * An OpenLayers.Bounds object that defines the default extent used when
      * displaying the map.
      * 
@@ -100,7 +99,6 @@ otp.core.MapStatic = {
         this.map.events.register('click', this, this.closeAllPopupsCB);
 
         otp.core.MapSingleton = this;
-        var self = this;
         otp.core.MapStatic.THIS = this;
 
         // if we have an empty array of controls, then add the defaults
@@ -109,70 +107,75 @@ otp.core.MapStatic = {
             this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.layerSwitchEnabled);
         }
 
-        if (this.defaultExtent === 'automatic') {
-            // ask the server for the extent
+        var layerLoaded = false;
+        var extentRetrieved = false;
+        var self = this;
 
+        // either ask the server for the extent, or...
+        if(this.defaultExtent != null && this.defaultExtent === 'automatic')
+        {
             // these two variables get enclosed over
             // the map gets zoomed when they are both true so that proper zoom levels
             // get calculated
             // without these checks, we were getting issues where the map would be zoomed
             // all the way out when the default extent was specified
-            var layerLoaded = false;
-            var extentRetrieved = false;
             var _params = {};
-            if (this.routerId)
-                _params = { routerId : this.routerId };
-                OpenLayers.Request.GET({
-                    // TODO: store the base /ws URL someplace else
-                    url: '/opentripplanner-api-webapp/ws/metadata',
-                    params: _params,
-                    // TODO: switch other ajax requests from XML to JSON?
-                    headers: {Accept: 'application/json'},
-                    success : function(xhr) 
-                    {
-                          var metadata = Ext.util.JSON.decode(xhr.responseText);
-                          self.defaultExtent = new OpenLayers.Bounds(
-                                  metadata.minLongitude,
-                                  metadata.minLatitude,
-                                  metadata.maxLongitude,
-                                  metadata.maxLatitude
-                          );
-                          extentRetrieved = true;
-                          if (layerLoaded) {
-                              self.zoomToDefaultExtent();
-                          }
-                    },
-                    failure: function(xhr)
-                    {
-                        console.log('failure retrieving default extent');
-                    }
-            });
+            if(this.routerId)
+                _params.routerId = this.routerId;
 
-            // TODO: rethink this ... very hacky to do this, very fragile code
-            var zoomOnFirstLoad = function() {
-                layerLoaded = true;
-                if (extentRetrieved) {
-                    self.zoomToDefaultExtent();
+            OpenLayers.Request.GET({
+                url: self.metadataUrl,
+                params: _params,
+                headers: {Accept: 'application/json'},
+                success : function(xhr) 
+                {
+                      var metadata = Ext.util.JSON.decode(xhr.responseText);
+                      self.defaultExtent = new OpenLayers.Bounds(
+                              metadata.minLongitude,
+                              metadata.minLatitude,
+                              metadata.maxLongitude,
+                              metadata.maxLatitude
+                      );
+                      self.defaultExtent.transform(self.dataProjection, self.map.getProjectionObject());
+                      extentRetrieved = true;
+                      if(layerLoaded){
+                          self.zoomToDefaultExtent();
+                      }
+                },
+                failure: function(xhr)
+                {
+                    console.log('failure retrieving default extent');
                 }
-                self.map.baseLayer.events.un({loadend: zoomOnFirstLoad});
-            };
-            self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
-        } else {
-            var zoomOnFirstLoad = function() {
-                self.zoomToDefaultExtent();
-                self.map.baseLayer.events.un({loadend: zoomOnFirstLoad});
-            };
-            self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
+            });
+        } 
+        else if (this.defaultExtent != null)
+        {
+            // explicitly defined extent
+            this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject());
+            extentRetrieved = true;
         }
+
+        // TODO: rethink this ... fragile code
+        var zoomOnFirstLoad = function()
+        {
+            layerLoaded = true;
+            if (extentRetrieved) {
+                self.zoomToDefaultExtent();
+            }
+            self.map.baseLayer.events.un({loadend: zoomOnFirstLoad});
+        };
+        self.map.baseLayer.events.on({loadend: zoomOnFirstLoad});
     },
-    
+
+
     /** */
-    zoomToDefaultExtent : function() {
+    zoomToDefaultExtent : function()
+    {
         try
         {
             if(this.defaultExtent && this.defaultExtent !== 'automatic')
             {
-                this.zoomToExtent(this.defaultExtent.transform(this.dataProjection, this.map.getProjectionObject()));
+                this.zoomToExtent(this.defaultExtent);
             }
         }
         catch(e)
@@ -271,20 +274,21 @@ otp.core.MapStatic = {
         {
             return this.defaultExtent;
         }
+        var self = this;
         OpenLayers.Request.GET({
-            // TODO: store the base /ws URL someplace else
-            url : '/opentripplanner-api-webapp/ws/metadata',
-            // TODO: switch other ajax requests from XML to JSON?
+            url : self.metadataUrl,
             headers: {Accept: 'application/json'},
             success : function(xhr) 
                       {
                           var metadata = Ext.util.JSON.decode(xhr.responseText);
-                          otp.core.MapSingleton.defaultExtent = new OpenLayers.Bounds(
+                          self.defaultExtent = new OpenLayers.Bounds(
                                   metadata.minLongitude,
                                   metadata.minLatitude,
                                   metadata.maxLongitude,
                                   metadata.maxLatitude
                           );
+                          self.defaultExtent.transform(self.dataProjection, self.map.getProjectionObject());
+                          otp.core.MapSingleton.defaultExtent = self.defaultExtent;
                       },
             failure : function(xhr)
                       {
@@ -294,7 +298,7 @@ otp.core.MapStatic = {
         });
         return null;
     },
-    
+
     /** */
     centerMapAtPixel: function(x, y)
     {
