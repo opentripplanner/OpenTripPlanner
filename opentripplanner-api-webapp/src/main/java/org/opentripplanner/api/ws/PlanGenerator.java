@@ -194,7 +194,6 @@ public class PlanGenerator {
             }
 
             TraverseMode mode = backEdgeNarrative.getMode();
-            System.out.println("Mode = " + mode + " and edge is " + backEdge + " and pgstate is " + pgstate);
             if (mode != null) {
                 long dt = state.getAbsTimeDeltaSec();
                 if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING
