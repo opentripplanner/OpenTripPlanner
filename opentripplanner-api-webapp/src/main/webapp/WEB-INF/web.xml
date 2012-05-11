@@ -43,11 +43,12 @@
 	<servlet>
 		<servlet-name>Jersey</servlet-name>
 		<servlet-class>org.opentripplanner.api.servlet.ApiServlet</servlet-class>
+		<!-- scan the semicolon-separated list packages for JAX-RS resource and parameter provider classes -->
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>
 			<param-value>org.opentripplanner</param-value>
 		</init-param>
-		<!--  to restore the old Badgerfish mapping, delete the following element -->
+		<!-- to restore the old Badgerfish mapping, delete the following element -->
 		<init-param>
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
 			<param-value>true</param-value>
