@@ -16,9 +16,9 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 
 /**
- * <p><strong>Fare support has not yet been implemented.</strong>
- * </p><p>
- * Fare is a set of fares for different classes of users.</p>
+ * <p>
+ * Fare is a set of fares for different classes of users.
+ * </p>
  */
 public class Fare {
 
@@ -38,11 +38,18 @@ public class Fare {
     public void addFare(FareType fareType, WrappedCurrency currency, int cents) {
         fare.put(fareType, new Money(currency, cents));
     }
-    
+
     public Money getFare(FareType type) {
         return fare.get(type);
     }
-    
+
+    public void addCost(int surcharge) {
+        for (Money cost : fare.values()) {
+            int cents = cost.getCents();
+            cost.setCents(cents + surcharge);
+        }
+    }
+
     public String toString() {
         StringBuffer buffer = new StringBuffer("Fare(");
         for (FareType type : fare.keySet()) {
