@@ -354,7 +354,7 @@ otp.locale.Dutch = {
             ['TRAINISH,WALK', 'Alleen trein'],
             ['WALK', 'Alleen lopen'],
             ['BICYCLE', 'Fiets'],
-            ['TRANSIT,BICYCLE', 'OV & Fiets'],
+            ['TRANSIT,BICYCLE', 'OV & Fiets']
         ],
 
         // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
