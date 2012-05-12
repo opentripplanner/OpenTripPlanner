@@ -227,14 +227,6 @@ try {
     // step 3: apply our default to the existing (possibly empty) otp config
     otp.inherit(otp.config, otp.config_defaults);       // step 3a: build the object up
     otp.configure(otp.config, otp.config_defaults);     // step 3b: make sure any / all local changes above get applied
-
-    // TODO more work needed to make train, bikeshare, etc... modes a 'switchable' feature in the UI
-    // TODO see otp.config_defaults.planner.options and the related code as to how to turn stuff on & off
-    if(otp.config.planner.options.showBikeshareMode)
-    {
-        otp.locale.English.tripPlanner.mode = otp.locale.English.tripPlanner.with_bikeshare_mode;
-    }
-
     console.log("otp.config updated with default items from otp.config_static");
 } catch(e) {
     console.log("ERROR: was unable to run otp.inherid override in config.js - got this exception: " + e);
