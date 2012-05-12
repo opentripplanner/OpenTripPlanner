@@ -144,7 +144,7 @@ public class RoutingContext implements Cloneable {
         final long SEC_IN_DAY = 60 * 60 * 24;
         final long time = opt.getSecondsSinceEpoch();
         this.serviceDays = new ArrayList<ServiceDay>(3);
-        if (calendarService == null) {
+        if (calendarService == null && (opt.getModes() == null || opt.getModes().contains(TraverseMode.TRANSIT))) {
             LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }
