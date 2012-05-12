@@ -35,6 +35,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
     private static final long serialVersionUID = -8147894489513820239L;
 
@@ -56,6 +58,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
 
     private HashMap<String, Agency> agencies = new HashMap<String, Agency>();
+
+    private Coordinate center;
 
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
@@ -192,5 +196,14 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             
         }
         return new ArrayList<AgencyAndId>(Arrays.asList(out.toArray(new AgencyAndId[0])));
+    }
+
+    public void setCenter(Coordinate coord) {
+        this.center = coord;
+    }
+
+    @Override
+    public Coordinate getCenter() {
+        return center;
     }
 }

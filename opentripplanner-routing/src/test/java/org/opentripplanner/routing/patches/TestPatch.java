@@ -53,6 +53,8 @@ import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.util.TestUtils;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class TestPatch extends TestCase {
     private Graph graph;
 
@@ -166,6 +168,11 @@ public class TestPatch extends TestCase {
 
             @Override
             public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
+                return null;
+            }
+
+            @Override
+            public Coordinate getCenter() {
                 return null;
             }
         };

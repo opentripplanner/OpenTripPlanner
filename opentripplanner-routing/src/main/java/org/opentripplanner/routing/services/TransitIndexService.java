@@ -25,6 +25,8 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public interface TransitIndexService {
     public List<RouteVariant> getVariantsForAgency(String agency);
 
@@ -55,4 +57,6 @@ public interface TransitIndexService {
     public List<ServiceCalendar> getCalendarsByAgency(String agency);
 
     public Agency getAgency(String id);
+
+    public Coordinate getCenter();
 }

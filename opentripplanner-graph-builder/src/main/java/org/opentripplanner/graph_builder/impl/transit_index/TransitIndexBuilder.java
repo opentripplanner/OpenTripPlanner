@@ -14,10 +14,13 @@
 package org.opentripplanner.graph_builder.impl.transit_index;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -29,6 +32,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -55,6 +59,8 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Process GTFS to build transit index for use in patching
@@ -123,7 +129,141 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
         addAgencies(service);
 
+        Coordinate coord = findTransitCenter();
+        service.setCenter(coord);
+
         graph.putService(TransitIndexService.class, service);
+    }
+
+    /**
+     * Used in k-means computation for transit centers
+     */
+    class Center implements Comparable<Center> {
+        public Coordinate coord;
+
+        public int weight = 0;
+
+        public Center(Coordinate coord) {
+            this.coord = coord;
+        }
+
+        @Override
+        public int compareTo(Center arg0) {
+            return (int) Math.signum(weight - arg0.weight);
+        }
+
+        public String toString() {
+            return "Center(" + coord + ", " + weight + ")";
+        }
+    }
+
+    /**
+     * Find the "transit center" of the graph using a weighted k-means technique
+     */
+    private Coordinate findTransitCenter() {
+        _log.debug("Finding transit center via k-means");
+        final int N = 30;// number of clusters
+        final int ITERATIONS = 50;
+        Map<Stop, Integer> stopWeight = new HashMap<Stop, Integer>();
+        // compute weight of all stop locations, which is the number of trips that stop at them.
+        for (StopTime stopTime : dao.getAllStopTimes()) {
+            Stop stop = stopTime.getStop();
+            String parent = stop.getParentStation();
+            if (parent != null) {
+                stop = dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), parent));
+            }
+
+            Integer weight = stopWeight.get(stop);
+            if (weight == null) {
+                stopWeight.put(stop, 1);
+            } else {
+                stopWeight.put(stop, weight + 1);
+            }
+        }
+
+        Map<Coordinate, Integer> pointWeight = new HashMap<Coordinate, Integer>();
+        for (Map.Entry<Stop, Integer> entry : stopWeight.entrySet()) {
+            Stop stop = entry.getKey();
+            int weight = entry.getValue();
+            Coordinate c = new Coordinate(stop.getLon(), stop.getLat());
+            Integer oldWeight = pointWeight.get(c);
+            if (oldWeight == null) {
+                pointWeight.put(c, weight);
+            } else {
+                pointWeight.put(c, oldWeight + weight);
+            }
+        }
+
+        List<Stop> stops = new ArrayList<Stop>(dao.getAllStops());
+        // choose N stations that are far away from each other and declare them to be the initial
+        // centers
+        Center[] centers = new Center[N];
+        Stop stop = stops.get(0);
+        Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
+        centers[0] = new Center(coord);
+        for (int i = 1; i < N; ++i) {
+            Coordinate best = coord;
+            double bestDistance = 0;
+            for (int j = 0; j < stops.size(); ++j) {
+                stop = stops.get(j);
+                coord = new Coordinate(stop.getLon(), stop.getLat());
+                double total = 0;
+                for (int k = 0; k < i; ++k) {
+                    double distance = DistanceLibrary.distance(coord, centers[k].coord);
+                    total += distance * distance;
+                }
+                if (total > bestDistance) {
+                    bestDistance = total;
+                    best = coord;
+                }
+            }
+            centers[i] = new Center(best);
+        }
+
+        int[] coord_count = new int[N];
+
+        // iterate ITERATIONS times and declare it good enough
+        for (int i = 0; i < ITERATIONS; ++i) {
+            double[] coord_sum_x = new double[centers.length];
+            double[] coord_sum_y = new double[N];
+            Arrays.fill(coord_count, 0);
+            for (int c = 0; c < centers.length; ++c) {
+                coord_count[c] = 0;
+            }
+            for (Map.Entry<Coordinate, Integer> entry : pointWeight.entrySet()) {
+                coord = entry.getKey();
+                int weight = entry.getValue();
+                int best_center = -1;
+                double best_distance = Double.MAX_VALUE;
+                for (int c = 0; c < centers.length; ++c) {
+                    Coordinate center = centers[c].coord;
+                    double distance = DistanceLibrary.distance(coord, center);
+                    if (distance < best_distance) {
+                        best_center = c;
+                        best_distance = distance;
+                    }
+                }
+                coord_sum_x[best_center] += coord.x * weight;
+                coord_sum_y[best_center] += coord.y * weight;
+                coord_count[best_center] += weight;
+            }
+
+            for (int c = 0; c < centers.length; ++c) {
+                if (coord_count[c] == 0) {
+                    // this center has no points near it.
+                    centers[c].weight = 0;
+                    continue;
+                }
+                centers[c].coord = new Coordinate(coord_sum_x[c] / coord_count[c], coord_sum_y[c]
+                        / coord_count[c]);
+                centers[c].weight = coord_count[c];
+            }
+
+        }
+        _log.debug("found transit center");
+
+        //the highest-weighted cluster
+        return Collections.max(Arrays.asList(centers)).coord;
     }
 
     private void addAgencies(TransitIndexServiceImpl service) {
