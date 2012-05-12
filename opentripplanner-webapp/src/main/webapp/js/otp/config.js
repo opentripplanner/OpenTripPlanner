@@ -11,10 +11,6 @@ if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
 
-// TODO more work needed to make train, bikeshare, etc... modes a 'switchable' feature in the UI
-// TODO see otp.config_defaults.planner.options and the related code as to how to turn stuff on & off
-otp.locale.English.tripPlanner.mode = otp.locale.English.tripPlanner.with_bikeshare_mode;
-
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
     routerId      : "",
@@ -28,6 +24,8 @@ otp.config_defaults = {
 
         // options to turn stuff on / off on the planner
         options        : {
+            showBikeshareMode     : true,   // turn on/off the bikeshare options in the mode pull down
+            showTrainMode         : true,   // turn on/off the train options in the mode pull down
             showWheelchairForm    : true,   // turn on/off the wheelchair check box (on by default)
             showIntermediateForms : true,   // turn on/off the ability to plan routes with intermediate points 
             showStopCodes         : true,   // show stop codes as part of the itinerary
@@ -229,6 +227,14 @@ try {
     // step 3: apply our default to the existing (possibly empty) otp config
     otp.inherit(otp.config, otp.config_defaults);       // step 3a: build the object up
     otp.configure(otp.config, otp.config_defaults);     // step 3b: make sure any / all local changes above get applied
+
+    // TODO more work needed to make train, bikeshare, etc... modes a 'switchable' feature in the UI
+    // TODO see otp.config_defaults.planner.options and the related code as to how to turn stuff on & off
+    if(otp.config.planner.options.showBikeshareMode)
+    {
+        otp.locale.English.tripPlanner.mode = otp.locale.English.tripPlanner.with_bikeshare_mode;
+    }
+
     console.log("otp.config updated with default items from otp.config_static");
 } catch(e) {
     console.log("ERROR: was unable to run otp.inherid override in config.js - got this exception: " + e);
