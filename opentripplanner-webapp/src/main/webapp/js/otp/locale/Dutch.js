@@ -354,6 +354,20 @@ otp.locale.Dutch = {
             ['TRAINISH,WALK', 'Alleen trein'],
             ['WALK', 'Alleen lopen'],
             ['BICYCLE', 'Fiets'],
+            ['TRANSIT,BICYCLE', 'OV & Fiets'],
+        ],
+
+        // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
+        //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
+        // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
+
+        with_bikeshare_mode :
+        [
+            ['TRANSIT,WALK', 'OV'],
+            ['BUSISH,WALK', 'Alleen bus'],
+            ['TRAINISH,WALK', 'Alleen trein'],
+            ['WALK', 'Alleen lopen'],
+            ['BICYCLE', 'Fiets'],
             ['WALK,BICYCLE', 'Huurfiets'],
             ['TRANSIT,BICYCLE', 'OV & Fiets'],
             ['TRANSIT,WALK,BICYCLE', 'OV & OV-fiets']
