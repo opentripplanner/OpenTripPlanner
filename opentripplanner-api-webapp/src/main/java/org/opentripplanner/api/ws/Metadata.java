@@ -23,9 +23,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Required;
 
 import com.sun.jersey.api.spring.Autowire;
 
