@@ -65,16 +65,17 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
         try {
             InputStream data = HttpUtils.getData(url);
             if (data == null) {
-                throw new RuntimeException("Failed to get data from url " + url);
+                log.warn("Failed to get data from url " + url);
+                return false;
             }
             parseXML(data);
         } catch (IOException e) {
-            log.warn("Eror reading bike rental feed from " + url, e);
+            log.warn("Error reading bike rental feed from " + url, e);
             return false;
         } catch (ParserConfigurationException e) {
             throw new RuntimeException(e);
         } catch (SAXException e) {
-            log.warn("Eror parsing bike rental feed from " + url + "(bad XML of some sort)", e);
+            log.warn("Error parsing bike rental feed from " + url + "(bad XML of some sort)", e);
             return false;
         }
         return true;
@@ -136,4 +137,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
 
     public abstract BikeRentalStation makeStation(Map<String, String> attributes);
 
+    public String toString() {
+        return getClass().getName() + "(" + url + ")";
+    }
 }
