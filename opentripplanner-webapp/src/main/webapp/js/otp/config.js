@@ -11,6 +11,9 @@ if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
 
+// TODO more work needed to make train, bikeshare, etc... modes a 'switchable' feature in the UI
+// TODO see otp.config_defaults.planner.options and the related code as to how to turn stuff on & off
+otp.locale.English.tripPlanner.mode = otp.locale.English.tripPlanner.with_bikeshare_mode;
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
