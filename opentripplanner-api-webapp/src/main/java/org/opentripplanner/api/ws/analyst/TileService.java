@@ -45,7 +45,7 @@ public class TileService extends RoutingResource {
     public Response tileGet() throws Exception { 
         
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
-        TileRequest tileRequest = new TileRequest(env, 255, 255);
+        TileRequest tileRequest = new TileRequest(env, 256, 256);
         RoutingRequest sptRequestA = buildRequest(0);
         RoutingRequest sptRequestB = buildRequest(1);
 
