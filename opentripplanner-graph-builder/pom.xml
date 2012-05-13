@@ -1,9 +1,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <artifactId>opentripplanner-graph-builder</artifactId>
     <packaging>jar</packaging>
-    <name>opentripplanner-graph-builder</name>
-    <url>http://maven.apache.org</url>
+    <name>OpenTripPlanner Graph Builder</name>
+    <url>http:/www.opentripplanner.org</url>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
@@ -11,40 +12,27 @@
         <version>0.7.4-SNAPSHOT</version>
     </parent>
 
-    <repositories>
-        <repository>
-            <id>opengeo</id>
-            <name>OpenGeo Maven Repository</name>
-            <url>http://repo.opengeo.org/</url>
-        </repository>
-    </repositories>
-
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-routing</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>openstreetmap</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-utils</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
@@ -55,12 +43,10 @@
             <artifactId>spring-orm</artifactId>
             <version>3.0.5.RELEASE</version>
         </dependency>
-        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-        
         <dependency>
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
@@ -76,7 +62,6 @@
           <artifactId>commons-discovery</artifactId>
           <version>0.4</version>
         </dependency>
-
         <dependency>
         	<groupId>postgresql</groupId>
         	<artifactId>postgresql</artifactId>
@@ -92,15 +77,25 @@
   	    <dependency>
   		    <groupId>org.geotools</groupId>
   		    <artifactId>gt-arcgrid</artifactId>
-  		    <version>${geotools.version}</version>
   	    </dependency>
-
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-shapefile</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-geotiff</artifactId>
+        </dependency>
+        <dependency>
+          <!-- provides EPSG database for shapefile loading -->
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-epsg-hsql</artifactId>
+        </dependency>
 	    <dependency>
 	        <groupId>org.apache.commons</groupId>
 	        <artifactId>commons-compress</artifactId>
 	        <version>1.0</version>
 	    </dependency>
-
         <dependency>
       		<groupId>net.java.dev.jets3t</groupId>
       		<artifactId>jets3t</artifactId>

@@ -217,6 +217,21 @@
   </profiles>
 
   <repositories>
+    <!-- Hack to force maven to check central first. Maven central is inherited from the superpom,
+      but ends up at the end of the list. Though most of the time the artifact is in central, 
+      Maven tries to download from every other repository and fails before checking central.  
+      Do not change the id from central2 to central, otherwise the entry will be ignored. -->
+    <repository>
+      <id>central2</id>
+      <name>check central first to avoid a lot of not found warnings</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>    
+    <repository>
+        <id>download.java.net</id>
+        <name>Java.net Repository for Maven</name>
+        <url>http://download.java.net/maven/2/</url>
+        <layout>default</layout>
+    </repository>
     <repository>
       <id>releases.developer.onebusaway.org</id>
       <url>http://developer.onebusaway.org/maven/repository/</url>
@@ -233,11 +248,6 @@
       <url>http://download.osgeo.org/webdav/geotools/</url>
     </repository>
     <repository>
-      <id>java.net</id>
-      <name>java.net</name>
-      <url>http://download.java.net/</url>
-    </repository>
-    <repository>
       <id>axis</id>
       <name>axis</name>
       <url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/</url>
@@ -250,59 +260,23 @@
       </snapshots>
       <url>http://repo.opengeo.org/</url>
     </repository>
+<!--         <repository> -->
+<!--             <id>osgeo-snapshots</id> -->
+<!--             <name>OSGeo snapshots repository</name> -->
+<!--             <snapshots> -->
+<!--                 <enabled>true</enabled> -->
+<!--             </snapshots> -->
+<!--             <url>http://download.osgeo.org/</url> -->
+<!--         </repository> -->
   </repositories>
 
+  <!-- define no dependencies in the top-level POM to minimize artifact size -->
   <dependencies>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-coverage</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-geojson</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-geotiff</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-main</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-shapefile</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-epsg-hsql</artifactId>
-      <version>${geotools.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.hsqlsdb</groupId>
-          <artifactId>hsqldb</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.hsqldb</groupId>
-      <artifactId>hsqldb</artifactId>
-      <version>2.0.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.onebusaway</groupId>
-      <artifactId>onebusaway-gtfs</artifactId>
-      <version>1.3.0</version>
-    </dependency>
   </dependencies>
 
   <dependencyManagement>
     <dependencies>
+      <!-- Spring -->
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-aop</artifactId>
@@ -343,6 +317,124 @@
         <artifactId>spring-security-web</artifactId>
         <version>${spring.version}</version>
       </dependency>
+      <!-- Geotools -->
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-coverage</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+	<dependency>
+	  <groupId>org.geotools</groupId>
+	  <artifactId>gt-geojson</artifactId>
+	  <version>${geotools.version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.geotools</groupId>
+	  <artifactId>gt-geotiff</artifactId>
+	  <version>${geotools.version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.geotools</groupId>
+	  <artifactId>gt-referencing</artifactId>
+	  <version>${geotools.version}</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.geotools</groupId>
+	  <artifactId>gt-shapefile</artifactId>
+	  <version>${geotools.version}</version>
+	</dependency>
+    <dependency>
+      <groupId>org.geotools</groupId>
+      <artifactId>gt-arcgrid</artifactId>
+      <version>${geotools.version}</version>
+    </dependency>
+	<dependency>
+      <!-- provides EPSG database -->
+	  <groupId>org.geotools</groupId>
+	  <artifactId>gt-epsg-hsql</artifactId>
+	  <version>${geotools.version}</version>
+	  <exclusions>
+	    <exclusion>
+	      <groupId>org.hsqlsdb</groupId>
+	      <artifactId>hsqldb</artifactId>
+	    </exclusion>
+	  </exclusions>
+  	</dependency>
+    <!-- 
+      JTS is a transitive dependency of Geotools, but some submodules only need JTS
+      so require the same version here.
+    -->
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+      <version>1.12</version>
+    </dependency>    
+    <!-- Jersey -->
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-server</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-servlet</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-client</artifactId>
+      <version>${jersey.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly2</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
+      <version>${jersey.version}</version>
+      <!-- exclude these spring 2.5.6 jars -->
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+      </exclusions> 
+    </dependency>
+	<!-- Other -->
+	<dependency>
+	  <groupId>org.hsqldb</groupId>
+	  <artifactId>hsqldb</artifactId>
+	  <version>2.0.0</version>
+	</dependency>
+	<dependency>
+	  <groupId>org.onebusaway</groupId>
+	  <artifactId>onebusaway-gtfs</artifactId>
+	  <version>1.3.0</version>
+	</dependency>
       <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
@@ -353,6 +445,11 @@
         <artifactId>junit</artifactId>
         <version>4.8.1</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.5.8</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -1,21 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <artifactId>opentripplanner-api-webapp</artifactId>
     <packaging>war</packaging>
-    <name>opentripplanner-api-webapp</name>
+    <name>OpenTripPlanner API Webapp</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
         <version>0.7.4-SNAPSHOT</version>
     </parent>
-
-    <repositories>
-        <repository>
-            <id>download.java.net</id>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -51,45 +45,23 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-json</artifactId>
-            <version>${jersey.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-            <version>${jersey.version}</version>
-            <exclusions>
-              <exclusion>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-core</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-beans</artifactId>
-              </exclusion>
-              <exclusion>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-              </exclusion>
-            </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-geojson</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -118,7 +90,6 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
         </dependency>
         <dependency>
             <groupId>javax.ws.rs</groupId>

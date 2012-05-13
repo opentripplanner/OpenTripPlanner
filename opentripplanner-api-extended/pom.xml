@@ -1,21 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <artifactId>opentripplanner-api-extended</artifactId>
     <packaging>war</packaging>
-    <name>opentripplanner-api-extended</name>
+    <name>OpenTripPlanner System Map</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
         <version>0.7.4-SNAPSHOT</version>
     </parent>
-
-    <repositories>
-        <repository>
-            <id>download.java.net</id>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <!--dependency>

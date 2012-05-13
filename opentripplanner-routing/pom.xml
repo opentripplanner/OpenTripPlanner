@@ -1,8 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    
     <artifactId>opentripplanner-routing</artifactId>
     <packaging>jar</packaging>
-    <name>opentripplanner-routing</name>
+    <name>OpenTripPlanner Routing</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
@@ -11,6 +12,10 @@
     </parent>
 
     <dependencies>
+        <dependency>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-core</artifactId>
@@ -29,7 +34,6 @@
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -46,14 +50,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-utils</artifactId>
             <version>${project.version}</version>
-            <type>jar</type>
             <scope>compile</scope>
         </dependency>
     </dependencies>

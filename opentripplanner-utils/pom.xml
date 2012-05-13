@@ -1,15 +1,25 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>opentripplanner-utils</artifactId>
+  <name>OpenTripPlanner Utilities</name>
+  <url>http://www.opentripplanner.org</url>
   <parent>
     <artifactId>opentripplanner</artifactId>
     <groupId>org.opentripplanner</groupId>
     <version>0.7.4-SNAPSHOT</version>
   </parent>
-  <artifactId>opentripplanner-utils</artifactId>
-  <name>opentripplanner-utils</name>
-  <url>http://www.opentripplanner.org</url>
+
   <dependencies>
+    <dependency>
+      <groupId>com.vividsolutions</groupId>
+      <artifactId>jts</artifactId>
+    </dependency>
+  <dependency>
+    <groupId>org.geotools</groupId>
+      <artifactId>gt-referencing</artifactId>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -17,7 +27,6 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.8</version>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>

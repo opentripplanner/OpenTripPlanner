@@ -3,17 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>opentripplanner-webapp</artifactId>
     <packaging>war</packaging>
-    <name>opentripplanner-webapp</name>
+    <name>OpenTripPlanner Main Client</name>
 
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
         <version>0.7.4-SNAPSHOT</version>
     </parent>
-
-    <dependencies>
-
-    </dependencies>
 
     <build>
         <finalName>opentripplanner-webapp</finalName>
