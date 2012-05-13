@@ -25,7 +25,7 @@ import com.vividsolutions.jts.operation.distance.GeometryLocation;
 public class SampleFactory implements SampleSource {
 
     private static final GeometryFactory geometryFactory = new GeometryFactory();
-    private static final double SEARCH_RADIUS_M = 100; // meters
+    private static final double SEARCH_RADIUS_M = 150; // meters
     private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
 
     @Autowired
@@ -49,7 +49,7 @@ public class SampleFactory implements SampleSource {
         Envelope env = new Envelope(c);
         env.expandBy(SEARCH_RADIUS_DEG, SEARCH_RADIUS_DEG);
         @SuppressWarnings("unchecked")
-        List<TurnVertex> vs = (List<TurnVertex>) index.query(env);
+        List<TurnVertex> vs = (List<TurnVertex>) index.queryPedestrian(env);
         // query always returns a (possibly empty) list, but never null
         
         // find two closest among nearby geometries
