@@ -39,6 +39,7 @@ otp.planner.StaticForms = {
     // forms & stores
     m_panel               : null,
     m_routerIdForm        : null,
+    m_preferredRoutes     : '',
 
     m_fromForm            : null,
     m_toForm              : null,
@@ -251,7 +252,8 @@ otp.planner.StaticForms = {
             fromPlace : fromPlace,
             toPlace   : toPlace,
             date      : date,
-            time      : time
+            time      : time,
+            preferredRoutes : this.m_preferredRoutes
         });
     },
 
@@ -486,6 +488,9 @@ otp.planner.StaticForms = {
                 forms.m_date.setRawValue(params.on);
                 date = true;
             }
+
+            if(params.preferredRoutes)
+                this.m_preferredRoutes = params.preferredRoutes;
 
             // arrive by parameter 
             if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "true"))
@@ -789,6 +794,7 @@ otp.planner.StaticForms = {
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
         var dateParam    = new Ext.form.Hidden({name: 'date',      value: ''});
+        var prefRoutes   = new Ext.form.Hidden({name: 'preferredRoutes', value: ''});
         //this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
 
         var conf = {
@@ -800,6 +806,7 @@ otp.planner.StaticForms = {
             items:       [  fromToFP,
                             optFP,
                             dateParam,
+                            prefRoutes,
                             this.m_routerIdForm,
                             this.m_toPlace,
                             this.m_fromPlace,
