@@ -36,6 +36,7 @@ public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
         ShortestPathTree spt = sptService.getShortestPathTree(req);
         long t1 = System.currentTimeMillis();
         LOG.debug("calculated spt in {}msec", (int) (t1 - t0));
+        req.cleanup();
         return spt;
     }
 
