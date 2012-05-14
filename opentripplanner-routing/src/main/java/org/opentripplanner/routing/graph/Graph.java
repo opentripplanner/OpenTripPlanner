@@ -195,7 +195,7 @@ public class Graph implements Serializable {
 
     // Infer the time period covered by the transit feed
     public void updateTransitFeedValidity(CalendarServiceData data) {
-        long now = new Date().getTime();
+        long now = new Date().getTime() / 1000;
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
