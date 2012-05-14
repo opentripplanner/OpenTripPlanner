@@ -42,6 +42,8 @@ public class GraphServiceImpl implements GraphService {
     
     private String defaultRouterId = "";
 
+    private boolean preloadGraphs = true;
+
     private boolean synchronousReload = true;
 
     public void setPath(String path) {
@@ -53,8 +55,14 @@ public class GraphServiceImpl implements GraphService {
         //////////////////
     }
 
-    @Override
     @PostConstruct // This means it will run on startup
+    public void preloadGraphs() {
+    	if (preloadGraphs) {
+    		getGraph(null); // pre-load the default graph
+    	}
+    }
+
+    @Override
     public Graph getGraph() {
         return getGraph(null);
     }
@@ -73,8 +81,10 @@ public class GraphServiceImpl implements GraphService {
         LOG.debug("graph for routerId '{}' is at {}", routerId, graphFile.getAbsolutePath());
         if (graphFile == null || !graphFile.exists()) {
             LOG.warn("graph file not found: {}", graphFile);
-            if (routerId.equals(defaultRouterId))
-            	throw new RuntimeException("graph for default routerId does not exist: " + graphFile);
+            if (routerId.equals(defaultRouterId)) {
+            	LOG.warn("graph for default routerId {} does not exist at {}", routerId, graphFile);
+            	return null;
+            }
             return getGraph(null); // fall back on default if graph does not exist
         }
         /* this really needs a readers/writer lock */

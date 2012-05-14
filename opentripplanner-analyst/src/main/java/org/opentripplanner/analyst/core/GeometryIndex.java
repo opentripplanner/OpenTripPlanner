@@ -40,6 +40,8 @@ public class GeometryIndex implements GeometryIndexService {
     @Autowired
     public void setGraphService(GraphService graphService) {
         Graph graph = graphService.getGraph();
+        if (graph == null) // analyst currently depends on there being a single default graph
+        	return;
         // build a spatial index of road geometries (not individual edges)
         pedestrianIndex = new STRtree();
         index = new STRtree();
