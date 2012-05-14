@@ -22,11 +22,11 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     @Autowired
     private SampleFactory sampleFactory;
     
-    @Autowired
-    private HashGridSampler hashSampler;
-
-    @Autowired
-    private SampleCache sampleCache;
+//    @Autowired
+//    private HashGridSampler hashSampler;
+//
+//    @Autowired
+//    private SampleCache sampleCache;
 
     private final LoadingCache<TileRequest, Tile> tileCache = CacheBuilder
             .newBuilder()

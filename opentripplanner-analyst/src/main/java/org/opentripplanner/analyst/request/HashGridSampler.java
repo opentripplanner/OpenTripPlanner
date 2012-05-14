@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
-@Component
+//@Component
 public class HashGridSampler implements SampleSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(HashGridSampler.class);
