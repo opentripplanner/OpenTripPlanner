@@ -20,7 +20,7 @@ otp.config_defaults = {
     planner : {
         url            : null,
         printUrl       : "print.html",
-        maxTransfers   : null,    // when maxTransfers > 0, this value will be sent down to the api to override any defaults (current api default == 2 as of 3/2012)
+        maxTransfers   : null,  // when maxTransfers != null, value is sent down as maxTransfers param to the api (current api default maxTransfers=2)
 
         // options to turn stuff on / off on the planner
         options        : {

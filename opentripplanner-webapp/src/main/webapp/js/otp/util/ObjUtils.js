@@ -50,7 +50,8 @@ otp.util.ObjUtils = {
         var retVal = false;
         try
         {
-            retVal = !isNaN(value - 111);
+            if(value)
+                retVal = !isNaN(value - 111);
         }
         catch(e)
         {
