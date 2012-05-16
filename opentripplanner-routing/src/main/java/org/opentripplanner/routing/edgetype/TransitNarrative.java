@@ -19,55 +19,57 @@ import org.opentripplanner.routing.core.EdgeNarrative;
 
 public class TransitNarrative extends DelegatingEdgeNarrative {
 
-	private Trip trip;
-	private String headsign;
+    private Trip trip;
 
-	public TransitNarrative(Trip trip, EdgeNarrative edge) {
-		super(edge);
-		this.trip = trip;
-	}
+    private String headsign;
 
-	public TransitNarrative(Trip trip, String headsign, EdgeNarrative edge) {
-		super(edge);
-		this.trip = trip;
-		this.headsign = headsign;
-	}
-	
+    public TransitNarrative(Trip trip, EdgeNarrative edge) {
+        super(edge);
+        this.trip = trip;
+    }
+
+    public TransitNarrative(Trip trip, String headsign, EdgeNarrative edge) {
+        super(edge);
+        this.trip = trip;
+        this.headsign = headsign;
+    }
+
     public String getDirection() {
         return getTrip().getTripHeadsign();
     }
 
-   
-	@Override
-	public String getName() {
-		return GtfsLibrary.getRouteName(trip.getRoute());
-	}
+    @Override
+    public String getName() {
+        return GtfsLibrary.getRouteName(trip.getRoute());
+    }
 
-	@Override
-	public Trip getTrip() {
-		if (headsign == null) {
-			return trip;
-		} else {
-			Trip newtrip = new Trip();
-			newtrip.setTripHeadsign(headsign); /* This is the only difference */
+    @Override
+    public Trip getTrip() {
+        if (headsign == null) {
+            return trip;
+        } else {
+            Trip newtrip = new Trip();
+            newtrip.setTripHeadsign(headsign); /* This is the only difference */
 
-			newtrip.setBlockId(trip.getBlockId());
-			newtrip.setDirectionId(trip.getDirectionId());
-			newtrip.setDirectionId(trip.getDirectionId());
-			newtrip.setId(trip.getId());
-			newtrip.setRoute(trip.getRoute());
-			newtrip.setRouteShortName(trip.getRouteShortName());
-			newtrip.setServiceId(trip.getServiceId());
-			newtrip.setShapeId(trip.getServiceId());
-			newtrip.setTripBikesAllowed(trip.getTripBikesAllowed());
-			newtrip.setTripShortName(trip.getTripShortName());
-			newtrip.setWheelchairAccessible(trip.getWheelchairAccessible());
+            newtrip.setBlockId(trip.getBlockId());
+            newtrip.setDirectionId(trip.getDirectionId());
+            newtrip.setDirectionId(trip.getDirectionId());
+            newtrip.setId(trip.getId());
+            newtrip.setRoute(trip.getRoute());
+            newtrip.setRouteShortName(trip.getRouteShortName());
+            newtrip.setServiceId(trip.getServiceId());
+            newtrip.setShapeId(trip.getServiceId());
+            newtrip.setTripBikesAllowed(trip.getTripBikesAllowed());
+            newtrip.setTripShortName(trip.getTripShortName());
+            newtrip.setWheelchairAccessible(trip.getWheelchairAccessible());
 
-			return newtrip;
-		}
-	}
+            trip = newtrip;
+            headsign = null;
+            return newtrip;
+        }
+    }
 
-	public String toString() {
-		return "TransitNarrative(" + base + ")";
-	}
+    public String toString() {
+        return "TransitNarrative(" + base + ")";
+    }
 }
