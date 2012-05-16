@@ -307,9 +307,9 @@ public class GTFSPatternHopFactory {
 
         for (Trip trip : trips) {
 
+            index++;
             if (index % 100000 == 0)
                 _log.debug("trips=" + index + "/" + trips.size());
-            index++;
 
             List<StopTime> stopTimes = getNonduplicateStopTimesForTrip(trip);
             filterStopTimes(stopTimes, graph);
@@ -369,11 +369,10 @@ public class GTFSPatternHopFactory {
                                 tripPattern.getTrip(insertionPoint)));
                         simple = true;
                         createSimpleHops(graph, trip, stopTimes);
-                        // break;//?
                     } else {
                         _log.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DUPLICATE,
                                 trip.getId(), tripPattern.getTrip(insertionPoint)));
-                        break; // not continue - for frequency case
+                        simple = true;
                     }
                 } else {
                     // try to insert this trip at this location
@@ -423,15 +422,13 @@ public class GTFSPatternHopFactory {
                     if (blockId != null && !blockId.equals("")) {
                         addTripToInterliningMap(trip, stopTimes, tripPattern);
                     }
-                    tripPattern
-                            .setTripFlags(
-                                    insertionPoint,
-                                    ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE
-                                            : 0)
-                                            | (((trip.getRoute().getBikesAllowed() == 2 && trip
-                                                    .getTripBikesAllowed() != 1) || trip
-                                                    .getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED
-                                                    : 0));
+                    tripPattern.setTripFlags(insertionPoint,
+                            ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE
+                                    : 0)
+                                    | (((trip.getRoute().getBikesAllowed() == 2 && trip
+                                    .getTripBikesAllowed() != 1) || trip
+                                    .getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED
+                                            : 0));
                 }
             }
 
