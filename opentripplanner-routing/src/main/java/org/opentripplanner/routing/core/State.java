@@ -355,7 +355,8 @@ public class State implements Cloneable {
             return TraverseMode.WALK;
         if (modes.getBicycle())
             return TraverseMode.BICYCLE;
-
+        if (modes.getWalk())
+            return TraverseMode.WALK;
         return null;
     }
 
