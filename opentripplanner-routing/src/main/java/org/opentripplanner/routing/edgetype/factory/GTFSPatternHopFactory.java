@@ -642,9 +642,15 @@ public class GTFSPatternHopFactory {
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                _log.trace(GraphBuilderAnnotation.register(graph, 
-                          Variety.HOP_SPEED, hopSpeed, hopDistance,
-                          st0.getTrip().getRoute(), 
+                _log.trace(GraphBuilderAnnotation.register(graph,
+                          Variety.HOP_SPEED_FAST, hopSpeed, hopDistance,
+                          st0.getTrip().getRoute(),
+                          st0.getTrip().getId(), st0.getStopSequence()));
+            } else if (hopSpeed < 0.1) {
+                // 0.1 m/sec ~= 0.2 miles/hr
+                _log.trace(GraphBuilderAnnotation.register(graph,
+                          Variety.HOP_SPEED_SLOW, hopSpeed, hopDistance,
+                          st0.getTrip().getRoute(),
                           st0.getTrip().getId(), st0.getStopSequence()));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect

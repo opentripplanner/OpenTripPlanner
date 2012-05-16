@@ -107,7 +107,8 @@ public class GraphBuilderAnnotation implements Serializable {
         ELEVATION_FLATTENED("Edge %s was steeper than Baldwin Street and was flattened."),
         AGENCY_NAME_COLLISION("Agency %s was already defined by %s. Both feeds will refer to the " +
                 "same agency. Is this intentional?"),
-        HOP_SPEED("Excessive speed of %f m/sec over %fm on route %s trip %s stop sequence %d."),
+        HOP_SPEED_FAST("Excessive speed of %f m/sec over %fm on route %s trip %s stop sequence %d."),
+        HOP_SPEED_SLOW("Very slow speed of %f m/sec over %fm on route %s trip %s stop sequence %d."),
         HOP_ZERO_DISTANCE("Zero-distance hop in %d seconds on trip %s stop sequence %d."),
         HOP_ZERO_TIME("Zero-time hop over %fm on route %s trip %s stop sequence %d."), 
         NEGATIVE_DWELL_TIME("Negative time dwell at %s; we will assume it is zero."),
