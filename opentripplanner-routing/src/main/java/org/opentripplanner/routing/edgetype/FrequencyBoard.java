@@ -20,39 +20,33 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge {
+    private static final long serialVersionUID = 7919511656529752927L;
 
-/**
- * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
- * on vehicle. When traversed forward, the the resultant state has the time of the next
- * departure, in addition the pattern that was boarded. When traversed backward, the result
- * state is unchanged. A boarding penalty can also be applied to discourage transfers.
- */
-public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
-
-    private static final long serialVersionUID = 1042740795612978747L;
-
-    private static final Logger _log = LoggerFactory.getLogger(PatternBoard.class);
-
+    private static final Logger _log = LoggerFactory.getLogger(FrequencyBoard.class);
+            
     private int stopIndex;
-
+    private FrequencyBasedTripPattern pattern;
     private int modeMask;
 
-    public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
-            TripPattern pattern, int stopIndex, TraverseMode mode) {
-        super(fromStopVertex, toPatternVertex, pattern);
+
+    public FrequencyBoard(TransitVertex from, TransitVertex to,
+            FrequencyBasedTripPattern pattern, int stopIndex, TraverseMode mode) {
+        super(from, to);
+        this.pattern = pattern;
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
     }
@@ -80,6 +74,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     public State traverse(State state0) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
+        Trip trip = pattern.getTrip();
+
         if (options.isArriveBy()) {
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
@@ -87,7 +83,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (state0.getBackEdge() instanceof PatternAlight) {
                 return null;
             }
-            Trip trip = pattern.getTrip(state0.getTrip());
             EdgeNarrative en = new TransitNarrative(trip, this);
             StateEditor s1 = state0.edit(this, en);
             int type = pattern.getBoardType(stopIndex);
@@ -109,41 +104,35 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long current_time = state0.getTime();
+            long currentTime = state0.getTime();
             int bestWait = -1;
-            int bestPatternIndex = -1;
             TraverseMode mode = state0.getNonTransitMode(options);
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            SD: for (ServiceDay sd : rctx.serviceDays) {
-                int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
+            if (options.bannedTrips.contains(trip.getId())) {
+                //This behaves a little differently than with ordinary trip patterns,
+                //because trips don't really have strong identities in frequency-based
+                //plans.  I expect that reasonable plans will still be produced, since
+                //we used to use route banning and that was not so bad.
+                return null;
+            }
+            AgencyAndId serviceId = trip.getServiceId();
+            for (ServiceDay sd : rctx.serviceDays) {
+                int secondsSinceMidnight = sd.secondsSinceMidnight(currentTime);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight,
+                    int startTime = pattern.getNextDepartureTime(stopIndex, secondsSinceMidnight,
                             options.wheelchairAccessible, mode == TraverseMode.BICYCLE, true);
-                    if (patternIndex >= 0) {
-                        Trip trip = pattern.getTrip(patternIndex);
-                        while (options.bannedTrips.contains(trip.getId())) {
-                            /* trip banned, try next trip */
-                            patternIndex += 1;
-                            if (patternIndex >= pattern.getTrips().size()) {
-                                /* ran out of trips today */
-                                continue SD;
-                            }
-                            trip = pattern.getTrip(patternIndex);
-                        }
-
-                        // a trip was found, index is valid, wait will be non-negative
-                        int wait = (int) (sd.time(pattern.getDepartureTime(stopIndex,
-                                patternIndex)) - current_time);
+                    if (startTime >= 0) {
+                        // a trip was found, wait will be non-negative
+                        
+                        int wait = (int) (sd.time(startTime) - currentTime);
                         if (wait < 0)
                             _log.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
-                            bestPatternIndex = patternIndex;
                         }
                     }
 
@@ -152,7 +141,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (bestWait < 0) {
                 return null;
             }
-            Trip trip = getPattern().getTrip(bestPatternIndex);
 
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
@@ -191,11 +179,10 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            s1.setTrip(bestPatternIndex);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
-            s1.setZone(getPattern().getZone(stopIndex));
+            s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 
             long wait_cost = bestWait;
@@ -222,7 +209,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (! rctx.opt.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            AgencyAndId serviceId = pattern.getTrip().getServiceId();
             for (ServiceDay sd : rctx.serviceDays)
                 if (sd.serviceIdRunning(serviceId))
                     return 0;
@@ -253,5 +240,9 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     public String toString() {
         return "PatternBoard(" + getFromVertex() + ", " + getToVertex() + ")";
+    }
+
+    public FrequencyBasedTripPattern getPattern() {
+        return pattern;
     }
 }

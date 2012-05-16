@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  *  Models waiting in a station on a vehicle. 
  */
-public class Dwell extends AbstractEdge {
+public class Dwell extends AbstractEdge implements DwellEdge {
 
     /*
      * Models waiting in a station where passengers may remain on the vehicle. This may be useful

@@ -39,6 +39,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
+import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
+import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -542,6 +544,26 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(4, path.states.size());
         endTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 14, 40, 0);
         assertEquals(endTime, path.getEndTime());
+        
+        boolean boarded = false;
+        for (FrequencyBoard e : filter(stop_u.getOutgoing(), FrequencyBoard.class)) {
+            boarded = true;
+            FrequencyBoard board = (FrequencyBoard) e;
+            FrequencyBasedTripPattern pattern = board.getPattern();
+            int previousArrivalTime = pattern.getPreviousArrivalTime(0, 0, false, false, false);
+            assertTrue(previousArrivalTime < 0);
+            
+            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*7-1, false, false, false);
+            assertEquals(60*60*6, previousArrivalTime);
+            
+            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*11, false, false, false);
+            assertEquals(60*60*10, previousArrivalTime);
+            
+            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*18, false, false, false);
+            assertEquals(60*60*16, previousArrivalTime);
+        }
+        assertTrue(boarded);
+        
     }
     
     public void testFewestTransfers() {

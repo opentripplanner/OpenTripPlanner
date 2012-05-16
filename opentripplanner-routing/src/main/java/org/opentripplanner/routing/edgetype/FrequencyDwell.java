@@ -14,34 +14,35 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
+import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- *  Models waiting in a station on a vehicle.  The vehicle may not change 
- *  names during this time -- PatternInterlineDwell represents that case.
+ *  Models waiting in a station on a vehicle, for frequency-based trips
  */
-public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
+public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
     
     private static final long serialVersionUID = 1L;
 
     private int stopIndex;
+
+    private FrequencyBasedTripPattern pattern;
     
-    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TripPattern tripPattern) {
-        super(from, to, tripPattern);
+    public FrequencyDwell(TransitVertex from, TransitVertex to, int stopIndex, FrequencyBasedTripPattern pattern) {
+        super(from, to);
         this.stopIndex = stopIndex;
-        this.pattern = tripPattern;
+        this.pattern = pattern;
     }
 
     public String getDirection() {
-        return pattern.getExemplar().getTripHeadsign();
+        return pattern.getTrip().getTripHeadsign();
     }
 
     public double getDistance() {
@@ -49,15 +50,15 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getTraverseMode(pattern.getTrip().getRoute());
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
     }
 
     public State traverse(State state0) {
-        int dwellTime = pattern.getDwellTime(stopIndex, state0.getTrip());
+        int dwellTime = pattern.getDwellTime(stopIndex);
         StateEditor s1 = state0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
@@ -66,7 +67,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
 
     @Override
     public State optimisticTraverse(State s0) {
-        int dwellTime = pattern.getBestDwellTime(stopIndex);
+        int dwellTime = pattern.getDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
@@ -75,7 +76,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return pattern.getBestDwellTime(stopIndex);
+        return pattern.getDwellTime(stopIndex);
     }
 
     @Override
@@ -91,11 +92,11 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return "PatternDwell(" + super.toString() + ")";
     }
 
-    public void setPattern(TripPattern pattern) {
+    public void setPattern(FrequencyBasedTripPattern pattern) {
         this.pattern = pattern;
     }
 
-    public TripPattern getPattern() {
+    public FrequencyBasedTripPattern getPattern() {
         return pattern;
     }
 
