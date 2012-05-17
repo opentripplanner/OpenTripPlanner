@@ -79,7 +79,7 @@ public class TestBikeRental extends TestCase {
         assertNull(path);
 
         // so we add a bike share
-        BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "station", -77.049,
+        BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "id", "station", -77.049,
                 36.856, "station", 10);
         new StreetBikeRentalLink(station, v2);
         new StreetBikeRentalLink(v2, station);
@@ -96,7 +96,7 @@ public class TestBikeRental extends TestCase {
         // null is returned because the only state at the target is not final
         assertNull(path); 
 
-        BikeRentalStationVertex station2 = new BikeRentalStationVertex(graph, "station2", -77.049,
+        BikeRentalStationVertex station2 = new BikeRentalStationVertex(graph, "id2", "station2", -77.049,
                 36.857, "station", 10);
         new StreetBikeRentalLink(station2, v3);
         new StreetBikeRentalLink(v3, station2);

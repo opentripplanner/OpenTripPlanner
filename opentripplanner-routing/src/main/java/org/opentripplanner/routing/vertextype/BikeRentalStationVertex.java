@@ -18,16 +18,20 @@ public class BikeRentalStationVertex extends AbstractVertex {
 
     private int spacesAvailable;
 
-    public BikeRentalStationVertex(Graph g, String label, double x, double y, String name,
+    private String id;
+
+    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
             int capacity) {
         super(g, label, x, y, name);
+        this.setId(id);
         this.bikesAvailable = capacity / 2;
         this.spacesAvailable = capacity / 2;
     }
 
-    public BikeRentalStationVertex(Graph g, String label, double x, double y, String name,
+    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
             int bikes, int spaces) {
         super(g, label, x, y, name);
+        this.setId(id);
         this.bikesAvailable = bikes;
         this.spacesAvailable = spaces;
     }
@@ -46,5 +50,13 @@ public class BikeRentalStationVertex extends AbstractVertex {
 
     public void setSpacesAvailable(int spaces) {
         this.spacesAvailable = spaces;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

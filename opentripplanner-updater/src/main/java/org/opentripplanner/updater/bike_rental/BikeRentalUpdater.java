@@ -85,7 +85,7 @@ public class BikeRentalUpdater implements Runnable {
             BikeRentalStationVertex vertex = verticesByStation.get(station);
             if (vertex == null) {
                 String name = "bike rental station " + id;
-                vertex = new BikeRentalStationVertex(graph, name, station.x,
+                vertex = new BikeRentalStationVertex(graph, id, name, station.x,
                         station.y, station.name, station.bikesAvailable, station.spacesAvailable);
                 LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
                 for (Edge e : request.getEdgesAdded()) {
