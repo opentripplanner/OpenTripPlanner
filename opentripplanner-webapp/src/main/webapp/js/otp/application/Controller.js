@@ -101,6 +101,10 @@ otp.application.Controller = {
         // do the POI and the openTool stuff (and if a POI exists, suspend the pan on the tool)
         var p = this.params.getPoi(this.poi, this.map);
 
+        // full screen
+        if(this.params.isFullScreen())
+            this.ui.fullScreen(true);
+
         // trip planner forms
         var forms = this.planner.getForms();
         forms.populate(this.params.m_params);

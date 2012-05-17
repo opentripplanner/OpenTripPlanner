@@ -297,15 +297,14 @@ otp.planner.TripTab = {
                 break;
             }
         }
-        
-        if(hasBikeWalkLeg)
+
+        if(hasBikeWalkLeg && this.planner.options.showElevationGraph)
         {
             try
             {
                 this.ui.innerSouth.getEl().setHeight(180);
                 this.ui.innerSouth.show();
                 this.ui.viewport.doLayout();
-
                 this.topoRenderer.draw(this.m_activeItinerary, this.m_tripDetailsTree);
             }
             catch(e)
