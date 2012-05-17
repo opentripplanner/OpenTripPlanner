@@ -34,6 +34,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.StreetUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
@@ -48,10 +49,8 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * Loads a shapefile into an edge-based graph.
@@ -320,9 +319,7 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             MultiLineString ml = (MultiLineString) g;
 
             Coordinate[] coords = ml.getCoordinates();
-            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
-                    PrecisionModel.FLOATING), 4326);
-            return factory.createLineString(coords);
+            return GeometryUtils.getGeometryFactory().createLineString(coords);
         } else {
             throw new RuntimeException("found a geometry feature that's not a linestring: " + g);
         }

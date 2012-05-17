@@ -13,17 +13,17 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -47,7 +47,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
      * dimension, e.g. the ones on the Eiffel Tower.
      */
     private Geometry the_geom;
-
+    
     /**
      * @param level It's a float for future expansion.
      */
@@ -59,8 +59,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
         Coordinate[] coords = new Coordinate[2];
         coords[0] = new Coordinate(from.getX(), from.getY());
         coords[1] = new Coordinate(to.getX(), to.getY());
-        // TODO: SRID?
-        the_geom = new GeometryFactory().createLineString(coords);
+        the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
     }
     
     @Override

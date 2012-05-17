@@ -13,8 +13,6 @@
 
 package org.opentripplanner.analysis;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -22,18 +20,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.common.DisjointSet;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.util.MapUtils;
 
 import com.vividsolutions.jts.algorithm.ConvexHull;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
@@ -76,13 +73,12 @@ public class AnalysisUtils {
 
         // generate convex hull of each component
         List<Geometry> geoms = new ArrayList<Geometry>();
-        GeometryFactory gf = new GeometryFactory();
         int mainComponentSize = 0;
         int mainComponentIndex = -1;
         int component = 0;
         for (List<Coordinate> coords : componentCoordinates.values()) {
             Coordinate[] coordArray = new Coordinate[coords.size()];
-            ConvexHull hull = new ConvexHull(coords.toArray(coordArray), gf);
+            ConvexHull hull = new ConvexHull(coords.toArray(coordArray), GeometryUtils.getGeometryFactory());
             Geometry geom = hull.getConvexHull();
             // buffer components which are mere lines so that they do not disappear.
             if (geom instanceof LineString) {

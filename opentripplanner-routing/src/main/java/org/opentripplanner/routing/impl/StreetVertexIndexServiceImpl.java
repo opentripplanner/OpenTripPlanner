@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -51,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
@@ -98,7 +98,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private static final double DIRECTION_ERROR = 0.05;
 
     private static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
-
+    
     public StreetVertexIndexServiceImpl(Graph graph) {
         this.graph = graph;
         setup();
@@ -394,8 +394,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             extraStreets.add(se);
         
         Envelope envelope = new Envelope(coordinate);
-        GeometryFactory factory = new GeometryFactory();
-        Point p = factory.createPoint(coordinate);
+        Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         RoutingRequest walkingOptions = null;
         if (options != null) {
             walkingOptions = options.getWalkingOptions();

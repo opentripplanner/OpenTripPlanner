@@ -7,13 +7,13 @@ import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LinearLocation;
@@ -24,7 +24,6 @@ import com.vividsolutions.jts.operation.distance.GeometryLocation;
 @Component
 public class SampleFactory implements SampleSource {
 
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
     private static final double SEARCH_RADIUS_M = 150; // meters
     private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
 
@@ -35,7 +34,7 @@ public class SampleFactory implements SampleSource {
     /** implements SampleSource interface */
     public Sample getSample(double lon, double lat) {
         Coordinate c = new Coordinate(lon, lat);
-        Point p = geometryFactory.createPoint(c);
+        Point p = GeometryUtils.getGeometryFactory().createPoint(c);
         
         // track best two turn vertices
         TurnVertex v0 = null;

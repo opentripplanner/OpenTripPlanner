@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
@@ -25,8 +26,6 @@ import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 /**
  * A transit vehicle's journey between departure at one stop and arrival at the next.
@@ -101,13 +100,11 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     public Geometry getGeometry() {
         if (geometry == null) {
-            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
-                    PrecisionModel.FLOATING), 4326);
 
             Coordinate c1 = new Coordinate(start.getLon(), start.getLat());
             Coordinate c2 = new Coordinate(end.getLon(), end.getLat());
 
-            geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+            geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
         }
         return geometry;
     }

@@ -29,6 +29,7 @@ import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.impl.osm.OSMPlainStreetEdgeFactory;
@@ -83,7 +84,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -441,8 +441,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Graph graph;
 
-        GeometryFactory geometryFactory = new GeometryFactory();
-
         /** The bike safety factor of the safest street */
         private double bestBikeSafety = 1;
 
@@ -519,7 +517,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 String creativeName = wayPropertySet.getCreativeNameForWay(node);
-                BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "bike rental "
+                BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "" + node.getId(), "bike rental "
                         + node.getId(), node.getLon(), node.getLat(),
                         creativeName, capacity);
                 new RentABikeOnEdge(station, station);
@@ -694,7 +692,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                                 Coordinate[] coordinates = new Coordinate[] {
                                         startEndpoint.getCoordinate(), endEndpoint.getCoordinate() };
-                                LineString geometry = geometryFactory.createLineString(coordinates);
+                                LineString geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
                                 String id = "way (area) " + areaEntity.getId() + " from "
                                         + nodeI.getId() + " to " + nodeJ.getId();
@@ -913,7 +911,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             }
                         }
 
-                        geometry = geometryFactory.createLineString(segmentCoordinates
+                        geometry = GeometryUtils.getGeometryFactory().createLineString(segmentCoordinates
                                 .toArray(new Coordinate[0]));
                         segmentCoordinates.clear();
                     } else {

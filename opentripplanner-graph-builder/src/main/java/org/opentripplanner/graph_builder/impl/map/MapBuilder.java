@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -32,7 +33,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class MapBuilder implements GraphBuilder {
@@ -67,14 +67,13 @@ public class MapBuilder implements GraphBuilder {
                         continue;
                     }
 
-                    GeometryFactory gf = geometry.getFactory();
                     List<Coordinate> coordinates = new ArrayList<Coordinate>();
                     for (Edge e : edges) {
                         coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
                         MapUtils.addToMapList(edgesForRoute.edgesForRoute, route, e);
                     }
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
-                    LineString ls = gf.createLineString(coordinates.toArray(coordinateArray));
+                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
                     variant.setGeometry(ls);
                 }
             }

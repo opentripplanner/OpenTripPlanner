@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -159,7 +160,7 @@ public class LinkRequest {
         // decide out which sub-segment the current coordinate lies on.
         double bestDist = Double.MAX_VALUE;
         P2<PlainStreetEdge> bestPair = null;
-        Point p = linker.geometryFactory.createPoint(coordinate);
+        Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
         for (P2<PlainStreetEdge> pair : replacement) {
             PlainStreetEdge e1 = pair.getFirst();
             double dist = e1.getGeometry().distance(p);

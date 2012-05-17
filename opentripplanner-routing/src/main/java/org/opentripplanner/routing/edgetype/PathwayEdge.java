@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -7,7 +8,6 @@ import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 /* This program is free software: you can redistribute it and/or
@@ -27,8 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
  * A walking pathway as described in GTFS
  */
 public class PathwayEdge extends AbstractEdge {
-
-    private static GeometryFactory _geometryFactory = new GeometryFactory();
 
     private int traversalTime;
 
@@ -58,7 +56,7 @@ public class PathwayEdge extends AbstractEdge {
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
                 getToVertex().getCoordinate() };
-        return _geometryFactory.createLineString(coordinates);
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     public TraverseMode getMode() {

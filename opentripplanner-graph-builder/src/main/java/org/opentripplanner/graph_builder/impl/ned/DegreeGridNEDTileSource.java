@@ -36,10 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.operation.buffer.BufferBuilder;
-import com.vividsolutions.jts.operation.buffer.BufferParameters;
 
 /**
  * Download one-degree-wide, 1/3 arcsecond NED tiles from S3 (or get them from a directory of files

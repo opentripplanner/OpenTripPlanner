@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class GeometryUtils {
 
-    private static GeometryFactory gf = null;
+    private static GeometryFactory gf = new GeometryFactory();
 
     public static LineString makeLineString(double... coords) {
         GeometryFactory factory = getGeometryFactory();
@@ -30,10 +30,7 @@ public class GeometryUtils {
         return factory.createLineString(coordinates);
     }
 
-    private static GeometryFactory getGeometryFactory() {
-        if (gf == null) {
-            gf = new GeometryFactory();
-        }
+    public static GeometryFactory getGeometryFactory() {
         return gf;
     }
     

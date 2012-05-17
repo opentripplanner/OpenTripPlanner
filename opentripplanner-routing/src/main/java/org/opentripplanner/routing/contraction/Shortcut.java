@@ -18,19 +18,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.AbstractEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class Shortcut extends AbstractEdge {
     private static final long serialVersionUID = -5813252201367498850L;
@@ -59,8 +58,7 @@ public class Shortcut extends AbstractEdge {
 
     @Override
     public Geometry getGeometry() {
-        GeometryFactory gf = new GeometryFactory();
-        return gf.createLineString(new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate() });
+        return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate() });
     }
 
     @Override

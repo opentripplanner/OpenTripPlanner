@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -25,7 +26,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 /** 
@@ -38,7 +38,6 @@ public class StreetTransitLink extends AbstractEdge {
     private static final long serialVersionUID = -3311099256178798981L;
     private static final double STL_TRAVERSE_COST = 1;
 
-    private static GeometryFactory _geometryFactory = new GeometryFactory();
     private boolean wheelchairAccessible;
 
     private TransitStop transitStop;
@@ -65,7 +64,7 @@ public class StreetTransitLink extends AbstractEdge {
 
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate()};
-        return _geometryFactory.createLineString(coordinates);
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     public TraverseMode getMode() {

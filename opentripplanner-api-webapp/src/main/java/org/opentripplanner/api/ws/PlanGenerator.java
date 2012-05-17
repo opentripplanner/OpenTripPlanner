@@ -31,6 +31,7 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -68,14 +69,11 @@ import org.springframework.stereotype.Service;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 @Service @Scope("singleton")
 public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
-
-    private GeometryFactory geometryFactory = new GeometryFactory();
 
     @Autowired public PathService pathService;
     
@@ -466,7 +464,7 @@ public class PlanGenerator {
             leg.walkSteps = getWalkSteps(states.subList(start, end + 1));
         }
         leg.endTime = makeCalendar(state.getBackState());
-        Geometry geometry = geometryFactory.createLineString(coordinates);
+        Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
         leg.to = makePlace(state, true);
         coordinates.clear();

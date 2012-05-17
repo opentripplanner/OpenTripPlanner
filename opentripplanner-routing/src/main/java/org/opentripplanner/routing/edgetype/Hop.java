@@ -18,6 +18,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
@@ -29,8 +30,6 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.PrecisionModel;
 
 public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
 
@@ -120,15 +119,13 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
     public Geometry getGeometry() {
         if (geometry == null) {
 
-            GeometryFactory factory = new GeometryFactory(new PrecisionModel(
-                    PrecisionModel.FLOATING), 4326);
             Stop stop1 = start.getStop();
             Stop stop2 = end.getStop();
 
             Coordinate c1 = new Coordinate(stop1.getLon(), stop1.getLat());
             Coordinate c2 = new Coordinate(stop2.getLon(), stop2.getLat());
 
-            geometry = factory.createLineString(new Coordinate[] { c1, c2 });
+            geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
         }
         return geometry;
     }

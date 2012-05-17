@@ -25,7 +25,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 
 @Scope("singleton")
 public class GraphServiceImpl implements GraphService {

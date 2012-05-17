@@ -35,7 +35,6 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 public class NetworkLinkerLibrary {
 
@@ -49,8 +48,6 @@ public class NetworkLinkerLibrary {
     /* a map to track which vertices were associated with each transit stop, to avoid repeat splitting */
     HashMap<Vertex, Collection<StreetVertex>> splitVertices = 
             new HashMap<Vertex, Collection<StreetVertex>> (); 
-
-    GeometryFactory geometryFactory = new GeometryFactory();
 
     /* by default traverse options allow walking only, which is what we want */
     RoutingRequest options = new RoutingRequest();

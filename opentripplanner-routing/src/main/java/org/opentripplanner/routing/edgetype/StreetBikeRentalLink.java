@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -25,7 +26,6 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -35,8 +35,6 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetBikeRentalLink extends AbstractEdge implements EdgeWithElevation {
 
     private static final long serialVersionUID = 1L;
-
-    private static GeometryFactory _geometryFactory = new GeometryFactory();
 
     private BikeRentalStationVertex bikeRentalStationVertex;
 
@@ -64,7 +62,7 @@ public class StreetBikeRentalLink extends AbstractEdge implements EdgeWithElevat
 
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { fromv.getCoordinate(), tov.getCoordinate() };
-        return _geometryFactory.createLineString(coordinates);
+        return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
     @Override

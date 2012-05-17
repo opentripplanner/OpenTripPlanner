@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
@@ -22,7 +23,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 
 
@@ -49,8 +49,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
         Coordinate[] coords = new Coordinate[2];
         coords[0] = new Coordinate(from.getX(), from.getY());
         coords[1] = new Coordinate(to.getX(), to.getY());
-        // TODO: SRID?
-        the_geom = new GeometryFactory().createLineString(coords);
+        the_geom = GeometryUtils.getGeometryFactory().createLineString(coords);
     }
     
     @Override
@@ -71,7 +70,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
 
     @Override
     public Geometry getGeometry() {
-        return null;
+        return the_geom;
     }
 
     @Override

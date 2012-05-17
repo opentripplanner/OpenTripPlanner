@@ -20,22 +20,19 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.jets3t.service.io.TempFile;
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.OverlayGraph;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.reach.EdgeWithReach;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -142,7 +139,7 @@ public class ReachTest extends TestCase {
         
         double length = DistanceLibrary.distance(c1, c2);
         String name = vA.getName() + " - " + vB.getName();
-        GeometryFactory gf = new GeometryFactory();
+        GeometryFactory gf = GeometryUtils.getGeometryFactory();
         LineString geometry = gf.createLineString(new Coordinate[] { c1, c2});
         
         return new PlainStreetEdge(vA, vB, geometry, name, length, StreetTraversalPermission.ALL, false);

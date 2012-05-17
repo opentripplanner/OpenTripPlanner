@@ -33,6 +33,7 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -217,7 +218,7 @@ public class GTFSPatternHopFactory {
 
     private static final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
 
-    private static GeometryFactory _factory = new GeometryFactory();
+    private static GeometryFactory _geometryFactory = GeometryUtils.getGeometryFactory();
 
     private GtfsRelationalDao _dao;
 
@@ -1085,7 +1086,7 @@ public class GTFSPatternHopFactory {
             // Pack the resulting line string
             CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
                     .getCoordinates(), 2);
-            geometry = _factory.createLineString(sequence);
+            geometry = _geometryFactory.createLineString(sequence);
 
             _geometriesByShapeSegmentKey.put(key, (LineString) geometry);
         }
@@ -1159,7 +1160,7 @@ public class GTFSPatternHopFactory {
         }
 
         CoordinateSequence sequence = new PackedCoordinateSequence.Float(coordinates, 2);
-        geometry = _factory.createLineString(sequence);
+        geometry = _geometryFactory.createLineString(sequence);
         _geometriesByShapeId.put(shapeId, geometry);
         _distancesByShapeId.put(shapeId, distances);
 
@@ -1276,7 +1277,7 @@ public class GTFSPatternHopFactory {
             TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
             CoordinateSequence sequence = new PackedCoordinateSequence.Float(new Coordinate[] {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
-            Geometry geometry = _factory.createLineString(sequence);
+            Geometry geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
     }

@@ -26,6 +26,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -36,7 +37,6 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -55,8 +55,6 @@ public class RouteVariant implements Serializable {
     private static final Logger _log = LoggerFactory.getLogger(RouteVariant.class);
 
     private static final long serialVersionUID = -3110443015998033630L;
-
-    private static final GeometryFactory geometryFactory = new GeometryFactory();
 
     /*
      * This indicates that trips with multipledirection_ids are part of this variant. It should
@@ -223,7 +221,7 @@ public class RouteVariant implements Serializable {
                 }
             }
             Coordinate[] coordArray = new Coordinate[coords.size()];
-            geometry = geometryFactory.createLineString(coords.toArray(coordArray));
+            geometry = GeometryUtils.getGeometryFactory().createLineString(coords.toArray(coordArray));
         }
         return geometry;
     }
