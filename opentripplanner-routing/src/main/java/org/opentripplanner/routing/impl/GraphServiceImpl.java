@@ -110,8 +110,8 @@ public class GraphServiceImpl implements GraphService {
             LOG.warn("attempt to navigate up the directory hierarchy using a routerId");
             return null;
         } else {
-            String fileName = pathPattern.replace("{}", routerId);
-            return new File(fileName.concat("/Graph.obj"));
+            String path = pathPattern.replace("{}", routerId);
+            return new File(path, "Graph.obj");
         }
     }
 
