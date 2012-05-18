@@ -67,6 +67,9 @@ public class StreetMatcher {
         
         routeGeometry = removeDuplicatePoints(routeGeometry);
         
+        if (routeGeometry == null) 
+            return null;
+        
         // initial state: start midway along a block.
         LocationIndexedLine indexedLine = new LocationIndexedLine(routeGeometry);
 
@@ -136,6 +139,9 @@ public class StreetMatcher {
                 last = c;
                 coords.add(c);
             }
+        }
+        if (coords.size() < 2) {
+            return null;
         }
         Coordinate[] coordArray = new Coordinate[coords.size()];
         return routeGeometry.getFactory().createLineString(coords.toArray(coordArray));
