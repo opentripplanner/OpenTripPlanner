@@ -48,7 +48,13 @@ public class BikeRentalUpdater implements Runnable {
     private NetworkLinkerLibrary networkLinkerLibrary;
 
     private BikeRentalStationService service;
-    
+
+    private String routerId;
+
+    public void setRouterId(String routerId) {
+        this.routerId = routerId;
+    }
+
     @Autowired
     public void setBikeRentalDataSource(BikeRentalDataSource source) {
         this.source = source;
@@ -56,7 +62,11 @@ public class BikeRentalUpdater implements Runnable {
 
     @Autowired
     public void setGraphService(GraphService graphService) {
-        graph = graphService.getGraph();
+        if (routerId != null) {
+            graph = graphService.getGraph(routerId);
+        } else {
+            graph = graphService.getGraph();
+        }
         networkLinkerLibrary = new NetworkLinkerLibrary(graph, Collections.<Class<?>, Object> emptyMap());
         service = graph.getService(BikeRentalStationService.class);
         if (service == null) {
