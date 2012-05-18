@@ -32,6 +32,8 @@ otp.config_defaults = {
             showStopCodes         : true,   // show stop codes as part of the itinerary
             showAgencyInfo        : true,   // show the 'service run by Yolobus' on each itinerary leg
             showFareInfo          : true,   // show the fare information in the itinerary
+            showReverseButton     : true,   // turn on/off itinerary reverse button
+            showEditButton        : true,   // turn on/off itinerary edit button
             showPrintButton       : true,   // turn on/off itinerary print button
             showLinksButton       : true,   // turn on/off itinerary links button
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
