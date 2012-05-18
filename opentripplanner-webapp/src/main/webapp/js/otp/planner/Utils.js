@@ -301,7 +301,7 @@ otp.planner.Utils = {
             autoScroll:   true,
             border:       false,
             buttonAlign: 'center',
-            buttons:      buttons,
+            buttons:      buttons.length > 0 ? buttons : null,
             items:        [itinTree, detailsTree]
         });
         

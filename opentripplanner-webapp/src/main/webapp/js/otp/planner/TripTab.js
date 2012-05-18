@@ -116,23 +116,31 @@ otp.planner.TripTab = {
         if(z.length > 0)
         {
             // step D++: add buttons to the tab 
-            var r = new Ext.Toolbar.Button({
-                text:    this.locale.buttons.reverse,
-                iconCls: 'reverse-button',
-                tooltip: this.locale.buttons.reverseTip,
-                scope:   this,
-                handler: this.reverseCB
-            });
+            var buttons = [];
 
-            var e = new Ext.Toolbar.Button({
-                text:    this.locale.buttons.edit,
-                iconCls: 'edit-button',
-                tooltip: this.locale.buttons.editTip,
-                scope:   this,
-                handler: this.editCB
-            });
+            if(this.planner.options.showReverseButton)
+            {
+                var r = new Ext.Toolbar.Button({
+                    text:    this.locale.buttons.reverse,
+                    iconCls: 'reverse-button',
+                    tooltip: this.locale.buttons.reverseTip,
+                    scope:   this,
+                    handler: this.reverseCB
+                });
+                buttons.push(r);
+            }
 
-            var buttons = [r, e];
+            if(this.planner.options.showEditButton)
+            {
+                var e = new Ext.Toolbar.Button({
+                    text:    this.locale.buttons.edit,
+                    iconCls: 'edit-button',
+                    tooltip: this.locale.buttons.editTip,
+                    scope:   this,
+                    handler: this.editCB
+                });
+                buttons.push(e);
+            }
 
             if(this.planner.options.showPrintButton)
             {
