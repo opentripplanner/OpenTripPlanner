@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.services;
 
+import java.util.Collection;
+
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.graph.Graph;
@@ -49,5 +51,7 @@ public interface GraphService {
 
     /** @return the default graph object for the given router ID */
     public Graph getGraph(String routerId);
+
+    public Collection<String> getGraphIds();
 
 }

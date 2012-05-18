@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -42,8 +43,6 @@ public class GraphServiceImpl implements GraphService {
     private String defaultRouterId = "";
 
     private boolean preloadGraphs = true;
-
-    private boolean synchronousReload = true;
 
     public void setPath(String path) {
         this.pathPattern = path;
@@ -124,5 +123,10 @@ public class GraphServiceImpl implements GraphService {
 
     public void setDefaultRouterId(String routerId) {
     	this.defaultRouterId = routerId;
+    }
+
+    @Override
+    public Collection<String> getGraphIds() {
+        return graphs.keySet();
     }
 }

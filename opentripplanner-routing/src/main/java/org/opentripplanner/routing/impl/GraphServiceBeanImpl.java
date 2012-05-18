@@ -13,8 +13,9 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
+import java.util.Arrays;
+import java.util.List;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
@@ -28,8 +29,6 @@ import org.opentripplanner.routing.services.GraphService;
 public class GraphServiceBeanImpl implements GraphService {
 
     private Graph graph;
-
-    private CalendarService calendarService;
 
     // 0-arg bean constructor
     public GraphServiceBeanImpl() {
@@ -65,5 +64,10 @@ public class GraphServiceBeanImpl implements GraphService {
     @Override
     public Graph getGraph(String routerId) {
         return graph;
+    }
+
+    @Override
+    public List<String> getGraphIds() {
+        return Arrays.asList("default");
     }
 }
