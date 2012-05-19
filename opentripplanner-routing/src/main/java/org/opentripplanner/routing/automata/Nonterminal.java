@@ -19,19 +19,18 @@ import java.util.List;
 public abstract class Nonterminal {
 
 	/**
-	 * Recursively builds a new graph of automaton states (an automaton) based on 
-	 * the model provided by this Nonterminal. This allows nonterminals to be reused in
-	 * multiple expressions, or multiple times within a single expression.
+	 * Recursively builds a new graph of automaton states (an NFA) based on the
+	 * model provided by this Nonterminal. This allows nonterminals to be reused
+	 * in multiple expressions, or multiple times within a single expression.
 	 * 
 	 * Because we allow epsilon moves in NFAs, every nonterminal can have a
-	 * single entry and exit point (i.e. start and accept state), yielding a
-	 * clearer graph.
+	 * single entry and exit point (i.e. start and accept state).
 	 * 
 	 * @param entry - the start state for the automaton to build
 	 * @return the accept state of the newly constructed automaton
 	 */
 	public abstract AutomatonState build(AutomatonState start);
-	
+
 	
 	/* postfix (instance) expression builder methods */
 
