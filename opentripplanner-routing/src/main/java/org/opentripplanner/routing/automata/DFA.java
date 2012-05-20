@@ -1,17 +1,13 @@
 package org.opentripplanner.routing.automata;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
-import java.util.Set;
 
 /**
  * A deterministic finite automaton, with a transition table for fast incremental parsing. 
@@ -24,8 +20,8 @@ public class DFA extends NFA {
 	/** Build a deterministic finite automaton from an existing, potentially nondeterministic one. */
 	public DFA(NFA nfa) {
 		super(nfa.nt, false);
-		table = determinize(nfa); // return state instead?
-		// relabelNodes() and eliminate counter
+		this.table = determinize(nfa); 
+		this.relabelNodes();
 	}
 
 	/** Build a deterministic finite automaton that accepts the given nonterminal from a grammar */
@@ -54,18 +50,6 @@ public class DFA extends NFA {
 					if (this.add(target))
 						queue.add(target);
 			}
-		}
-		public String deriveLabel() {
-			Set<Character> charSet = new HashSet<Character>();
-			for (AutomatonState as : this)
-				for (char c : as.label.toCharArray())
-					charSet.add(c);
-			List<Character> chars = new ArrayList<Character>(charSet);
-			Collections.sort(chars);
-			StringBuilder sb = new StringBuilder();
-			for (char c : chars)
-				sb.append(c);
-			return sb.toString();
 		}
 	}
 	

@@ -14,8 +14,6 @@ public class AutomatonState {
 	/** The states in a DFA should be ordered such that the start state is always 0. */
 	public static final int START = 0;
 
-	private static char nextLabel = 'A';
-	
 	public String label;
 	
 	public final List<Transition> transitions = new ArrayList<Transition>(); 
@@ -23,15 +21,11 @@ public class AutomatonState {
 	public final List<AutomatonState> epsilonTransitions = new ArrayList<AutomatonState>(); 
 	
 	public AutomatonState() {
-		this(Character.toString(nextLabel));
-		nextLabel++;
-		if (nextLabel > 'Z')
-			nextLabel = 'A';
+		this.label = null; // indicating it should be automatically filled in
 	}
-	
+
 	public AutomatonState(String label) {
 		this.label = label;
-		//System.out.println(this.toString());
 	}
 
 	public String toString() {

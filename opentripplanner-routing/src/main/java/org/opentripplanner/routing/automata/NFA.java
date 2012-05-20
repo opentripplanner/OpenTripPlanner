@@ -31,7 +31,8 @@ public class NFA {
 			AutomatonState accept = nt.build(start);
 			this.startStates.add(start);
 			this.acceptStates.add(accept);
-			states.addAll(findStates());
+			this.states.addAll(findStates());
+			this.relabelNodes();
 		}
 	}
 
@@ -121,6 +122,18 @@ public class NFA {
 		}
 		sb.append("}\n");
 		return sb.toString();
+	}
+	
+	protected void relabelNodes() {
+		char c = 'A';
+		for (AutomatonState state : this.states) {
+			if (state.label == null) {
+				state.label = Character.toString(c); 
+				c += 1;
+				if (c > 'Z')
+					c = 'A';
+			}
+		}
 	}
 	
 }
