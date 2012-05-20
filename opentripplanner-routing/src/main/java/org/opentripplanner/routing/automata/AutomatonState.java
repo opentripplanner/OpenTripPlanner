@@ -21,11 +21,11 @@ public class AutomatonState {
 	
 	public final List<AutomatonState> epsilonTransitions = new ArrayList<AutomatonState>(); 
 	
-	/** Indicates whether input is to be accepted if parsing ends at this AutomatonState instance. */
-	public boolean accept = false;
-
 	public AutomatonState() {
-		this(Character.toString(nextLabel++));
+		this(Character.toString(nextLabel));
+		nextLabel++;
+		if (nextLabel > 'Z')
+			nextLabel = 'A';
 	}
 	
 	public AutomatonState(String label) {

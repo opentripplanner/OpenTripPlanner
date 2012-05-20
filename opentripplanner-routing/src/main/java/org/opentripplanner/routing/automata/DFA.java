@@ -3,6 +3,7 @@ package org.opentripplanner.routing.automata;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -19,12 +20,12 @@ import java.util.Set;
 public class DFA extends NFA {
 
 	final int[][] table;
-	final List<Integer> acceptStates = new ArrayList<Integer>();
 	
 	/** Build a deterministic finite automaton from an existing, potentially nondeterministic one. */
 	public DFA(NFA nfa) {
-		super(new AutomatonState("START"), nfa.nt);
-		table = determinize(nfa);
+		super(nfa.nt, false);
+		table = determinize(nfa); // return state instead?
+		// relabelNodes() and eliminate counter
 	}
 
 	/** Build a deterministic finite automaton that accepts the given nonterminal from a grammar */
@@ -55,9 +56,15 @@ public class DFA extends NFA {
 			}
 		}
 		public String deriveLabel() {
-			StringBuilder sb = new StringBuilder();
+			Set<Character> charSet = new HashSet<Character>();
 			for (AutomatonState as : this)
-				sb.append(as.label);
+				for (char c : as.label.toCharArray())
+					charSet.add(c);
+			List<Character> chars = new ArrayList<Character>(charSet);
+			Collections.sort(chars);
+			StringBuilder sb = new StringBuilder();
+			for (char c : chars)
+				sb.append(c);
 			return sb.toString();
 		}
 	}
@@ -68,13 +75,15 @@ public class DFA extends NFA {
 		int maxTerminal = 0; // track the max token value so we know how big to make the transition table
 		Map<NFAStateSet, AutomatonState> dfaStates = new HashMap<NFAStateSet, AutomatonState>();
 		Queue<NFAStateSet> queue = new LinkedList<NFAStateSet>();
-		Set<AutomatonState> dfaAcceptStates = new HashSet<AutomatonState>();
 		
 		/* initialize the work queue with the set of all states reachable from the NFA start state */
 		{
-			NFAStateSet startSet = new NFAStateSet(nfa.start);
-			startSet.followEpsilons();
-			dfaStates.put(startSet, this.start);
+			AutomatonState dfaStart = new AutomatonState("START");
+			this.startStates.add(dfaStart);
+			this.states.add(dfaStart);
+			NFAStateSet startSet = new NFAStateSet(nfa.startStates);
+			startSet.followEpsilons(); // be sure to follow episilons *before* using hashcode
+			dfaStates.put(startSet, dfaStart);
 			queue.add(startSet);
 		}
 		
@@ -84,10 +93,8 @@ public class DFA extends NFA {
 			AutomatonState dfaFromState = dfaStates.get(nfaFromStates);
 			Map<Integer, NFAStateSet> dfaTransitions = new HashMap<Integer, NFAStateSet>();
 			for (AutomatonState nfaFromState : nfaFromStates) {
-				if (nfaFromState.accept) {
-					dfaAcceptStates.add(dfaFromState); // multiple adds OK, it's a set
-					dfaFromState.accept = true;
-				}
+				if (nfa.acceptStates.contains(nfaFromState))
+					this.acceptStates.add(dfaFromState); // multiple adds OK, it's a set
 				for (Transition t : nfaFromState.transitions) {
 					if (t.terminal > maxTerminal)
 						maxTerminal = t.terminal;
@@ -105,8 +112,9 @@ public class DFA extends NFA {
 				nfaToStates.followEpsilons();
 				AutomatonState dfaToState = dfaStates.get(nfaToStates);
 				if (dfaToState == null) {
-					dfaToState = new AutomatonState(nfaToStates.deriveLabel());
+					dfaToState = new AutomatonState(); //nfaToStates.deriveLabel());
 					dfaStates.put(nfaToStates, dfaToState);
+					this.states.add(dfaToState);
 					queue.add(nfaToStates);
 				}
 				dfaFromState.transitions.add(new Transition(terminal, dfaToState));
@@ -114,28 +122,15 @@ public class DFA extends NFA {
 		}
 		
 		/* create a transition table, filled with the reserved value for the reject state */
-		int[][] table = new int[dfaStates.size()][maxTerminal+1];
+		int[][] table = new int[this.states.size()][maxTerminal+1];
 		for (int[] row : table)
 			Arrays.fill(row, AutomatonState.REJECT);
 		
-		/* assign integer ids to all new DFA states */
-		Map<AutomatonState, Integer> stateNumbers = new HashMap<AutomatonState, Integer>();
-		int i = 0;
-		for (AutomatonState as : dfaStates.values())
-			stateNumbers.put(as,  i++);
-		
 		/* copy all edges from the new DFA states into the table */ 
-		for (AutomatonState as :  dfaStates.values()) {
-			int row = stateNumbers.get(as);
-			for (Transition t : as.transitions)
-				table[row][t.terminal] = stateNumbers.get(t.target);
-			row++;
-		}
-		
-		/* save the integer ids for the accept states */
-		for (AutomatonState as : dfaAcceptStates)
-			this.acceptStates.add(stateNumbers.get(as));
-		
+		for (int row = 0; row < this.states.size(); row++)
+			for (Transition t : this.states.get(row).transitions)
+				table[row][t.terminal] = this.states.indexOf(t.target);
+			
 		/* return the transition table to the DFA constructor */
 		return table;
 	}
@@ -143,14 +138,21 @@ public class DFA extends NFA {
 	/** Dump the transition table to a string. Rows are states, columns are terminal symbols. */ 
 	public String dumpTable() {
 		StringBuilder sb = new StringBuilder();
+		int r = 0;
+		sb.append("      ");
+		for (int i = 0; i < table[0].length; i++)
+			sb.append(String.format("%2d ", i));
+		sb.append(" \n");
 		for (int[] row : table) {
+			sb.append(String.format("%5s ", states.get(r).label));
 			for (int i : row) {
 				if (i == AutomatonState.REJECT)
-					sb.append("-- ");
+					sb.append(" - ");
 				else
-					sb.append(String.format("%02d ", i));
+					sb.append(String.format("%2s ", states.get(i).label));
 			}
 			sb.append("\n");
+			r += 1;
 		}
 		return sb.toString();
 	}
@@ -163,6 +165,6 @@ public class DFA extends NFA {
 			if (state == AutomatonState.REJECT)
 				return false;
 		}
-		return acceptStates.contains(state);
+		return acceptStates.contains(states.get(state));
 	}
 }
