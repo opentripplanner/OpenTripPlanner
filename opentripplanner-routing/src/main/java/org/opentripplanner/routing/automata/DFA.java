@@ -36,12 +36,12 @@ public class DFA extends NFA {
 	 * A glorified set of automaton states, used in determinizing NFAs.
 	 * Semantic equality inherited from HashSet is needed for determinization. 
 	 */
-	private class DFAState extends HashSet<AutomatonState> {
+	private class NFAStateSet extends HashSet<AutomatonState> {
 		private static final long serialVersionUID = 1L;
-		DFAState(AutomatonState... automatonStates) {
+		NFAStateSet(AutomatonState... automatonStates) {
 			this.addAll(Arrays.asList(automatonStates));
 		}
-		DFAState(Collection<AutomatonState> automatonStates) { 
+		NFAStateSet(Collection<AutomatonState> automatonStates) { 
 			this.addAll(automatonStates);
 		}
 		public void followEpsilons() {
@@ -66,65 +66,66 @@ public class DFA extends NFA {
 	private int[][] determinize(NFA nfa) {
 		
 		int maxTerminal = 0; // track the max token value so we know how big to make the transition table
-
-		Map<DFAState, AutomatonState> newStates = new HashMap<DFAState, AutomatonState>();
-		Queue<DFAState> queue = new LinkedList<DFAState>();
+		Map<NFAStateSet, AutomatonState> dfaStates = new HashMap<NFAStateSet, AutomatonState>();
+		Queue<NFAStateSet> queue = new LinkedList<NFAStateSet>();
+		Set<AutomatonState> dfaAcceptStates = new HashSet<AutomatonState>();
 		
-		DFAState dStart = new DFAState(nfa.start);
-		dStart.followEpsilons();
-		newStates.put(dStart, this.start);
-		queue.add(dStart);
+		/* initialize the work queue with the set of all states reachable from the NFA start state */
+		{
+			NFAStateSet startSet = new NFAStateSet(nfa.start);
+			startSet.followEpsilons();
+			dfaStates.put(startSet, this.start);
+			queue.add(startSet);
+		}
 		
-		Set<AutomatonState> acceptStates = new HashSet<AutomatonState>();
-		
+		/* find all transitions between epsilon-connected subsets of the NFA states */
 		while ( ! queue.isEmpty()) {
-			DFAState ds = queue.poll();
-			AutomatonState fromAutomatonState = newStates.get(ds);
-			Map<Integer, DFAState> transitions = new HashMap<Integer, DFAState>();
-			for (AutomatonState as : ds) {
-				if (as.accept) {
-					acceptStates.add(fromAutomatonState); // multiple adds OK, it's a set
-					fromAutomatonState.accept = true;
+			NFAStateSet nfaFromStates = queue.poll();
+			AutomatonState dfaFromState = dfaStates.get(nfaFromStates);
+			Map<Integer, NFAStateSet> dfaTransitions = new HashMap<Integer, NFAStateSet>();
+			for (AutomatonState nfaFromState : nfaFromStates) {
+				if (nfaFromState.accept) {
+					dfaAcceptStates.add(dfaFromState); // multiple adds OK, it's a set
+					dfaFromState.accept = true;
 				}
-				for (Transition t : as.transitions) {
+				for (Transition t : nfaFromState.transitions) {
 					if (t.terminal > maxTerminal)
 						maxTerminal = t.terminal;
-					DFAState targets = transitions.get(t.terminal);
-					if (targets == null) {
-						targets = new DFAState();
-						transitions.put(t.terminal, targets);
+					NFAStateSet nfaTargetStates = dfaTransitions.get(t.terminal);
+					if (nfaTargetStates == null) {
+						nfaTargetStates = new NFAStateSet();
+						dfaTransitions.put(t.terminal, nfaTargetStates);
 					}
-					targets.add(t.target);
+					nfaTargetStates.add(t.target);
 				}
 			}
-			for (Entry<Integer, DFAState> transition : transitions.entrySet()) {
-				int token = transition.getKey();
-				DFAState target = transition.getValue();
-				target.followEpsilons();
-				AutomatonState toAutomatonState = newStates.get(target);
-				if (toAutomatonState == null) {
-					toAutomatonState = new AutomatonState(target.deriveLabel());
-					newStates.put(target, toAutomatonState);
-					queue.add(target);
+			for (Entry<Integer, NFAStateSet> t : dfaTransitions.entrySet()) {
+				int terminal = t.getKey();
+				NFAStateSet nfaToStates = t.getValue();
+				nfaToStates.followEpsilons();
+				AutomatonState dfaToState = dfaStates.get(nfaToStates);
+				if (dfaToState == null) {
+					dfaToState = new AutomatonState(nfaToStates.deriveLabel());
+					dfaStates.put(nfaToStates, dfaToState);
+					queue.add(nfaToStates);
 				}
-				fromAutomatonState.transitions.add(new Transition(token, toAutomatonState));
+				dfaFromState.transitions.add(new Transition(terminal, dfaToState));
 			}
 		}
 		
 		/* create a transition table, filled with the reserved value for the reject state */
-		int[][] table = new int[newStates.size()][maxTerminal+1];
-		for (int[] row : table) {
+		int[][] table = new int[dfaStates.size()][maxTerminal+1];
+		for (int[] row : table)
 			Arrays.fill(row, AutomatonState.REJECT);
-		}
 		
 		/* assign integer ids to all new DFA states */
 		Map<AutomatonState, Integer> stateNumbers = new HashMap<AutomatonState, Integer>();
 		int i = 0;
-		for (AutomatonState as : newStates.values())
+		for (AutomatonState as : dfaStates.values())
 			stateNumbers.put(as,  i++);
 		
 		/* copy all edges from the new DFA states into the table */ 
-		for (AutomatonState as :  newStates.values()) {
+		for (AutomatonState as :  dfaStates.values()) {
 			int row = stateNumbers.get(as);
 			for (Transition t : as.transitions)
 				table[row][t.terminal] = stateNumbers.get(t.target);
@@ -132,7 +133,7 @@ public class DFA extends NFA {
 		}
 		
 		/* save the integer ids for the accept states */
-		for (AutomatonState as : acceptStates)
+		for (AutomatonState as : dfaAcceptStates)
 			this.acceptStates.add(stateNumbers.get(as));
 		
 		/* return the transition table to the DFA constructor */
