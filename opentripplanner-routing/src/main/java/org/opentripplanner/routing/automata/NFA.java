@@ -11,10 +11,14 @@ import java.util.Set;
 
 public class NFA {
 
-    final Nonterminal nt; 
-	final Set<AutomatonState> startStates = new HashSet<AutomatonState>();
-	final Set<AutomatonState> acceptStates = new HashSet<AutomatonState>();
-	final List<AutomatonState> states = new ArrayList<AutomatonState>(); // fill me in during dfa creation, positions are DFA table indexes
+	/** the nonterminal which this state machine accepts */
+    public final Nonterminal nt; 
+    
+	public final Set<AutomatonState> startStates = new HashSet<AutomatonState>();
+	public final Set<AutomatonState> acceptStates = new HashSet<AutomatonState>();
+
+	/** for DFAs, state list indexes are same as transition table indexes. */
+	final List<AutomatonState> states = new ArrayList<AutomatonState>(); 
 
 	public NFA(Nonterminal nt) {
 		this(nt, true);
@@ -27,6 +31,7 @@ public class NFA {
 			AutomatonState accept = nt.build(start);
 			this.startStates.add(start);
 			this.acceptStates.add(accept);
+			states.addAll(findStates());
 		}
 	}
 
@@ -34,27 +39,21 @@ public class NFA {
 		return new DFA(this);
 	}
 
-	/**
-	 * Do a Dijkstra search from the start state to find all reachable states in this NFA.
-	 * This is of course not O(1), cache the list if you need to reuse it.
-	 */
+	/** Do a Dijkstra search from the start state to find all reachable states in this NFA.	*/
 	private Set<AutomatonState> findStates() {
 		Set<AutomatonState> states = new HashSet<AutomatonState>();
-		{
-			Queue<AutomatonState> q = new LinkedList<AutomatonState>();
-			q.addAll(startStates);
-			states.addAll(startStates);
-			while ( ! q.isEmpty()) {
-				AutomatonState s = q.poll();
-				//System.out.println(s.toString());
-				List<AutomatonState> targets = new ArrayList<AutomatonState>();
-				for (Transition transition : s.transitions)
-					targets.add(transition.target);
-				targets.addAll(s.epsilonTransitions);
-				for (AutomatonState target : targets)
-					if (states.add(target))
-						q.add(target);
-			}
+		Queue<AutomatonState> q = new LinkedList<AutomatonState>();
+		q.addAll(startStates);
+		states.addAll(startStates);
+		while ( ! q.isEmpty()) {
+			AutomatonState s = q.poll();
+			Set<AutomatonState> targets = new HashSet<AutomatonState>();
+			for (Transition transition : s.transitions)
+				targets.add(transition.target);
+			targets.addAll(s.epsilonTransitions);
+			for (AutomatonState target : targets)
+				if (states.add(target))
+					q.add(target);
 		}
 		return states;
 	}
@@ -96,7 +95,6 @@ public class NFA {
 	public String toGraphViz() {
 		/* first, find all states reachable from the start state */
 		Set<AutomatonState> states = this.findStates();
-		
 		/* build DOT file node styles */
 		StringBuilder sb = new StringBuilder();
 		sb.append("digraph automaton { \n");

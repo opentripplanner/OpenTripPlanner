@@ -5,8 +5,6 @@ import java.util.List;
 
 public class AutomatonState {
 
-	private static final long serialVersionUID = 42L;
-
 	/** Signals that no transition was found for a given input symbol. The input is rejected. */
 	public static final int REJECT = Integer.MIN_VALUE;
 	
