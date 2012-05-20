@@ -158,13 +158,25 @@ public class DFA extends NFA {
 	}
 
 	/** Return true if this DFA (and the nonterminal it is built from) match the given sequence of terminal symbols. */ 
-	public boolean parse(int... symbols) {
-		int state = 0;
-		for (int sym : symbols) {
-			state = table[state][sym];
+	public boolean parse(int... terminals) {
+		int state = AutomatonState.START;
+		for (int terminal : terminals) {
+			state = transition(state, terminal);
 			if (state == AutomatonState.REJECT)
 				return false;
 		}
+		return this.accepts(state);
+	}
+	
+	/** this method will not catch reject states; the caller must do so. */
+	public int transition(int initState, int terminal) {
+		return table[initState][terminal];
+	}
+	
+	public boolean accepts(int state) {
+		if (state == AutomatonState.REJECT)
+			return false;
 		return acceptStates.contains(states.get(state));
 	}
+	
 }

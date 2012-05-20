@@ -11,6 +11,9 @@ public class AutomatonState {
 	/** Could be used to provide a single accept state, using transitions on a special terminal from all other accept states. */
 	public static final int ACCEPT = Integer.MAX_VALUE;
 
+	/** The states in a DFA should be ordered such that the start state is always 0. */
+	public static final int START = 0;
+
 	private static char nextLabel = 'A';
 	
 	public String label;
