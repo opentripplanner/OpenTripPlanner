@@ -11,11 +11,13 @@ public class NTKleenePlus extends Nonterminal {
 	@Override
 	public AutomatonState build(AutomatonState in) {
 		// isolate epsilon loop from chained NFAs
-		AutomatonState start = new AutomatonState();
-		in.epsilonTransitions.add(start); 
-		AutomatonState end = nt.build(start);
-		end.epsilonTransitions.add(start);
-		return end;
+		AutomatonState in2 = new AutomatonState();
+		in.epsilonTransitions.add(in2); 
+		AutomatonState out = nt.build(in2);
+		out.epsilonTransitions.add(in2);
+		return out;
 	}
+	
+	// general rule for nonterminals: never add an epsilon edge to a state you did not create
 
 }

@@ -9,12 +9,12 @@ public class NTSequence extends Nonterminal {
 	}
 	
 	@Override
-	public AutomatonState build(AutomatonState start) {
-		AutomatonState exit = start;
+	public AutomatonState build(AutomatonState in) {
+		AutomatonState out = in;
 		for (Nonterminal nt : nts) {
-			exit = nt.build(exit);
+			out = nt.build(out);
 		}
-		return exit;
+		return out;
 	}
 
 }

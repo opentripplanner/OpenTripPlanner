@@ -5,11 +5,11 @@ public class Transition {
 	public final int terminal;
 	public final AutomatonState target;
 	
-	Transition (int token, AutomatonState target) {
-		this.terminal = token;
+	Transition (int terminal, AutomatonState target) {
+		this.terminal = terminal;
 		this.target = target;
-		if (token < 0)
-			throw new RuntimeException("negative token values are reserved");
+		if (terminal < 0)
+			throw new RuntimeException("negative terminal symbols are reserved");
 	}
 	
 }

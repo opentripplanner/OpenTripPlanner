@@ -29,7 +29,7 @@ public abstract class Nonterminal {
 	 * @param entry - the start state for the automaton to build
 	 * @return the accept state of the newly constructed automaton
 	 */
-	public abstract AutomatonState build(AutomatonState start);
+	public abstract AutomatonState build(AutomatonState in);
 
 	
 	/* postfix (instance) expression builder methods */

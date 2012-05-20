@@ -9,10 +9,10 @@ public class NTTrivial extends Nonterminal {
 	}
 
 	@Override
-	public AutomatonState build(AutomatonState start) {
-		AutomatonState exit = new AutomatonState();
-		start.transitions.add(new Transition(terminal, exit));
-		return exit;
+	public AutomatonState build(AutomatonState in) {
+		AutomatonState out = new AutomatonState();
+		in.transitions.add(new Transition(terminal, out));
+		return out;
 	}
 
 }

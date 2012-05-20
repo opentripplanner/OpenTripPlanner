@@ -12,16 +12,16 @@ public class NTChoice extends Nonterminal {
 	}
 
 	@Override
-	public AutomatonState build(AutomatonState start) {
-		Collection<AutomatonState> exits = new LinkedList<AutomatonState>();
+	public AutomatonState build(AutomatonState in) {
+		Collection<AutomatonState> outs = new LinkedList<AutomatonState>();
 		for (Nonterminal nt : nts) {
-			exits.add(nt.build(start));
+			outs.add(nt.build(in));
 		}
-		AutomatonState exit = new AutomatonState();
-		for (AutomatonState subExit : exits) {
-			subExit.epsilonTransitions.add(exit);
+		AutomatonState out = new AutomatonState();
+		for (AutomatonState subExit : outs) {
+			subExit.epsilonTransitions.add(out);
 		}
-		return exit;
+		return out;
 	}
 
 }
