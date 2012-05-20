@@ -9,10 +9,13 @@ public class NTKleenePlus extends Nonterminal {
 	}
 	
 	@Override
-	public AutomatonState build(AutomatonState start) {
-		AutomatonState exit = nt.build(start);
-		exit.add(new EpsilonTransition(start));
-		return exit;
+	public AutomatonState build(AutomatonState in) {
+		// isolate epsilon loop from chained NFAs
+		AutomatonState start = new AutomatonState();
+		in.epsilonTransitions.add(start); 
+		AutomatonState end = nt.build(start);
+		end.epsilonTransitions.add(start);
+		return end;
 	}
 
 }

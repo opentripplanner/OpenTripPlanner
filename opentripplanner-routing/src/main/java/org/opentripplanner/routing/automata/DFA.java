@@ -23,7 +23,7 @@ public class DFA extends NFA {
 	
 	/** Build a deterministic finite automaton from an existing, potentially nondeterministic one. */
 	public DFA(NFA nfa) {
-		super(new AutomatonState(), nfa.nt);
+		super(new AutomatonState("START"), nfa.nt);
 		table = determinize(nfa);
 	}
 
@@ -32,7 +32,10 @@ public class DFA extends NFA {
 		this(new NFA(nonterminal));
 	}
 
-	/** A glorified set of automaton states, used in determinizing NFAs */
+	/** 
+	 * A glorified set of automaton states, used in determinizing NFAs.
+	 * Semantic equality inherited from HashSet is needed for determinization. 
+	 */
 	private class DFAState extends HashSet<AutomatonState> {
 		private static final long serialVersionUID = 1L;
 		DFAState(AutomatonState... automatonStates) {
@@ -42,14 +45,20 @@ public class DFA extends NFA {
 			this.addAll(automatonStates);
 		}
 		public void followEpsilons() {
-			// might want a separate epsilon set for states, and make edgelist a set too
-			// this avoids needing a special epsilon token, and filtering lists all the time
-			List<AutomatonState> newStates = new LinkedList<AutomatonState>();
+			Queue<AutomatonState> queue = new LinkedList<AutomatonState>();
+			queue.addAll(this);
+			while ( ! queue.isEmpty()) {
+				AutomatonState as = queue.poll();
+				for (AutomatonState target : as.epsilonTransitions)
+					if (this.add(target))
+						queue.add(target);
+			}
+		}
+		public String deriveLabel() {
+			StringBuilder sb = new StringBuilder();
 			for (AutomatonState as : this)
-				for (Transition ae : as)
-					if (ae.token == Transition.EPSILON)
-						newStates.add(ae.target);
-			this.addAll(newStates); // avoid concurrent modification
+				sb.append(as.label);
+			return sb.toString();
 		}
 	}
 	
@@ -62,6 +71,7 @@ public class DFA extends NFA {
 		Queue<DFAState> queue = new LinkedList<DFAState>();
 		
 		DFAState dStart = new DFAState(nfa.start);
+		dStart.followEpsilons();
 		newStates.put(dStart, this.start);
 		queue.add(dStart);
 		
@@ -76,15 +86,13 @@ public class DFA extends NFA {
 					acceptStates.add(fromAutomatonState); // multiple adds OK, it's a set
 					fromAutomatonState.accept = true;
 				}
-				for (Transition t : as) {
-					if (t.token == Transition.EPSILON)
-						continue;
-					if (t.token > maxTerminal)
-						maxTerminal = t.token;
-					DFAState targets = transitions.get(t.token);
+				for (Transition t : as.transitions) {
+					if (t.terminal > maxTerminal)
+						maxTerminal = t.terminal;
+					DFAState targets = transitions.get(t.terminal);
 					if (targets == null) {
 						targets = new DFAState();
-						transitions.put(t.token, targets);
+						transitions.put(t.terminal, targets);
 					}
 					targets.add(t.target);
 				}
@@ -95,11 +103,11 @@ public class DFA extends NFA {
 				target.followEpsilons();
 				AutomatonState toAutomatonState = newStates.get(target);
 				if (toAutomatonState == null) {
-					toAutomatonState = new AutomatonState();
+					toAutomatonState = new AutomatonState(target.deriveLabel());
 					newStates.put(target, toAutomatonState);
 					queue.add(target);
 				}
-				fromAutomatonState.add(new SymbolTransition(token, toAutomatonState));
+				fromAutomatonState.transitions.add(new Transition(token, toAutomatonState));
 			}
 		}
 		
@@ -118,8 +126,8 @@ public class DFA extends NFA {
 		/* copy all edges from the new DFA states into the table */ 
 		for (AutomatonState as :  newStates.values()) {
 			int row = stateNumbers.get(as);
-			for (Transition t : as)
-				table[row][t.token] = stateNumbers.get(t.target);
+			for (Transition t : as.transitions)
+				table[row][t.terminal] = stateNumbers.get(t.target);
 			row++;
 		}
 		
@@ -136,7 +144,7 @@ public class DFA extends NFA {
 		StringBuilder sb = new StringBuilder();
 		for (int[] row : table) {
 			for (int i : row) {
-				if (i == Transition.EPSILON)
+				if (i == AutomatonState.REJECT)
 					sb.append("-- ");
 				else
 					sb.append(String.format("%02d ", i));

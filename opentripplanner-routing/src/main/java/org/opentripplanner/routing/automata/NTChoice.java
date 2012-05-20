@@ -19,7 +19,7 @@ public class NTChoice extends Nonterminal {
 		}
 		AutomatonState exit = new AutomatonState();
 		for (AutomatonState subExit : exits) {
-			subExit.add(new EpsilonTransition(exit));
+			subExit.epsilonTransitions.add(exit);
 		}
 		return exit;
 	}

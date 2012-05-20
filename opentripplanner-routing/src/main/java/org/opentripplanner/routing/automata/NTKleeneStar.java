@@ -12,7 +12,8 @@ public class NTKleeneStar extends Nonterminal {
 	public AutomatonState build(AutomatonState start) {
 		Nonterminal plus = new NTKleenePlus(nt);
 		AutomatonState exit = plus.build(start);
-		start.add(new EpsilonTransition(exit));
+		// bypass Kleene plus to match zero occurrences 
+		start.epsilonTransitions.add(exit);
 		return exit;
 	}
 

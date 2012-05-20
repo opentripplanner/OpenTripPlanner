@@ -1,19 +1,27 @@
 package org.opentripplanner.routing.automata;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NFA {
 
-	final Nonterminal nt; 
+    final Nonterminal nt; 
 	final AutomatonState start;
 	
 	public NFA(Nonterminal nt) {
 		this.nt = nt;
-		this.start = new AutomatonState();
+		this.start = new AutomatonState("START");
 		AutomatonState acceptState = nt.build(start);
+		//acceptState.label = "END";
 		acceptState.accept = true;
 	}
 
@@ -27,43 +35,47 @@ public class NFA {
 	}
 
 	public String toGraphViz() {
-
-		// first, find all states reachable from the start state
-		Queue<AutomatonState> q = new LinkedList<AutomatonState>();
-		Map<AutomatonState, String> names = new HashMap<AutomatonState, String>();
-		q.add(start);
-		names.put(start, "START");
-		//names.put(end, "END");
-		char counter = 'A';
-		while ( ! q.isEmpty()) {
-			AutomatonState s = q.poll();
-			for (Transition e : s) {
-				if ( ! names.containsKey(e.target)) {
-					names.put(e.target, Character.toString(counter++));
-					q.add(e.target);
-				}
+		/* first, find all states reachable from the start state */
+		Set<AutomatonState> states = new HashSet<AutomatonState>();
+		{
+			Queue<AutomatonState> q = new LinkedList<AutomatonState>();
+			q.add(start);
+			states.add(start);
+			while ( ! q.isEmpty()) {
+				AutomatonState s = q.poll();
+				//System.out.println(s.toString());
+				List<AutomatonState> targets = new ArrayList<AutomatonState>();
+				for (Transition transition : s.transitions)
+					targets.add(transition.target);
+				targets.addAll(s.epsilonTransitions);
+				for (AutomatonState target : targets)
+					if (states.add(target))
+						q.add(target);
 			}
 		}
-		
+		/* build DOT file node styles */
 		StringBuilder sb = new StringBuilder();
 		sb.append("digraph automaton { \n");
 		sb.append("  rankdir=LR; \n");
 		sb.append("  node [shape = doublecircle]; \n");
-		for (AutomatonState as : names.keySet())
+		for (AutomatonState as : states)
 			if (as.accept)
-				sb.append(String.format("  %s; \n", names.get(as)));
-		sb.append("  node [shape = circle]; \n");
-
-		for (AutomatonState as : names.keySet()) {
-			for (Transition e : as) {
-				sb.append("  ");
-				sb.append(names.get(as));
-				sb.append("->");
-				sb.append(names.get(e.target));
-				String label = Integer.toString(e.token);
-				if (e.token == Transition.EPSILON)
-					label = "e";
+				sb.append(String.format("  %s; \n", as.label));
+		sb.append("  node [shape = circle]; \n"); 
+		/* make edges for terminal and epsilon transitions */
+		for (AutomatonState fromState : states) {
+			for (Transition transition : fromState.transitions) {
+				sb.append("  " + fromState.label);
+				sb.append(" -> ");
+				sb.append(transition.target.label);
+				String label = Integer.toString(transition.terminal);
 				sb.append(String.format(" [label=%s];\n", label));
+			}
+			for (AutomatonState toState : fromState.epsilonTransitions) {
+				sb.append("  " + fromState.label);
+				sb.append(" -> ");
+				sb.append(toState.label);
+				sb.append(" [label=ε];\n");
 			}
 		}
 		sb.append("}\n");

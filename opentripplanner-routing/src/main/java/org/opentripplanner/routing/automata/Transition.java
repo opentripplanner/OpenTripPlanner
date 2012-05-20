@@ -1,15 +1,15 @@
 package org.opentripplanner.routing.automata;
 
-public abstract class Transition {
+public class Transition {
 
-	public static final int EPSILON = Integer.MIN_VALUE;
-	
-	public final int token;
+	public final int terminal;
 	public final AutomatonState target;
 	
 	Transition (int token, AutomatonState target) {
-		this.token = token;
+		this.terminal = token;
 		this.target = target;
+		if (token < 0)
+			throw new RuntimeException("negative token values are reserved");
 	}
 	
 }

@@ -11,7 +11,7 @@ public class NTTrivial extends Nonterminal {
 	@Override
 	public AutomatonState build(AutomatonState start) {
 		AutomatonState exit = new AutomatonState();
-		start.add(new SymbolTransition(terminal, exit));
+		start.transitions.add(new Transition(terminal, exit));
 		return exit;
 	}
 

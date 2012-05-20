@@ -43,7 +43,7 @@ public abstract class Nonterminal {
 	}
 
 	public Nonterminal or(Object that) {
-		return new NTChoice(this, wrap(that));
+		return new NTChoice(this, wrap0(that));
 	}
 	
 	public Nonterminal chain(Object... objects) {
@@ -55,8 +55,8 @@ public abstract class Nonterminal {
 	
 	/* prefix (factory) expression builder methods (use via static import) */
 
-	public static Nonterminal seq(Object... objects) {
-		return new NTSequence(wrap(objects));
+	public static Nonterminal seq(Object... objs) {
+		return new NTSequence(wrap(objs));
 	}
 
 	public static Nonterminal star(Object... objs) {
@@ -74,7 +74,7 @@ public abstract class Nonterminal {
 	
 	/* wrap terminals in trivial nonterminals to provide them with/to expression builder methods */
 	
-	private static Nonterminal wrap(Object o) {
+	private static Nonterminal wrap0(Object o) {
 		if (o instanceof Integer)
 			return new NTTrivial((Integer) o);
 		else if (o instanceof Nonterminal)
@@ -87,7 +87,7 @@ public abstract class Nonterminal {
 		Nonterminal[] nonterminals = new Nonterminal[objects.length];
 		int i=0;
 		for (Object object : objects) {
-			nonterminals[i++] = wrap(object);
+			nonterminals[i++] = wrap0(object);
 		}
 		return nonterminals;
 	}
