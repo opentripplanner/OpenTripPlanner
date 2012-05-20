@@ -161,8 +161,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (!_searchTerminationStrategy.shouldSearchContinue(
                     rctx.origin, rctx.target, u, spt, options))
                     break;
-            // TODO LG: Provide a generic end of search condition
-            } else if (!options.batch && u_vertex == rctx.target && u.isFinal()) {
+            // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
+            } else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
                 LOG.debug("total vertices visited {}", nVisited);
                 storeMemory();
                 return spt;
