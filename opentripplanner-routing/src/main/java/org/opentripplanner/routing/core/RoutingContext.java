@@ -74,7 +74,7 @@ public class RoutingContext implements Cloneable {
      */
     public long searchAbortTime = 0;
     
-    public PathParser[] pathParsers = new PathParser[] {new BasicPathParser()};
+    public PathParser[] pathParsers = new PathParser[]{}; // { new BasicPathParser() };
     
     /* CONSTRUCTORS */
     

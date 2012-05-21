@@ -97,8 +97,10 @@ public class State implements Cloneable {
         this.stateData.tripSeqHash = 0;
         this.stateData.usingRentedBike = false;
         this.time = time;
-        this.pathParserStates = new int[options.rctx.pathParsers.length];
-        Arrays.fill(this.pathParserStates, AutomatonState.START);
+        if (options.rctx != null) {
+        	this.pathParserStates = new int[options.rctx.pathParsers.length];
+        	Arrays.fill(this.pathParserStates, AutomatonState.START);
+        }
     }
 
     /**

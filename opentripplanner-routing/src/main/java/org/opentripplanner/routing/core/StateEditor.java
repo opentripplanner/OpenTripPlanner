@@ -457,7 +457,10 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
+    /** return true if all PathParsers advanced to a state other than REJECT */
 	public boolean parsePath(State state) {
+		if (state.stateData.opt.rctx == null)
+			return true; // a lot of tests don't set a routing context
 		PathParser[] parsers = state.stateData.opt.rctx.pathParsers;
 		int[] parserStates = state.pathParserStates; 
 		boolean accept = true;
