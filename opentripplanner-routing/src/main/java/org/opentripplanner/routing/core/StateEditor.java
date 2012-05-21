@@ -13,16 +13,19 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +145,8 @@ public class StateEditor {
                 return null;
             }
         }
+        if ( ! parsePath(this.child))
+        	return null;
         spawned = true;
         return child;
     }
@@ -452,10 +457,35 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
-//    public void setTraverseOptions(TraverseOptions options) {
-//        child.stateData.options = options;
-//        traversingBackward = options.isArriveBy();
-//    }
+    /** return true if all PathParsers advanced to a state other than REJECT */
+	public boolean parsePath(State state) {
+		if (state.stateData.opt.rctx == null)
+			return true; // a lot of tests don't set a routing context
+		PathParser[] parsers = state.stateData.opt.rctx.pathParsers;
+		int[] parserStates = state.pathParserStates; 
+		boolean accept = true;
+		boolean modified = false;
+		int i = 0;
+		for (PathParser parser : parsers) {
+			int terminal = parser.terminalFor(state);
+			int oldState = parserStates[i];
+			int newState = parser.transition(oldState, terminal);
+			if (newState != oldState) {
+				if ( ! modified) {
+					// clone the state array so only the new state will see modifications
+					parserStates = parserStates.clone();
+					modified = true;
+				}
+				parserStates[i] = newState;
+				if (newState == AutomatonState.REJECT)
+					accept = false;
+			}
+			i++;
+		}
+		if (modified)
+			state.pathParserStates = parserStates;
+		return accept;
+	}
 
     public void alightTransit() {
         cloneStateDataAsNeeded();

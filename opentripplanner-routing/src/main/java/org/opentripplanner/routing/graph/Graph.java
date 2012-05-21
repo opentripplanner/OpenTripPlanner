@@ -317,8 +317,13 @@ public class Graph implements Serializable {
         return load(in, level);
     }
 
+    public static Graph load(InputStream is, LoadLevel level) 
+    	throws ClassNotFoundException, IOException {
+    	return load(new ObjectInputStream(is), level);
+    }
+
     @SuppressWarnings("unchecked")
-    private static Graph load(ObjectInputStream in, LoadLevel level) 
+	private static Graph load(ObjectInputStream in, LoadLevel level) 
         throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();

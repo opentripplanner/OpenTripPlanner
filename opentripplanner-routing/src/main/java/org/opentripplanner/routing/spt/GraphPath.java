@@ -272,6 +272,14 @@ public class GraphPath {
         System.out.println(" --- END GRAPHPATH DUMP ---");
     }
 
+    public void dumpPathParser() {
+        System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
+        System.out.println(this.toString());
+        for (State s : states) 
+            System.out.println(s.getPathParserStates() + s + " via " + s.getBackEdge());
+        System.out.println(" --- END GRAPHPATH DUMP ---");
+    }
+
     public double getWalkDistance() {
         return walkDistance;
     }

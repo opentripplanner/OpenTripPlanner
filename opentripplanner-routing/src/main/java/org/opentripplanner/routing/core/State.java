@@ -13,14 +13,17 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.PathParser;
 
 public class State implements Cloneable {
 
@@ -53,6 +56,9 @@ public class State implements Cloneable {
     // how far have we walked
     protected double walkDistance;
 
+    // track the states of all path parsers -- probably changes frequently
+    protected int[] pathParserStates;
+    
     /* CONSTRUCTORS */
 
     /**
@@ -91,6 +97,10 @@ public class State implements Cloneable {
         this.stateData.tripSeqHash = 0;
         this.stateData.usingRentedBike = false;
         this.time = time;
+        if (options.rctx != null) {
+        	this.pathParserStates = new int[options.rctx.pathParsers.length];
+        	Arrays.fill(this.pathParserStates, AutomatonState.START);
+        }
     }
 
     /**
@@ -436,5 +446,22 @@ public class State implements Cloneable {
         }
         return foundAlternatePaths;
     }
+    
+    public boolean allPathParsersAccept() {
+    	PathParser[] parsers = this.stateData.opt.rctx.pathParsers;
+    	for (int i = 0; i < parsers.length; i++)
+    		if ( ! parsers[i].accepts(pathParserStates[i]))
+    			return false;
+    	return true;
+	}
+    		
+	public String getPathParserStates() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("( ");
+		for (int i : pathParserStates)
+			sb.append(String.format("%02d ", i));
+		sb.append(")");
+		return sb.toString();
+	}
 
 }

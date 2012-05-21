@@ -18,6 +18,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -72,6 +74,7 @@ public class RoutingContext implements Cloneable {
      */
     public long searchAbortTime = 0;
     
+    public PathParser[] pathParsers = new PathParser[]{}; // { new BasicPathParser() };
     
     /* CONSTRUCTORS */
     

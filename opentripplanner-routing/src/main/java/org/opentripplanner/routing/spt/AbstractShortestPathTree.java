@@ -50,7 +50,7 @@ public abstract class AbstractShortestPathTree implements ShortestPathTree {
             return Collections.emptyList();
         List<GraphPath> ret = new LinkedList<GraphPath>();
         for (State s : stateList) {
-            if (s.isFinal())
+            if (s.isFinal() && s.allPathParsersAccept())
                 ret.add(new GraphPath(s, optimize));
         }
         return ret;
