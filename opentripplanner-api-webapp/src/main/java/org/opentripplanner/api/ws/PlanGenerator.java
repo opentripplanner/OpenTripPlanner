@@ -337,6 +337,7 @@ public class PlanGenerator {
                         LOG.error("leg unexpectedly not null (boarding loop)");
                     } else {
                         leg = makeLeg(itinerary, state);
+                        leg.stop = new ArrayList<Place>();
                         itinerary.transfers++;
                         leg.boardRule = (String) state.getExtension("boardAlightRule");
                     }
@@ -377,6 +378,7 @@ public class PlanGenerator {
                         // interline dwell
                         finalizeLeg(leg, state, null, -1, -1, coordinates);
                         leg = makeLeg(itinerary, state);
+                        leg.stop = new ArrayList<Place>();
                         fixupTransitLeg(leg, state, transitIndex);
                         leg.startTime = makeCalendar(state);
                         leg.interlineWithPreviousLeg = true;
