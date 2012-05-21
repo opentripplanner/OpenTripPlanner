@@ -90,7 +90,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
             s1.setZone(getStartStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
-        s1.setRoute(pattern.getExemplar().getRoute().getId());
+        //s1.setRoute(pattern.getExemplar().getRoute().getId());
         s1.incrementWeight(runningTime);
         return s1.makeState();
     }

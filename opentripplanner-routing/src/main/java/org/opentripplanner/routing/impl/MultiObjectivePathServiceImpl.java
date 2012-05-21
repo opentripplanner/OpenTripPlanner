@@ -287,7 +287,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
     // TODO: move into an epsilon-dominance shortest path tree
     private boolean eDominates(State s0, State s1) {
         final double EPSILON = 0.05;
-        if (s0.similarTripSeq(s1)) {
+        if (s0.similarRouteSequence(s1)) {
             return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
                     s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
                     s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 

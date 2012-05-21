@@ -16,6 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -53,7 +54,7 @@ public class StateData implements Cloneable {
 
     protected NoThruTrafficState noThruTrafficState = NoThruTrafficState.INIT;
 
-    protected int tripSeqHash;
+    protected AgencyAndId[] routeSequence;
 
     protected HashMap<Object, Object> extensions;
 
