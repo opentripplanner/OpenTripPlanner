@@ -19,6 +19,8 @@ import java.util.HashMap;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -38,6 +40,7 @@ public class NetworkLinker {
     public NetworkLinker(Graph graph, HashMap<Class<?>,Object> extra) {
         this.graph = graph;
         this.networkLinkerLibrary = new NetworkLinkerLibrary(graph, extra);
+        networkLinkerLibrary.options = new RoutingRequest(TraverseMode.BICYCLE);
     }
 
     public NetworkLinker(Graph graph) {
