@@ -415,7 +415,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
             for (StreetEdge e : nearbyEdges) {
-                if (e == null || e instanceof OutEdge)
+                if (e == null || e instanceof OutEdge || e.getFromVertex() == null)
                     continue;
                 if (options != null && 
                    (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
