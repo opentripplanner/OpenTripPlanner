@@ -213,8 +213,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     }
 
     public int getRunningTime(int stopIndex, int trip) {
-        int[] stopRunningTimes = runningTimes[stopIndex];
-        return stopRunningTimes[trip];
+        return getArrivalTime(stopIndex, trip) - getDepartureTime(stopIndex, trip);
     }
 
     public int getDepartureTime(int stopIndex, int trip) {
@@ -259,18 +258,18 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     }
 
     public int getArrivalTime(int stopIndex, int trip) {
-        int[][] arrivals = arrivalTimes;
-        if (arrivals == null) {
-            arrivals = departureTimes;
-            stopIndex += 1;
-        }
-        int[] stopArrivalTimes = arrivals[stopIndex];
+        // array indexes are actually _hop_ indexes, not stop indexes; 0 refers to the hop between stops 0 and 1.
+        if (arrivalTimes == null)
+            return getDepartureTime(stopIndex + 1, trip);
+        // could also leave some rows null, only create them when needed (sparse table)
+        int[] stopArrivalTimes = arrivalTimes[stopIndex];
         return stopArrivalTimes[trip];
     }
 
     public int getDwellTime(int stopIndex, int trip) {
-        int[] stopDwellTimes = dwellTimes[stopIndex];
-        return stopDwellTimes[trip];
+        int arrivalTime = getArrivalTime(stopIndex - 1, trip);
+        int departureTime = getDepartureTime(stopIndex, trip);
+        return departureTime - arrivalTime;
     }
 
     public Iterator<Integer> getDepartureTimes(int stopIndex) {
