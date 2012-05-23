@@ -105,10 +105,11 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
                 Resource resource = resourceLoader.getResource(resourceName.concat("/Graph.obj"));
                 is = resource.getInputStream();
             } catch (Exception e) {
-                LOG.warn("graph file not found at {}", resourceName);
+                LOG.warn("graph file not found or not openable at {}", resourceName);
                 if (routerId.equals(defaultRouterId)) {
-                    LOG.warn("graph for default routerId {} does not exist at {}", routerId,
-                            resourceName);
+                    LOG.warn("graph for default routerId {} does not exist or cannot be opened at {}",
+                             routerId, resourceName);
+                    e.printStackTrace();
                     return null;
                 }
                 return getGraph(null); // fall back on default if graph does not exist
