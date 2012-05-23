@@ -1087,6 +1087,10 @@ textarea {
     z-index:2;
     position:relative;
 }
+[dir=rtl] .x-form-item label.x-form-item-label {
+    float:right;
+    clear:right;
+}
 
 .x-form-element {
     padding-left:105px;
@@ -1107,6 +1111,14 @@ textarea {
 
 .x-form-label-right label.x-form-item-label {
    text-align:right;
+}
+
+[dir=rtl] .x-form-label-left label.x-form-item-label {
+   text-align:right;
+}
+
+[dir=rtl] .x-form-label-right label.x-form-item-label {
+   text-align:left;
 }
 
 .x-form-label-top .x-form-item label.x-form-item-label {
@@ -4761,7 +4773,9 @@ body.ext-ie6.x-body-masked .x-window select {
     overflow:hidden;
     zoom:1;
 }
-
+[dir=rtl] .x-column {
+    float:right;
+}
 .x-column-inner {
     overflow:hidden;
     zoom:1;

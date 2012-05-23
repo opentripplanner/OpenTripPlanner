@@ -5,6 +5,10 @@ background: #81bee7 !important;
 div.olMapViewport {
 z-index: 0;
 }
+[dir=rtl] div.olMapViewport {
+	text-align:right;
+}
+
 
 div.olControlScale {
 right: 3px;
@@ -161,6 +165,9 @@ background-image: url(images/ui/buttons/systemmap.png)!important;
     font-family: arial, sans serif;
     font-size: 13px;    
 }
+[dir=rtl] .dir-alt-route-inner {
+    padding: 2px 20px 2px 4px;
+}
 
 #trip-details {
   border: 1px solid #4c4c4c;
@@ -169,10 +176,17 @@ background-image: url(images/ui/buttons/systemmap.png)!important;
   padding: 10px 0 10px 10px;
 }
 
+[dir=rtl] #trip-details {
+  padding: 10px 10px 10px 0;
+}
+
 #trip-details table td {
   font: 80%/120% "Helvetica Neue", Arial, Helvetica, sans-serif;
   vertical-align: top;
   padding: 0 8px 2px 0;
+}
+[dir=rtl] #trip-details table td {
+  padding: 0 0 2px 8px;
 }
 
 #trip-details h3 {
@@ -241,6 +255,10 @@ padding: 8px;
     padding-left: 2em !important;
     font-size: 0.9em;
  }
+[dir=rtl] #tripplanner-panel .itiny ol.steps {
+    padding-left: 0 !important;
+    padding-right: 2em !important;
+}
  
  #tripplanner-panel .itiny ol.steps li {
      list-style-type: decimal !important;
@@ -277,7 +295,9 @@ strong {
     background-color: transparent !important;
     overflow: visible !important;
 }
-
+[dir=rtl] .mapTooltipPopup {
+    padding: 2px 11px 0 0 !important;
+}
 .mapTooltipPopup img {
     top: 4px;
 }
@@ -293,6 +313,9 @@ strong {
     position: relative;
     background-color: transparent !important;
     overflow: visible !important;
+}
+[dir=rtl] .mapStreetviewPopup {
+    padding: 21px 17px 0 0 !important;
 }
 
 #mapStreetviewPopup .olPopupCloseBox {
@@ -346,8 +369,15 @@ p.alert {
     padding: 4px 10px 4px 2px !important;
     font: 90%/100% Arial, Helvetica, sans-serif;
 }
+[dir=rtl] p.alert {
+    padding: 4px 2px 4px 10px !important;
+}
 p.alert img {
     padding-left:-2px;
+}
+[dir=rtl] p.alert img {
+    padding-left:0;
+    padding-right:2px;
 }
 
 .duration {
@@ -435,6 +465,10 @@ margin: 0 7px 0 0 !important;
 
 img.x-tree-ec-icon {
 margin: 0 7px 0 0 !important;
+}
+[dir=rtl] img.x-tree-node-icon,
+[dir=rtl] img.x-tree-ec-icon {
+margin: 0 0 0 7px !important;
 }
 
 .x-tree-node-indent {
@@ -555,6 +589,10 @@ border-top: 1px solid #808080;
 vertical-align: middle;
 margin: 0;
 }
+[dir=rtl] .itiny, .itiny-note {
+	padding-left: 0;
+	padding-right: 7px;
+}
 
 .itiny .x-tree-ec-icon {
 display: none;
@@ -570,27 +608,36 @@ min-height: 16px!important;
 vertical-align: middle;
 margin: 0;
 }
-
+[dir=rtl] .itiny-steps {
+	padding-left: 0;
+	padding-right: 10px;
+}
 .itiny-inline-icon {
 float: left;
 width: 21px !important;
 height: 21px !important;
 }
-
+[dir=rtl] .itiny-inline-icon {
+float: right;
+}
 /* IMPORTANT (don't delete: itiny-step-icon is a duplicate to inline here, but not so for printing */
 .itiny-step-icon {
 float: left;
 width: 21px !important;
 height: 21px !important;
 }
-
+[dir=rtl] .itiny-step-icon {
+float: right;
+}
 .popup-route-icon {
 float: left;
 height: 18px;
 width: 18px;
 margin: 0 5 0 0;
 }
-
+[dir=rtl] .popup-route-icon {
+float: right;
+}
 .new-tab {
 background-image: url(images/ui/trip/triangle.png)!important;
 }
@@ -663,6 +710,25 @@ float: left;
 float: left;
 }
 
+[dir=rtl] .start-icon,
+[dir=rtl] .itinys-icon,
+[dir=rtl] .start-icon,
+[dir=rtl] .end-icon, 
+[dir=rtl] .caution-icon,
+[dir=rtl] .busish-icon,[dir=rtl] .bus-icon,
+[dir=rtl] .subway-icon,[dir=rtl] .transit-icon,
+[dir=rtl] .ltrail-icon,[dir=rtl] .light_trail-icon,
+[dir=rtl] .commuter-icon, [dir=rtl] .rail-icon, [dir=rtl] .commrail-icon, [dir=rtl] .trainish-icon,
+[dir=rtl] .funicular-icon, [dir=rtl] .gondola-icon,
+[dir=rtl] .tram-icon, [dir=rtl] .streetcar-icon,
+[dir=rtl] .cable_car-icon,[dir=rtl] .trolley-icon,
+[dir=rtl] .walk-icon,
+[dir=rtl] .bike-icon, [dir=rtl] .bicycle-icon,
+[dir=rtl] .plane-icon, 
+[dir=rtl] .x-tree-elbow-minus, [dir=rtl] .x-tree-elbow-plus {
+	float: right;
+}
+
 .x-tree-no-lines .x-tree-elbow-minus {
 vertical-align: top;
 background-position: 1pt 50%;
@@ -694,7 +760,10 @@ color: #000;
 padding-left: 20px;
 background: transparent url(images/ui/bg.gif) no-repeat 0 2px;
 }
-
+[dir=rtl] .x-grid3-td-title .topic {
+	padding-left: 0;
+	padding-right: 20px;
+}
 .x-grid3-td-title .x-grid3-cell-inner {
 white-space: normal;
 }
@@ -772,6 +841,9 @@ font-weight: 400;
 color: #555;
 float: right;
 }
+[dir=rtl] .preview .x-panel-body span.post-date {
+float: left;
+}
 
 .preview .x-panel-body div.post-data {
 background: #FFF;
@@ -805,6 +877,9 @@ float: right;
 margin-right: 4px;
 padding: 3px;
 }
+[dir=rtl] #suggested a {
+float: left;
+}
 
 #suggested a:hover {
 text-decoration: underline;
@@ -826,12 +901,18 @@ color: #777;
 font-style: normal;
 float: left;
 }
+[dir=rtl] .x-combo-list-item strong {
+float: left;
+}
 
 .x-combo-list-item em {
 color: #222;
 font-style: normal;
 float: left;
 width: 325px;
+}
+[dir=rtl] .x-combo-list-item em {
+float: right;
 }
 
 .x-node-ctx {
@@ -1012,4 +1093,8 @@ See http://opentripplanner.org/ticket/257
 ***---------------------------------------------------------------*/
 .ext-chrome .x-date-picker {
     width: 185px;
+}
+
+[dir=rtl] .disclaimer {
+	padding-right:5px;
 }

@@ -147,7 +147,7 @@ otp.core.UI = {
 
             this.west   = new Ext.Panel({
                 layout:       'accordion',
-                region:       'west',
+                region:       'east',
                 id:           'west-panel',
                 header:       false,
                 width:        360,
