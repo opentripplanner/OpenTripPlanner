@@ -179,6 +179,8 @@ public class StreetLocation extends AbstractVertex {
 
             FreeEdge free = new FreeEdge(fromv, newFrom);
             TurnEdge incoming = new TurnEdge(newFrom, location);
+            base.extra.add(free);
+            base.extra.add(incoming);
 
         }
         Vertex tov = street.getToVertex();
