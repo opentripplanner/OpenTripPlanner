@@ -23,6 +23,7 @@ otp.locale.Hebrew = {
     config :
     {
         metricsSystem : "international",
+        rtl           : true,
         rightClickMsg : "יש ללחוץ על המפה במקש ימני כדי להקצות את נקודות ההתחלה והסיום של המסלול שלך.",
         attribution   : {
             title   : "אודות האתר",
@@ -246,7 +247,7 @@ otp.locale.Hebrew = {
         // see otp/planner/*.js for where these values are used
         labels : 
         {
-            panelTitle    : "מתכנן המסלול",
+            panelTitle    : "מתכנן המסלולים",
             tabTitle      : "תכנון מסלול",
             inputTitle    : "פרטי המסלול",
             optTitle      : "העדפות המסלול (רשות)",
@@ -260,11 +261,11 @@ otp.locale.Hebrew = {
             to            : "למיקום",
             toHere        : "לכאן",
             intermediate  : "נקודות ביניים",
-            minimize      : "נא להציג לי את",
+            minimize      : "סוג המסלול",
             maxWalkDistance: "הליכה מרבית",
             maxBikeDistance: "רכיבה מרבית",
             arriveDepart  : "הגעה עד/יציאה ב",
-            mode          : "טיול באמצעות",
+            mode          : "אמצעי תחבורה",
             wheelchair    : "מסלול נגיש לכיסא גלגלים", 
             go            : "לדרך",
             planTrip      : "תכנון המסלול שלך",
