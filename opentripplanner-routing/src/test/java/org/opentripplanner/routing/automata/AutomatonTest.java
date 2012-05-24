@@ -1,19 +1,26 @@
 package org.opentripplanner.routing.automata;
 
 import static org.opentripplanner.routing.automata.Nonterminal.*;
+import junit.framework.TestCase;
 
-public class AutomatonTest {
+public class AutomatonTest extends TestCase {
 
     static final int WALK = 0;
     static final int STATION = 1;
     static final int TRANSIT = 2;
+    
     static final int NONTHRU = 0;
     static final int THRU = 1;
 
-    public static void main(String[] args) {
+    private Nonterminal itinerary;
+    
+    public void setUp() {
         Nonterminal walkLeg = plus(WALK);
         Nonterminal transitLeg = plus(plus(STATION), plus(TRANSIT), plus(STATION));
-        Nonterminal itinerary = seq(walkLeg, star(transitLeg, walkLeg));
+        itinerary = seq(walkLeg, star(transitLeg, walkLeg));
+    }
+    
+    public void testAutomata() {
         // NFA nfa = seq(WALK, STATION, choice(TRANSIT, WALK), STATION, WALK).toNFA();
         // NFA nfa = seq(WALK, STATION, star(TRANSIT), STATION, WALK).toNFA();
         // NFA nfa = new NTKleenePlus(new NTTrivial(TRANSIT)).toNFA();
@@ -45,18 +52,17 @@ public class AutomatonTest {
     }
 
     private static void testParse(DFA dfa) {
-        testParse(dfa, WALK, WALK, WALK, WALK, WALK, WALK, WALK);
-        testParse(dfa, WALK, STATION, TRANSIT, STATION, WALK, WALK, WALK);
-        testParse(dfa, WALK, STATION, TRANSIT, STATION, STATION, TRANSIT, STATION, WALK);
-        testParse(dfa, WALK, WALK, STATION, STATION, STATION, WALK, WALK);
+        testParse(dfa, true, WALK, WALK, WALK, WALK, WALK, WALK, WALK);
+        testParse(dfa, true, WALK, STATION, TRANSIT, STATION, WALK, WALK, WALK);
+        testParse(dfa, true, WALK, STATION, TRANSIT, STATION, STATION, TRANSIT, STATION, WALK);
+        testParse(dfa, false, WALK, WALK, STATION, STATION, STATION, WALK, WALK);
     }
 
-    private static void testParse(DFA dfa, int... symbols) {
+    private static void testParse(DFA dfa, boolean acceptable, int... symbols) {
         boolean accepted = dfa.parse(symbols);
-        for (int i : symbols) {
-            System.out.print(i + " ");
-        }
-        System.out.print(": ");
-        System.out.println(accepted);
+        if (acceptable)
+            assertTrue("DFA should accept this input.", accepted);
+        else 
+            assertFalse("DFA should reject this input.", accepted);
     }
 }
