@@ -53,9 +53,9 @@ position: absolute;
 right: 3px;
 }
 [dir=rtl] div.olControlAttribution {
-	right: auto;
-	left: 3px;
-	direction:ltr;
+right: auto;
+left: 3px;
+direction:ltr;
 }
 
 div.olControlAttribution a {
@@ -1100,6 +1100,33 @@ See http://opentripplanner.org/ticket/257
     width: 185px;
 }
 
+/* CSS RTL Overrides
+These rules fix RTL support for styles defined in external libraries
+*/
+
+/**---------------------------------------------------------------
+*** RTL override for code in xtheme-transit-extend.css
+***---------------------------------------------------------------*/
 [dir=rtl] .disclaimer {
-	padding-right:5px;
+    padding-right:5px;
+}
+
+/**---------------------------------------------------------------
+*** RTL override for code in ext-all-notheme.css
+***---------------------------------------------------------------*/
+[dir=rtl] .x-form-item label.x-form-item-label {
+    float:right;
+    clear:right;
+}
+
+[dir=rtl] .x-form-label-left label.x-form-item-label {
+   text-align:right;
+}
+
+[dir=rtl] .x-form-label-right label.x-form-item-label {
+   text-align:left;
+}
+
+[dir=rtl] .x-column {
+    float:right;
 }
