@@ -52,6 +52,11 @@ font-size: 65%;
 position: absolute;
 right: 3px;
 }
+[dir=rtl] div.olControlAttribution {
+	right: auto;
+	left: 3px;
+	direction:ltr;
+}
 
 div.olControlAttribution a {
 color: #393939;
