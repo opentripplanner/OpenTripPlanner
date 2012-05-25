@@ -96,6 +96,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             int bestWait = -1;
             int bestPatternIndex = -1;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            TraverseMode mode = state0.getNonTransitMode(options);
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -104,7 +105,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight,
-                            options.wheelchairAccessible, options.getModes().getBicycle(), false);
+                            options.wheelchairAccessible, mode == TraverseMode.BICYCLE, false);
                     if (patternIndex >= 0) {
                         Trip trip = pattern.getTrip(patternIndex);
                         while (options.bannedTrips.contains(trip.getId())) {
@@ -181,7 +182,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setZone(pattern.getZone(stopIndex + 1));
             s1.setRoute(trip.getRoute().getId());
 
-            TraverseMode mode = state0.getNonTransitMode(options);
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
