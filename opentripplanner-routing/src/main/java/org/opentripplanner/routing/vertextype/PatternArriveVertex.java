@@ -16,14 +16,14 @@ package org.opentripplanner.routing.vertextype;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
 public class PatternArriveVertex extends PatternStopVertex {
 
     private static final long serialVersionUID = 4858000141204480555L;
 
-    public PatternArriveVertex(Graph g, TripPattern tripPattern, StopTime stopTime) {
+    public PatternArriveVertex(Graph g, TableTripPattern tripPattern, StopTime stopTime) {
         super(g, makeLabel(tripPattern.getExemplar(), stopTime), tripPattern, stopTime.getStop());
     }
 

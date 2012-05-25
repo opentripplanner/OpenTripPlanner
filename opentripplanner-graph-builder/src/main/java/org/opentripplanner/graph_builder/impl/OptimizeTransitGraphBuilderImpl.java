@@ -21,7 +21,7 @@ import java.util.List;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.PatternEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -45,7 +45,7 @@ public class OptimizeTransitGraphBuilderImpl implements GraphBuilder {
             for (Edge e: v.getOutgoing()) {
                 if (e instanceof PatternEdge) {
                     PatternEdge pe = (PatternEdge) e;
-                    TripPattern pattern = pe.getPattern();
+                    TableTripPattern pattern = pe.getPattern();
                     if (pattern instanceof BasicTripPattern) {
                         pe.setPattern(((BasicTripPattern) pattern).convertToArrayTripPattern());
                     }

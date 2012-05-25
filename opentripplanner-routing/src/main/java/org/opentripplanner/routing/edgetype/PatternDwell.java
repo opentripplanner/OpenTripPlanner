@@ -35,7 +35,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
 
     private int stopIndex;
     
-    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TripPattern tripPattern) {
+    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TableTripPattern tripPattern) {
         super(from, to, tripPattern);
         this.stopIndex = stopIndex;
         this.pattern = tripPattern;
@@ -94,11 +94,11 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return "PatternDwell(" + super.toString() + ")";
     }
 
-    public void setPattern(TripPattern pattern) {
+    public void setPattern(TableTripPattern pattern) {
         this.pattern = pattern;
     }
 
-    public TripPattern getPattern() {
+    public TableTripPattern getPattern() {
         return pattern;
     }
 

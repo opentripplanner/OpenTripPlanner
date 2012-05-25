@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 
 /**
@@ -62,7 +63,7 @@ class IntArrayIterator implements Iterator<Integer> {
 /**
  * A memory-efficient implementation of TripPattern
  */
-public class ArrayTripPattern implements TripPattern, Serializable {
+public class ArrayTripPattern implements TableTripPattern, Serializable {
 
     private static final long serialVersionUID = -1283975534796913802L;
 
@@ -346,5 +347,10 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     @Override
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    }
+
+    @Override
+    public List<Stop> getStops() {
+        throw new UnsupportedOperationException();
     }
 }

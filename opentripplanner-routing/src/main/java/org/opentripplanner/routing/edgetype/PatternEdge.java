@@ -23,20 +23,20 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
  */
 public abstract class PatternEdge extends AbstractEdge {
 
-    protected TripPattern pattern;
+    protected TableTripPattern pattern;
 
     private static final long serialVersionUID = 1L;
 
-    public PatternEdge(TransitVertex fromv, TransitVertex tov, TripPattern pattern) {
+    public PatternEdge(TransitVertex fromv, TransitVertex tov, TableTripPattern pattern) {
         super(fromv, tov);
         this.pattern = pattern;
     }
 
-    public TripPattern getPattern() {
+    public TableTripPattern getPattern() {
         return pattern;
     }
 
-    public void setPattern(TripPattern pattern) {
+    public void setPattern(TableTripPattern pattern) {
         this.pattern = pattern;
     }
 }

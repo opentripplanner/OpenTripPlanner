@@ -63,7 +63,7 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -424,11 +424,11 @@ public class GTFSPatternHopFactory {
                         addTripToInterliningMap(trip, stopTimes, tripPattern);
                     }
                     tripPattern.setTripFlags(insertionPoint,
-                            ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE
+                            ((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE
                                     : 0)
                                     | (((trip.getRoute().getBikesAllowed() == 2 && trip
                                     .getTripBikesAllowed() != 1) || trip
-                                    .getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED
+                                    .getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED
                                             : 0));
                 }
             }
@@ -507,14 +507,17 @@ public class GTFSPatternHopFactory {
         TransitVertex psv0depart;
         ArrayList<Edge> createdEdges = new ArrayList<Edge>();
         ArrayList<Vertex> createdVertices = new ArrayList<Vertex>();
-        
+        List<Stop> stops = new ArrayList<Stop>();
         int offset = stopTimes.get(0).getDepartureTime();
-        for (i = 0; i < lastStop; i++) {           
+        for (i = 0; i < lastStop; i++) {    
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
+            stops.add(s0);
             st1 = stopTimes.get(i + 1);
             Stop s1 = st1.getStop();
-
+            if (i == lastStop - 1)
+                stops.add(s1);
+            
             int arrivalTime = st1.getArrivalTime() - offset;
             int departureTime = st0.getDepartureTime() - offset;
 
@@ -578,9 +581,11 @@ public class GTFSPatternHopFactory {
             createdEdges.add(alight);
         }
 
-        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+        pattern.setStops(stops);
+
+        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
         | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-            || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
+            || trip.getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED : 0));
 
         return pattern;
     }
@@ -904,9 +909,9 @@ public class GTFSPatternHopFactory {
         }
 
         tripPattern.setTripFlags(0, 
-                                ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+                                ((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
                                 | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-                                    || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
+                                    || trip.getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED : 0));
 
         return tripPattern;
     }

@@ -13,28 +13,23 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.BasicTripPattern;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -90,6 +85,10 @@ public class LocalStopFinder {
             for (Edge e : gv.getOutgoing()) {
                 if (e instanceof PatternBoard) {
                     TripPattern pattern = ((PatternBoard) e).getPattern();
+                    patterns.add(pattern);
+                }
+                if (e instanceof FrequencyBoard) {
+                    TripPattern pattern = ((FrequencyBoard) e).getPattern();
                     patterns.add(pattern);
                 }
             }
@@ -337,7 +336,7 @@ public class LocalStopFinder {
     }
 
     private List<Stop> getStops(TripPattern pattern) {
-        return ((BasicTripPattern) pattern).stops;
+        return pattern.getStops();
     }
 
 }

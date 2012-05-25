@@ -31,7 +31,7 @@ import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 /**
  * A simple implementation of TripPattern that's convenient for graph building, but slow and memory-hogging.
  */
-public final class BasicTripPattern implements Serializable, TripPattern {
+public final class BasicTripPattern implements Serializable, TableTripPattern {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,8 +58,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
 
     public ArrayList<Stop> stops;
 
-	private ArrayList<String>[] headsigns;
-    
+    private ArrayList<String>[] headsigns;
+
     @SuppressWarnings("unchecked")
     public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes) {
         this.exemplar = exemplar;
@@ -447,4 +447,8 @@ public final class BasicTripPattern implements Serializable, TripPattern {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
 
+    @Override
+    public List<Stop> getStops() {
+        return stops;
+    }
 }

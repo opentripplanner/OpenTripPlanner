@@ -68,7 +68,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -146,7 +146,7 @@ class TripPatternListModel extends AbstractListModel {
 
     ArrayList<String> departureTimes = new ArrayList<String>();
 
-    public TripPatternListModel(TripPattern pattern, int stopIndex) {
+    public TripPatternListModel(TableTripPattern pattern, int stopIndex) {
     	Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
     	while (departureTimeIterator.hasNext()) {
     	    int dt = departureTimeIterator.next();
@@ -530,7 +530,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 metadataList.revalidate();
                 
                 // figure out the pattern, if any
-                TripPattern pattern = null;
+                TableTripPattern pattern = null;
                 int stopIndex = 0;
                 if (selected instanceof PatternBoard) {
                     PatternBoard boardEdge = (PatternBoard) selected;

@@ -20,10 +20,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.onebusaway.gtfs.model.Frequency;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.T2;
 
-public class FrequencyBasedTripPattern implements Serializable {
+public class FrequencyBasedTripPattern implements Serializable, TripPattern {
 
     private static final long serialVersionUID = -5392197874345648815L;
 
@@ -64,6 +65,8 @@ public class FrequencyBasedTripPattern implements Serializable {
     @XmlElement
     private int[] perStopFlags;
 
+    private transient List<Stop> stops;
+    
     boolean exact;
 
     public FrequencyBasedTripPattern(Trip trip, int size) {
@@ -84,19 +87,19 @@ public class FrequencyBasedTripPattern implements Serializable {
 
     public int getNextDepartureTime(int stopIndex, int afterTime, boolean wheelchairAccessible,
             boolean bikesAllowed, boolean pickup) {
-        int mask = pickup ? TripPattern.MASK_PICKUP : TripPattern.MASK_DROPOFF;
-        int shift = pickup ? TripPattern.SHIFT_PICKUP : TripPattern.SHIFT_DROPOFF;
-        if ((perStopFlags[stopIndex] & mask) >> shift == TripPattern.NO_PICKUP) {
+        int mask = pickup ? TableTripPattern.MASK_PICKUP : TableTripPattern.MASK_DROPOFF;
+        int shift = pickup ? TableTripPattern.SHIFT_PICKUP : TableTripPattern.SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex] & mask) >> shift == TableTripPattern.NO_PICKUP) {
             return -1;
         }
         if (wheelchairAccessible
-                && (perStopFlags[stopIndex] & TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+                && (perStopFlags[stopIndex] & TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return -1;
         }
 
         if (wheelchairAccessible || bikesAllowed) {
-            int flags = (bikesAllowed ? TripPattern.FLAG_BIKES_ALLOWED : 0)
-                    | (wheelchairAccessible ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            int flags = (bikesAllowed ? TableTripPattern.FLAG_BIKES_ALLOWED : 0)
+                    | (wheelchairAccessible ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
             if ((tripFlags & flags) == 0) {
                 return -1;
             }
@@ -144,19 +147,19 @@ public class FrequencyBasedTripPattern implements Serializable {
 
     public int getPreviousArrivalTime(int stopIndex, int beforeTime,
             boolean wheelchairAccessible, boolean bikesAllowed, boolean pickup) {
-        int mask = pickup ? TripPattern.MASK_PICKUP : TripPattern.MASK_DROPOFF;
-        int shift = pickup ? TripPattern.SHIFT_PICKUP : TripPattern.SHIFT_DROPOFF;
-        if ((perStopFlags[stopIndex + 1] & mask) >> shift == TripPattern.NO_PICKUP) {
+        int mask = pickup ? TableTripPattern.MASK_PICKUP : TableTripPattern.MASK_DROPOFF;
+        int shift = pickup ? TableTripPattern.SHIFT_PICKUP : TableTripPattern.SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex + 1] & mask) >> shift == TableTripPattern.NO_PICKUP) {
             return -1;
         }
         if (wheelchairAccessible
-                && (perStopFlags[stopIndex] & TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+                && (perStopFlags[stopIndex] & TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return -1;
         }
 
         if (wheelchairAccessible || bikesAllowed) {
-            int flags = (bikesAllowed ? TripPattern.FLAG_BIKES_ALLOWED : 0)
-                    | (wheelchairAccessible ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+            int flags = (bikesAllowed ? TableTripPattern.FLAG_BIKES_ALLOWED : 0)
+                    | (wheelchairAccessible ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0);
             if ((tripFlags & flags) == 0) {
                 return -1;
             }
@@ -219,22 +222,22 @@ public class FrequencyBasedTripPattern implements Serializable {
     }
 
     public boolean getWheelchairAccessible(int stopIndex) {
-        if ((perStopFlags[stopIndex] & TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+        if ((perStopFlags[stopIndex] & TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return false;
         }
         return true;
     }
 
     public boolean getBikesAllowed(int trip) {
-        return (tripFlags & TripPattern.FLAG_BIKES_ALLOWED) != 0;
+        return (tripFlags & TableTripPattern.FLAG_BIKES_ALLOWED) != 0;
     }
 
     public boolean canAlight(int stopIndex) {
-        return getAlightType(stopIndex) != TripPattern.NO_PICKUP;
+        return getAlightType(stopIndex) != TableTripPattern.NO_PICKUP;
     }
 
     public boolean canBoard(int stopIndex) {
-        return getBoardType(stopIndex) != TripPattern.NO_PICKUP;
+        return getBoardType(stopIndex) != TableTripPattern.NO_PICKUP;
     }
 
     public String getZone(int stopIndex) {
@@ -250,11 +253,11 @@ public class FrequencyBasedTripPattern implements Serializable {
     }
 
     public int getAlightType(int stopIndex) {
-        return (perStopFlags[stopIndex] & TripPattern.MASK_DROPOFF) >> TripPattern.SHIFT_DROPOFF;
+        return (perStopFlags[stopIndex] & TableTripPattern.MASK_DROPOFF) >> TableTripPattern.SHIFT_DROPOFF;
     }
 
     public int getBoardType(int stopIndex) {
-        return (perStopFlags[stopIndex] & TripPattern.MASK_PICKUP) >> TripPattern.SHIFT_PICKUP;
+        return (perStopFlags[stopIndex] & TableTripPattern.MASK_PICKUP) >> TableTripPattern.SHIFT_PICKUP;
     }
 
     public void createRanges(List<Frequency> frequencies) {
@@ -291,6 +294,15 @@ public class FrequencyBasedTripPattern implements Serializable {
         dwellTimes[index] = dwellTime;
         headsigns[index] = headsign;
 
+    }
+
+    @Override
+    public List<Stop> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<Stop> stops) {
+        this.stops = stops;
     }
 
 }

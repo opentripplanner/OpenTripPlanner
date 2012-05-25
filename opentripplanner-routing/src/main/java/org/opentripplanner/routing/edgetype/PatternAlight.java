@@ -50,7 +50,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     private int modeMask;
 
     public PatternAlight(PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
-            TripPattern pattern, int stopIndex, TraverseMode mode) {
+            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
         super(fromPatternStop, toStationVertex, pattern);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
