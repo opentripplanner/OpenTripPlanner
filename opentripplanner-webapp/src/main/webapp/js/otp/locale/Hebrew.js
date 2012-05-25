@@ -23,6 +23,7 @@ otp.locale.Hebrew = {
     config :
     {
         metricsSystem : "international",
+        rtl           : true,
         rightClickMsg : "יש ללחוץ על המפה במקש ימני כדי להקצות את נקודות ההתחלה והסיום של המסלול שלך.",
         attribution   : {
             title   : "היקף הרישיון",
