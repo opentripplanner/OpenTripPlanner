@@ -272,13 +272,27 @@ public class StateEditor {
     }
 
     public void setZone(String zone) {
-        cloneStateDataAsNeeded();
-        child.stateData.zone = zone;
+        if (zone == null) {
+            if (child.stateData.zone != null) {
+                cloneStateDataAsNeeded();
+                child.stateData.zone = zone;
+            }
+        } else if (!zone.equals(child.stateData.zone)) {
+            cloneStateDataAsNeeded();
+            child.stateData.zone = zone;
+        }
     }
 
     public void setRoute(AgencyAndId route) {
-        cloneStateDataAsNeeded();
-        child.stateData.route = route;
+        if (route == null) {
+            if (child.stateData.route != null) {
+                cloneStateDataAsNeeded();
+                child.stateData.route = route;
+            }
+        } else if (!route.equals(child.stateData.route)) {
+            cloneStateDataAsNeeded();
+            child.stateData.route = route;
+        }
     }
 
     public void setNumBoardings(int numBoardings) {
