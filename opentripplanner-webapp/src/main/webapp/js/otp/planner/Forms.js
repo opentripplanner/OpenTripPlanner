@@ -642,7 +642,7 @@ otp.planner.StaticForms = {
         {
         }
 
-        return retVal;
+        return retVal; 
     },
 
     /**

@@ -181,6 +181,25 @@ otp.util.DateUtils = {
         return date.format(this.TIME_FORMAT_STRING);
     },
 
+    /** my own parse int, since I've seen "09" not work natively */ 
+    parseInt : function(int, defVal)
+    {
+        var retVal = defVal;
+        try
+        {
+            if(int)
+            {
+                var i = int * 1;
+                i = i * 1;
+                i = i / 1;
+                retVal = i;
+            }
+        }
+        catch(e)
+        {}
+        return retVal;
+    },
+
     /** arbitrary am/pm time string correction ... e.g., 1233pm gets formatted into 12:33pm, etc... */
     correctAmPmTimeString : function(time, format)
     {
@@ -188,16 +207,16 @@ otp.util.DateUtils = {
         time = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
 
         var h = time[1];
-        var m = parseInt(time[2]) || null;
+        var m = this.parseInt(time[2], null);
         var am = time[3];
-    
+
         if(h && h.length > 2)
         {
             if(m == null)
                 m = h.substring(h.length-2);
             h = h.substring(0, h.length-2);
         }
-        h = parseInt(h) || 12;
+        h = this.parseInt(h, 12);
         if(h > 12)
         {
             h = h % 12;
@@ -207,12 +226,30 @@ otp.util.DateUtils = {
                 am = 'p';
         }
         if(m == null || m > 59 || m < 0)
-            m = "00"
+            m = "00";
+        else if(m.length != 2 && m >= 0 && m <= 9)
+        {
+            m = "0" + m          // pad single digit number
+        }
 
-        if(am && am == 'p')
-            am = "pm"
-        else  
-            am = "am"
+        m = "" + m + "";
+        if(m.length != 2)
+            console.log("ERROR: we have problem with our minutes string:== " + m);
+
+        if(am)
+        {
+            if(am == 'p')
+                am = "pm"
+            else
+                am = "am"
+        } 
+        else
+        {
+            if(h > 6 && h < 12)
+                am = "am";
+            else
+                am = "pm";
+        }
 
         var space = "";
         if(format.toLowerCase().charAt(format.length-2) == " ")
@@ -225,7 +262,7 @@ otp.util.DateUtils = {
     parseTime : function(time, format)
     {
         var retVal = time;
-        if(format && format.toLowerCase().charAt(format.length-1) == "a")
+        if(format && format.toLowerCase().charAt(format.length-1) == "a" && format.toLowerCase().indexOf("g:i") == 0)
         {
             retVal = this.correctAmPmTimeString(time, format);
         }
