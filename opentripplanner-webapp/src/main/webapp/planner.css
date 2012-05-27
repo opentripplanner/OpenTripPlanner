@@ -116,6 +116,10 @@ background-image: url(images/ui/buttons/measure.gif)!important;
 background-image: url(images/ui/buttons/reverse.png)!important;
 }
 
+[dir=rtl] .reverse-button {
+background-image: url(images/ui/buttons/reverse_RTL.png)!important;
+}
+
 .edit-button {
 background-image: url(images/ui/buttons/edit.png)!important;
 }
@@ -664,6 +668,9 @@ width: 21px!important;
 height: 21px!important;
 padding: 0!important;
 }
+[dir=rtl] .start-icon {
+background-image: url(images/ui/trip/start_RTL.png)!important;
+}
 .itinys-icon {display: none; visibility: collapse;}
 .start-icon {background-image:url(images/ui/trip/start.png)!important;float:left;width:21px!important;height:21px!important;}
 .end-icon {background-image:url(images/ui/trip/end.png) !important;float:left;width:21px!important;height:21px!important;}
@@ -1129,4 +1136,8 @@ These rules fix RTL support for styles defined in external libraries
 
 [dir=rtl] .x-column {
     float:right;
+}
+
+[dir=rtl] .x-form-field-wrap {
+    text-align:  right;
 }
