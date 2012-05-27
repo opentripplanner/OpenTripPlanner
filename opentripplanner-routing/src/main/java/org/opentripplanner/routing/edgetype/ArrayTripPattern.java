@@ -66,20 +66,13 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     private static final long serialVersionUID = -1283975534796913802L;
 
-    /*
-     * All of these 2d arrays are [stop][trip].
-     */
     private Trip exemplar;
 
     @XmlElement
     private int[][] departureTimes;
 
-    private int[][] runningTimes;
-
     @XmlElement
     private int[][] arrivalTimes;
-
-    private int[][] dwellTimes;
 
     private String[][] headsigns;
 
@@ -102,85 +95,112 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             ArrayList<Integer>[] runningTimes, ArrayList<Integer>[] arrivalTimes,
             ArrayList<Integer>[] dwellTimes, ArrayList<String>[] headsigns, String[] zones, ArrayList<Integer> perTripFlags,
             int[] perStopFlags, ArrayList<Trip> trips) {
+        
+        int nHops  = runningTimes.length;
+        int nStops = nHops + 1;
+        int nTrips = departureTimes[0].size(); 
+        // maybe check against other incoming array sizes, or trips
+        
         this.exemplar = exemplar;
-        this.departureTimes = new int[departureTimes.length][departureTimes[0].size()];
-        this.runningTimes = new int[runningTimes.length][runningTimes[0].size()];
-        if (headsigns != null) { 
-        	this.headsigns = new String[headsigns.length][headsigns[0].size()];
-        }
+        
+        // transposing from stop-trip TO TRIP-STOP
         if (arrivalTimes == null) {
+            // if arrival times are not used, there is one extra departure storing the final arrival
+            this.departureTimes = new int[nTrips][nStops];
             this.arrivalTimes = null;
-            this.dwellTimes = null;
             this.bestDwellTimes = null;
         } else {
-            this.arrivalTimes = new int[arrivalTimes.length][arrivalTimes[0].size()];
-            this.dwellTimes = new int[dwellTimes.length][dwellTimes[0].size()];
-            this.bestDwellTimes = new int[perStopFlags.length];
+            this.departureTimes = new int[nTrips][nHops];
+            this.arrivalTimes = new int[nTrips][nHops];
+            this.bestDwellTimes = new int[nHops];
         }
-        this.zones = zones;
-        this.perTripFlags = new int[perTripFlags.size()];
-        this.perStopFlags = perStopFlags;
-        this.bestRunningTimes = new int[perStopFlags.length];
-        this.trips = new Trip[trips.size()];
 
-        for (int i = 0; i < departureTimes.length; ++i) {
-            for (int j = 0; j < departureTimes[i].size(); ++j) {
-                this.departureTimes[i][j] = departureTimes[i].get(j);
+        this.zones = zones;
+        this.perTripFlags = new int[nTrips];
+        this.perStopFlags = perStopFlags;
+        this.bestRunningTimes = new int[nHops];
+        this.trips = new Trip[nTrips];
+
+        for (int h = 0; h < departureTimes.length; ++h) {
+            for (int t = 0; t < nTrips; ++t) {
+                this.departureTimes[t][h] = departureTimes[h].get(t); // transpose
             }
         }
-        for (int i = 0; i < runningTimes.length; ++i) {
-            bestRunningTimes[i] = Integer.MAX_VALUE;
-            for (int j = 0; j < runningTimes[i].size(); ++j) {
-                this.runningTimes[i][j] = runningTimes[i].get(j);
-                if (bestRunningTimes[i] > this.runningTimes[i][j]) {
-                    bestRunningTimes[i] = this.runningTimes[i][j];
+        if (arrivalTimes != null) {
+            for (int h = 0; h < nHops; ++h) {
+                for (int t = 0; t < nTrips; ++t) {
+                    this.arrivalTimes[t][h] = arrivalTimes[h].get(t); // transpose
                 }
             }
-        }
-        if (this.arrivalTimes != null) {
-            for (int i = 0; i < arrivalTimes.length; ++i) {
-                for (int j = 0; j < arrivalTimes[i].size(); ++j) {
-                    this.arrivalTimes[i][j] = arrivalTimes[i].get(j);
-                }
-            }
-            for (int i = 0; i < dwellTimes.length; ++i) {
-                bestDwellTimes[i] = Integer.MAX_VALUE;
-                for (int j = 0; j < dwellTimes[i].size(); ++j) {
-                    this.dwellTimes[i][j] = dwellTimes[i].get(j);
-                    if (bestDwellTimes[i] > this.dwellTimes[i][j]) {
-                        bestDwellTimes[i] = this.dwellTimes[i][j];
+            for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
+                bestDwellTimes[h] = Integer.MAX_VALUE;
+                for (int t = 0; t < nTrips; ++t) {
+                    int dt = this.getDwellTime(h,  t);
+                    if (bestDwellTimes[h] > dt) {
+                        bestDwellTimes[h] = dt;
                     }
                 }
             }
         }
+        // FIXME: why is incoming running times 1 shorter than departures?
+        // because when there are no arrivals array, the last departure is actually used for an arrival 
+        for (int h = 0; h < nHops; ++h) {
+            bestRunningTimes[h] = Integer.MAX_VALUE;
+            for (int t = 0; t < nTrips; ++t) { // iterate over trip times
+                int rt = this.getRunningTime(h, t);
+                if (bestRunningTimes[h] > rt) {
+                    bestRunningTimes[h] = rt;
+                }
+            }
+        }
+
         if (headsigns != null) { 
-        	String[] nullRow = null;
-        	
-        	for (int i = 0; i < headsigns.length; ++i) {
+            // DO NOT transpose headsigns to allow repeating empty rows
+            this.headsigns = new String[nHops][nTrips]; 
+            String[] nullRow = null; 
+            // headsigns contains 1 less headsign than there are stops, because sign change is pointless at the last stop
+            for (int s = 0; s < nHops; ++s) { 
         		boolean rowIsNull = true;
-        		for (int j = 0; j < headsigns[i].size(); ++j) {
-        			this.headsigns[i][j] = headsigns[i].get(j);
-        			if (this.headsigns[i][j] != null) {
+        		for (int t = 0; t < headsigns[s].size(); ++t) {
+        			this.headsigns[s][t] = headsigns[s].get(t); 
+        			if (this.headsigns[s][t] != null) {
         				rowIsNull = false; 
         			}
         		}
         		if (rowIsNull) {
+        		    // repeat the same row object when empty row encountered
         			if (nullRow == null) {
-        				nullRow = this.headsigns[i];
+        				nullRow = this.headsigns[s];
         			} else {
-        				this.headsigns[i] = nullRow;
+        				this.headsigns[s] = nullRow;
         			}
         		}
             }
         }
-        for (int i = 0; i < perTripFlags.size(); ++i) {
-            this.perTripFlags[i] = perTripFlags.get(i);
+        for (int t = 0; t < nTrips; ++t) {
+            this.perTripFlags[t] = perTripFlags.get(t);
         }
-        for (int i = 0; i < trips.size(); ++i) {
-            this.trips[i] = trips.get(i);
+        for (int t = 0; t < nTrips; ++t) {
+            this.trips[t] = trips.get(t);
         }
     }
 
+    // based on Arrays.binarySearch source, but always returns the insertion point as a positive int
+    private int binarySearch2D(int[][] array, int col, int key, int low, int high) {
+        int mid = 0;
+        while (low <= high) {
+            mid = (low + high) >>> 1;
+            final int d = array[mid][col];
+            if (d == key)
+                return mid;
+            else if (d > key) 
+                high = mid - 1;
+            else
+                low = ++mid;
+        }
+        return mid;
+    }
+    
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
             boolean bikesAllowed, boolean pickup) {
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
@@ -191,34 +211,50 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         if (wheelchairAccessible && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return -1;
         }
-        int[] stopDepartureTimes = departureTimes[stopIndex];
-        int index = Arrays.binarySearch(stopDepartureTimes, afterTime);
-        if (index == -stopDepartureTimes.length - 1)
+
+        int tripIndex = binarySearch2D(departureTimes, stopIndex, afterTime, 0, trips.length - 1);
+        if (tripIndex == trips.length)
             return -1;
 
-        if (index < 0) {
-            index = -index - 1;
-        }
+//  unneeded because of custom binary search method
+//        if (index < 0) {
+//            index = -index - 1;
+//        }
 
         if (wheelchairAccessible || bikesAllowed) {
             int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-            while ((perTripFlags[index] & flags) == 0) {
-                index++;
-                if (index == perTripFlags.length) {
+            while ((perTripFlags[tripIndex] & flags) == 0) {
+                tripIndex++;
+                if (tripIndex == perTripFlags.length) {
                     return -1;
                 }
             }
         }
-        return index;
+        return tripIndex;
+    }
+
+    public int getDepartureTime(int hop, int trip) {
+        return departureTimes[trip][hop];
+    }
+
+    // array indexes are actually _hop_ indexes, not stop indexes; 0 refers to the hop between stops 0 and 1.
+    public int getArrivalTime(int hop, int trip) {
+        if (arrivalTimes == null)
+            return getDepartureTime(hop + 1, trip);
+        return arrivalTimes[trip][hop];
     }
 
     public int getRunningTime(int stopIndex, int trip) {
         return getArrivalTime(stopIndex, trip) - getDepartureTime(stopIndex, trip);
     }
 
-    public int getDepartureTime(int stopIndex, int trip) {
-        int[] stopDepartureTimes = departureTimes[stopIndex];
-        return stopDepartureTimes[trip];
+    public int getDwellTime(int hop, int trip) {
+        // the dwell time of a hop is the dwell time *before* that hop.
+        // Therefore it is undefined for hop 0, and at the end of a trip.
+        // see GTFSPatternHopFactory.makeTripPattern()
+        int arrivalTime = getArrivalTime(hop-1, trip);
+        int departureTime = getDepartureTime(hop, trip);
+        return departureTime - arrivalTime;
     }
 
     public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
@@ -236,40 +272,29 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             arrivals = departureTimes;
             stopIndex += 1;
         }
-        int[] stopArrivalTimes = arrivals[stopIndex];
-        int index = Arrays.binarySearch(stopArrivalTimes, beforeTime);
-        if (index == -1)
+        int tripIndex = binarySearch2D(arrivals, stopIndex, beforeTime, 0, trips.length - 1);
+        if (tripIndex == trips.length)
             return -1;
 
-        if (index < 0) {
-            index = -index - 2;
-        }
-
+        // assuming int seconds are half-open intervals in positive direction, i.e. second t refers to
+        // times in [t, t+1), there is no need to check for key equality.
+        // HOWEVER reverse-optimizing depends on this check unless you add 1 to the final time.
+        if (arrivals[tripIndex][stopIndex] != beforeTime)
+            tripIndex -= 1; 
+        
+        if (tripIndex == -1) // passed 0, no trip before the given time
+            return -1;
+        
         if (wheelchairAccessible || bikesAllowed) {
             int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-            while ((perTripFlags[index] & flags) == 0) {
-                index--;
-                if (index == -1) {
+            while ((perTripFlags[tripIndex] & flags) == 0) {
+                tripIndex--;
+                if (tripIndex == -1) {
                     return -1;
                 }
             }
         }
-        return index;
-    }
-
-    public int getArrivalTime(int stopIndex, int trip) {
-        // array indexes are actually _hop_ indexes, not stop indexes; 0 refers to the hop between stops 0 and 1.
-        if (arrivalTimes == null)
-            return getDepartureTime(stopIndex + 1, trip);
-        // could also leave some rows null, only create them when needed (sparse table)
-        int[] stopArrivalTimes = arrivalTimes[stopIndex];
-        return stopArrivalTimes[trip];
-    }
-
-    public int getDwellTime(int stopIndex, int trip) {
-        int arrivalTime = getArrivalTime(stopIndex - 1, trip);
-        int departureTime = getDepartureTime(stopIndex, trip);
-        return departureTime - arrivalTime;
+        return tripIndex;
     }
 
     public Iterator<Integer> getDepartureTimes(int stopIndex) {
@@ -346,4 +371,5 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
+
 }
