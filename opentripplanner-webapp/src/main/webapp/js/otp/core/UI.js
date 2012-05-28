@@ -53,7 +53,7 @@ otp.core.UI = {
 
         if (config.locale.config.rtl) {
             this.rtl = true;
-            Ext.get(document).set({'dir':'rtl'});
+            Ext.get(document.body).set({'dir':'rtl'});
         }
 		
         this.viewport = new Ext.Viewport({
