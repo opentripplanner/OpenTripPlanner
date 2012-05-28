@@ -9,7 +9,12 @@ import org.opentripplanner.common.MavenVersion;
 /**
  * Holds the arrival / departure times for a single trip in an ArrayTripPattern Also gets carried
  * along by States when routing to ensure that they have a consistent view of the trip when realtime
- * updates are being taken into account.
+ * updates are being taken into account. 
+ * All times are in seconds since midnight (as in GTFS). The array indexes are actually *hop* indexes,
+ * not stop indexes, in the sense that 0 refers to the hop between stops 0 and 1, so arrival 0 is actually
+ * an arrival at stop 1. 
+ * By making indexes refer to stops not hops we could reuse the departures array for arrivals, 
+ * at the cost of an extra entry. This seems more coherent to me (AMB) but would probably break things elsewhere.
  */
 public class TripTimes implements Serializable {
 
@@ -21,15 +26,12 @@ public class TripTimes implements Serializable {
     @XmlElement
     protected int[] arrivalTimes;
 
-    // by making indexes refer to stops not hops we could reuse the departures array for arrivals,
-    // at the cost of 2 extra entries
     public TripTimes(int nStops, boolean nullArrivals) {
+        // departure arrays could be 1 shorter when arrivals are present, but they are not
+        departureTimes = new int[nStops];
         if (nullArrivals) {
-            departureTimes = new int[nStops];
             arrivalTimes = null;
         } else {
-            // arrays could be 1 shorter when arrivals are present, but they are not
-            departureTimes = new int[nStops];
             arrivalTimes = new int[nStops];
         }
     }
@@ -38,8 +40,6 @@ public class TripTimes implements Serializable {
         return departureTimes[hop];
     }
 
-    // array indexes are actually _hop_ indexes, not stop indexes; 0 refers to the hop between stops
-    // 0 and 1.
     public int getArrivalTime(int hop) {
         if (arrivalTimes == null)
             return departureTimes[hop + 1];
