@@ -112,7 +112,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             long current_time = state0.getTime();
             int bestWait = -1;
             int bestPatternIndex = -1;
-            TraverseMode mode = state0.getNonTransitMode(options);
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -121,20 +120,9 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight,
-                            options.wheelchairAccessible, mode == TraverseMode.BICYCLE, true);
+                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options);
                     if (patternIndex >= 0) {
                         Trip trip = pattern.getTrip(patternIndex);
-                        while (options.bannedTrips.contains(trip.getId())) {
-                            /* trip banned, try next trip */
-                            patternIndex += 1;
-                            if (patternIndex >= pattern.getTrips().size()) {
-                                /* ran out of trips today */
-                                continue SD;
-                            }
-                            trip = pattern.getTrip(patternIndex);
-                        }
-
                         // a trip was found, index is valid, wait will be non-negative
                         int wait = (int) (sd.time(pattern.getDepartureTime(stopIndex,
                                 patternIndex)) - current_time);
@@ -146,7 +134,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                             bestPatternIndex = patternIndex;
                         }
                     }
-
                 }
             }
             if (bestWait < 0) {
@@ -205,6 +192,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
+            TraverseMode mode = state0.getNonTransitMode(options); // why is this method on State not RoutingRequest?
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             return s1.makeState();
         }

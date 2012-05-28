@@ -18,12 +18,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
  * A memory-efficient implementation of TripPattern
@@ -142,8 +145,11 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         }
     }
 
-    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
-            boolean bikesAllowed, boolean pickup) {
+    public int getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
+        boolean pickup = true;
+        boolean wheelchairAccessible = options.wheelchairAccessible;
+        boolean bikesAllowed = options.modes.getBicycle();
+        
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
         if ((perStopFlags[stopIndex] & mask) >> shift == NO_PICKUP) {
@@ -161,17 +167,22 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             TripTimes currTrip = tripTimes[i]; // grab reference in case it is swapped out by an update
             int currTime = currTrip.getDepartureTime(stopIndex);
             boolean acceptableTrip = flags == 0 ? true : (perTripFlags[i] & flags) != 0; 
-            if (currTime > afterTime && currTime < bestTime && acceptableTrip) {
+            if (currTime > afterTime && currTime < bestTime && acceptableTrip && 
+                ! options.bannedTrips.contains(trips[i].getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;
                 bestIndex = i;
             }
         }
         return bestIndex;
+
     }
 
-    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
-            boolean bikesAllowed, boolean pickup) {
+    public int getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
+        boolean pickup = false;
+        boolean wheelchairAccessible = options.wheelchairAccessible;
+        boolean bikesAllowed = options.modes.getBicycle();
+
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
         if ((perStopFlags[stopIndex + 1] & mask) >> shift == NO_PICKUP) {
@@ -189,7 +200,8 @@ public class ArrayTripPattern implements TripPattern, Serializable {
             TripTimes currTrip = tripTimes[i]; // grab reference in case it is swapped out by an update
             int currTime = currTrip.getDepartureTime(stopIndex);
             boolean acceptableTrip = flags == 0 ? true : (perTripFlags[i] & flags) != 0; 
-            if (currTime < beforeTime && currTime > bestTime && acceptableTrip) {
+            if (currTime < beforeTime && currTime > bestTime && acceptableTrip &&
+                ! options.bannedTrips.contains(trips[i].getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;
                 bestIndex = i;

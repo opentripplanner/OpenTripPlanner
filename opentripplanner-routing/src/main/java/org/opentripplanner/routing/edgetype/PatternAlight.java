@@ -103,20 +103,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight,
-                            options.wheelchairAccessible, options.getModes().getBicycle(), false);
+                    int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options);
                     if (patternIndex >= 0) {
                         Trip trip = pattern.getTrip(patternIndex);
-                        while (options.bannedTrips.contains(trip.getId())) {
-                            /* trip banned, try previous trip */
-                            patternIndex -= 1;
-                            if (patternIndex < 0) {
-                                /* ran out of trips today */
-                                continue SD;
-                            }
-                            trip = pattern.getTrip(patternIndex);
-                        }
-
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting
                         // should be expressed as non-negative.
@@ -181,7 +170,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setZone(pattern.getZone(stopIndex + 1));
             s1.setRoute(trip.getRoute().getId());
 
-            TraverseMode mode = state0.getNonTransitMode(options);
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
@@ -189,6 +177,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
+            TraverseMode mode = state0.getNonTransitMode(options);
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             return s1.makeState();
 

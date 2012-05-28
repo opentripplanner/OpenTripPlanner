@@ -15,8 +15,11 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
  * Represents a class of trips distinguished by service id and list of stops. For each stop, there
@@ -44,8 +47,7 @@ public interface TripPattern {
      * 
      * @param pickup whether the stop must be one that picks up passengers 
      */
-    public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
-            boolean bikesAllowed, boolean pickup);
+    public int getNextTrip(int stopIndex, int afterTime, RoutingRequest options);
 
     /** Gets the running time after a given stop on a given trip */
     public int getRunningTime(int stopIndex, int tripIndex);
@@ -57,8 +59,7 @@ public interface TripPattern {
      * 
      * @param pickup whether the stop must be one that picks up passengers
      */
-    public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
-            boolean bikesAllowed, boolean pickup);
+    public int getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options);
 
     /** Gets the arrival time for a given stop on a given trip */
     public int getArrivalTime(int stopIndex, int trip);
